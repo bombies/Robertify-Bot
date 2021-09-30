@@ -1,4 +1,4 @@
-package main.commands.commands;
+package main.commands.commands.misc;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;

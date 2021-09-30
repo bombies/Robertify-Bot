@@ -5,6 +5,9 @@ import main.commands.CommandManager;
 import main.constants.ENV;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
+import main.utils.json.JSONConfig;
+import main.utils.json.permissions.PermissionsConfig;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.Event;
@@ -27,13 +30,22 @@ public class Listener extends ListenerAdapter {
         manager = new CommandManager();
     }
 
+    @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        JSONConfig.initDirectory();
+        PermissionsConfig permConfig = new PermissionsConfig();
+
+        permConfig.initConfig();
+
         for (Guild g : new BotUtils().getGuilds()) {
+            permConfig.initGuild(g.getId());
             LOGGER.info("Guild: {}", g.getName());
         }
 
         ServerUtils.initPrefixMap();
+
+        Robertify.api.getPresence().setPresence(Activity.listening("-help"), true);
     }
 
     @Override
@@ -56,12 +68,16 @@ public class Listener extends ListenerAdapter {
         }
     }
 
+    @SneakyThrows
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
 
         BotUtils botUtils = new BotUtils();
-        botUtils.addGuild(guild.getIdLong());
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
+
+        botUtils.addGuild(guild.getIdLong()).closeConnection();
+        permissionsConfig.initGuild(guild.getId());
 
         LOGGER.info("Joined {}", guild.getName());
 
@@ -73,9 +89,10 @@ public class Listener extends ListenerAdapter {
         Guild guild = event.getGuild();
 
         BotUtils botUtils = new BotUtils();
-        botUtils.removeGuild(guild.getIdLong());
+        botUtils.removeGuild(guild.getIdLong()).closeConnection();
 
         LOGGER.info("Left {}", guild.getName());
+
 
     }
 }

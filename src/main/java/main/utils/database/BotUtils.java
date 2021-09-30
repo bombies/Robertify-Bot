@@ -22,13 +22,14 @@ public class BotUtils extends DatabaseUtils{
      * @param gid ID of the guild
      */
     @SneakyThrows
-    public void addGuild(long gid) {
+    public BotUtils addGuild(long gid) {
         Statement dbStat = getCon().createStatement();
         String sql = "INSERT INTO " + DatabaseTable.MAIN_BOT_INFO + "(server_id, prefix) VALUES(" +
                 ""+gid+"," +
                 "'"+Config.get(ENV.PREFIX)+"'" +
                 ");";
         dbStat.executeUpdate(sql);
+        return this;
     }
 
     /**
@@ -36,10 +37,11 @@ public class BotUtils extends DatabaseUtils{
      * @param gid ID of the guild
      */
     @SneakyThrows
-    public void removeGuild(long gid) {
+    public BotUtils removeGuild(long gid) {
         Statement dbStat = getCon().createStatement();
         String sql = "DELETE FROM " + DatabaseTable.MAIN_BOT_INFO + " WHERE server_id="+gid+";";
         dbStat.executeUpdate(sql);
+        return this;
     }
 
     /**
@@ -62,6 +64,7 @@ public class BotUtils extends DatabaseUtils{
         for (long gid : guildIDs)
             guilds.add(Robertify.api.getGuildById(gid));
 
+        getCon().close();
         return guilds;
     }
 
@@ -78,8 +81,9 @@ public class BotUtils extends DatabaseUtils{
         ResultSet dbRes = dbStat.executeQuery(sql);
 
         String ret = null;
-        while (dbRes.next()) ret = dbRes.getString("id");
+        while (dbRes.next()) ret = dbRes.getString("developer_id");
 
+        getCon().close();
         return ret != null;
     }
 }

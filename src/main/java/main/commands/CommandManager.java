@@ -1,6 +1,13 @@
 package main.commands;
 
-import main.commands.commands.PingCommand;
+import lombok.Getter;
+import main.commands.commands.audio.LeaveCommand;
+import main.commands.commands.audio.PlayCommand;
+import main.commands.commands.misc.PingCommand;
+import main.commands.commands.dev.config.ViewConfigCommand;
+import main.commands.commands.dev.permissions.PermissionsCommand;
+import main.commands.commands.misc.SetPrefixCommand;
+import main.commands.commands.util.HelpCommand;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,10 +22,19 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class CommandManager {
+    @Getter
     private final List<ICommand> commands = new ArrayList<>();
 
     public CommandManager() {
-        addCommands(new PingCommand());
+        addCommands(
+                new PingCommand(),
+                new ViewConfigCommand(),
+                new PermissionsCommand(),
+                new HelpCommand(),
+                new SetPrefixCommand(),
+                new PlayCommand(),
+                new LeaveCommand()
+        );
     }
 
     private void addCommands(ICommand... cmds) {
@@ -47,7 +63,7 @@ public class CommandManager {
         String searchLower = search.toLowerCase();
 
         for (ICommand cmd : this.commands)
-            if (cmd instanceof ITestCommand)
+            if (cmd instanceof IDevCommand)
                 if (cmd.getName().equals(searchLower) || cmd.getAliases().contains(searchLower))
                     return cmd;
         return null;
@@ -57,16 +73,16 @@ public class CommandManager {
     public List<ICommand> getCommands() {
         List<ICommand> ret = new ArrayList<>();
         for (ICommand cmd : this.commands)
-            if (!(cmd instanceof ITestCommand))
+            if (!(cmd instanceof IDevCommand))
                 ret.add(cmd);
         return  ret;
     }
 
     @Nullable
-    public List<ICommand> getTestCommands() {
+    public List<ICommand> getDevCommands() {
         List<ICommand> ret = new ArrayList<>();
         for (ICommand cmd : this.commands)
-            if (cmd instanceof ITestCommand)
+            if (cmd instanceof IDevCommand)
                 ret.add(cmd);
         return ret;
     }

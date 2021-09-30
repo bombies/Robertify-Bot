@@ -1,14 +1,11 @@
 package main.constants;
 
-public enum ENV {
-    BOT_TOKEN("bot_token"),
-    DATABASE_DIR("database_dir"),
-    JSON_DIR("json_dir"),
-    PREFIX("prefix");
+public enum JSONConfigFile {
+    PERMISSIONS("permissions.json");
 
     private final String str;
 
-    ENV(String str) {
+    JSONConfigFile(String str) {
         this.str = str;
     }
 

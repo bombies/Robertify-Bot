@@ -109,4 +109,16 @@ public class DatabaseUtils {
         Statement dbStat = con.createStatement();
         dbStat.execute(sql);
     }
+
+    /**
+     * Closes the database connection
+     */
+    @SneakyThrows
+    public void closeConnection() {
+        con.close();
+    }
+
+    public DatabaseUtils createConnection(Database db) {
+        return new DatabaseUtils(db);
+    }
 }

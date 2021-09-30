@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public enum Permission {
-    DYNAMIC_ADMIN(0),
-    DYNAMIC_MOD(1),
-    DYNAMIC_TICKETS(2),
-    DYNAMIC_APPLICATIONS(3);
+    ROBERTIFY_ADMIN(0),
+    ROBERTIFY_MOD(1);
 
     private final int code;
 

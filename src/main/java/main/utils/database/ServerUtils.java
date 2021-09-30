@@ -24,11 +24,12 @@ public class ServerUtils extends DatabaseUtils {
      * @param prefix Prefix to be set
      */
     @SneakyThrows
-    public void setServerPrefix(long gid, @NotNull String prefix) {
+    public ServerUtils setServerPrefix(long gid, @NotNull String prefix) {
         Statement dbStat = getCon().createStatement();
         String sql = "INSERT INTO " + DatabaseTable.MAIN_BOT_INFO + "(server_id, prefix) " +
                 "VALUES("+gid+", '"+prefix+"');";
         dbStat.executeUpdate(sql);
+        return this;
     }
 
     /**
@@ -37,10 +38,14 @@ public class ServerUtils extends DatabaseUtils {
      * @param prefix Prefix to be set
      */
     @SneakyThrows
-    public void updateServerPrefix(long gid, @NotNull String prefix) {
+    public ServerUtils updateServerPrefix(long gid, @NotNull String prefix) {
         Statement dbStat = getCon().createStatement();
         String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET prefix='"+prefix+"' WHERE server_id="+gid+";";
         dbStat.executeUpdate(sql);
+
+        prefixes.put(gid, prefix);
+
+        return this;
     }
 
     /**
@@ -54,8 +59,11 @@ public class ServerUtils extends DatabaseUtils {
         String sql = "SELECT prefix FROM " + DatabaseTable.MAIN_BOT_INFO + " WHERE server_id="+gid+";";
         ResultSet dbRest = dbStat.executeQuery(sql);
 
-        while (dbRest.next())
-            return dbRest.getString("prefix");
+        while (dbRest.next()) {
+            String ret = dbRest.getString("prefix");
+            getCon().close();
+            return ret;
+        }
 
         throw new NullPointerException("There was nothing found for guild with ID \""+gid+"\"");
     }
