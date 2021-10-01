@@ -1,15 +1,14 @@
 package main.commands;
 
 import lombok.Getter;
-import main.commands.commands.audio.LeaveCommand;
-import main.commands.commands.audio.PlayCommand;
-import main.commands.commands.audio.SkipCommand;
-import main.commands.commands.audio.StopCommand;
+import main.commands.commands.audio.*;
+import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.dev.permissions.PermissionsCommand;
 import main.commands.commands.misc.SetPrefixCommand;
 import main.commands.commands.util.HelpCommand;
+import main.commands.commands.util.ShutdownCommand;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,7 +36,12 @@ public class CommandManager {
                 new PlayCommand(),
                 new LeaveCommand(),
                 new StopCommand(),
-                new SkipCommand()
+                new SkipCommand(),
+                new NowPlayingCommand(),
+                new QueueCommand(),
+                new PauseCommand(),
+                new ShutdownCommand(),
+                new DeveloperCommand()
         );
     }
 

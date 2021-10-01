@@ -25,6 +25,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.script.ScriptException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlayCommand implements ICommand {
     @Override
@@ -63,28 +64,14 @@ public class PlayCommand implements ICommand {
             return;
         }
 
-        if (!selfVoiceState.inVoiceChannel()) {
-            AudioManager audioManager = ctx.getGuild().getAudioManager();
-            AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-            AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-            AudioPlayer player = audioPlayerManager.createPlayer();
-            audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
-            audioManager.openAudioConnection(memberVoiceState.getChannel());
-
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-            musicManager.scheduler.player.stopTrack();
-            musicManager.scheduler.queue.clear();
-        }
-
         String link = String.join(" ", args);
 
         if (!GeneralUtils.isUrl(link)) {
-            link = "ytsearch:" + link;
+            link = "scsearch:" + link;
         }
 
         PlayerManager.getInstance()
-                .loadAndPlay(channel, link);
-
+                .loadAndPlay(channel, link, selfVoiceState, memberVoiceState, ctx);
     }
 
     @Override

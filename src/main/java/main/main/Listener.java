@@ -45,7 +45,7 @@ public class Listener extends ListenerAdapter {
 
         ServerUtils.initPrefixMap();
 
-        Robertify.api.getPresence().setPresence(Activity.listening("-help"), true);
+        Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
 
     @Override

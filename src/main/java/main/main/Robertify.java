@@ -1,7 +1,10 @@
 package main.main;
 
+import main.commands.commands.audio.QueueCommand;
 import main.constants.ENV;
+import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
+import main.utils.pagination.PaginationEvents;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -30,7 +33,16 @@ public class Robertify {
                             GatewayIntent.GUILD_PRESENCES
                     )
                     .setChunkingFilter(ChunkingFilter.ALL)
-                    .addEventListeners(new Listener())
+
+                    // Event Listeners
+                    .addEventListeners(
+                            new Listener(),
+                            new VoiceChannelEvents()
+                    )
+
+                    // Button Listeners
+                    .addEventListeners(new PaginationEvents())
+
                     .enableCache(
                             CacheFlag.ACTIVITY,
                             CacheFlag.CLIENT_STATUS,

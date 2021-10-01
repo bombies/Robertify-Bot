@@ -89,6 +89,32 @@ public class BotUtils extends DatabaseUtils {
         return ret != null;
     }
 
+    @SneakyThrows
+    public BotUtils addDeveloper(String id) {
+        if (isDeveloper(id))
+            throw new NullPointerException("The ID passed already belongs to a developer");
+
+        createConnection();
+
+        Statement dbStat = getCon().createStatement();
+        String sql = "INSERT INTO " + DatabaseTable.MAIN_BOT_DEVELOPERS + " VALUES('"+id+"');";
+        dbStat.executeUpdate(sql);
+        return this;
+    }
+
+    @SneakyThrows
+    public BotUtils removeDeveloper(String id) {
+        if (!isDeveloper(id))
+            throw new NullPointerException("The ID passed doesn't belong to a developer");
+
+        createConnection();
+
+        Statement dbStat = getCon().createStatement();
+        String sql = "DELETE FROM " + DatabaseTable.MAIN_BOT_DEVELOPERS + " WHERE developer_id='"+id+"';";
+        dbStat.executeUpdate(sql);
+        return this;
+    }
+
     /**
      * Get whether the bot should announce new tracks being played
      * @return True if the track is to be announced and vice versa.

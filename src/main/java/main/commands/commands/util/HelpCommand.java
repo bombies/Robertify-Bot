@@ -43,8 +43,12 @@ public class HelpCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
-            if (!new BotUtils().isDeveloper(ctx.getAuthor().getId()))
+            if (!new BotUtils().isDeveloper(ctx.getAuthor().getId())) {
+                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+args.get(0)+"`");
+                msg.replyEmbeds(eb.build()).queue();
+                GeneralUtils.setDefaultEmbed();
                 return;
+            }
 
             StringBuilder stringBuilder = new StringBuilder();
             for (ICommand cmd : manager.getDevCommands())

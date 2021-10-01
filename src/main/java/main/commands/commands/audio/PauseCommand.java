@@ -1,7 +1,6 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
@@ -15,7 +14,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 
-public class StopCommand implements ICommand {
+public class PauseCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
@@ -59,27 +58,31 @@ public class StopCommand implements ICommand {
 
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
         AudioPlayer audioPlayer = musicManager.audioPlayer;
-        AudioTrack track = audioPlayer.getPlayingTrack();
 
-        if (track == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+        if (audioPlayer.getPlayingTrack() == null) {
+            eb = EmbedUtils.embedMessage("There is nothing playing");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        musicManager.scheduler.player.stopTrack();
-        musicManager.scheduler.queue.clear();
+        if (audioPlayer.isPaused()) {
+            audioPlayer.setPaused(false);
+            eb = EmbedUtils.embedMessage("You have resumed the music!");
+        } else {
+            eb = EmbedUtils.embedMessage("You have paused the music!");
+            audioPlayer.setPaused(true);
+        }
 
-        msg.addReaction("✅").queue();
+        msg.replyEmbeds(eb.build()).queue();
     }
 
     @Override
     public String getName() {
-        return "stop";
+        return "pause";
     }
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Pauses the song currently playing";
     }
 }

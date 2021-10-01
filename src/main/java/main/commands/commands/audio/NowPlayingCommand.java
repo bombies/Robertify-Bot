@@ -2,10 +2,12 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,8 +16,9 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
+import java.util.List;
 
-public class StopCommand implements ICommand {
+public class NowPlayingCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
@@ -67,19 +70,26 @@ public class StopCommand implements ICommand {
             return;
         }
 
-        musicManager.scheduler.player.stopTrack();
-        musicManager.scheduler.queue.clear();
+        AudioTrackInfo info = track.getInfo();
 
-        msg.addReaction("✅").queue();
+        eb =  EmbedUtils.embedMessage("**"+info.title+"**");
+        eb.setTitle(BotConstants.ROBERTIFY_EMBED_TITLE + " | Now Playing", info.uri);
+
+        msg.replyEmbeds(eb.build()).queue();
     }
 
     @Override
     public String getName() {
-        return "stop";
+        return "nowplaying";
     }
 
     @Override
     public String getHelp(String guildID) {
         return null;
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("np");
     }
 }
