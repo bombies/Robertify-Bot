@@ -31,7 +31,7 @@ public class PlayerManager {
 
     public GuildMusicManager getMusicManager(Guild guild) {
         return  this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildID) -> {
-            final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager);
+            final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
 
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
             return guildMusicManager;
@@ -44,11 +44,12 @@ public class PlayerManager {
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
+                EmbedBuilder eb = EmbedUtils.embedMessage("🎼 Adding to queue: `" + audioTrack.getInfo().title
+                        + "` by `" + audioTrack.getInfo().author + "`");
+                channel.sendMessageEmbeds(eb.build()).queue();
+
                 musicManager.scheduler.queue(audioTrack);
 
-                EmbedBuilder eb = EmbedUtils.embedMessage("🎼 Adding to queue: `" + audioTrack.getInfo().title
-                        + "` tracks from playlist `" + audioTrack.getInfo().author + "`");
-                channel.sendMessageEmbeds(eb.build()).queue();
             }
 
             @Override

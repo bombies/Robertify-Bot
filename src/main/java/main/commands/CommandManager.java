@@ -3,6 +3,8 @@ package main.commands;
 import lombok.Getter;
 import main.commands.commands.audio.LeaveCommand;
 import main.commands.commands.audio.PlayCommand;
+import main.commands.commands.audio.SkipCommand;
+import main.commands.commands.audio.StopCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.dev.permissions.PermissionsCommand;
@@ -33,7 +35,9 @@ public class CommandManager {
                 new HelpCommand(),
                 new SetPrefixCommand(),
                 new PlayCommand(),
-                new LeaveCommand()
+                new LeaveCommand(),
+                new StopCommand(),
+                new SkipCommand()
         );
     }
 

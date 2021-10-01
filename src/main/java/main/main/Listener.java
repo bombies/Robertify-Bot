@@ -76,7 +76,10 @@ public class Listener extends ListenerAdapter {
         BotUtils botUtils = new BotUtils();
         PermissionsConfig permissionsConfig = new PermissionsConfig();
 
-        botUtils.addGuild(guild.getIdLong()).closeConnection();
+        botUtils.addGuild(guild.getIdLong())
+                .announceNewTrack(guild.getIdLong(), true)
+                .closeConnection();
+
         permissionsConfig.initGuild(guild.getId());
 
         LOGGER.info("Joined {}", guild.getName());

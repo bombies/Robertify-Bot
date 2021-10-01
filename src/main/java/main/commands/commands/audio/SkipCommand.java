@@ -1,5 +1,6 @@
 package main.commands.commands.audio;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
@@ -13,17 +14,18 @@ import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 
-public class LeaveCommand implements ICommand {
+public class SkipCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final Member self = ctx.getSelfMember();
-        final GuildVoiceState selfState = self.getVoiceState();
         final Message msg = ctx.getMessage();
+        final Member self = ctx.getSelfMember();
+        GuildVoiceState selfVoiceState = self.getVoiceState();
 
         EmbedBuilder eb;
 
         BotUtils botUtils = new BotUtils();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
+            System.out.println("there is no announcement channel set");
             botUtils.createConnection();
             botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
                     .closeConnection();
@@ -33,29 +35,47 @@ public class LeaveCommand implements ICommand {
             ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
         }
 
-        if (!selfState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
+        final Member member = ctx.getMember();
+        final GuildVoiceState memberVoiceState = member.getVoiceState();
+
+        if (!selfVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+        if (!memberVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        musicManager.audioPlayer.stopTrack();
-        musicManager.audioPlayer.destroy();
-        musicManager.scheduler.player.stopTrack();
-        musicManager.scheduler.queue.clear();
+        AudioPlayer audioPlayer = musicManager.audioPlayer;
 
-        ctx.getGuild().getAudioManager().closeAudioConnection();
+        if (audioPlayer.getPlayingTrack() == null) {
+            eb = EmbedUtils.embedMessage("There is nothing to skip!");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+        musicManager.scheduler.nextTrack();
         msg.addReaction("✅").queue();
     }
 
     @Override
     public String getName() {
-        return "leave";
+        return "skip";
     }
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Skips a track";
     }
 }

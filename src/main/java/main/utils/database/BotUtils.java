@@ -7,12 +7,14 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotUtils extends DatabaseUtils{
+public class BotUtils extends DatabaseUtils {
+
     public BotUtils() {
         super(Database.MAIN);
     }
@@ -85,5 +87,80 @@ public class BotUtils extends DatabaseUtils{
 
         getCon().close();
         return ret != null;
+    }
+
+    /**
+     * Get whether the bot should announce new tracks being played
+     * @return True if the track is to be announced and vice versa.
+     */
+    @SneakyThrows
+    public boolean announceNewTrack(long guildID) {
+        Statement dbStat = getCon().createStatement();
+        String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_INFO + " WHERE server_id="+guildID+";";
+        ResultSet dbRes = dbStat.executeQuery(sql);
+
+         boolean ret = true;
+
+         while (dbRes.next()) ret = dbRes.getBoolean("announce_msgs");
+
+         getCon().close();
+         return ret;
+    }
+
+    /**
+     * Set the boolean value for whether the bot should announce new tracks being played.
+     * @param gid The ID of the guild
+     * @param value The boolean value
+     * @return A copy of this object to continue chains
+     */
+    @SneakyThrows
+    public BotUtils announceNewTrack(long gid, boolean value) {
+        Statement dbStat = getCon().createStatement();
+        String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET announce_msgs="+value+"" +
+                " WHERE server_id="+gid+";";
+        dbStat.executeUpdate(sql);
+        return this;
+    }
+
+    @SneakyThrows
+    public BotUtils setAnnouncementChannel(long guildID, long channelID) {
+        Statement dbStat = getCon().createStatement();
+        String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET announcement_channel="+channelID+"" +
+                " WHERE server_id="+guildID+";";
+        dbStat.executeUpdate(sql);
+        return this;
+    }
+
+    @SneakyThrows
+    public long getAnnouncementChannel(long guildID) {
+        Statement dbStat = getCon().createStatement();
+        String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_INFO +
+                " WHERE server_id="+guildID+";";
+        ResultSet dbRes = dbStat.executeQuery(sql);
+
+        long ret = -1;
+
+        while (dbRes.next()) ret = dbRes.getLong("announcement_channel");
+
+        getCon().close();
+        return ret;
+    }
+
+    @SneakyThrows
+    public TextChannel getAnnouncementChannelObject(long guildID) {
+        return Robertify.api.getTextChannelById(getAnnouncementChannel(guildID));
+    }
+
+    /**
+     * Checks if the announcement channel has been set
+     * @param gid ID of the guild
+     * @return True if the channel is set and vice versa.
+     */
+    public boolean isAnnouncementChannelSet(long gid) {
+        return getAnnouncementChannel(gid) != 0;
+    }
+
+    public void createConnection() {
+        super.createConnection(Database.MAIN);
     }
 }

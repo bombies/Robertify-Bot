@@ -1,5 +1,6 @@
 package main.utils;
 
+import lombok.SneakyThrows;
 import main.commands.commands.dev.permissions.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
@@ -17,6 +18,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,6 +61,15 @@ public class GeneralUtils {
     public static boolean stringIsID(String s) {
         String idRegex = "^[0-9]{18}$";
         return Pattern.matches(idRegex, s);
+    }
+
+    public static boolean isUrl(String url) {
+        try {
+            new URI(url);
+            return true;
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     public static String getDigitsOnly(String s) {

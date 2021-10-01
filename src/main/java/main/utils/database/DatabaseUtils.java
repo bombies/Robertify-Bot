@@ -30,7 +30,6 @@ public class DatabaseUtils {
 
         if (!dbExists)
             createTables(db);
-        // TODO Log connection
     }
 
     /**
@@ -44,23 +43,19 @@ public class DatabaseUtils {
                 Statement dbStat = con.createStatement();
                 String sql = "CREATE TABLE " + DatabaseTable.MAIN_BOT_INFO + " (" +
                         "server_id INTEGER PRIMARY KEY," +
-                        "prefix TEXT NOT NULL" +
+                        "prefix TEXT NOT NULL," +
+                        "announce_msgs BOOLEAN," +
+                        "announcement_channel INTEGER" +
                         ");";
 
                 String sql2 = "CREATE TABLE " + DatabaseTable.MAIN_BOT_DEVELOPERS + " (" +
                         "developer_id INTEGER" +
                         ");";
 
-//                dbStat.execute(sql);
-//                dbStat.execute(sql2);
+                dbStat.execute(sql);
+                dbStat.execute(sql2);
             }
         }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        con.close();
-        super.finalize();
     }
 
     /**
@@ -72,7 +67,8 @@ public class DatabaseUtils {
     private boolean databaseExists(Database db) {
         if (!Files.exists(Path.of(Config.get(ENV.DATABASE_DIR) + "/")))
             Files.createDirectories(Paths.get(Config.get(ENV.DATABASE_DIR)));
-        return Files.exists(Path.of(ENV.DATABASE_DIR + "/" + db.toString()));
+
+        return Files.exists(Path.of(Config.get(ENV.DATABASE_DIR) + "/" + db.toString() + ".db"));
     }
 
     /**
@@ -118,7 +114,9 @@ public class DatabaseUtils {
         con.close();
     }
 
-    public DatabaseUtils createConnection(Database db) {
-        return new DatabaseUtils(db);
+    @SneakyThrows
+    public void createConnection(Database db) {
+        String url = "jdbc:sqlite:" + Config.get(ENV.DATABASE_DIR) + "/" + db.toString() + ".db";
+        con = DriverManager.getConnection(url);
     }
 }
