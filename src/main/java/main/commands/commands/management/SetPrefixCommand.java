@@ -1,4 +1,4 @@
-package main.commands.commands.misc;
+package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -50,11 +50,12 @@ public class SetPrefixCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Sets the bot's prefix";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("help");
+        return List.of("sp");
     }
 }

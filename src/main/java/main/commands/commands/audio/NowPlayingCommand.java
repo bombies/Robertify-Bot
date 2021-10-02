@@ -85,7 +85,8 @@ public class NowPlayingCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Displays the song that is currently playing";
     }
 
     @Override

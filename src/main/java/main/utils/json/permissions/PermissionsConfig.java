@@ -1,7 +1,7 @@
 package main.utils.json.permissions;
 
 import lombok.SneakyThrows;
-import main.commands.commands.dev.permissions.Permission;
+import main.commands.commands.management.permissions.Permission;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;

@@ -27,7 +27,6 @@ public class PaginationEvents extends ListenerAdapter {
         if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
             currentPage.put(msg, 0);
             event.editMessageEmbeds(pages.get(0).getEmbed()).queue();
-            event.deferEdit().queue();
 
         } else if (event.getButton().getId().equals(MessageButton.PREVIOUS + event.getUser().getId())) {
             if (currentPage.get(msg) == 0) {
@@ -36,8 +35,7 @@ public class PaginationEvents extends ListenerAdapter {
             }
 
             currentPage.put(msg, currentPage.get(msg)-1);
-            msg.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
-            event.deferEdit().queue();
+            event.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
 
         } else if (event.getButton().getId().equals(MessageButton.NEXT + event.getUser().getId())) {
             if (currentPage.get(msg) == pages.size()-1) {
@@ -46,13 +44,11 @@ public class PaginationEvents extends ListenerAdapter {
             }
 
             currentPage.put(msg, currentPage.get(msg)+1);
-            msg.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
-            event.deferEdit().queue();
+            event.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
 
         } else if (event.getButton().getId().equals(MessageButton.END + event.getUser().getId())) {
             currentPage.put(msg, pages.size()-1);
             event.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
-            event.deferEdit().queue();
 
         } else {
             EmbedBuilder eb = EmbedUtils.embedMessage("You do not have permission to interact with this button.");

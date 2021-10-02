@@ -1,7 +1,6 @@
 package main.utils;
 
-import lombok.SneakyThrows;
-import main.commands.commands.dev.permissions.Permission;
+import main.commands.commands.management.permissions.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
 import main.main.Config;

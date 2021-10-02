@@ -55,6 +55,7 @@ public class LeaveCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Forces the bot to stop playing music and leave the voice channel" +
+                " if already in one.";
     }
 }

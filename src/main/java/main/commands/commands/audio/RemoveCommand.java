@@ -1,15 +1,15 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
+import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
-import main.utils.pagination.Pages;
+import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,14 +18,14 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-public class QueueCommand implements ICommand {
+public class RemoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
         final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
+        final List<String> args = ctx.getArgs();
 
         BotUtils botUtils = new BotUtils();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
@@ -47,41 +47,46 @@ public class QueueCommand implements ICommand {
             return;
         }
 
-        final List<AudioTrack> trackList = new ArrayList<>(queue);
-
-        List<String> content = new ArrayList<>();
-        for (int i = 0; i < queue.size(); i++) {
-            final AudioTrack track = trackList.get(i);
-            final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" `["+formatTime(track.getDuration())+"]`");
+        if (args.isEmpty()) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to remove from the queue.");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
         }
 
-        Pages.paginate(ctx.getChannel(), ctx.getAuthor(), content, 10);
+        if (!GeneralUtils.stringIsInt(args.get(0))) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as the ID.");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
 
-        GeneralUtils.setDefaultEmbed();
-    }
+        final int id = Integer.parseInt(args.get(0));
+        final List<AudioTrack> trackList = new ArrayList<>(queue);
 
-    private String formatTime(long duration) {
-        final long hours = duration / TimeUnit.HOURS.toMillis(1);
-        final long minutes = duration / TimeUnit.MINUTES.toMillis(1);
-        final long seconds = duration % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
+        if (id <= 0 || id > trackList.size()) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid id.");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        EmbedBuilder eb = EmbedUtils.embedMessage("Removing `"+trackList.get(id-1).getInfo().title
+                +"` from the queue");
+        msg.replyEmbeds(eb.build()).queue();
+
+        if (!queue.remove(trackList.get(id-1))) {
+            Listener.LOGGER.error("Could not remove track with id "+id+" from the queue");
+            msg.addReaction("❌").queue();
+        }
+
     }
 
     @Override
     public String getName() {
-        return "queue";
+        return "remove";
     }
 
     @Override
     public String getHelp(String guildID) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Shows all the queued songs";
-    }
-
-    @Override
-    public List<String> getAliases() {
-        return List.of("q");
+        return "Remove a specific song from the queue\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"remove <id>`";
     }
 }

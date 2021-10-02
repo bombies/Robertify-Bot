@@ -38,7 +38,6 @@ public class Pages {
         List<Page> pages = new ArrayList<>();
 
         if (content.size() <= maxPerPage) {
-            System.out.println("content < maxper");
             EmbedBuilder eb = EmbedUtils.embedMessage("\t");
             for (String str : content)
                 eb.appendDescription(str + "\n");
@@ -46,7 +45,6 @@ public class Pages {
         } else {
             int pagesRequired = (int)Math.ceil((double)content.size() / maxPerPage);
 
-            System.out.println("Pages req: "+ pagesRequired);
             int lastIndex = 0;
             for (int i = 0; i < pagesRequired; i++) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("\t");

@@ -1,4 +1,4 @@
-package main.commands.commands.dev.permissions;
+package main.commands.commands.management.permissions;
 
 import java.util.ArrayList;
 import java.util.List;

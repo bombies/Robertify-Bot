@@ -80,6 +80,7 @@ public class StopCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Forces the bot to stop playing music and clear the queue" +
+                " if already playing music.";
     }
 }

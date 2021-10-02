@@ -148,7 +148,8 @@ public class DeveloperCommand implements IDevCommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Developer command.";
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Developer command.";
     }
 
     @Override

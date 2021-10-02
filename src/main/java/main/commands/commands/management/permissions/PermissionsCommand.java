@@ -1,8 +1,10 @@
-package main.commands.commands.dev.permissions;
+package main.commands.commands.management.permissions;
 
+import lombok.SneakyThrows;
 import main.commands.CommandContext;
-import main.commands.IDevCommand;
+import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.database.BotUtils;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionsCommand implements IDevCommand {
+public class PermissionsCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
@@ -49,7 +51,11 @@ public class PermissionsCommand implements IDevCommand {
      * Initialize the permission JSON files for all servers
      * @param msg Message sent with the command
      */
+    @SneakyThrows
     private void init(Message msg) {
+        if (!new BotUtils().isDeveloper(msg.getAuthor().getId()))
+            return;
+
         try {
             new PermissionsConfig().initConfig();
             msg.addReaction("✅").queue();
@@ -222,7 +228,8 @@ public class PermissionsCommand implements IDevCommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Manage bot permissions for roles";
     }
 
     @Override

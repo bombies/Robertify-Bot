@@ -52,7 +52,8 @@ public class ViewConfigCommand implements IDevCommand {
 
     @Override
     public String getHelp(String guildID) {
-        return null;
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "View the JSON configurations associated with the bot";
     }
 
     @Override

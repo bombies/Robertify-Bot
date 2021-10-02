@@ -5,8 +5,9 @@ import main.commands.commands.audio.*;
 import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
-import main.commands.commands.dev.permissions.PermissionsCommand;
-import main.commands.commands.misc.SetPrefixCommand;
+import main.commands.commands.management.permissions.PermissionsCommand;
+import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.SetPrefixCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.ShutdownCommand;
 import main.utils.database.ServerUtils;
@@ -41,7 +42,10 @@ public class CommandManager {
                 new QueueCommand(),
                 new PauseCommand(),
                 new ShutdownCommand(),
-                new DeveloperCommand()
+                new DeveloperCommand(),
+                new SetChannelCommand(),
+                new RemoveCommand(),
+                new MoveCommand()
         );
     }
 
