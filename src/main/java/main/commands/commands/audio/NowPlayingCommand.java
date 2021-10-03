@@ -8,6 +8,7 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
+import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -72,8 +73,13 @@ public class NowPlayingCommand implements ICommand {
 
         AudioTrackInfo info = track.getInfo();
 
-        eb =  EmbedUtils.embedMessage("**"+info.title+"**");
+        double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
+        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+"`\n\n`[0:00]`" +
+                GeneralUtils.progressBar(progress) + "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`\n\n" +
+                "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition())+"`");
         eb.setTitle(BotConstants.ROBERTIFY_EMBED_TITLE + " | Now Playing", info.uri);
+
+        System.out.println("player paused: " + audioPlayer.isPaused());
 
         msg.replyEmbeds(eb.build()).queue();
     }

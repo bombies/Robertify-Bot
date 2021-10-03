@@ -1,9 +1,6 @@
 package main.audiohandlers;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.*;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
@@ -19,7 +16,6 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
@@ -30,22 +26,27 @@ public class PlayerManager {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        AudioSourceManagers.registerRemoteSources(this.audioPlayerManager);
-        AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
+        AudioSourceManagers.registerLocalSource(audioPlayerManager);
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
         return  this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildID) -> {
-            final GuildMusicManager guildMusicManager = new GuildMusicManager(this.audioPlayerManager, guild);
+            final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager, guild);
 
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
             return guildMusicManager;
         });
     }
 
+    public void removeMusicManager(Guild guild) {
+        musicManagers.remove(guild.getIdLong());
+    }
+
     public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx) {
         joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
-        final GuildMusicManager musicManager = this.getMusicManager(channel.getGuild());
+
+        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
 
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
@@ -54,8 +55,6 @@ public class PlayerManager {
                         + "` by `" + audioTrack.getInfo().author + "`");
                 channel.sendMessageEmbeds(eb.build()).queue();
 
-//                joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
-
                 musicManager.scheduler.queue(audioTrack);
             }
 
@@ -63,11 +62,18 @@ public class PlayerManager {
             public void playlistLoaded(AudioPlaylist audioPlaylist) {
                 List<AudioTrack> tracks = audioPlaylist.getTracks();
 
+                if (trackUrl.startsWith("ytsearch:")) {
+                    EmbedBuilder eb = EmbedUtils.embedMessage("🎼 Adding to queue: `" + tracks.get(0).getInfo().title
+                            + "` by `" + tracks.get(0).getInfo().author + "`");
+                    channel.sendMessageEmbeds(eb.build()).queue();
+
+                    musicManager.scheduler.queue(tracks.get(0));
+                    return;
+                }
+
                 EmbedBuilder eb = EmbedUtils.embedMessage("🎼 Adding to queue: `" + tracks.size()
                 + "` tracks from playlist `" + audioPlaylist.getName() + "`");
                 channel.sendMessageEmbeds(eb.build()).queue();
-
-//                joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
 
                 for (final AudioTrack track : tracks)
                     musicManager.scheduler.queue(track);
@@ -75,15 +81,21 @@ public class PlayerManager {
 
             @Override
             public void noMatches() {
-                ctx.getGuild().getAudioManager().closeAudioConnection();
-                channel.sendMessage("Nothing was found").queue();
+                if (musicManager.audioPlayer.getPlayingTrack() == null)
+                    ctx.getGuild().getAudioManager().closeAudioConnection();
+
+                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `"+ctx.getArgs().get(0)+"`. Trying being more specific. (Adding name of the artiste)");
+                ctx.getMessage().replyEmbeds(eb.build()).queue();
             }
 
             @Override
             public void loadFailed(FriendlyException e) {
-                ctx.getGuild().getAudioManager().closeAudioConnection();
+                if (musicManager.audioPlayer.getPlayingTrack() == null)
+                    ctx.getGuild().getAudioManager().closeAudioConnection();
                 e.printStackTrace();
-                channel.sendMessage("Error loading track").queue();
+
+                EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
+                ctx.getMessage().replyEmbeds(eb.build()).queue();
             }
         });
     }
@@ -91,11 +103,8 @@ public class PlayerManager {
     private void joinVoiceChannel(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx) {
         if (!selfVoiceState.inVoiceChannel()) {
             AudioManager audioManager = ctx.getGuild().getAudioManager();
-            AudioPlayerManager audioPlayerManager = new DefaultAudioPlayerManager();
-            AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-            AudioPlayer player = audioPlayerManager.createPlayer();
-            audioManager.setSendingHandler(new AudioPlayerSendHandler(player));
             audioManager.openAudioConnection(memberVoiceState.getChannel());
+            audioManager.setSelfDeafened(true);
         }
     }
 

@@ -1,9 +1,10 @@
-package main.commands.commands.util;
+package main.commands.commands.management;
 
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
+import main.main.Robertify;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -20,7 +21,9 @@ public class ShutdownCommand implements IDevCommand {
 
         EmbedBuilder eb = EmbedUtils.embedMessage("Now shutting down...");
         ctx.getMessage().replyEmbeds(eb.build()).queue();
+
         BotCommons.shutdown();
+        Robertify.api.shutdown();
     }
 
     @Override

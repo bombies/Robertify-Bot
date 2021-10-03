@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class GeneralUtils {
@@ -131,6 +132,24 @@ public class GeneralUtils {
 
     public static boolean hasPerms(Guild guild, User sender, Permission... perm) {
         return hasPerms(guild, guild.getMember(sender), perm);
+    }
+
+    public static String progressBar(double percent) {
+        String str = "";
+        for(int i=0; i<12; i++)
+            if(i == (int)(percent*12))
+                str+="\uD83D\uDD18"; // 🔘
+            else
+                str+="▬";
+        return str;
+    }
+
+    public static String formatTime(long duration) {
+        final long hours = duration / TimeUnit.HOURS.toMillis(1);
+        final long minutes = duration / TimeUnit.MINUTES.toMillis(1);
+        final long seconds = duration % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     public static String getFileContent(String path) {

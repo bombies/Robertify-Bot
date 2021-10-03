@@ -53,20 +53,12 @@ public class QueueCommand implements ICommand {
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" `["+formatTime(track.getDuration())+"]`");
+            content.add("**#"+(i+1)+".** "+info.title+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
         }
 
         Pages.paginate(ctx.getChannel(), ctx.getAuthor(), content, 10);
 
         GeneralUtils.setDefaultEmbed();
-    }
-
-    private String formatTime(long duration) {
-        final long hours = duration / TimeUnit.HOURS.toMillis(1);
-        final long minutes = duration / TimeUnit.MINUTES.toMillis(1);
-        final long seconds = duration % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
     @Override

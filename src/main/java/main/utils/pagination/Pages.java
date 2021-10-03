@@ -21,16 +21,18 @@ public class Pages {
         Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
 
         channel.sendMessageEmbeds(pages.get(0).getEmbed()).queue(msg -> {
-            msg.editMessageComponents(
-                    ActionRow.of(
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFront()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPrevious()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNext()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEnd())
-                    )
-            ).queue();
+            if (pages.size() > 1) {
+                msg.editMessageComponents(
+                        ActionRow.of(
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFront()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPrevious()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNext()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEnd())
+                        )
+                ).queue();
 
-            messages.put(msg, pages);
+                messages.put(msg, pages);
+            }
         });
     }
 

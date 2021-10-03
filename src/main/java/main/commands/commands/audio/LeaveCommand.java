@@ -39,10 +39,24 @@ public class LeaveCommand implements ICommand {
             return;
         }
 
+        final Member member = ctx.getMember();
+        final GuildVoiceState memberVoiceState = member.getVoiceState();
+
+        if (!memberVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfState.getChannel())) {
+            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-//        musicManager.scheduler.repeating = false;
         musicManager.scheduler.queue.clear();
-        musicManager.audioPlayer.stopTrack();
+        musicManager.scheduler.player.stopTrack();
 
         ctx.getGuild().getAudioManager().closeAudioConnection();
         msg.addReaction("✅").queue();

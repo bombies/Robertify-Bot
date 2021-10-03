@@ -9,7 +9,7 @@ import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.SetPrefixCommand;
 import main.commands.commands.util.HelpCommand;
-import main.commands.commands.util.ShutdownCommand;
+import main.commands.commands.management.ShutdownCommand;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;

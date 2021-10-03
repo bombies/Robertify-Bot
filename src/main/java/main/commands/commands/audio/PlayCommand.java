@@ -1,17 +1,8 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import lombok.SneakyThrows;
-import main.audiohandlers.AudioPlayerSendHandler;
-import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.main.Listener;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
@@ -21,11 +12,9 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 import javax.script.ScriptException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PlayCommand implements ICommand {
     @Override
@@ -67,7 +56,7 @@ public class PlayCommand implements ICommand {
         String link = String.join(" ", args);
 
         if (!GeneralUtils.isUrl(link)) {
-            link = "scsearch:" + link;
+            link = "ytsearch:" + link;
         }
 
         PlayerManager.getInstance()
