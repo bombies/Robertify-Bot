@@ -45,7 +45,8 @@ public class CommandManager {
                 new DeveloperCommand(),
                 new SetChannelCommand(),
                 new RemoveCommand(),
-                new MoveCommand()
+                new MoveCommand(),
+                new ShuffleCommand()
         );
     }
 

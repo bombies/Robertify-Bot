@@ -4,7 +4,9 @@ public enum ENV {
     BOT_TOKEN("bot_token"),
     DATABASE_DIR("database_dir"),
     JSON_DIR("json_dir"),
-    PREFIX("prefix");
+    PREFIX("prefix"),
+    SPOTIFY_CLIENT_ID("spotify_client_id"),
+    SPOTIFY_CLIENT_SECRET("spotify_client_secret");
 
     private final String str;
 

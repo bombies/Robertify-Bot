@@ -1,8 +1,6 @@
 package main.commands.commands.audio;
 
-import com.jagrosh.jdautilities.menu.ButtonMenu;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
@@ -10,7 +8,6 @@ import main.commands.ICommand;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
-import main.utils.pagination.Pages;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,9 +15,10 @@ import net.dv8tion.jda.api.entities.Message;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
-public class QueueCommand implements ICommand {
+public class ShuffleCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
@@ -48,32 +46,31 @@ public class QueueCommand implements ICommand {
         }
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
+        List<AudioTrack> shuffledTrackList = new ArrayList<>();
+        Random random = new Random();
+        int trackListSize = trackList.size();
 
-        List<String> content = new ArrayList<>();
-        for (int i = 0; i < queue.size(); i++) {
-            final AudioTrack track = trackList.get(i);
-            final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
+        for (AudioTrack ignored : trackList) {
+            AudioTrack trackSelected = trackList.get(random.nextInt(trackListSize));
+            while (shuffledTrackList.contains(trackSelected))
+                trackSelected = trackList.get(random.nextInt(trackListSize));
+            shuffledTrackList.add(trackSelected);
         }
 
-        Pages.paginate(ctx.getChannel(), ctx.getAuthor(), content, 10);
+        queue.clear();
+        queue.addAll(shuffledTrackList);
 
-        GeneralUtils.setDefaultEmbed();
+        EmbedBuilder eb = EmbedUtils.embedMessage("Shuffled the queue!");
+        msg.replyEmbeds(eb.build()).queue();
     }
 
     @Override
     public String getName() {
-        return "queue";
+        return "shuffle";
     }
 
     @Override
     public String getHelp(String guildID) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Shows all the queued songs";
-    }
-
-    @Override
-    public List<String> getAliases() {
-        return List.of("q");
+        return "Shuffle the current queue";
     }
 }

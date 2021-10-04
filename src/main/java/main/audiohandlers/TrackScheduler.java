@@ -15,6 +15,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class TrackScheduler extends AudioEventAdapter {
+
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
     private final Guild guild;
@@ -45,7 +46,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(guild.getIdLong());
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("▶️  **Now Playing**: `"+track.getInfo().title+"`");
+        EmbedBuilder eb = EmbedUtils.embedMessage("▶️  **Now Playing**: `" + track.getInfo().title + "`");
         announcementChannel.sendMessageEmbeds(eb.build()).queue();
     }
 

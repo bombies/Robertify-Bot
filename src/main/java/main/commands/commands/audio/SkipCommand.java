@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
+import java.util.List;
 
 public class SkipCommand implements ICommand {
     @Override
@@ -76,6 +77,12 @@ public class SkipCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Skips a track";
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Skips a track";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("next");
     }
 }

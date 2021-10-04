@@ -144,6 +144,18 @@ public class GeneralUtils {
         return str;
     }
 
+    public static String trimString(String string, String delimiter) {
+        if (!string.contains(delimiter)) return string;
+
+        switch (delimiter) {
+            case "?", "^", "[", ".", "$", "{", "&", "(", "+", ")", "|", "<", ">", "]", "}"
+                -> delimiter = "\\\\" + delimiter;
+        }
+        System.out.println(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*");
+
+        return string.replaceAll(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "");
+    }
+
     public static String formatTime(long duration) {
         final long hours = duration / TimeUnit.HOURS.toMillis(1);
         final long minutes = duration / TimeUnit.MINUTES.toMillis(1);

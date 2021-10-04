@@ -70,7 +70,13 @@ public class PlayCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Plays a song\n" +
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Plays a song\n\n" +
                 "Usage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "play <song>`";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("p");
     }
 }

@@ -1,10 +1,15 @@
 package main.main;
 
-import main.commands.commands.audio.QueueCommand;
+import com.wrapper.spotify.SpotifyApi;
+import com.wrapper.spotify.SpotifyHttpManager;
+import com.wrapper.spotify.model_objects.specification.Track;
+import lombok.Getter;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
 import main.utils.pagination.PaginationEvents;
+import main.utils.spotify.SpotifyAuthorizationUtils;
+import main.utils.spotify.SpotifyTrack;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -12,15 +17,24 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
+import java.awt.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class Robertify {
 
     public static JDA api;
+    @Getter
+    private static SpotifyApi spotifyApi;
 
     public static void main(String[] args) {
         WebUtils.setUserAgent("Mozilla/Robertify / bombies#4445");
         GeneralUtils.setDefaultEmbed();
 
         try {
+
             api = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_MEMBERS,
@@ -51,8 +65,27 @@ public class Robertify {
                             CacheFlag.MEMBER_OVERRIDES
                     )
                     .build();
+
+            spotifyApi = new SpotifyApi.Builder()
+                    .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))
+                    .setClientSecret(Config.get(ENV.SPOTIFY_CLIENT_SECRET))
+                    .setRedirectUri(SpotifyHttpManager.makeUri("http://localhost/callback/"))
+                    .build();
+
+            final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            scheduler.scheduleAtFixedRate(new RefreshSpotifyToken(), 0, 1, TimeUnit.HOURS);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+}
+
+class RefreshSpotifyToken implements Runnable {
+
+    @Override
+    public void run() {
+        Listener.LOGGER.info("Setting new SpotifyAPI access token.");
+        SpotifyAuthorizationUtils.setTokens();
     }
 }

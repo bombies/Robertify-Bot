@@ -13,12 +13,15 @@ import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Pages {
     private static HashMap<Message, List<Page>> messages = new HashMap<>();
 
-    public static void paginate(TextChannel channel, User user, List<Page> pages) {
+    public static Message paginate(TextChannel channel, User user, List<Page> pages) {
         Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
+
+        AtomicReference<Message> ret = new AtomicReference<>();
 
         channel.sendMessageEmbeds(pages.get(0).getEmbed()).queue(msg -> {
             if (pages.size() > 1) {
@@ -32,11 +35,14 @@ public class Pages {
                 ).queue();
 
                 messages.put(msg, pages);
+                ret.set(msg);
             }
         });
+
+        return ret.get();
     }
 
-    public static void paginate(TextChannel channel, User user, List<String> content, int maxPerPage) {
+    public static Message paginate(TextChannel channel, User user, List<String> content, int maxPerPage) {
         List<Page> pages = new ArrayList<>();
 
         if (content.size() <= maxPerPage) {
@@ -60,7 +66,7 @@ public class Pages {
             }
         }
 
-        paginate(channel, user, pages);
+        return paginate(channel, user, pages);
     }
 
     public static List<Page> getPages(Message msg) {

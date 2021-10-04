@@ -79,8 +79,6 @@ public class NowPlayingCommand implements ICommand {
                 "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition())+"`");
         eb.setTitle(BotConstants.ROBERTIFY_EMBED_TITLE + " | Now Playing", info.uri);
 
-        System.out.println("player paused: " + audioPlayer.isPaused());
-
         msg.replyEmbeds(eb.build()).queue();
     }
 
