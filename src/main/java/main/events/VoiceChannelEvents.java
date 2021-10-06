@@ -27,7 +27,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
             GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-//        musicManager.scheduler.repeating = false;
+            musicManager.scheduler.repeating = false;
             if (musicManager.audioPlayer.isPaused())
                 musicManager.audioPlayer.setPaused(false);
             musicManager.audioPlayer.stopTrack();

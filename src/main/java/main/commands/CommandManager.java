@@ -49,7 +49,8 @@ public class CommandManager {
                 new ShuffleCommand(),
                 new ClearQueueCommand(),
 //                new RewindCommand(),
-                new SkipToCommand()
+                new SkipToCommand(),
+                new RepeatCommand()
         );
     }
 

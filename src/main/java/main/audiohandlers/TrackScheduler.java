@@ -18,6 +18,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
     public final BlockingQueue<AudioTrack> queue;
+    public boolean repeating = false;
     private final Guild guild;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
@@ -56,7 +57,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (endReason.mayStartNext) {
+        if (repeating) {
+            player.playTrack(track);
+        } else if (endReason.mayStartNext) {
             nextTrack();
         }
     }
