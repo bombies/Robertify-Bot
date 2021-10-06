@@ -73,4 +73,9 @@ public class ShuffleCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Shuffle the current queue";
     }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("rubble");
+    }
 }

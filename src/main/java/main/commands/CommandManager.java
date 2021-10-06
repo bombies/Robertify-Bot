@@ -46,7 +46,10 @@ public class CommandManager {
                 new SetChannelCommand(),
                 new RemoveCommand(),
                 new MoveCommand(),
-                new ShuffleCommand()
+                new ShuffleCommand(),
+                new ClearQueueCommand(),
+//                new RewindCommand(),
+                new SkipToCommand()
         );
     }
 

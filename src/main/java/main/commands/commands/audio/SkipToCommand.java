@@ -6,7 +6,6 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
-import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
-public class RemoveCommand implements ICommand {
+public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
@@ -39,60 +38,53 @@ public class RemoveCommand implements ICommand {
             ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
         }
 
-        GeneralUtils.setCustomEmbed(BotConstants.ROBERTIFY_EMBED_TITLE + " | Queue");
-
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
-
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to remove from the queue.");
+            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to skip to.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!GeneralUtils.stringIsInt(args.get(0))) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as the ID.");
+            EmbedBuilder eb = EmbedUtils.embedMessage("ID provided **must** be a valid integer!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        final int id = Integer.parseInt(args.get(0));
-        final List<AudioTrack> trackList = new ArrayList<>(queue);
+        int id = Integer.parseInt(args.get(0));
 
-        if (id <= 0 || id > trackList.size()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid id.");
+        if (id > queue.size() || id <= 0) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("ID provided isn't a valid ID!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Removing `"+trackList.get(id-1).getInfo().title
-                +"` from the queue");
+        List<AudioTrack> currentQueue = new ArrayList<>(queue);
+        List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
+
+        for (int i = 0; i < id-1; i++)
+            songsToRemoveFromQueue.add(currentQueue.get(i));
+
+        queue.removeAll(songsToRemoveFromQueue);
+        musicManager.scheduler.nextTrack();
+
+        EmbedBuilder eb = EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
         msg.replyEmbeds(eb.build()).queue();
-
-        if (!queue.remove(trackList.get(id-1))) {
-            Listener.LOGGER.error("Could not remove track with id "+id+" from the queue");
-            msg.addReaction("❌").queue();
-        }
-
     }
 
     @Override
     public String getName() {
-        return "remove";
+        return "skipto";
     }
 
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Remove a specific song from the queue\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"remove <id>`";
+                "Skip to a specific song in the queue\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"skipto <id>`";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("robbery");
+        return List.of("st");
     }
 }

@@ -6,6 +6,7 @@ import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;
 import main.utils.GeneralUtils;
+import main.utils.database.ServerUtils;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -53,7 +54,8 @@ public class ViewConfigCommand implements IDevCommand {
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "View the JSON configurations associated with the bot";
+                "View the JSON configurations associated with the bot\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"viewconfig <filename>.json`";
     }
 
     @Override

@@ -41,6 +41,8 @@ public class SetPrefixCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage("You have set the bot's prefix to `" + args.get(0) + "`");
             msg.replyEmbeds(eb.build()).queue();
         }
+
+        GeneralUtils.setDefaultEmbed();
     }
 
     @Override

@@ -50,6 +50,7 @@ public class Robertify {
 
                     // Event Listeners
                     .addEventListeners(
+                            VoiceChannelEvents.waiter,
                             new Listener(),
                             new VoiceChannelEvents()
                     )

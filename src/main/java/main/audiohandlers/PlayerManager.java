@@ -66,7 +66,7 @@ public class PlayerManager {
                 if (parsed.length == 2) {
                     final GetTrackRequest getTrackRequest = Robertify.getSpotifyApi().getTrack(parsed[1].replaceAll("\\?[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "")).build();
                     Track track = getTrackRequest.execute();
-                    trackUrl = "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName();
+                    trackUrl = "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName() + " audio";
                 }
             } else if (trackUrl.contains("/playlist/")) {
                 String[] parsed = trackUrl.split("/playlist/");
@@ -125,7 +125,8 @@ public class PlayerManager {
                     return;
                 }
             }
-        }
+        } else if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
 
         String finalTrackUrl = trackUrl;
         this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {

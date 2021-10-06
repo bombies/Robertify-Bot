@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
+import main.utils.database.ServerUtils;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -229,7 +230,19 @@ public class PermissionsCommand implements ICommand {
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Manage bot permissions for roles";
+                "Manage bot permissions for roles\n\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions add <@role> <" + String.join(
+                        "|",
+                        Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
+                ) + ">`\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions remove <@role> <" + String.join(
+                "|",
+                Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
+                ) + ">`\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions list <["+ String.join(
+                "|",
+                Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
+                ) +"]|@role>`";
     }
 
     @Override

@@ -1,5 +1,6 @@
 package main.events;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -12,7 +13,10 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.TimeUnit;
+
 public class VoiceChannelEvents extends ListenerAdapter {
+    public static final EventWaiter waiter = new EventWaiter();
 
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
@@ -24,10 +28,25 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
             GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 //        musicManager.scheduler.repeating = false;
+            if (musicManager.audioPlayer.isPaused())
+                musicManager.audioPlayer.setPaused(false);
             musicManager.audioPlayer.stopTrack();
             musicManager.scheduler.queue.clear();
         } else {
-//            pauseSong(event);
+             VoiceChannel channelLeft = event.getChannelLeft();
+             GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
+
+             if (!selfVoiceState.getChannel().equals(channelLeft)) return;
+
+             if (channelLeft.getMembers().size() == 1) {
+                waiter.waitForEvent(
+                        GuildVoiceJoinEvent.class,
+                        (e) -> e.getChannelJoined().equals(channelLeft),
+                        (e) -> {},
+                        1L, TimeUnit.MINUTES,
+                        () -> event.getGuild().getAudioManager().closeAudioConnection()
+                );
+             }
         }
     }
 
