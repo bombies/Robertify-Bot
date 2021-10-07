@@ -26,7 +26,7 @@ public class PermissionsCommand implements ICommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        GeneralUtils.setCustomEmbed("Robertify | Permissions", new Color(109, 254, 99));
+        GeneralUtils.setCustomEmbed("Permissions", new Color(109, 254, 99));
 
         if (args.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide arguments!");

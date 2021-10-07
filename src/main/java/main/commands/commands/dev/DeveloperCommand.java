@@ -26,7 +26,7 @@ public class DeveloperCommand implements IDevCommand {
         final Message msg = ctx.getMessage();
         final BotUtils botUtils = new BotUtils();
 
-        GeneralUtils.setCustomEmbed(BotConstants.ROBERTIFY_EMBED_TITLE + " | Developer Tools", new Color(118, 0, 236));
+        GeneralUtils.setCustomEmbed("Developer Tools", new Color(118, 0, 236));
 
         if (args.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide arguments.\n\n" +

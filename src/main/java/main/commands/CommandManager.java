@@ -26,6 +26,13 @@ import java.util.regex.Pattern;
 public class CommandManager {
     @Getter
     private final List<ICommand> commands = new ArrayList<>();
+    @Getter
+    private final List<ICommand> musicCommands = new ArrayList<>();
+    @Getter
+    private final List<ICommand> managementCommands = new ArrayList<>();
+    @Getter
+    private final List<ICommand> miscCommands = new ArrayList<>();
+
 
     public CommandManager() {
         addCommands(
@@ -53,6 +60,34 @@ public class CommandManager {
                 new RepeatCommand(),
                 new JumpCommand()
         );
+
+        addMusicCommands(
+                new PlayCommand(),
+                new LeaveCommand(),
+                new StopCommand(),
+                new SkipCommand(),
+                new NowPlayingCommand(),
+                new QueueCommand(),
+                new PauseCommand(),
+                new RemoveCommand(),
+                new MoveCommand(),
+                new ShuffleCommand(),
+                new ClearQueueCommand(),
+                new RewindCommand(),
+                new SkipToCommand(),
+                new RepeatCommand(),
+                new JumpCommand()
+        );
+
+        addManagementCommands(
+                new PermissionsCommand(),
+                new SetChannelCommand(),
+                new SetPrefixCommand()
+        );
+
+        addMiscCommands(
+                new PingCommand()
+        );
     }
 
     private void addCommands(ICommand... cmds) {
@@ -63,6 +98,39 @@ public class CommandManager {
                 throw new IllegalArgumentException("A command with this name already exists!");
 
             commands.add(cmd);
+        }
+    }
+
+    private void addMusicCommands(ICommand... cmds) {
+        for (ICommand cmd : cmds) {
+            boolean nameFound = this.musicCommands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
+
+            if (nameFound)
+                throw new IllegalArgumentException("A command with this name already exists!");
+
+            musicCommands.add(cmd);
+        }
+    }
+
+    private void addManagementCommands(ICommand... cmds) {
+        for (ICommand cmd : cmds) {
+            boolean nameFound = this.managementCommands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
+
+            if (nameFound)
+                throw new IllegalArgumentException("A command with this name already exists!");
+
+            managementCommands.add(cmd);
+        }
+    }
+
+    private void addMiscCommands(ICommand... cmds) {
+        for (ICommand cmd : cmds) {
+            boolean nameFound = this.miscCommands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
+
+            if (nameFound)
+                throw new IllegalArgumentException("A command with this name already exists!");
+
+            miscCommands.add(cmd);
         }
     }
 

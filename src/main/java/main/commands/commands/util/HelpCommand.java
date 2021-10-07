@@ -25,19 +25,28 @@ public class HelpCommand implements ICommand {
         final String prefix = ServerUtils.getPrefix(ctx.getGuild().getIdLong());
 
         GeneralUtils.setCustomEmbed(
-                BotConstants.ROBERTIFY_EMBED_TITLE + " | Help",
+                "Help Command",
                 "Type \"" + prefix + "help <command>\" to get more help on a specific command."
         );
 
         CommandManager manager = new CommandManager();
 
         if (args.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder();
-            for (ICommand cmd : manager.getCommands())
-                stringBuilder.append("`").append(cmd.getName()).append("`, ");
+            StringBuilder musicCommandsStringBuilder = new StringBuilder();
+            StringBuilder managementCommandsStringBuilder = new StringBuilder();
+            StringBuilder miscCommandsStringBuilder = new StringBuilder();
+
+            for (ICommand cmd : manager.getMusicCommands())
+                musicCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
+            for (ICommand cmd : manager.getManagementCommands())
+                managementCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
+            for (ICommand cmd : manager.getMiscCommands())
+                miscCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
 
             EmbedBuilder eb = EmbedUtils.embedMessage("**Prefix**: `" + prefix + "`");
-            eb.addField("Commands", stringBuilder.toString(), false);
+            eb.addField(" Management Commands", managementCommandsStringBuilder.toString(), false);
+            eb.addField(" Music Commands", musicCommandsStringBuilder.toString(), false);
+            eb.addField(" Miscellaneous Commands", miscCommandsStringBuilder.toString(), false);
             msg.replyEmbeds(eb.build()).queue();
 
             GeneralUtils.setDefaultEmbed();
@@ -80,10 +89,8 @@ public class HelpCommand implements ICommand {
             }
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessageWithTitle(
-                BotConstants.ROBERTIFY_EMBED_TITLE + " | Help ["+command.getName()+"]",
-                command.getHelp(msg.getGuild().getId())
-        );
+        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(msg.getGuild().getId()));
+        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.SPOTIFY_ICON_URL.toString());
         msg.replyEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed();

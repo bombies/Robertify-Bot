@@ -39,7 +39,7 @@ public class MoveCommand implements ICommand {
             ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
         }
 
-        GeneralUtils.setCustomEmbed(BotConstants.ROBERTIFY_EMBED_TITLE + " | Queue");
+        GeneralUtils.setCustomEmbed("Queue");
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");

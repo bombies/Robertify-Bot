@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
@@ -213,8 +214,8 @@ public class GeneralUtils {
     public static void setDefaultEmbed() {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
-                        .setTitle(BotConstants.ROBERTIFY_EMBED_TITLE.toString())
                         .setColor(embedColor)
+                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, BotConstants.SPOTIFY_ICON_URL.toString())
         );
     }
 
@@ -222,31 +223,38 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(color)
-                        .setFooter(Robertify.api.getSelfUser().getAsTag())
         );
     }
 
-    public static void setCustomEmbed(String title, Color color) {
+    public static void setCustomEmbed(String author, Color color) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(color)
-                        .setTitle(title)
-                        .setFooter(Robertify.api.getSelfUser().getAsTag())
+                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
         );
     }
 
-    public static void setCustomEmbed(String title) {
+    public static void setCustomEmbed(String author) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(embedColor)
-                        .setTitle(title)
-                        .setFooter(Robertify.api.getSelfUser().getAsTag())
+                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
         );
     }
 
-    public static void setCustomEmbed(String title, String footer) {
+    public static void setCustomEmbed(String author, String footer) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
+                        .setColor(embedColor)
+                        .setAuthor(author,null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setFooter(footer)
+        );
+    }
+
+    public static void setCustomEmbed(String author, @Nullable String title, String footer) {
+        EmbedUtils.setEmbedBuilder(
+                () -> new EmbedBuilder()
+                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
                         .setColor(embedColor)
                         .setTitle(title)
                         .setFooter(footer)

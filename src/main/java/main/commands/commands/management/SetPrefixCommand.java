@@ -22,7 +22,7 @@ public class SetPrefixCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed(BotConstants.ROBERTIFY_EMBED_TITLE + " | Set Prefix");
+        GeneralUtils.setCustomEmbed("Set Prefix");
 
         if (args.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a prefix to set!");

@@ -25,7 +25,7 @@ public class LeaveCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_MOD)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
             eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
             msg.replyEmbeds(eb.build()).queue();
             return;
@@ -81,6 +81,7 @@ public class LeaveCommand implements ICommand {
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n"+
                 "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";
     }

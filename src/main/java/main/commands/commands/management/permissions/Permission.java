@@ -5,7 +5,7 @@ import java.util.List;
 
 public enum Permission {
     ROBERTIFY_ADMIN(0),
-    ROBERTIFY_MOD(1);
+    ROBERTIFY_DJ(1);
 
     private final int code;
 
