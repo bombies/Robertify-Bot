@@ -1,11 +1,14 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.wrapper.spotify.model_objects.specification.Track;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.database.BotUtils;
+import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -13,6 +16,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
+import java.util.List;
 
 public class RepeatCommand implements ICommand {
     @Override
@@ -65,15 +69,38 @@ public class RepeatCommand implements ICommand {
             return;
         }
 
-        if (musicManager.scheduler.repeating) {
-            musicManager.scheduler.repeating = false;
-            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title  + "` will no longer be repeated!");
+        if (ctx.getArgs().isEmpty()) {
+            if (musicManager.scheduler.repeating) {
+                musicManager.scheduler.repeating = false;
+                eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will no longer be repeated!");
+            } else {
+                musicManager.scheduler.repeating = true;
+                eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will now be replayed");
+            }
             msg.replyEmbeds(eb.build()).queue();
-        } else {
-            musicManager.scheduler.repeating = true;
-            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title  + "` will now be replayed");
-            msg.replyEmbeds(eb.build()).queue();
+            return;
         }
+
+        if (ctx.getArgs().get(0).equalsIgnoreCase("queue") || ctx.getArgs().get(0).equalsIgnoreCase("q")) {
+            if (musicManager.scheduler.playlistRepeating) {
+                musicManager.scheduler.playlistRepeating = false;
+                musicManager.scheduler.removeSavedQueue(ctx.getGuild());
+                eb = EmbedUtils.embedMessage("The current queue will no longer be repeated!");
+            } else {
+                musicManager.scheduler.playlistRepeating = true;
+
+                AudioTrack thisTrack = audioPlayer.getPlayingTrack().makeClone();
+                thisTrack.setPosition(0L);
+
+                musicManager.scheduler.queue.offer(thisTrack);
+                musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
+                musicManager.scheduler.queue.remove(thisTrack);
+                eb = EmbedUtils.embedMessage("The current queue will now be repeated!");
+            }
+        } else {
+            eb = EmbedUtils.embedMessage("Invalid arguments!");
+        }
+        msg.replyEmbeds(eb.build()).queue();
     }
 
     @Override
@@ -83,6 +110,13 @@ public class RepeatCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Set the song being replayed ";
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Set the song being replayed\n" +
+                "\nUsage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "repeat [queue]` *(Add `queue` to start repeating the current queue)*";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("rep");
     }
 }

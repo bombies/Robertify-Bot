@@ -5,20 +5,26 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import main.main.Listener;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
-    public final BlockingQueue<AudioTrack> queue;
+    private final static HashMap<Guild, BlockingQueue<AudioTrack>> savedQueue = new HashMap<>();
+    public BlockingQueue<AudioTrack> queue;
     public boolean repeating = false;
+    public boolean playlistRepeating = false;
+    private boolean announceNowPlaying = true;
+    private boolean errorOccurred = false;
     private final Guild guild;
     private final TextChannel announcementChannel;
 
@@ -48,21 +54,46 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("▶️  **Now Playing**: `" + track.getInfo().title + "`");
-            announcementChannel.sendMessageEmbeds(eb.build()).queue();
+            if (announceNowPlaying) {
+                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`");
+                announcementChannel.sendMessageEmbeds(eb.build()).queue();
+            }
         }
     }
 
     public void nextTrack() {
-        this.player.startTrack(this.queue.poll(), false);
+        if (this.queue.isEmpty())
+            if (playlistRepeating)
+                this.queue = new LinkedBlockingQueue<>(savedQueue.get(this.guild));
+
+        AudioTrack nextTrack = this.queue.poll();
+
+        if (nextTrack == null) {
+            Listener.LOGGER.error("Next track is null!");
+            return;
+        }
+
+        nextTrack.setPosition(0L);
+
+        try {
+            this.player.stopTrack();
+            this.player.startTrack(nextTrack, false);
+        } catch (IllegalStateException e) {
+            announceNowPlaying = false;
+            this.player.stopTrack();
+            this.player.startTrack(nextTrack.makeClone(), false);
+            announceNowPlaying = true;
+        }
     }
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (repeating) {
-            player.playTrack(track.makeClone());
-        } else if (endReason.mayStartNext) {
-            nextTrack();
+        if (!errorOccurred) {
+            if (repeating) {
+                player.playTrack(track.makeClone());
+            } else if (endReason.mayStartNext) {
+                nextTrack();
+            }
         }
     }
 
@@ -74,9 +105,35 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        exception.printStackTrace();
+        Listener.LOGGER.error("There was an exception with playing the track. Handling it.");
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("There was an error playing `"+track.getInfo().title+"`. It is most likely a copyright issue.");
-        announcementChannel.sendMessageEmbeds(eb.build()).queue();
+        errorOccurred = true;
+
+        try {
+            announceNowPlaying = false;
+            player.stopTrack();
+            player.startTrack(track, false);
+            announceNowPlaying = true;
+        } catch (IllegalStateException e) {
+            announceNowPlaying = false;
+            player.stopTrack();
+            player.startTrack(track.makeClone(), false);
+            announceNowPlaying = true;
+        }
+
+        errorOccurred = false;
+    }
+
+    public void setSavedQueue(Guild guild, BlockingQueue<AudioTrack> queue) {
+        BlockingQueue<AudioTrack> savedBlockingQueue = new LinkedBlockingQueue<>(queue);
+
+        for (AudioTrack track : savedBlockingQueue)
+            track.setPosition(0L);
+
+        savedQueue.put(guild, savedBlockingQueue);
+    }
+
+    public void removeSavedQueue(Guild guild) {
+        savedQueue.remove(guild);
     }
 }

@@ -4,6 +4,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.commands.commands.management.permissions.Permission;
+import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -22,6 +24,14 @@ public class LeaveCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         EmbedBuilder eb;
+
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_MOD)) {
+            eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+
 
         BotUtils botUtils = new BotUtils();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
@@ -44,7 +54,7 @@ public class LeaveCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = EmbedUtils.embedMessage("You need to be in the same voice channel as me for this to work");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
