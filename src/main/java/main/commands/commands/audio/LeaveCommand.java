@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
+import java.util.List;
 
 public class LeaveCommand implements ICommand {
     @Override
@@ -69,7 +70,13 @@ public class LeaveCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Forces the bot to stop playing music and leave the voice channel" +
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("dc");
     }
 }

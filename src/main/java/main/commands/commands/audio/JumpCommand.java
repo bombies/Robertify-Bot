@@ -19,7 +19,7 @@ import javax.script.ScriptException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RewindCommand implements ICommand {
+public class JumpCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
@@ -72,7 +72,9 @@ public class RewindCommand implements ICommand {
         }
 
         if (ctx.getArgs().isEmpty()) {
-            track.setPosition(0L);
+            eb  = EmbedUtils.embedMessage("You must provide the amount of seconds to jump in the song!");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
         } else {
             long time;
             if (GeneralUtils.stringIsInt(ctx.getArgs().get(0)))
@@ -91,13 +93,13 @@ public class RewindCommand implements ICommand {
 
             time = TimeUnit.SECONDS.toMillis(time);
 
-            if (time > track.getPosition()) {
-                eb = EmbedUtils.embedMessage("This duration cannot be more than the current time in the song");
+            if (time > track.getDuration() - time) {
+                eb = EmbedUtils.embedMessage("This duration cannot be more than the time left!");
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }
 
-            track.setPosition(track.getPosition() - time);
+            track.setPosition(track.getPosition() + time);
         }
 
         msg.addReaction("✅").queue();
@@ -105,19 +107,18 @@ public class RewindCommand implements ICommand {
 
     @Override
     public String getName() {
-        return "rewind";
+        return "jump";
     }
 
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Rewind the song\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"rewind` *(Rewinds the song to the beginning)*\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"rewind <seconds_to_rewind>` *(Rewinds the song to a specific duration)*\n";
+                "Skips the song by the given number of seconds\n" +
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"jump <seconds_to_jump>` *(Skips the song to a specific duration)*\n";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("r");
+        return List.of("j", "ff", "fastforward");
     }
 }

@@ -20,11 +20,13 @@ public class TrackScheduler extends AudioEventAdapter {
     public final BlockingQueue<AudioTrack> queue;
     public boolean repeating = false;
     private final Guild guild;
+    private final TextChannel announcementChannel;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
         this.queue = new LinkedBlockingQueue<>();
         this.guild = guild;
+        this.announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
     }
 
     public void queue(AudioTrack track) {
@@ -45,10 +47,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(guild.getIdLong());
-
-        EmbedBuilder eb = EmbedUtils.embedMessage("▶️  **Now Playing**: `" + track.getInfo().title + "`");
-        announcementChannel.sendMessageEmbeds(eb.build()).queue();
+        if (!repeating) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("▶️  **Now Playing**: `" + track.getInfo().title + "`");
+            announcementChannel.sendMessageEmbeds(eb.build()).queue();
+        }
     }
 
     public void nextTrack() {
@@ -58,7 +60,7 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (repeating) {
-            player.playTrack(track);
+            player.playTrack(track.makeClone());
         } else if (endReason.mayStartNext) {
             nextTrack();
         }
@@ -73,5 +75,8 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         exception.printStackTrace();
+
+        EmbedBuilder eb = EmbedUtils.embedMessage("There was an error playing `"+track.getInfo().title+"`. It is most likely a copyright issue.");
+        announcementChannel.sendMessageEmbeds(eb.build()).queue();
     }
 }

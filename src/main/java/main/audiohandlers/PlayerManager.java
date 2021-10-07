@@ -82,7 +82,7 @@ public class PlayerManager {
                     channel.sendMessageEmbeds(eb.build()).queue(msg -> {
                         long timeStarted = System.currentTimeMillis();
                         for (Track track : trueTracks) {
-                            finalTrackUrl[0] = "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName();
+                            finalTrackUrl[0] = "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName() + " audio";
                             String finalTrackUrl1 = finalTrackUrl[0];
                             audioPlayerManager.loadItemOrdered(
                                     musicManager,
