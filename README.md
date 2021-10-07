@@ -28,6 +28,6 @@ Robertify supports all sources and formats supported by [lavaplayer](https://git
 ![Queue Example](https://i.imgur.com/1PWkKef.gif)
 
 ## Help
-Confused about something? Try taking a look at the **help menu** that comes with tbe bot! You can see all help command and even get help with a specific command.
-![Main Help Menu](https://i.imgur.com/zyMS43y.png)
+Confused about something? Try taking a look at the **help menu** that comes with tbe bot! You can see all help commands and even get help with a specific command. <br><br>
+![Main Help Menu](https://i.imgur.com/zyMS43y.png) <br><br>
 ![Specific Help Menu](https://i.imgur.com/X4575hL.png)
