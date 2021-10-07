@@ -113,7 +113,7 @@ public class RewindCommand implements ICommand {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Rewind the song\n" +
                 "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"rewind` *(Rewinds the song to the beginning)*\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"rewind <seconds_to_rewind>` *(Rewinds the song to a specific duration)*\n";
+                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"rewind <seconds_to_rewind>` *(Rewinds the song by a specific duration)*\n";
     }
 
     @Override

@@ -86,6 +86,7 @@ public class MoveCommand implements ICommand {
         prevList.remove(trackList.get(id-1));
         prevList.add(position-1, trackList.get(id-1));
         if (!queue.addAll(prevList)) {
+            queue.addAll(trackList);
             Listener.LOGGER.error("Could not move track with id "+id+" in the queue");
             msg.addReaction("❌").queue();
         }
@@ -102,7 +103,13 @@ public class MoveCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Move a specific track to a specific position in the queue\n" +
+        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+                "\nMove a specific track to a specific position in the queue\n" +
                 "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"move <id> <position>`";
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("m");
     }
 }

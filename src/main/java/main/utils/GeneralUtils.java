@@ -215,7 +215,6 @@ public class GeneralUtils {
                 () -> new EmbedBuilder()
                         .setTitle(BotConstants.ROBERTIFY_EMBED_TITLE.toString())
                         .setColor(embedColor)
-                        .setFooter(Robertify.api.getSelfUser().getAsTag())
         );
     }
 
