@@ -182,7 +182,9 @@ public class PlayerManager {
                     return;
                 }
             }
-        } else if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio")) {
+        }
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
             String finalTrackUrl = trackUrl;
@@ -242,7 +244,6 @@ public class PlayerManager {
                     ctx.getMessage().replyEmbeds(eb.build()).queue();
                 }
             });
-        }
     }
 
     private void joinVoiceChannel(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx) {

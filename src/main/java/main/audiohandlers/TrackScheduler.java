@@ -68,11 +68,6 @@ public class TrackScheduler extends AudioEventAdapter {
 
         AudioTrack nextTrack = this.queue.poll();
 
-        if (nextTrack == null) {
-            Listener.LOGGER.error("Next track is null!");
-            return;
-        }
-
         nextTrack.setPosition(0L);
 
         try {
