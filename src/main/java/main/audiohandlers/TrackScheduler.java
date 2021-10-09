@@ -5,6 +5,8 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
 import main.utils.database.BotUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -26,13 +28,11 @@ public class TrackScheduler extends AudioEventAdapter {
     private boolean announceNowPlaying = true;
     private boolean errorOccurred = false;
     private final Guild guild;
-    private final TextChannel announcementChannel;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
         this.queue = new LinkedBlockingQueue<>();
         this.guild = guild;
-        this.announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
     }
 
     public void queue(AudioTrack track) {
@@ -54,10 +54,12 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
-            if (announceNowPlaying) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`");
-                announcementChannel.sendMessageEmbeds(eb.build()).queue();
-            }
+            if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES))
+                if (announceNowPlaying) {
+                    TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
+                    EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`");
+                    announcementChannel.sendMessageEmbeds(eb.build()).queue();
+                }
         }
     }
 

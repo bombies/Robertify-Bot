@@ -44,7 +44,7 @@ public class HelpCommand implements ICommand {
             for (ICommand cmd : manager.getMiscCommands())
                 miscCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("**Prefix**: `" + prefix + "`");
+            EmbedBuilder eb = EmbedUtils.embedMessage("*Completely confused and new? Try running the `tutorial` command!*\n\n**Prefix**: `" + prefix + "`");
             eb.addField(" Management Commands", managementCommandsStringBuilder.toString(), false);
             eb.addField(" Music Commands", musicCommandsStringBuilder.toString(), false);
             eb.addField(" Miscellaneous Commands", miscCommandsStringBuilder.toString(), false);

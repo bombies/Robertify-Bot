@@ -3,6 +3,7 @@ package main.main;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
@@ -36,6 +37,7 @@ public class Listener extends ListenerAdapter {
 
         permConfig.initConfig();
         new ChangeLogConfig().initConfig();
+        new TogglesConfig().initConfig();
 
         for (Guild g : new BotUtils().getGuilds()) {
             permConfig.initGuild(g.getId());

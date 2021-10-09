@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
@@ -51,11 +53,14 @@ public class ChangeLogCommand implements IDevCommand {
 
         botUtils.createConnection();
 
-        logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n"));
+        logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
         for (Guild g : guilds) {
+            if (!new TogglesConfig().getToggle(msg.getGuild(), Toggles.ANNOUNCE_CHANGELOGS))
+                continue;
+
             botUtils.createConnection();
             TextChannel announcementChannel = botUtils.getAnnouncementChannelObject(g.getIdLong());
 
@@ -74,7 +79,7 @@ public class ChangeLogCommand implements IDevCommand {
         var logsToString = new StringBuilder();
 
         for (int i = 0; i < logs.size(); i++)
-            logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n");
+            logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n\n");
 
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");

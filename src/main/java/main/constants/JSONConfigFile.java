@@ -2,7 +2,8 @@ package main.constants;
 
 public enum JSONConfigFile {
     PERMISSIONS("permissions.json"),
-    CHANGELOG("changelog.json");
+    CHANGELOG("changelog.json"),
+    TOGGLES("toggles.json");
 
     private final String str;
 

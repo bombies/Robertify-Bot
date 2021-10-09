@@ -7,6 +7,7 @@ import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.management.toggles.TogglesCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
@@ -67,7 +68,8 @@ public class CommandManager {
                 new JumpCommand(),
                 new SetDJCommand(),
                 new RemoveDJCommand(),
-                new TutorialCommand()
+                new TutorialCommand(),
+                new TogglesCommand()
         );
 
         addMusicCommands(

@@ -86,7 +86,6 @@ class RefreshSpotifyToken implements Runnable {
 
     @Override
     public void run() {
-        Listener.LOGGER.info("Setting new SpotifyAPI access token.");
         SpotifyAuthorizationUtils.setTokens();
     }
 }
