@@ -1,8 +1,11 @@
 package main.commands;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.audio.*;
 import main.commands.commands.dev.DeveloperCommand;
+import main.commands.commands.management.permissions.RemoveDJCommand;
+import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
@@ -10,6 +13,7 @@ import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.SetPrefixCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.management.ShutdownCommand;
+import main.commands.commands.util.TutorialCommand;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,7 +38,7 @@ public class CommandManager {
     private final List<ICommand> miscCommands = new ArrayList<>();
 
 
-    public CommandManager() {
+    public CommandManager(EventWaiter waiter) {
         addCommands(
                 new PingCommand(),
                 new ViewConfigCommand(),
@@ -58,7 +62,10 @@ public class CommandManager {
                 new RewindCommand(),
                 new SkipToCommand(),
                 new RepeatCommand(),
-                new JumpCommand()
+                new JumpCommand(),
+                new SetDJCommand(),
+                new RemoveDJCommand(),
+                new TutorialCommand()
         );
 
         addMusicCommands(
@@ -82,7 +89,9 @@ public class CommandManager {
         addManagementCommands(
                 new PermissionsCommand(),
                 new SetChannelCommand(),
-                new SetPrefixCommand()
+                new SetPrefixCommand(),
+                new SetDJCommand(),
+                new RemoveDJCommand()
         );
 
         addMiscCommands(

@@ -95,7 +95,8 @@ public class GeneralUtils {
     }
 
     public static boolean  hasPerms(Guild guild, Member sender, Permission perm) {
-        if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)) return true;
+        if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
+        || sender.isOwner()) return true;
 
         List<Role> userRoles = sender.getRoles();
 

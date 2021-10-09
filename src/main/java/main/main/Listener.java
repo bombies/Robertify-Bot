@@ -1,5 +1,6 @@
 package main.main;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
 import main.utils.database.BotUtils;
@@ -22,8 +23,8 @@ public class Listener extends ListenerAdapter {
     private final CommandManager manager;
     public static final Logger LOGGER = LoggerFactory.getLogger(Listener.class);
 
-    public Listener() {
-        manager = new CommandManager();
+    public Listener(EventWaiter waiter) {
+        manager = new CommandManager(waiter);
     }
 
     @SneakyThrows

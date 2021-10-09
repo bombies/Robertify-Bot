@@ -1,15 +1,14 @@
 package main.main;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.SpotifyHttpManager;
-import com.wrapper.spotify.model_objects.specification.Track;
 import lombok.Getter;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
-import main.utils.spotify.SpotifyTrack;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -26,6 +25,8 @@ public class Robertify {
     public static JDA api;
     @Getter
     private static SpotifyApi spotifyApi;
+    @Getter
+    private static final EventWaiter commandWaiter = new EventWaiter();
 
     public static void main(String[] args) {
         WebUtils.setUserAgent("Mozilla/Robertify / bombies#4445");
@@ -49,7 +50,8 @@ public class Robertify {
                     // Event Listeners
                     .addEventListeners(
                             VoiceChannelEvents.waiter,
-                            new Listener(),
+                            commandWaiter,
+                            new Listener(commandWaiter),
                             new VoiceChannelEvents()
                     )
 

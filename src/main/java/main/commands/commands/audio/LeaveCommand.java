@@ -81,7 +81,7 @@ public class LeaveCommand implements ICommand {
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n"+
+                "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n\n"+
                 "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";
     }

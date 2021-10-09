@@ -71,7 +71,7 @@ public class PermissionsCommand implements ICommand {
      * @param msg Message sent with the command
      * @param args Arguments with the role ID and the permission to be added
      */
-    private void add(Message msg, List<String> args) {
+    private void  add(Message msg, List<String> args) {
         Object[] checks = checks(msg, args);
         if (!((boolean) checks[0])) return;
         Role role = (Role) checks[1];
@@ -211,9 +211,15 @@ public class PermissionsCommand implements ICommand {
                     for (Role r : roles)
                         rolesString.add(r.getAsMention());
 
-                    EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles with permission `" + args.get(1).toUpperCase()
-                            + "`**\n\n" + rolesString);
-                    msg.replyEmbeds(eb.build()).queue();
+                    if (!roles.isEmpty()) {
+                        EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles with permission `" + args.get(1).toUpperCase()
+                                + "`**\n\n" + rolesString);
+                        msg.replyEmbeds(eb.build()).queue();
+                    } else {
+                        EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles with permission `" + args.get(1).toUpperCase()
+                                + "`**\n\n`Nothing's here!`");
+                        msg.replyEmbeds(eb.build()).queue();
+                    }
                 } else {
                     EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!");
                     msg.replyEmbeds(eb.build()).queue();

@@ -6,6 +6,7 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
 import main.constants.BotConstants;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
@@ -29,7 +30,7 @@ public class HelpCommand implements ICommand {
                 "Type \"" + prefix + "help <command>\" to get more help on a specific command."
         );
 
-        CommandManager manager = new CommandManager();
+        CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
 
         if (args.isEmpty()) {
             StringBuilder musicCommandsStringBuilder = new StringBuilder();
