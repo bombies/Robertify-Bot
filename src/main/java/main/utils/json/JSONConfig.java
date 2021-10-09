@@ -27,6 +27,23 @@ public abstract class JSONConfig {
      */
     public abstract void initConfig();
 
+    /**
+     * Attempts to make the specified JSON configuration file if it doesn't already exist.
+     * @param file JSON file to be created
+     */
+    @SneakyThrows
+    public void makeConfigFile(JSONConfigFile file) {
+        boolean newConfig = false;
+
+        if (!Files.exists(Config.getPath(ENV.JSON_DIR, file))) {
+            new File(String.valueOf(Config.getPath(ENV.JSON_DIR, file)))
+                    .createNewFile();
+            newConfig = true;
+        }
+
+        if (!newConfig) throw new IllegalStateException("File already exists.");
+    }
+
     protected JSONObject getJSONObject() {
         return new JSONObject(getJSON());
     }

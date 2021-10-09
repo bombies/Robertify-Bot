@@ -25,15 +25,11 @@ public class PermissionsConfig extends JSONConfig {
     @SneakyThrows
     @Override
     public void initConfig() {
-        boolean newConfig = false;
-
-        if (!Files.exists(Config.getPath(ENV.JSON_DIR, JSONConfigFile.PERMISSIONS))) {
-            new File(String.valueOf(Config.getPath(ENV.JSON_DIR, JSONConfigFile.PERMISSIONS)))
-                    .createNewFile();
-            newConfig = true;
+        try {
+            makeConfigFile(JSONConfigFile.PERMISSIONS);
+        } catch (IllegalStateException e) {
+            return;
         }
-
-        if (!newConfig) return;
 
         JSONObject obj = new JSONObject();
 

@@ -6,6 +6,7 @@ import main.commands.CommandManager;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
+import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -34,6 +35,7 @@ public class Listener extends ListenerAdapter {
         PermissionsConfig permConfig = new PermissionsConfig();
 
         permConfig.initConfig();
+        new ChangeLogConfig().initConfig();
 
         for (Guild g : new BotUtils().getGuilds()) {
             permConfig.initGuild(g.getId());

@@ -3,6 +3,7 @@ package main.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.audio.*;
+import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
@@ -42,6 +43,7 @@ public class CommandManager {
         addCommands(
                 new PingCommand(),
                 new ViewConfigCommand(),
+                new ChangeLogCommand(),
                 new PermissionsCommand(),
                 new HelpCommand(),
                 new SetPrefixCommand(),

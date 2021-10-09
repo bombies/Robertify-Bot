@@ -3,8 +3,8 @@ package main.utils;
 import main.commands.commands.management.permissions.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
+import main.constants.TimeFormat;
 import main.main.Config;
-import main.main.Robertify;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -156,6 +157,21 @@ public class GeneralUtils {
         System.out.println(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*");
 
         return string.replaceAll(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "");
+    }
+
+    public static String getJoinedString(List<String> args, int startIndex) {
+        StringBuilder arg = new StringBuilder();
+        for (int i = startIndex; i < args.size(); i++)
+            arg.append(args.get(i)).append((i < args.size() - 1) ? " " : "");
+        return  arg.toString();
+    }
+
+    public static String formatDate(long date, TimeFormat style) {
+        return switch (style) {
+            case DD_MMMM_YYYY, MM_DD_YYYY, DD_MMMM_YYYY_ZZZZ, DD_M_YYYY_HH_MM_SS,
+                    E_DD_MMM_YYYY_HH_MM_SS_Z -> new SimpleDateFormat(style.toString()).format(date);
+            default -> throw new IllegalArgumentException("The enum provided isn't a supported enum!");
+        };
     }
 
     public static String formatTime(long duration) {
