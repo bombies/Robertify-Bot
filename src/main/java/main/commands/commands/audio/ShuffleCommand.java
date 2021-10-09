@@ -32,8 +32,8 @@ public class ShuffleCommand implements ICommand {
             botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
                     .closeConnection();
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting to to this channel.\n" +
-                    "\n_You can change the announcement channel by using set \"setchannel\" command._");
+            EmbedBuilder eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
+                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
             ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
         }
 
