@@ -39,7 +39,7 @@ public class TogglesConfig extends JSONConfig {
         for (Guild g : new BotUtils().getGuilds())
             for (Toggles toggle : Toggles.values())
                 if (!obj.getJSONObject(g.getId()).has(toggle.toString()))
-                    obj.put(toggle.toString(), true);
+                    obj.getJSONObject(g.getId()).put(toggle.toString(), true);
 
         setJSON(obj);
     }

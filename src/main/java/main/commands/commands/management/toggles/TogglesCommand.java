@@ -42,7 +42,7 @@ public class TogglesCommand implements ICommand {
             var config = new TogglesConfig();
             var eb = new EmbedBuilder();
             switch (args.get(0).toLowerCase()) {
-                case "announcements" -> {
+                case "announcements", "1" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
                         eb = EmbedUtils.embedMessage("You have toggled announcing player messages **OFF**");
@@ -50,13 +50,23 @@ public class TogglesCommand implements ICommand {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
                         eb = EmbedUtils.embedMessage("You have toggled announcing player messages **ON**");
                     }
-                } case "changelog" -> {
+                }
+                case "changelog", "2" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_CHANGELOGS)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, false);
                         eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, true);
                         eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **ON**");
+                    }
+                }
+                case "requester", "3" -> {
+                    if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
+                        config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
+                        eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
+                        eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
                 default -> eb = EmbedUtils.embedMessage("Invalid toggle!");

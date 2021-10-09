@@ -19,13 +19,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
-    private  final Map<Long, GuildMusicManager> musicManagers;
+    private final Map<Long, GuildMusicManager> musicManagers;
+    private static final HashMap<AudioTrack, User> trackRequestedByUser = new HashMap<>();
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
@@ -83,6 +85,7 @@ public class PlayerManager {
                                     new AudioLoadResultHandler() {
                                         @Override
                                         public void trackLoaded(AudioTrack audioTrack) {
+                                            trackRequestedByUser.put(audioTrack, ctx.getAuthor());
                                             musicManager.scheduler.queue(audioTrack);
                                             if (musicManager.scheduler.playlistRepeating)
                                                 musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
@@ -91,6 +94,7 @@ public class PlayerManager {
                                         @Override
                                         public void playlistLoaded(AudioPlaylist audioPlaylist) {
                                             List<AudioTrack> tracks = audioPlaylist.getTracks();
+                                            trackRequestedByUser.put(tracks.get(0), ctx.getAuthor());
                                             musicManager.scheduler.queue(tracks.get(0));
                                             if (musicManager.scheduler.playlistRepeating)
                                                 musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
@@ -144,6 +148,7 @@ public class PlayerManager {
                                     new AudioLoadResultHandler() {
                                         @Override
                                         public void trackLoaded(AudioTrack audioTrack) {
+                                            trackRequestedByUser.put(audioTrack, ctx.getAuthor());
                                             musicManager.scheduler.queue(audioTrack);
                                             if (musicManager.scheduler.playlistRepeating)
                                                 musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
@@ -152,6 +157,7 @@ public class PlayerManager {
                                         @Override
                                         public void playlistLoaded(AudioPlaylist audioPlaylist) {
                                             List<AudioTrack> tracks = audioPlaylist.getTracks();
+                                            trackRequestedByUser.put(tracks.get(0), ctx.getAuthor());
                                             musicManager.scheduler.queue(tracks.get(0));
                                             if (musicManager.scheduler.playlistRepeating)
                                                 musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
@@ -195,6 +201,7 @@ public class PlayerManager {
                             + "` by `" + audioTrack.getInfo().author + "`");
                     channel.sendMessageEmbeds(eb.build()).queue();
 
+                    trackRequestedByUser.put(audioTrack, ctx.getAuthor());
                     musicManager.scheduler.queue(audioTrack);
 
                     if (musicManager.scheduler.playlistRepeating)
@@ -210,6 +217,7 @@ public class PlayerManager {
                                 + "` by `" + tracks.get(0).getInfo().author + "`");
                         channel.sendMessageEmbeds(eb.build()).queue();
 
+                        trackRequestedByUser.put(tracks.get(0), ctx.getAuthor());
                         musicManager.scheduler.queue(tracks.get(0));
 
                         if (musicManager.scheduler.playlistRepeating)
@@ -221,8 +229,10 @@ public class PlayerManager {
                             + "` tracks from playlist `" + audioPlaylist.getName() + "`");
                     channel.sendMessageEmbeds(eb.build()).queue();
 
-                    for (final AudioTrack track : tracks)
+                    for (final AudioTrack track : tracks) {
+                        trackRequestedByUser.put(track, ctx.getAuthor());
                         musicManager.scheduler.queue(track);
+                    }
 
                     if (musicManager.scheduler.playlistRepeating)
                         musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
@@ -252,6 +262,14 @@ public class PlayerManager {
             audioManager.openAudioConnection(memberVoiceState.getChannel());
             audioManager.setSelfDeafened(true);
         }
+    }
+
+    public static User getRequester(AudioTrack track) {
+        return trackRequestedByUser.get(track);
+    }
+
+    public static void removeRequester(AudioTrack track, User requester) {
+        trackRequestedByUser.remove(track, requester);
     }
 
     public static PlayerManager getInstance() {

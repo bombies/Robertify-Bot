@@ -7,6 +7,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
@@ -74,9 +76,16 @@ public class NowPlayingCommand implements ICommand {
         AudioTrackInfo info = track.getInfo();
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
-        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+"`\n\n`[0:00]`" +
+        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ "`" + (
+                ((new TogglesConfig().getToggle(ctx.getGuild(), Toggles.SHOW_REQUESTER))) ?
+                        " [ Requested by" + PlayerManager.getRequester(track).getAsMention() + " ]"
+                        :
+                        ""
+        ) +
+                "\n\n`[0:00]`" +
                 GeneralUtils.progressBar(progress) + "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`\n\n" +
                 "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition())+"`");
+
         eb.setAuthor("Now Playing", info.uri, BotConstants.SPOTIFY_ICON_URL.toString());
 
         msg.replyEmbeds(eb.build()).queue();

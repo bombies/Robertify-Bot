@@ -57,7 +57,13 @@ public class TrackScheduler extends AudioEventAdapter {
             if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES))
                 if (announceNowPlaying) {
                     TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
-                    EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`");
+                    EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`"
+                            + (
+                                    ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) ?
+                                            " [" + PlayerManager.getRequester(track).getAsMention() + "]"
+                                            :
+                                            ""
+                    ));
                     announcementChannel.sendMessageEmbeds(eb.build()).queue();
                 }
         }
@@ -87,6 +93,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (!errorOccurred) {
             if (repeating) {
+                PlayerManager.removeRequester(track, PlayerManager.getRequester(track));
                 player.playTrack(track.makeClone());
             } else if (endReason.mayStartNext) {
                 nextTrack();

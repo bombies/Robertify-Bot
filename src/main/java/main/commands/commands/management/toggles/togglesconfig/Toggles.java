@@ -4,7 +4,8 @@ import main.utils.json.IJSONField;
 
 public enum Toggles implements IJSONField {
     ANNOUNCE_MESSAGES("announce_messages"),
-    ANNOUNCE_CHANGELOGS("announce_changelogs");
+    ANNOUNCE_CHANGELOGS("announce_changelogs"),
+    SHOW_REQUESTER("show_requester");
 
     private final String str;
 
@@ -24,6 +25,9 @@ public enum Toggles implements IJSONField {
             }
             case ANNOUNCE_CHANGELOGS -> {
                 return "changelogs";
+            }
+            case SHOW_REQUESTER -> {
+                return "requester";
             }
         }
         throw new NullPointerException("No such toggle!");

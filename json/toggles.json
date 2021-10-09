@@ -1,10 +1,12 @@
 {
     "304828928223084546": {
         "announce_changelogs": true,
-        "announce_messages": false
+        "show_requester": true,
+        "announce_messages": true
     },
     "683480919545479202": {
         "announce_changelogs": true,
+        "show_requester": true,
         "announce_messages": true
     }
 }
