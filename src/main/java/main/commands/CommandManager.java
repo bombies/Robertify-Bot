@@ -2,9 +2,12 @@ package main.commands;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
+import main.commands.commands.ITestCommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
+import main.commands.commands.dev.test.PlaySpotifyURICommand;
+import main.commands.commands.dev.test.SpotifyURLToURICommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
@@ -69,7 +72,11 @@ public class CommandManager {
                 new SetDJCommand(),
                 new RemoveDJCommand(),
                 new TutorialCommand(),
-                new TogglesCommand()
+                new TogglesCommand(),
+
+                //Test Commands
+                new SpotifyURLToURICommand(),
+                new PlaySpotifyURICommand()
         );
 
         addMusicCommands(
@@ -95,7 +102,8 @@ public class CommandManager {
                 new SetChannelCommand(),
                 new SetPrefixCommand(),
                 new SetDJCommand(),
-                new RemoveDJCommand()
+                new RemoveDJCommand(),
+                new TogglesCommand()
         );
 
         addMiscCommands(
@@ -162,7 +170,7 @@ public class CommandManager {
         String searchLower = search.toLowerCase();
 
         for (ICommand cmd : this.commands)
-            if (cmd instanceof IDevCommand)
+            if (cmd instanceof IDevCommand && !(cmd instanceof ITestCommand))
                 if (cmd.getName().equals(searchLower) || cmd.getAliases().contains(searchLower))
                     return cmd;
         return null;
@@ -172,7 +180,7 @@ public class CommandManager {
     public List<ICommand> getCommands() {
         List<ICommand> ret = new ArrayList<>();
         for (ICommand cmd : this.commands)
-            if (!(cmd instanceof IDevCommand))
+            if (!(cmd instanceof IDevCommand) || !(cmd instanceof ITestCommand))
                 ret.add(cmd);
         return  ret;
     }

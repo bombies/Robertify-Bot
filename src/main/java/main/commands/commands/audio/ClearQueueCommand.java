@@ -17,12 +17,13 @@ import net.dv8tion.jda.api.entities.Message;
 import javax.script.ScriptException;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClearQueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 

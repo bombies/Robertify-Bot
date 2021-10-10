@@ -16,13 +16,14 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
-    private final static HashMap<Guild, BlockingQueue<AudioTrack>> savedQueue = new HashMap<>();
-    public BlockingQueue<AudioTrack> queue;
+    private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
+    public ConcurrentLinkedQueue<AudioTrack> queue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
     private boolean announceNowPlaying = true;
@@ -31,7 +32,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
-        this.queue = new LinkedBlockingQueue<>();
+        this.queue = new ConcurrentLinkedQueue<>();
         this.guild = guild;
     }
 
@@ -72,7 +73,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void nextTrack() {
         if (this.queue.isEmpty())
             if (playlistRepeating)
-                this.queue = new LinkedBlockingQueue<>(savedQueue.get(this.guild));
+                this.queue = new ConcurrentLinkedQueue<>(savedQueue.get(this.guild));
 
         AudioTrack nextTrack = this.queue.poll();
 
@@ -128,13 +129,13 @@ public class TrackScheduler extends AudioEventAdapter {
         errorOccurred = false;
     }
 
-    public void setSavedQueue(Guild guild, BlockingQueue<AudioTrack> queue) {
-        BlockingQueue<AudioTrack> savedBlockingQueue = new LinkedBlockingQueue<>(queue);
+    public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
+        ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);
 
-        for (AudioTrack track : savedBlockingQueue)
+        for (AudioTrack track : savedQueue)
             track.setPosition(0L);
 
-        savedQueue.put(guild, savedBlockingQueue);
+        TrackScheduler.savedQueue.put(guild, savedQueue);
     }
 
     public void removeSavedQueue(Guild guild) {

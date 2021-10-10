@@ -18,12 +18,13 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RemoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        final BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
 
