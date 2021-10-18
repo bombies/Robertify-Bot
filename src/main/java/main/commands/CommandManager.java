@@ -73,6 +73,7 @@ public class CommandManager {
                 new RemoveDJCommand(),
                 new TutorialCommand(),
                 new TogglesCommand(),
+                new ResumeCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -94,7 +95,8 @@ public class CommandManager {
                 new RewindCommand(),
                 new SkipToCommand(),
                 new RepeatCommand(),
-                new JumpCommand()
+                new JumpCommand(),
+                new ResumeCommand()
         );
 
         addManagementCommands(

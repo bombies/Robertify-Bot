@@ -42,7 +42,7 @@ public class PlayerManager {
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
-        return  this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildID) -> {
+        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildID) -> {
             final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager, guild);
 
             guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
@@ -62,7 +62,6 @@ public class PlayerManager {
         } else if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
-        String finalTrackUrl = trackUrl;
         loadTrack(trackUrl, musicManager, channel, ctx, true);
     }
 
@@ -90,7 +89,6 @@ public class PlayerManager {
                             musicManager, channel, ctx, false
                     ));
                 });
-
             }
             case PLAYLIST -> {
                 GetPlaylistRequest getPlaylistRequest = Robertify.getSpotifyApi().getPlaylist(uri.getId()).build();
@@ -134,9 +132,11 @@ public class PlayerManager {
                 List<AudioTrack> tracks = audioPlaylist.getTracks();
 
                 if (trackUrl.startsWith("ytsearch:")) {
-                    EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.get(0).getInfo().title
-                            + "` by `" + tracks.get(0).getInfo().author + "`");
-                    channel.sendMessageEmbeds(eb.build()).queue();
+                    if (announceMsg) {
+                        EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.get(0).getInfo().title
+                                + "` by `" + tracks.get(0).getInfo().author + "`");
+                        channel.sendMessageEmbeds(eb.build()).queue();
+                    }
 
                     trackRequestedByUser.put(tracks.get(0), ctx.getAuthor());
                     musicManager.scheduler.queue(tracks.get(0));
@@ -161,7 +161,7 @@ public class PlayerManager {
 
             @Override
             public void noMatches() {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl + "`. Try being more specific. *(Adding name of the artiste)*");
+                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "") + "`. Try being more specific. *(Adding name of the artiste)*");
                 ctx.getMessage().replyEmbeds(eb.build()).queue();
             }
 
