@@ -34,10 +34,11 @@ public class Listener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         JSONConfig.initDirectory();
         PermissionsConfig permConfig = new PermissionsConfig();
+        TogglesConfig togglesConfig = new TogglesConfig();
 
         permConfig.initConfig();
         new ChangeLogConfig().initConfig();
-        new TogglesConfig().initConfig();
+        togglesConfig.initConfig();
 
         for (Guild g : new BotUtils().getGuilds()) {
             permConfig.initGuild(g.getId());

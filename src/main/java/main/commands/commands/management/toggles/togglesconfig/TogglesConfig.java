@@ -4,6 +4,7 @@ import main.constants.JSONConfigFile;
 import main.utils.database.BotUtils;
 import main.utils.json.JSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class TogglesConfig extends JSONConfig {
@@ -38,8 +39,13 @@ public class TogglesConfig extends JSONConfig {
 
         for (Guild g : new BotUtils().getGuilds())
             for (Toggles toggle : Toggles.values())
-                if (!obj.getJSONObject(g.getId()).has(toggle.toString()))
+                try {
                     obj.getJSONObject(g.getId()).put(toggle.toString(), true);
+                } catch (JSONException e) {
+                    obj.put(g.getId(), new JSONObject());
+                    for (Toggles errToggles: Toggles.values())
+                        obj.getJSONObject(g.getId()).put(errToggles.toString(), true);
+                }
 
         setJSON(obj);
     }
