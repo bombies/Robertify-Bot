@@ -6,6 +6,7 @@ import main.commands.commands.ITestCommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
+import main.commands.commands.dev.EvalCommand;
 import main.commands.commands.dev.test.PlaySpotifyURICommand;
 import main.commands.commands.dev.test.SpotifyURLToURICommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
@@ -47,6 +48,7 @@ public class CommandManager {
         addCommands(
                 new PingCommand(),
                 new ViewConfigCommand(),
+                new EvalCommand(),
                 new ChangeLogCommand(),
                 new PermissionsCommand(),
                 new HelpCommand(),
