@@ -86,7 +86,7 @@ public class NowPlayingCommand implements ICommand {
                 GeneralUtils.progressBar(progress) + "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`\n\n" +
                 "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition())+"`");
 
-        eb.setAuthor("Now Playing", info.uri, BotConstants.SPOTIFY_ICON_URL.toString());
+        eb.setAuthor("Now Playing", info.uri, BotConstants.ICON_URL.toString());
 
         msg.replyEmbeds(eb.build()).queue();
     }

@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class GeneralUtils {
-    private static Color embedColor = new Color(51, 255, 0);
+    private static Color embedColor = parseColor(Config.get(ENV.BOT_COLOR));
 
 
     public static String getEmojiRegex() {
@@ -232,7 +232,7 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(embedColor)
-                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, BotConstants.ICON_URL.toString())
         );
     }
 
@@ -247,7 +247,7 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(color)
-                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setAuthor(author, null, BotConstants.ICON_URL.toString())
         );
     }
 
@@ -255,7 +255,7 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(embedColor)
-                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setAuthor(author, null, BotConstants.ICON_URL.toString())
         );
     }
 
@@ -263,7 +263,7 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(embedColor)
-                        .setAuthor(author,null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setAuthor(author,null, BotConstants.ICON_URL.toString())
                         .setFooter(footer)
         );
     }
@@ -271,7 +271,7 @@ public class GeneralUtils {
     public static void setCustomEmbed(String author, @Nullable String title, String footer) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
-                        .setAuthor(author, null, BotConstants.SPOTIFY_ICON_URL.toString())
+                        .setAuthor(author, null, BotConstants.ICON_URL.toString())
                         .setColor(embedColor)
                         .setTitle(title)
                         .setFooter(footer)
@@ -285,5 +285,9 @@ public class GeneralUtils {
                         .setTitle(title)
                         .setFooter(footer)
         );
+    }
+
+    public static Color parseColor(String hex) {
+        return Color.decode(hex);
     }
 }

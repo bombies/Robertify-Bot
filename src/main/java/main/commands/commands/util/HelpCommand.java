@@ -91,7 +91,7 @@ public class HelpCommand implements ICommand {
         }
 
         EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(msg.getGuild().getId()));
-        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.SPOTIFY_ICON_URL.toString());
+        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
         msg.replyEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed();

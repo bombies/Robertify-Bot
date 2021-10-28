@@ -14,7 +14,7 @@ import java.awt.*;
 import java.util.List;
 
 public class EvalCommand implements IDevCommand {
-    private ScriptEngine engine;
+    private final ScriptEngine engine;
 
     public EvalCommand() {
         engine = new ScriptEngineManager().getEngineByName("nashorn");
@@ -61,14 +61,13 @@ public class EvalCommand implements IDevCommand {
             engine.put("guild", ctx.getGuild());
             engine.put("member", ctx.getMember());
 
-            ctx.getGuild().createRole().setPermissions();
-
             Object out = engine.eval(
                     "(function() {\n" +
                             " with (imports) { \n" +
                             src +
                             " \n}" +
                             "\n})();");
+
             if (out != null) {
                 eb = EmbedUtils.embedMessage("```java\n" + src + "```");
                 eb.addField("Result", out.toString(), false);
@@ -80,13 +79,14 @@ public class EvalCommand implements IDevCommand {
         }
 
         msg.replyEmbeds(eb.build()).queue();
-        msg.delete().queue();
 
         GeneralUtils.setDefaultEmbed();
     }
 
     @Override
     public String getName() {
+
+
         return "eval";
     }
 
