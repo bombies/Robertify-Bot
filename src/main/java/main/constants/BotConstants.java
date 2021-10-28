@@ -4,7 +4,7 @@ import main.main.Config;
 
 public enum BotConstants {
     SPOTIFY_EMOJI("<:spotify:893153435438940181>"),
-    ICON_URL("https://cdn-icons-png.flaticon.com/512/174/174872.png"),
+    ICON_URL(Config.get(ENV.ICON_URL)),
     ROBERTIFY_EMBED_TITLE(Config.get(ENV.BOT_NAME));
 
     private final String str;
