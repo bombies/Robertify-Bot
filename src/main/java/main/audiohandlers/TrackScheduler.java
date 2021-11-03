@@ -77,7 +77,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
         AudioTrack nextTrack = this.queue.poll();
 
-        nextTrack.setPosition(0L);
+        if (nextTrack != null) nextTrack.setPosition(0L);
 
         try {
             this.player.stopTrack();

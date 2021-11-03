@@ -85,8 +85,6 @@ public class EvalCommand implements IDevCommand {
 
     @Override
     public String getName() {
-
-
         return "eval";
     }
 
