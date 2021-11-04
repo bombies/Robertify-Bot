@@ -94,8 +94,12 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (!errorOccurred) {
             if (repeating) {
-                PlayerManager.removeRequester(track, PlayerManager.getRequester(track));
-                player.playTrack(track.makeClone());
+                if (track != null) {
+                    if (PlayerManager.getTrackRequestedByUser().containsKey(track))
+                        PlayerManager.removeRequester(track, PlayerManager.getRequester(track));
+                    player.playTrack(track.makeClone());
+                } else
+                    nextTrack();
             } else if (endReason.mayStartNext) {
                 nextTrack();
             }
@@ -105,13 +109,21 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
-        System.out.println("track stuck");
+        Listener.LOGGER.error("Track stuck. Attemping to replay the song.");
+        synchronized (this) {
+            handleTrackException(player, track);
+        }
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         Listener.LOGGER.error("There was an exception with playing the track. Handling it.");
+        synchronized (this) {
+            handleTrackException(player, track);
+        }
+    }
 
+    private void handleTrackException(AudioPlayer player, AudioTrack track) {
         errorOccurred = true;
 
         try {
@@ -119,14 +131,20 @@ public class TrackScheduler extends AudioEventAdapter {
             player.stopTrack();
             player.startTrack(track, false);
             announceNowPlaying = true;
+            errorOccurred = false;
         } catch (IllegalStateException e) {
             announceNowPlaying = false;
-            player.stopTrack();
-            player.startTrack(track.makeClone(), false);
-            announceNowPlaying = true;
+            try {
+                player.stopTrack();
+                player.startTrack(track.makeClone(), false);
+                announceNowPlaying = true;
+                errorOccurred = false;
+            } catch (Exception exc) {
+                exc.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        errorOccurred = false;
     }
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {

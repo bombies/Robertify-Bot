@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -75,10 +76,13 @@ public class NowPlayingCommand implements ICommand {
 
         AudioTrackInfo info = track.getInfo();
 
+
+
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
+        final User requester = PlayerManager.getRequester(track);
         eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ "`" + (
-                ((new TogglesConfig().getToggle(ctx.getGuild(), Toggles.SHOW_REQUESTER))) ?
-                        " [ Requested by" + PlayerManager.getRequester(track).getAsMention() + " ]"
+                ((new TogglesConfig().getToggle(ctx.getGuild(), Toggles.SHOW_REQUESTER))) && requester != null ?
+                        " [ Requested by " + requester.getAsMention() + " ]"
                         :
                         ""
         ) +

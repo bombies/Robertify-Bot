@@ -29,6 +29,7 @@ import java.util.*;
 public class PlayerManager {
     private static PlayerManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
+    @Getter
     private static final HashMap<AudioTrack, User> trackRequestedByUser = new HashMap<>();
     @Getter
     private final AudioPlayerManager audioPlayerManager;
@@ -91,19 +92,22 @@ public class PlayerManager {
                 });
             }
             case PLAYLIST -> {
-                GetPlaylistRequest getPlaylistRequest = Robertify.getSpotifyApi().getPlaylist(uri.getId()).build();
-                Playlist playlist = getPlaylistRequest.execute();
-                PlaylistTrack[] tracks = playlist.getTracks().getItems();
-                List<Track> trueTracks = new ArrayList<>();
+                EmbedBuilder eb = EmbedUtils.embedMessage("Sorry, spotify playlists aren't available right now.");
+                ctx.getMessage().replyEmbeds(eb.build()).queue();
 
-                EmbedBuilder eb = EmbedUtils.embedMessage("Adding `" + tracks.length + "` tracks from `" + playlist.getName() + "` to the queue...");
-                ctx.getMessage().replyEmbeds(eb.build()).queue(msg ->{
-                    Arrays.stream(tracks).forEach(track -> trueTracks.add((Track) track.getTrack()));
-                    trueTracks.forEach(track -> loadTrack(
-                            "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName() + " audio",
-                            musicManager, channel, ctx, false
-                    ));
-                });
+//                GetPlaylistRequest getPlaylistRequest = Robertify.getSpotifyApi().getPlaylist(uri.getId()).build();
+//                Playlist playlist = getPlaylistRequest.execute();
+//                PlaylistTrack[] tracks = playlist.getTracks().getItems();
+//                List<Track> trueTracks = new ArrayList<>();
+//
+//                EmbedBuilder eb = EmbedUtils.embedMessage("Adding `" + tracks.length + "` tracks from `" + playlist.getName() + "` to the queue...");
+//                ctx.getMessage().replyEmbeds(eb.build()).queue(msg ->{
+//                    Arrays.stream(tracks).forEach(track -> trueTracks.add((Track) track.getTrack()));
+//                    trueTracks.forEach(track -> loadTrack(
+//                            "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName() + " audio",
+//                            musicManager, channel, ctx, false
+//                    ));
+//                });
             }
         }
     }
