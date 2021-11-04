@@ -33,7 +33,8 @@ public class PlaySpotifyURICommand implements ITestCommand {
                     uri.toString(),
                     musicManager,
                     ctx.getChannel(),
-                    ctx
+                    ctx,
+                    ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState()
             );
         } catch (InvalidSpotifyURIException e) {
             msg.reply(e.getMessage()).queue();

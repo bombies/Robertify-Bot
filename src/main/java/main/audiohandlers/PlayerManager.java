@@ -1,7 +1,10 @@
 package main.audiohandlers;
 
+import com.google.inject.*;
 import com.sedmelluq.discord.lavaplayer.player.*;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeSearchProvider;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
@@ -11,9 +14,11 @@ import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import com.wrapper.spotify.requests.data.tracks.GetTrackRequest;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.youtube.LazyYoutubeAudioTrackFactory;
 import main.commands.CommandContext;
 import main.main.Listener;
 import main.main.Robertify;
+import main.utils.spotify.SpotifySourceManager;
 import main.utils.spotify.SpotifyURI;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,7 +31,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import java.net.URI;
 import java.util.*;
 
-public class PlayerManager {
+public class PlayerManager extends AbstractModule {
     private static PlayerManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
@@ -34,12 +39,23 @@ public class PlayerManager {
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
+    @Override
+    protected void configure() {
+        bind(AudioTrackFactory.class).to(LazyYoutubeAudioTrackFactory.class);
+    }
+
     public PlayerManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         AudioSourceManagers.registerLocalSource(audioPlayerManager);
+    }
+
+    @Provides
+    @Singleton
+    SpotifySourceManager spotifySourceManager(AudioTrackFactory trackFactory) {
+        return new SpotifySourceManager(trackFactory);
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -53,32 +69,37 @@ public class PlayerManager {
 
     @SneakyThrows
     public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx) {
-        joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
-
         final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
 
         if (trackUrl.contains("spotify.com")) {
-            handleSpotifyURI(trackUrl, musicManager, channel, ctx);
+            handleSpotifyURI(trackUrl, musicManager, channel, ctx, selfVoiceState, memberVoiceState);
             return;
         } else if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
+        joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
         loadTrack(trackUrl, musicManager, channel, ctx, true);
     }
 
     @SneakyThrows
     public void handleSpotifyURI(String spotifyURI, GuildMusicManager musicManager,
-                                 TextChannel channel, CommandContext ctx) {
+                                 TextChannel channel, CommandContext ctx,
+                                 GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         var uri = SpotifyURI.parse(spotifyURI);
+
+        LazyYoutubeAudioTrackFactory lazyYoutubeAudioTrackFactory = new LazyYoutubeAudioTrackFactory(new YoutubeSearchProvider(), audioPlayerManager.source(YoutubeAudioSourceManager.class));
+        audioPlayerManager.registerSourceManager(spotifySourceManager(lazyYoutubeAudioTrackFactory));
 
         switch (uri.getType()) {
             case TRACK -> {
+                joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
                 final GetTrackRequest getTrackRequest = Robertify.getSpotifyApi().getTrack(uri.getId()).build();
                 Track track = getTrackRequest.execute();
                 spotifyURI = "ytsearch:" + track.getName() + " " + track.getArtists()[0].getName() + " audio";
                 loadTrack(spotifyURI, musicManager, channel, ctx, true);
             }
             case ALBUM -> {
+                joinVoiceChannel(selfVoiceState, memberVoiceState, ctx);
                 GetAlbumRequest getAlbumRequest = Robertify.getSpotifyApi().getAlbum(uri.getId()).build();
                 Album album = getAlbumRequest.execute();
                 TrackSimplified[] tracks = album.getTracks().getItems();
