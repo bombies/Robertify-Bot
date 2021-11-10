@@ -109,6 +109,11 @@
             <version>3.12.0</version>
         </dependency>
         <dependency>
+            <groupId>com.github.kskelm</groupId>
+            <artifactId>baringo</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>net.robinfriedli</groupId>
             <artifactId>exec</artifactId>
             <version>1.2</version>

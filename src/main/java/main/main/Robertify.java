@@ -1,8 +1,8 @@
 package main.main;
 
+import com.github.kskelm.baringo.BaringoClient;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.wrapper.spotify.SpotifyApi;
-import com.wrapper.spotify.SpotifyHttpManager;
 import lombok.Getter;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -23,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class Robertify {
 
     public static JDA api;
+    public static BaringoClient baringo;
     @Getter
     private static SpotifyApi spotifyApi;
     @Getter
@@ -75,6 +78,14 @@ public class Robertify {
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(new RefreshSpotifyToken(), 0, 1, TimeUnit.HOURS);
+
+            try {
+                baringo = new BaringoClient.Builder()
+                        .clientAuth(Config.get(ENV.IMGUR_CLIENT), Config.get(ENV.IMGUR_SECRET))
+                        .build();
+            } catch (BaringoApiException e) {
+                e.printStackTrace();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

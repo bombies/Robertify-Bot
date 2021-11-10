@@ -1,13 +1,13 @@
 package main.utils.spotify;
 
-import com.wrapper.spotify.model_objects.credentials.AuthorizationCodeCredentials;
-import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
-import com.wrapper.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
-import com.wrapper.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
-import com.wrapper.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
-import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import lombok.SneakyThrows;
 import main.main.Robertify;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRefreshRequest;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
+import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
 import java.net.URI;
 

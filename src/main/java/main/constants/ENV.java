@@ -9,7 +9,9 @@ public enum ENV {
     ICON_URL("icon_url"),
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
-    SPOTIFY_CLIENT_SECRET("spotify_client_secret");
+    SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
+    IMGUR_CLIENT("imgur_client"),
+    IMGUR_SECRET("imgur_secret");
 
     private final String str;
 
