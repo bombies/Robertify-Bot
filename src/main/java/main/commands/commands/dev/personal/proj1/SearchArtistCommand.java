@@ -37,7 +37,7 @@ public class SearchArtistCommand implements IDevCommand {
 
         eb.set(EmbedUtils.embedMessage("Linearly searching for `" + String.join(" ", args) + "`..."));
         msg.replyEmbeds(eb.get().build()).queue(response -> {
-            final String artistID = "3TVXtAsR1Inumwj472S9r4";
+            final String artistID = "3TVXtAsR1Inumwj472S9r4"; // Drake's spotify artist ID.
             final String albumName = String.join(" ", args); // The album to be searched for
             var spotifyApi = Robertify.getSpotifyApi();
 
