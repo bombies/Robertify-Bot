@@ -28,8 +28,11 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
             GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
             musicManager.scheduler.repeating = false;
+            musicManager.scheduler.playlistRepeating = false;
+
             if (musicManager.audioPlayer.isPaused())
                 musicManager.audioPlayer.setPaused(false);
+
             musicManager.audioPlayer.stopTrack();
             musicManager.scheduler.queue.clear();
         } else {
