@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -155,7 +156,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         @NotNull
         private final List<SubCommand> subCommands = new ArrayList<>();
         @Nullable
-        private BiPredicate<Member, Guild> checkPermission = null;
+        private Predicate<SlashCommandEvent> checkPermission = null;
         private final InteractionBuilder builder;
 
         public CommandBuilder(InteractionBuilder builder) {
@@ -186,7 +187,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return this;
         }
 
-        public CommandBuilder setPermissionCheck(BiPredicate<Member, Guild> predicate) {
+        public CommandBuilder setPermissionCheck(Predicate<SlashCommandEvent> predicate) {
             checkPermission = predicate;
             return this;
         }
@@ -215,9 +216,9 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         @Getter @NotNull
         private final List<SubCommand> subCommands;
         @Nullable
-        private final BiPredicate<Member, Guild> checkPermission;
+        private final Predicate<SlashCommandEvent> checkPermission;
 
-        private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options, @NotNull List<SubCommand> subCommands, @Nullable BiPredicate<Member, Guild> checkPermission) {
+        private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandEvent> checkPermission) {
             this.name = name.toLowerCase();
             this.description = description;
             this.options = options;
@@ -225,14 +226,14 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             this.checkPermission = checkPermission;
         }
 
-        public boolean permissionCheck(Member user, Guild guild) {
+        public boolean permissionCheck(SlashCommandEvent e) {
             if (checkPermission == null)
                 throw new NullPointerException("Can't perform permission check since a check predicate was not provided!");
 
-            return checkPermission.test(user, guild);
+            return checkPermission.test(e);
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, BiPredicate<Member, Guild> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
             return new Command(name, description, options, subCommands, checkPermission);
         }
 
@@ -240,7 +241,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, options, subCommands, null);
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, BiPredicate<Member, Guild> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, Predicate<SlashCommandEvent> checkPermission) {
             return new Command(name, description, options, List.of(), checkPermission);
         }
 
@@ -248,7 +249,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, options, List.of(), null);
         }
 
-        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, BiPredicate<Member, Guild> checkPermission) {
+        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
             return new Command(name, description, List.of(), subCommands, checkPermission);
         }
 
@@ -256,7 +257,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, List.of(), subCommands, null);
         }
 
-        public static Command of(String name, String description, BiPredicate<Member, Guild> checkPermission) {
+        public static Command of(String name, String description, Predicate<SlashCommandEvent> checkPermission) {
             return new Command(name, description, List.of(), List.of(), checkPermission);
         }
 
