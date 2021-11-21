@@ -25,6 +25,9 @@ public class BotUtils extends DatabaseUtils {
      */
     @SneakyThrows
     public BotUtils addGuild(long gid) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "INSERT INTO " + DatabaseTable.MAIN_BOT_INFO + "(server_id, prefix) VALUES(" +
                 ""+gid+"," +
@@ -40,6 +43,9 @@ public class BotUtils extends DatabaseUtils {
      */
     @SneakyThrows
     public BotUtils removeGuild(long gid) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "DELETE FROM " + DatabaseTable.MAIN_BOT_INFO + " WHERE server_id="+gid+";";
         dbStat.executeUpdate(sql);
@@ -52,6 +58,9 @@ public class BotUtils extends DatabaseUtils {
      */
     @SneakyThrows
     public List<Guild> getGuilds() {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "SELECT server_id FROM " + DatabaseTable.MAIN_BOT_INFO + ";";
         ResultSet dbRes = dbStat.executeQuery(sql);
@@ -78,6 +87,9 @@ public class BotUtils extends DatabaseUtils {
      * @throws SQLException
      */
     public boolean isDeveloper(String id) throws SQLException {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_DEVELOPERS + " WHERE developer_id='"+id+"';";
         ResultSet dbRes = dbStat.executeQuery(sql);
@@ -91,6 +103,9 @@ public class BotUtils extends DatabaseUtils {
 
     @SneakyThrows
     public BotUtils addDeveloper(String id) {
+        if (getCon().isClosed())
+            createConnection();
+
         if (isDeveloper(id))
             throw new NullPointerException("The ID passed already belongs to a developer");
 
@@ -104,6 +119,9 @@ public class BotUtils extends DatabaseUtils {
 
     @SneakyThrows
     public BotUtils removeDeveloper(String id) {
+        if (getCon().isClosed())
+            createConnection();
+
         if (!isDeveloper(id))
             throw new NullPointerException("The ID passed doesn't belong to a developer");
 
@@ -121,6 +139,9 @@ public class BotUtils extends DatabaseUtils {
      */
     @SneakyThrows
     public boolean announceNewTrack(long guildID) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_INFO + " WHERE server_id="+guildID+";";
         ResultSet dbRes = dbStat.executeQuery(sql);
@@ -141,6 +162,9 @@ public class BotUtils extends DatabaseUtils {
      */
     @SneakyThrows
     public BotUtils announceNewTrack(long gid, boolean value) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET announce_msgs="+value+"" +
                 " WHERE server_id="+gid+";";
@@ -162,6 +186,9 @@ public class BotUtils extends DatabaseUtils {
 
     @SneakyThrows
     public long getAnnouncementChannel(long guildID) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_INFO +
                 " WHERE server_id="+guildID+";";
