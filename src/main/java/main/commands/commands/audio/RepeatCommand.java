@@ -94,7 +94,7 @@ public class RepeatCommand implements ICommand {
                 musicManager.scheduler.queue.offer(thisTrack);
                 musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
                 musicManager.scheduler.queue.remove(thisTrack);
-                eb = EmbedUtils.embedMessage("The current queue will now be repeated!");
+                eb = EmbedUtils.embedMessage("The current queue will now be looped!");
             }
         } else {
             eb = EmbedUtils.embedMessage("Invalid arguments!");
@@ -116,6 +116,6 @@ public class RepeatCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("rep");
+        return List.of("rep", "loop" , "l");
     }
 }

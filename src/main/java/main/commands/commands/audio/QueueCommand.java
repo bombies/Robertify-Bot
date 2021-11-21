@@ -14,6 +14,8 @@ import main.utils.pagination.Pages;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -48,18 +50,26 @@ public class QueueCommand implements ICommand {
             return;
         }
 
+        sendQueue(queue, ctx.getChannel(), ctx.getAuthor());
+        GeneralUtils.setDefaultEmbed();
+    }
+
+    private void sendQueue(ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
+        List<String> content = getContent(queue, trackList);
+
+        Pages.paginate(channel, user, content, 10);
+    }
+
+    public List<String> getContent(ConcurrentLinkedQueue<AudioTrack> queue, List<AudioTrack> trackList) {
         List<String> content = new ArrayList<>();
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
             content.add("**#"+(i+1)+".** "+info.title+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
         }
-
-        Pages.paginate(ctx.getChannel(), ctx.getAuthor(), content, 10);
-
-        GeneralUtils.setDefaultEmbed();
+        return content;
     }
 
     @Override

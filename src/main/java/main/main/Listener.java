@@ -3,6 +3,8 @@ package main.main;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.commands.commands.audio.QueueCommand;
+import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
@@ -42,6 +44,9 @@ public class Listener extends ListenerAdapter {
 
         for (Guild g : new BotUtils().getGuilds()) {
             permConfig.initGuild(g.getId());
+
+            initSlashCommands(g);
+
             LOGGER.info("Guild: {}", g.getName());
         }
 
@@ -80,6 +85,8 @@ public class Listener extends ListenerAdapter {
         permissionsConfig.initGuild(guild.getId());
         togglesConfig.initConfig();
 
+        initSlashCommands(guild);
+
         LOGGER.info("Joined {}", guild.getName());
 
         ServerUtils.initPrefixMap();
@@ -93,5 +100,17 @@ public class Listener extends ListenerAdapter {
         botUtils.removeGuild(guild.getIdLong()).closeConnection();
 
         LOGGER.info("Left {}", guild.getName());
+    }
+
+    public void initSlashCommands() {
+        new PlaySlashCommand().initCommand();
+    }
+
+    public void initSlashCommands(Guild g) {
+        new PlaySlashCommand().initCommand();
+        new QueueSlashCommand().initCommand();
+        new LeaveSlashCommand().initCommand();
+        new ClearQueueSlashCommand().initCommand();
+        new JumpSlashCommand().initCommand();
     }
 }

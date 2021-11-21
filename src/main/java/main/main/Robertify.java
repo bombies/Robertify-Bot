@@ -4,6 +4,8 @@ import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
+import main.commands.commands.audio.ClearQueueCommand;
+import main.commands.commands.audio.slashcommands.*;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
@@ -58,6 +60,15 @@ public class Robertify {
                             new VoiceChannelEvents()
                     )
 
+                    // Slash Commands
+                    .addEventListeners(
+                            new PlaySlashCommand(),
+                            new QueueSlashCommand(),
+                            new LeaveSlashCommand(),
+                            new ClearQueueSlashCommand(),
+                            new JumpSlashCommand()
+                    )
+
                     // Button Listeners
                     .addEventListeners(new PaginationEvents())
 
@@ -91,12 +102,14 @@ public class Robertify {
             e.printStackTrace();
         }
     }
-}
 
-class RefreshSpotifyToken implements Runnable {
+    private static class RefreshSpotifyToken implements Runnable {
 
-    @Override
-    public void run() {
-        SpotifyAuthorizationUtils.setTokens();
+        @Override
+        public void run() {
+            SpotifyAuthorizationUtils.setTokens();
+        }
     }
 }
+
+

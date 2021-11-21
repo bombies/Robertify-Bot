@@ -6,9 +6,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pages {
-    private static HashMap<Message, List<Page>> messages = new HashMap<>();
+    private static HashMap<Long, List<Page>> messages = new HashMap<>();
 
     public static Message paginate(TextChannel channel, User user, List<Page> pages) {
         Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
@@ -34,9 +36,39 @@ public class Pages {
                         )
                 ).queue();
 
-                messages.put(msg, pages);
+                messages.put(msg.getIdLong(), pages);
                 ret.set(msg);
             }
+        });
+
+        return ret.get();
+    }
+
+    public static Message paginate(SlashCommandEvent event, List<Page> pages) {
+        Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
+
+        AtomicReference<Message> ret = new AtomicReference<>();
+
+        ReplyAction replyAction = event.replyEmbeds(pages.get(0).getEmbed()).setEphemeral(true);
+
+        if (pages.size() > 1) {
+            replyAction.addActionRows(
+                    ActionRow.of(
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + event.getUser().getId(), paginator.getFront()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + event.getUser().getId(), paginator.getPrevious()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + event.getUser().getId(), paginator.getNext()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.END + event.getUser().getId(), paginator.getEnd())
+                    )
+            );
+        }
+
+        replyAction.queue(msg -> {
+           if (pages.size() > 1) {
+               msg.retrieveOriginal().queue(msg2 -> {
+                   messages.put(msg2.getIdLong(), pages);
+                   ret.set(msg2);
+               });
+           }
         });
 
         return ret.get();
@@ -45,6 +77,20 @@ public class Pages {
     public static Message paginate(TextChannel channel, User user, List<String> content, int maxPerPage) {
         List<Page> pages = new ArrayList<>();
 
+        logic(pages, content, maxPerPage);
+
+        return paginate(channel, user, pages);
+    }
+
+    public static Message paginate(List<String> content, int maxPerPage, SlashCommandEvent event) {
+        List<Page> pages = new ArrayList<>();
+
+        logic(pages, content, maxPerPage);
+
+        return paginate(event, pages);
+    }
+
+    private static void logic(List<Page> pages, List<String> content, int maxPerPage) {
         if (content.size() <= maxPerPage) {
             EmbedBuilder eb = EmbedUtils.embedMessage("\t");
             for (String str : content)
@@ -65,11 +111,9 @@ public class Pages {
                 pages.add(new Page(eb.build()));
             }
         }
-
-        return paginate(channel, user, pages);
     }
 
-    public static List<Page> getPages(Message msg) {
+    public static List<Page> getPages(long msg) {
         return messages.get(msg);
     }
 }

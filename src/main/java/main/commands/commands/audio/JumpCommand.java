@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 
+import javax.annotation.Nullable;
 import javax.script.ScriptException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -43,66 +44,74 @@ public class JumpCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
+        msg.replyEmbeds(doJump(selfVoiceState, memberVoiceState, ctx, null).build()).queue();
+    }
+
+    public EmbedBuilder doJump(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, @Nullable CommandContext ctx, @Nullable String input) {
+
+        EmbedBuilder eb;
         if (!selfVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("There is nothing playing!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
+        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         AudioPlayer audioPlayer = musicManager.audioPlayer;
         AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null) {
             eb = EmbedUtils.embedMessage("There is nothing playing!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
-        if (ctx.getArgs().isEmpty()) {
-            eb  = EmbedUtils.embedMessage("You must provide the amount of seconds to jump in the song!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        } else {
-            long time;
-            if (GeneralUtils.stringIsInt(ctx.getArgs().get(0)))
-                time = Long.parseLong(ctx.getArgs().get(0));
-            else {
-                eb = EmbedUtils.embedMessage("You must provide a valid duration to rewind");
-                msg.replyEmbeds(eb.build()).queue();
-                return;
-            }
+        if (ctx != null)
+            if (ctx.getArgs().isEmpty()) {
+                eb = EmbedUtils.embedMessage("You must provide the amount of seconds to jump in the song!");
+                return eb;
+            } else
+                return doActualJump(ctx.getArgs().get(0), track);
+        else {
+            if (input == null)
+                throw new NullPointerException("Input string cannot be null");
+            return doActualJump(input, track);
+        }
+    }
 
-            if (time <= 0) {
-                eb = EmbedUtils.embedMessage("The duration cannot be negative or zero!");
-                msg.replyEmbeds(eb.build()).queue();
-                return;
-            }
-
-            time = TimeUnit.SECONDS.toMillis(time);
-
-            if (time > track.getDuration() - time) {
-                eb = EmbedUtils.embedMessage("This duration cannot be more than the time left!");
-                msg.replyEmbeds(eb.build()).queue();
-                return;
-            }
-
-            track.setPosition(track.getPosition() + time);
+    private EmbedBuilder doActualJump(String input, AudioTrack track) {
+        long time;
+        EmbedBuilder eb;
+        if (GeneralUtils.stringIsInt(input))
+            time = Long.parseLong(input);
+        else {
+            eb = EmbedUtils.embedMessage("You must provide a valid duration to rewind");
+            return eb;
         }
 
-        msg.addReaction("✅").queue();
+        if (time <= 0) {
+            eb = EmbedUtils.embedMessage("The duration cannot be negative or zero!");
+            return eb;
+        }
+
+        time = TimeUnit.SECONDS.toMillis(time);
+
+        if (time > track.getDuration() - time) {
+            eb = EmbedUtils.embedMessage("This duration cannot be more than the time left!");
+            return eb;
+        }
+
+        track.setPosition(track.getPosition() + time);
+
+        return EmbedUtils.embedMessage("Successfully jumped `"+input+"` seconds ahead!");
     }
 
     @Override

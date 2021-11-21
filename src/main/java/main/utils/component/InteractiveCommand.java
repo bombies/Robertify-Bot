@@ -25,9 +25,14 @@ public abstract class InteractiveCommand extends ListenerAdapter {
     private static InteractionCommand interactionCommand;
 
     public abstract void initCommand();
+    public abstract void initCommand(Guild g);
 
     public static void upsertCommand() {
         interactionCommand.pushToAllGuilds();
+    }
+
+    public static void upsertCommand(Guild g) {
+        interactionCommand.pushToGuild(g);
     }
 
     public static class InteractionCommand {
@@ -68,30 +73,37 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             addCommandToAllGuilds(command);
         }
 
+        public void pushToGuild(Guild g) {
+            addCommandToSpecificGuild(g, command);
+        }
+
         private void addCommandToAllGuilds(Command command) {
-            for (Guild g : new BotUtils().getGuilds()) {
-                // Initial request builder
-                CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
+            for (Guild g : new BotUtils().getGuilds())
+                addCommandToSpecificGuild(g, command);
+        }
 
-                // Adding subcommands
-                if (!command.getSubCommands().isEmpty()) {
-                    for (SubCommand subCommand : command.getSubCommands()) {
-                        var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
+        private void addCommandToSpecificGuild(Guild g, Command command) {
+            // Initial request builder
+            CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
 
-                        // Adding options for subcommands
-                        for (CommandOption options : subCommand.getOptions())
-                            subCommandData.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+            // Adding subcommands
+            if (!command.getSubCommands().isEmpty()) {
+                for (SubCommand subCommand : command.getSubCommands()) {
+                    var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
 
-                        commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
-                    }
-                } else {
-                    // Adding options for the main command
-                    for (CommandOption options : command.getOptions())
-                        commandCreateAction = commandCreateAction.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                    // Adding options for subcommands
+                    for (CommandOption options : subCommand.getOptions())
+                        subCommandData.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+
+                    commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
                 }
-
-                commandCreateAction.queue();
+            } else {
+                // Adding options for the main command
+                for (CommandOption options : command.getOptions())
+                    commandCreateAction = commandCreateAction.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
             }
+
+            commandCreateAction.queue();
         }
     }
 
@@ -99,7 +111,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private Command command;
         private HashMap<String, SelectionDialogue> selectionDialogues = new HashMap<>();
 
-        public InteractionBuilder addCommand(@NotNull Command command) {
+        public InteractionBuilder setCommand(@NotNull Command command) {
             this.command = command;
             return this;
         }
@@ -177,7 +189,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                 throw new InvalidBuilderException("You can't have both main command options and subcommands empty!");
 
 
-            return this.builder.addCommand(new Command(name, description, commandOptions, subCommands, checkPermission));
+            return this.builder.setCommand(new Command(name, description, commandOptions, subCommands, checkPermission));
         }
     }
 
@@ -210,6 +222,34 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<Member> checkPermission) {
             return new Command(name, description, options, subCommands, checkPermission);
+        }
+
+        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands) {
+            return new Command(name, description, options, subCommands, null);
+        }
+
+        public static Command of(String name, String description, List<CommandOption> options, Predicate<Member> checkPermission) {
+            return new Command(name, description, options, List.of(), checkPermission);
+        }
+
+        public static Command of(String name, String description, List<CommandOption> options) {
+            return new Command(name, description, options, List.of(), null);
+        }
+
+        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<Member> checkPermission) {
+            return new Command(name, description, List.of(), subCommands, checkPermission);
+        }
+
+        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands) {
+            return new Command(name, description, List.of(), subCommands, null);
+        }
+
+        public static Command of(String name, String description, Predicate<Member> checkPermission) {
+            return new Command(name, description, List.of(), List.of(), checkPermission);
+        }
+
+        public static Command of(String name, String description) {
+            return new Command(name, description, List.of(), List.of(), null);
         }
     }
 

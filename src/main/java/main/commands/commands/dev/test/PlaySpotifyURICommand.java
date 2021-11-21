@@ -26,7 +26,7 @@ public class PlaySpotifyURICommand implements ITestCommand {
 
         try {
             var uri = SpotifyURI.parse(args.get(0));
-            PlayerManager.getInstance().joinVoiceChannel(ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState(), ctx);
+            PlayerManager.getInstance().joinVoiceChannel(ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState());
 
             final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
             PlayerManager.getInstance().handleSpotifyURI(

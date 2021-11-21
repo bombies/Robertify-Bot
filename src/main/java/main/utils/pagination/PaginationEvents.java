@@ -12,16 +12,16 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PaginationEvents extends ListenerAdapter {
-    private static HashMap<Message, Integer> currentPage = new HashMap<>();
+    private static final HashMap<Long, Integer> currentPage = new HashMap<>();
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
         event.getHook().setEphemeral(true);
 
-        if (!currentPage.containsKey(event.getMessage()))
-            currentPage.put(event.getMessage(), 0);
+        if (!currentPage.containsKey(event.getMessage().getIdLong()))
+            currentPage.put(event.getMessage().getIdLong(), 0);
 
-        Message msg = event.getMessage();
+        long msg = event.getMessage().getIdLong();
         List<Page> pages = Pages.getPages(msg);
 
         if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
