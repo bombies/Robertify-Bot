@@ -3,20 +3,25 @@ package main.utils.component;
 import lombok.Getter;
 import lombok.Setter;
 import main.utils.database.BotUtils;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public abstract class InteractiveCommand extends ListenerAdapter {
@@ -33,6 +38,10 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
     public static void upsertCommand(Guild g) {
         interactionCommand.pushToGuild(g);
+    }
+
+    public SelectionDialogue getSelectionDialogue(String name) {
+        return interactionCommand.getSelectionDialogues().get(name);
     }
 
     public static class InteractionCommand {
@@ -63,8 +72,11 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                     .setPlaceholder(selectionDialogue.getPlaceholder())
                     .setRequiredRange(selectionDialogue.range.getLeft(), selectionDialogue.range.getLeft());
 
-            for (Pair<String, String> val : selectionDialogue.getOptions())
-                builder.addOption(val.getLeft(), val.getRight());
+            for (Triple<String, String, String> val : selectionDialogue.getOptions())
+                if (val.getRight() == null)
+                    builder.addOption(val.getLeft(), val.getMiddle());
+                else
+                    builder.addOption(val.getLeft(), val.getMiddle(), Emoji.fromUnicode(val.getRight()));
 
             return builder.build();
         }
@@ -143,7 +155,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         @NotNull
         private final List<SubCommand> subCommands = new ArrayList<>();
         @Nullable
-        private Predicate<Member> checkPermission = null;
+        private BiPredicate<Member, Guild> checkPermission = null;
         private final InteractionBuilder builder;
 
         public CommandBuilder(InteractionBuilder builder) {
@@ -174,7 +186,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return this;
         }
 
-        public CommandBuilder setPermissionCheck(Predicate<Member> predicate) {
+        public CommandBuilder setPermissionCheck(BiPredicate<Member, Guild> predicate) {
             checkPermission = predicate;
             return this;
         }
@@ -203,9 +215,9 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         @Getter @NotNull
         private final List<SubCommand> subCommands;
         @Nullable
-        private final Predicate<Member> checkPermission;
+        private final BiPredicate<Member, Guild> checkPermission;
 
-        private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options, @NotNull List<SubCommand> subCommands, @Nullable Predicate<Member> checkPermission) {
+        private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options, @NotNull List<SubCommand> subCommands, @Nullable BiPredicate<Member, Guild> checkPermission) {
             this.name = name.toLowerCase();
             this.description = description;
             this.options = options;
@@ -213,14 +225,14 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             this.checkPermission = checkPermission;
         }
 
-        public boolean permissionCheck(Member user) {
+        public boolean permissionCheck(Member user, Guild guild) {
             if (checkPermission == null)
                 throw new NullPointerException("Can't perform permission check since a check predicate was not provided!");
 
-            return checkPermission.test(user);
+            return checkPermission.test(user, guild);
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<Member> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, BiPredicate<Member, Guild> checkPermission) {
             return new Command(name, description, options, subCommands, checkPermission);
         }
 
@@ -228,7 +240,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, options, subCommands, null);
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, Predicate<Member> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, BiPredicate<Member, Guild> checkPermission) {
             return new Command(name, description, options, List.of(), checkPermission);
         }
 
@@ -236,7 +248,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, options, List.of(), null);
         }
 
-        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<Member> checkPermission) {
+        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, BiPredicate<Member, Guild> checkPermission) {
             return new Command(name, description, List.of(), subCommands, checkPermission);
         }
 
@@ -244,7 +256,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return new Command(name, description, List.of(), subCommands, null);
         }
 
-        public static Command of(String name, String description, Predicate<Member> checkPermission) {
+        public static Command of(String name, String description, BiPredicate<Member, Guild> checkPermission) {
             return new Command(name, description, List.of(), List.of(), checkPermission);
         }
 
@@ -334,7 +346,8 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private String name;
         private String placeholder;
         private Pair<Integer, Integer> range;
-        private final List<Pair<String, String>> options = new ArrayList<>();
+        private final List<Triple<String, String, String>> options = new ArrayList<>();
+        private Predicate<SelectionMenuEvent> predicate;
         private final InteractionBuilder builder;
 
         public SelectionDialogueBuilder(InteractionBuilder builder) {
@@ -357,7 +370,17 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         }
 
         public SelectionDialogueBuilder addOption(String label, String value) {
-            options.add(Pair.of(label.toLowerCase(), value.toLowerCase()));
+            options.add(Triple.of(label.toLowerCase(), value.toLowerCase(), null));
+            return this;
+        }
+
+        public SelectionDialogueBuilder addOption(String label, String value, String emoji) {
+            options.add(Triple.of(label.toLowerCase(), value.toLowerCase(), emoji));
+            return this;
+        }
+
+        public SelectionDialogueBuilder setPermission(Predicate<SelectionMenuEvent> predicate) {
+            this.predicate = predicate;
             return this;
         }
 
@@ -378,29 +401,59 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                 throw new InvalidBuilderException("The options list can't be empty!");
 
 
-            return this.builder.addSelectionDialogue(new SelectionDialogue(name, placeholder, range, options));
+            return this.builder.addSelectionDialogue(new SelectionDialogue(name, placeholder, range, options, predicate));
         }
     }
 
     public static class SelectionDialogue {
-        @Getter
+        @Getter @NotNull
         private final String name;
-        @Getter
+        @Getter @NotNull
         private final String placeholder;
-        @Getter
+        @Getter @NotNull
         private final Pair<Integer, Integer> range;
-        @Getter
-        private final List<Pair<String, String>> options;
+        @Getter @NotNull
+        private final List<Triple<String, String, String>> options;
+        @Nullable
+        private final Predicate<SelectionMenuEvent> permissionCheck;
 
-        private SelectionDialogue(String name, String placeholder, Pair<Integer, Integer> range, List<Pair<String,String>> options) {
+        private SelectionDialogue(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, String>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck) {
             this.name = name.toLowerCase();
             this.placeholder = placeholder;
             this.range = range;
             this.options = options;
+            this.permissionCheck = permissionCheck;
         }
 
-        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Pair<String, String>> options) {
-            return new SelectionDialogue(name, placeholder, range, options);
+        public boolean checkPermission(SelectionMenuEvent e) {
+            if (permissionCheck == null)
+                throw new NullPointerException("There is no permission to check!");
+            return permissionCheck.test(e);
+        }
+
+        /**
+         *
+         * @param name Name of the menu to be used as an identifier
+         * @param placeholder The text that is to show up on the menu when there is nothing selected
+         * @param range The range of values that will be allowed to be selected. Pair(Min, Max)
+         * @param options This of pair of options to be presented List(Pair(Label, Value))
+         * @return A new fancy selection menu
+         */
+        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, String>> options) {
+            return new SelectionDialogue(name, placeholder, range, options, null);
+        }
+
+        /**
+         *
+         * @param name Name of the menu to be used as an identifier
+         * @param placeholder The text that is to show up on the menu when there is nothing selected
+         * @param range The range of values that will be allowed to be selected. Pair(Min, Max)
+         * @param options This of pair of options to be presented List(Pair(Label, Value))
+         * @param permissionCheck The check that can be performed when a user interacts with the selection menu
+         * @return A new fancy selection menu
+         */
+        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, String>> options, Predicate<SelectionMenuEvent> permissionCheck) {
+            return new SelectionDialogue(name, placeholder, range, options, permissionCheck);
         }
     }
 }

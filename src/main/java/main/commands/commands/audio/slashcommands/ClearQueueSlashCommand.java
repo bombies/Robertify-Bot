@@ -37,9 +37,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
                 .setCommand(Command.of(
                         commandName,
                         "Clear the queue of all its contents",
-                        List.of(),
-                        List.of(),
-                        null
+                        (user, guild) -> GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_DJ)
                 ))
                 .build();
     }
@@ -63,7 +61,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
-                if (!GeneralUtils.hasPerms(event.getGuild(), event.getUser(), Permission.ROBERTIFY_DJ)) {
+                if (!getInteractionCommand().getCommand().permissionCheck(event.getMember(), event.getGuild())) {
                     EmbedBuilder eb = EmbedUtils.embedMessage("You need to be a DJ to use this command when there's other users in the channel!");
                     event.replyEmbeds(eb.build()).queue();
                     return;

@@ -6,6 +6,7 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.QueueCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.commands.commands.util.HelpCommand;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
@@ -104,13 +105,23 @@ public class Listener extends ListenerAdapter {
 
     public void initSlashCommands() {
         new PlaySlashCommand().initCommand();
-    }
-
-    public void initSlashCommands(Guild g) {
-        new PlaySlashCommand().initCommand();
         new QueueSlashCommand().initCommand();
         new LeaveSlashCommand().initCommand();
         new ClearQueueSlashCommand().initCommand();
         new JumpSlashCommand().initCommand();
+        new NowPlayingSlashCommand().initCommand();
+        new PauseSlashCommand().initCommand();
+        new HelpCommand().initCommand();
+    }
+
+    public void initSlashCommands(Guild g) {
+        new PlaySlashCommand().initCommand(g);
+        new QueueSlashCommand().initCommand(g);
+        new LeaveSlashCommand().initCommand(g);
+        new ClearQueueSlashCommand().initCommand(g);
+        new JumpSlashCommand().initCommand(g);
+        new NowPlayingSlashCommand().initCommand(g);
+        new PauseSlashCommand().initCommand(g);
+        new HelpCommand().initCommand(g);
     }
 }

@@ -6,20 +6,77 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
 import main.constants.BotConstants;
+import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.component.InteractionBuilderException;
+import main.utils.component.InteractiveCommand;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
+import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class HelpCommand implements ICommand {
-    @SneakyThrows
+public class HelpCommand extends InteractiveCommand implements ICommand {
+    private final String menuName = "menu:help";
+
     @Override
+    public void initCommand() {
+        setInteractionCommand(getCommand());
+        upsertCommand();
+    }
+
+    @Override
+    public void initCommand(Guild g) {
+        setInteractionCommand(getCommand());
+        upsertCommand(g);
+    }
+
+    private InteractionCommand getCommand() {
+        return InteractionCommand.create()
+                .setCommand(Command.of(
+                        getName(),
+                        "See all the commands the bot has to offer to you!",
+                        List.of(CommandOption.of(
+                                OptionType.STRING,
+                                "command",
+                                "View help for a specific command",
+                                false
+                        ))
+                ))
+                .addSelectionDialogue(SelectionDialogue.of(
+                        menuName,
+                        "Select an option",
+                        Pair.of(1,1),
+                        List.of(
+                                Triple.of("Management Commands", "help:management", "💼"),
+                                Triple.of("Music Commands", "help:music", "🎶"),
+                                Triple.of("Miscellaneous Commands", "help:misc", "⚒️")
+                        ),
+                        e -> {
+                            var msgID = e.getMessage().getMessageReference().getMessageIdLong();
+                            Message msg = e.getJDA().getTextChannelById(e.getTextChannel().getIdLong())
+                                    .retrieveMessageById(msgID).complete(); // BAD BAD BAD PREDICATE | TODO FIGURE OUT A NEW ONE!
+                            return e.getUser().getIdLong() == msg.getAuthor().getIdLong();
+                        }
+                )).build();
+    }
+
+
+    @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
@@ -33,22 +90,20 @@ public class HelpCommand implements ICommand {
         CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
 
         if (args.isEmpty()) {
-            StringBuilder musicCommandsStringBuilder = new StringBuilder();
-            StringBuilder managementCommandsStringBuilder = new StringBuilder();
-            StringBuilder miscCommandsStringBuilder = new StringBuilder();
-
-            for (ICommand cmd : manager.getMusicCommands())
-                musicCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
-            for (ICommand cmd : manager.getManagementCommands())
-                managementCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
-            for (ICommand cmd : manager.getMiscCommands())
-                miscCommandsStringBuilder.append("`").append(cmd.getName()).append("`, ");
-
             EmbedBuilder eb = EmbedUtils.embedMessage("*Completely confused and new? Try running the `tutorial` command!*\n\n**Prefix**: `" + prefix + "`");
-            eb.addField(" Management Commands", managementCommandsStringBuilder.toString(), false);
-            eb.addField(" Music Commands", musicCommandsStringBuilder.toString(), false);
-            eb.addField(" Miscellaneous Commands", miscCommandsStringBuilder.toString(), false);
-            msg.replyEmbeds(eb.build()).queue();
+
+            eb = EmbedUtils.embedMessage("*Select an option to view the commands I have to offer!");
+            msg.replyEmbeds(eb.build()).queue(repliedMsg ->
+                    {
+                        try {
+                            repliedMsg.editMessageComponents(
+                                        ActionRow.of(getInteractionCommand().getSelectionMenu(menuName))
+                                    ).queue();
+                        } catch (InteractionBuilderException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            );
 
             GeneralUtils.setDefaultEmbed();
             return;
@@ -97,6 +152,105 @@ public class HelpCommand implements ICommand {
         GeneralUtils.setDefaultEmbed();
     }
 
+
+    @Override @SneakyThrows
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!event.getName().equals(getName())) return;
+
+        if (event.getOptions().isEmpty()) {
+            final String prefix = ServerUtils.getPrefix(event.getGuild().getIdLong());
+
+            GeneralUtils.setCustomEmbed(
+                    "Help Command",
+                    "Type \"" + prefix + "help <command>\" to get more help on a specific command."
+            );
+
+            EmbedBuilder eb = EmbedUtils.embedMessage("*Select an option to view the commands I have to offer!");
+            event.replyEmbeds(eb.build())
+                    .addActionRow(getInteractionCommand().getSelectionMenu(menuName))
+                    .setEphemeral(true).queue();
+        } else {
+            final CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
+            final String command = event.getOption("command").getAsString();
+            event.replyEmbeds(searchCommand(manager, command, event.getGuild(), event.getUser()).build())
+                    .setEphemeral(true).queue();
+        }
+    }
+
+    @Override @SneakyThrows
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+        if (!event.getComponentId().equals(menuName)) return;
+
+        var optionSelected = event.getSelectedOptions();
+        final String prefix = ServerUtils.getPrefix(event.getGuild().getIdLong());
+
+        if (!getSelectionDialogue(menuName).checkPermission(event)) {
+            event.replyEmbeds(EmbedUtils.embedMessage("You can't interact with this menu!").build())
+                    .setEphemeral(true).queue();
+            return;
+        }
+
+        switch (optionSelected.get(0).getValue()) {
+            case "help:management" -> {
+                event.editMessageEmbeds(getHelpEmbed(HelpType.MANAGEMENT, prefix).build()).queue();
+            }
+            case "help:music" -> {
+                event.editMessageEmbeds(getHelpEmbed(HelpType.MUSIC, prefix).build()).queue();
+            }
+            case "help:misc" -> {
+                event.editMessageEmbeds(getHelpEmbed(HelpType.MISCELLANEOUS, prefix).build()).queue();
+            }
+        }
+    }
+
+    @SneakyThrows
+    private EmbedBuilder searchCommand(CommandManager manager, String search, Guild guild, User user) {
+        ICommand command = manager.getCommand(search);
+
+        if (command == null) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
+            GeneralUtils.setDefaultEmbed();
+            return eb;
+        } else if (command instanceof IDevCommand) {
+            if (!new BotUtils().isDeveloper(user.getId())) {
+                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
+                GeneralUtils.setDefaultEmbed();
+                return eb;
+            }
+        }
+
+        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(guild.getId()));
+        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
+        return eb;
+    }
+
+    private EmbedBuilder getHelpEmbed(HelpType type, String prefix) {
+        EmbedBuilder eb = EmbedUtils.embedMessage("Here are your commands!\n\n" +
+                "**Prefix**: `"+prefix+"`");
+        CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
+        StringBuilder sb = new StringBuilder();
+
+        switch (type) {
+            case MANAGEMENT -> {
+                for (ICommand cmd : manager.getManagementCommands())
+                    sb.append("`").append(cmd.getName()).append("`, ");
+                eb.addField("Management Commands", sb.toString(), false);
+            }
+            case MISCELLANEOUS -> {
+                for (ICommand cmd : manager.getMiscCommands())
+                    sb.append("`").append(cmd.getName()).append("`, ");
+                eb.addField("Miscellaneous Commands", sb.toString(), false);
+            }
+            case MUSIC -> {
+                for (ICommand cmd : manager.getMusicCommands())
+                    sb.append("`").append(cmd.getName()).append("`, ");
+                eb.addField("Music Commands", sb.toString(), false);
+            }
+        }
+
+        return eb;
+    }
+
     @Override
     public String getName() {
         return "help";
@@ -105,5 +259,11 @@ public class HelpCommand implements ICommand {
     @Override
     public String getHelp(String guildID) {
         return null;
+    }
+
+    enum HelpType {
+        MANAGEMENT,
+        MUSIC,
+        MISCELLANEOUS
     }
 }
