@@ -26,7 +26,7 @@ public class StopCommand implements ICommand {
 
         BotUtils botUtils = new BotUtils();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            System.out.println("there is no announcement channel set");
+            
             botUtils.createConnection();
             botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
                     .closeConnection();

@@ -2,6 +2,7 @@ package main.utils.component;
 
 import lombok.Getter;
 import lombok.Setter;
+import main.main.Listener;
 import main.utils.database.BotUtils;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -122,7 +123,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
     public static class InteractionBuilder {
         private Command command;
-        private HashMap<String, SelectionDialogue> selectionDialogues = new HashMap<>();
+        private static HashMap<String, SelectionDialogue> selectionDialogues = new HashMap<>();
 
         public InteractionBuilder setCommand(@NotNull Command command) {
             this.command = command;
@@ -143,6 +144,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         }
 
         public InteractionCommand build() {
+            InteractionCommand interactionCommand = new InteractionCommand(command, selectionDialogues);
             return new InteractionCommand(command, selectionDialogues);
         }
     }

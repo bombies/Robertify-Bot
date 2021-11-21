@@ -67,6 +67,9 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                                 Triple.of("Miscellaneous Commands", "help:misc", "⚒️")
                         ),
                         e -> {
+                             if (e.getMessage().getMessageReference() == null)
+                                 return true;
+
                             var msgID = e.getMessage().getMessageReference().getMessageIdLong();
                             Message msg = e.getJDA().getTextChannelById(e.getTextChannel().getIdLong())
                                     .retrieveMessageById(msgID).complete(); // BAD BAD BAD PREDICATE | TODO FIGURE OUT A NEW ONE!
@@ -90,9 +93,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("*Completely confused and new? Try running the `tutorial` command!*\n\n**Prefix**: `" + prefix + "`");
-
-            eb = EmbedUtils.embedMessage("*Select an option to view the commands I have to offer!");
+            EmbedBuilder eb = EmbedUtils.embedMessage("*Select an option to view the commands I have to offer!*");
             msg.replyEmbeds(eb.build()).queue(repliedMsg ->
                     {
                         try {
