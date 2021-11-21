@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import main.commands.CommandManager;
 import main.commands.commands.audio.QueueCommand;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.util.HelpCommand;
 import main.utils.database.BotUtils;
@@ -123,5 +124,11 @@ public class Listener extends ListenerAdapter {
         new NowPlayingSlashCommand().initCommand(g);
         new PauseSlashCommand().initCommand(g);
         new HelpCommand().initCommand(g);
+        new SkipSlashCommand().initCommand(g);
+        new RemoveSlashCommand().initCommand(g);
+        new LoopSlashCommand().initCommand(g);
+        new MoveSlashCommand().initCommand(g);
+        new RewindSlashCommand().initCommand(g);
+        new SetChannelCommand().initCommand(g);
     }
 }

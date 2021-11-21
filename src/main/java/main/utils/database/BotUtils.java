@@ -150,6 +150,9 @@ public class BotUtils extends DatabaseUtils {
 
     @SneakyThrows
     public BotUtils setAnnouncementChannel(long guildID, long channelID) {
+        if (getCon().isClosed())
+            createConnection();
+
         Statement dbStat = getCon().createStatement();
         String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET announcement_channel="+channelID+"" +
                 " WHERE server_id="+guildID+";";

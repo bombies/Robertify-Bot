@@ -6,6 +6,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.audio.ClearQueueCommand;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
@@ -70,7 +71,13 @@ public class Robertify {
                             new JumpSlashCommand(),
                             new NowPlayingSlashCommand(),
                             new PauseSlashCommand(),
-                            new HelpCommand()
+                            new HelpCommand(),
+                            new SkipSlashCommand(),
+                            new RemoveSlashCommand(),
+                            new LoopSlashCommand(),
+                            new MoveSlashCommand(),
+                            new RewindSlashCommand(),
+                            new SetChannelCommand()
                     )
 
                     // Button Listeners

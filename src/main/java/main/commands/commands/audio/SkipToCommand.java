@@ -52,11 +52,12 @@ public class SkipToCommand implements ICommand {
 
         int id = Integer.parseInt(args.get(0));
 
-        if (id > queue.size() || id <= 0) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("ID provided isn't a valid ID!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
+        msg.replyEmbeds(handleSkip(queue, musicManager, id).build()).queue();
+    }
+
+    public EmbedBuilder handleSkip(ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
+        if (id > queue.size() || id <= 0)
+            return EmbedUtils.embedMessage("ID provided isn't a valid ID!");
 
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
@@ -67,8 +68,7 @@ public class SkipToCommand implements ICommand {
         queue.removeAll(songsToRemoveFromQueue);
         musicManager.scheduler.nextTrack();
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
-        msg.replyEmbeds(eb.build()).queue();
+        return EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
     }
 
     @Override

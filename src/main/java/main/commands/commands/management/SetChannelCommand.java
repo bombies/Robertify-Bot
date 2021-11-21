@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.component.InteractiveCommand;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -12,11 +13,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.util.List;
 
-public class SetChannelCommand implements ICommand {
+public class SetChannelCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
@@ -81,5 +85,50 @@ public class SetChannelCommand implements ICommand {
     @Override
     public List<String> getAliases() {
         return List.of("sc");
+    }
+
+    @Override
+    public void initCommand() {
+        setInteractionCommand(getCommand());
+        upsertCommand();
+    }
+
+    @Override
+    public void initCommand(Guild g) {
+        setInteractionCommand(getCommand());
+        upsertCommand(g);
+    }
+
+    private InteractionCommand getCommand() {
+        return InteractionCommand.create()
+                .setCommand(Command.of(
+                        getName(),
+                        "Set the channel where all the now playing messages will be announced",
+                        List.of(CommandOption.of(
+                                OptionType.CHANNEL,
+                                "channel",
+                                "The channel to be set",
+                                true
+                        ))
+                )).build();
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!event.getName().equals(getName())) return;
+
+        var channel = event.getOption("channel").getAsGuildChannel();
+        var botUtils = new BotUtils();
+
+        if (botUtils.getAnnouncementChannel(event.getGuild().getIdLong()) == channel.getIdLong()) {
+            event.replyEmbeds(EmbedUtils.embedMessage(channel.getAsMention() + " is already the announcement channel").build())
+                    .setEphemeral(true).queue();
+            return;
+        }
+
+        botUtils.setAnnouncementChannel(event.getGuild().getIdLong(), channel.getIdLong());
+        event.replyEmbeds(EmbedUtils.embedMessage("You have set the announcement channel to: " + channel.getAsMention()).build())
+                .setEphemeral(false)
+                .queue();
     }
 }

@@ -60,6 +60,13 @@ public class GeneralUtils {
         }
     }
 
+    public static int longToInt(long l) {
+        if (l > Integer.MAX_VALUE || l < Integer.MIN_VALUE)
+            throw new IllegalArgumentException("This long exceeds the integer limits!");
+
+        return Integer.parseInt(String.valueOf(l));
+    }
+
     public static boolean stringIsID(String s) {
         String idRegex = "^[0-9]{18}$";
         return Pattern.matches(idRegex, s);

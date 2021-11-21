@@ -42,12 +42,6 @@ public class MoveCommand implements ICommand {
 
         GeneralUtils.setCustomEmbed("Queue");
 
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
-
         if (args.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to move in the queue and the position to move it to.");
             msg.replyEmbeds(eb.build()).queue();
@@ -70,18 +64,27 @@ public class MoveCommand implements ICommand {
 
         final int id = Integer.parseInt(args.get(0));
         final int position = Integer.parseInt(args.get(1));
+
+        msg.replyEmbeds(handleMove(queue, id, position).build()).queue();
+    }
+
+    public EmbedBuilder handleMove(ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
+        GeneralUtils.setCustomEmbed("Queue");
+
+        if (queue.isEmpty()) {
+            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            return eb;
+        }
+
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (id <= 0 || id > trackList.size()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid song id.");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         } else if (position <= 0 || position > trackList.size()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid position id.");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
-
 
         final List<AudioTrack> prevList = new ArrayList<>(queue);
         queue.clear();
@@ -89,13 +92,11 @@ public class MoveCommand implements ICommand {
         prevList.add(position-1, trackList.get(id-1));
         if (!queue.addAll(prevList)) {
             queue.addAll(trackList);
-            Listener.LOGGER.error("Could not move track with id "+id+" in the queue");
-            msg.addReaction("❌").queue();
+            return EmbedUtils.embedMessage("Could not move track with id "+id+" in the queue");
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Moved `"+trackList.get(id-1).getInfo().title
+        return EmbedUtils.embedMessage("Moved `"+trackList.get(id-1).getInfo().title
                 +"` to position `"+position+"`.");
-        msg.replyEmbeds(eb.build()).queue();
     }
 
     @Override

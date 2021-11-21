@@ -39,35 +39,37 @@ public class SkipCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
+        msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState).build()).queue();
+    }
+
+    public EmbedBuilder handleSkip(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+        EmbedBuilder eb;
+
         if (!selfVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("There is nothing playing!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
+        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         AudioPlayer audioPlayer = musicManager.audioPlayer;
 
         if (audioPlayer.getPlayingTrack() == null) {
             eb = EmbedUtils.embedMessage("There is nothing to skip!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
+            return eb;
         }
 
         musicManager.scheduler.nextTrack();
-        msg.addReaction("✅").queue();
+        return EmbedUtils.embedMessage("Skipped the song!");
     }
 
     @Override

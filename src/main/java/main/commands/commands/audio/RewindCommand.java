@@ -43,21 +43,8 @@ public class RewindCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
-
-        if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
-
-        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
-            msg.replyEmbeds(eb.build()).queue();
+        if (checks(selfVoiceState, memberVoiceState) != null) {
+            msg.replyEmbeds(checks(selfVoiceState, memberVoiceState).build()).queue();
             return;
         }
 
@@ -71,10 +58,9 @@ public class RewindCommand implements ICommand {
             return;
         }
 
-        if (ctx.getArgs().isEmpty()) {
-            track.setPosition(0L);
-        } else {
-            long time;
+        long time = -1;
+
+        if (!ctx.getArgs().isEmpty()) {
             if (GeneralUtils.stringIsInt(ctx.getArgs().get(0)))
                 time = Long.parseLong(ctx.getArgs().get(0));
             else {
@@ -82,25 +68,64 @@ public class RewindCommand implements ICommand {
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }
+        }
 
+        msg.replyEmbeds(handleRewind(selfVoiceState, time, ctx.getArgs().isEmpty()).build()).queue();
+    }
+
+    public EmbedBuilder handleRewind(GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
+        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final AudioTrack track = audioPlayer.getPlayingTrack();
+        EmbedBuilder eb;
+
+        if (track == null) {
+            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            return eb;
+        }
+
+        if (rewindToBeginning) {
+            track.setPosition(0L);
+            eb = EmbedUtils.embedMessage("You have rewound the song to the beginning!");
+        } else {
             if (time <= 0) {
                 eb = EmbedUtils.embedMessage("The duration cannot be negative or zero!");
-                msg.replyEmbeds(eb.build()).queue();
-                return;
+                return eb;
             }
 
             time = TimeUnit.SECONDS.toMillis(time);
 
             if (time > track.getPosition()) {
                 eb = EmbedUtils.embedMessage("This duration cannot be more than the current time in the song");
-                msg.replyEmbeds(eb.build()).queue();
-                return;
+                return eb;
             }
 
             track.setPosition(track.getPosition() - time);
+            eb = EmbedUtils.embedMessage("You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
         }
 
-        msg.addReaction("✅").queue();
+        return eb;
+    }
+
+    public EmbedBuilder checks(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+        EmbedBuilder eb;
+
+        if (!selfVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            return eb;
+        }
+
+        if (!memberVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            return eb;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            return eb;
+        }
+
+        return null;
     }
 
     @Override
