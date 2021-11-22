@@ -120,6 +120,12 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
         var channel = event.getOption("channel").getAsGuildChannel();
         var botUtils = new BotUtils();
 
+        if (!(channel instanceof TextChannel)) {
+            event.replyEmbeds(EmbedUtils.embedMessage("The channel must be a **text** channel!").build())
+                    .setEphemeral(true).queue();
+            return;
+        }
+
         if (botUtils.getAnnouncementChannel(event.getGuild().getIdLong()) == channel.getIdLong()) {
             event.replyEmbeds(EmbedUtils.embedMessage(channel.getAsMention() + " is already the announcement channel").build())
                     .setEphemeral(true).queue();
