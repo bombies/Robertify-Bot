@@ -130,5 +130,6 @@ public class Listener extends ListenerAdapter {
         new MoveSlashCommand().initCommand(g);
         new RewindSlashCommand().initCommand(g);
         new SetChannelCommand().initCommand(g);
+        new VolumeSlashCommand().initCommand(g);
     }
 }

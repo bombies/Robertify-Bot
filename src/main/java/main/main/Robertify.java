@@ -77,7 +77,8 @@ public class Robertify {
                             new LoopSlashCommand(),
                             new MoveSlashCommand(),
                             new RewindSlashCommand(),
-                            new SetChannelCommand()
+                            new SetChannelCommand(),
+                            new VolumeSlashCommand()
                     )
 
                     // Button Listeners

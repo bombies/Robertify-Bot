@@ -80,6 +80,7 @@ public class CommandManager {
                 new TutorialCommand(),
                 new TogglesCommand(),
                 new ResumeCommand(),
+                new VolumeCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
