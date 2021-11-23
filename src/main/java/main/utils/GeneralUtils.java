@@ -7,6 +7,8 @@ import main.constants.TimeFormat;
 import main.main.Config;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.annotations.ForRemoval;
+import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -144,14 +146,45 @@ public class GeneralUtils {
         return hasPerms(guild, guild.getMember(sender), perm);
     }
 
+    @Deprecated @ForRemoval
+    @ReplaceWith("progressBar(String percent, ProgressBar barType)")
     public static String progressBar(double percent) {
-        String str = "";
+        StringBuilder str = new StringBuilder();
         for(int i=0; i<12; i++)
             if(i == (int)(percent*12))
-                str+="\uD83D\uDD18"; // 🔘
+                str.append("\uD83D\uDD18"); // 🔘
             else
-                str+="▬";
-        return str;
+                str.append("▬");
+        return str.toString();
+    }
+
+    public static String progressBar(double percent, ProgressBar barType) {
+        switch (barType) {
+            case DURATION -> {
+                StringBuilder str = new StringBuilder();
+                for(int i=0; i<12; i++)
+                    if(i == (int)(percent*12))
+                        str.append("\uD83D\uDD18"); // 🔘
+                    else
+                        str.append("▬");
+                return str.toString();
+            }
+            case FILL -> {
+                StringBuilder str = new StringBuilder();
+                for(int i=0; i<12; i++)
+                    if(i <= (int)(percent*12))
+                        str.append("█");
+                    else
+                        str.append("▒");
+                return str.toString();
+            }
+        }
+        throw new NullPointerException("Something went wrong!");
+    }
+
+    public enum ProgressBar {
+        DURATION,
+        FILL
     }
 
     public static String trimString(String string, String delimiter) {
