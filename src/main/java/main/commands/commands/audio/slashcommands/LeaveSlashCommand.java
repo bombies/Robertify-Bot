@@ -64,6 +64,12 @@ public class LeaveSlashCommand extends InteractiveCommand {
             return;
         }
 
+        if (!memberVoiceState.inVoiceChannel()) {
+            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            event.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
             event.replyEmbeds(eb.build()).queue();

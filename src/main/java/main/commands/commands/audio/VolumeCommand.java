@@ -26,7 +26,7 @@ public class VolumeCommand implements ICommand {
         }
 
         if (ctx.getArgs().isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide what volume you'd like to sert the bot to").build())
+            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide what volume you'd like to set the bot to").build())
                     .queue();
             return;
         }
@@ -48,7 +48,7 @@ public class VolumeCommand implements ICommand {
 
     public EmbedBuilder handleVolumeChange(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int volume) {
         if (!selfVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("You can't use this command while I'm not i na voice channel");
+            return EmbedUtils.embedMessage("You can't use this command while I'm not in a voice channel");
 
         if (memberVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             return EmbedUtils.embedMessage("You must be in the same voice channel as I am to use this command");

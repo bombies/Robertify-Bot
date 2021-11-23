@@ -1,6 +1,7 @@
 package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.VolumeCommand;
+import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -37,13 +38,20 @@ public class VolumeSlashCommand extends InteractiveCommand {
                                 "volume",
                                 "The volume to set the bot to",
                                 true
-                        ))
+                        )),
+                        (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_DJ)
                 )).build();
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
+
+        if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

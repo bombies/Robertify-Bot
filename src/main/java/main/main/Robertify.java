@@ -7,6 +7,8 @@ import lombok.Getter;
 import main.commands.commands.audio.ClearQueueCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.permissions.RemoveDJCommand;
+import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
@@ -78,7 +80,9 @@ public class Robertify {
                             new MoveSlashCommand(),
                             new RewindSlashCommand(),
                             new SetChannelCommand(),
-                            new VolumeSlashCommand()
+                            new VolumeSlashCommand(),
+                            new SetDJCommand(),
+                            new RemoveDJCommand()
                     )
 
                     // Button Listeners

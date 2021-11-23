@@ -6,6 +6,8 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.QueueCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.permissions.RemoveDJCommand;
+import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.util.HelpCommand;
 import main.utils.database.BotUtils;
@@ -131,5 +133,7 @@ public class Listener extends ListenerAdapter {
         new RewindSlashCommand().initCommand(g);
         new SetChannelCommand().initCommand(g);
         new VolumeSlashCommand().initCommand(g);
+        new SetDJCommand().initCommand(g);
+        new RemoveDJCommand().initCommand(g);
     }
 }
