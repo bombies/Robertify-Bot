@@ -20,7 +20,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-//        resumeSong(event);
+        resumeSong(event);
     }
 
     @Override
@@ -44,6 +44,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
              if (channelLeft.getMembers().size() == 1) {
+                 pauseSong(event);
                 waiter.waitForEvent(
                         GuildVoiceJoinEvent.class,
                         (e) -> e.getChannelJoined().equals(channelLeft),
@@ -61,9 +62,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
         GuildVoiceState voiceState = self.getVoiceState();
 
         if (event.getChannelJoined().equals(voiceState.getChannel())) {
-//            resumeSong(event);
+            resumeSong(event);
         } else {
-//            pauseSong(event);
+            pauseSong(event);
         }
     }
 
@@ -87,7 +88,8 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
     void resumeSong(GenericGuildVoiceUpdateEvent event) {
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
-        if (musicManager.audioPlayer.isPaused())
+        if (musicManager.audioPlayer.isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
+             && !musicManager.isForcePaused())
             musicManager.audioPlayer.setPaused(false);
     }
 }

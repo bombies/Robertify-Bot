@@ -70,10 +70,12 @@ public class PauseCommand implements ICommand {
 
         if (audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
+            musicManager.setForcePaused(false);
             eb = EmbedUtils.embedMessage("You have resumed the music!");
         } else {
-            eb = EmbedUtils.embedMessage("You have paused the music!");
             audioPlayer.setPaused(true);
+            musicManager.setForcePaused(true);
+            eb = EmbedUtils.embedMessage("You have paused the music!");
         }
 
         return eb;

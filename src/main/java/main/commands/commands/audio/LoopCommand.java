@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import javax.script.ScriptException;
 import java.util.List;
 
-public class RepeatCommand implements ICommand {
+public class LoopCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
@@ -143,18 +143,18 @@ public class RepeatCommand implements ICommand {
 
     @Override
     public String getName() {
-        return "repeat";
+        return "loop";
     }
 
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set the song being replayed\n" +
-                "\nUsage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "repeat [queue]` *(Add `queue` to start repeating the current queue)*";
+                "\nUsage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("rep", "loop" , "l");
+        return List.of("l");
     }
 }

@@ -4,7 +4,6 @@ import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
-import main.commands.commands.audio.ClearQueueCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
@@ -82,7 +81,8 @@ public class Robertify {
                             new SetChannelCommand(),
                             new VolumeSlashCommand(),
                             new SetDJCommand(),
-                            new RemoveDJCommand()
+                            new RemoveDJCommand(),
+                            new SeekSlashCommand()
                     )
 
                     // Button Listeners

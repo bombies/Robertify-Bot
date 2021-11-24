@@ -135,5 +135,6 @@ public class Listener extends ListenerAdapter {
         new VolumeSlashCommand().initCommand(g);
         new SetDJCommand().initCommand(g);
         new RemoveDJCommand().initCommand(g);
+        new SeekSlashCommand().initCommand(g);
     }
 }

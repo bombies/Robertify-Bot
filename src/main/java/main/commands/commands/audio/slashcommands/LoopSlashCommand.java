@@ -3,7 +3,7 @@ package main.commands.commands.audio.slashcommands;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
-import main.commands.commands.audio.RepeatCommand;
+import main.commands.commands.audio.LoopCommand;
 import main.utils.component.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -52,7 +52,7 @@ public class LoopSlashCommand extends InteractiveCommand {
             final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
             final var memberVoiceState = event.getMember().getVoiceState();
 
-            var checks = new RepeatCommand().checks(selfVoiceState, memberVoiceState, audioPlayer);
+            var checks = new LoopCommand().checks(selfVoiceState, memberVoiceState, audioPlayer);
 
             if (checks != null) {
                 event.replyEmbeds(checks.build())
@@ -60,12 +60,12 @@ public class LoopSlashCommand extends InteractiveCommand {
                 return;
             }
 
-            event.replyEmbeds(new RepeatCommand().handleRepeat(musicManager).build())
+            event.replyEmbeds(new LoopCommand().handleRepeat(musicManager).build())
                     .setEphemeral(false).queue();
         } else {
 //            boolean choice = event.getOption("queue").getAsBoolean();
 
-            event.replyEmbeds(new RepeatCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
+            event.replyEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
                     .setEphemeral(false).queue();
         }
     }

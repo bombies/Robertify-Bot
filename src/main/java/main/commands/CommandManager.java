@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.ITestCommand;
 import main.commands.commands.audio.*;
+import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.dev.EvalCommand;
@@ -73,7 +74,7 @@ public class CommandManager {
                 new ClearQueueCommand(),
                 new RewindCommand(),
                 new SkipToCommand(),
-                new RepeatCommand(),
+                new LoopCommand(),
                 new JumpCommand(),
                 new SetDJCommand(),
                 new RemoveDJCommand(),
@@ -81,6 +82,7 @@ public class CommandManager {
                 new TogglesCommand(),
                 new ResumeCommand(),
                 new VolumeCommand(),
+                new SeekCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -101,9 +103,10 @@ public class CommandManager {
                 new ClearQueueCommand(),
                 new RewindCommand(),
                 new SkipToCommand(),
-                new RepeatCommand(),
+                new LoopCommand(),
                 new JumpCommand(),
-                new ResumeCommand()
+                new ResumeCommand(),
+                new SeekCommand()
         );
 
         addManagementCommands(

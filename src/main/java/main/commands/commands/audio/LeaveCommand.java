@@ -88,6 +88,6 @@ public class LeaveCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("dc");
+        return List.of("dc", "disconnect");
     }
 }
