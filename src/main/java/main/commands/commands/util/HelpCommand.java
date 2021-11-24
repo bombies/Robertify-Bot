@@ -11,6 +11,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InteractiveCommand;
+import main.utils.database.BanUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;

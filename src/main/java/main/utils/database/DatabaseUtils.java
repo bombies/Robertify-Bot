@@ -1,6 +1,7 @@
 package main.utils.database;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import main.constants.Database;
 import main.constants.DatabaseTable;
@@ -16,6 +17,8 @@ import java.sql.*;
 public class DatabaseUtils {
     @Getter
     private Connection con = null;
+    @Setter @Getter
+    private static Database database = null;
 
     @SneakyThrows
     public DatabaseUtils(Database db) {
@@ -30,6 +33,8 @@ public class DatabaseUtils {
 
         if (!dbExists)
             createTables(db);
+
+        setDatabase(db);
     }
 
     /**
@@ -54,6 +59,18 @@ public class DatabaseUtils {
 
                 dbStat.execute(sql);
                 dbStat.execute(sql2);
+            }
+            case BANNED_USERS -> {
+                Statement dbStat = con.createStatement();
+                String sql = "CREATE TABLE " + DatabaseTable.BANNED_USERS_TABLE + " (" +
+                        "guild_id INTEGER," +
+                        "banned_id INTEGER," +
+                        "banned_by INTEGER," +
+                        "banned_at INTEGER," +
+                        "banned_until INTEGER"
+                        + ");";
+
+                dbStat.execute(sql);
             }
         }
     }
@@ -118,5 +135,20 @@ public class DatabaseUtils {
     public void createConnection(Database db) {
         String url = "jdbc:sqlite:" + Config.get(ENV.DATABASE_DIR) + "/" + db.toString() + ".db";
         con = DriverManager.getConnection(url);
+    }
+
+    @SneakyThrows
+    public void createConnection() {
+        if (database == null)
+            throw new NullPointerException("There is no database!");
+
+        String url = "jdbc:sqlite:" + Config.get(ENV.DATABASE_DIR) + "/" + database.toString() + ".db";
+        con = DriverManager.getConnection(url);
+    }
+
+    @SneakyThrows
+    public void openConnectionIfClosed() {
+        if (con.isClosed())
+            createConnection();
     }
 }

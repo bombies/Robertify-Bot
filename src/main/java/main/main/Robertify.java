@@ -5,7 +5,9 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.util.HelpCommand;
@@ -82,7 +84,9 @@ public class Robertify {
                             new VolumeSlashCommand(),
                             new SetDJCommand(),
                             new RemoveDJCommand(),
-                            new SeekSlashCommand()
+                            new SeekSlashCommand(),
+                            new BanCommand(),
+                            new UnbanCommand()
                     )
 
                     // Button Listeners

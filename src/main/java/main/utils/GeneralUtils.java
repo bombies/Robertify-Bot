@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -220,6 +221,47 @@ public class GeneralUtils {
         final long seconds = duration % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
 
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public static boolean isValidDuration(String timeUnparsed) {
+        String durationStrRegex = "^\\d*[sSmMhHdD]$";
+        return Pattern.matches(durationStrRegex, timeUnparsed);
+    }
+
+    public static long getFutureTime(String timeUnparsed) {
+        String timeDigits       = timeUnparsed.substring(0, timeUnparsed.length()-1);
+        char duration           = timeUnparsed.charAt(timeUnparsed.length()-1);
+        long scheduledDuration  = 0L;
+
+        if (GeneralUtils.stringIsInt(timeDigits))
+            switch (duration) {
+                case 's' -> scheduledDuration = new Date().getTime()+ TimeUnit.SECONDS.toMillis(Integer.parseInt(timeDigits));
+                case 'm' -> scheduledDuration = new Date().getTime()+ TimeUnit.MINUTES.toMillis(Integer.parseInt(timeDigits));
+                case 'h' -> scheduledDuration = new Date().getTime()+ TimeUnit.HOURS.toMillis(Integer.parseInt(timeDigits));
+                case 'd' -> scheduledDuration = new Date().getTime()+ TimeUnit.DAYS.toMillis(Integer.parseInt(timeDigits));
+                default -> throw new IllegalArgumentException("The duration specifier \""+duration+"\" is invalid!");
+            }
+        else throw new IllegalArgumentException("There was no valid integer provided!");
+
+        return scheduledDuration;
+    }
+
+    public static String formatDuration(String timeUnparsed) {
+        String ret;
+        String timeDigits       = timeUnparsed.substring(0, timeUnparsed.length()-1);
+        char duration           = timeUnparsed.charAt(timeUnparsed.length()-1);
+
+        if (GeneralUtils.stringIsInt(timeDigits))
+            switch (duration) {
+                case 's' -> ret = timeDigits + " seconds";
+                case 'm' -> ret = timeDigits + " minutes";
+                case 'h' -> ret = timeDigits + " hours";
+                case 'd' -> ret = timeDigits + " days";
+                default -> throw new IllegalArgumentException("The duration specifier \""+duration+"\" is invalid!");
+            }
+        else throw new IllegalArgumentException("There was no valid integer provided!");
+
+        return ret;
     }
 
     public static String getFileContent(String path) {

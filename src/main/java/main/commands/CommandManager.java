@@ -12,16 +12,14 @@ import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
 import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
 import main.commands.commands.dev.test.PlaySpotifyURICommand;
 import main.commands.commands.dev.test.SpotifyURLToURICommand;
+import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
-import main.commands.commands.management.SetChannelCommand;
-import main.commands.commands.management.SetPrefixCommand;
 import main.commands.commands.util.HelpCommand;
-import main.commands.commands.management.ShutdownCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.utils.database.ServerUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -83,6 +81,8 @@ public class CommandManager {
                 new ResumeCommand(),
                 new VolumeCommand(),
                 new SeekCommand(),
+                new BanCommand(),
+                new UnbanCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -115,7 +115,9 @@ public class CommandManager {
                 new SetPrefixCommand(),
                 new SetDJCommand(),
                 new RemoveDJCommand(),
-                new TogglesCommand()
+                new TogglesCommand(),
+                new BanCommand(),
+                new UnbanCommand()
         );
 
         addMiscCommands(

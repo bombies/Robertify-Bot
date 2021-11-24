@@ -5,27 +5,39 @@ import lombok.SneakyThrows;
 import main.commands.CommandManager;
 import main.commands.commands.audio.QueueCommand;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.util.HelpCommand;
+import main.constants.BotConstants;
+import main.utils.database.BanUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.permissions.PermissionsConfig;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Listener extends ListenerAdapter {
     private final CommandManager manager;
@@ -46,10 +58,13 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
         togglesConfig.initConfig();
 
+        BanUtils.initBannedUserMap();
+
         for (Guild g : new BotUtils().getGuilds()) {
             permConfig.initGuild(g.getId());
 
             initSlashCommands(g);
+            rescheduleUnbans(g);
 
             LOGGER.info("Guild: {}", g.getName());
         }
@@ -69,8 +84,20 @@ public class Listener extends ListenerAdapter {
         // Making sure the user isn't a bot or webhook command
         if (user.isBot() || event.isWebhookMessage()) return;
 
-        if (raw.startsWith(prefix) && raw.length() > prefix.length())
+        if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
+            if (BanUtils.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
+                event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
+                        .queue();
+            } else
                 manager.handle(event);
+        }
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (BanUtils.isUserBannedLazy(event.getGuild().getIdLong(), event.getUser().getIdLong()))
+            event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
+                    .queue();
     }
 
     @SneakyThrows
@@ -79,6 +106,7 @@ public class Listener extends ListenerAdapter {
         Guild guild = event.getGuild();
 
         BotUtils botUtils = new BotUtils();
+        BanUtils banUtils = new BanUtils();
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
 
@@ -94,6 +122,7 @@ public class Listener extends ListenerAdapter {
         LOGGER.info("Joined {}", guild.getName());
 
         ServerUtils.initPrefixMap();
+        BanUtils.initBannedUserMap();
     }
 
     @Override
@@ -136,5 +165,80 @@ public class Listener extends ListenerAdapter {
         new SetDJCommand().initCommand(g);
         new RemoveDJCommand().initCommand(g);
         new SeekSlashCommand().initCommand(g);
+        new BanCommand().initCommand(g);
+        new UnbanCommand().initCommand(g);
     }
+
+    private static void rescheduleUnbans(Guild g) {
+        final var banUtils = new BanUtils();
+
+        Timer timer = new Timer();
+        final var map = BanUtils.getBannedUsers().get(g.getIdLong());
+        for (long user : map.keySet()) {
+            if (map.get(user) == null) continue;
+            if (map.get(user) - System.currentTimeMillis() <= 0) {
+                try {
+                    banUtils.unbanUser(g.getIdLong(), user);
+                    map.remove(user);
+                } catch (IllegalArgumentException e) {
+                    map.remove(user);
+                }
+                continue;
+            }
+
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    banUtils.unbanUser(user, g.getIdLong());
+                    map.remove(user);
+
+                    Robertify.api.retrieveUserById(user).queue(user -> {
+                        user.openPrivateChannel().queue(channel -> {
+                            channel.sendMessageEmbeds(
+                                    EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
+                                            .build()
+                            ).queue(success -> {}, new ErrorHandler()
+                                    .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
+                                        LOGGER.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")");
+                                    }));
+                        });
+                    });
+                }
+            };
+            timer.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), user)));
+
+
+        }
+    }
+
+    public static void scheduleUnban(Guild g, User u) {
+        final Timer timer = new Timer();
+        final BanUtils banUtils = new BanUtils();
+        final var map = BanUtils.getBannedUsers().get(g.getIdLong());
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                if (!BanUtils.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
+                    return;
+
+                banUtils.unbanUser(g.getIdLong(), u.getIdLong());
+                map.remove(u.getIdLong());
+
+                u.openPrivateChannel().queue(channel -> {
+                    channel.sendMessageEmbeds(
+                            EmbedUtils.embedMessage("You have been unbanned from Robertify in **" + g.getName() + "**")
+                                    .build()
+                    ).queue(success -> {
+                    }, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
+                                LOGGER.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
+                            }));
+                });
+            }
+        };
+        timer.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())));
+    }
+
+
 }
