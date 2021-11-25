@@ -3,6 +3,7 @@ package main.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.ITestCommand;
+import main.commands.commands.KotlinTestCommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.dev.ChangeLogCommand;
@@ -86,7 +87,8 @@ public class CommandManager {
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
-                new PlaySpotifyURICommand()
+                new PlaySpotifyURICommand(),
+                new KotlinTestCommand()
         );
 
         addMusicCommands(
