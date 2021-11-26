@@ -15,7 +15,9 @@ public enum BotConstants {
     PLAY_AND_PAUSE_EMOJI("<:playandpause:913594828338659368>"),
     LOOP_EMOJI("<:loop:913613388003823636>"),
     SHUFFLE_EMOJI("<:shuffle:913613387974471741>"),
-    STOP_EMOJI("<:stop:913601140879425557>");
+    STOP_EMOJI("<:stop:913601140879425557>"),
+    QUIT_EMOJI("<:close:913798787691073556>"),
+    DEFAULT_IMAGE("https://i.imgur.com/qgMcAj6.png");
 
     private final String str;
 

@@ -177,6 +177,8 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             event.replyEmbeds(searchCommand(manager, command, event.getGuild(), event.getUser()).build())
                     .setEphemeral(true).queue();
         }
+
+        GeneralUtils.setDefaultEmbed();
     }
 
     @Override @SneakyThrows

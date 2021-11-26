@@ -11,6 +11,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
 import main.utils.database.BotUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,6 +31,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public boolean playlistRepeating = false;
     private boolean announceNowPlaying = true;
     private boolean errorOccurred = false;
+    @Getter
     private final Guild guild;
 
     public TrackScheduler(AudioPlayer player, Guild guild) {
@@ -57,18 +59,17 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
-            if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES))
-                if (announceNowPlaying) {
-                    TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
-                    EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`"
-                            + (
-                                    ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) ?
-                                            " [" + PlayerManager.getRequester(track).getAsMention() + "]"
-                                            :
-                                            ""
-                    ));
-                    announcementChannel.sendMessageEmbeds(eb.build()).queue();
-                }
+            if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
+                TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
+                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`"
+                        + (
+                        ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) ?
+                                " [" + PlayerManager.getRequester(track).getAsMention() + "]"
+                                :
+                                ""
+                ));
+                announcementChannel.sendMessageEmbeds(eb.build()).queue();
+            }
         }
     }
 
@@ -90,6 +91,9 @@ public class TrackScheduler extends AudioEventAdapter {
             this.player.startTrack(nextTrack.makeClone(), false);
             announceNowPlaying = true;
         }
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
+            new DedicatedChannelConfig().updateMessage(guild);
     }
 
     @Override

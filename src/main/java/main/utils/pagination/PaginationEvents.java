@@ -16,6 +16,9 @@ public class PaginationEvents extends ListenerAdapter {
 
     @Override
     public void onButtonClick(@NotNull ButtonClickEvent event) {
+        if (!event.getButton().getId().startsWith(MessageButton.PAGE_ID.toString()))
+            return;
+
         event.getHook().setEphemeral(true);
 
         if (!currentPage.containsKey(event.getMessage().getIdLong()))

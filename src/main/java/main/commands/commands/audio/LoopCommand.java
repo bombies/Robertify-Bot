@@ -8,6 +8,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -95,6 +96,9 @@ public class LoopCommand implements ICommand {
     }
 
     public EmbedBuilder handleRepeat(GuildMusicManager musicManager) {
+        if (musicManager.audioPlayer.getPlayingTrack() == null)
+            return EmbedUtils.embedMessage("There is nothing playing!");
+
         EmbedBuilder eb;
 
         if (musicManager.scheduler.repeating) {

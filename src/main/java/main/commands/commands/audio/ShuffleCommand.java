@@ -8,8 +8,10 @@ import main.commands.ICommand;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -20,31 +22,23 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ShuffleCommand implements ICommand {
+    //TODO Add shuffle slash command
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
 
-        BotUtils botUtils = new BotUtils();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
+        msg.replyEmbeds(handleShuffle(ctx.getGuild()).build()).queue();
+    }
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
+    public EmbedBuilder handleShuffle(Guild guild) {
+        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
-        GeneralUtils.setCustomEmbed("Queue");
 
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
+        if (queue.isEmpty())
+            return EmbedUtils.embedMessage("There is nothing in the queue.");
+        
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
         List<AudioTrack> shuffledTrackList = new ArrayList<>();
@@ -61,8 +55,10 @@ public class ShuffleCommand implements ICommand {
         queue.clear();
         queue.addAll(shuffledTrackList);
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Shuffled the queue!");
-        msg.replyEmbeds(eb.build()).queue();
+        if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
+            new DedicatedChannelConfig().updateMessage(guild);
+
+        return EmbedUtils.embedMessage("Shuffled the queue!");
     }
 
     @Override

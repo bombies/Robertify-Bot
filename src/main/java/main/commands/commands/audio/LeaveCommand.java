@@ -7,11 +7,10 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -24,25 +23,6 @@ public class LeaveCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         EmbedBuilder eb;
-
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
-            eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
-
-
-
-        BotUtils botUtils = new BotUtils();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
-
-            eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
 
         if (!selfState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
@@ -65,12 +45,24 @@ public class LeaveCommand implements ICommand {
             return;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
+        msg.replyEmbeds(handleDisconnect(ctx.getGuild(), ctx.getAuthor()).build())
+                .queue();
+    }
+
+    public EmbedBuilder handleDisconnect(Guild guild, User author) {
+        if (!GeneralUtils.hasPerms(guild, author, Permission.ROBERTIFY_DJ))
+            return EmbedUtils.embedMessage("You need to be a DJ to use this command!");
+
+        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.player.stopTrack();
 
-        ctx.getGuild().getAudioManager().closeAudioConnection();
-        msg.addReaction("✅").queue();
+        guild.getAudioManager().closeAudioConnection();
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
+            new DedicatedChannelConfig().updateMessage(guild);
+
+        return EmbedUtils.embedMessage("Disconnected!");
     }
 
     @Override

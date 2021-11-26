@@ -6,6 +6,7 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.database.BotUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -69,6 +70,10 @@ public class SkipCommand implements ICommand {
         }
 
         musicManager.scheduler.nextTrack();
+
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+
         return EmbedUtils.embedMessage("Skipped the song!");
     }
 

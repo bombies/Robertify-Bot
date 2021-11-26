@@ -58,19 +58,22 @@ public class StopCommand implements ICommand {
         }
 
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
+
+        msg.replyEmbeds(handleStop(musicManager).build()).queue();
+    }
+
+    public EmbedBuilder handleStop(GuildMusicManager musicManager) {
         AudioPlayer audioPlayer = musicManager.audioPlayer;
         AudioTrack track = audioPlayer.getPlayingTrack();
 
-        if (track == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
-            msg.replyEmbeds(eb.build()).queue();
-            return;
-        }
+        if (track == null)
+            return EmbedUtils.embedMessage("There is nothing playing!");
+
 
         musicManager.scheduler.player.stopTrack();
         musicManager.scheduler.queue.clear();
 
-        msg.addReaction("✅").queue();
+        return EmbedUtils.embedMessage("You have stopped the track and cleared the queue.");
     }
 
     @Override

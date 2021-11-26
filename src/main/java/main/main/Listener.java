@@ -172,6 +172,7 @@ public class Listener extends ListenerAdapter {
         new SeekSlashCommand().initCommand(g);
         new BanCommand().initCommand(g);
         new UnbanCommand().initCommand(g);
+        new ShuffleSlashCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

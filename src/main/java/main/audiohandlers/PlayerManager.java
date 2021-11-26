@@ -16,6 +16,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
 import main.main.Robertify;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.spotify.SpotifySourceManager;
 import main.utils.spotify.SpotifyURI;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -210,6 +211,15 @@ public class PlayerManager extends AbstractModule {
                     EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + audioTrack.getInfo().title
                             + "` by `" + audioTrack.getInfo().author + "`");
                     channel.sendMessageEmbeds(eb.build()).queue();
+                } else {
+                    TogglesConfig toggleConfig = new TogglesConfig();
+                    DedicatedChannelConfig config = new DedicatedChannelConfig();
+
+                    if (config.isChannelSet(ctx.getGuild().getId()))
+                        toggleConfig.setToggle(
+                                ctx.getGuild(), Toggles.ANNOUNCE_MESSAGES,
+                                config.getOriginalAnnouncementToggle(ctx.getGuild().getId())
+                        );
                 }
 
                 trackRequestedByUser.put(audioTrack, ctx.getAuthor());
@@ -217,6 +227,9 @@ public class PlayerManager extends AbstractModule {
 
                 if (musicManager.scheduler.playlistRepeating)
                     musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
+
+                if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                    new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             }
 
             @Override
@@ -228,6 +241,15 @@ public class PlayerManager extends AbstractModule {
                         EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.get(0).getInfo().title
                                 + "` by `" + tracks.get(0).getInfo().author + "`");
                         channel.sendMessageEmbeds(eb.build()).queue();
+                    } else {
+                        TogglesConfig toggleConfig = new TogglesConfig();
+                        DedicatedChannelConfig config = new DedicatedChannelConfig();
+
+                        if (config.isChannelSet(ctx.getGuild().getId()))
+                            toggleConfig.setToggle(
+                                    ctx.getGuild(), Toggles.ANNOUNCE_MESSAGES,
+                                    config.getOriginalAnnouncementToggle(ctx.getGuild().getId())
+                            );
                     }
 
                     trackRequestedByUser.put(tracks.get(0), ctx.getAuthor());
@@ -235,6 +257,9 @@ public class PlayerManager extends AbstractModule {
 
                     if (musicManager.scheduler.playlistRepeating)
                         musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
+
+                    if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                        new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
                     return;
                 }
 
@@ -249,6 +274,9 @@ public class PlayerManager extends AbstractModule {
 
                 if (musicManager.scheduler.playlistRepeating)
                     musicManager.scheduler.setSavedQueue(ctx.getGuild(), musicManager.scheduler.queue);
+
+                if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                    new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             }
 
             @Override
@@ -279,6 +307,15 @@ public class PlayerManager extends AbstractModule {
                     EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + audioTrack.getInfo().title
                             + "` by `" + audioTrack.getInfo().author + "`");
                     event.replyEmbeds(eb.build()).queue();
+                } else {
+                    TogglesConfig toggleConfig = new TogglesConfig();
+                    DedicatedChannelConfig config = new DedicatedChannelConfig();
+
+                    if (config.isChannelSet(event.getGuild().getId()))
+                        toggleConfig.setToggle(
+                                event.getGuild(), Toggles.ANNOUNCE_MESSAGES,
+                                config.getOriginalAnnouncementToggle(event.getGuild().getId())
+                        );
                 }
 
                 trackRequestedByUser.put(audioTrack, event.getUser());
@@ -286,6 +323,9 @@ public class PlayerManager extends AbstractModule {
 
                 if (musicManager.scheduler.playlistRepeating)
                     musicManager.scheduler.setSavedQueue(event.getGuild(), musicManager.scheduler.queue);
+
+                if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                    new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             }
 
             @Override
@@ -297,6 +337,15 @@ public class PlayerManager extends AbstractModule {
                         EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.get(0).getInfo().title
                                 + "` by `" + tracks.get(0).getInfo().author + "`");
                         event.replyEmbeds(eb.build()).setEphemeral(false).queue();
+                    } else {
+                        TogglesConfig toggleConfig = new TogglesConfig();
+                        DedicatedChannelConfig config = new DedicatedChannelConfig();
+
+                        if (config.isChannelSet(event.getGuild().getId()))
+                            toggleConfig.setToggle(
+                                    event.getGuild(), Toggles.ANNOUNCE_MESSAGES,
+                                    config.getOriginalAnnouncementToggle(event.getGuild().getId())
+                            );
                     }
 
                     trackRequestedByUser.put(tracks.get(0), event.getUser());
@@ -304,6 +353,9 @@ public class PlayerManager extends AbstractModule {
 
                     if (musicManager.scheduler.playlistRepeating)
                         musicManager.scheduler.setSavedQueue(event.getGuild(), musicManager.scheduler.queue);
+
+                    if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                        new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
                     return;
                 }
 
@@ -318,6 +370,9 @@ public class PlayerManager extends AbstractModule {
 
                 if (musicManager.scheduler.playlistRepeating)
                     musicManager.scheduler.setSavedQueue(event.getGuild(), musicManager.scheduler.queue);
+
+                if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                    new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             }
 
             @Override

@@ -88,7 +88,8 @@ public class Robertify {
                             new RemoveDJCommand(),
                             new SeekSlashCommand(),
                             new BanCommand(),
-                            new UnbanCommand()
+                            new UnbanCommand(),
+                            new ShuffleSlashCommand()
                     )
 
                     // Button Listeners
