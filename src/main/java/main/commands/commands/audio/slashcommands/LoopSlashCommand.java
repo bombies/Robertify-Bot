@@ -45,6 +45,8 @@ public class LoopSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
 
@@ -55,17 +57,17 @@ public class LoopSlashCommand extends InteractiveCommand {
             var checks = new LoopCommand().checks(selfVoiceState, memberVoiceState, audioPlayer);
 
             if (checks != null) {
-                event.replyEmbeds(checks.build())
+                event.getHook().sendMessageEmbeds(checks.build())
                         .setEphemeral(true).queue();
                 return;
             }
 
-            event.replyEmbeds(new LoopCommand().handleRepeat(musicManager).build())
+            event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
                     .setEphemeral(false).queue();
         } else {
 //            boolean choice = event.getOption("queue").getAsBoolean();
 
-            event.replyEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
+            event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
                     .setEphemeral(false).queue();
         }
     }

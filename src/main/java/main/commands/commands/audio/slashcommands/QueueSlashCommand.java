@@ -48,6 +48,8 @@ public class QueueSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
@@ -55,7 +57,7 @@ public class QueueSlashCommand extends InteractiveCommand {
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
-            event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 

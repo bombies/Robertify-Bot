@@ -47,11 +47,13 @@ public class RemoveSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
-        event.replyEmbeds(new RemoveCommand().handleRemove(queue, trackSelected).build())
+        event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(queue, trackSelected).build())
                 .setEphemeral(true)
                 .queue();
     }

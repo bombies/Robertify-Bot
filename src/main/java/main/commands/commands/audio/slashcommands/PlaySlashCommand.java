@@ -49,6 +49,8 @@ public class PlaySlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(new PlayCommand().getName())) return;
 
+        event.deferReply().queue();
+
         EmbedBuilder eb;
 
         BotUtils botUtils = new BotUtils();
@@ -67,7 +69,7 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            event.replyEmbeds(eb.build()).setEphemeral(false).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(false).queue();
             return;
         }
 

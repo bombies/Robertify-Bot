@@ -48,17 +48,19 @@ public class SkipSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         if (event.getOptions().isEmpty()) {
             var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
             var memberSelfVoiceState = event.getMember().getVoiceState();
-            event.replyEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberSelfVoiceState).build())
+            event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberSelfVoiceState).build())
                     .setEphemeral(false)
                     .queue();
         } else {
             final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
             final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
             final int tracksToSkip = GeneralUtils.longToInt(event.getOption("trackstoskip").getAsLong());
-            event.replyEmbeds(new SkipToCommand().handleSkip(queue, musicManager, tracksToSkip).build())
+            event.getHook().sendMessageEmbeds(new SkipToCommand().handleSkip(queue, musicManager, tracksToSkip).build())
                     .setEphemeral(false)
                     .queue();
         }

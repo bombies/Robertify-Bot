@@ -56,12 +56,14 @@ public class MoveSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final int id = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());
 
-        event.replyEmbeds(new MoveCommand().handleMove(queue, id, pos).build())
+        event.getHook().sendMessageEmbeds(new MoveCommand().handleMove(queue, id, pos).build())
                 .setEphemeral(false)
                 .queue();
     }

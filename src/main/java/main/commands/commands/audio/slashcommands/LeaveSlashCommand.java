@@ -45,11 +45,13 @@ public class LeaveSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         EmbedBuilder eb;
 
         if (!GeneralUtils.hasPerms(event.getGuild(), event.getUser(), Permission.ROBERTIFY_DJ)) {
             eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
@@ -60,19 +62,19 @@ public class LeaveSlashCommand extends InteractiveCommand {
 
         if (!selfVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
@@ -83,6 +85,6 @@ public class LeaveSlashCommand extends InteractiveCommand {
         event.getGuild().getAudioManager().closeAudioConnection();
 
         eb = EmbedUtils.embedMessage("Disconnected!");
-        event.replyEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build()).queue();
     }
 }

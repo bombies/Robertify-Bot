@@ -46,10 +46,12 @@ public class JumpSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        event.replyEmbeds(
+        event.getHook().sendMessageEmbeds(
                 new JumpCommand().doJump(selfVoiceState, memberVoiceState, null, String.valueOf(event.getOption("seconds").getAsLong()))
                         .build()
         ).setEphemeral(true).queue();

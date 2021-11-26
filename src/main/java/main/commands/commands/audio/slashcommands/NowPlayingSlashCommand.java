@@ -37,11 +37,13 @@ public class NowPlayingSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         EmbedBuilder eb;
 
-        event.replyEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), selfVoiceState, memberVoiceState).build())
+        event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), selfVoiceState, memberVoiceState).build())
                 .setEphemeral(false)
                 .queue();
     }

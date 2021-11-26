@@ -47,8 +47,10 @@ public class VolumeSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         if (!getInteractionCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
@@ -56,7 +58,7 @@ public class VolumeSlashCommand extends InteractiveCommand {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        event.replyEmbeds(new VolumeCommand().handleVolumeChange(
+        event.getHook().sendMessageEmbeds(new VolumeCommand().handleVolumeChange(
                 selfVoiceState ,memberVoiceState,
                         GeneralUtils.longToInt(event.getOption("volume").getAsLong())
                 ).build())

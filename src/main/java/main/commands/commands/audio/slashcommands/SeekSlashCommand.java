@@ -51,12 +51,14 @@ public class SeekSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final var minutes = Integer.parseInt(String.valueOf(event.getOption("minutes").getAsLong()));
         final var seconds = Integer.parseInt(String.valueOf(event.getOption("seconds").getAsLong()));
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
-        event.replyEmbeds(new SeekCommand().handleSeek(selfVoiceState, memberVoiceState, minutes, seconds).build())
+        event.getHook().sendMessageEmbeds(new SeekCommand().handleSeek(selfVoiceState, memberVoiceState, minutes, seconds).build())
                 .setEphemeral(false).queue();
     }
 }

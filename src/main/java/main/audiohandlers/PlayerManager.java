@@ -307,7 +307,7 @@ public class PlayerManager extends AbstractModule {
 
                 EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.size()
                         + "` tracks from playlist `" + audioPlaylist.getName() + "`");
-                event.replyEmbeds(eb.build()).setEphemeral(false).queue();
+                event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(false).queue();
 
                 for (final AudioTrack track : tracks) {
                     trackRequestedByUser.put(track, event.getUser());

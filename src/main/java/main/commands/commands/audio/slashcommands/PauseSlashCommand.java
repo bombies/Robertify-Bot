@@ -34,10 +34,12 @@ public class PauseSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        event.replyEmbeds(new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState).build())
+        event.getHook().sendMessageEmbeds(new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState).build())
                 .setEphemeral(false).queue();
      }
 }

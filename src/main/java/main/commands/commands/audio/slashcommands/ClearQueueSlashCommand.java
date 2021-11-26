@@ -46,6 +46,8 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
@@ -53,7 +55,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("There is already nothing in the queue.");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
@@ -63,20 +65,20 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!getInteractionCommand().getCommand().permissionCheck(event)) {
                     EmbedBuilder eb = EmbedUtils.embedMessage("You need to be a DJ to use this command when there's other users in the channel!");
-                    event.replyEmbeds(eb.build()).queue();
+                    event.getHook().sendMessageEmbeds(eb.build()).queue();
                     return;
                 }
             }
         } else {
             EmbedBuilder eb = EmbedUtils.embedMessage("The bot isn't in a voice channel.");
-            event.replyEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         queue.clear();
 
         EmbedBuilder eb = EmbedUtils.embedMessage("The queue was cleared!");
-        event.replyEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed();
     }

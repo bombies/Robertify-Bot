@@ -46,13 +46,15 @@ public class RewindSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        event.deferReply().queue();
+
         long time = -1;
 
         if (!event.getOptions().isEmpty()) {
             time = event.getOption("seconds").getAsLong();
         }
 
-        event.replyEmbeds(new RewindCommand().handleRewind(event.getGuild().getSelfMember().getVoiceState(), time, event.getOptions().isEmpty()).build())
+        event.getHook().sendMessageEmbeds(new RewindCommand().handleRewind(event.getGuild().getSelfMember().getVoiceState(), time, event.getOptions().isEmpty()).build())
                 .queue();
     }
 }
