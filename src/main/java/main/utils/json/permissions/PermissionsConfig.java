@@ -5,9 +5,11 @@ import main.commands.commands.management.permissions.Permission;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.database.BotUtils;
 import main.utils.json.JSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -225,6 +227,16 @@ public class PermissionsConfig extends JSONConfig {
                 .getJSONArray(String.valueOf(code));
         for (int i = 0; i < arr.length(); i++)
             ret.add(arr.getString(i));
+        return ret;
+    }
+
+    public List<Role> getRolesForPermission(Guild g, Permission p) {
+        final List<Role> ret = new ArrayList<>();
+        final var roleIDs = getRolesForPermission(g.getId(), p);
+
+        for (var roleID : roleIDs)
+            ret.add(Robertify.api.getRoleById(roleID));
+
         return ret;
     }
 

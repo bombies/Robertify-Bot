@@ -38,6 +38,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Listener extends ListenerAdapter {
     private final CommandManager manager;
@@ -186,7 +189,8 @@ public class Listener extends ListenerAdapter {
                 continue;
             }
 
-            TimerTask task = new TimerTask() {
+            final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            final Runnable task = new Runnable() {
                 @Override
                 public void run() {
                     banUtils.unbanUser(user, g.getIdLong());
@@ -205,8 +209,7 @@ public class Listener extends ListenerAdapter {
                     });
                 }
             };
-            timer.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), user)));
-
+            scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), user)).getTime(), TimeUnit.MILLISECONDS);
 
         }
     }
@@ -216,7 +219,9 @@ public class Listener extends ListenerAdapter {
         final BanUtils banUtils = new BanUtils();
         final var map = BanUtils.getBannedUsers().get(g.getIdLong());
 
-        TimerTask task = new TimerTask() {
+        final var scheduler = Executors.newScheduledThreadPool(1);
+
+        final Runnable task = new Runnable() {
             @Override
             public void run() {
                 if (!BanUtils.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
@@ -237,7 +242,7 @@ public class Listener extends ListenerAdapter {
                 });
             }
         };
-        timer.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())));
+        scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())).getTime(), TimeUnit.MILLISECONDS);
     }
 
 

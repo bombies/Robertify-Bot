@@ -118,7 +118,8 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
                                 "The user to unban",
                                 true
                         )),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN)
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN),
+                        true
                 )).build();
     }
 
