@@ -11,10 +11,12 @@ import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
+import main.utils.json.EightBallConfig;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import me.duncte123.botcommons.web.WebUtils;
@@ -89,7 +91,8 @@ public class Robertify {
                             new SeekSlashCommand(),
                             new BanCommand(),
                             new UnbanCommand(),
-                            new ShuffleSlashCommand()
+                            new ShuffleSlashCommand(),
+                            new EightBallCommand()
                     )
 
                     // Button Listeners

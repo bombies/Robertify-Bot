@@ -18,6 +18,7 @@ import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
+import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
@@ -86,6 +87,7 @@ public class CommandManager {
                 new BanCommand(),
                 new UnbanCommand(),
                 new DedicatedChannelCommand(),
+                new EightBallCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -126,7 +128,8 @@ public class CommandManager {
         );
 
         addMiscCommands(
-                new PingCommand()
+                new PingCommand(),
+                new EightBallCommand()
         );
     }
 

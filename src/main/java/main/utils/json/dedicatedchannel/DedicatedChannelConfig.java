@@ -50,6 +50,8 @@ public class DedicatedChannelConfig extends JSONConfig {
             } catch (JSONException e) {
                 obj.put(g.getId(), "");
             }
+
+        setJSON(obj);
     }
 
     public synchronized DedicatedChannelConfig setChannel(String gid, String cid) {

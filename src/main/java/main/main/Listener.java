@@ -10,11 +10,13 @@ import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
 import main.utils.database.BanUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
+import main.utils.json.EightBallConfig;
 import main.utils.json.JSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -60,6 +62,7 @@ public class Listener extends ListenerAdapter {
 
         new ChangeLogConfig().initConfig();
         new DedicatedChannelConfig().initConfig();
+        new EightBallConfig().initConfig();
 
         BanUtils.initBannedUserMap();
 
@@ -114,6 +117,7 @@ public class Listener extends ListenerAdapter {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
         new DedicatedChannelConfig().initConfig();
+        new EightBallConfig().initConfig();
 
         botUtils.addGuild(guild.getIdLong())
                 .announceNewTrack(guild.getIdLong(), true)
@@ -173,6 +177,7 @@ public class Listener extends ListenerAdapter {
         new BanCommand().initCommand(g);
         new UnbanCommand().initCommand(g);
         new ShuffleSlashCommand().initCommand(g);
+        new EightBallCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

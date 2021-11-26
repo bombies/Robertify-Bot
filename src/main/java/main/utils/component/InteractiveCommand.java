@@ -104,8 +104,9 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                     // Adding options for subcommands
                     for (CommandOption options : subCommand.getOptions()) {
                         OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
-                        for (String choices : options.getChoices())
-                            optionData.addChoice(choices, choices);
+                        if (options.getChoices() != null)
+                            for (String choices : options.getChoices())
+                                optionData.addChoice(choices, choices);
 
                         subCommandData.addOptions(optionData);
                     }
@@ -458,6 +459,10 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
         public static SubCommand of(String name, String description, List<CommandOption> options) {
             return new SubCommand(name, description, options);
+        }
+
+        public static SubCommand of(String name, String description) {
+            return new SubCommand(name, description, List.of());
         }
     }
 
