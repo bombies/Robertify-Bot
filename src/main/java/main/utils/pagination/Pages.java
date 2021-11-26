@@ -1,8 +1,10 @@
 package main.utils.pagination;
 
+import main.constants.BotConstants;
 import main.constants.MessageButton;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -18,21 +20,25 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Pages {
-    private static HashMap<Long, List<Page>> messages = new HashMap<>();
+    private static final HashMap<Long, List<Page>> messages = new HashMap<>();
+    private static final Paginator paginator = new Paginator(
+            Emoji.fromMarkdown(BotConstants.PREVIOUS_EMOJI.toString()),
+            Emoji.fromMarkdown(BotConstants.REWIND_EMOJI.toString()),
+            Emoji.fromMarkdown(BotConstants.PLAY_EMOJI.toString()),
+            Emoji.fromMarkdown(BotConstants.END_EMOJI.toString())
+    );
 
     public static Message paginate(TextChannel channel, User user, List<Page> pages) {
-        Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
-
         AtomicReference<Message> ret = new AtomicReference<>();
 
         channel.sendMessageEmbeds(pages.get(0).getEmbed()).queue(msg -> {
             if (pages.size() > 1) {
                 msg.editMessageComponents(
                         ActionRow.of(
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFront()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPrevious()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNext()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEnd())
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFrontEmoji()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPreviousEmoji()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNextEmoji()),
+                                Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEndEmoji())
                         )
                 ).queue();
 
@@ -45,19 +51,17 @@ public class Pages {
     }
 
     public static Message paginate(SlashCommandEvent event, List<Page> pages) {
-        Paginator paginator = new Paginator("◂◂", "◂", "▸", "▸▸");
-
         AtomicReference<Message> ret = new AtomicReference<>();
 
         ReplyAction replyAction = event.replyEmbeds(pages.get(0).getEmbed()).setEphemeral(true);
 
         if (pages.size() > 1) {
-            replyAction.addActionRows(
+            replyAction = replyAction.addActionRows(
                     ActionRow.of(
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + event.getUser().getId(), paginator.getFront()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + event.getUser().getId(), paginator.getPrevious()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + event.getUser().getId(), paginator.getNext()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.END + event.getUser().getId(), paginator.getEnd())
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + event.getUser().getId(), paginator.getFrontEmoji()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + event.getUser().getId(), paginator.getPreviousEmoji()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + event.getUser().getId(), paginator.getNextEmoji()),
+                            Button.of(ButtonStyle.SECONDARY, MessageButton.END + event.getUser().getId(), paginator.getEndEmoji())
                     )
             );
         }
