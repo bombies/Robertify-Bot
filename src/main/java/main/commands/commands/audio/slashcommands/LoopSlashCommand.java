@@ -33,10 +33,11 @@ public class LoopSlashCommand extends InteractiveCommand {
                         commandName,
                         "Replay the current song being played",
                         List.of(CommandOption.of(
-                                OptionType.BOOLEAN,
+                                OptionType.STRING,
                                 "queue",
                                 "Toggle whether you want the current queue to be repeated or not",
-                                false
+                                false,
+                                List.of("queue")
                         ))
                 )).build();
     }
@@ -49,24 +50,21 @@ public class LoopSlashCommand extends InteractiveCommand {
 
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
+        final var memberVoiceState = event.getMember().getVoiceState();
+
+        var checks = new LoopCommand().checks(selfVoiceState, memberVoiceState, audioPlayer);
+
+        if (checks != null) {
+            event.getHook().sendMessageEmbeds(checks.build())
+                    .setEphemeral(true).queue();
+            return;
+        }
 
         if (event.getOptions().isEmpty()) {
-            final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
-            final var memberVoiceState = event.getMember().getVoiceState();
-
-            var checks = new LoopCommand().checks(selfVoiceState, memberVoiceState, audioPlayer);
-
-            if (checks != null) {
-                event.getHook().sendMessageEmbeds(checks.build())
-                        .setEphemeral(true).queue();
-                return;
-            }
-
             event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
                     .setEphemeral(false).queue();
         } else {
-//            boolean choice = event.getOption("queue").getAsBoolean();
-
             event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
                     .setEphemeral(false).queue();
         }

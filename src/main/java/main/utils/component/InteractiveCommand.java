@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
@@ -106,15 +107,25 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                     var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
 
                     // Adding options for subcommands
-                    for (CommandOption options : subCommand.getOptions())
-                        subCommandData.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                    for (CommandOption options : subCommand.getOptions()) {
+                        OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                        for (String choices : options.getChoices())
+                            optionData.addChoice(choices, choices);
 
+                        subCommandData.addOptions(optionData);
+                    }
                     commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
                 }
             } else {
                 // Adding options for the main command
-                for (CommandOption options : command.getOptions())
-                    commandCreateAction = commandCreateAction.addOption(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                for (CommandOption options : command.getOptions()) {
+                    OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+
+                    if (options.getChoices() != null)
+                        for (String choices : options.getChoices())
+                            optionData.addChoice(choices, choices);
+                    commandCreateAction = commandCreateAction.addOptions(optionData);
+                }
             }
 
             commandCreateAction.queue(createdCommand -> {
@@ -464,16 +475,23 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private final String description;
         @Getter
         private final boolean required;
+        @Getter
+        private final List<String> choices;
 
-        private CommandOption(OptionType type, String name, String description, boolean required) {
+        private CommandOption(OptionType type, String name, String description, boolean required, List<String> choices) {
             this.type = type;
             this.name = name.toLowerCase();
             this.description = description;
             this.required = required;
+            this.choices = choices;
         }
 
         public static CommandOption of(OptionType type, String name, String description, boolean required) {
-            return new CommandOption(type, name, description, required);
+            return new CommandOption(type, name, description, required, null);
+        }
+
+        public static CommandOption of(OptionType type, String name, String description, boolean required, List<String> choices) {
+            return new CommandOption(type, name, description, required, choices);
         }
     }
 
