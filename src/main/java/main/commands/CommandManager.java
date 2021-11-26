@@ -14,6 +14,7 @@ import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
 import main.commands.commands.dev.test.PlaySpotifyURICommand;
 import main.commands.commands.dev.test.SpotifyURLToURICommand;
 import main.commands.commands.management.*;
+import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
@@ -84,6 +85,7 @@ public class CommandManager {
                 new SeekCommand(),
                 new BanCommand(),
                 new UnbanCommand(),
+                new DedicatedChannelCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -119,7 +121,8 @@ public class CommandManager {
                 new RemoveDJCommand(),
                 new TogglesCommand(),
                 new BanCommand(),
-                new UnbanCommand()
+                new UnbanCommand(),
+                new DedicatedChannelCommand()
         );
 
         addMiscCommands(

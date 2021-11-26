@@ -12,6 +12,8 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.youtube.LazyYoutubeAudioTrackFactory;
 import main.commands.CommandContext;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.spotify.SpotifySourceManager;
@@ -79,7 +81,7 @@ public class PlayerManager extends AbstractModule {
             trackUrl += " audio";
 
         joinVoiceChannel(selfVoiceState, memberVoiceState);
-        loadTrack(trackUrl, musicManager, channel, ctx, true);
+        loadTrack(trackUrl, musicManager, channel, ctx, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES));
     }
 
     public void loadAndPlay(String trackUrl, TextChannel announcementChannel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, SlashCommandEvent event) {
@@ -92,7 +94,7 @@ public class PlayerManager extends AbstractModule {
             trackUrl += " audio";
 
         joinVoiceChannel(selfVoiceState, memberVoiceState);
-        loadTrack(trackUrl, musicManager, announcementChannel, true, event);
+        loadTrack(trackUrl, musicManager, announcementChannel, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), event);
     }
 
     @SneakyThrows

@@ -12,6 +12,9 @@ public enum BotConstants {
     PLAY_EMOJI("<:play:913594529603547237>"),
     END_EMOJI("<:next:913594937298280528>"),
     PAUSE_EMOJI("<:pause:913595131058356256>"),
+    PLAY_AND_PAUSE_EMOJI("<:playandpause:913594828338659368>"),
+    LOOP_EMOJI("<:loop:913613388003823636>"),
+    SHUFFLE_EMOJI("<:shuffle:913613387974471741>"),
     STOP_EMOJI("<:stop:913601140879425557>");
 
     private final String str;

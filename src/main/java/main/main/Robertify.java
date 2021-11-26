@@ -8,6 +8,7 @@ import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
+import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.util.HelpCommand;
@@ -62,7 +63,8 @@ public class Robertify {
                             VoiceChannelEvents.waiter,
                             commandWaiter,
                             new Listener(commandWaiter),
-                            new VoiceChannelEvents()
+                            new VoiceChannelEvents(),
+                            new DedicatedChannelEvents()
                     )
 
                     // Slash Commands

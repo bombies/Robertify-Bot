@@ -3,7 +3,6 @@ package main.main;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
-import main.commands.commands.audio.QueueCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
@@ -18,6 +17,7 @@ import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -58,8 +56,10 @@ public class Listener extends ListenerAdapter {
         TogglesConfig togglesConfig = new TogglesConfig();
 
         permConfig.initConfig();
-        new ChangeLogConfig().initConfig();
         togglesConfig.initConfig();
+
+        new ChangeLogConfig().initConfig();
+        new DedicatedChannelConfig().initConfig();
 
         BanUtils.initBannedUserMap();
 
@@ -69,7 +69,7 @@ public class Listener extends ListenerAdapter {
             initSlashCommands(g);
             rescheduleUnbans(g);
 
-            LOGGER.info("Guild: {}", g.getName());
+            LOGGER.info("Watching {}", g.getName());
         }
 
         ServerUtils.initPrefixMap();
@@ -110,8 +110,10 @@ public class Listener extends ListenerAdapter {
 
         BotUtils botUtils = new BotUtils();
         BanUtils banUtils = new BanUtils();
+
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
+        new DedicatedChannelConfig().initConfig();
 
         botUtils.addGuild(guild.getIdLong())
                 .announceNewTrack(guild.getIdLong(), true)
@@ -174,9 +176,8 @@ public class Listener extends ListenerAdapter {
 
     private static void rescheduleUnbans(Guild g) {
         final var banUtils = new BanUtils();
-
-        Timer timer = new Timer();
         final var map = BanUtils.getBannedUsers().get(g.getIdLong());
+
         for (long user : map.keySet()) {
             if (map.get(user) == null) continue;
             if (map.get(user) - System.currentTimeMillis() <= 0) {
@@ -215,10 +216,8 @@ public class Listener extends ListenerAdapter {
     }
 
     public static void scheduleUnban(Guild g, User u) {
-        final Timer timer = new Timer();
         final BanUtils banUtils = new BanUtils();
         final var map = BanUtils.getBannedUsers().get(g.getIdLong());
-
         final var scheduler = Executors.newScheduledThreadPool(1);
 
         final Runnable task = new Runnable() {

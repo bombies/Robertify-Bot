@@ -61,7 +61,7 @@ public abstract class JSONConfig {
      * @param object JSONObject containing all the JSON info
      */
     @SneakyThrows
-    public void setJSON(JSONObject object) {
+    public synchronized void setJSON(JSONObject object) {
         GeneralUtils.setFileContent(Config.getPath(ENV.JSON_DIR, file), object.toString(4));
     }
 
