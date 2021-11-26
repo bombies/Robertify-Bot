@@ -2,10 +2,7 @@ package main.utils.component;
 
 import lombok.Getter;
 import lombok.Setter;
-import main.commands.commands.management.permissions.Permission;
-import main.main.Listener;
 import main.utils.database.BotUtils;
-import main.utils.json.permissions.PermissionsConfig;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -13,7 +10,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
