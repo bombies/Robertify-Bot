@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 
 import javax.script.ScriptException;
 import java.util.List;
