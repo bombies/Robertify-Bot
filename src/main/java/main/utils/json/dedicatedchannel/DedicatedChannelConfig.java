@@ -45,11 +45,8 @@ public class DedicatedChannelConfig extends JSONConfig {
         var obj = getJSONObject();
 
         for (Guild g : new BotUtils().getGuilds())
-            try {
-                obj.getString(g.getId());
-            } catch (JSONException e) {
+            if (!obj.has(g.getId()))
                 obj.put(g.getId(), "");
-            }
 
         setJSON(obj);
     }
