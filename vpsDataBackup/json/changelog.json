@@ -1,0 +1,47 @@
+{
+    "past_logs": [{
+        "10 october 2021": {"logs": [
+            "Added a tutorial command. `tutorial`",
+            "Added the song requester beside the now playing messages",
+            "Added a toggle for showing the song requesters beside the now playing messages",
+            "Cleaned up internals for queueing music. Everything should feel a bit more optimized now."
+        ]},
+        "16 november 2021": {"logs": ["Fixed a bug where repeating a queue would persist even after the bot disconnects fro ma voice channel"]},
+        "24 november 2021": {"logs": [
+            "The `rewind` command has new aliases (`repeat`, `rep`)",
+            "The old repeat command has been changed to `loop`. The `loop` slash command has been unaffected."
+        ]},
+        "21 november 2021": {"logs": [
+            "Added new aliases for looping songs. `loop, l`",
+            "Updated the help menu. It now features a selection menu for easily going around the categories.",
+            "Updated the back-end logic for controlling audio. Listening to, queueing and controlling music should be much smoother now.",
+            "Added slash commands for pretty much all music commands. Do `/` and click on Robertify on the left to view all the commands. More slash commands will be added in the future"
+        ]},
+        "09 october 2021": {"logs": [
+            "Added changelogs! Every time something has been updated/implemented into the bot you will now receive changelog messages in your announcement channel.",
+            "Added commands to easily set and remove a role as a DJ (`setdj`, `removedj`). You no longer have to configure that using the permissions command.",
+            "Added a command for managing **toggles**. Toggles are customizable feature that you can turn on or off. For example, if you don't want the bot to be announcing every time it plays a song, you can run the command `toggle announcements`. Use `help toggles` for more information.",
+            "Implemented a new mechanism to allows non-DJ users to force the bot to leave the voice channel. This will only work if the user is the only other user in the channel with the bot.",
+            "Fixed an issue where running the `setchannel` command wouldn't actually update the announcement channel."
+        ]},
+        "26 november 2021": {"logs": [
+            "The bot now pauses when all users have left the voice chat. The music will resume where it left off once someone joins back within it's timeout period.",
+            "Added a seek command. `seek`",
+            "Added commands to ban/unban users from the bot. For more information you can do `help ban` and `help unban`",
+            "Updated the buttons for the queue. It looks a lot cleaner now.",
+            "The possibility of slash commands timing out has been mitigated.",
+            "Fixed the announcement toggle",
+            "Fixed a bug where you could loop the queue without a queue being present, without being in a voice channel and without anything playing.",
+            "Added a requests channel. In this channel you can easily control the bot using buttons, view the currently playing song and the first **10** elements of the queue. You can set this command up by using the `setup` command.",
+            "Added a shuffle slash command. `/shuffle`",
+            "Added an 8ball command. Custom responses can be added. For more information do `help 8ball`."
+        ]},
+        "19 october 2021": {"logs": ["Added a resume command. (`resume`)"]},
+        "23 november 2021": {"logs": [
+            "Added a volume command. `volume`",
+            "Added a volume indicator in the **Now Playing** menu",
+            "Added slash commands for setting and removing a role as a DJ. `/setdj` `/removedj`"
+        ]}
+    }],
+    "current_log": []
+}

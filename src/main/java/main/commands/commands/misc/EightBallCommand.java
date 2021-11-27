@@ -166,13 +166,13 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         final var random = new Random().nextDouble();
 
         if (!customAnswers.isEmpty()) {
-            if (random < 0.25) {
+            if (random < 0.11) {
                 return EmbedUtils.embedMessage("🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
-            } else if (random > 0.25 && random < 0.5) {
+            } else if (random > 0.11 && random < 0.22) {
                 return EmbedUtils.embedMessage("🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
-            } else if (random > 0.5 && random < 0.75) {
+            } else if (random > 0.22 && random < 0.33) {
                 return EmbedUtils.embedMessage("🎱| " +  negativeAnswers.get(new Random().nextInt(negativeAnswers.size())));
-            } else if (random > 0.75) {
+            } else if (random > 0.33) {
                 return EmbedUtils.embedMessage("🎱| " +  customAnswers.get(new Random().nextInt(customAnswers.size())));
             }
         } else {
