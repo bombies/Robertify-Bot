@@ -2,7 +2,8 @@ package main.constants;
 
 public enum Database {
     MAIN("main"),
-    BANNED_USERS("bannedusers");
+    BANNED_USERS("bannedusers"),
+    TRACKS_PLAYED("tracks");
 
     private final String str;
 

@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 
-public class DatabaseUtils {
+public abstract class DatabaseUtils {
     @Getter
     private Connection con = null;
     @Setter @Getter
@@ -70,6 +70,14 @@ public class DatabaseUtils {
                         "banned_until INTEGER"
                         + ");";
 
+                dbStat.execute(sql);
+            }
+            case TRACKS_PLAYED -> {
+                Statement dbStat = con.createStatement();
+                String sql = "CREATE TABLE " + DatabaseTable.SPOTIFY_TRACKS_TABLE + " (" +
+                        "spotify_id TEXT PRIMARY KEY," +
+                        "youtube_id TEXT"
+                        + ");";
                 dbStat.execute(sql);
             }
         }

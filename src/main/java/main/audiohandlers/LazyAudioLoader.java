@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.commands.CommandContext;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -12,39 +11,61 @@ import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class AudioLoader implements AudioLoadResultHandler {
+public class LazyAudioLoader implements AudioLoadResultHandler {
     private final Guild guild;
     private final User sender;
+    private final Message msg;
     private final GuildMusicManager musicManager;
     private final boolean announceMsg;
+    private final TextChannel channel;
     private final HashMap<AudioTrack, User> trackRequestedByUser;
     private final String trackUrl;
-    private final Message botMsg;
+    private final SlashCommandEvent event;
 
 
-    public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
-                       String trackUrl, boolean announceMsg, Message botMsg) {
-        this.guild = musicManager.scheduler.getGuild();
+    public LazyAudioLoader(User sender, GuildMusicManager musicManager, Message msg, TextChannel channel, HashMap<AudioTrack, User> trackRequestedByUser,
+                           String trackUrl, boolean announceMsg) {
         this.sender = sender;
+        this.guild = musicManager.scheduler.getGuild();
         this.musicManager = musicManager;
+        this.msg = msg;
+        this.channel = channel;
         this.trackRequestedByUser = trackRequestedByUser;
         this.trackUrl = trackUrl;
         this.announceMsg = announceMsg;
-        this.botMsg = botMsg;
+        this.event = null;
+    }
+
+    public LazyAudioLoader(User sender, GuildMusicManager musicManager, Message msg, TextChannel channel, HashMap<AudioTrack, User> trackRequestedByUser,
+                           SlashCommandEvent event, String trackUrl, boolean announceMsg) {
+        this.sender = sender;
+        this.guild = musicManager.scheduler.getGuild();
+        this.musicManager = musicManager;
+        this.msg = msg;
+        this.channel = channel;
+        this.trackRequestedByUser = trackRequestedByUser;
+        this.trackUrl = trackUrl;
+        this.event = event;
+        this.announceMsg = announceMsg;
     }
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
         if (announceMsg) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + audioTrack.getInfo().title
+            EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + audioTrack.getInfo().title
                     + "` by `" + audioTrack.getInfo().author + "`");
 
-            botMsg.editMessageEmbeds(eb.build()).queue();
+            if (event == null)
+                channel.sendMessageEmbeds(eb.build()).queue();
+            else
+                event.replyEmbeds(eb.build()).setEphemeral(false).queue();
         } else {
             TogglesConfig toggleConfig = new TogglesConfig();
             DedicatedChannelConfig config = new DedicatedChannelConfig();
@@ -72,9 +93,12 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         if (trackUrl.startsWith("ytsearch:")) {
             if (announceMsg) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.get(0).getInfo().title
+                EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.get(0).getInfo().title
                         + "` by `" + tracks.get(0).getInfo().author + "`");
-                botMsg.editMessageEmbeds(eb.build()).queue();
+                if (event == null)
+                    channel.sendMessageEmbeds(eb.build()).queue();
+                else
+                    event.replyEmbeds(eb.build()).setEphemeral(false).queue();
             } else {
                 TogglesConfig toggleConfig = new TogglesConfig();
                 DedicatedChannelConfig config = new DedicatedChannelConfig();
@@ -97,9 +121,12 @@ public class AudioLoader implements AudioLoadResultHandler {
             return;
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.size()
+        EmbedBuilder eb = EmbedUtils.embedMessage("Adding to queue: `" + tracks.size()
                 + "` tracks from playlist `" + audioPlaylist.getName() + "`");
-        botMsg.editMessageEmbeds(eb.build()).queue();
+        if (event == null)
+            channel.sendMessageEmbeds(eb.build()).queue();
+        else
+            event.replyEmbeds(eb.build()).setEphemeral(false).queue();
 
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
@@ -115,8 +142,11 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "") + "`. Try being more specific. *(Added name of the artiste)*");
-        botMsg.editMessageEmbeds(eb.build()).queue();
+        EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "") + "`. Try being more specific. *(Adding name of the artiste)*");
+        if (event == null)
+            msg.replyEmbeds(eb.build()).queue();
+        else
+            event.replyEmbeds(eb.build()).setEphemeral(false).queue();
     }
 
     @Override
@@ -126,6 +156,9 @@ public class AudioLoader implements AudioLoadResultHandler {
         e.printStackTrace();
 
         EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
-        botMsg.editMessageEmbeds(eb.build()).queue();
+        if (event == null)
+            msg.replyEmbeds(eb.build()).queue();
+        else
+            event.replyEmbeds(eb.build()).setEphemeral(false).queue();
     }
 }

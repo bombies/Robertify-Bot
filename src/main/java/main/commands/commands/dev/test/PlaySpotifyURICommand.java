@@ -29,13 +29,6 @@ public class PlaySpotifyURICommand implements ITestCommand {
             PlayerManager.getInstance().joinVoiceChannel(ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState());
 
             final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-            PlayerManager.getInstance().handleSpotifyURI(
-                    uri.toString(),
-                    musicManager,
-                    ctx.getChannel(),
-                    ctx,
-                    ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState()
-            );
         } catch (InvalidSpotifyURIException e) {
             msg.reply(e.getMessage()).queue();
         }

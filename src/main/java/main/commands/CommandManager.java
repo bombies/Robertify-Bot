@@ -12,6 +12,7 @@ import main.commands.commands.dev.EvalCommand;
 import main.commands.commands.dev.UpdateCommand;
 import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
 import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
+import main.commands.commands.dev.test.LazyQueueAndPlayCommand;
 import main.commands.commands.dev.test.LoadSpotifyPlaylistCommand;
 import main.commands.commands.dev.test.PlaySpotifyURICommand;
 import main.commands.commands.dev.test.SpotifyURLToURICommand;
@@ -99,7 +100,8 @@ public class CommandManager {
                 new SpotifyURLToURICommand(),
                 new PlaySpotifyURICommand(),
                 new KotlinTestCommand(),
-                new LoadSpotifyPlaylistCommand()
+                new LoadSpotifyPlaylistCommand(),
+                new LazyQueueAndPlayCommand()
         );
 
         addMusicCommands(

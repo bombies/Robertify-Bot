@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.main.Robertify;
+import main.utils.database.AudioDB;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -70,14 +71,18 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Future<Album> albumFuture = api.getAlbum(res.group(res.groupCount())).build().executeAsync();
             Album album = albumFuture.get();
 
+            final var audioDB = new AudioDB();
             for (TrackSimplified t : album.getTracks().getItems()) {
-                // TODO caching!
-                /*AudioItem item = youtubeManager.loadItem(null, new AudioReference("ytsearch:" + album.getArtists()[0].getName() + " " + t.getName(), null));
-                if (item instanceof AudioPlaylist)
-                    playlist.add(((AudioPlaylist) item).getTracks().get(0));*/
+                if (audioDB.isTrackCached(t.getId())) {
+                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
+                    playlist.add((AudioTrack) track);
+                    continue;
+                }
+
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + album.getArtists()[0].getName() + " " + t.getName(), false, null);
-                playlist.add(new SpotifyAudioTrack(info, youtubeManager));
+                        "ytsearch:" + album.getArtists()[0].getName() + " " + t.getName() +  " audio", false, null);
+                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
+                playlist.add(track);
             }
 
             return new BasicAudioPlaylist(album.getName(), playlist, playlist.get(0), false);
@@ -91,12 +96,10 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
     private AudioItem getSpotifyPlaylist(AudioReference reference) {
         Matcher res = getSpotifyPlaylistFromString(reference.identifier);
 
-        if (!res.matches()) {
+        if (!res.matches())
             return null;
-        }
 
         String playListId = res.group(res.groupCount());
-//        String userId = res.group(res.groupCount() - 1);
 
         try {
             final List<AudioTrack> finalPlaylist = new ArrayList<>();
@@ -106,15 +109,21 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             playlistFuture = api.getPlaylist(playListId).build().executeAsync();
 
             final Playlist spotifyPlaylist = playlistFuture.get();
+            final var audioDB = new AudioDB();
 
             for (PlaylistTrack playlistTrack : spotifyPlaylist.getTracks().getItems()) {
-                Track trueTrack = api.getTrack(playlistTrack.getTrack().getId()).build().execute();
-                /*AudioItem item = youtubeManager.loadItem(null, new AudioReference("ytsearch:" + playlistTrack.getTrack().getArtists()[0].getName() + " " + playlistTrack.getTrack().getName(), null));
-                if (item instanceof AudioPlaylist)
-                    finalPlaylist.add(((AudioPlaylist) item).getTracks().get(0));*/
-                AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), trueTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
-                        "ytsearch:" + trueTrack.getArtists()[0].getName() + " " + playlistTrack.getTrack().getName(), false, null);
-                finalPlaylist.add(new SpotifyAudioTrack(info, youtubeManager));
+                var plTrack = (Track)playlistTrack.getTrack();
+
+                if (audioDB.isTrackCached(plTrack.getId())) {
+                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(plTrack.getId()), true);
+                    finalPlaylist.add((AudioTrack) track);
+                    continue;
+                }
+
+                AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
+                        "ytsearch:" + plTrack.getArtists()[0].getName() + " " + playlistTrack.getTrack().getName() + " audio", false, null);
+                var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
+                finalPlaylist.add(track);
             }
             if (finalPlaylist.isEmpty())
                 return null;
@@ -143,21 +152,21 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
     private AudioItem getSpotifyTrack(AudioReference reference) {
         Matcher res = SPOTIFY_TRACK_REGEX.matcher(reference.identifier);
-        if (!res.matches()) {
+        if (!res.matches())
             return null;
-        }
 
         try {
             Future<Track> trackFuture = api.getTrack(res.group(res.groupCount())).build().executeAsync();
             Track track = trackFuture.get();
+            AudioDB audioDB = new AudioDB();
 
-            /* AudioItem item = youtubeManager.loadItem(null, new AudioReference("ytsearch:" + track.getArtists()[0].getName() + " " + track.getName(), null));
-            if (item instanceof AudioPlaylist)
-                return ((AudioPlaylist) item).getTracks().get(0);*/
+            if (audioDB.isTrackCached(track.getId()))
+                return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
+
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
                     "ytsearch:" + track.getArtists()[0].getName() + " " + track.getName(), false, null);
 
-            return new SpotifyAudioTrack(info, youtubeManager);
+            return new SpotifyAudioTrack(info, youtubeManager, track.getId());
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);

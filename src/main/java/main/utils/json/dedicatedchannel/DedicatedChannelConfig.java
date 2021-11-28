@@ -185,18 +185,20 @@ public class DedicatedChannelConfig extends JSONConfig {
             nextTenSongs.append("```");
             if (queueAsList.size() > 10) {
                 for (AudioTrack track : queueAsList.subList(0, 10))
-                    nextTenSongs.append("→ ").append(track.getInfo().title).append(" [").append(GeneralUtils.formatTime(track.getDuration()))
+                    nextTenSongs.append("→ ").append(track.getInfo().title)
+                            .append(" - ").append(track.getInfo().author)
+                            .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
                             .append("]\n");
             } else {
                 if (queue.size() == 0)
                     nextTenSongs.append("Songs in the queue will appear here.");
                 else
                     for (AudioTrack track : queueAsList)
-                        nextTenSongs.append("→ ").append(track.getInfo().title).append(" [").append(GeneralUtils.formatTime(track.getDuration()))
+                        nextTenSongs.append("→ ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
+                                .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
                                 .append("]\n");
             }
             nextTenSongs.append("```");
-
 
             msg.editMessage("**__Queue__**\n" + nextTenSongs.toString())
                     .setEmbeds(eb.build())

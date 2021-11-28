@@ -86,7 +86,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             PlayerManager.getInstance()
                     .loadAndPlay(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
-                            new CommandContext(event, null));
+                            new CommandContext(event, null), null);
         }
 
         if (event.getAuthor().isBot()) {

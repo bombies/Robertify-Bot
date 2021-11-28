@@ -81,13 +81,21 @@ public class PlaySlashCommand extends InteractiveCommand {
             link = "ytsearch:" + link;
         }
 
-        PlayerManager.getInstance()
-                .loadAndPlay(
-                        link,
-                        botUtils.getAnnouncementChannelObject(event.getGuild().getIdLong()),
-                        event.getGuild().getSelfMember().getVoiceState(),
-                        event.getMember().getVoiceState(),
-                        event
-                );
+        String finalLink = link;
+        event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build())
+                        .setEphemeral(false)
+                                .queue(msg -> {
+                                    PlayerManager.getInstance()
+                                            .loadAndPlay(
+                                                    finalLink,
+                                                    botUtils.getAnnouncementChannelObject(event.getGuild().getIdLong()),
+                                                    event.getGuild().getSelfMember().getVoiceState(),
+                                                    event.getMember().getVoiceState(),
+                                                    msg,
+                                                    event
+                                            );
+                                });
+
+
     }
 }

@@ -2,11 +2,14 @@ package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import lombok.Setter;
+import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
@@ -16,6 +19,7 @@ import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -27,12 +31,14 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
+    private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrackInfo>> savedInfoQueue = new HashMap<>();
     @Getter
     private final Stack<AudioTrack> pastQueue;
     public ConcurrentLinkedQueue<AudioTrack> queue;
+    public ConcurrentLinkedQueue<AudioTrackInfo> infoQueue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
-    private boolean announceNowPlaying = true;
+    private boolean announceNowPlaying;
     private boolean errorOccurred = false;
     @Getter
     private final Guild guild;
@@ -42,6 +48,7 @@ public class TrackScheduler extends AudioEventAdapter {
         this.queue = new ConcurrentLinkedQueue<>();
         this.pastQueue = new Stack<>();
         this.guild = guild;
+        this.announceNowPlaying = new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
     }
 
     public void queue(AudioTrack track) {
@@ -63,18 +70,17 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
-            if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
-                final var requester = PlayerManager.getRequester(track);
-                TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
-                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
-                        + (
-                        (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
-                                " [" + requester.getAsMention() + "]"
-                                :
-                                ""
-                ));
-                announcementChannel.sendMessageEmbeds(eb.build()).queue();
-            }
+            if (!announceNowPlaying) return;
+
+            final var requester = PlayerManager.getRequester(track);
+            TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
+            EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
+                    + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
+                    " [" + requester.getAsMention() + "]"
+                    :
+                    ""
+            ));
+            announcementChannel.sendMessageEmbeds(eb.build()).queue();
         }
     }
 
@@ -94,7 +100,7 @@ public class TrackScheduler extends AudioEventAdapter {
             announceNowPlaying = false;
             this.player.stopTrack();
             this.player.startTrack(nextTrack.makeClone(), false);
-            announceNowPlaying = true;
+            announceNowPlaying = new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
@@ -108,7 +114,11 @@ public class TrackScheduler extends AudioEventAdapter {
                 if (track != null) {
                     if (PlayerManager.getTrackRequestedByUser().containsKey(track))
                         PlayerManager.removeRequester(track, PlayerManager.getRequester(track));
-                    player.playTrack(track.makeClone());
+                    try {
+                        player.playTrack(track.makeClone());
+                    } catch (UnsupportedOperationException e) {
+                        track.setPosition(0);
+                    }
                 } else
                     nextTrack();
             } else if (endReason.mayStartNext) {

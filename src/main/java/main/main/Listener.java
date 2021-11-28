@@ -13,6 +13,7 @@ import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
+import main.utils.database.AudioDB;
 import main.utils.database.BanUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
@@ -76,6 +77,7 @@ public class Listener extends ListenerAdapter {
         }
 
         ServerUtils.initPrefixMap();
+        new AudioDB().cacheAllTracks();
 
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }

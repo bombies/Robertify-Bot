@@ -79,7 +79,7 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
         final User requester = PlayerManager.getRequester(track);
-        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ "`" + (
+        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ " - "+info.author+"`" + (
                 ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
                         " [ Requested by " + requester.getAsMention() + " ]"
                         :

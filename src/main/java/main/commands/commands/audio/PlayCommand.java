@@ -59,8 +59,11 @@ public class PlayCommand implements ICommand {
             link = "ytsearch:" + link;
         }
 
-        PlayerManager.getInstance()
-                .loadAndPlay(channel, link, selfVoiceState, memberVoiceState, ctx);
+        String finalLink = link;
+        channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
+            PlayerManager.getInstance()
+                    .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg);
+        });
     }
 
     @Override
