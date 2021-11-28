@@ -159,6 +159,11 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             EmbedBuilder stopEmbed = new StopCommand().handleStop(musicManager);
             event.reply(user.getAsMention()).addEmbeds(stopEmbed.build())
                     .queue();
+        } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
+            EmbedBuilder previousEmbed = new PreviousTrackCommand().handlePrevious(event.getGuild(), memberVoiceState);
+            event.reply(user.getAsMention()).addEmbeds(previousEmbed.build())
+                    .setEphemeral(false)
+                    .queue();
         }
     }
 }

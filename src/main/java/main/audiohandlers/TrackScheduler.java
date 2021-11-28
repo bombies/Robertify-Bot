@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
+import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -26,6 +27,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public final AudioPlayer player;
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
+    @Getter
+    private final Stack<AudioTrack> pastQueue;
     public ConcurrentLinkedQueue<AudioTrack> queue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
@@ -37,6 +40,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public TrackScheduler(AudioPlayer player, Guild guild) {
         this.player = player;
         this.queue = new ConcurrentLinkedQueue<>();
+        this.pastQueue = new Stack<>();
         this.guild = guild;
     }
 
@@ -60,11 +64,12 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
             if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
+                final var requester = PlayerManager.getRequester(track);
                 TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
                 EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`"
                         + (
-                        ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) ?
-                                " [" + PlayerManager.getRequester(track).getAsMention() + "]"
+                        (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
+                                " [" + requester.getAsMention() + "]"
                                 :
                                 ""
                 ));
@@ -107,6 +112,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 } else
                     nextTrack();
             } else if (endReason.mayStartNext) {
+                pastQueue.push(track.makeClone());
                 nextTrack();
             }
         }
@@ -159,7 +165,18 @@ public class TrackScheduler extends AudioEventAdapter {
         TrackScheduler.savedQueue.put(guild, savedQueue);
     }
 
+    public void addToBeginningOfQueue(AudioTrack track) {
+        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
+        newQueue.offer(track);
+        newQueue.addAll(queue);
+        queue = newQueue;
+    }
+
     public void removeSavedQueue(Guild guild) {
         savedQueue.remove(guild);
+    }
+
+    public AudioTrack getLastPlayedTrack() {
+        return pastQueue.pop();
     }
 }

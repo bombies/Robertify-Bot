@@ -69,6 +69,8 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
+        audioPlayer.getPlayingTrack().setPosition(0);
+        musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
         musicManager.scheduler.nextTrack();
 
         if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))

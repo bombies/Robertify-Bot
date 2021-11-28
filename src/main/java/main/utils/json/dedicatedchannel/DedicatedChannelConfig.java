@@ -2,6 +2,7 @@ package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.PlayerManager;
+import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
@@ -12,9 +13,15 @@ import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
 import main.utils.json.JSONConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -141,6 +148,9 @@ public class DedicatedChannelConfig extends JSONConfig {
     }
 
     public synchronized void updateMessage(Guild guild) {
+        if (!isChannelSet(guild.getId()))
+            return;
+
         final var msg = getMessage(guild.getId());
         final var musicManager = PlayerManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.audioPlayer;
@@ -163,7 +173,11 @@ public class DedicatedChannelConfig extends JSONConfig {
 
             eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
             eb.setTitle(trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getDuration()) +"]");
-            eb.setDescription("Requested by " + PlayerManager.getRequester(playingTrack).getAsMention());
+
+            var requester = PlayerManager.getRequester(playingTrack);
+            if (requester != null)
+                eb.setDescription("Requested by " + requester.getAsMention());
+
             eb.setImage(BotConstants.DEFAULT_IMAGE.toString());
             eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getVolume() + "%");
 
@@ -190,5 +204,68 @@ public class DedicatedChannelConfig extends JSONConfig {
         }
 
 
+    }
+
+    public void updateButtons() {
+        for (Guild g : new BotUtils().getGuilds()) {
+            if (!isChannelSet(g.getId())) continue;
+
+            final var msg = getMessage(g.getId());
+
+            buttonUpdateRequest(msg).queue();
+        }
+    }
+
+    public synchronized void updateButtons(Guild g) {
+            if (!isChannelSet(g.getId())) return;
+
+            final var msg = getMessage(g.getId());
+
+            buttonUpdateRequest(msg).queue();
+    }
+
+    public synchronized MessageAction buttonUpdateRequest(Message msg) {
+        return msg.editMessageComponents(
+                ActionRow.of(
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(BotConstants.PREVIOUS_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(BotConstants.REWIND_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(BotConstants.PLAY_AND_PAUSE_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(BotConstants.STOP_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(BotConstants.END_EMOJI.toString()))
+                ),
+                ActionRow.of(
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(BotConstants.LOOP_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(BotConstants.SHUFFLE_EMOJI.toString())),
+                        Button.of(ButtonStyle.DANGER, DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(BotConstants.QUIT_EMOJI.toString()))
+                ));
+    }
+
+    public synchronized void updateTopic(Guild g) {
+        if (!isChannelSet(g.getId())) return;
+
+        final var channel = getTextChannel(g.getId());
+        channelTopicUpdateRequest(channel).queue();
+    }
+
+    public void updateTopic() {
+        for (Guild g : new BotUtils().getGuilds()) {
+            if (!isChannelSet(g.getId())) continue;
+
+            final var channel = getTextChannel(g.getId());
+            channelTopicUpdateRequest(channel).queue();
+        }
+    }
+
+    public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
+        return channel.getManager().setTopic(
+                        BotConstants.PREVIOUS_EMOJI + " Go to the previous song. " +
+                        BotConstants.REWIND_EMOJI + " Rewind the song. " +
+                        BotConstants.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
+                        BotConstants.STOP_EMOJI + " Stop the song. " +
+                        BotConstants.END_EMOJI + " Skip the song. " +
+                        BotConstants.LOOP_EMOJI + " Loop the song. " +
+                        BotConstants.SHUFFLE_EMOJI + " Shuffle the song. " +
+                        BotConstants.QUIT_EMOJI + " Disconnect the bot "
+        );
     }
 }

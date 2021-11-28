@@ -59,6 +59,7 @@ public class SkipToCommand implements ICommand {
         if (id > queue.size() || id <= 0)
             return EmbedUtils.embedMessage("ID provided isn't a valid ID!");
 
+        final var audioPlayer = musicManager.audioPlayer;
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
 
@@ -66,6 +67,8 @@ public class SkipToCommand implements ICommand {
             songsToRemoveFromQueue.add(currentQueue.get(i));
 
         queue.removeAll(songsToRemoveFromQueue);
+        audioPlayer.getPlayingTrack().setPosition(0);
+        musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
         musicManager.scheduler.nextTrack();
 
         return EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");

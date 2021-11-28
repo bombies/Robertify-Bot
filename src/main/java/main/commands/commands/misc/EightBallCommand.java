@@ -26,7 +26,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed("🎱 | 8ball");
+        GeneralUtils.setCustomEmbed("");
 
         if (args.isEmpty()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You must provide something for me to respond to...")

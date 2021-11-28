@@ -9,6 +9,7 @@ import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.dev.ChangeLogCommand;
 import main.commands.commands.dev.DeveloperCommand;
 import main.commands.commands.dev.EvalCommand;
+import main.commands.commands.dev.UpdateCommand;
 import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
 import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
 import main.commands.commands.dev.test.PlaySpotifyURICommand;
@@ -51,12 +52,7 @@ public class CommandManager {
     public CommandManager(EventWaiter waiter) {
         addCommands(
                 new PingCommand(),
-                new ViewConfigCommand(),
-                new EvalCommand(),
-                new ChangeLogCommand(),
                 new PermissionsCommand(),
-                new SearchArtistCommand(),
-                new SortPopularityCommand(),
                 new HelpCommand(),
                 new SetPrefixCommand(),
                 new PlayCommand(),
@@ -67,7 +63,6 @@ public class CommandManager {
                 new QueueCommand(),
                 new PauseCommand(),
                 new ShutdownCommand(),
-                new DeveloperCommand(),
                 new SetChannelCommand(),
                 new RemoveCommand(),
                 new MoveCommand(),
@@ -88,6 +83,16 @@ public class CommandManager {
                 new UnbanCommand(),
                 new DedicatedChannelCommand(),
                 new EightBallCommand(),
+                new PreviousTrackCommand(),
+
+                //Dev Commands
+                new UpdateCommand(),
+                new DeveloperCommand(),
+                new SearchArtistCommand(),
+                new SortPopularityCommand(),
+                new ViewConfigCommand(),
+                new EvalCommand(),
+                new ChangeLogCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -112,7 +117,8 @@ public class CommandManager {
                 new LoopCommand(),
                 new JumpCommand(),
                 new ResumeCommand(),
-                new SeekCommand()
+                new SeekCommand(),
+                new PreviousTrackCommand()
         );
 
         addManagementCommands(
