@@ -16,7 +16,6 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,9 +61,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
     private AudioItem getSpotifyAlbum(AudioReference reference) {
         Matcher res = SPOTIFY_ALBUM_REGEX.matcher(reference.identifier);
 
-        if (!res.matches()) {
+        if (!res.matches())
             return null;
-        }
 
         try {
             List<AudioTrack> playlist = new ArrayList<>();
@@ -98,18 +96,14 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
         }
 
         String playListId = res.group(res.groupCount());
-        String userId = res.group(res.groupCount() - 1);
+//        String userId = res.group(res.groupCount() - 1);
 
         try {
             final List<AudioTrack> finalPlaylist = new ArrayList<>();
 
             final Future<Playlist> playlistFuture;
 
-            if (userId != null) {
-                playlistFuture = api.getPlaylist(playListId).build().executeAsync();
-            } else {
-                playlistFuture = api.getPlaylist(playListId).build().executeAsync();
-            }
+            playlistFuture = api.getPlaylist(playListId).build().executeAsync();
 
             final Playlist spotifyPlaylist = playlistFuture.get();
 
@@ -157,7 +151,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Future<Track> trackFuture = api.getTrack(res.group(res.groupCount())).build().executeAsync();
             Track track = trackFuture.get();
 
-            /*AudioItem item = youtubeManager.loadItem(null, new AudioReference("ytsearch:" + track.getArtists()[0].getName() + " " + track.getName(), null));
+            /* AudioItem item = youtubeManager.loadItem(null, new AudioReference("ytsearch:" + track.getArtists()[0].getName() + " " + track.getName(), null));
             if (item instanceof AudioPlaylist)
                 return ((AudioPlaylist) item).getTracks().get(0);*/
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
