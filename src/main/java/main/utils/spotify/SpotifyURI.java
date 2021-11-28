@@ -67,6 +67,10 @@ public class SpotifyURI {
         return split[split.length - 1];
     }
 
+    public static boolean isValidURL(String url) {
+        return Pattern.matches("^https:\\/\\/open.spotify.com\\/(album|playlist|track)\\/[a-zA-Z0-9]{22}[?]{0,1}[a-zA-Z0-9=]*$", url);
+    }
+
     @Override
     public String toString() {
         return "spotify:" + type.name().toLowerCase() + ":" + id;

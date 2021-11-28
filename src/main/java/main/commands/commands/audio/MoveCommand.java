@@ -10,8 +10,10 @@ import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -65,10 +67,10 @@ public class MoveCommand implements ICommand {
         final int id = Integer.parseInt(args.get(0));
         final int position = Integer.parseInt(args.get(1));
 
-        msg.replyEmbeds(handleMove(queue, id, position).build()).queue();
+        msg.replyEmbeds(handleMove(ctx.getGuild(), queue, id, position).build()).queue();
     }
 
-    public EmbedBuilder handleMove(ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
+    public EmbedBuilder handleMove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
         GeneralUtils.setCustomEmbed("Queue");
 
         if (queue.isEmpty()) {
@@ -94,6 +96,9 @@ public class MoveCommand implements ICommand {
             queue.addAll(trackList);
             return EmbedUtils.embedMessage("Could not move track with id "+id+" in the queue");
         }
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
         return EmbedUtils.embedMessage("Moved `"+trackList.get(id-1).getInfo().title
                 +"` to position `"+position+"`.");

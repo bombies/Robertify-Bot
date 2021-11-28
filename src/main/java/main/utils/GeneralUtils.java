@@ -310,6 +310,16 @@ public class GeneralUtils {
         writer.close();
     }
 
+    public static void setFileContent(File passedFile, String content) throws IOException {
+        File file = new File(passedFile.getPath());
+        if (!file.exists())
+            file.createNewFile();
+
+        FileWriter writer = new FileWriter(passedFile.getPath(), false);
+        writer.write(content);
+        writer.close();
+    }
+
     public static void setDefaultEmbed() {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()

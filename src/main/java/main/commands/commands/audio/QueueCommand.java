@@ -67,7 +67,7 @@ public class QueueCommand implements ICommand {
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
+            content.add("**#"+(i+1)+".** "+info.title+" - "+info.author+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
         }
         return content;
     }

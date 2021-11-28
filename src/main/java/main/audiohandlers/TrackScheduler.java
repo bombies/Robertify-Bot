@@ -66,7 +66,7 @@ public class TrackScheduler extends AudioEventAdapter {
             if (new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                 final var requester = PlayerManager.getRequester(track);
                 TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
-                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "`"
+                EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                         + (
                         (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                                 " [" + requester.getAsMention() + "]"

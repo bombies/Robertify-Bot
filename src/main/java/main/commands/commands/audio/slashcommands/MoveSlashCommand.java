@@ -63,7 +63,7 @@ public class MoveSlashCommand extends InteractiveCommand {
         final int id = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());
 
-        event.getHook().sendMessageEmbeds(new MoveCommand().handleMove(queue, id, pos).build())
+        event.getHook().sendMessageEmbeds(new MoveCommand().handleMove(event.getGuild(), queue, id, pos).build())
                 .setEphemeral(false)
                 .queue();
     }

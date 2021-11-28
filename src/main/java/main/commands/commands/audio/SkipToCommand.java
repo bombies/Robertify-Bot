@@ -8,6 +8,7 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.BotUtils;
 import main.utils.database.ServerUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -70,6 +71,9 @@ public class SkipToCommand implements ICommand {
         audioPlayer.getPlayingTrack().setPosition(0);
         musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
         musicManager.scheduler.nextTrack();
+
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
 
         return EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
     }
