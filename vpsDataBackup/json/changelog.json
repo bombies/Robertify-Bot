@@ -1,5 +1,10 @@
 {
     "past_logs": [{
+        "27 november 2021": {"logs": [
+            "Added a command to go to the previous track. `previous`",
+            "Changed the embed for 8ball",
+            "The dedicated requests channel now has a button which supports going to the previous track"
+        ]},
         "10 october 2021": {"logs": [
             "Added a tutorial command. `tutorial`",
             "Added the song requester beside the now playing messages",
@@ -35,6 +40,13 @@
             "Added a requests channel. In this channel you can easily control the bot using buttons, view the currently playing song and the first **10** elements of the queue. You can set this command up by using the `setup` command.",
             "Added a shuffle slash command. `/shuffle`",
             "Added an 8ball command. Custom responses can be added. For more information do `help 8ball`."
+        ]},
+        "28 november 2021": {"logs": [
+            "Re-added support for Spotify playlists. Loading Spotify playlists and albums are now 95% faster than before!",
+            "Fixed a bug where moving tracks wouldn't update the message in the requests channel.",
+            "Fixed a bug where skipping to a track wouldn't update the message in the requests channel.",
+            "Fixed a bug where stopping a track wouldn't update the message in the requests channel.",
+            "Added caching for tracks. Load times will now be decreased for songs that have been played already."
         ]},
         "19 october 2021": {"logs": ["Added a resume command. (`resume`)"]},
         "23 november 2021": {"logs": [

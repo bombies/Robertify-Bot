@@ -5,7 +5,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,7 +24,7 @@ public class PauseCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();

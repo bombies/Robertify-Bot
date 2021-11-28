@@ -27,7 +27,7 @@ import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.TutorialCommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -230,7 +230,7 @@ public class CommandManager {
         long timeLeft = System.currentTimeMillis() - CooldownManager.INSTANCE.getCooldown(e.getAuthor());
         if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= CooldownManager.DEFAULT_COOLDOWN) {
             String[] split = e.getMessage().getContentRaw()
-                    .replaceFirst("(?i)" + Pattern.quote(ServerUtils.getPrefix(e.getGuild().getIdLong())), "")
+                    .replaceFirst("(?i)" + Pattern.quote(ServerDB.getPrefix(e.getGuild().getIdLong())), "")
                     .split("\\s+");
 
             String invoke = split[0].toLowerCase();

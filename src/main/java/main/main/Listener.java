@@ -14,11 +14,11 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
 import main.utils.database.AudioDB;
-import main.utils.database.BanUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BanDB;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import main.utils.json.EightBallConfig;
-import main.utils.json.JSONConfig;
+import main.utils.json.AbstractJSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
@@ -54,7 +54,7 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        JSONConfig.initDirectory();
+        AbstractJSONConfig.initDirectory();
         PermissionsConfig permConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
 
@@ -65,9 +65,9 @@ public class Listener extends ListenerAdapter {
         new DedicatedChannelConfig().initConfig();
         new EightBallConfig().initConfig();
 
-        BanUtils.initBannedUserMap();
+        BanDB.initBannedUserMap();
 
-        for (Guild g : new BotUtils().getGuilds()) {
+        for (Guild g : new BotDB().getGuilds()) {
             permConfig.initGuild(g.getId());
 
             initSlashCommands(g);
@@ -76,7 +76,7 @@ public class Listener extends ListenerAdapter {
             LOGGER.info("Watching {}", g.getName());
         }
 
-        ServerUtils.initPrefixMap();
+        ServerDB.initPrefixMap();
         new AudioDB().cacheAllTracks();
 
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
@@ -86,14 +86,14 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         User user = event.getAuthor();
-        String prefix = ServerUtils.getPrefix(event.getGuild().getIdLong());
+        String prefix = ServerDB.getPrefix(event.getGuild().getIdLong());
         String raw = event.getMessage().getContentRaw();
 
         // Making sure the user isn't a bot or webhook command
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
-            if (BanUtils.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
+            if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
                 event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
                         .queue();
             } else
@@ -103,7 +103,7 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (BanUtils.isUserBannedLazy(event.getGuild().getIdLong(), event.getUser().getIdLong()))
+        if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
     }
@@ -113,8 +113,8 @@ public class Listener extends ListenerAdapter {
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
 
-        BotUtils botUtils = new BotUtils();
-        BanUtils banUtils = new BanUtils();
+        BotDB botUtils = new BotDB();
+        BanDB banUtils = new BanDB();
 
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
@@ -132,15 +132,15 @@ public class Listener extends ListenerAdapter {
 
         LOGGER.info("Joined {}", guild.getName());
 
-        ServerUtils.initPrefixMap();
-        BanUtils.initBannedUserMap();
+        ServerDB.initPrefixMap();
+        BanDB.initBannedUserMap();
     }
 
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         botUtils.removeGuild(guild.getIdLong()).closeConnection();
 
         LOGGER.info("Left {}", guild.getName());
@@ -183,8 +183,8 @@ public class Listener extends ListenerAdapter {
     }
 
     private static void rescheduleUnbans(Guild g) {
-        final var banUtils = new BanUtils();
-        final var map = BanUtils.getBannedUsers().get(g.getIdLong());
+        final var banUtils = new BanDB();
+        final var map = BanDB.getBannedUsers().get(g.getIdLong());
 
         for (long user : map.keySet()) {
             if (map.get(user) == null) continue;
@@ -224,14 +224,14 @@ public class Listener extends ListenerAdapter {
     }
 
     public static void scheduleUnban(Guild g, User u) {
-        final BanUtils banUtils = new BanUtils();
-        final var map = BanUtils.getBannedUsers().get(g.getIdLong());
+        final BanDB banUtils = new BanDB();
+        final var map = BanDB.getBannedUsers().get(g.getIdLong());
         final var scheduler = Executors.newScheduledThreadPool(1);
 
         final Runnable task = new Runnable() {
             @Override
             public void run() {
-                if (!BanUtils.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
+                if (!BanDB.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
                     return;
 
                 banUtils.unbanUser(g.getIdLong(), u.getIdLong());

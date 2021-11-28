@@ -8,9 +8,9 @@ import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.BanUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BanDB;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -83,15 +83,15 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You cannot ban another admin!");
 
-        if (new BotUtils().isDeveloper(user.getId()))
+        if (new BotDB().isDeveloper(user.getId()))
             return EmbedUtils.embedMessage("You cannot ban a developer of Robertify!");
 
-        if (BanUtils.isUserBannedLazy(guild.getIdLong(), user.getIdLong()))
+        if (BanDB.isUserBannedLazy(guild.getIdLong(), user.getIdLong()))
             return EmbedUtils.embedMessage("This user is already banned.");
 
         if (bannedUntil == null) { // Perm ban
-            new BanUtils().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis());
-            BanUtils.addBannedUser(guild.getIdLong(), user.getIdLong(), null);
+            new BanDB().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis());
+            BanDB.addBannedUser(guild.getIdLong(), user.getIdLong(), null);
             user.openPrivateChannel().queue(channel -> {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned permanently in **"+guild.getName()+"**!")
                         .build())
@@ -101,8 +101,8 @@ public class BanCommand extends InteractiveCommand implements ICommand {
             });
             return EmbedUtils.embedMessage("You have banned " + user.getAsMention());
         } else {
-            new BanUtils().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
-            BanUtils.addBannedUser(guild.getIdLong(), user.getIdLong(), bannedUntil);
+            new BanDB().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
+            BanDB.addBannedUser(guild.getIdLong(), user.getIdLong(), bannedUntil);
             user.openPrivateChannel().queue(channel -> {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
                                 .build())
@@ -127,7 +127,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nBan a user from the bot\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"ban <user>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"ban <user>`";
     }
 
     @Override

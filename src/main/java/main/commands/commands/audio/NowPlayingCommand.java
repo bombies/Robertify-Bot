@@ -11,7 +11,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -28,7 +28,7 @@ public class NowPlayingCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();

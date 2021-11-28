@@ -3,10 +3,8 @@ package main.commands.commands.management;
 import lombok.SneakyThrows;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
-import main.commands.ICommand;
 import main.commands.IDevCommand;
-import main.main.Robertify;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -25,7 +23,7 @@ public class ShutdownCommand implements IDevCommand {
         EmbedBuilder eb = EmbedUtils.embedMessage("Now shutting down...");
         ctx.getMessage().replyEmbeds(eb.build()).queue();
 
-        for (Guild g : new BotUtils().getGuilds()) {
+        for (Guild g : new BotDB().getGuilds()) {
             var selfMember = g.getSelfMember();
             var musicManager = PlayerManager.getInstance().getMusicManager(g);
             var queue = musicManager.scheduler.queue;

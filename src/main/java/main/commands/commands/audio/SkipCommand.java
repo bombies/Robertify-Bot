@@ -1,14 +1,11 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,7 +25,7 @@ public class SkipCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();

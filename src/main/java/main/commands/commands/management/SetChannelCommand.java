@@ -6,8 +6,8 @@ import main.commands.commands.management.permissions.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,7 +30,7 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
 
         if (args.isEmpty()) {
             TextChannel channel = ctx.getChannel();
@@ -79,7 +79,7 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nSet the announcement channel for when a new song is being played.\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"setchannel <channelID>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setchannel <channelID>`";
     }
 
     @Override
@@ -118,7 +118,7 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         var channel = event.getOption("channel").getAsGuildChannel();
-        var botUtils = new BotUtils();
+        var botUtils = new BotDB();
 
         if (!(channel instanceof TextChannel)) {
             event.replyEmbeds(EmbedUtils.embedMessage("The channel must be a **text** channel!").build())

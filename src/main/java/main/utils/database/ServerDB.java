@@ -11,10 +11,10 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerUtils extends DatabaseUtils {
+public class ServerDB extends AbstractDatabase {
     private static Map<@NotNull Long, @NotNull String> prefixes = new HashMap<>();
 
-    public ServerUtils() {
+    public ServerDB() {
         super(Database.MAIN);
     }
 
@@ -24,7 +24,7 @@ public class ServerUtils extends DatabaseUtils {
      * @param prefix Prefix to be set
      */
     @SneakyThrows
-    public ServerUtils setServerPrefix(long gid, @NotNull String prefix) {
+    public ServerDB setServerPrefix(long gid, @NotNull String prefix) {
         Statement dbStat = getCon().createStatement();
         String sql = "INSERT INTO " + DatabaseTable.MAIN_BOT_INFO + "(server_id, prefix) " +
                 "VALUES("+gid+", '"+prefix+"');";
@@ -38,7 +38,7 @@ public class ServerUtils extends DatabaseUtils {
      * @param prefix Prefix to be set
      */
     @SneakyThrows
-    public ServerUtils updateServerPrefix(long gid, @NotNull String prefix) {
+    public ServerDB updateServerPrefix(long gid, @NotNull String prefix) {
         Statement dbStat = getCon().createStatement();
         String sql = "UPDATE " + DatabaseTable.MAIN_BOT_INFO + " SET prefix='"+prefix+"' WHERE server_id="+gid+";";
         dbStat.executeUpdate(sql);
@@ -70,8 +70,8 @@ public class ServerUtils extends DatabaseUtils {
 
     @SneakyThrows
     public static void initPrefixMap() {
-        for (Guild g : new BotUtils().getGuilds())
-            prefixes.put(g.getIdLong(), new ServerUtils().getServerPrefix(g.getIdLong()));
+        for (Guild g : new BotDB().getGuilds())
+            prefixes.put(g.getIdLong(), new ServerDB().getServerPrefix(g.getIdLong()));
     }
 
     public static String getPrefix(long gid) {

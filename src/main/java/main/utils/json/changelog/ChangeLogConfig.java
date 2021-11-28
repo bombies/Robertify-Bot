@@ -3,7 +3,7 @@ package main.utils.json.changelog;
 import main.constants.JSONConfigFile;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
-import main.utils.json.JSONConfig;
+import main.utils.json.AbstractJSONConfig;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ChangeLogConfig extends JSONConfig {
+public class ChangeLogConfig extends AbstractJSONConfig {
     public ChangeLogConfig() {
         super(JSONConfigFile.CHANGELOG);
     }

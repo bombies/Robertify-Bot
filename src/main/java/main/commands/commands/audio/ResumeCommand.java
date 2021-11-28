@@ -5,8 +5,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -25,7 +25,7 @@ public class ResumeCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();
@@ -87,7 +87,7 @@ public class ResumeCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Resumes the currently playing song if paused\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"resume`";
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"resume`";
     }
 
     @Override

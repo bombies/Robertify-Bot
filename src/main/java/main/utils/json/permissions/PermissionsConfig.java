@@ -2,24 +2,20 @@ package main.utils.json.permissions;
 
 import lombok.SneakyThrows;
 import main.commands.commands.management.permissions.Permission;
-import main.constants.ENV;
 import main.constants.JSONConfigFile;
-import main.main.Config;
 import main.main.Robertify;
-import main.utils.database.BotUtils;
-import main.utils.json.JSONConfig;
+import main.utils.database.BotDB;
+import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionsConfig extends JSONConfig {
+public class PermissionsConfig extends AbstractJSONConfig {
     public PermissionsConfig() {
         super(JSONConfigFile.PERMISSIONS);
     }
@@ -35,7 +31,7 @@ public class PermissionsConfig extends JSONConfig {
 
         JSONObject obj = new JSONObject();
 
-        for (Guild guild : new BotUtils().getGuilds()) {
+        for (Guild guild : new BotDB().getGuilds()) {
             JSONObject serverObj = new JSONObject();
             for (int i : Permission.getCodes())
                 serverObj.put(String.valueOf(i), new JSONArray());
@@ -81,7 +77,7 @@ public class PermissionsConfig extends JSONConfig {
      */
     public void addPermission(Permission p) throws IOException {
         JSONObject obj = getJSONObject();
-        for (Guild g : new BotUtils().getGuilds())
+        for (Guild g : new BotDB().getGuilds())
             obj.getJSONObject(g.getId()).put(String.valueOf(p.getCode()), new JSONArray());
         setJSON(obj);
     }
@@ -106,7 +102,7 @@ public class PermissionsConfig extends JSONConfig {
     public void addPermissions(Permission... p) throws IOException {
         JSONObject obj = getJSONObject();
         for (Permission perm : p) {
-            for (Guild g : new BotUtils().getGuilds())
+            for (Guild g : new BotDB().getGuilds())
                 obj.getJSONObject(g.getId()).put(String.valueOf(perm.getCode()), new JSONArray());
         }
         setJSON(obj);

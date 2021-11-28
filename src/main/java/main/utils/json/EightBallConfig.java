@@ -1,7 +1,7 @@
 package main.utils.json;
 
 import main.constants.JSONConfigFile;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +10,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EightBallConfig extends JSONConfig {
+public class EightBallConfig extends AbstractJSONConfig {
 
     public EightBallConfig() {
         super(JSONConfigFile.EIGHT_BALL);
@@ -27,7 +27,7 @@ public class EightBallConfig extends JSONConfig {
 
         final var jsonObject = new JSONObject();
 
-        for (Guild guild : new BotUtils().getGuilds())
+        for (Guild guild : new BotDB().getGuilds())
             jsonObject.put(guild.getId(), new JSONArray());
 
         setJSON(jsonObject);
@@ -36,7 +36,7 @@ public class EightBallConfig extends JSONConfig {
     private synchronized void updateConfig() {
         var obj = getJSONObject();
 
-        for (Guild g : new BotUtils().getGuilds())
+        for (Guild g : new BotDB().getGuilds())
             try {
                 obj.getJSONArray(g.getId());
             } catch (JSONException e) {

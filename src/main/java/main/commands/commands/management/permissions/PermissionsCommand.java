@@ -4,8 +4,8 @@ import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -54,7 +54,7 @@ public class PermissionsCommand implements ICommand {
      */
     @SneakyThrows
     private void init(Message msg) {
-        if (!new BotUtils().isDeveloper(msg.getAuthor().getId()))
+        if (!new BotDB().isDeveloper(msg.getAuthor().getId()))
             return;
 
         try {
@@ -237,15 +237,15 @@ public class PermissionsCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Manage bot permissions for roles\n\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions add <@role> <" + String.join(
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions add <@role> <" + String.join(
                         "|",
                         Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions remove <@role> <" + String.join(
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions remove <@role> <" + String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"permissions list <["+ String.join(
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions list <["+ String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) +"]|@role>`";

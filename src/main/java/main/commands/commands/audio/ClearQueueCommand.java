@@ -6,9 +6,8 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
-import main.constants.BotConstants;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -16,7 +15,6 @@ import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClearQueueCommand implements ICommand {
@@ -27,7 +25,7 @@ public class ClearQueueCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();

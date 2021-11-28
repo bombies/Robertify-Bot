@@ -3,13 +3,12 @@ package main.commands.commands.management;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
-import main.constants.BotConstants;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.BanUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BanDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -65,11 +64,11 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleUnban(Guild guild, User user) {
-        if (!BanUtils.isUserBannedLazy(guild.getIdLong(), user.getIdLong()))
+        if (!BanDB.isUserBannedLazy(guild.getIdLong(), user.getIdLong()))
             return EmbedUtils.embedMessage("This user is not banned.");
 
-        new BanUtils().unbanUser(guild.getIdLong(), user.getIdLong());
-        BanUtils.removeBannedUser(guild.getIdLong(), user.getIdLong());
+        new BanDB().unbanUser(guild.getIdLong(), user.getIdLong());
+        BanDB.removeBannedUser(guild.getIdLong(), user.getIdLong());
 
         user.openPrivateChannel().queue(channel -> {
             channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been unbanned from **" + guild.getName() + "**").build())
@@ -92,7 +91,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nUnban a user from the bot\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"unban <user>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"unban <user>`";
     }
 
     @Override

@@ -4,8 +4,8 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -27,7 +27,7 @@ public class PlayCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             botUtils.createConnection();
             botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
@@ -75,7 +75,7 @@ public class PlayCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Plays a song\n\n" +
-                "Usage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "play <song>`";
+                "Usage `" + ServerDB.getPrefix(Long.parseLong(guildID)) + "play <song>`";
     }
 
     @Override

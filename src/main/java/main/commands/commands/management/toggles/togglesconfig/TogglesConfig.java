@@ -1,13 +1,13 @@
 package main.commands.commands.management.toggles.togglesconfig;
 
 import main.constants.JSONConfigFile;
-import main.utils.database.BotUtils;
-import main.utils.json.JSONConfig;
+import main.utils.database.BotDB;
+import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TogglesConfig extends JSONConfig {
+public class TogglesConfig extends AbstractJSONConfig {
     private final JSONConfigFile file = JSONConfigFile.TOGGLES;
 
     public TogglesConfig() {
@@ -24,7 +24,7 @@ public class TogglesConfig extends JSONConfig {
         }
 
         var obj = new JSONObject();
-        for (Guild g : new BotUtils().getGuilds()) {
+        for (Guild g : new BotDB().getGuilds()) {
             var guildObj = new JSONObject();
             for (Toggles toggle : Toggles.values())
                 guildObj.put(toggle.toString(), true);
@@ -37,7 +37,7 @@ public class TogglesConfig extends JSONConfig {
     private void updateFile() {
         var obj = getJSONObject();
 
-        for (Guild g : new BotUtils().getGuilds())
+        for (Guild g : new BotDB().getGuilds())
             for (Toggles toggle : Toggles.values())
                 try {
                     obj.getJSONObject(g.getId()).put(toggle.toString(), true);

@@ -6,14 +6,12 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
 import main.constants.BotConstants;
-import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.BanUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,7 +27,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HelpCommand extends InteractiveCommand implements ICommand {
     private final String menuName = "menu:help";
@@ -84,7 +81,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
-        final String prefix = ServerUtils.getPrefix(ctx.getGuild().getIdLong());
+        final String prefix = ServerDB.getPrefix(ctx.getGuild().getIdLong());
 
         GeneralUtils.setCustomEmbed(
                 "Help Command",
@@ -110,7 +107,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
-            if (!new BotUtils().isDeveloper(ctx.getAuthor().getId())) {
+            if (!new BotDB().isDeveloper(ctx.getAuthor().getId())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+args.get(0)+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed();
@@ -139,7 +136,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return;
         } else if (command instanceof IDevCommand) {
-            if (!new BotUtils().isDeveloper(ctx.getAuthor().getId())) {
+            if (!new BotDB().isDeveloper(ctx.getAuthor().getId())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed();
@@ -160,7 +157,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (event.getOptions().isEmpty()) {
-            final String prefix = ServerUtils.getPrefix(event.getGuild().getIdLong());
+            final String prefix = ServerDB.getPrefix(event.getGuild().getIdLong());
 
             GeneralUtils.setCustomEmbed(
                     "Help Command",
@@ -186,7 +183,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         if (!event.getComponentId().equals(menuName)) return;
 
         var optionSelected = event.getSelectedOptions();
-        final String prefix = ServerUtils.getPrefix(event.getGuild().getIdLong());
+        final String prefix = ServerDB.getPrefix(event.getGuild().getIdLong());
 
         if (!getSelectionDialogue(menuName).checkPermission(event)) {
             event.replyEmbeds(EmbedUtils.embedMessage("You can't interact with this menu!").build())
@@ -216,7 +213,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return eb;
         } else if (command instanceof IDevCommand) {
-            if (!new BotUtils().isDeveloper(user.getId())) {
+            if (!new BotDB().isDeveloper(user.getId())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
                 GeneralUtils.setDefaultEmbed();
                 return eb;

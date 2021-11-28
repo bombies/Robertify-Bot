@@ -6,7 +6,6 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;

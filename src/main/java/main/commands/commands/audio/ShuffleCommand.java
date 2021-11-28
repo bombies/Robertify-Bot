@@ -5,9 +5,6 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.constants.BotConstants;
-import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,7 +15,6 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ShuffleCommand implements ICommand {

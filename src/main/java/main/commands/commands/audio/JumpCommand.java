@@ -7,8 +7,8 @@ import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -29,7 +29,7 @@ public class JumpCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();
@@ -123,7 +123,7 @@ public class JumpCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Skips the song by the given number of seconds\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"jump <seconds_to_jump>` *(Skips the song to a specific duration)*\n";
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"jump <seconds_to_jump>` *(Skips the song to a specific duration)*\n";
     }
 
     @Override

@@ -4,7 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -80,7 +80,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Remove DJ privileges from a specific role\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"remove <@role>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"remove <@role>`";
     }
 
     @Override

@@ -13,9 +13,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotUtils extends DatabaseUtils {
+public class BotDB extends AbstractDatabase {
 
-    public BotUtils() {
+    public BotDB() {
         super(Database.MAIN);
     }
 
@@ -24,7 +24,7 @@ public class BotUtils extends DatabaseUtils {
      * @param gid ID of the guild
      */
     @SneakyThrows
-    public BotUtils addGuild(long gid) {
+    public BotDB addGuild(long gid) {
         if (getCon().isClosed())
             createConnection();
 
@@ -42,7 +42,7 @@ public class BotUtils extends DatabaseUtils {
      * @param gid ID of the guild
      */
     @SneakyThrows
-    public BotUtils removeGuild(long gid) {
+    public BotDB removeGuild(long gid) {
         if (getCon().isClosed())
             createConnection();
 
@@ -102,7 +102,7 @@ public class BotUtils extends DatabaseUtils {
     }
 
     @SneakyThrows
-    public BotUtils addDeveloper(String id) {
+    public BotDB addDeveloper(String id) {
         if (getCon().isClosed())
             createConnection();
 
@@ -118,7 +118,7 @@ public class BotUtils extends DatabaseUtils {
     }
 
     @SneakyThrows
-    public BotUtils removeDeveloper(String id) {
+    public BotDB removeDeveloper(String id) {
         if (getCon().isClosed())
             createConnection();
 
@@ -161,7 +161,7 @@ public class BotUtils extends DatabaseUtils {
      * @return A copy of this object to continue chains
      */
     @SneakyThrows
-    public BotUtils announceNewTrack(long gid, boolean value) {
+    public BotDB announceNewTrack(long gid, boolean value) {
         if (getCon().isClosed())
             createConnection();
 
@@ -173,7 +173,7 @@ public class BotUtils extends DatabaseUtils {
     }
 
     @SneakyThrows
-    public BotUtils setAnnouncementChannel(long guildID, long channelID) {
+    public BotDB setAnnouncementChannel(long guildID, long channelID) {
         if (getCon().isClosed())
             createConnection();
 

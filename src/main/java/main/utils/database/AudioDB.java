@@ -7,7 +7,7 @@ import main.constants.DatabaseTable;
 
 import java.util.HashMap;
 
-public class AudioDB extends DatabaseUtils {
+public class AudioDB extends AbstractDatabase {
     @Getter
     private static final HashMap<String, String> cachedTracks = new HashMap<>();
 

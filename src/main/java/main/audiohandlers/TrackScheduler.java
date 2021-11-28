@@ -2,30 +2,24 @@ package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
-import lombok.Setter;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Stack;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -73,7 +67,7 @@ public class TrackScheduler extends AudioEventAdapter {
             if (!announceNowPlaying) return;
 
             final var requester = PlayerManager.getRequester(track);
-            TextChannel announcementChannel = new BotUtils().getAnnouncementChannelObject(this.guild.getIdLong());
+            TextChannel announcementChannel = new BotDB().getAnnouncementChannelObject(this.guild.getIdLong());
             EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                     + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                     " [" + requester.getAsMention() + "]"

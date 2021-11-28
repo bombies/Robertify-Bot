@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.main.Robertify;
 import main.utils.database.AudioDB;
+import me.duncte123.botcommons.web.WebUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import java.io.DataOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -73,14 +75,14 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
             final var audioDB = new AudioDB();
             for (TrackSimplified t : album.getTracks().getItems()) {
-                if (audioDB.isTrackCached(t.getId())) {
-                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
-                    playlist.add((AudioTrack) track);
-                    continue;
-                }
+//                if (audioDB.isTrackCached(t.getId())) {
+//                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
+//                    playlist.add((AudioTrack) track);
+//                    continue;
+//                }
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + album.getArtists()[0].getName() + " " + t.getName() +  " audio", false, null);
+                        "ytsearch:" + album.getArtists()[0].getName() + " " + t.getName() +  " audio explicit", false, null);
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
                 playlist.add(track);
             }
@@ -104,27 +106,38 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
         try {
             final List<AudioTrack> finalPlaylist = new ArrayList<>();
 
-            final Future<Playlist> playlistFuture;
-
-            playlistFuture = api.getPlaylist(playListId).build().executeAsync();
+            final Future<Playlist> playlistFuture = api.getPlaylist(playListId).build().executeAsync();
 
             final Playlist spotifyPlaylist = playlistFuture.get();
+            final var playlistPaging = spotifyPlaylist.getTracks();
             final var audioDB = new AudioDB();
 
-            for (PlaylistTrack playlistTrack : spotifyPlaylist.getTracks().getItems()) {
-                var plTrack = (Track)playlistTrack.getTrack();
+            int offset = 0;
+            do {
+                Paging<PlaylistTrack> playlistTrackPaging = playlistPaging;
+                if (offset != 0)
+                    playlistTrackPaging = api.getPlaylistsItems(playListId).offset(offset).limit(100)
+                        .build().executeAsync().get();
 
-                if (audioDB.isTrackCached(plTrack.getId())) {
-                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(plTrack.getId()), true);
-                    finalPlaylist.add((AudioTrack) track);
-                    continue;
+                for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
+                    var plTrack = (Track)playlistTrack.getTrack();
+
+//                    if (audioDB.isTrackCached(plTrack.getId())) {
+//                        AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(plTrack.getId()), true);
+//                        finalPlaylist.add((AudioTrack) track);
+//                        continue;
+//                    }
+
+                    AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
+                            "ytsearch:" + plTrack.getArtists()[0].getName() + " " + playlistTrack.getTrack().getName() + " audio explicit", false, null);
+                    var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
+                    finalPlaylist.add(track);
                 }
 
-                AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
-                        "ytsearch:" + plTrack.getArtists()[0].getName() + " " + playlistTrack.getTrack().getName() + " audio", false, null);
-                var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
-                finalPlaylist.add(track);
-            }
+
+                offset += 100;
+            } while (offset < playlistPaging.getTotal());
+
             if (finalPlaylist.isEmpty())
                 return null;
 

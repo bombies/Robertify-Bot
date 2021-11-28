@@ -6,7 +6,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -46,7 +46,7 @@ public class ChangeLogCommand implements IDevCommand {
 
     private void send(Message msg) {
         var config = new ChangeLogConfig();
-        var botUtils = new BotUtils();
+        var botUtils = new BotDB();
         var logsToString = new StringBuilder();
         var logs = config.getCurrentChangelog();
         var guilds = botUtils.getGuilds();

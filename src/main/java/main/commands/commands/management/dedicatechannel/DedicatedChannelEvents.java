@@ -8,7 +8,7 @@ import main.commands.commands.audio.*;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,9 +18,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -72,7 +70,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (!message.startsWith(ServerUtils.getPrefix(guild.getIdLong())) && !user.isBot()) {
+        if (!message.startsWith(ServerDB.getPrefix(guild.getIdLong())) && !user.isBot()) {
             final var toggleConfig = new TogglesConfig();
             final boolean originalAnnouncementToggle = toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
 

@@ -5,10 +5,9 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -92,6 +91,6 @@ public class SeekCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Jump to a specific position in the current song\n" +
-                "\nUsage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"seek <mm:ss>`\n";
+                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"seek <mm:ss>`\n";
     }
 }

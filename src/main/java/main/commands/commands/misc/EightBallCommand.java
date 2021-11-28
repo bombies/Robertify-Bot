@@ -5,7 +5,7 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import main.utils.json.EightBallConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -206,11 +206,11 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Want to determine your fate? Take a chance with the 8ball!\n" +
                 "\n**__Usages__**\n" +
-                "`"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"8ball <question>` *(Ask 8ball a question)*\n" +
-                "`"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"8ball add <response>` *(Add a custom response to 8ball)*\n" +
-                "`"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"8ball remove <responseID>` *(Remove a custom response from)*\n" +
-                "`"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"8ball list` *(List all custom responses)*\n" +
-                "`"+ ServerUtils.getPrefix(Long.parseLong(guildID))+"8ball clear` *(Clear all custom responses)*";
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball <question>` *(Ask 8ball a question)*\n" +
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball add <response>` *(Add a custom response to 8ball)*\n" +
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball remove <responseID>` *(Remove a custom response from)*\n" +
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball list` *(List all custom responses)*\n" +
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball clear` *(Clear all custom responses)*";
     }
 
     @Override

@@ -4,7 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -85,7 +85,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set a specific role to be a DJ\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"setdj <@role>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setdj <@role>`";
     }
 
     @Override

@@ -2,12 +2,10 @@ package main.commands.commands.dev;
 
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
-import main.commands.ICommand;
 import main.commands.IDevCommand;
-import main.constants.BotConstants;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,7 +22,7 @@ public class DeveloperCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        final BotUtils botUtils = new BotUtils();
+        final BotDB botUtils = new BotDB();
 
         GeneralUtils.setCustomEmbed("Developer Tools", new Color(118, 0, 236));
 
@@ -50,7 +48,7 @@ public class DeveloperCommand implements IDevCommand {
     }
 
     @SneakyThrows
-    private void add(BotUtils botUtils, Message msg, List<String> args) {
+    private void add(BotDB botUtils, Message msg, List<String> args) {
         if (args.size() <= 1) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to add as a developer");
             msg.replyEmbeds(eb.build()).queue();
@@ -96,7 +94,7 @@ public class DeveloperCommand implements IDevCommand {
     }
 
     @SneakyThrows
-    private void remove(BotUtils botUtils, Message msg, List<String> args) {
+    private void remove(BotDB botUtils, Message msg, List<String> args) {
         if (args.size() <= 1) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to remove as a developer");
             msg.replyEmbeds(eb.build()).queue();

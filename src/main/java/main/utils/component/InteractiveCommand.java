@@ -2,7 +2,7 @@ package main.utils.component;
 
 import lombok.Getter;
 import lombok.Setter;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -88,7 +88,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         }
 
         private void addCommandToAllGuilds(Command command) {
-            for (Guild g : new BotUtils().getGuilds())
+            for (Guild g : new BotDB().getGuilds())
                 addCommandToSpecificGuild(g, command);
         }
 

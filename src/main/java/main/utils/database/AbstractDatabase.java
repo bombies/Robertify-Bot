@@ -14,14 +14,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 
-public abstract class DatabaseUtils {
+public abstract class AbstractDatabase {
     @Getter
     private Connection con = null;
     @Setter @Getter
     private static Database database = null;
 
     @SneakyThrows
-    public DatabaseUtils(Database db) {
+    public AbstractDatabase(Database db) {
         String url = "jdbc:sqlite:" + Config.get(ENV.DATABASE_DIR) + "/" + db.toString() + ".db";
 
         boolean dbExists = databaseExists(db);

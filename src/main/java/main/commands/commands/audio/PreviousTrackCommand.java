@@ -3,7 +3,7 @@ package main.commands.commands.audio;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -71,7 +71,7 @@ public class PreviousTrackCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Go back to he track that was played previously\n\n" +
-                "**Usage**: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"previous`";
+                "**Usage**: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"previous`";
     }
 
     @Override

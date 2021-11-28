@@ -3,10 +3,9 @@ package main.commands.commands.audio.slashcommands;
 import lombok.SneakyThrows;
 import main.audiohandlers.PlayerManager;
 import main.commands.commands.audio.PlayCommand;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -53,7 +52,7 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(event.getGuild().getIdLong())) {
             botUtils.createConnection();
             botUtils.setAnnouncementChannel(event.getGuild().getIdLong(), event.getChannel().getIdLong())

@@ -6,9 +6,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.BotUtils;
-import main.utils.database.ServerUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.database.BotDB;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,7 +27,7 @@ public class LoopCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotUtils botUtils = new BotUtils();
+        BotDB botUtils = new BotDB();
         if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
             
             botUtils.createConnection();
@@ -153,7 +152,7 @@ public class LoopCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set the song being replayed\n" +
-                "\nUsage `" + ServerUtils.getPrefix(Long.parseLong(guildID)) + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
+                "\nUsage `" + ServerDB.getPrefix(Long.parseLong(guildID)) + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
     }
 
     @Override

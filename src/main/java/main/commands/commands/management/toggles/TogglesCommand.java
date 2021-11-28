@@ -6,7 +6,7 @@ import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.ServerUtils;
+import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -86,8 +86,8 @@ public class TogglesCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Toggle specific features on or off!\n\n" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"toggles\n`" +
-                "Usage: `"+ ServerUtils.getPrefix(Long.parseLong(guildID)) +"toggle <toggle_name>\n`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"toggles\n`" +
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"toggle <toggle_name>\n`";
     }
 
     @Override

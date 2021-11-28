@@ -2,7 +2,6 @@ package main.utils.database;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
-import lombok.extern.java.Log;
 import main.constants.Database;
 import main.constants.DatabaseTable;
 import main.main.Robertify;
@@ -13,16 +12,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class BanUtils extends DatabaseUtils {
+public class BanDB extends AbstractDatabase {
     @Getter
     private static final HashMap<Long, HashMap<Long, Long>> bannedUsers = new HashMap<>();
 
-    public BanUtils() {
+    public BanDB() {
         super(Database.BANNED_USERS);
     }
 
     @SneakyThrows
-    public BanUtils banUser(long gid, long userId, long modId, long bannedAt) {
+    public BanDB banUser(long gid, long userId, long modId, long bannedAt) {
         openConnectionIfClosed();
 
         final Statement dbStat = getCon().createStatement();
@@ -34,7 +33,7 @@ public class BanUtils extends DatabaseUtils {
     }
 
     @SneakyThrows
-    public BanUtils banUser(long gid, long userId, long modId, long bannedAt, long bannedUntil) {
+    public BanDB banUser(long gid, long userId, long modId, long bannedAt, long bannedUntil) {
         if (isUserBannedLazy(gid, userId))
             throw new IllegalArgumentException("User with ID \""+userId+"\" in guild "+gid+" is already banned!");
 
@@ -67,7 +66,7 @@ public class BanUtils extends DatabaseUtils {
     }
 
     @SneakyThrows
-    public BanUtils unbanUser(long gid, long userId) {
+    public BanDB unbanUser(long gid, long userId) {
         if (!isUserBannedLazy(gid, userId))
             throw new IllegalArgumentException("User with ID \""+userId+"\" in guild "+gid+" isn't banned!");
 
@@ -190,7 +189,7 @@ public class BanUtils extends DatabaseUtils {
 
     public static void initBannedUserMap() {
         for (Guild g : Robertify.api.getGuilds()) {
-            var bannedUserIDs = new BanUtils().getAllBannedUsers(g.getIdLong());
+            var bannedUserIDs = new BanDB().getAllBannedUsers(g.getIdLong());
             bannedUsers.put(g.getIdLong(), bannedUserIDs);
         }
     }

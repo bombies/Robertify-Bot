@@ -12,13 +12,13 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public abstract class JSONConfig {
+public abstract class AbstractJSONConfig {
     /**
      * The JSON file itself
      */
     private final JSONConfigFile file;
 
-    public JSONConfig(JSONConfigFile file) {
+    public AbstractJSONConfig(JSONConfigFile file) {
         this.file = file;
     }
 

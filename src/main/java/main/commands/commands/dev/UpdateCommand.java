@@ -2,7 +2,7 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
-import main.utils.database.BotUtils;
+import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +42,7 @@ public class UpdateCommand implements IDevCommand {
         try {
             switch (args.get(1).toLowerCase()) {
                 case "all" -> {
-                    for (Guild g : new BotUtils().getGuilds()) {
+                    for (Guild g : new BotDB().getGuilds()) {
                         conf.updateButtons(g);
                         conf.updateTopic(g);
                         conf.updateMessage(g);
@@ -55,7 +55,7 @@ public class UpdateCommand implements IDevCommand {
                     conf.updateButtons();
                 }
                 case "message" -> {
-                    for (Guild g : new BotUtils().getGuilds())
+                    for (Guild g : new BotDB().getGuilds())
                         conf.updateMessage(g);
                 }
                 default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arg").build()).queue();
