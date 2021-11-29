@@ -12,6 +12,7 @@ import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
+import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
@@ -66,7 +67,8 @@ public class Robertify {
                             commandWaiter,
                             new Listener(commandWaiter),
                             new VoiceChannelEvents(),
-                            new DedicatedChannelEvents()
+                            new DedicatedChannelEvents(),
+                            new PollEvents()
                     )
 
                     // Slash Commands

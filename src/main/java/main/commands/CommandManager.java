@@ -25,6 +25,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
+import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.utils.database.ServerDB;
@@ -86,6 +87,7 @@ public class CommandManager {
                 new DedicatedChannelCommand(),
                 new EightBallCommand(),
                 new PreviousTrackCommand(),
+                new PollCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -139,7 +141,8 @@ public class CommandManager {
 
         addMiscCommands(
                 new PingCommand(),
-                new EightBallCommand()
+                new EightBallCommand(),
+                new PollCommand()
         );
     }
 

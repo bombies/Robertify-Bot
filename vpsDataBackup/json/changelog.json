@@ -55,5 +55,10 @@
             "Added slash commands for setting and removing a role as a DJ. `/setdj` `/removedj`"
         ]}
     }],
-    "current_log": []
+    "current_log": [
+        "Fixed a bug where you couldn't play any Spotify links in the requests channel.",
+        "Fixed being able to interact with buttons in the requests channel if you weren't in the same voice channel as the bot.",
+        "Updated the topic in the requests channel. `Stop the track.` is now `Stop the track and clear the queue.`",
+        "Added polls. `help polls`"
+    ]
 }
