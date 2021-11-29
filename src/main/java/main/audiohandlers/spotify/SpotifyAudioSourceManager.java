@@ -173,11 +173,11 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Track track = trackFuture.get();
             AudioDB audioDB = new AudioDB();
 
-            if (audioDB.isTrackCached(track.getId()))
-                return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
+//            if (audioDB.isTrackCached(track.getId()))
+//                return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
 
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
-                    "ytsearch:" + track.getName() + " by " + track.getArtists()[0].getName() + " audio explicit", false, null);
+                    "ytsearch:" + track.getName() + " by " + track.getArtists()[0].getName(), false, null);
 
             return new SpotifyAudioTrack(info, youtubeManager, track.getId());
         } catch (Exception e) {

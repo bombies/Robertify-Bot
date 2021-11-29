@@ -22,6 +22,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
 import main.commands.commands.misc.EightBallCommand;
+import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
@@ -88,6 +89,7 @@ public class CommandManager {
                 new EightBallCommand(),
                 new PreviousTrackCommand(),
                 new PollCommand(),
+                new LyricsCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
