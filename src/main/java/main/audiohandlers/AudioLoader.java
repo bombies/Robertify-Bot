@@ -46,6 +46,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             if (botMsg != null)
                 botMsg.editMessageEmbeds(eb.build()).queue();
+            else {
+                new DedicatedChannelConfig().getTextChannel(guild.getId())
+                        .sendMessageEmbeds(eb.build()).queue();
+            }
         } else {
             TogglesConfig toggleConfig = new TogglesConfig();
             DedicatedChannelConfig config = new DedicatedChannelConfig();
@@ -75,8 +79,12 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (announceMsg) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.get(0).getInfo().title
                         + "` by `" + tracks.get(0).getInfo().author + "`");
-                if (botMsg != null)
+                if (botMsg != null) {
                     botMsg.editMessageEmbeds(eb.build()).queue();
+                } else {
+                    new DedicatedChannelConfig().getTextChannel(guild.getId())
+                            .sendMessageEmbeds(eb.build()).queue();
+                }
             } else {
                 TogglesConfig toggleConfig = new TogglesConfig();
                 DedicatedChannelConfig config = new DedicatedChannelConfig();
@@ -104,6 +112,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         if (botMsg != null)
           botMsg.editMessageEmbeds(eb.build()).queue();
+        else {
+            new DedicatedChannelConfig().getTextChannel(guild.getId())
+                    .sendMessageEmbeds(eb.build()).queue();
+        }
 
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
@@ -122,6 +134,10 @@ public class AudioLoader implements AudioLoadResultHandler {
         EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "") + "`. Try being more specific. *(Added name of the artiste)*");
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
+        else {
+            new DedicatedChannelConfig().getTextChannel(guild.getId())
+                    .sendMessageEmbeds(eb.build()).queue();
+        }
     }
 
     @Override
@@ -133,5 +149,9 @@ public class AudioLoader implements AudioLoadResultHandler {
         EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
+        else {
+            new DedicatedChannelConfig().getTextChannel(guild.getId())
+                    .sendMessageEmbeds(eb.build()).queue();
+        }
     }
 }
