@@ -121,12 +121,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command")
                     .build())
                     .queue();
+            return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command")
                             .build())
                     .queue();
+            return;
         }
 
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
