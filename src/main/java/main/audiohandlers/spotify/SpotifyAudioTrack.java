@@ -9,6 +9,8 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
+import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioReference;
 import main.utils.database.AudioDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +32,20 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
-        AudioItem item = manager.loadItem(null, new AudioReference(trackInfo.identifier, null));
+        AudioItem item = manager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, spotifyID));
         AudioDB audioDB = new AudioDB();
 
         if (item instanceof AudioPlaylist playlist) {
-            var track = playlist.getTracks().get(0);
+            AudioTrack track = playlist.getTracks().get(0);
+            for (AudioTrack audioTrack : playlist.getTracks()) {
+                if (audioTrack.getDuration() >= trackInfo.length - 5000 && audioTrack.getDuration() <= trackInfo.length + 5000) {
+                    track = audioTrack;
+                    break;
+                } else if (audioTrack.getInfo().title.contains(trackInfo.author) || audioTrack.getInfo().author.contains(trackInfo.author)) {
+                    track = audioTrack;
+                }
+            }
+
             ((YoutubeAudioTrack) track).process(executor);
 
             if (!audioDB.isTrackCached(spotifyID)) {

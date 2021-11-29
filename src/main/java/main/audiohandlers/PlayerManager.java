@@ -3,6 +3,12 @@ package main.audiohandlers;
 import com.google.inject.*;
 import com.sedmelluq.discord.lavaplayer.player.*;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
@@ -37,6 +43,13 @@ public class PlayerManager extends AbstractModule {
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
+
+        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
+        audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
 
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
     }

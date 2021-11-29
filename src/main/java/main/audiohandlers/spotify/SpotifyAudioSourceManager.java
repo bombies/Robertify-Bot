@@ -82,7 +82,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 //                }
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + album.getArtists()[0].getName() + " " + t.getName() +  " audio explicit", false, null);
+                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName() + " audio explicit", false, null);
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
                 playlist.add(track);
             }
@@ -129,7 +129,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 //                    }
 
                     AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
-                            "ytsearch:" + plTrack.getArtists()[0].getName() + " " + playlistTrack.getTrack().getName() + " audio explicit", false, null);
+                            "ytsearch:" + plTrack.getName() + " by " + plTrack.getArtists()[0].getName() , false, null);
                     var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
                     finalPlaylist.add(track);
                 }
@@ -177,7 +177,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                 return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
 
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
-                    "ytsearch:" + track.getArtists()[0].getName() + " " + track.getName(), false, null);
+                    "ytsearch:" + track.getName() + " by " + track.getArtists()[0].getName() + " audio explicit", false, null);
 
             return new SpotifyAudioTrack(info, youtubeManager, track.getId());
         } catch (Exception e) {
