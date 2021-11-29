@@ -262,7 +262,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
                         BotConstants.PREVIOUS_EMOJI + " Go to the previous song. " +
                         BotConstants.REWIND_EMOJI + " Rewind the song. " +
                         BotConstants.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
-                        BotConstants.STOP_EMOJI + " Stop the song. " +
+                        BotConstants.STOP_EMOJI + " Stop the song and clear the queue. " +
                         BotConstants.END_EMOJI + " Skip the song. " +
                         BotConstants.LOOP_EMOJI + " Loop the song. " +
                         BotConstants.SHUFFLE_EMOJI + " Shuffle the song. " +
