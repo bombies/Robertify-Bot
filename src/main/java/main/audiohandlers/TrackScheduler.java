@@ -15,6 +15,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.util.HashMap;
@@ -29,11 +30,11 @@ public class TrackScheduler extends AudioEventAdapter {
     @Getter
     private final Stack<AudioTrack> pastQueue;
     public ConcurrentLinkedQueue<AudioTrack> queue;
-    public ConcurrentLinkedQueue<AudioTrackInfo> infoQueue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
     private boolean announceNowPlaying;
     private boolean errorOccurred = false;
+    private Message lastSentMsg = null;
     @Getter
     private final Guild guild;
 
@@ -74,7 +75,12 @@ public class TrackScheduler extends AudioEventAdapter {
                     :
                     ""
             ));
-            announcementChannel.sendMessageEmbeds(eb.build()).queue();
+            announcementChannel.sendMessageEmbeds(eb.build())
+                    .queue(msg -> {
+                        if (lastSentMsg != null)
+                            lastSentMsg.delete().queue();
+                        lastSentMsg = msg;
+                    });
         }
     }
 

@@ -131,7 +131,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "") + "`. Try being more specific. *(Added name of the artiste)*");
+        EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "")
+                + "`. Try being more specific. *(Adding name of the artiste)*");
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
