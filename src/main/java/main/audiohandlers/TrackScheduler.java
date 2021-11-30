@@ -131,7 +131,7 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
         // Audio track has been unable to provide us any audio, might want to just start a new track
-        Listener.LOGGER.error("Track stuck. Attemping to replay the song.");
+        Listener.LOGGER.error("Track stuck. Attempting to replay the song.");
         handleTrackException(player, track);
     }
 
@@ -188,5 +188,9 @@ public class TrackScheduler extends AudioEventAdapter {
 
     public AudioTrack getLastPlayedTrack() {
         return pastQueue.pop();
+    }
+
+    public AudioTrack peekLastPlayedTrack() {
+        return pastQueue.peek();
     }
 }
