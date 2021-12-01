@@ -1,6 +1,6 @@
 <img align="right" src="https://i.imgur.com/HkAHWq5.png" height="256" width="256">
 
-# Robertify-Bot
+# Robertify
 [![Discord](https://discordapp.com/api/guilds/304828928223084546/widget.png)](https://discord.gg/2qcgtCXSQ5) <br>
 A Discord music bot with an easily understood interface and is easy to use!
 
