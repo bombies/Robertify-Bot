@@ -61,6 +61,8 @@ public class LeaveCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
             new DedicatedChannelConfig().updateMessage(guild);
 
+        musicManager.scheduler.getPastQueue().clear();
+
         return EmbedUtils.embedMessage("Disconnected!");
     }
 
