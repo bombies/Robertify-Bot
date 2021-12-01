@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 public class CooldownManager {
     private HashMap<User, Long> cooldowns = new HashMap<>();
-    public static final long DEFAULT_COOLDOWN = 2L;
+    public static final long DEFAULT_COOLDOWN = 1L;
 
     public void setCooldown(User u, long time) {
         if (time == 0)
