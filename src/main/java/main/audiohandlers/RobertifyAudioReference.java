@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.io.Serial;
 
 public class RobertifyAudioReference extends AudioReference {
-    @Getter @Setter
+    @Getter
     private final String spotifyID;
 
     public RobertifyAudioReference(String identifier, String title) {

@@ -14,11 +14,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.spotify.SpotifyAudioSourceManager;
-import main.audiohandlers.youtube.LazyYoutubeAudioTrackFactory;
 import main.commands.CommandContext;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
-import main.utils.spotify.SpotifySourceManager;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
@@ -33,31 +31,22 @@ public class PlayerManager extends AbstractModule {
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
-    @Override
-    protected void configure() {
-        bind(AudioTrackFactory.class).to(LazyYoutubeAudioTrackFactory.class);
-    }
-
     public PlayerManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
 
-        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
         audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
 
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-    }
-
-    @Provides
-    @Singleton
-    SpotifySourceManager spotifySourceManager(AudioTrackFactory trackFactory) {
-        return new SpotifySourceManager(trackFactory);
+        AudioSourceManagers.registerLocalSource(audioPlayerManager);
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -93,36 +82,17 @@ public class PlayerManager extends AbstractModule {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            CommandContext ctx, boolean announceMsg, Message botMsg) {
 
-        AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
-        var audioRef = new RobertifyAudioReference(trackUrl, null);
+        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
+        final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender) {
 
-        AudioLoader loader = new AudioLoader(sender, musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
-        var audioRef = new RobertifyAudioReference(trackUrl, null);
+        final AudioLoader loader = new AudioLoader(sender, musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
+        final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
-    }
-
-    public void lazyLoadAndPlay(String trackUrl, TextChannel announcementChannel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
-
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
-
-        joinVoiceChannel(selfVoiceState, memberVoiceState);
-        lazyLoadTrack(trackUrl, musicManager, announcementChannel, ctx, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES));
-    }
-
-    private void lazyLoadTrack(String trackUrl, GuildMusicManager musicManager,
-                               TextChannel channel, CommandContext ctx, boolean announceMsg) {
-
-        LazyAudioLoader lazyLoader = new LazyAudioLoader(ctx.getAuthor(), musicManager, ctx.getMessage(),
-                channel, trackRequestedByUser, trackUrl, announceMsg);
-        var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, lazyLoader);
     }
 
     public void joinVoiceChannel(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
