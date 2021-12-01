@@ -65,6 +65,8 @@ public class MoveCommand implements ICommand {
         final int position = Integer.parseInt(args.get(1));
 
         msg.replyEmbeds(handleMove(ctx.getGuild(), queue, id, position).build()).queue();
+
+        GeneralUtils.setDefaultEmbed();
     }
 
     public EmbedBuilder handleMove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
