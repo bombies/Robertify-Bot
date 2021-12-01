@@ -18,7 +18,7 @@ public enum BotConstants {
     STOP_EMOJI("<:stop:913601140879425557>"),
     QUIT_EMOJI("<:close:913798787691073556>"),
     CHECK_EMOJI("<:check:914738311535407136>"),
-    DEFAULT_IMAGE("https://i.imgur.com/qgMcAj6.png");
+    DEFAULT_IMAGE("https://i.imgur.com/VNQvjve.png");
 
     private final String str;
 

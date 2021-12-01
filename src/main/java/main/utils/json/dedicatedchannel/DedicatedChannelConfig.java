@@ -162,7 +162,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         if (playingTrack == null) {
             eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
             eb.setTitle("No song playing...");
-            eb.setImage("https://64.media.tumblr.com/9942a8261011606a2e78d75effad6220/c353caede4addfc4-52/s1280x1920/d085001a961ff09af5217c114c5cf0d7df7a63b9.png");
+            eb.setImage("https://i.imgur.com/1HDoSgP.png");
             eb.setFooter("Prefix for this server is: " + ServerDB.getPrefix(guild.getIdLong()));
 
             msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
