@@ -117,7 +117,9 @@ public class GeneralUtils {
             if (permissionsConfig.getRolesForPermission(guild.getId(), perm).contains(r.getId()) ||
                     permissionsConfig.getRolesForPermission(guild.getId(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
                 return true;
-        return false;
+
+
+        return permissionsConfig.getUsersForPermission(guild.getId(), perm.name()).contains(sender.getId());
     }
 
     public static boolean hasPerms(Guild guild, User sender, Permission perm) {
@@ -136,11 +138,14 @@ public class GeneralUtils {
         for (Role r : userRoles) {
             if (permissionsConfig.getRolesForPermission(guild.getId(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
                 return true;
-            for (Permission p : perms)
+            for (Permission p : perms) {
                 if (permissionsConfig.getRolesForPermission(guild.getId(), p).contains(r.getId()))
                     pass++;
+                else if (permissionsConfig.getUsersForPermission(guild.getId(), p.name()).contains(sender.getId()))
+                    pass++;
+            }
         }
-        return pass == perms.length;
+        return pass >= perms.length;
     }
 
     public static boolean hasPerms(Guild guild, User sender, Permission... perm) {

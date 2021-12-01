@@ -2,6 +2,7 @@ package main.commands.commands.management.permissions;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.ServerDB;
@@ -46,15 +47,18 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         String id = GeneralUtils.getDigitsOnly(args.get(0));
 
         Role role = guild.getRoleById(id);
+        User user = Robertify.api.getUserById(id);
 
-        if (!GeneralUtils.stringIsID(id) || role == null) {
-            eb = EmbedUtils.embedMessage("Please provide a valid role ID!");
+        if (role == null && user == null) {
+            eb = EmbedUtils.embedMessage("Please provide a valid role/user ID!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
-        msg.replyEmbeds(handleSetDJ(guild, role).build()).queue();
+        if (user == null)
+            msg.replyEmbeds(handleSetDJ(guild, role).build()).queue();
+        else
+            msg.replyEmbeds(handleSetDJ(guild, user).build()).queue();
 
         GeneralUtils.setDefaultEmbed();
     }
@@ -76,6 +80,23 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         }
     }
 
+    private EmbedBuilder handleSetDJ(Guild guild, User user) {
+        EmbedBuilder eb;
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        try {
+            permissionsConfig.addPermissionToUser(guild.getId(), user.getId(), Permission.ROBERTIFY_DJ);
+            eb = EmbedUtils.embedMessage("Set " + user.getAsMention() + " as a DJ!");
+            return eb;
+        } catch (IllegalArgumentException e) {
+            eb = EmbedUtils.embedMessage("This user has already been set as a DJ!");
+            return eb;
+        } catch (Exception e) {
+            e.printStackTrace();
+            eb = EmbedUtils.embedMessage("An unexpected error occurred!");
+            return eb;
+        }
+    }
+
     @Override
     public String getName() {
         return "setdj";
@@ -85,7 +106,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set a specific role to be a DJ\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setdj <@role>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setdj <@role|@user>`";
     }
 
     @Override
@@ -109,13 +130,30 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         return InteractionCommand.create()
                 .setCommand(Command.of(
                         getName(),
-                        "Set a specific as a DJ!",
-                        List.of(CommandOption.of(
-                                OptionType.ROLE,
-                                "role",
-                                "The role to set as a DJ",
-                                true
-                        )),
+                        "Set a specific user/role as a DJ!",
+                        List.of(),
+                        List.of(
+                                SubCommand.of(
+                                        "role",
+                                        "Set a role as a DJ",
+                                        List.of(CommandOption.of(
+                                                OptionType.ROLE,
+                                                "role",
+                                                "The role to set as a DJ",
+                                                true
+                                        ))
+                                ),
+                                SubCommand.of(
+                                        "user",
+                                        "Set a user as a DJ",
+                                        List.of(CommandOption.of(
+                                                OptionType.USER,
+                                                "user",
+                                                "The user to set as a DJ",
+                                                true
+                                        ))
+                                )
+                        ),
                         (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN)
                 )).build();
     }
@@ -124,22 +162,28 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+        if (!getCommand().getCommand().permissionCheck(event)) {
             event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to use this command!").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        var role = event.getOption("role").getAsRole();
-
         GeneralUtils.setCustomEmbed("Set DJ");
-
-        event.replyEmbeds(handleSetDJ(event.getGuild(), role).build())
-                .setEphemeral(false)
-                .queue();
-
+        switch  (event.getSubcommandName()) {
+            case "role" -> {
+                var role = event.getOption("role").getAsRole();
+                event.replyEmbeds(handleSetDJ(event.getGuild(), role).build())
+                        .setEphemeral(false)
+                        .queue();
+            }
+            case "user" -> {
+                var user = event.getOption("user").getAsUser();
+                event.replyEmbeds(handleSetDJ(event.getGuild(), user).build())
+                        .setEphemeral(false)
+                        .queue();
+            }
+        }
         GeneralUtils.setDefaultEmbed();
-
     }
 }

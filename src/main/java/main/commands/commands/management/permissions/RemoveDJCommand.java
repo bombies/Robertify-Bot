@@ -2,6 +2,7 @@ package main.commands.commands.management.permissions;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.ServerDB;
@@ -46,14 +47,18 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         String id = GeneralUtils.getDigitsOnly(args.get(0));
 
         Role role = guild.getRoleById(id);
+        User user = Robertify.api.getUserById(id);
 
-        if (!GeneralUtils.stringIsID(id) || role == null) {
-            eb = EmbedUtils.embedMessage("Please provide a valid role ID!");
+        if (role == null && user == null) {
+            eb = EmbedUtils.embedMessage("Please provide a valid role/user ID!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        msg.replyEmbeds(handleDJRemove(guild, role).build()).queue();
+        if (user == null)
+            msg.replyEmbeds(handleDJRemove(guild, role).build()).queue();
+        else
+            msg.replyEmbeds(handleDJRemove(guild, user).build()).queue();
 
         GeneralUtils.setDefaultEmbed();
     }
@@ -71,6 +76,19 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         }
     }
 
+    private EmbedBuilder handleDJRemove(Guild guild, User user) {
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        try {
+            permissionsConfig.removePermissionFromUser(guild.getId(), user.getId(), Permission.ROBERTIFY_DJ);
+            return EmbedUtils.embedMessage("Removed " + user.getAsMention() + " as a DJ!");
+        } catch (IllegalArgumentException e) {
+            return EmbedUtils.embedMessage("This user never was a DJ in the first place");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return EmbedUtils.embedMessage("An unexpected error occurred!");
+        }
+    }
+
     @Override
     public String getName() {
         return "removedj";
@@ -80,7 +98,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Remove DJ privileges from a specific role\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"remove <@role>`";
+                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"remove <@role|@user>`";
     }
 
     @Override
@@ -104,23 +122,39 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         return InteractionCommand.create()
                 .setCommand(Command.of(
                         getName(),
-                        "Remove a role asa DJ",
-                        List.of(CommandOption.of(
-                                OptionType.ROLE,
-                                "role",
-                                "The role to remove as a dj",
-                                true
-                        )),
+                        "Remove a role/user as a DJ",
+                        List.of(),
+                        List.of(
+                                SubCommand.of(
+                                        "role",
+                                        "Remove a role as a DJ",
+                                        List.of(CommandOption.of(
+                                                OptionType.ROLE,
+                                                "role",
+                                                "The role to remove as a DJ",
+                                                true
+                                        ))
+                                ),
+                                SubCommand.of(
+                                        "user",
+                                        "Remove a user as a DJ",
+                                        List.of(CommandOption.of(
+                                                OptionType.USER,
+                                                "user",
+                                                "The user to remove as a DJ",
+                                                true
+                                        ))
+                                )
+                        ),
                         (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN)
                 )).build();
-
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+        if (!getCommand().getCommand().permissionCheck(event)) {
             event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to use this command!").build())
                     .setEphemeral(true)
                     .queue();
@@ -128,12 +162,20 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         }
 
         GeneralUtils.setCustomEmbed("Remove DJ");
-        var role = event.getOption("role").getAsRole();
-
-        event.replyEmbeds(handleDJRemove(event.getGuild(), role).build())
-                .setEphemeral(false)
-                .queue();
-
+        switch  (event.getSubcommandName()) {
+            case "role" -> {
+                var role = event.getOption("role").getAsRole();
+                event.replyEmbeds(handleDJRemove(event.getGuild(), role).build())
+                        .setEphemeral(false)
+                        .queue();
+            }
+            case "user" -> {
+                var user = event.getOption("user").getAsUser();
+                event.replyEmbeds(handleDJRemove(event.getGuild(), user).build())
+                        .setEphemeral(false)
+                        .queue();
+            }
+        }
         GeneralUtils.setDefaultEmbed();
     }
 }

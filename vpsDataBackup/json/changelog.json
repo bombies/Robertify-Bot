@@ -16,6 +16,12 @@
             "The `rewind` command has new aliases (`repeat`, `rep`)",
             "The old repeat command has been changed to `loop`. The `loop` slash command has been unaffected."
         ]},
+        "29 november 2021": {"logs": [
+            "Fixed a bug where you couldn't play any Spotify links in the requests channel.",
+            "Fixed being able to interact with buttons in the requests channel if you weren't in the same voice channel as the bot.",
+            "Updated the topic in the requests channel. `Stop the track.` is now `Stop the track and clear the queue.`",
+            "Added polls. `help polls`"
+        ]},
         "21 november 2021": {"logs": [
             "Added new aliases for looping songs. `loop, l`",
             "Updated the help menu. It now features a selection menu for easily going around the categories.",
@@ -28,6 +34,12 @@
             "Added a command for managing **toggles**. Toggles are customizable feature that you can turn on or off. For example, if you don't want the bot to be announcing every time it plays a song, you can run the command `toggle announcements`. Use `help toggles` for more information.",
             "Implemented a new mechanism to allows non-DJ users to force the bot to leave the voice channel. This will only work if the user is the only other user in the channel with the bot.",
             "Fixed an issue where running the `setchannel` command wouldn't actually update the announcement channel."
+        ]},
+        "01 december 2021": {"logs": [
+            "Added a command for viewing the lyrics of the song being played. lyrics",
+            "Fixed a bug where playing single Spotify tracks wouldn't queue the accurate track.",
+            "Now playing tracks will no longer clutter your announcement channel.",
+            "Fixed a bug where YouTube links couldn't be played at all."
         ]},
         "26 november 2021": {"logs": [
             "The bot now pauses when all users have left the voice chat. The music will resume where it left off once someone joins back within it's timeout period.",
@@ -56,9 +68,9 @@
         ]}
     }],
     "current_log": [
-        "Fixed a bug where you couldn't play any Spotify links in the requests channel.",
-        "Fixed being able to interact with buttons in the requests channel if you weren't in the same voice channel as the bot.",
-        "Updated the topic in the requests channel. `Stop the track.` is now `Stop the track and clear the queue.`",
-        "Added polls. `help polls`"
+        "Reduced the command cooldown from `2 seconds` to `1 second`.",
+        "Slowed down the deletion of song queue messages in the request channel.",
+        "Permissions can now be **user specific**, meaning that a specific permission can be added to a specific role. Do `help perms` to see the new usages.",
+        "Changed the `setdj` and `removedj` commands. They now support adding permissions to specific users. The slash command has also been changed. There are now two commands relating to `setdj` and `removedj` respectively. One regarding a role and the other regarding a user. For more information on how to use the commands do `help setdj` and `help removedj`"
     ]
 }

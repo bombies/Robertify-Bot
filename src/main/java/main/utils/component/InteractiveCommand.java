@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class InteractiveCommand extends ListenerAdapter {
-    @Setter
-    @Getter
+    @Setter @Getter
     private static InteractionCommand interactionCommand;
 
     public abstract void initCommand();
@@ -271,7 +270,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private final List<CommandOption> options;
         @Getter @NotNull
         private final List<SubCommand> subCommands;
-        @Nullable
+        @Nullable @Getter
         private final Predicate<SlashCommandEvent> checkPermission;
         @Nullable @Getter
         private final Boolean djOnly;

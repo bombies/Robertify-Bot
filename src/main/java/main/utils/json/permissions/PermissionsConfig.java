@@ -26,6 +26,7 @@ public class PermissionsConfig extends AbstractJSONConfig {
         try {
             makeConfigFile(JSONConfigFile.PERMISSIONS);
         } catch (IllegalStateException e) {
+            update();
             return;
         }
 
@@ -39,6 +40,21 @@ public class PermissionsConfig extends AbstractJSONConfig {
         }
 
         setJSON(obj);
+    }
+
+    private void update() {
+        var jsonObj = getJSONObject();
+
+        for (Guild guild : new BotDB().getGuilds()) {
+            var guildObj = jsonObj.getJSONObject(guild.getId());
+
+            if (!guildObj.has(PermissionConfigField.USER_PERMISSIONS.toString())) {
+                guildObj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
+                jsonObj.put(guild.getId(), guildObj);
+            }
+        }
+
+        setJSON(jsonObj);
     }
 
     /**
@@ -67,6 +83,57 @@ public class PermissionsConfig extends AbstractJSONConfig {
     public void removeGuild(String gid) throws IOException {
         JSONObject obj = getJSONObject();
         obj.remove(gid);
+        setJSON(obj);
+    }
+
+    public void addPermissionToUser(String guildID, String userID, Permission p) {
+        var obj = getJSONObject();
+        var usersObj = obj.getJSONObject(guildID)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+
+        try {
+            if (userHasPermission(guildID, userID, p))
+                throw new IllegalArgumentException("User with id \"" + userID + "\" already has " + p.name() + "");
+        } catch (NullPointerException e) {
+            usersObj.put(userID, new JSONArray());
+            setJSON(obj);
+        }
+
+        obj = getJSONObject();
+        usersObj = obj.getJSONObject(guildID)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+
+        JSONArray array = usersObj.getJSONArray(userID);
+        array.put(p.getCode());
+
+        usersObj.put(userID, array);
+
+        setJSON(obj);
+    }
+
+    public boolean userHasPermission(String guildID, String userID, Permission p) {
+        var userObj = getJSONObject().getJSONObject(guildID)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+
+        if (!userObj.has(userID))
+            throw new NullPointerException("There is no user with ID: \""+userID+"\"");
+
+        return userObj.getJSONArray(userID).toList().contains(p.getCode());
+    }
+
+    public void removePermissionFromUser(String guildID, String userID, Permission p) {
+        if (!userHasPermission(guildID, userID, p))
+            throw new IllegalArgumentException("User with id \""+userID+"\" doesn't have "+p.name()+"");
+
+        var obj = getJSONObject();
+        var usersObj = obj.getJSONObject(guildID)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+
+        JSONArray array = usersObj.getJSONArray(userID);
+        array.remove(p.getCode());
+
+        usersObj.put(userID, array);
+
         setJSON(obj);
     }
 
@@ -226,6 +293,30 @@ public class PermissionsConfig extends AbstractJSONConfig {
         return ret;
     }
 
+    public List<String> getUsersForPermission(String gid, String p) {
+        if (!Permission.getPermissions().contains(p.toUpperCase()))
+            throw new NullPointerException("There is no enum with the name \""+p+"\"");
+
+        int code = -1;
+
+        for (Permission perm : Permission.values())
+            if (perm.name().equalsIgnoreCase(p)) {
+                code = perm.getCode(); break;
+            }
+
+        JSONObject object = getJSONObject()
+                .getJSONObject(gid)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+
+        List<String> ret = new ArrayList<>();
+
+        for (String s : object.keySet())
+            if (object.getJSONArray(s).toList().contains(code))
+                ret.add(s);
+
+        return ret;
+    }
+
     public List<Role> getRolesForPermission(Guild g, Permission p) {
         final List<Role> ret = new ArrayList<>();
         final var roleIDs = getRolesForPermission(g.getId(), p);
@@ -247,13 +338,26 @@ public class PermissionsConfig extends AbstractJSONConfig {
         JSONObject obj = getJSONObject()
                 .getJSONObject(gid);
 
-        for (int i = 0; i < obj.length(); i++) {
+        for (int i = 0; i < obj.length()-1; i++) {
             JSONArray arr = obj.getJSONArray(String.valueOf(i));
             for (int j = 0; j < arr.length(); j++)
                 if (arr.getString(j).equals(rid)) {
                     codes.add(i); break;
                 }
         }
+
+        return codes;
+    }
+
+    public List<Integer> getPermissionsForUser(String gid, String uid) {
+        List<Integer> codes = new ArrayList<>();
+        JSONObject obj = getJSONObject().getJSONObject(gid)
+                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
+        JSONArray arr = obj.getJSONArray(uid);
+
+        for (int i = 0; i < arr.length(); i++)
+            codes.add(arr.getInt(i));
+
 
         return codes;
     }
