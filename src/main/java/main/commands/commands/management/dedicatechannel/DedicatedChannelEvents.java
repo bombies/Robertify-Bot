@@ -91,7 +91,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             if (!event.getMessage().isEphemeral())
                 event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
         } else
-            event.getMessage().delete().queue();
+            event.getMessage().delete().queueAfter(1, TimeUnit.SECONDS);
     }
 
     @Override
