@@ -3,8 +3,11 @@ package main.events;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
+import main.utils.database.BotDB;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -45,12 +48,25 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
              if (channelLeft.getMembers().size() == 1) {
                  pauseSong(event);
-                waiter.waitForEvent(
+                 TextChannel channel = event.getGuild().getTextChannelById(new BotDB().getAnnouncementChannel(event.getGuild().getIdLong()));
+                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("Everyone's left me alone! ☹️" +
+                         "\nI will disconnect from "+channelLeft.getAsMention()+" in 1 minute.").build())
+                                 .queue();
+                 waiter.waitForEvent(
                         GuildVoiceJoinEvent.class,
                         (e) -> e.getChannelJoined().equals(channelLeft),
-                        (e) -> {},
+                        (e) -> {
+                            channel.sendMessageEmbeds(EmbedUtils.embedMessage("Someone joined me! 🥳" +
+                                    "\nNow resuming the music!").build())
+                                    .queue();
+                        },
                         1L, TimeUnit.MINUTES,
-                        () -> event.getGuild().getAudioManager().closeAudioConnection()
+                        () -> {
+                            event.getGuild().getAudioManager().closeAudioConnection();
+                            channel.sendMessageEmbeds(EmbedUtils.embedMessage("I've disconnected from " + channelLeft.getAsMention())
+                                    .build())
+                                    .queue();
+                        }
                 );
              }
         }

@@ -74,6 +74,8 @@ public class StopCommand implements ICommand {
         musicManager.scheduler.player.stopTrack();
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.getPastQueue().clear();
+        musicManager.scheduler.repeating = false;
+        musicManager.scheduler.playlistRepeating = false;
 
         if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
             new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
