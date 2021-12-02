@@ -6,6 +6,7 @@ import main.utils.database.BotDB;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -152,7 +153,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 //                            }
 //                        }
 //                    }
-            });
+            }, new ErrorHandler());
         }
     }
 

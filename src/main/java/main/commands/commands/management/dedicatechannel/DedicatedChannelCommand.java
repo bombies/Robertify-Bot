@@ -36,6 +36,16 @@ public class DedicatedChannelCommand implements ICommand {
             return;
         }
 
+        if (!ctx.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MANAGE_CHANNEL)) {
+            msg.replyEmbeds(EmbedUtils.embedMessage("""
+                            I do not have enough permissions to do this!
+                            Please give my role the `Manage Channels` permission in order for me to execute this command.
+
+                            *For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*""").build())
+                    .queue();
+            return;
+        }
+
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
                     var dediChannelConfig = new DedicatedChannelConfig();
@@ -47,7 +57,7 @@ public class DedicatedChannelCommand implements ICommand {
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
                     eb.setTitle("No song playing...");
-                    eb.setImage("https://64.media.tumblr.com/9942a8261011606a2e78d75effad6220/c353caede4addfc4-52/s1280x1920/d085001a961ff09af5217c114c5cf0d7df7a63b9.png");
+                    eb.setImage("https://i.imgur.com/1HDoSgP.png");
                     eb.setFooter("Prefix for this server is: " + ServerDB.getPrefix(guild.getIdLong()));
 
 

@@ -23,6 +23,7 @@ import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -96,8 +97,19 @@ public class Listener extends ListenerAdapter {
             if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
                 event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
                         .queue();
-            } else
+            } else {
+                if (!event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
+                    event.getMessage().replyEmbeds(EmbedUtils.embedMessage("""
+                            I do not have enough permissions to do this!
+                            Please give my role the `Manage Messages` permission in order for me to execute this command.
+
+                            *For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*""").build())
+                            .queue();
+                    return;
+                }
+
                 manager.handle(event);
+            }
         }
     }
 
