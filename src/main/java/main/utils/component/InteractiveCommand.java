@@ -12,10 +12,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,6 +27,8 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public abstract class InteractiveCommand extends ListenerAdapter {
+    final static Logger logger = LoggerFactory.getLogger(InteractiveCommand.class);
+
     @Setter @Getter
     private static InteractionCommand interactionCommand;
 
@@ -153,7 +158,10 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 //                            }
 //                        }
 //                    }
-            }, new ErrorHandler());
+            }, new ErrorHandler()
+                    .handle(ErrorResponse.MISSING_ACCESS, e -> {
+                        logger.error("Could not create Slash Command in {}. I do not have enough permissions", g.getName());
+                    }));
         }
     }
 
