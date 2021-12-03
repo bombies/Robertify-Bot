@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
 import main.utils.database.BotDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -38,6 +39,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
             musicManager.audioPlayer.stopTrack();
             musicManager.scheduler.queue.clear();
+
+            if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
+                new DedicatedChannelConfig().updateMessage(event.getGuild());
+
         } else {
              VoiceChannel channelLeft = event.getChannelLeft();
              GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
