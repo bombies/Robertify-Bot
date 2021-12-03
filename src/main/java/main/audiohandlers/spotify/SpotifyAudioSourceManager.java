@@ -82,7 +82,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 //                }
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName() + " audio explicit", false, null);
+                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
                 playlist.add(track);
             }

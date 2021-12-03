@@ -1,7 +1,12 @@
 package main.utils.component;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import lombok.Setter;
+import main.commands.CommandManager;
+import main.commands.commands.management.permissions.Permission;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.utils.GeneralUtils;
 import main.utils.database.BotDB;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
@@ -31,6 +36,19 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
     @Setter @Getter
     private static InteractionCommand interactionCommand;
+
+    public Predicate<SlashCommandEvent> djPredicate = e -> {
+        final TogglesConfig config = new TogglesConfig();
+
+        if (!config.isDJToggleSet(e.getGuild(), e.getName()))
+            return true;
+
+        if (config.getDJToggle(e.getGuild(), new CommandManager(new EventWaiter()).getCommand(e.getName())))
+            return GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_DJ);
+
+        return true;
+
+    };
 
     public abstract void initCommand();
     public abstract void initCommand(Guild g);

@@ -37,9 +37,7 @@ public class QueueSlashCommand extends InteractiveCommand {
                 .setCommand(Command.of(
                         commandName,
                         "See all queued songs!",
-                        List.of(),
-                        List.of(),
-                        null
+                        djPredicate
                 ))
                 .build();
     }
@@ -49,6 +47,12 @@ public class QueueSlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;

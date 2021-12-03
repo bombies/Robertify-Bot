@@ -10,12 +10,16 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionsConfig extends AbstractJSONConfig {
+    final Logger logger = LoggerFactory.getLogger(PermissionsConfig.class);
+
     public PermissionsConfig() {
         super(JSONConfigFile.PERMISSIONS);
     }
@@ -130,10 +134,9 @@ public class PermissionsConfig extends AbstractJSONConfig {
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
         JSONArray array = usersObj.getJSONArray(userID);
-        array.remove(p.getCode());
+        array.remove(getIndexOfObjectInArray(array, p.getCode()));
 
         usersObj.put(userID, array);
-
         setJSON(obj);
     }
 

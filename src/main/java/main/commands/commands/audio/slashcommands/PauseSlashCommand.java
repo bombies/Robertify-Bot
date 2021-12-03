@@ -2,6 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.PauseCommand;
 import main.utils.component.InteractiveCommand;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -26,7 +27,8 @@ public class PauseSlashCommand extends InteractiveCommand {
         return InteractionCommand.create()
                 .setCommand(Command.of(
                         commandName,
-                        "Pause the song being currently played!"
+                        "Pause the song being currently played!",
+                        djPredicate
                 )).build();
     }
 
@@ -35,6 +37,12 @@ public class PauseSlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

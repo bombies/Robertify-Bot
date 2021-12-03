@@ -6,6 +6,7 @@ import main.audiohandlers.PlayerManager;
 import main.commands.commands.audio.MoveCommand;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -47,7 +48,9 @@ public class MoveSlashCommand extends InteractiveCommand {
                                         "The position to move the track to",
                                         true
                                 )
-                        )
+                        ),
+                        List.of(),
+                        djPredicate
                 )).build();
 
     }
@@ -57,6 +60,12 @@ public class MoveSlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;

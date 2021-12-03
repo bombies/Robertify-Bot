@@ -28,7 +28,8 @@ public class NowPlayingSlashCommand extends InteractiveCommand {
         return InteractionCommand.create()
                 .setCommand(Command.of(
                         commandName,
-                        "See the song that is currently being played"
+                        "See the song that is currently being played",
+                        djPredicate
                 )).build();
 
     }
@@ -38,6 +39,12 @@ public class NowPlayingSlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

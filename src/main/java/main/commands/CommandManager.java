@@ -17,9 +17,11 @@ import main.commands.commands.dev.test.PlaySpotifyURICommand;
 import main.commands.commands.dev.test.SpotifyURLToURICommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
+import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.misc.PingCommand;
@@ -28,6 +30,7 @@ import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.TutorialCommand;
+import main.utils.GeneralUtils;
 import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -242,8 +245,19 @@ public class CommandManager {
             if (cmd != null) {
                 List<String> args = Arrays.asList(split).subList(1, split.length);
                 CommandContext ctx = new CommandContext(e, args);
+                var toggles = new TogglesConfig();
 
-                cmd.handle(ctx);
+                if (toggles.isDJToggleSet(ctx.getGuild(), cmd)) {
+                    if (toggles.getDJToggle(ctx.getGuild(), cmd)) {
+                        if (GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+                            cmd.handle(ctx);
+                        } else {
+                            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have enough permissions" +
+                                            " to run this command!").build())
+                                    .queue();
+                        }
+                    } else cmd.handle(ctx);
+                } else cmd.handle(ctx);
             }
             CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
         } else {

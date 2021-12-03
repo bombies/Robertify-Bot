@@ -39,7 +39,7 @@ public class VolumeSlashCommand extends InteractiveCommand {
                                 "The volume to set the bot to",
                                 true
                         )),
-                        (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_DJ)
+                        djPredicate
                 )).build();
     }
 
@@ -49,7 +49,7 @@ public class VolumeSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
-        if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+        if (!getCommand().getCommand().permissionCheck(event)) {
             event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
                     .queue();
             return;

@@ -49,8 +49,8 @@ public class LeaveCommand implements ICommand {
     }
 
     public EmbedBuilder handleDisconnect(Guild guild, User author) {
-        if (!GeneralUtils.hasPerms(guild, author, Permission.ROBERTIFY_DJ))
-            return EmbedUtils.embedMessage("You need to be a DJ to use this command!");
+//        if (!GeneralUtils.hasPerms(guild, author, Permission.ROBERTIFY_DJ))
+//            return EmbedUtils.embedMessage("You need to be a DJ to use this command!");
 
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
         musicManager.scheduler.queue.clear();

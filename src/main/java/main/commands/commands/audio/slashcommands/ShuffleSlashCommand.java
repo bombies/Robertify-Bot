@@ -2,6 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.ShuffleCommand;
 import main.utils.component.InteractiveCommand;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,8 @@ public class ShuffleSlashCommand extends InteractiveCommand {
         return InteractionCommand.create()
                 .setCommand(Command.of(
                         commandName,
-                        "Shuffle the queue"
+                        "Shuffle the queue",
+                        djPredicate
                 )).build();
     }
 
@@ -33,7 +35,15 @@ public class ShuffleSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
-        event.replyEmbeds(new ShuffleCommand().handleShuffle(event.getGuild()).build())
+        event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
+
+        event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild()).build())
                 .setEphemeral(false).queue();
     }
 }

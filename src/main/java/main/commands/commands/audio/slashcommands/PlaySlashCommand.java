@@ -18,30 +18,26 @@ import org.jetbrains.annotations.NotNull;
 public class PlaySlashCommand extends InteractiveCommand {
     @Override @SneakyThrows
     public void initCommand() {
-        var command = InteractiveCommand.InteractionCommand.create()
-                .buildCommand()
-                    .setName(new PlayCommand().getName())
-                    .setDescription("Play a song! Links are accepted by either Spotify or YouTube")
-                    .addOption(CommandOption.of(OptionType.STRING, "track", "The name/link of a track", true))
-                    .build()
-                .build();
-
-        setInteractionCommand(command);
+        setInteractionCommand(getCommand());
         upsertCommand();
     }
 
     @Override @SneakyThrows
     public void initCommand(Guild g) {
-        var command = InteractiveCommand.InteractionCommand.create()
-                .buildCommand()
-                .setName(new PlayCommand().getName())
-                .setDescription("Play a song! Links are accepted by either Spotify or YouTube")
-                .addOption(CommandOption.of(OptionType.STRING, "track", "The name/link of a track", true))
-                .build()
-                .build();
-
-        setInteractionCommand(command);
+        setInteractionCommand(getCommand());
         upsertCommand(g);
+    }
+
+    @SneakyThrows
+    private InteractionCommand getCommand() {
+        return InteractiveCommand.InteractionCommand.create()
+                .buildCommand()
+                    .setName(new PlayCommand().getName())
+                    .setDescription("Play a song! Links are accepted by either Spotify or YouTube")
+                    .addOption(CommandOption.of(OptionType.STRING, "track", "The name/link of a track", true))
+                    .setPermissionCheck(djPredicate)
+                    .build()
+                .build();
     }
 
     @Override
@@ -49,6 +45,12 @@ public class PlaySlashCommand extends InteractiveCommand {
         if (!event.getName().equals(new PlayCommand().getName())) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         EmbedBuilder eb;
 

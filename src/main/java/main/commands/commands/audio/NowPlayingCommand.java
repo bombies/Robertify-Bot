@@ -75,8 +75,6 @@ public class NowPlayingCommand implements ICommand {
 
         AudioTrackInfo info = track.getInfo();
 
-
-
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
         final User requester = PlayerManager.getRequester(track);
         eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ " - "+info.author+"`" + (

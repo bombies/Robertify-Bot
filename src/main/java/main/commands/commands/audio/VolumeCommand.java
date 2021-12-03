@@ -19,11 +19,11 @@ public class VolumeCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must be a DJ to use this command").build())
-                    .queue();
-            return;
-        }
+//        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+//            msg.replyEmbeds(EmbedUtils.embedMessage("You must be a DJ to use this command").build())
+//                    .queue();
+//            return;
+//        }
 
         if (ctx.getArgs().isEmpty()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You must provide what volume you'd like to set the bot to").build())

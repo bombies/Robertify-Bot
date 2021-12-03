@@ -32,4 +32,19 @@ public enum Toggles implements IJSONField {
         }
         throw new NullPointerException("No such toggle!");
     }
+
+    enum TogglesConfigField implements IJSONField {
+        DJ_TOGGLES("dj_toggles");
+
+        private final String str;
+
+        TogglesConfigField(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 }

@@ -1,11 +1,17 @@
 package main.commands.commands.management.toggles.togglesconfig;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import main.commands.CommandManager;
+import main.commands.ICommand;
 import main.constants.JSONConfigFile;
 import main.utils.database.BotDB;
 import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class TogglesConfig extends AbstractJSONConfig {
     private final JSONConfigFile file = JSONConfigFile.TOGGLES;
@@ -40,7 +46,17 @@ public class TogglesConfig extends AbstractJSONConfig {
         for (Guild g : new BotDB().getGuilds())
             for (Toggles toggle : Toggles.values())
                 try {
-                    obj.getJSONObject(g.getId()).put(toggle.toString(), true);
+                    JSONObject guildObj = obj.getJSONObject(g.getId());
+                    guildObj.put(toggle.toString(), true);
+
+                    if (!guildObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
+                        var djTogglesObj = new JSONObject();
+
+                        for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+                            djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
+
+                        guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
+                    }
                 } catch (JSONException e) {
                     obj.put(g.getId(), new JSONObject());
                     for (Toggles errToggles: Toggles.values())
@@ -60,6 +76,29 @@ public class TogglesConfig extends AbstractJSONConfig {
         return obj.getJSONObject(guild.getId()).getBoolean(toggle.toString());
     }
 
+    public HashMap<String, Boolean> getDJToggles(Guild g) {
+        final HashMap<String, Boolean> ret = new HashMap<>();
+        var obj = getJSONObject()
+                .getJSONObject(g.getId())
+                .getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
+
+        for (String key : obj.keySet())
+            ret.put(key, false);
+
+        ret.replaceAll((k, v) -> obj.getBoolean(k));
+
+        return ret;
+    }
+
+    public boolean getDJToggle(Guild g, ICommand cmd) {
+        final var djToggles = getDJToggles(g);
+
+        if (!djToggles.containsKey(cmd.getName()))
+            throw new NullPointerException("Invalid command passed!");
+
+        return djToggles.get(cmd.getName().toLowerCase());
+    }
+
     /**
      * Set the status of the specific toggle passed
      * @param toggle The toggle whose status is to be set
@@ -69,5 +108,23 @@ public class TogglesConfig extends AbstractJSONConfig {
         var obj = getJSONObject();
         obj.getJSONObject(guild.getId()).put(toggle.toString(), val);
         setJSON(obj);
+    }
+
+    public void setDJToggle(Guild guild, ICommand command, boolean val) {
+        var obj = getJSONObject();
+        var djObj = obj.getJSONObject(guild.getId())
+                .getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
+
+        djObj.put(command.getName().toLowerCase(), val);
+
+        setJSON(obj);
+    }
+
+    public boolean isDJToggleSet(Guild guild, ICommand cmd) {
+        return getDJToggles(guild).containsKey(cmd.getName().toLowerCase());
+    }
+
+    public boolean isDJToggleSet(Guild guild, String cmd) {
+        return getDJToggles(guild).containsKey(cmd.toLowerCase());
     }
 }

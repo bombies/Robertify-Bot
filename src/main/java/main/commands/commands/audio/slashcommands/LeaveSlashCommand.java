@@ -1,8 +1,11 @@
 package main.commands.commands.audio.slashcommands;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.PlayerManager;
+import main.commands.CommandManager;
 import main.commands.commands.management.permissions.Permission;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -36,7 +39,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
                         "Disconnect the bot from the voice channel it's currently in",
                         List.of(),
                         List.of(),
-                        null
+                        djPredicate
                 ))
                 .build();
     }
@@ -49,7 +52,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
 
         EmbedBuilder eb;
 
-        if (!GeneralUtils.hasPerms(event.getGuild(), event.getUser(), Permission.ROBERTIFY_DJ)) {
+        if (!getCommand().getCommand().permissionCheck(event)) {
             eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;

@@ -2,6 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.SeekCommand;
 import main.utils.component.InteractiveCommand;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -43,7 +44,8 @@ public class SeekSlashCommand extends InteractiveCommand {
                                         "The seconds to seek",
                                         true
                                 )
-                        )
+                        ),
+                        djPredicate
                 )).build();
     }
 
@@ -52,6 +54,12 @@ public class SeekSlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         event.deferReply().queue();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         final var minutes = Integer.parseInt(String.valueOf(event.getOption("minutes").getAsLong()));
         final var seconds = Integer.parseInt(String.valueOf(event.getOption("seconds").getAsLong()));
