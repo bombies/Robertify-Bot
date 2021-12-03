@@ -10,6 +10,7 @@
         "dj_toggles": {
             "play": false,
             "resume": false,
+            "disconnect": false,
             "move": false,
             "nowplaying": false,
             "previous": false,
@@ -35,6 +36,7 @@
         "dj_toggles": {
             "play": false,
             "resume": false,
+            "disconnect": false,
             "move": false,
             "nowplaying": false,
             "previous": false,

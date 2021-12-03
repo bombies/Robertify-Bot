@@ -8,6 +8,8 @@ import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.ServerDB;
 import net.dv8tion.jda.api.entities.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -15,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ViewConfigCommand implements IDevCommand {
+    final Logger logger = LoggerFactory.getLogger(ViewConfigCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx))
@@ -38,7 +42,7 @@ public class ViewConfigCommand implements IDevCommand {
                     msg.reply("```json\n" +
                             info + "\n```").queue();
                 } catch (IllegalArgumentException e) {
-                    File file = new File(Config.get(ENV.JSON_DIR) + fileName.toLowerCase());
+                    File file = new File(Config.get(ENV.JSON_DIR) +"/"+ fileName.toLowerCase());
                     ctx.getMessage().reply(file).queue();
                 }
 

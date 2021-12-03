@@ -152,7 +152,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             event.reply(user.getAsMention()).addEmbeds(shuffleEmbed.build())
                     .queue();
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
-            EmbedBuilder disconnectEmbed = new LeaveCommand().handleDisconnect(event.getGuild(), event.getUser());
+            EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild(), event.getUser());
             event.reply(user.getAsMention()).addEmbeds(disconnectEmbed.build())
                     .queue();
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {

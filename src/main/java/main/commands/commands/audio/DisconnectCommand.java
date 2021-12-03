@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.*;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class LeaveCommand implements ICommand {
+public class DisconnectCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Member self = ctx.getSelfMember();
@@ -70,19 +70,18 @@ public class LeaveCommand implements ICommand {
 
     @Override
     public String getName() {
-        return "leave";
+        return "disconnect";
     }
 
     @Override
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
-                "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n\n"+
                 "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("dc", "disconnect");
+        return List.of("dc", "leave");
     }
 }

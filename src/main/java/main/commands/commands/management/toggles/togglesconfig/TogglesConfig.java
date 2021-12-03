@@ -56,6 +56,14 @@ public class TogglesConfig extends AbstractJSONConfig {
                             djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
 
                         guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
+                    } else {
+                        var djTogglesObj = guildObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
+
+                        for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+                            if (!djTogglesObj.has(musicCommand.getName()))
+                                djTogglesObj.put(musicCommand.getName(), false);
+
+                        guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
                     }
                 } catch (JSONException e) {
                     obj.put(g.getId(), new JSONObject());

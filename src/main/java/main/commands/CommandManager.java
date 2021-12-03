@@ -62,7 +62,7 @@ public class CommandManager {
                 new HelpCommand(),
                 new SetPrefixCommand(),
                 new PlayCommand(),
-                new LeaveCommand(),
+                new DisconnectCommand(),
                 new StopCommand(),
                 new SkipCommand(),
                 new NowPlayingCommand(),
@@ -111,7 +111,7 @@ public class CommandManager {
 
         addMusicCommands(
                 new PlayCommand(),
-                new LeaveCommand(),
+                new DisconnectCommand(),
                 new StopCommand(),
                 new SkipCommand(),
                 new NowPlayingCommand(),
