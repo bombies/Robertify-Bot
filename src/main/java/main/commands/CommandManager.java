@@ -252,7 +252,7 @@ public class CommandManager {
                         if (GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
                             cmd.handle(ctx);
                         } else {
-                            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have enough permissions" +
+                            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
                                             " to run this command!").build())
                                     .queue();
                         }

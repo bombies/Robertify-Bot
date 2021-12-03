@@ -143,7 +143,7 @@ public class TogglesCommand implements ICommand {
 
         eb.addField("Command", toggleNames.toString(), true);
         eb.addBlankField(true);
-        eb.addField("Status", toggleStatuses.toString(), true);
+        eb.addField("DJ Status", toggleStatuses.toString(), true);
 
         return eb;
     }
