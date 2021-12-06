@@ -1,5 +1,6 @@
 package main.audiohandlers.spotify;
 
+import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -8,7 +9,6 @@ import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.main.Robertify;
 import main.utils.database.AudioDB;
-import me.duncte123.botcommons.web.WebUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -21,7 +21,6 @@ import java.io.DataOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,6 +29,7 @@ import java.util.regex.Pattern;
 
 public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfigurable {
     private static final Pattern SPOTIFY_TRACK_REGEX = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/track/([a-zA-z0-9]+))(?:.*)$");
+    private static final Pattern SPOTIFY_ARTIST_REGEX = Pattern.compile("^(?:spotify:(artist:)|(?:http://|https://)[a-z]+\\.spotify\\.com/artist/([a-zA-z0-9]+))(?:.*)$");
     private static final Pattern SPOTIFY_ALBUM_REGEX = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/album/([a-zA-z0-9]+))(?:.*)$");
     private static final Pattern SPOTIFY_PLAYLIST_REGEX = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/)playlist/([a-zA-z0-9]+)(?:.*)$");
     private static final Pattern SPOTIFY_PLAYLIST_REGEX_USER = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/)user/(.*)/playlist/([a-zA-z0-9]+)(?:.*)$");
@@ -43,7 +43,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
     public SpotifyAudioSourceManager(YoutubeAudioSourceManager youtubeManager) {
         this.youtubeManager = youtubeManager;
-        this.loaders = Arrays.asList(this::getSpotifyTrack, this::getSpotifyAlbum, this::getSpotifyPlaylist);
+        this.loaders = Arrays.asList(this::getSpotifyTrack, this::getSpotifyAlbum, this::getSpotifyPlaylist, this::getSpotifyArtist);
     }
 
     @Override
@@ -88,6 +88,39 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             }
 
             return new BasicAudioPlaylist(album.getName(), playlist, playlist.get(0), false);
+        } catch (Exception e) {
+            logger.error("oops!", e);
+            throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);
+        }
+    }
+
+    private AudioItem getSpotifyArtist(AudioReference reference) {
+        Matcher res = SPOTIFY_ARTIST_REGEX.matcher(reference.identifier);
+
+        if (!res.matches())
+            return null;
+
+        try {
+            List<AudioTrack> playlist = new ArrayList<>();
+
+            Future<Track[]> artistFuture = api.getArtistsTopTracks(res.group(res.groupCount()), CountryCode.US).build().executeAsync();
+            Track[] tracks = artistFuture.get();
+
+            final var audioDB = new AudioDB();
+            for (Track t : tracks) {
+//                if (audioDB.isTrackCached(t.getId())) {
+//                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
+//                    playlist.add((AudioTrack) track);
+//                    continue;
+//                }
+
+                AudioTrackInfo info = new AudioTrackInfo(t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
+                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
+                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
+                playlist.add(track);
+            }
+
+            return new BasicAudioPlaylist(tracks[0].getArtists()[0].getName(), playlist, playlist.get(0), false);
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);
