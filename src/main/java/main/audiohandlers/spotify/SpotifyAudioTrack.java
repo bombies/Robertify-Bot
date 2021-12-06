@@ -38,7 +38,7 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
         if (item instanceof AudioPlaylist playlist) {
             AudioTrack track = playlist.getTracks().get(0);
             for (AudioTrack audioTrack : playlist.getTracks()) {
-                if (audioTrack.getDuration() >= trackInfo.length - 5000 && audioTrack.getDuration() <= trackInfo.length + 5000) {
+                if (audioTrack.getDuration() >= trackInfo.length - 7000 && audioTrack.getDuration() <= trackInfo.length + 5000) {
                     track = audioTrack;
                     break;
                 } else if (audioTrack.getInfo().title.contains(trackInfo.author) || audioTrack.getInfo().author.contains(trackInfo.author)) {

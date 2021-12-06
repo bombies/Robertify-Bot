@@ -108,7 +108,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         }
 
         EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.size()
-                + "` tracks from playlist `" + audioPlaylist.getName() + "`");
+                + "` tracks from `" + audioPlaylist.getName() + "`");
 
         if (botMsg != null)
           botMsg.editMessageEmbeds(eb.build()).queue();

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -75,12 +76,15 @@ public class TrackScheduler extends AudioEventAdapter {
                     :
                     ""
             ));
-            announcementChannel.sendMessageEmbeds(eb.build())
-                    .queue(msg -> {
-                        if (lastSentMsg != null)
-                            lastSentMsg.delete().queue();
-                        lastSentMsg = msg;
-                    });
+            try {
+                announcementChannel.sendMessageEmbeds(eb.build())
+                        .queue(msg -> {
+                            if (lastSentMsg != null)
+                                lastSentMsg.delete().queue();
+                            lastSentMsg = msg;
+                        });
+            } catch (InsufficientPermissionException ignored) {
+            }
         }
     }
 

@@ -17,8 +17,10 @@ import main.audiohandlers.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
@@ -65,7 +67,11 @@ public class PlayerManager extends AbstractModule {
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
-        joinVoiceChannel(selfVoiceState, memberVoiceState);
+        try {
+            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
         loadTrack(trackUrl, musicManager, ctx, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), botMsg);
     }
 
@@ -75,7 +81,11 @@ public class PlayerManager extends AbstractModule {
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
-        joinVoiceChannel(selfVoiceState, memberVoiceState);
+        try {
+            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
         loadTrack(trackUrl, musicManager, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), botMsg, event.getUser());
     }
 
@@ -95,10 +105,17 @@ public class PlayerManager extends AbstractModule {
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
-    public void joinVoiceChannel(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+    public void joinVoiceChannel(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         if (!selfVoiceState.inVoiceChannel()) {
             AudioManager audioManager = selfVoiceState.getGuild().getAudioManager();
-            audioManager.openAudioConnection(memberVoiceState.getChannel());
+
+            try {
+                audioManager.openAudioConnection(memberVoiceState.getChannel());
+            } catch (InsufficientPermissionException e) {
+                channel.sendMessageEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
+                        .queue();
+                throw e;
+            }
             audioManager.setSelfDeafened(true);
         }
     }
