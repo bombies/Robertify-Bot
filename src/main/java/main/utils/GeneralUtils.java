@@ -40,10 +40,6 @@ public class GeneralUtils {
 
     private static Color embedColor = parseColor(Config.get(ENV.BOT_COLOR));
 
-    public static String getEmojiRegex() {
-        return "([\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee])";
-    }
-
     public static boolean stringIsNum(String s) {
         if (s == null) return false;
         else {
