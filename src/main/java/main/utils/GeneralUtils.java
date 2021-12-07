@@ -3,6 +3,7 @@ package main.utils;
 import main.commands.commands.management.permissions.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
+import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
 import main.utils.json.permissions.PermissionsConfig;
@@ -14,6 +15,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -32,8 +36,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class GeneralUtils {
-    private static Color embedColor = parseColor(Config.get(ENV.BOT_COLOR));
+    private static final Logger logger = LoggerFactory.getLogger(GeneralUtils.class);
 
+    private static Color embedColor = parseColor(Config.get(ENV.BOT_COLOR));
 
     public static String getEmojiRegex() {
         return "([\\u20a0-\\u32ff\\ud83c\\udc00-\\ud83d\\udeff\\udbb9\\udce5-\\udbb9\\udcee])";
@@ -76,6 +81,9 @@ public class GeneralUtils {
     }
 
     public static boolean isUrl(String url) {
+        if (url == null)
+            return false;
+
         try {
             new URI(url);
             return true;
@@ -168,7 +176,7 @@ public class GeneralUtils {
         switch (barType) {
             case DURATION -> {
                 StringBuilder str = new StringBuilder();
-                for(int i=0; i<12; i++)
+                for(int i = 0; i < 12; i++)
                     if(i == (int)(percent*12))
                         str.append("\uD83D\uDD18"); // 🔘
                     else
@@ -177,11 +185,34 @@ public class GeneralUtils {
             }
             case FILL -> {
                 StringBuilder str = new StringBuilder();
-                for(int i=0; i<12; i++)
-                    if(i <= (int)(percent*12))
-                        str.append("█");
-                    else
-                        str.append("▒");
+
+                if (percent * 12 == 0L) {
+                    for (int i = 0; i < 12; i++) {
+                        if (i == 0)
+                            str.append(RobertifyEmoji.BAR_START_EMPTY);
+                        else if (i == 11)
+                            str.append(RobertifyEmoji.BAR_END_EMPTY);
+                        else
+                            str.append(RobertifyEmoji.BAR_MIDDLE_EMPTY);
+                    }
+                } else {
+                    for (int i = 0; i < 12; i++)
+                        if (i <= (int) (percent * 12)) {
+                            if (i == 0)
+                                str.append(RobertifyEmoji.BAR_START_FULL);
+                            else if (i == 11)
+                                str.append(RobertifyEmoji.BAR_END_FULL);
+                            else
+                                str.append(RobertifyEmoji.BAR_MIDDLE_FULL);
+                        } else {
+                            if (i == 0)
+                                str.append(RobertifyEmoji.BAR_START_EMPTY);
+                            else if (i == 11)
+                                str.append(RobertifyEmoji.BAR_END_EMPTY);
+                            else
+                                str.append(RobertifyEmoji.BAR_MIDDLE_EMPTY);
+                        }
+                }
                 return str.toString();
             }
         }
@@ -221,11 +252,7 @@ public class GeneralUtils {
     }
 
     public static String formatTime(long duration) {
-        final long hours = duration / TimeUnit.HOURS.toMillis(1);
-        final long minutes = duration / TimeUnit.MINUTES.toMillis(1);
-        final long seconds = duration % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
-
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        return DurationFormatUtils.formatDuration(duration, "HH:mm:ss");
     }
 
     public static boolean isValidDuration(String timeUnparsed) {
