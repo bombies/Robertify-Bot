@@ -1,6 +1,6 @@
 package main.commands.commands.audio;
 
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.database.ServerDB;
@@ -27,7 +27,7 @@ public class PreviousTrackCommand implements ICommand {
     }
 
     public EmbedBuilder handlePrevious(Guild guild, GuildVoiceState memberVoiceState) {
-        final var musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var scheduler = musicManager.scheduler;
         final var queue = scheduler.queue;
         final var previouslyPlayedTracks = scheduler.getPastQueue();

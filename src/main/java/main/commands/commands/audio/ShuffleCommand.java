@@ -2,7 +2,7 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -28,7 +28,7 @@ public class ShuffleCommand implements ICommand {
     }
 
     public EmbedBuilder handleShuffle(Guild guild) {
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
 

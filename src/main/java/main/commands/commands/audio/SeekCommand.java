@@ -2,7 +2,7 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.database.ServerDB;
@@ -57,7 +57,7 @@ public class SeekCommand implements ICommand {
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
             return EmbedUtils.embedMessage("You must bein the same voice channel I am in order to use this command");
 
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
 
         if (audioPlayer.getPlayingTrack() == null)

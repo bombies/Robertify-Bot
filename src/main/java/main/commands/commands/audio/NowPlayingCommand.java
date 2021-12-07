@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
@@ -64,7 +64,7 @@ public class NowPlayingCommand implements ICommand {
             return eb;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         AudioPlayer audioPlayer = musicManager.audioPlayer;
         AudioTrack track = audioPlayer.getPlayingTrack();
 
@@ -76,7 +76,7 @@ public class NowPlayingCommand implements ICommand {
         AudioTrackInfo info = track.getInfo();
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
-        final User requester = PlayerManager.getRequester(track);
+        final User requester = RobertifyAudioManager.getRequester(track);
         eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ " - "+info.author+"`" + (
                 ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
                         " [ Requested by " + requester.getAsMention() + " ]"

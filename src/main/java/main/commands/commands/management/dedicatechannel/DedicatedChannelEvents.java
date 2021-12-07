@@ -2,7 +2,7 @@ package main.commands.commands.management.dedicatechannel;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.commands.audio.*;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
@@ -82,7 +82,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             if (!GeneralUtils.isUrl(message))
                 message = "ytsearch:" + message;
 
-            PlayerManager.getInstance()
+            RobertifyAudioManager.getInstance()
                     .loadAndPlay(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
                             new CommandContext(event, null), null);
         }
@@ -105,7 +105,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (!event.getTextChannel().getId().equals(config.getChannelID(event.getGuild().getId()))) return;
 
         final String id = event.getButton().getId();
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final AudioPlayer audioPlayer = musicManager.audioPlayer;
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();

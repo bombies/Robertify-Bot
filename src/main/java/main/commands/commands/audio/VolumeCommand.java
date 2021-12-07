@@ -1,9 +1,8 @@
 package main.commands.commands.audio;
 
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -56,7 +55,7 @@ public class VolumeCommand implements ICommand {
         if (volume < 0 || volume > 100)
             return EmbedUtils.embedMessage("You can't set the volume to that value");
 
-        var musicManager = PlayerManager.getInstance().getMusicManager(memberVoiceState.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
         var audioPlayer = musicManager.audioPlayer;
 
         audioPlayer.setVolume(volume);

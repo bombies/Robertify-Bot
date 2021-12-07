@@ -1,7 +1,7 @@
 package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
 import main.constants.ENV;
@@ -151,7 +151,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
             return;
 
         final var msg = getMessage(guild.getId());
-        final var musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.audioPlayer;
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var queue = musicManager.scheduler.queue;
@@ -173,7 +173,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
             eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
             eb.setTitle(trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getDuration()) +"]");
 
-            var requester = PlayerManager.getRequester(playingTrack);
+            var requester = RobertifyAudioManager.getRequester(playingTrack);
             if (requester != null)
                 eb.setDescription("Requested by " + requester.getAsMention());
 

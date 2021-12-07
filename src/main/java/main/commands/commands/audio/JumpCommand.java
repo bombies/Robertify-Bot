@@ -3,7 +3,7 @@ package main.commands.commands.audio;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -65,7 +65,7 @@ public class JumpCommand implements ICommand {
             return eb;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         AudioPlayer audioPlayer = musicManager.audioPlayer;
         AudioTrack track = audioPlayer.getPlayingTrack();
 

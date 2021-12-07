@@ -1,7 +1,7 @@
 package main.commands.commands.audio.slashcommands;
 
 import lombok.SneakyThrows;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.PlayCommand;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
@@ -86,7 +86,7 @@ public class PlaySlashCommand extends InteractiveCommand {
         event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build())
                         .setEphemeral(false)
                                 .queue(msg -> {
-                                    PlayerManager.getInstance()
+                                    RobertifyAudioManager.getInstance()
                                             .loadAndPlay(
                                                     finalLink,
                                                     botUtils.getAnnouncementChannelObject(event.getGuild().getIdLong()),

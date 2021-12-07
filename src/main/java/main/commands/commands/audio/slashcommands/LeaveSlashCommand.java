@@ -1,12 +1,7 @@
 package main.commands.commands.audio.slashcommands;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
-import main.commands.CommandManager;
-import main.commands.commands.management.permissions.Permission;
-import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
-import main.utils.GeneralUtils;
+import main.audiohandlers.RobertifyAudioManager;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -81,7 +76,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
             return;
         }
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.player.stopTrack();
 

@@ -2,7 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ClearQueueCommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClearQueueSlashCommand extends InteractiveCommand {
@@ -48,7 +47,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
         GeneralUtils.setCustomEmbed("Queue");

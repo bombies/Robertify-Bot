@@ -2,7 +2,7 @@ package main.events;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -30,7 +30,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
     @Override
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             musicManager.scheduler.repeating = false;
             musicManager.scheduler.playlistRepeating = false;
 
@@ -102,13 +102,13 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (!channel.equals(voiceState.getChannel())) return;
 
         if (channel.getMembers().size() == 1) {
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             musicManager.audioPlayer.setPaused(true);
         }
     }
 
     void resumeSong(GenericGuildVoiceUpdateEvent event) {
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         if (musicManager.audioPlayer.isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
              && !musicManager.isForcePaused())
             musicManager.audioPlayer.setPaused(false);

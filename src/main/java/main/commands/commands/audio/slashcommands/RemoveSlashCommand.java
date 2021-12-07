@@ -2,7 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.RemoveCommand;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
@@ -58,7 +58,7 @@ public class RemoveSlashCommand extends InteractiveCommand {
         }
 
         final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
-        final GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
+        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
         event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(queue, trackSelected).build())

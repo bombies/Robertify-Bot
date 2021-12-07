@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
@@ -25,15 +26,15 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
 
-public class PlayerManager extends AbstractModule {
-    private static PlayerManager INSTANCE;
+public class RobertifyAudioManager extends AbstractModule {
+    private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
     private static final HashMap<AudioTrack, User> trackRequestedByUser = new HashMap<>();
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
-    public PlayerManager() {
+    public RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
@@ -46,6 +47,7 @@ public class PlayerManager extends AbstractModule {
         audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
+        audioPlayerManager.registerSourceManager(new LocalAudioSourceManager());
 
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);
         AudioSourceManagers.registerLocalSource(audioPlayerManager);
@@ -128,9 +130,9 @@ public class PlayerManager extends AbstractModule {
         trackRequestedByUser.remove(track, requester);
     }
 
-    public static PlayerManager getInstance() {
+    public static RobertifyAudioManager getInstance() {
         if (INSTANCE == null)
-            INSTANCE = new PlayerManager();
+            INSTANCE = new RobertifyAudioManager();
         return INSTANCE;
     }
 }

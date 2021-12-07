@@ -1,6 +1,6 @@
 package main.commands.commands.audio;
 
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -61,7 +61,7 @@ public class PlayCommand implements ICommand {
 
         String finalLink = link;
         channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
-            PlayerManager.getInstance()
+            RobertifyAudioManager.getInstance()
                     .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg);
         });
     }

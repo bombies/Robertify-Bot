@@ -1,11 +1,9 @@
 package main.commands.commands.audio;
 
 import main.audiohandlers.GuildMusicManager;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
-import main.utils.GeneralUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -52,7 +50,7 @@ public class DisconnectCommand implements ICommand {
 //        if (!GeneralUtils.hasPerms(guild, author, Permission.ROBERTIFY_DJ))
 //            return EmbedUtils.embedMessage("You need to be a DJ to use this command!");
 
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         musicManager.scheduler.queue.clear();
         musicManager.scheduler.player.stopTrack();
 

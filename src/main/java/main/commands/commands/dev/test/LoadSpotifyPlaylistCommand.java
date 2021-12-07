@@ -5,16 +5,11 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.SneakyThrows;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.RobertifyAudioReference;
-import main.audiohandlers.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
 import main.commands.commands.ITestCommand;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
-import main.utils.spotify.SpotifyURI;
-import main.utils.spotify.SpotifyURIType;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -41,8 +36,8 @@ public class LoadSpotifyPlaylistCommand implements ITestCommand {
 
         List<AudioTrack> loadedTracks = new ArrayList<>();
 
-        Future<Void> voidFuture = PlayerManager.getInstance().getAudioPlayerManager()
-                .loadItemOrdered(PlayerManager.getInstance().getMusicManager(ctx.getGuild()),
+        Future<Void> voidFuture = RobertifyAudioManager.getInstance().getAudioPlayerManager()
+                .loadItemOrdered(RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild()),
                         audioRef, new AudioLoadResultHandler() {
                             @Override
                             public void trackLoaded(AudioTrack audioTrack) {

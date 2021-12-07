@@ -1,7 +1,7 @@
 package main.commands.commands.management;
 
 import lombok.SneakyThrows;
-import main.audiohandlers.PlayerManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.utils.database.BotDB;
@@ -25,7 +25,7 @@ public class ShutdownCommand implements IDevCommand {
 
         for (Guild g : new BotDB().getGuilds()) {
             var selfMember = g.getSelfMember();
-            var musicManager = PlayerManager.getInstance().getMusicManager(g);
+            var musicManager = RobertifyAudioManager.getInstance().getMusicManager(g);
             var queue = musicManager.scheduler.queue;
             var audioPlayer = musicManager.audioPlayer;
 

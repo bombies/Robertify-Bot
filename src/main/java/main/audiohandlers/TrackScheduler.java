@@ -68,7 +68,7 @@ public class TrackScheduler extends AudioEventAdapter {
         if (!repeating) {
             if (!announceNowPlaying) return;
 
-            final var requester = PlayerManager.getRequester(track);
+            final var requester = RobertifyAudioManager.getRequester(track);
             TextChannel announcementChannel = new BotDB().getAnnouncementChannelObject(this.guild.getIdLong());
             EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                     + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
@@ -116,8 +116,8 @@ public class TrackScheduler extends AudioEventAdapter {
         if (!errorOccurred) {
             if (repeating) {
                 if (track != null) {
-                    if (PlayerManager.getTrackRequestedByUser().containsKey(track))
-                        PlayerManager.removeRequester(track, PlayerManager.getRequester(track));
+                    if (RobertifyAudioManager.getTrackRequestedByUser().containsKey(track))
+                        RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
                     try {
                         player.playTrack(track.makeClone());
                     } catch (UnsupportedOperationException e) {
