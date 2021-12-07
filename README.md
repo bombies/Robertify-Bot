@@ -9,7 +9,7 @@ A Discord music bot with an easily understood interface and is easy to use!
 - Server-specific prefixes.
 - Server-specific permissions.
 - Clean and beautiful embedded menus.
-- Supports streaming services such as YouTube and Spotify.
+- Supports streaming services such as YouTube, Spotify and more.
 - Playlist support. (Both YouTube and Spotify)
 - Toggles for specific features such as the announcing of tracks.
 - Fun commands such as 8ball and polls!
@@ -19,7 +19,12 @@ Robertify supports all sources and formats supported by [lavaplayer](https://git
 ### Available Sources
 - YouTube
 - Spotify
-- more to come...
+- SoundCloud
+- Bandcamp
+- Twitch Streams
+- Beam
+- HTTP Audio Files
+- Local Audio Files (MP3, OGG, M4A, WAV, FLAC)
 
 ## Examples
 - Playing a song/playlist from YouTube
