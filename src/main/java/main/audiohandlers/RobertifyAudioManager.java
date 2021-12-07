@@ -77,7 +77,7 @@ public class RobertifyAudioManager extends AbstractModule {
         loadTrack(trackUrl, musicManager, ctx, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), botMsg);
     }
 
-    public void loadAndPlay(String trackUrl, TextChannel announcementChannel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
+    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
         final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))

@@ -89,7 +89,6 @@ public class PlaySlashCommand extends InteractiveCommand {
                                     RobertifyAudioManager.getInstance()
                                             .loadAndPlay(
                                                     finalLink,
-                                                    botUtils.getAnnouncementChannelObject(event.getGuild().getIdLong()),
                                                     event.getGuild().getSelfMember().getVoiceState(),
                                                     event.getMember().getVoiceState(),
                                                     msg,

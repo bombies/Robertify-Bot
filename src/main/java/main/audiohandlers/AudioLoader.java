@@ -13,11 +13,15 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class AudioLoader implements AudioLoadResultHandler {
+    private final Logger logger = LoggerFactory.getLogger(AudioLoader.class);
+
     private final Guild guild;
     private final User sender;
     private final GuildMusicManager musicManager;
@@ -145,7 +149,9 @@ public class AudioLoader implements AudioLoadResultHandler {
     public void loadFailed(FriendlyException e) {
         if (musicManager.audioPlayer.getPlayingTrack() == null)
             guild.getAudioManager().closeAudioConnection();
-        e.printStackTrace();
+
+        logger.error("[FATAL ERROR] Could not load track!", e);
+
 
         EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
         if (botMsg != null)
