@@ -11,7 +11,8 @@ public enum ENV {
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
     IMGUR_CLIENT("imgur_client"),
-    IMGUR_SECRET("imgur_secret");
+    IMGUR_SECRET("imgur_secret"),
+    AUDIO_DIR("local_audio_dir");
 
     private final String str;
 

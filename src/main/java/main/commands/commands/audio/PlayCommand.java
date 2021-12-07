@@ -1,8 +1,11 @@
 package main.commands.commands.audio;
 
+import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.BotDB;
 import main.utils.database.ServerDB;
@@ -12,11 +15,22 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Random;
 
 public class PlayCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(PlayCommand.class);
+
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final TextChannel channel = ctx.getChannel();
@@ -53,6 +67,78 @@ public class PlayCommand implements ICommand {
             return;
         }
 
+        if (args.get(0).equalsIgnoreCase("file")) {
+            final List<Message.Attachment> attachments = msg.getAttachments();
+
+            if (attachments.isEmpty()) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("You must attach an audio file to play!").build())
+                        .queue();
+                return;
+            }
+
+            var audioFile = attachments.get(0);
+
+            switch (audioFile.getFileExtension().toLowerCase()) {
+                case "mp3", "ogg", "m4a", "wav", "flac" -> {
+                    if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {
+                        try {
+                            Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
+                        } catch (Exception e) {
+                            msg.replyEmbeds(EmbedUtils.embedMessage("Something went wrong when attempting to create a " +
+                                    "local audio directory. Contact the developers immediately!").build())
+                                    .queue();
+
+                            logger.error("[FATAL ERROR] Could not create audio directory!", e);
+                            return;
+                        }
+                    }
+
+                    try {
+                        if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
+                            audioFile.downloadToFile(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName())
+                                    .thenAccept(file -> {
+                                        try {
+                                            file.createNewFile();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
+                                            RobertifyAudioManager.getInstance()
+                                                    .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg);
+                                        });
+                                    })
+                                    .exceptionally(e -> {
+                                        logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                                        msg.replyEmbeds(EmbedUtils.embedMessage("Something went wrong when attempting to " +
+                                                        "download the file. Contact the developers immediately!").build())
+                                                .queue();
+                                        return null;
+                                    });
+                        } else {
+                            File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
+                            channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
+                                RobertifyAudioManager.getInstance()
+                                        .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg);
+                            });
+                        }
+                    } catch (IllegalArgumentException e) {
+                        logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                        msg.replyEmbeds(EmbedUtils.embedMessage("Something went wrong when attempting to " +
+                                        "download the file. Contact the developers immediately!").build())
+                                .queue();
+                        return;
+                    }
+                }
+                default -> {
+                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid file.").build())
+                            .queue();
+                }
+            }
+
+            return;
+        }
+
         String link = String.join(" ", args);
 
         if (!GeneralUtils.isUrl(link)) {
@@ -75,7 +161,9 @@ public class PlayCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Plays a song\n\n" +
-                "Usage `" + ServerDB.getPrefix(Long.parseLong(guildID)) + "play <song>`";
+                "**__Usages__**\n" +
+                "`" + ServerDB.getPrefix(Long.parseLong(guildID)) + "play <song>`\n" +
+                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"play file` *(Must have a file attached to the message)*";
     }
 
     @Override

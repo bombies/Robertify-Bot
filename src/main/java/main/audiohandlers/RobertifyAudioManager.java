@@ -74,7 +74,14 @@ public class RobertifyAudioManager extends AbstractModule {
         } catch (Exception e) {
             return;
         }
-        loadTrack(trackUrl, musicManager, ctx, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), botMsg);
+
+        loadTrack(
+                trackUrl,
+                musicManager,
+                ctx,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg
+        );
     }
 
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
@@ -88,7 +95,31 @@ public class RobertifyAudioManager extends AbstractModule {
         } catch (Exception e) {
             return;
         }
-        loadTrack(trackUrl, musicManager, new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES), botMsg, event.getUser());
+
+        loadTrack(
+                trackUrl,
+                musicManager,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg,
+                event.getUser()
+        );
+    }
+
+    public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
+
+        try {
+            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+        loadTrack(
+                path,
+                musicManager,
+                ctx,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg
+        );
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,

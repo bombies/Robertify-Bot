@@ -4,14 +4,20 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.database.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import org.apache.commons.io.FileUtils;
 
 import javax.script.ScriptException;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class ShutdownCommand implements IDevCommand {
     @SneakyThrows
@@ -42,8 +48,9 @@ public class ShutdownCommand implements IDevCommand {
                 new DedicatedChannelConfig().updateMessage(g);
         }
 
+        FileUtils.cleanDirectory(new File(Config.get(ENV.AUDIO_DIR) + "/"));
+
         BotCommons.shutdown(ctx.getJDA());
-        System.exit(1000);
     }
 
     @Override
