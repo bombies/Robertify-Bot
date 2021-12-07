@@ -1,7 +1,7 @@
 package main.utils.pagination;
 
-import main.constants.BotConstants;
 import main.constants.MessageButton;
+import main.constants.RobertifyEmoji;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -22,10 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Pages {
     private static final HashMap<Long, List<Page>> messages = new HashMap<>();
     private static final Paginator paginator = new Paginator(
-            Emoji.fromMarkdown(BotConstants.PREVIOUS_EMOJI.toString()),
-            Emoji.fromMarkdown(BotConstants.REWIND_EMOJI.toString()),
-            Emoji.fromMarkdown(BotConstants.PLAY_EMOJI.toString()),
-            Emoji.fromMarkdown(BotConstants.END_EMOJI.toString())
+            Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString()),
+            Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString()),
+            Emoji.fromMarkdown(RobertifyEmoji.PLAY_EMOJI.toString()),
+            Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())
     );
 
     public static Message paginate(TextChannel channel, User user, List<Page> pages) {

@@ -6,6 +6,7 @@ import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand
 import main.constants.BotConstants;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
+import main.constants.RobertifyEmoji;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -199,7 +200,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
             }
             nextTenSongs.append("```");
 
-            msg.editMessage("**__Queue__**\n" + nextTenSongs.toString())
+            msg.editMessage("**__Queue__**\n" + nextTenSongs)
                     .setEmbeds(eb.build())
                     .queue();
         }
@@ -228,16 +229,16 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
     public synchronized MessageAction buttonUpdateRequest(Message msg) {
         return msg.editMessageComponents(
                 ActionRow.of(
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(BotConstants.PREVIOUS_EMOJI.toString())),
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(BotConstants.REWIND_EMOJI.toString())),
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(BotConstants.PLAY_AND_PAUSE_EMOJI.toString())),
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(BotConstants.STOP_EMOJI.toString())),
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(BotConstants.END_EMOJI.toString()))
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(RobertifyEmoji.PLAY_AND_PAUSE_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.STOP_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString()))
                 ),
                 ActionRow.of(
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(BotConstants.LOOP_EMOJI.toString())),
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(BotConstants.SHUFFLE_EMOJI.toString())),
-                        Button.of(ButtonStyle.DANGER, DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(BotConstants.QUIT_EMOJI.toString()))
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
+                        Button.of(ButtonStyle.DANGER, DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(RobertifyEmoji.QUIT_EMOJI.toString()))
                 ));
     }
 
@@ -259,14 +260,14 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
 
     public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
         return channel.getManager().setTopic(
-                        BotConstants.PREVIOUS_EMOJI + " Go to the previous song. " +
-                        BotConstants.REWIND_EMOJI + " Rewind the song. " +
-                        BotConstants.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
-                        BotConstants.STOP_EMOJI + " Stop the song and clear the queue. " +
-                        BotConstants.END_EMOJI + " Skip the song. " +
-                        BotConstants.LOOP_EMOJI + " Loop the song. " +
-                        BotConstants.SHUFFLE_EMOJI + " Shuffle the song. " +
-                        BotConstants.QUIT_EMOJI + " Disconnect the bot "
+                        RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song. " +
+                        RobertifyEmoji.REWIND_EMOJI + " Rewind the song. " +
+                        RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
+                        RobertifyEmoji.STOP_EMOJI + " Stop the song and clear the queue. " +
+                        RobertifyEmoji.END_EMOJI + " Skip the song. " +
+                        RobertifyEmoji.LOOP_EMOJI + " Loop the song. " +
+                        RobertifyEmoji.SHUFFLE_EMOJI + " Shuffle the song. " +
+                        RobertifyEmoji.QUIT_EMOJI + " Disconnect the bot "
         );
     }
 }

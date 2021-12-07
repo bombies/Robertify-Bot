@@ -7,12 +7,11 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
-import main.constants.BotConstants;
+import main.constants.RobertifyEmoji;
 import main.utils.GeneralUtils;
 import main.utils.database.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -46,7 +45,7 @@ public class TogglesCommand implements ICommand {
 
             for (Toggles toggle : Toggles.values()) {
                 toggleNames.append(Toggles.parseToggle(toggle)).append("\n");
-                toggleStatuses.append(config.getToggle(guild, toggle) ? BotConstants.CHECK_EMOJI.toString() : BotConstants.QUIT_EMOJI.toString())
+                toggleStatuses.append(config.getToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                         .append("\n");
             }
 
@@ -137,7 +136,7 @@ public class TogglesCommand implements ICommand {
 
         for (ICommand toggle : musicCmds) {
             toggleNames.append(toggle.getName()).append("\n");
-            toggleStatuses.append(config.getDJToggle(guild, toggle) ? BotConstants.CHECK_EMOJI.toString() : BotConstants.QUIT_EMOJI.toString())
+            toggleStatuses.append(config.getDJToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                     .append("\n");
         }
 
