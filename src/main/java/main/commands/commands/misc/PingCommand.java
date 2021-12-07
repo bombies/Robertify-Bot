@@ -16,7 +16,9 @@ public class PingCommand implements ICommand {
 
         Robertify.api.getRestPing().queue(
                 (ping) -> {
-                    EmbedBuilder eb = EmbedUtils.embedMessage("🏓 Pong! `"+ping+"ms`");
+                    EmbedBuilder eb = EmbedUtils.embedMessage("🏓 Pong!\n\n" +
+                            "REST Ping: **"+ping+"ms**\n" +
+                            "Websocket Ping: **"+Robertify.api.getGatewayPing()+"ms**");
                     msg.replyEmbeds(eb.build()).queue();
                 }
         );
