@@ -1,9 +1,10 @@
 package main.commands.commands.misc;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import core.GLA;
+import genius.SongSearch;
 import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
@@ -11,7 +12,6 @@ import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
-import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
-import java.net.URLEncoder;
+import java.io.IOException;
 import java.util.List;
 
 public class LyricsCommand implements ICommand {
@@ -32,72 +32,80 @@ public class LyricsCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = ctx.getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must be in a voice channel to use this command")
-                    .build())
-                    .queue();
-            return;
+
+
+        final List<String> args = ctx.getArgs();
+
+        String query;
+
+        if (args.isEmpty()) {
+            if (!memberVoiceState.inVoiceChannel()) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("You must be in a voice channel to use this command")
+                                .build())
+                        .queue();
+                return;
+            }
+
+            if (!selfVoiceState.inVoiceChannel()) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("I must be in a voice channel to use this command")
+                                .build())
+                        .queue();
+                return;
+            }
+
+            if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as I am to use this command")
+                                .build())
+                        .queue();
+                return;
+            }
+
+            final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+            final AudioPlayer audioPlayer = musicManager.audioPlayer;
+            final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
+
+            if (playingTrack == null) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("There is nothing playing!").build())
+                        .queue();
+                return;
+            }
+
+            if (!(playingTrack instanceof SpotifyAudioTrack)) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("This command is only supported by Spotify tracks!").build())
+                        .queue();
+                return;
+            }
+
+            AudioTrackInfo trackInfo = playingTrack.getInfo();
+            query = trackInfo.title + " by " + trackInfo.author;
+        } else {
+            query = String.join(" ", args);
         }
 
-        if (!selfVoiceState.inVoiceChannel()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("I must be in a voice channel to use this command")
-                            .build())
-                    .queue();
-            return;
-        }
+        String finalQuery = query;
+        msg.replyEmbeds(EmbedUtils.embedMessage("Now looking for: `"+query+"`").build())
+                .queue(lookingMsg -> {
+                    GLA gla = new GLA();
+                    SongSearch songSearch = null;
+                    try {
+                        songSearch = gla.search(finalQuery);
+                    } catch (IOException e) {
+                        logger.error("[FATAL ERROR] Unexpected error!", e);
+                    }
 
-        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as I am to use this command")
-                            .build())
-                    .queue();
-            return;
-        }
-
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final AudioPlayer audioPlayer = musicManager.audioPlayer;
-        final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
-
-        if (playingTrack == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("There is nothing playing!").build())
-                    .queue();
-            return;
-        }
-
-        if (!(playingTrack instanceof SpotifyAudioTrack)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("This command is only supported by Spotify tracks!").build())
-                    .queue();
-            return;
-        }
-
-        AudioTrackInfo trackInfo = playingTrack.getInfo();
-        final String query = trackInfo.title + " by " + trackInfo.author;
-        String encode = URLEncoder.encode(query.replaceAll("\\(\\)", ""), "UTF-8");
-        final String url = "https://api.happi.dev/v1/music?q="+encode+"&limit=&apikey=58eb91teNRjudggr0fU0GjSu8OuVJEMiSpnAIhOPkkBr7SKZRsRtOfyU&type=track&lyrics=1";
-
-        WebUtils.ins.getJSONObject(url)
-                .async(json -> {
-                    final int length = json.get("length").asInt();
-                    if (length == 0) {
-                        msg.replyEmbeds(EmbedUtils.embedMessage("There was nothing found for: " +
-                                "`"+trackInfo.title+" by "+trackInfo.author+"`").build())
+                    if (songSearch.getStatus() == 404 || songSearch.getHits().size() == 0) {
+                        lookingMsg.editMessageEmbeds(EmbedUtils.embedMessage("Nothing was found for `"+ finalQuery +"`").build())
                                 .queue();
                         return;
                     }
 
-                    final JsonNode result = json.get("result").get(0);
-                    final String artistID = result.get("id_artist").asText();
-                    final String albumID = result.get("id_album").asText();
-                    final String trackID = result.get("id_track").asText();
+                    SongSearch.Hit hit = songSearch.getHits().get(0);
 
-                    WebUtils.ins.getJSONObject("https://api.happi.dev/v1/music/artists/"+artistID+"/albums/"+albumID+"/tracks/"+trackID+"/lyrics?apikey=58eb91teNRjudggr0fU0GjSu8OuVJEMiSpnAIhOPkkBr7SKZRsRtOfyU")
-                            .async(lyricJson -> {
-                                final JsonNode resultObj = lyricJson.get("result");
-                                final String lyrics = resultObj.get("lyrics").asText();
-                                ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage(lyrics)
-                                                .setTitle(trackInfo.title + " by " + trackInfo.author)
-                                                .build())
-                                        .queue();
-                            });
+                    lookingMsg.editMessageEmbeds(EmbedUtils.embedMessageWithTitle(hit.getTitle() + " by " + hit.getArtist().getName(),
+                                    hit.fetchLyrics())
+                                    .setThumbnail(hit.getImageUrl())
+                                    .build())
+                            .queue();
                 });
     }
 
@@ -108,7 +116,10 @@ public class LyricsCommand implements ICommand {
 
     @Override
     public String getHelp(String guildID) {
-        return "Get the lyrics for the song being played";
+        return "Get the lyrics for the song being played\n\n" +
+                "**__Usages__**\n" +
+                "`lyrics` *(Fetches the lyrics for the song being currently played)*\n" +
+                "`lyrics <songname> *(Fetches the lyrics for a specific song)*`";
     }
 
     @Override

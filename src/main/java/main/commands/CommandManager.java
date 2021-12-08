@@ -3,7 +3,7 @@ package main.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.ITestCommand;
-import main.commands.commands.dev.test.KotlinTestCommand;
+import main.commands.commands.dev.test.*;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.dev.ChangeLogCommand;
@@ -12,9 +12,6 @@ import main.commands.commands.dev.EvalCommand;
 import main.commands.commands.dev.UpdateCommand;
 import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
 import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
-import main.commands.commands.dev.test.LoadSpotifyPlaylistCommand;
-import main.commands.commands.dev.test.PlaySpotifyURICommand;
-import main.commands.commands.dev.test.SpotifyURLToURICommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.Permission;
@@ -106,7 +103,8 @@ public class CommandManager {
                 new SpotifyURLToURICommand(),
                 new PlaySpotifyURICommand(),
                 new KotlinTestCommand(),
-                new LoadSpotifyPlaylistCommand()
+                new LoadSpotifyPlaylistCommand(),
+                new LyricsTestCommand()
         );
 
         addMusicCommands(
