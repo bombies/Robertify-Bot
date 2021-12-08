@@ -6,6 +6,7 @@ import main.constants.ENV;
 import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;

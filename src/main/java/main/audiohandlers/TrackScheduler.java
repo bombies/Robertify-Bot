@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 public class TrackScheduler extends AudioEventAdapter {
 
@@ -80,7 +81,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 announcementChannel.sendMessageEmbeds(eb.build())
                         .queue(msg -> {
                             if (lastSentMsg != null)
-                                lastSentMsg.delete().queue();
+                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS);
                             lastSentMsg = msg;
                         });
             } catch (InsufficientPermissionException ignored) {
