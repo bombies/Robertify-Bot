@@ -100,7 +100,7 @@ public class PlayCommand implements ICommand {
                                         try {
                                             file.createNewFile();
                                         } catch (IOException e) {
-                                            e.printStackTrace();
+                                            logger.error("[FATAL ERROR] Error when trying to create a new audio file!", e);
                                         }
 
                                         channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {

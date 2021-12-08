@@ -6,6 +6,8 @@ import main.utils.GeneralUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -14,6 +16,7 @@ import java.awt.*;
 import java.util.List;
 
 public class EvalCommand implements IDevCommand {
+    private final Logger logger = LoggerFactory.getLogger(EvalCommand.class);
     private final ScriptEngine engine;
 
     public EvalCommand() {
@@ -30,7 +33,7 @@ public class EvalCommand implements IDevCommand {
                     "Packages.net.dv8tion.jda.api.managers.impl," +
                     "Packages.net.dv8tion.jda.api.utils);");
         } catch (ScriptException e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] Script error occurred!", e);
         }
     }
 

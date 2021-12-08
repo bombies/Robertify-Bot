@@ -305,7 +305,7 @@ public class GeneralUtils {
         try {
             ret = new String(Files.readAllBytes(Paths.get(path)));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] There was an error reading from the file!", e);
         }
 
         if (ret == null) throw new NullPointerException();
@@ -318,7 +318,7 @@ public class GeneralUtils {
         try {
             ret = new String(Files.readAllBytes(path));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] There was an error reading from the file!", e);
         }
 
         if (ret == null) throw new NullPointerException();

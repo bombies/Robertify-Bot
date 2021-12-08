@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -25,6 +27,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class TrackScheduler extends AudioEventAdapter {
+
+    private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
 
     public final AudioPlayer player;
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
@@ -164,10 +168,10 @@ public class TrackScheduler extends AudioEventAdapter {
                 announceNowPlaying = true;
                 errorOccurred = false;
             } catch (Exception exc) {
-                exc.printStackTrace();
+                logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
     }
 

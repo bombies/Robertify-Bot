@@ -16,11 +16,15 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
 public class SetDJCommand extends InteractiveCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(SetDJCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
@@ -74,7 +78,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
             eb = EmbedUtils.embedMessage("This role has already been set as a DJ!");
             return eb;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             eb = EmbedUtils.embedMessage("An unexpected error occurred!");
             return eb;
         }
@@ -91,7 +95,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
             eb = EmbedUtils.embedMessage("This user has already been set as a DJ!");
             return eb;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             eb = EmbedUtils.embedMessage("An unexpected error occurred!");
             return eb;
         }

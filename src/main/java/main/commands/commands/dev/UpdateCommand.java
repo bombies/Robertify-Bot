@@ -7,11 +7,15 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
 public class UpdateCommand implements IDevCommand {
+    private final Logger logger = LoggerFactory.getLogger(UpdateCommand.class);
+    
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
@@ -62,7 +66,7 @@ public class UpdateCommand implements IDevCommand {
             }
             msg.addReaction("✅").queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }

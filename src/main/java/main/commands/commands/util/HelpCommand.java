@@ -24,11 +24,14 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
 public class HelpCommand extends InteractiveCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
     private final String menuName = "menu:help";
 
     @Override
@@ -99,7 +102,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                                         ActionRow.of(getInteractionCommand().getSelectionMenu(menuName))
                                     ).queue();
                         } catch (InteractionBuilderException e) {
-                            e.printStackTrace();
+                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
                         }
                     }
             );

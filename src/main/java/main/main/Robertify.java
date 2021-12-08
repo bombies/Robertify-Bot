@@ -17,7 +17,6 @@ import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
-import main.utils.json.EightBallConfig;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import me.duncte123.botcommons.web.WebUtils;
@@ -26,6 +25,8 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
@@ -34,6 +35,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Robertify {
+
+    private static Logger logger = LoggerFactory.getLogger(Robertify.class);
 
     public static JDA api;
     public static BaringoClient baringo;
@@ -123,11 +126,10 @@ public class Robertify {
                         .clientAuth(Config.get(ENV.IMGUR_CLIENT), Config.get(ENV.IMGUR_SECRET))
                         .build();
             } catch (BaringoApiException e) {
-                e.printStackTrace();
+                logger.error("[ERROR] There was an issue building the Baringo client!", e);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
     }
 

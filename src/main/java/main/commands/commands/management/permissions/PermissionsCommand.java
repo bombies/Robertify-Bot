@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.awt.*;
@@ -22,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionsCommand implements ICommand {
+    
+    private final Logger logger = LoggerFactory.getLogger(PermissionsCommand.class);
+    
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
@@ -66,7 +71,7 @@ public class PermissionsCommand implements ICommand {
             new PermissionsConfig().initConfig();
             msg.addReaction("✅").queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }
@@ -90,7 +95,7 @@ public class PermissionsCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage(role.getAsMention() + " already has permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }
@@ -109,7 +114,7 @@ public class PermissionsCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage(user.getAsMention() + " already has permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }
@@ -128,7 +133,7 @@ public class PermissionsCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage(user.getAsMention() + " doesn't have permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }
@@ -187,13 +192,13 @@ public class PermissionsCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] There was an error reading from/writing to the JSON file!", e);
             msg.addReaction("❌").queue();
         } catch (IllegalAccessException e) {
             EmbedBuilder eb = EmbedUtils.embedMessage(role.getAsMention() + " does not have permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             msg.addReaction("❌").queue();
         }
     }

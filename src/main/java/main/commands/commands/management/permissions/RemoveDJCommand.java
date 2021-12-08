@@ -16,11 +16,15 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
 public class RemoveDJCommand extends InteractiveCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(RemoveDJCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
@@ -71,7 +75,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         } catch (IllegalAccessException e) {
             return EmbedUtils.embedMessage("This role never was a DJ in the first place");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             return EmbedUtils.embedMessage("An unexpected error occurred!");
         }
     }
@@ -84,7 +88,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         } catch (IllegalArgumentException e) {
             return EmbedUtils.embedMessage("This user never was a DJ in the first place");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
             return EmbedUtils.embedMessage("An unexpected error occurred!");
         }
     }
