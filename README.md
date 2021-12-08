@@ -10,7 +10,8 @@ A Discord music bot with an easily understood interface and is easy to use!
 - Server-specific permissions.
 - Clean and beautiful embedded menus.
 - Supports streaming services such as YouTube, Spotify and more.
-- Playlist support. (Both YouTube and Spotify)
+- Playlist support. (YouTube, Spotify, etc...)
+- Album and artist support for Spotify
 - Toggles for specific features such as the announcing of tracks.
 - Fun commands such as 8ball and polls!
 
