@@ -119,7 +119,7 @@ public class LyricsCommand implements ICommand {
         return "Get the lyrics for the song being played\n\n" +
                 "**__Usages__**\n" +
                 "`lyrics` *(Fetches the lyrics for the song being currently played)*\n" +
-                "`lyrics <songname> *(Fetches the lyrics for a specific song)*`";
+                "`lyrics <songname>` *(Fetches the lyrics for a specific song)*";
     }
 
     @Override
