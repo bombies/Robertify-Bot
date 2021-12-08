@@ -1,11 +1,11 @@
 package main.commands.commands.dev.test;
 
-import core.GLA;
-import genius.SongSearch;
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.commands.ITestCommand;
 import main.utils.GeneralUtils;
+import main.utils.genius.GeniusAPI;
+import main.utils.genius.GeniusSongSearch;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
@@ -32,8 +32,8 @@ public class LyricsTestCommand implements ITestCommand {
 
         String query = String.join(" ", args);
 
-        GLA gla = new GLA();
-        SongSearch songSearch = gla.search(query);
+        GeniusAPI gla = new GeniusAPI();
+        GeniusSongSearch songSearch = gla.search(query);
 
         logger.info("Response code: {}", songSearch.getStatus());
 
@@ -42,7 +42,7 @@ public class LyricsTestCommand implements ITestCommand {
             return;
         }
 
-        SongSearch.Hit hit = songSearch.getHits().get(0);
+        GeniusSongSearch.Hit hit = songSearch.getHits().get(0);
 
         try {
             channel.sendMessageEmbeds(EmbedUtils.embedMessageWithTitle(hit.getTitle(), hit.fetchLyrics()).build()).queue();

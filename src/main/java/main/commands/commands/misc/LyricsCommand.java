@@ -3,14 +3,14 @@ package main.commands.commands.misc;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import core.GLA;
-import genius.SongSearch;
 import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.genius.GeniusAPI;
+import main.utils.genius.GeniusSongSearch;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LyricsCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(LyricsCommand.class);
@@ -82,15 +83,23 @@ public class LyricsCommand implements ICommand {
             query = String.join(" ", args);
         }
 
-        String finalQuery = query;
+        AtomicReference<String> finalQuery = new AtomicReference<>(query);
         msg.replyEmbeds(EmbedUtils.embedMessage("Now looking for: `"+query+"`").build())
                 .queue(lookingMsg -> {
-                    GLA gla = new GLA();
-                    SongSearch songSearch = null;
+
+                    GeniusAPI geniusAPI = new GeniusAPI();
+                    GeniusSongSearch songSearch;
                     try {
-                        songSearch = gla.search(finalQuery);
+                        songSearch = geniusAPI.search(finalQuery.get());
                     } catch (IOException e) {
                         logger.error("[FATAL ERROR] Unexpected error!", e);
+                        return;
+                    }
+
+                    if (songSearch.getStatus() == 403) {
+                        lookingMsg.editMessageEmbeds(EmbedUtils.embedMessage("I do not have permission to execute this request!").build())
+                                .queue();
+                        return;
                     }
 
                     if (songSearch.getStatus() == 404 || songSearch.getHits().size() == 0) {
@@ -99,7 +108,7 @@ public class LyricsCommand implements ICommand {
                         return;
                     }
 
-                    SongSearch.Hit hit = songSearch.getHits().get(0);
+                    GeniusSongSearch.Hit hit = songSearch.getHits().get(0);
 
                     lookingMsg.editMessageEmbeds(EmbedUtils.embedMessageWithTitle(hit.getTitle() + " by " + hit.getArtist().getName(),
                                     hit.fetchLyrics())

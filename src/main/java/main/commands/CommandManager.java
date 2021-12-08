@@ -88,7 +88,7 @@ public class CommandManager {
                 new EightBallCommand(),
                 new PreviousTrackCommand(),
                 new PollCommand(),
-                new LyricsCommand(),
+//                new LyricsCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
