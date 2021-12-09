@@ -1,14 +1,13 @@
 package main.commands.commands.audio;
 
-import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
-import main.utils.database.BotDB;
-import main.utils.database.ServerDB;
+import main.utils.database.sqlite3.BotDB;
+import main.utils.database.sqlite3.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -25,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Random;
 
 public class PlayCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(PlayCommand.class);

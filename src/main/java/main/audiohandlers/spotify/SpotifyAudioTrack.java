@@ -10,7 +10,7 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 import main.audiohandlers.RobertifyAudioReference;
-import main.utils.database.AudioDB;
+import main.utils.database.sqlite3.AudioDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

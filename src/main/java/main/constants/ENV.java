@@ -13,7 +13,9 @@ public enum ENV {
     IMGUR_CLIENT("imgur_client"),
     IMGUR_SECRET("imgur_secret"),
     AUDIO_DIR("local_audio_dir"),
-    GENIUS_API_KEY("genius_api_key");
+    GENIUS_API_KEY("genius_api_key"),
+    MONGO_USERNAME("mongo_username"),
+    MONGO_PASSWORD("mongo_password");
 
     private final String str;
 

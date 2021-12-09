@@ -1,4 +1,4 @@
-package main.utils.database;
+package main.utils.database.sqlite3;
 
 import lombok.SneakyThrows;
 import main.constants.Database;
@@ -11,7 +11,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ServerDB extends AbstractDatabase {
+public class ServerDB extends AbstractSQLiteDatabase {
     private static Map<@NotNull Long, @NotNull String> prefixes = new HashMap<>();
 
     public ServerDB() {

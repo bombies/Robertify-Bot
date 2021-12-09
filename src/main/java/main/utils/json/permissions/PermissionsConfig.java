@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import main.commands.commands.management.permissions.Permission;
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;

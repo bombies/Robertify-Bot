@@ -20,7 +20,6 @@ import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
-import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
@@ -28,7 +27,7 @@ import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.utils.GeneralUtils;
-import main.utils.database.ServerDB;
+import main.utils.database.sqlite3.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -104,7 +103,8 @@ public class CommandManager {
                 new PlaySpotifyURICommand(),
                 new KotlinTestCommand(),
                 new LoadSpotifyPlaylistCommand(),
-                new LyricsTestCommand()
+                new LyricsTestCommand(),
+                new MongoTestCommand()
         );
 
         addMusicCommands(

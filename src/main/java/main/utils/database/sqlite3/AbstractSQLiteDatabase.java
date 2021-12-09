@@ -1,4 +1,4 @@
-package main.utils.database;
+package main.utils.database.sqlite3;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,14 +14,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.*;
 
-public abstract class AbstractDatabase {
+public abstract class AbstractSQLiteDatabase {
     @Getter
     private Connection con = null;
     @Setter @Getter
     private static Database database = null;
 
     @SneakyThrows
-    public AbstractDatabase(Database db) {
+    public AbstractSQLiteDatabase(Database db) {
         String url = "jdbc:sqlite:" + Config.get(ENV.DATABASE_DIR) + "/" + db.toString() + ".db";
 
         boolean dbExists = databaseExists(db);

@@ -1,4 +1,4 @@
-package main.utils.database;
+package main.utils.database.sqlite3;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -7,7 +7,7 @@ import main.constants.DatabaseTable;
 
 import java.util.HashMap;
 
-public class AudioDB extends AbstractDatabase {
+public class AudioDB extends AbstractSQLiteDatabase {
     @Getter
     private static final HashMap<String, String> cachedTracks = new HashMap<>();
 

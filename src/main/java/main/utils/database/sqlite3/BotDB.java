@@ -1,4 +1,4 @@
-package main.utils.database;
+package main.utils.database.sqlite3;
 
 import lombok.SneakyThrows;
 import main.constants.Database;
@@ -13,7 +13,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotDB extends AbstractDatabase {
+public class BotDB extends AbstractSQLiteDatabase {
 
     public BotDB() {
         super(Database.MAIN);

@@ -6,7 +6,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;

@@ -1,7 +1,7 @@
 package main.utils.json;
 
 import main.constants.JSONConfigFile;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONException;

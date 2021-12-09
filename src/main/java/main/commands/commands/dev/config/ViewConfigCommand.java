@@ -6,7 +6,7 @@ import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;
 import main.utils.GeneralUtils;
-import main.utils.database.ServerDB;
+import main.utils.database.sqlite3.ServerDB;
 import net.dv8tion.jda.api.entities.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,7 +6,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.ENV;
 import main.main.Config;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -16,8 +16,6 @@ import org.apache.commons.io.FileUtils;
 
 import javax.script.ScriptException;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class ShutdownCommand implements IDevCommand {
     @SneakyThrows

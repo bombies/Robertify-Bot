@@ -1,4 +1,4 @@
-package main.utils.database;
+package main.utils.database.sqlite3;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class BanDB extends AbstractDatabase {
+public class BanDB extends AbstractSQLiteDatabase {
     @Getter
     private static final HashMap<Long, HashMap<Long, Long>> bannedUsers = new HashMap<>();
 

@@ -9,7 +9,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.RobertifyEmoji;
 import main.utils.GeneralUtils;
-import main.utils.database.ServerDB;
+import main.utils.database.sqlite3.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

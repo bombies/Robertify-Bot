@@ -4,10 +4,9 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.JSONConfigFile;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

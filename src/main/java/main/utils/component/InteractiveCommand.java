@@ -7,7 +7,7 @@ import main.commands.CommandManager;
 import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.BotDB;
+import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
