@@ -29,8 +29,8 @@ public class MongoTestDB extends AbstractMongoDatabase {
         updateDocument("guild_id", guildID, key, value);
     }
 
-    public <T> String getItemString(String key, T value) {
-        return getDocument(key, value);
+    public <T> String getItemString(String key, T value, boolean indented) {
+        return getDocument(key, value, indented);
     }
 
     public <T> String getItemsString(String key, T value) {

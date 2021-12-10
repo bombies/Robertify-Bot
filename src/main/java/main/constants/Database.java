@@ -22,6 +22,7 @@ public enum Database {
         MAIN("Learning0"),
 
         ROBERTIFY_DATABASE("Robertify"),
+        ROBERTIFY_PERMISSIONS("permissions"),
         ROBERTIFY_TEST("test");
 
         private final String str;

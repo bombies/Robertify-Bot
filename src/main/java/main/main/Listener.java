@@ -13,6 +13,7 @@ import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
+import main.utils.database.mongodb.PermissionsDB;
 import main.utils.database.sqlite3.AudioDB;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
@@ -62,6 +63,7 @@ public class Listener extends ListenerAdapter {
         permConfig.initConfig();
         togglesConfig.initConfig();
 
+//        new PermissionsDB().init();
         new ChangeLogConfig().initConfig();
         new DedicatedChannelConfig().initConfig();
         new EightBallConfig().initConfig();

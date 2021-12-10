@@ -40,7 +40,7 @@ public class MongoTestCommand implements ITestCommand {
                 try {
                     msg.reply(
                             "```json\n"+
-                            db.getItemsString("guild_id", ctx.getGuild().getId())
+                            db.getItemString("guild_id", ctx.getGuild().getId(), true)
                     + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {

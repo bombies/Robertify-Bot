@@ -1,5 +1,7 @@
 package main.utils.database.mongodb;
 
+import lombok.SneakyThrows;
+import main.utils.component.InvalidBuilderException;
 import org.bson.Document;
 import org.json.JSONObject;
 
@@ -19,7 +21,11 @@ public class DocumentBuilder {
         return this;
     }
 
+    @SneakyThrows
     public Document build() {
+        if (obj.isEmpty())
+            throw new InvalidBuilderException("You cannot create a document with no fields!");
+
         return Document.parse(obj.toString());
     }
 }
