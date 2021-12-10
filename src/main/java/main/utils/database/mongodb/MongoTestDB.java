@@ -15,7 +15,7 @@ public class MongoTestDB extends AbstractMongoDatabase {
         Document doc = DocumentBuilder.create()
                 .addField("guild_id", guild_id)
                 .addField("time", dummy_time)
-                .addField("obj", dummyObj)
+                .addField("object", dummyObj)
                 .build();
 
         addDocument(doc);
@@ -23,6 +23,10 @@ public class MongoTestDB extends AbstractMongoDatabase {
 
     public void removeItem(String guild_id) {
         removeDocument("guild_id", guild_id);
+    }
+
+    public <T> void updateItem(String guildID, String key, T value) {
+        updateDocument("guild_id", guildID, key, value);
     }
 
     public <T> String getItemString(String key, T value) {

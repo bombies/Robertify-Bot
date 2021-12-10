@@ -28,7 +28,7 @@ public class MongoTestCommand implements ITestCommand {
         switch (args.get(0).toLowerCase()) {
             case "add" -> {
                 try {
-                    db.addItem("304828928223084546", System.currentTimeMillis(), new JSONObject().put("test", "Test123"));
+                    db.addItem(ctx.getGuild().getId(), System.currentTimeMillis(), new JSONObject().put("test", "Test123"));
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -40,7 +40,7 @@ public class MongoTestCommand implements ITestCommand {
                 try {
                     msg.reply(
                             "```json\n"+
-                            db.getItemsString("guild_id", "304828928223084546")
+                            db.getItemsString("guild_id", ctx.getGuild().getId())
                     + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
@@ -51,13 +51,25 @@ public class MongoTestCommand implements ITestCommand {
 
             case "remove" -> {
                 try {
-                    db.removeItem("304828928223084546");
+                    db.removeItem(ctx.getGuild().getId());
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();
                     msg.addReaction("❌").queue();
                 }
             }
+
+            case "update" -> {
+                try {
+                    db.updateItem(ctx.getGuild().getId(), "time", "ballslol");
+                    msg.addReaction("✅").queue();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    msg.addReaction("❌").queue();
+                }
+            }
+
+            default -> msg.addReaction("❓").queue();
         }
     }
 

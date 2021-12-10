@@ -4,6 +4,8 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Filters;
 import com.mongodb.ConnectionString;
+import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.Updates;
 import lombok.Getter;
 import main.constants.Database;
 import org.bson.Document;
@@ -11,7 +13,10 @@ import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public abstract class AbstractMongoDatabase {
     @Getter
@@ -78,6 +83,46 @@ public abstract class AbstractMongoDatabase {
 
         var doc = findDocument(key, value).next();
         removeDocument(doc);
+    }
+
+    void updateDocument(Document document, Bson updates) {
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        getCollection().updateOne(document, updates, options);
+    }
+
+    void updateDocument(Document document, List<Bson> updates) {
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        getCollection().updateOne(document, updates, options);
+    }
+
+    <T> void updateDocument(Document document, String key, T newValue) {
+        Bson updates = Updates.combine(
+                Updates.set(key, newValue),
+                Updates.currentTimestamp("lastUpdated")
+        );
+
+        updateDocument(document, updates);
+    }
+
+    void updateDocument(Document document, JSONObject json) {
+        final List<Bson> updates = new ArrayList<>();
+
+        for (String key : json.keySet())
+            updates.add(Updates.combine(
+                    Updates.set(key, json.get(key)),
+                    Updates.currentTimestamp("lastUpdated")
+            ));
+
+        updateDocument(document, updates);
+    }
+
+    <T> void updateDocument(String idName, String idValue, String key, T newValue) {
+        Document document = findSpecificDocument(idName, idValue);
+
+        if (document == null)
+            throw new NullPointerException("There is no such document with mapping <"+idName+":"+idValue+">");
+
+        updateDocument(document, key, newValue);
     }
 
     boolean documentExists(String key, String value) {
@@ -178,6 +223,10 @@ public abstract class AbstractMongoDatabase {
                 .indent(indented)
                 .build()
         );
+    }
+
+    String documentToJSON(Document doc) {
+        return documentToJSON(doc, false);
     }
 
     <TItem> Bson eq(String key, TItem value) {
