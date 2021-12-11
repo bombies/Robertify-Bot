@@ -56,6 +56,11 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        BotDB botDB = new BotDB();
+        if (botDB.getGuilds().isEmpty())
+            for (Guild g : Robertify.api.getGuilds())
+                botDB.addGuild(g.getIdLong());
+
         AbstractJSONConfig.initDirectory();
         PermissionsConfig permConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
@@ -67,10 +72,11 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
         new DedicatedChannelConfig().initConfig();
         new EightBallConfig().initConfig();
+        new ServerDB();
 
         BanDB.initBannedUserMap();
 
-        for (Guild g : new BotDB().getGuilds()) {
+        for (Guild g : botDB.getGuilds()) {
             permConfig.initGuild(g.getId());
 
             initSlashCommands(g);

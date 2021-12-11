@@ -3,6 +3,8 @@ package main.utils.database.sqlite3;
 import lombok.SneakyThrows;
 import main.constants.Database;
 import main.constants.DatabaseTable;
+import main.constants.ENV;
+import main.main.Config;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,8 +72,14 @@ public class ServerDB extends AbstractSQLiteDatabase {
 
     @SneakyThrows
     public static void initPrefixMap() {
-        for (Guild g : new BotDB().getGuilds())
-            prefixes.put(g.getIdLong(), new ServerDB().getServerPrefix(g.getIdLong()));
+        for (Guild g : new BotDB().getGuilds()) {
+            String serverPrefix = new ServerDB().getServerPrefix(g.getIdLong());
+
+            if (serverPrefix != null)
+                prefixes.put(g.getIdLong(), serverPrefix);
+            else
+                prefixes.put(g.getIdLong(), Config.get(ENV.PREFIX));
+        }
     }
 
     public static String getPrefix(long gid) {
