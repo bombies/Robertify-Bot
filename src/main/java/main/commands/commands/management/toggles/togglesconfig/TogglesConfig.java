@@ -31,8 +31,21 @@ public class TogglesConfig extends AbstractJSONConfig {
         var obj = new JSONObject();
         for (Guild g : new BotDB().getGuilds()) {
             var guildObj = new JSONObject();
-            for (Toggles toggle : Toggles.values())
-                guildObj.put(toggle.toString(), true);
+            for (Toggles toggle : Toggles.values()) {
+                try {
+                    guildObj.put(toggle.toString(), true);
+                    var djTogglesObj = new JSONObject();
+
+                    for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+                        djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
+
+                    guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
+                } catch (JSONException e) {
+                    obj.put(g.getId(), new JSONObject());
+                    for (Toggles errToggles: Toggles.values())
+                        obj.getJSONObject(g.getId()).put(errToggles.toString(), true);
+                }
+            }
             obj.put(g.getId(), guildObj);
         }
 

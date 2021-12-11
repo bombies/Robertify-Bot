@@ -87,7 +87,6 @@ public class Listener extends ListenerAdapter {
 
         ServerDB.initPrefixMap();
         new AudioDB().cacheAllTracks();
-
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
 
