@@ -5,13 +5,8 @@ import main.constants.Database;
 import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IMentionable;
-import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class PermissionsDB extends AbstractMongoDatabase {
 

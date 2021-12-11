@@ -21,7 +21,7 @@ public enum Database {
     public enum MONGO {
         MAIN("Learning0"),
 
-        ROBERTIFY_DATABASE("Robertify"),
+        ROBERTIFY_DATABASE(Config.get(ENV.MONGO_DATABASE_NAME)),
         ROBERTIFY_PERMISSIONS("permissions"),
         ROBERTIFY_TEST("test");
 
@@ -38,7 +38,7 @@ public enum Database {
 
         public static String getConnectionString(String db) {
 
-            return "mongodb+srv://" + Config.get(ENV.MONGO_USERNAME) + ":" + Config.get(ENV.MONGO_PASSWORD) + "@learning0.qb5ie.azure.mongodb.net/" + db.toString() + "?retryWrites=true&w=majority";
+            return "mongodb+srv://" + Config.get(ENV.MONGO_USERNAME) + ":" + Config.get(ENV.MONGO_PASSWORD) + "@"+Config.get(ENV.MONGO_CLUSTER_NAME)+".qb5ie.azure.mongodb.net/" + db + "?retryWrites=true&w=majority";
         }
     }
 }

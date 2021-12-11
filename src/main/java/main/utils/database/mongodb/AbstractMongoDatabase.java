@@ -8,26 +8,48 @@ import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
 import lombok.Getter;
 import main.constants.Database;
+import main.constants.ENV;
+import main.main.Config;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class AbstractMongoDatabase {
+    private final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
+
     @Getter
     private final MongoClient client;
     @Getter
     private final MongoDatabase database;
     @Getter
-    private final MongoCollection<Document> collection;
+    private MongoCollection<Document> collection;
+
+    public AbstractMongoDatabase(Database.MONGO db) {
+        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
+        final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
+                .applyConnectionString(CONNECTION_STRING)
+                .build();
+
+        client = MongoClients.create(CLIENT_SETTINGS);
+
+        try {
+            database = client.getDatabase(db.toString());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("There was no database with the name " + db);
+        }
+
+        this.collection = null;
+    }
 
     public AbstractMongoDatabase(Database.MONGO db, Database.MONGO collection) {
-        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString("myFirstDatabase"));
+        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
         final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
                 .applyConnectionString(CONNECTION_STRING)
                 .build();
@@ -43,8 +65,14 @@ public abstract class AbstractMongoDatabase {
         try {
             this.collection = database.getCollection(collection.toString());
         } catch (IllegalArgumentException e) {
-            throw new NullPointerException("There is no collection in " + db + " called " + collection);
+            database.createCollection(collection.toString());
+            logger.info("Created a new collection with name \"{}\" in {}", collection, db);
+            this.collection = database.getCollection(collection.toString());
         }
+    }
+
+    MongoCollection<Document> getCollection(String name) {
+        return database.getCollection(name);
     }
 
     void addDocument(Document doc) {
@@ -137,11 +165,11 @@ public abstract class AbstractMongoDatabase {
         return documentExists(key, Document.parse(value.toString()));
     }
 
-    Iterator<Document> findDocument(String key, String value) {
+    public Iterator<Document> findDocument(String key, String value) {
         return getCollection().find(eq(key, value)).iterator();
     }
 
-    Document findSpecificDocument(String key, String value) {
+    public Document findSpecificDocument(String key, String value) {
         return getCollection().find(eq(key, value)).iterator().next();
     }
 

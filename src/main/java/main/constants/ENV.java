@@ -15,7 +15,9 @@ public enum ENV {
     AUDIO_DIR("local_audio_dir"),
     GENIUS_API_KEY("genius_api_key"),
     MONGO_USERNAME("mongo_username"),
-    MONGO_PASSWORD("mongo_password");
+    MONGO_PASSWORD("mongo_password"),
+    MONGO_CLUSTER_NAME("mongo_cluster_name"),
+    MONGO_DATABASE_NAME("mongo_database_name");
 
     private final String str;
 
