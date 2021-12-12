@@ -34,7 +34,7 @@ public class RobertifyAudioManager extends AbstractModule {
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
-    public RobertifyAudioManager() {
+    private RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
