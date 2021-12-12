@@ -3,6 +3,7 @@ package main.commands.commands.dev.test;
 import main.commands.CommandContext;
 import main.commands.commands.ITestCommand;
 import main.utils.database.mongodb.MongoTestDB;
+import main.utils.database.mongodb.cache.MongoCache;
 import net.dv8tion.jda.api.entities.Message;
 import org.json.JSONObject;
 
@@ -62,6 +63,16 @@ public class MongoTestCommand implements ITestCommand {
             case "update" -> {
                 try {
                     db.updateItem(ctx.getGuild().getId(), "time", "ballslol");
+                    msg.addReaction("✅").queue();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    msg.addReaction("❌").queue();
+                }
+            }
+
+            case "cache" -> {
+                try {
+                    msg.reply("```json\n" + MongoCache.cacheTest(MongoCache.TEST_CACHE) + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();

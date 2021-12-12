@@ -14,6 +14,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.PermissionsDB;
+import main.utils.database.mongodb.cache.MongoCache;
 import main.utils.database.sqlite3.AudioDB;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
@@ -87,6 +88,8 @@ public class Listener extends ListenerAdapter {
 
         ServerDB.initPrefixMap();
         new AudioDB().cacheAllTracks();
+
+        MongoCache.initAllCaches();
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
 

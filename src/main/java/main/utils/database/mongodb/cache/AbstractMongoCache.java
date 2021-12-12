@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class AbstractMongoCache<T extends AbstractMongoDatabase> extends AbstractMongoDatabase {
-    private static final HashMap<Class, AbstractMongoCache> INSTANCES = new HashMap<>();
+    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache<AbstractMongoDatabase>> INSTANCES = new HashMap<>();
 
     @Getter
     private final T mongoDB;
@@ -32,6 +32,11 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         // NOTHING
     }
 
+    public void updateCache() {
+        this.collection = mongoDB.getCollection();
+        this.collectionJSONCache = collectionToJSON(this.collection);
+    }
+
     @SneakyThrows
     public void updateCache(MongoCollection<Document> collection) {
         this.collection = collection;
@@ -43,10 +48,24 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         final String id = (String) document.get("_id");
         final JSONArray collectionArr = this.collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
 
-        collectionArr.remove(getIndexOfObjectInArray(collectionArr, CacheField.DOCUMENTS, id));
+        collectionArr.remove(getIndexOfObjectInArray(collectionArr, CacheField.ID, id));
         collectionArr.put(new JSONObject(document.toJson()));
 
         upsertDocument(document);
+    }
+
+    public JSONObject getJSON() {
+        return collectionJSONCache;
+    }
+
+    public JSONObject getJSON(String id) {
+        var arr = collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
+        return arr.getJSONObject(getIndexOfObjectInArray(arr, CacheField.ID, id));
+    }
+
+    public JSONObject getJSONByGuild(String gid) {
+        var arr = collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
+        return arr.getJSONObject(getIndexOfObjectInArray(arr, CacheField.GUILD_ID, gid));
     }
 
     private int getIndexOfObjectInArray(JSONArray array, IJSONField field, Object object) {
@@ -66,11 +85,11 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return false;
     }
 
-    static <T extends AbstractMongoDatabase> AbstractMongoCache<T> ins(T db) {
+    static AbstractMongoCache<AbstractMongoDatabase> ins(AbstractMongoDatabase db) {
         if (INSTANCES.containsKey(db.getClass())) {
             return INSTANCES.get(db.getClass());
         } else {
-            AbstractMongoCache<T> abstractMongoCache = new AbstractMongoCache<>(db);
+            AbstractMongoCache<AbstractMongoDatabase> abstractMongoCache = new AbstractMongoCache<>(db);
             INSTANCES.put(db.getClass(), abstractMongoCache);
             return abstractMongoCache;
         }
@@ -81,12 +100,15 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         JSONArray documentArr = new JSONArray();
 
         collection.find().forEach(doc -> documentArr.put(new JSONObject(doc.toJson())));
+
         collectionObj.put(CacheField.DOCUMENTS.toString(), documentArr);
         return collectionObj;
     }
 
     enum CacheField implements IJSONField {
-        DOCUMENTS("documents");
+        DOCUMENTS("documents"),
+        GUILD_ID("guild_id"),
+        ID("_id");
 
         private final String str;
 

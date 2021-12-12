@@ -9,6 +9,7 @@ import com.mongodb.client.model.Updates;
 import lombok.Getter;
 import main.constants.Database;
 import main.constants.ENV;
+import main.events.MongoEventListener;
 import main.main.Config;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -57,6 +58,7 @@ public abstract class AbstractMongoDatabase {
         final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
         final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
                 .applyConnectionString(CONNECTION_STRING)
+                .addCommandListener(new MongoEventListener())
                 .build();
 
         client = MongoClients.create(CLIENT_SETTINGS);
