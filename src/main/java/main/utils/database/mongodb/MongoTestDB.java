@@ -46,7 +46,7 @@ public class MongoTestDB extends AbstractMongoDatabase {
     }
 
     private void updateCache() {
-        TestMongoCache.TEST_CACHE.updateCache();
+        TestMongoCache.getCache().updateCache();
         logger.info("Updated test cache");
     }
 

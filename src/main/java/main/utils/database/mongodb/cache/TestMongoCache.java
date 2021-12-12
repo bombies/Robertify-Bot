@@ -1,14 +1,17 @@
 package main.utils.database.mongodb.cache;
 
+import lombok.Getter;
+import lombok.Setter;
 import main.utils.database.mongodb.MongoTestDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class TestMongoCache {
+public class TestMongoCache {
     private final static Logger logger = LoggerFactory.getLogger(TestMongoCache.class);
-    public static AbstractMongoCache<MongoTestDB> TEST_CACHE = null;
+    @Getter @Setter
+    private static AbstractMongoCache<MongoTestDB> cache = null;
 
-    public static String cacheTest(AbstractMongoCache<MongoTestDB> cache) {
+    public String cacheTest() {
         return cache.getJSON().toString(4);
     }
 }

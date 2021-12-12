@@ -72,7 +72,7 @@ public class MongoTestCommand implements ITestCommand {
 
             case "cache" -> {
                 try {
-                    msg.reply("```json\n" + TestMongoCache.cacheTest(TestMongoCache.TEST_CACHE) + "```").queue();
+                    msg.reply("```json\n" + new TestMongoCache().cacheTest() + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -85,7 +85,7 @@ public abstract class AbstractMongoDatabase {
     public static void initAllCaches() {
         var testDb = new MongoTestDB();
 
-        TestMongoCache.TEST_CACHE = (AbstractMongoCache<MongoTestDB>) AbstractMongoCache.ins(testDb);
+        TestMongoCache.setCache((AbstractMongoCache<MongoTestDB>) AbstractMongoCache.ins(testDb));
     }
 
     MongoCollection<Document> getCollection(String name) {
