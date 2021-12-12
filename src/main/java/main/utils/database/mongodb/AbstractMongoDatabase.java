@@ -11,6 +11,8 @@ import main.constants.Database;
 import main.constants.ENV;
 import main.events.MongoEventListener;
 import main.main.Config;
+import main.utils.database.mongodb.cache.AbstractMongoCache;
+import main.utils.database.mongodb.cache.TestMongoCache;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
@@ -79,6 +81,12 @@ public abstract class AbstractMongoDatabase {
     }
 
     public abstract void init();
+
+    public static void initAllCaches() {
+        var testDb = new MongoTestDB();
+
+        TestMongoCache.TEST_CACHE = (AbstractMongoCache<MongoTestDB>) AbstractMongoCache.ins(testDb);
+    }
 
     MongoCollection<Document> getCollection(String name) {
         return database.getCollection(name);

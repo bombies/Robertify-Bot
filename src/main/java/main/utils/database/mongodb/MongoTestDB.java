@@ -1,7 +1,7 @@
 package main.utils.database.mongodb;
 
 import main.constants.Database;
-import main.utils.database.mongodb.cache.MongoCache;
+import main.utils.database.mongodb.cache.TestMongoCache;
 import org.bson.Document;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class MongoTestDB extends AbstractMongoDatabase {
     }
 
     private void updateCache() {
-        MongoCache.TEST_CACHE.updateCache();
+        TestMongoCache.TEST_CACHE.updateCache();
         logger.info("Updated test cache");
     }
 

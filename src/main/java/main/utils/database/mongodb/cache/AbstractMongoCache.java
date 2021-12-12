@@ -85,7 +85,7 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return false;
     }
 
-    static <T extends AbstractMongoDatabase> AbstractMongoCache<? extends AbstractMongoDatabase> ins(T db) {
+    public static <T extends AbstractMongoDatabase> AbstractMongoCache<? extends AbstractMongoDatabase> ins(T db) {
         if (INSTANCES.containsKey(db.getClass())) {
             return INSTANCES.get(db.getClass());
         } else {

@@ -3,7 +3,7 @@ package main.commands.commands.dev.test;
 import main.commands.CommandContext;
 import main.commands.commands.ITestCommand;
 import main.utils.database.mongodb.MongoTestDB;
-import main.utils.database.mongodb.cache.MongoCache;
+import main.utils.database.mongodb.cache.TestMongoCache;
 import net.dv8tion.jda.api.entities.Message;
 import org.json.JSONObject;
 
@@ -72,7 +72,7 @@ public class MongoTestCommand implements ITestCommand {
 
             case "cache" -> {
                 try {
-                    msg.reply("```json\n" + MongoCache.cacheTest(MongoCache.TEST_CACHE) + "```").queue();
+                    msg.reply("```json\n" + TestMongoCache.cacheTest(TestMongoCache.TEST_CACHE) + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();
