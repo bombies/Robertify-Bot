@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class AbstractMongoCache<T extends AbstractMongoDatabase> extends AbstractMongoDatabase {
-    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache<AbstractMongoDatabase>> INSTANCES = new HashMap<>();
+    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache<? extends AbstractMongoDatabase>> INSTANCES = new HashMap<>();
 
     @Getter
     private final T mongoDB;
@@ -85,11 +85,11 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return false;
     }
 
-    static AbstractMongoCache<AbstractMongoDatabase> ins(AbstractMongoDatabase db) {
+    static <T extends AbstractMongoDatabase> AbstractMongoCache<? extends AbstractMongoDatabase> ins(T db) {
         if (INSTANCES.containsKey(db.getClass())) {
             return INSTANCES.get(db.getClass());
         } else {
-            AbstractMongoCache<AbstractMongoDatabase> abstractMongoCache = new AbstractMongoCache<>(db);
+            AbstractMongoCache<T> abstractMongoCache = new AbstractMongoCache<>(db);
             INSTANCES.put(db.getClass(), abstractMongoCache);
             return abstractMongoCache;
         }

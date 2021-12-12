@@ -7,16 +7,16 @@ import org.slf4j.LoggerFactory;
 
 public abstract class MongoCache {
     private final static Logger logger = LoggerFactory.getLogger(MongoCache.class);
-    public static AbstractMongoCache<AbstractMongoDatabase> TEST_CACHE = null;
+    public static AbstractMongoCache<MongoTestDB> TEST_CACHE = null;
 
 
     public static void initAllCaches() {
         var testDb = new MongoTestDB();
 
-        TEST_CACHE = AbstractMongoCache.ins(testDb);
+        TEST_CACHE = (AbstractMongoCache<MongoTestDB>) AbstractMongoCache.ins(testDb);
     }
 
-    public static String cacheTest(AbstractMongoCache<AbstractMongoDatabase> cache) {
+    public static String cacheTest(AbstractMongoCache<MongoTestDB> cache) {
         return cache.getJSON().toString(4);
     }
 }
