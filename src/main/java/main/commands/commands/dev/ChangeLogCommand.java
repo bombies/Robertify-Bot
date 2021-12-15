@@ -13,12 +13,18 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.Date;
 import java.util.List;
 
 public class ChangeLogCommand implements IDevCommand {
+    private static final Logger logger = LoggerFactory.getLogger(ChangeLogCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx))
@@ -66,7 +72,10 @@ public class ChangeLogCommand implements IDevCommand {
 
             if (announcementChannel == null) continue;
 
-            announcementChannel.sendMessageEmbeds(eb.build()).queue();
+            announcementChannel.sendMessageEmbeds(eb.build()).queue(null, new ErrorHandler()
+                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+                        logger.error("Was not able to send a changelog in {}", g.getName());
+                    }));
         }
 
         config.sendLog();
