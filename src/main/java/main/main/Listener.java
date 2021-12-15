@@ -202,6 +202,7 @@ public class Listener extends ListenerAdapter {
         new UnbanCommand().initCommand(g);
         new ShuffleSlashCommand().initCommand(g);
         new EightBallCommand().initCommand(g);
+        new JoinSlashCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

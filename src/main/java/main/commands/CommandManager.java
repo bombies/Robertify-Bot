@@ -87,6 +87,7 @@ public class CommandManager {
                 new EightBallCommand(),
                 new PreviousTrackCommand(),
                 new PollCommand(),
+                new JoinCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -101,7 +102,7 @@ public class CommandManager {
                 //Test Commands
                 new SpotifyURLToURICommand(),
                 new PlaySpotifyURICommand(),
-                new KotlinTestCommand(),
+//                new KotlinTestCommand(),
                 new LoadSpotifyPlaylistCommand(),
                 new LyricsTestCommand(),
                 new MongoTestCommand()
@@ -125,7 +126,8 @@ public class CommandManager {
                 new JumpCommand(),
                 new ResumeCommand(),
                 new SeekCommand(),
-                new PreviousTrackCommand()
+                new PreviousTrackCommand(),
+                new JoinCommand()
         );
 
         addManagementCommands(

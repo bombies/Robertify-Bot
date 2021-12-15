@@ -94,6 +94,7 @@ public class Robertify {
                             new SetDJCommand(),
                             new RemoveDJCommand(),
                             new SeekSlashCommand(),
+                            new JoinSlashCommand(),
                             new BanCommand(),
                             new UnbanCommand(),
                             new ShuffleSlashCommand(),
