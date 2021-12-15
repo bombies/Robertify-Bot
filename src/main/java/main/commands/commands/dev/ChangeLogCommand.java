@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ChangeLogCommand implements IDevCommand {
     private static final Logger logger = LoggerFactory.getLogger(ChangeLogCommand.class);
@@ -72,10 +74,14 @@ public class ChangeLogCommand implements IDevCommand {
 
             if (announcementChannel == null) continue;
 
-            announcementChannel.sendMessageEmbeds(eb.build()).queue(null, new ErrorHandler()
-                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
-                        logger.error("Was not able to send a changelog in {}", g.getName());
-                    }));
+            try {
+                announcementChannel.sendMessageEmbeds(eb.build()).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+                            logger.error("Was not able to send a changelog in {}", g.getName());
+                        }));
+            } catch (InsufficientPermissionException e) {
+                logger.error("Was not able to send a changelog in {}", g.getName());
+            }
         }
 
         config.sendLog();
