@@ -67,10 +67,18 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
+        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
             event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(false).queue();
+            return;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
+                            .build())
+                    .queue();
             return;
         }
 
