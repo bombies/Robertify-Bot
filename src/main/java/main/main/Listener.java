@@ -83,6 +83,9 @@ public class Listener extends ListenerAdapter {
             initSlashCommands(g);
             rescheduleUnbans(g);
 
+            if (new DedicatedChannelConfig().isChannelSet(g.getId()))
+                new DedicatedChannelConfig().updateMessage(g);
+
             LOGGER.info("Watching {}", g.getName());
         }
 
