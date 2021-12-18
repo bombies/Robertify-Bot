@@ -139,40 +139,19 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        // Audio track has been unable to provide us any audio, might want to just start a new track
         Listener.LOGGER.error("Track stuck. Attempting to replay the song.");
         handleTrackException(player, track);
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-        Listener.LOGGER.error("There was an exception with playing the track. Handling it.");
+        logger.error("There was an exception with playing the track. Handling it.");
         exception.printStackTrace();
         handleTrackException(player, track);
     }
 
     private void handleTrackException(AudioPlayer player, AudioTrack track) {
-        errorOccurred = true;
-
-        try {
-            announceNowPlaying = false;
-            player.stopTrack();
-            player.startTrack(track, false);
-            announceNowPlaying = true;
-            errorOccurred = false;
-        } catch (IllegalStateException e) {
-            announceNowPlaying = false;
-            try {
-                player.stopTrack();
-                player.startTrack(track.makeClone(), false);
-                announceNowPlaying = true;
-                errorOccurred = false;
-            } catch (Exception exc) {
-                logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            }
-        } catch (Exception e) {
-            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-        }
+        // TODO handling exceptions
     }
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {

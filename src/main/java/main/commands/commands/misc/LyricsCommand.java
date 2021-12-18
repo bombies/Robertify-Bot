@@ -33,8 +33,6 @@ public class LyricsCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = ctx.getSelfMember().getVoiceState();
 
-
-
         final List<String> args = ctx.getArgs();
 
         String query;
