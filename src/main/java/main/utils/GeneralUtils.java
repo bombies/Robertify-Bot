@@ -63,6 +63,18 @@ public class GeneralUtils {
         }
     }
 
+    public static <E> String listToString(List<E> list) {
+        final var sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            var elem = list.get(i);
+            sb.append(elem instanceof net.dv8tion.jda.api.Permission ?
+                    ((net.dv8tion.jda.api.Permission) elem).getName()
+                    : elem.toString())
+                    .append(i != list.size() - 1 ? ", " : "");
+        }
+        return sb.toString();
+    }
+
     public static int longToInt(long l) {
         if (l > Integer.MAX_VALUE || l < Integer.MIN_VALUE)
             throw new IllegalArgumentException("This long exceeds the integer limits!");

@@ -144,12 +144,13 @@ public class RobertifyAudioManager extends AbstractModule {
 
             try {
                 audioManager.openAudioConnection(memberVoiceState.getChannel());
+                audioManager.setSelfDeafened(true);
             } catch (InsufficientPermissionException e) {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
                         .queue();
                 throw e;
             }
-            audioManager.setSelfDeafened(true);
+
         }
     }
 

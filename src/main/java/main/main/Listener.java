@@ -45,6 +45,7 @@ import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class Listener extends ListenerAdapter {
     private final CommandManager manager;
@@ -107,19 +108,8 @@ public class Listener extends ListenerAdapter {
             if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
                 event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
                         .queue();
-            } else {
-                if (!event.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
-                    event.getMessage().replyEmbeds(EmbedUtils.embedMessage("""
-                            I do not have enough permissions to do this!
-                            Please give my role the `Manage Messages` permission in order for me to execute this command.
-
-                            *For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*""").build())
-                            .queue();
-                    return;
-                }
-
+            } else
                 manager.handle(event);
-            }
         }
     }
 
@@ -222,24 +212,21 @@ public class Listener extends ListenerAdapter {
             }
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            final Runnable task = new Runnable() {
-                @Override
-                public void run() {
-                    banUtils.unbanUser(user, g.getIdLong());
-                    map.remove(user);
+            final Runnable task = () -> {
+                banUtils.unbanUser(user, g.getIdLong());
+                map.remove(user);
 
-                    Robertify.api.retrieveUserById(user).queue(user -> {
-                        user.openPrivateChannel().queue(channel -> {
-                            channel.sendMessageEmbeds(
-                                    EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
-                                            .build()
-                            ).queue(success -> {}, new ErrorHandler()
-                                    .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                                        LOGGER.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")");
-                                    }));
-                        });
+                Robertify.api.retrieveUserById(user).queue(user1 -> {
+                    user1.openPrivateChannel().queue(channel -> {
+                        channel.sendMessageEmbeds(
+                                EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
+                                        .build()
+                        ).queue(success -> {}, new ErrorHandler()
+                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
+                                    LOGGER.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
+                                }));
                     });
-                }
+                });
             };
             scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), user)).getTime(), TimeUnit.MILLISECONDS);
 
@@ -251,26 +238,23 @@ public class Listener extends ListenerAdapter {
         final var map = BanDB.getBannedUsers().get(g.getIdLong());
         final var scheduler = Executors.newScheduledThreadPool(1);
 
-        final Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                if (!BanDB.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
-                    return;
+        final Runnable task = () -> {
+            if (!BanDB.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
+                return;
 
-                banUtils.unbanUser(g.getIdLong(), u.getIdLong());
-                map.remove(u.getIdLong());
+            banUtils.unbanUser(g.getIdLong(), u.getIdLong());
+            map.remove(u.getIdLong());
 
-                u.openPrivateChannel().queue(channel -> {
-                    channel.sendMessageEmbeds(
-                            EmbedUtils.embedMessage("You have been unbanned from Robertify in **" + g.getName() + "**")
-                                    .build()
-                    ).queue(success -> {
-                    }, new ErrorHandler()
-                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                                LOGGER.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
-                            }));
-                });
-            }
+            u.openPrivateChannel().queue(channel -> {
+                channel.sendMessageEmbeds(
+                        EmbedUtils.embedMessage("You have been unbanned from Robertify in **" + g.getName() + "**")
+                                .build()
+                ).queue(success -> {
+                }, new ErrorHandler()
+                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
+                            LOGGER.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
+                        }));
+            });
         };
         scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())).getTime(), TimeUnit.MILLISECONDS);
     }

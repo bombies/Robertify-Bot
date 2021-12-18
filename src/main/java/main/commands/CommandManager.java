@@ -30,6 +30,7 @@ import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import javax.annotation.Nullable;
@@ -243,6 +244,18 @@ public class CommandManager {
             ICommand cmd = this.getCommand(invoke);
 
             if (cmd != null) {
+                if (cmd.requiresPermission())
+                    if (!hasAllPermissions(cmd, e.getGuild().getSelfMember())) {
+                        final var permissionsRequired = cmd.getPermissionsRequired();
+                        e.getMessage().replyEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to do this\n" +
+                                "Please give my role the following permission(s):\n\n" +
+                                        "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
+                                        "*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*")
+                                        .build())
+                                .queue();
+                        return;
+                    }
+
                 List<String> args = Arrays.asList(split).subList(1, split.length);
                 CommandContext ctx = new CommandContext(e, args);
                 var toggles = new TogglesConfig();
@@ -267,5 +280,12 @@ public class CommandManager {
                             + " " + ((time_left <= 1) ? "second`" : "seconds`") + " before running another command!");
             e.getMessage().replyEmbeds(eb.build()).queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS));
         }
+    }
+
+    public boolean hasAllPermissions(ICommand cmd, Member selfMember) {
+        for (var perm : cmd.getPermissionsRequired())
+            if (!selfMember.hasPermission(perm))
+                return false;
+        return true;
     }
 }

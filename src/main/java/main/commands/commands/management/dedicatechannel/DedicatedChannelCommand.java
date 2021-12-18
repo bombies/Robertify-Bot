@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
 import javax.script.ScriptException;
+import java.util.List;
 
 public class DedicatedChannelCommand implements ICommand {
     @Override
@@ -89,6 +90,12 @@ public class DedicatedChannelCommand implements ICommand {
                 " queue songs. When this channel is created, if you want it removed all you have to do" +
                 " is right click on it and delete it. Once the channel is created you can find it at the" +
                 " top of your channel list. Happy listening!";
+    }
+
+    @Override
+    public List<net.dv8tion.jda.api.Permission> getPermissionsRequired() {
+        return List.of(net.dv8tion.jda.api.Permission.MESSAGE_MANAGE,
+                net.dv8tion.jda.api.Permission.MANAGE_CHANNEL);
     }
 
     public enum ButtonID {
