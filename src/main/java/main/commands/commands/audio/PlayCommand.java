@@ -65,7 +65,7 @@ public class PlayCommand implements ICommand {
             return;
         }
 
-        if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
                     .build())
                     .queue();

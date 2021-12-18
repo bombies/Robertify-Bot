@@ -77,17 +77,20 @@ public class Listener extends ListenerAdapter {
         new ServerDB();
 
         BanDB.initBannedUserMap();
-
+        ServerDB.initPrefixMap();
         for (Guild g : botDB.getGuilds()) {
             permConfig.initGuild(g.getId());
 
             initSlashCommands(g);
             rescheduleUnbans(g);
 
+            if (new DedicatedChannelConfig().isChannelSet(g.getId()))
+                new DedicatedChannelConfig().updateMessage(g);
+
             LOGGER.info("Watching {}", g.getName());
         }
 
-        ServerDB.initPrefixMap();
+
         new AudioDB().cacheAllTracks();
 
         AbstractMongoDatabase.initAllCaches();
