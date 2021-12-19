@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.json.IJSONField;
+import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,7 +68,7 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return arr.getJSONObject(getIndexOfObjectInArray(arr, CacheField.GUILD_ID, gid));
     }
 
-    private int getIndexOfObjectInArray(JSONArray array, IJSONField field, Object object) {
+    private int getIndexOfObjectInArray(JSONArray array, GenericJSONField field, Object object) {
         if (!arrayHasObject(array, field, object))
             throw new NullPointerException("There was no such object found in the array!");
 
@@ -78,7 +78,7 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return -1;
     }
 
-    private boolean arrayHasObject(JSONArray array, IJSONField field, Object object) {
+    private boolean arrayHasObject(JSONArray array, GenericJSONField field, Object object) {
         for (int i = 0; i < array.length(); i++)
             if (array.getJSONObject(i).get(field.toString()).equals(object))
                 return true;
@@ -105,7 +105,7 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return collectionObj;
     }
 
-    enum CacheField implements IJSONField {
+    enum CacheField implements GenericJSONField {
         DOCUMENTS("documents"),
         GUILD_ID("guild_id"),
         ID("_id");

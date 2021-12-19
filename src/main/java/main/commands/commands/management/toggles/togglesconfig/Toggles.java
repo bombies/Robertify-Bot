@@ -1,8 +1,8 @@
 package main.commands.commands.management.toggles.togglesconfig;
 
-import main.utils.json.IJSONField;
+import main.utils.json.GenericJSONField;
 
-public enum Toggles implements IJSONField {
+public enum Toggles implements GenericJSONField {
     ANNOUNCE_MESSAGES("announce_messages"),
     ANNOUNCE_CHANGELOGS("announce_changelogs"),
     SHOW_REQUESTER("show_requester");
@@ -33,7 +33,7 @@ public enum Toggles implements IJSONField {
         throw new NullPointerException("No such toggle!");
     }
 
-    enum TogglesConfigField implements IJSONField {
+    enum TogglesConfigField implements GenericJSONField {
         DJ_TOGGLES("dj_toggles");
 
         private final String str;

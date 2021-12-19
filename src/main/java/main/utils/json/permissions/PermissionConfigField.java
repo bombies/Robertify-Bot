@@ -1,9 +1,8 @@
 package main.utils.json.permissions;
 
-import main.utils.json.AbstractJSONConfig;
-import main.utils.json.IJSONField;
+import main.utils.json.GenericJSONField;
 
-public enum PermissionConfigField implements IJSONField {
+public enum PermissionConfigField implements GenericJSONField {
     USER_PERMISSIONS("users");
 
     private final String str;

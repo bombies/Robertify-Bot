@@ -93,7 +93,7 @@ public abstract class AbstractJSONConfig {
      * @param object Object to be searched for
      * @return True if the object is found, else vice versa.
      */
-    public boolean arrayHasObject(JSONArray array, IJSONField field, Object object) {
+    public boolean arrayHasObject(JSONArray array, GenericJSONField field, Object object) {
         for (int i = 0; i < array.length(); i++)
             if (array.getJSONObject(i).get(field.toString()).equals(object))
                 return true;
@@ -127,7 +127,7 @@ public abstract class AbstractJSONConfig {
      *      * if some unexpected error occurs
      * @throws NullPointerException Thrown when the object couldn't be found in the array
      */
-    public int getIndexOfObjectInArray(JSONArray array, IJSONField field, Object object) {
+    public int getIndexOfObjectInArray(JSONArray array, GenericJSONField field, Object object) {
         if (!arrayHasObject(array, field, object))
             throw new NullPointerException("There was no such object found in the array!");
 

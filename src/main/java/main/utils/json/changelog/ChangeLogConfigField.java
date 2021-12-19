@@ -1,8 +1,8 @@
 package main.utils.json.changelog;
 
-import main.utils.json.IJSONField;
+import main.utils.json.GenericJSONField;
 
-public enum ChangeLogConfigField implements IJSONField {
+public enum ChangeLogConfigField implements GenericJSONField {
     CURRENT_LOG("current_log"),
     PAST_LOGS("past_logs"),
     LOGS("logs");
