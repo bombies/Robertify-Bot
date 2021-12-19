@@ -114,8 +114,11 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 //                    continue;
 //                }
 
-                AudioTrackInfo info = new AudioTrackInfo(t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
+                AudioTrackInfo info = new AudioTrackInfo(
+                        t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
+                        getIdentifier(t.getName(), t.getArtists()[0].getName()),
+                        false, null
+                );
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
                 playlist.add(track);
             }
@@ -161,8 +164,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 //                        continue;
 //                    }
 
-                    AudioTrackInfo info = new AudioTrackInfo(playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
-                            "ytsearch:" + plTrack.getName() + " by " + plTrack.getArtists()[0].getName() , false, null);
+                    AudioTrackInfo info = new AudioTrackInfo(
+                            playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
+                            getIdentifier(plTrack.getName(), plTrack.getArtists()[0].getName()),
+                            false, null
+                    );
+
                     var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
                     finalPlaylist.add(track);
                 }
@@ -208,9 +215,11 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
 //            if (audioDB.isTrackCached(track.getId()))
 //                return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
-
-            AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
-                    "ytsearch:" + track.getName() + " by " + track.getArtists()[0].getName(), false, null);
+            AudioTrackInfo info = new AudioTrackInfo(
+                    track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
+                    getIdentifier(track.getName(), track.getArtists()[0].getName()),
+                    false, null
+            );
 
             return new SpotifyAudioTrack(info, youtubeManager, track.getId());
         } catch (Exception e) {
@@ -247,5 +256,9 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
     @Override
     public void configureBuilder(Consumer<HttpClientBuilder> configurator) {
         //
+    }
+
+    private String getIdentifier(String trackName, String artistName) {
+        return "ytsearch:" + trackName + " by " + artistName;
     }
 }

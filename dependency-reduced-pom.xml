@@ -120,13 +120,13 @@
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test</artifactId>
-      <version>1.6.0</version>
+      <version>1.6.10</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <properties>
     <maven.compiler.target>16</maven.compiler.target>
-    <kotlin.version>1.6.0</kotlin.version>
+    <kotlin.version>1.6.10</kotlin.version>
     <maven.compiler.source>16</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
