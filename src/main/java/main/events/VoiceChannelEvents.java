@@ -60,6 +60,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
         Member self = event.getGuild().getSelfMember();
         GuildVoiceState voiceState = self.getVoiceState();
 
+        if (!voiceState.inVoiceChannel()) return;
+        if (!voiceState.getChannel().equals(event.getChannelLeft())) return;
+
         if (event.getChannelJoined().equals(voiceState.getChannel())) {
             resumeSong(event);
         } else {
