@@ -10,6 +10,8 @@ public enum ENV {
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
+    YOUTUBE_PAPISID("youtube_papisid"),
+    YOUTUBE_PSID("youtube_psid"),
     IMGUR_CLIENT("imgur_client"),
     IMGUR_SECRET("imgur_secret"),
     AUDIO_DIR("local_audio_dir"),

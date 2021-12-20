@@ -3,6 +3,7 @@ package main.main;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import lombok.Getter;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.BanCommand;
@@ -112,6 +113,9 @@ public class Robertify {
                             CacheFlag.MEMBER_OVERRIDES
                     )
                     .build();
+
+            YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.YOUTUBE_PAPISID));
+            YoutubeHttpContextFilter.setPSID(Config.get(ENV.YOUTUBE_PSID));
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))
