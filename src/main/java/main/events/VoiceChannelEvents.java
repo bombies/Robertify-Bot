@@ -62,7 +62,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
         if (!voiceState.inVoiceChannel()) return;
 
-        if (event.getChannelJoined().equals(voiceState.getChannel())) {
+
+        if (event.getMember().getIdLong() == self.getIdLong()) {
+            doAutoLeave(event, event.getChannelLeft());
+        } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
             resumeSong(event);
         } else if (voiceState.getChannel().equals(event.getChannelLeft())) {
             doAutoLeave(event, event.getChannelLeft());
@@ -102,19 +105,35 @@ public class VoiceChannelEvents extends ListenerAdapter {
                             "\nI will disconnect from "+channelLeft.getAsMention()+" in 1 minute.").build())
                     .queue();
             waiter.waitForEvent(
-                    GuildVoiceJoinEvent.class,
-                    (e) -> e.getChannelJoined().equals(channelLeft),
+                    GenericGuildVoiceUpdateEvent.class,
                     (e) -> {
-                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("Someone joined me! 🥳" +
-                                        "\nNow resuming the music!").build())
-                                .queue();
+                        if (!(e instanceof GuildVoiceJoinEvent)
+                            && !(e instanceof GuildVoiceMoveEvent)) return false;
+
+                        if (e instanceof GuildVoiceMoveEvent moveEvent) {
+                            final var channelJoined = moveEvent.getChannelJoined();
+
+                            if (moveEvent.getMember().getIdLong() == event.getGuild().getSelfMember().getIdLong()) {
+                                return channelJoined.getMembers().size() > 1;
+                            } else {
+                                return channelJoined.equals(channelLeft);
+                            }
+                        } else  {
+                            final var channelJoined = e.getChannelJoined();
+                            return channelJoined.equals(channelLeft);
+                        }
+                    },
+                    (e) -> {
+//                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("Someone joined me! 🥳" +
+//                                        "\nNow resuming the music!").build())
+//                                .queue();
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-                        event.getGuild().getAudioManager().closeAudioConnection();
-                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("I've disconnected from " + channelLeft.getAsMention())
-                                        .build())
-                                .queue();
+//                        event.getGuild().getAudioManager().closeAudioConnection();
+//                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("I've disconnected from " + channelLeft.getAsMention())
+//                                        .build())
+//                                .queue();
                     }
             );
         }
