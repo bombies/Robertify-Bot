@@ -97,7 +97,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
                         .build())
                         .queue(success -> {}, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                        Listener.LOGGER.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
+                                        Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
             });
             return EmbedUtils.embedMessage("You have banned " + user.getAsMention());
         } else {
@@ -108,7 +108,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
                                 .build())
                         .queue(success -> {}, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                        Listener.LOGGER.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
+                                        Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
             });
 
             Listener.scheduleUnban(guild, user);

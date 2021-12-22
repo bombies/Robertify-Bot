@@ -14,7 +14,6 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.cache.TestMongoCache;
 import main.utils.database.sqlite3.AudioDB;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
@@ -25,7 +24,6 @@ import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -48,7 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Listener extends ListenerAdapter {
     private final CommandManager manager;
-    public static final Logger LOGGER = LoggerFactory.getLogger(Listener.class);
+    public static final Logger logger = LoggerFactory.getLogger(Listener.class);
 
     public Listener(EventWaiter waiter) {
         manager = new CommandManager(waiter);
@@ -85,10 +83,9 @@ public class Listener extends ListenerAdapter {
 
             if (new DedicatedChannelConfig().isChannelSet(g.getId()))
                 new DedicatedChannelConfig().updateMessage(g);
-
-            LOGGER.info("Watching {}", g.getName());
         }
 
+        logger.info("Watching {} guilds", botDB.getGuilds().size());
 
         new AudioDB().cacheAllTracks();
 
@@ -144,7 +141,7 @@ public class Listener extends ListenerAdapter {
 
         initSlashCommands(guild);
 
-        LOGGER.info("Joined {}", guild.getName());
+        logger.info("Joined {}", guild.getName());
 
         ServerDB.initPrefixMap();
         BanDB.initBannedUserMap();
@@ -157,7 +154,7 @@ public class Listener extends ListenerAdapter {
         BotDB botUtils = new BotDB();
         botUtils.removeGuild(guild.getIdLong()).closeConnection();
 
-        LOGGER.info("Left {}", guild.getName());
+        logger.info("Left {}", guild.getName());
     }
 
     public void initSlashCommands() {
@@ -225,7 +222,7 @@ public class Listener extends ListenerAdapter {
                                         .build()
                         ).queue(success -> {}, new ErrorHandler()
                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                                    LOGGER.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
+                                    logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
                                 }));
                     });
                 });
@@ -254,7 +251,7 @@ public class Listener extends ListenerAdapter {
                 ).queue(success -> {
                 }, new ErrorHandler()
                         .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                            LOGGER.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
+                            logger.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
                         }));
             });
         };

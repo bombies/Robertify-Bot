@@ -139,7 +139,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        Listener.LOGGER.error("Track stuck. Attempting to replay the song.");
+        Listener.logger.error("Track stuck. Attempting to replay the song.");
         handleTrackException(player, track);
     }
 

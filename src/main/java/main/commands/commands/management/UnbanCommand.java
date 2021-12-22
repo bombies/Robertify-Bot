@@ -75,7 +75,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
                     .queue(success -> {}, new ErrorHandler()
                             .handle(
                                     ErrorResponse.CANNOT_SEND_TO_USER,
-                                    e -> Listener.LOGGER.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
+                                    e -> Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
                             ));
         });
 
