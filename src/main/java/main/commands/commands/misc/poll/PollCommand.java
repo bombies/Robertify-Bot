@@ -43,11 +43,8 @@ public class PollCommand implements ICommand {
         final TextChannel channel = ctx.getChannel();
         final Message msg = ctx.getMessage();
 
-        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The poll command has been disabled in this server!").build())
-                    .queue();
+        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS))
             return;
-        }
 
         GeneralUtils.setCustomEmbed("Polls");
 

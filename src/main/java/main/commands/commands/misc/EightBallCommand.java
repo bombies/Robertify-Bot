@@ -28,11 +28,8 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
 
-        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.EIGHT_BALL)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The 8ball command has been disabled in this server!").build())
-                    .queue();
+        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.EIGHT_BALL))
             return;
-        }
 
         GeneralUtils.setCustomEmbed("");
 
