@@ -85,6 +85,24 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
+                case "8ball", "4" -> {
+                    if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
+                        config.setToggle(guild, Toggles.EIGHT_BALL, false);
+                        eb = EmbedUtils.embedMessage("You have toggled the 8ball command **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.EIGHT_BALL, true);
+                        eb = EmbedUtils.embedMessage("You have toggled the 8ball command **ON**");
+                    }
+                }
+                case "polls", "poll", "5" -> {
+                    if (config.getToggle(guild, Toggles.POLLS)) {
+                        config.setToggle(guild, Toggles.POLLS, false);
+                        eb = EmbedUtils.embedMessage("You have toggled the polls command **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.POLLS, true);
+                        eb = EmbedUtils.embedMessage("You have toggled the polls command **ON**");
+                    }
+                }
                 case "dj" -> eb = handleDJToggles(guild, args);
                 default -> eb = EmbedUtils.embedMessage("Invalid toggle!");
             }

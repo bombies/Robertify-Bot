@@ -3,6 +3,8 @@ package main.commands.commands.misc;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.sqlite3.ServerDB;
@@ -25,6 +27,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+
+        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.EIGHT_BALL)) {
+            msg.replyEmbeds(EmbedUtils.embedMessage("The 8ball command has been disabled in this server!").build())
+                    .queue();
+            return;
+        }
 
         GeneralUtils.setCustomEmbed("");
 

@@ -5,7 +5,9 @@ import main.utils.json.GenericJSONField;
 public enum Toggles implements GenericJSONField {
     ANNOUNCE_MESSAGES("announce_messages"),
     ANNOUNCE_CHANGELOGS("announce_changelogs"),
-    SHOW_REQUESTER("show_requester");
+    SHOW_REQUESTER("show_requester"),
+    EIGHT_BALL("8ball"),
+    POLLS("polls");
 
     private final String str;
 
@@ -28,6 +30,12 @@ public enum Toggles implements GenericJSONField {
             }
             case SHOW_REQUESTER -> {
                 return "requester";
+            }
+            case EIGHT_BALL -> {
+                return "8ball";
+            }
+            case POLLS -> {
+                return "polls";
             }
         }
         throw new NullPointerException("No such toggle!");

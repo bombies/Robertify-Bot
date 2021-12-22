@@ -4,6 +4,8 @@ import lombok.Getter;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -40,6 +42,12 @@ public class PollCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final TextChannel channel = ctx.getChannel();
         final Message msg = ctx.getMessage();
+
+        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS)) {
+            msg.replyEmbeds(EmbedUtils.embedMessage("The poll command has been disabled in this server!").build())
+                    .queue();
+            return;
+        }
 
         GeneralUtils.setCustomEmbed("Polls");
 
