@@ -3,13 +3,10 @@ package main.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import main.commands.commands.ITestCommand;
+import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.SeekCommand;
-import main.commands.commands.dev.ChangeLogCommand;
-import main.commands.commands.dev.DeveloperCommand;
-import main.commands.commands.dev.EvalCommand;
-import main.commands.commands.dev.UpdateCommand;
 import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
 import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
 import main.commands.commands.management.*;
@@ -99,6 +96,7 @@ public class CommandManager {
                 new ViewConfigCommand(),
                 new EvalCommand(),
                 new ChangeLogCommand(),
+                new GuildCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
