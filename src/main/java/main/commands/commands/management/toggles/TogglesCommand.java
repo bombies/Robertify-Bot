@@ -36,8 +36,8 @@ public class TogglesCommand implements ICommand {
 
         GeneralUtils.setCustomEmbed("Toggles");
 
+        var config = new TogglesConfig();
         if (args.isEmpty()) {
-            var config = new TogglesConfig();
             var toggleIDs = new StringBuilder();
             var toggleNames = new StringBuilder();
             var toggleStatuses = new StringBuilder();
@@ -58,7 +58,6 @@ public class TogglesCommand implements ICommand {
 
             msg.replyEmbeds(eb.build()).queue();
         } else {
-            var config = new TogglesConfig();
             var eb = new EmbedBuilder();
             switch (args.get(0).toLowerCase()) {
                 case "restrictedvoice", "1", "rvc", "rvchannels" -> {
