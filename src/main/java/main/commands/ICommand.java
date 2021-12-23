@@ -12,6 +12,10 @@ public interface ICommand {
 
     String getHelp(String guildID);
 
+    default String getUsages(long guildID) {
+        return null;
+    }
+
     default List<String> getAliases() {
         return List.of();
     }

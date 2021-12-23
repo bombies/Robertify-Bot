@@ -226,7 +226,8 @@ public class RestrictedChannelsCommand implements ICommand {
                 "**__Usages__**\n" + getUsages(Long.parseLong(guildID));
     }
 
-    private String getUsages(long guildID) {
+    @Override
+    public String getUsages(long guildID) {
         return "**__Usages__**\n" +
                 "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels add <channelID>`\n" +
                 "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels remove <channelID>`\n" +
