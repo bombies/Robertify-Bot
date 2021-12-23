@@ -29,6 +29,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public abstract class InteractiveCommand extends ListenerAdapter {
@@ -147,7 +148,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                 }
             }
 
-            commandCreateAction.queue(createdCommand -> {
+            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
 //                if (command.getAdminOnly() == null && command.getDjOnly() == null)
 //                    return;
 //
