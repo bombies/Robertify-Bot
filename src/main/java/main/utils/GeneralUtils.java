@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
 public class GeneralUtils {
     private static final Logger logger = LoggerFactory.getLogger(GeneralUtils.class);
 
-    private static Color embedColor = parseColor(Config.get(ENV.BOT_COLOR));
+    public final static Color EMBED_COLOR = parseColor(Config.get(ENV.BOT_COLOR));
 
     public static boolean stringIsNum(String s) {
         if (s == null) return false;
@@ -369,7 +369,7 @@ public class GeneralUtils {
     public static void setDefaultEmbed() {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
-                        .setColor(embedColor)
+                        .setColor(EMBED_COLOR)
                         .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, BotConstants.ICON_URL.toString())
         );
     }
@@ -392,7 +392,7 @@ public class GeneralUtils {
     public static void setCustomEmbed(String author) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
-                        .setColor(embedColor)
+                        .setColor(EMBED_COLOR)
                         .setAuthor(author, null, BotConstants.ICON_URL.toString())
         );
     }
@@ -400,7 +400,7 @@ public class GeneralUtils {
     public static void setCustomEmbed(String author, String footer) {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
-                        .setColor(embedColor)
+                        .setColor(EMBED_COLOR)
                         .setAuthor(author,null, BotConstants.ICON_URL.toString())
                         .setFooter(footer)
         );
@@ -410,7 +410,7 @@ public class GeneralUtils {
         EmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setAuthor(author, null, BotConstants.ICON_URL.toString())
-                        .setColor(embedColor)
+                        .setColor(EMBED_COLOR)
                         .setTitle(title)
                         .setFooter(footer)
         );

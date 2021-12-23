@@ -21,15 +21,7 @@ public class SuggestionsConfig extends AbstractJSONConfig {
             return;
         }
 
-        final var obj = new JSONObject();
-
-        obj.put(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString(), -1L);
-        obj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), -1L);
-        obj.put(SuggestionsConfigField.ACCEPTED_CHANNEL.toString(), -1L);
-        obj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), -1L);
-        obj.put(SuggestionsConfigField.BANNED_USERS.toString(), new JSONArray());
-
-        setJSON(obj);
+        resetConfig();
     }
 
     public void initChannels(long categoryID, long pendingChannel, long acceptedChanel, long deniedChannel) {
@@ -44,6 +36,34 @@ public class SuggestionsConfig extends AbstractJSONConfig {
         obj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), deniedChannel);
 
         setJSON(obj);
+    }
+
+    public void resetConfig() {
+        final var obj = new JSONObject();
+
+        obj.put(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString(), -1L);
+        obj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), -1L);
+        obj.put(SuggestionsConfigField.ACCEPTED_CHANNEL.toString(), -1L);
+        obj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), -1L);
+        obj.put(SuggestionsConfigField.BANNED_USERS.toString(), new JSONArray());
+
+        setJSON(obj);
+    }
+
+    public long getCategoryID() {
+        return getJSONObject().getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString());
+    }
+
+    public long getPendingChannelID() {
+        return getJSONObject().getLong(SuggestionsConfigField.PENDING_CHANNEL.toString());
+    }
+
+    public long getAcceptedChannelID() {
+        return getJSONObject().getLong(SuggestionsConfigField.ACCEPTED_CHANNEL.toString());
+    }
+
+    public long getDeniedChannelID() {
+        return getJSONObject().getLong(SuggestionsConfigField.DENIED_CHANNEL.toString());
     }
 
     public void banUser(long id) {

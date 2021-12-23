@@ -16,6 +16,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.HelpCommand;
 import main.constants.ENV;
+import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
 import main.utils.pagination.PaginationEvents;
@@ -72,7 +73,8 @@ public class Robertify {
                             new Listener(commandWaiter),
                             new VoiceChannelEvents(),
                             new DedicatedChannelEvents(),
-                            new PollEvents()
+                            new PollEvents(),
+                            new SuggestionCategoryDeletionEvents()
                     )
 
                     // Slash Commands

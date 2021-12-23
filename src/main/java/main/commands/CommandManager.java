@@ -23,6 +23,7 @@ import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.HelpCommand;
+import main.commands.commands.util.SuggestionCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
@@ -90,6 +91,7 @@ public class CommandManager {
                 new PollCommand(),
                 new JoinCommand(),
                 new RestrictedChannelsCommand(),
+                new SuggestionCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands

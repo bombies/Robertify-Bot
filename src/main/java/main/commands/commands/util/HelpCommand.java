@@ -147,13 +147,12 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             }
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(ServerDB.getPrefix(Long.parseLong(prefix))));
+        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(prefix));
         eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
         msg.replyEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed();
     }
-
 
     @Override @SneakyThrows
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
