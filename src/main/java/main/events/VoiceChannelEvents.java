@@ -100,10 +100,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
     void doAutoLeave(GenericGuildVoiceUpdateEvent event, VoiceChannel channelLeft) {
         if (channelLeft.getMembers().size() == 1) {
             pauseSong(event);
-            TextChannel channel = event.getGuild().getTextChannelById(new BotDB().getAnnouncementChannel(event.getGuild().getIdLong()));
-            channel.sendMessageEmbeds(EmbedUtils.embedMessage("Everyone's left me alone! ☹️" +
-                            "\nI will disconnect from "+channelLeft.getAsMention()+" in 1 minute.").build())
-                    .queue();
+//            TextChannel channel = event.getGuild().getTextChannelById(new BotDB().getAnnouncementChannel(event.getGuild().getIdLong()));
+//            channel.sendMessageEmbeds(EmbedUtils.embedMessage("Everyone's left me alone! ☹️" +
+//                            "\nI will disconnect from "+channelLeft.getAsMention()+" in 1 minute.").build())
+//                    .queue();
             waiter.waitForEvent(
                     GenericGuildVoiceUpdateEvent.class,
                     (e) -> {
