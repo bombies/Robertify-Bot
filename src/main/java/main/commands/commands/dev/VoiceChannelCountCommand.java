@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.utils.database.sqlite3.BotDB;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -9,7 +11,14 @@ import java.util.List;
 public class VoiceChannelCountCommand implements IDevCommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!permissionCheck(ctx))
+        if (!permissionCheck(ctx)) return;
+
+        int vcCount = 0;
+        for (var guild : new BotDB().getGuilds())
+            vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
+
+        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("🔊 I am currently in **" + vcCount + "** voice channels").build())
+                .queue();
     }
 
     @Override

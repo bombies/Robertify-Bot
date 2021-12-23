@@ -106,6 +106,7 @@ public class CommandManager {
                 new EvalCommand(),
                 new ChangeLogCommand(),
                 new GuildCommand(),
+                new VoiceChannelCountCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
