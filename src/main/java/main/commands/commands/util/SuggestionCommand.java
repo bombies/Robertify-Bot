@@ -12,8 +12,11 @@ import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -384,6 +387,30 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public void initCommand(Guild g) {
+        setInteractionCommand(getCommand());
+        upsertCommand(g);
+    }
 
+    public InteractionCommand getCommand() {
+        return InteractionCommand.create()
+                .setCommand(Command.of(
+                        getName(),
+                        "Suggest a feature you'd like to see in the bot!",
+                        List.of(CommandOption.of(
+                                OptionType.STRING,
+                                "suggestion",
+                                "The suggestion to send to us",
+                                true
+                        ))
+                )).build();
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (event.getCommandId().equals(getName())) return;
+
+        event.replyEmbeds(handleSuggestion(event.getUser(), event.getOption("suggestion").getAsString()))
+                .setEphemeral(true)
+                .queue();
     }
 }

@@ -12,6 +12,7 @@ import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
+import main.commands.commands.util.SuggestionCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.sqlite3.AudioDB;
@@ -211,6 +212,7 @@ public class Listener extends ListenerAdapter {
         new ShuffleSlashCommand().initCommand(g);
         new EightBallCommand().initCommand(g);
         new JoinSlashCommand().initCommand(g);
+        new SuggestionCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

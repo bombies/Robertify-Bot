@@ -130,7 +130,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-//                        event.getGuild().getAudioManager().closeAudioConnection();
+                        event.getGuild().getAudioManager().closeAudioConnection();
 //                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("I've disconnected from " + channelLeft.getAsMention())
 //                                        .build())
 //                                .queue();

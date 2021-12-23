@@ -15,6 +15,7 @@ import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.HelpCommand;
+import main.commands.commands.util.SuggestionCommand;
 import main.constants.ENV;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
@@ -101,7 +102,8 @@ public class Robertify {
                             new BanCommand(),
                             new UnbanCommand(),
                             new ShuffleSlashCommand(),
-                            new EightBallCommand()
+                            new EightBallCommand(),
+                            new SuggestionCommand()
                     )
 
                     // Button Listeners
