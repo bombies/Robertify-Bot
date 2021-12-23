@@ -20,7 +20,7 @@ public class ChangeLogConfig extends AbstractJSONConfig {
     @Override
     public void initConfig() {
         try {
-            makeConfigFile(JSONConfigFile.CHANGELOG);
+            makeConfigFile();
         } catch (IllegalStateException e) {
             return;
         }

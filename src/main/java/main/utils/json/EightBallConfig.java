@@ -19,7 +19,7 @@ public class EightBallConfig extends AbstractJSONConfig {
     @Override
     public void initConfig() {
         try {
-            makeConfigFile(JSONConfigFile.EIGHT_BALL);
+            makeConfigFile();
         } catch (IllegalStateException e) {
             updateConfig();
             return;

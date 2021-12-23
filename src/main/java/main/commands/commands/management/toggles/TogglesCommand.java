@@ -38,19 +38,22 @@ public class TogglesCommand implements ICommand {
 
         if (args.isEmpty()) {
             var config = new TogglesConfig();
+            var toggleIDs = new StringBuilder();
             var toggleNames = new StringBuilder();
             var toggleStatuses = new StringBuilder();
 
             EmbedBuilder eb = EmbedUtils.embedMessage("\t");
 
+            int toggleID = 0;
             for (Toggles toggle : Toggles.values()) {
+                toggleIDs.append(++toggleID).append("\n");
                 toggleNames.append(Toggles.parseToggle(toggle)).append("\n");
                 toggleStatuses.append(config.getToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                         .append("\n");
             }
 
+            eb.addField("Toggle ID", toggleIDs.toString(), true);
             eb.addField("Feature", toggleNames.toString(), true);
-            eb.addBlankField(true);
             eb.addField("Status", toggleStatuses.toString(), true);
 
             msg.replyEmbeds(eb.build()).queue();
@@ -58,7 +61,25 @@ public class TogglesCommand implements ICommand {
             var config = new TogglesConfig();
             var eb = new EmbedBuilder();
             switch (args.get(0).toLowerCase()) {
-                case "announcements", "1" -> {
+                case "restrictedvoice", "1", "rvc", "rvchannels" -> {
+                    if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                        config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
+                        eb = EmbedUtils.embedMessage("You have toggled restricted voice channels **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
+                        eb = EmbedUtils.embedMessage("You have toggled restricted voice channels **ON**");
+                    }
+                }
+                case "restrictedtext", "2", "rtc", "rtchannels" -> {
+                    if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                        config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
+                        eb = EmbedUtils.embedMessage("You have toggled restricted text channels **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
+                        eb = EmbedUtils.embedMessage("You have toggled restricted text channels **ON**");
+                    }
+                }
+                case "announcements", "3" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
                         eb = EmbedUtils.embedMessage("You have toggled announcing player messages **OFF**");
@@ -67,7 +88,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled announcing player messages **ON**");
                     }
                 }
-                case "changelog", "2" -> {
+                case "changelog", "4" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_CHANGELOGS)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, false);
                         eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **OFF**");
@@ -76,7 +97,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **ON**");
                     }
                 }
-                case "requester", "3" -> {
+                case "requester", "5" -> {
                     if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
                         eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **OFF**");
@@ -85,7 +106,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
-                case "8ball", "4" -> {
+                case "8ball", "6" -> {
                     if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                         config.setToggle(guild, Toggles.EIGHT_BALL, false);
                         eb = EmbedUtils.embedMessage("You have toggled the 8ball command **OFF**");
@@ -94,7 +115,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled the 8ball command **ON**");
                     }
                 }
-                case "polls", "poll", "5" -> {
+                case "polls", "poll", "7" -> {
                     if (config.getToggle(guild, Toggles.POLLS)) {
                         config.setToggle(guild, Toggles.POLLS, false);
                         eb = EmbedUtils.embedMessage("You have toggled the polls command **OFF**");

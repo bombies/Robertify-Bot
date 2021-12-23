@@ -84,7 +84,7 @@ public class GeneralUtils {
 
     public static boolean stringIsID(String s) {
         String idRegex = "^[0-9]{18}$";
-        return Pattern.matches(idRegex, s);
+        return Pattern.matches(idRegex, getDigitsOnly(s));
     }
 
     public static boolean isUrl(String url) {

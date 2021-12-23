@@ -22,7 +22,7 @@ public class TogglesConfig extends AbstractJSONConfig {
     @Override
     public void initConfig() {
         try {
-            makeConfigFile(file);
+            makeConfigFile();
         } catch (IllegalStateException e) {
             updateFile();
             return;
@@ -33,7 +33,12 @@ public class TogglesConfig extends AbstractJSONConfig {
             var guildObj = new JSONObject();
             for (Toggles toggle : Toggles.values()) {
                 try {
-                    guildObj.put(toggle.toString(), true);
+
+                    switch (toggle) {
+                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> guildObj.put(toggle.toString(), false);
+                        default -> guildObj.put(toggle.toString(), true);
+                    }
+
                     var djTogglesObj = new JSONObject();
 
                     for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
@@ -41,9 +46,7 @@ public class TogglesConfig extends AbstractJSONConfig {
 
                     guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
                 } catch (JSONException e) {
-                    obj.put(g.getId(), new JSONObject());
-                    for (Toggles errToggles: Toggles.values())
-                        obj.getJSONObject(g.getId()).put(errToggles.toString(), true);
+                    handleInitException(g, obj);
                 }
             }
             obj.put(g.getId(), guildObj);
@@ -59,7 +62,12 @@ public class TogglesConfig extends AbstractJSONConfig {
             for (Toggles toggle : Toggles.values())
                 try {
                     JSONObject guildObj = obj.getJSONObject(g.getId());
-                    guildObj.put(toggle.toString(), true);
+
+                    if (!guildObj.has(toggle.toString()))
+                        switch (toggle) {
+                            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> guildObj.put(toggle.toString(), false);
+                            default -> guildObj.put(toggle.toString(), true);
+                        }
 
                     if (!guildObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
                         var djTogglesObj = new JSONObject();
@@ -78,12 +86,19 @@ public class TogglesConfig extends AbstractJSONConfig {
                         guildObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
                     }
                 } catch (JSONException e) {
-                    obj.put(g.getId(), new JSONObject());
-                    for (Toggles errToggles: Toggles.values())
-                        obj.getJSONObject(g.getId()).put(errToggles.toString(), true);
+                    handleInitException(g, obj);
                 }
 
         setJSON(obj);
+    }
+
+    private void handleInitException(Guild g, JSONObject obj) {
+        obj.put(g.getId(), new JSONObject());
+        for (Toggles errToggles: Toggles.values())
+            switch (errToggles) {
+                case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> obj.getJSONObject(g.getId()).put(errToggles.toString(), false);
+                default -> obj.getJSONObject(g.getId()).put(errToggles.toString(), true);
+            }
     }
 
     /**

@@ -28,7 +28,7 @@ public class PermissionsConfig extends AbstractJSONConfig {
     @Override
     public void initConfig() {
         try {
-            makeConfigFile(JSONConfigFile.PERMISSIONS);
+            makeConfigFile();
         } catch (IllegalStateException e) {
             update();
             return;

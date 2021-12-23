@@ -15,6 +15,7 @@ import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
@@ -25,9 +26,12 @@ import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 import javax.annotation.Nullable;
@@ -39,7 +43,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class CommandManager {
-    @Getter
     private final List<ICommand> commands = new ArrayList<>();
     @Getter
     private final List<ICommand> musicCommands = new ArrayList<>();
@@ -86,6 +89,7 @@ public class CommandManager {
                 new PreviousTrackCommand(),
                 new PollCommand(),
                 new JoinCommand(),
+                new RestrictedChannelsCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -138,7 +142,8 @@ public class CommandManager {
                 new TogglesCommand(),
                 new BanCommand(),
                 new UnbanCommand(),
-                new DedicatedChannelCommand()
+                new DedicatedChannelCommand(),
+                new RestrictedChannelsCommand()
         );
 
         addMiscCommands(
@@ -254,16 +259,32 @@ public class CommandManager {
                         return;
                     }
 
-                List<String> args = Arrays.asList(split).subList(1, split.length);
-                CommandContext ctx = new CommandContext(e, args);
-                var toggles = new TogglesConfig();
+                final List<String> args = Arrays.asList(split).subList(1, split.length);
+                final CommandContext ctx = new CommandContext(e, args);
+                final Guild guild = e.getGuild();
+                final Message msg = e.getMessage();
+                final var toggles = new TogglesConfig();
 
-                if (toggles.isDJToggleSet(ctx.getGuild(), cmd)) {
-                    if (toggles.getDJToggle(ctx.getGuild(), cmd)) {
-                        if (GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+                if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                    if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
+                        return;
+
+                    final var rcConfig = new RestrictedChannelsConfig();
+                    if (!rcConfig.isRestrictedChannel(
+                            guild.getId(),
+                            msg.getTextChannel().getIdLong(),
+                            RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
+                    )) {
+                      return;
+                    }
+                }
+
+                if (toggles.isDJToggleSet(guild, cmd)) {
+                    if (toggles.getDJToggle(guild, cmd)) {
+                        if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
                             cmd.handle(ctx);
                         } else {
-                            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                            msg.replyEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
                                             " to run this command!").build())
                                     .queue();
                         }

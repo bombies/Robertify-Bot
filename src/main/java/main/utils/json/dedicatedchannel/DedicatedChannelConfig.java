@@ -36,7 +36,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
     @Override
     public void initConfig() {
         try {
-            makeConfigFile(JSONConfigFile.DEDICATED_CHANNELS);
+            makeConfigFile();
         } catch (IllegalStateException e) {
             updateConfig();
             return;

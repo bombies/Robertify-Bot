@@ -23,6 +23,7 @@ import main.utils.json.AbstractJSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -62,15 +63,14 @@ public class Listener extends ListenerAdapter {
 
         AbstractJSONConfig.initDirectory();
         PermissionsConfig permConfig = new PermissionsConfig();
-        TogglesConfig togglesConfig = new TogglesConfig();
-
-        permConfig.initConfig();
-        togglesConfig.initConfig();
 
 //        new PermissionsDB().init();
+        permConfig.initConfig();
         new ChangeLogConfig().initConfig();
+        new TogglesConfig().initConfig();
         new DedicatedChannelConfig().initConfig();
         new EightBallConfig().initConfig();
+        new RestrictedChannelsConfig().initConfig();
         new ServerDB();
 
         BanDB.initBannedUserMap();

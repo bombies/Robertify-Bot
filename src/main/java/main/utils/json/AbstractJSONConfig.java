@@ -1,5 +1,6 @@
 package main.utils.json;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
@@ -16,6 +17,7 @@ public abstract class AbstractJSONConfig {
     /**
      * The JSON file itself
      */
+    @Getter
     private final JSONConfigFile file;
 
     public AbstractJSONConfig(JSONConfigFile file) {
@@ -29,14 +31,13 @@ public abstract class AbstractJSONConfig {
 
     /**
      * Attempts to make the specified JSON configuration file if it doesn't already exist.
-     * @param file JSON file to be created
      */
     @SneakyThrows
-    public void makeConfigFile(JSONConfigFile file) {
+    public void makeConfigFile() {
         boolean newConfig = false;
 
-        if (!Files.exists(Config.getPath(ENV.JSON_DIR, file))) {
-            new File(String.valueOf(Config.getPath(ENV.JSON_DIR, file)))
+        if (!Files.exists(Config.getPath(ENV.JSON_DIR, this.file))) {
+            new File(String.valueOf(Config.getPath(ENV.JSON_DIR, this.file)))
                     .createNewFile();
             newConfig = true;
         }

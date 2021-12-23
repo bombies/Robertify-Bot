@@ -3,6 +3,8 @@ package main.commands.commands.management.toggles.togglesconfig;
 import main.utils.json.GenericJSONField;
 
 public enum Toggles implements GenericJSONField {
+    RESTRICTED_VOICE_CHANNELS("restricted_voice_channels"),
+    RESTRICTED_TEXT_CHANNELS("restricted_text_channels"),
     ANNOUNCE_MESSAGES("announce_messages"),
     ANNOUNCE_CHANGELOGS("announce_changelogs"),
     SHOW_REQUESTER("show_requester"),
@@ -36,6 +38,12 @@ public enum Toggles implements GenericJSONField {
             }
             case POLLS -> {
                 return "polls";
+            }
+            case RESTRICTED_VOICE_CHANNELS -> {
+                return "restrictedvoice";
+            }
+            case RESTRICTED_TEXT_CHANNELS -> {
+                return "restrictedtext";
             }
         }
         throw new NullPointerException("No such toggle!");
