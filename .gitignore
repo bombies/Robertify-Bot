@@ -30,9 +30,8 @@ hs_err_pid*
 classes
 
 # Other files
-target
+*.json
 .env
 vpsDataBackup
-json/
 databases
 localaudio
