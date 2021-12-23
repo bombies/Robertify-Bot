@@ -18,7 +18,9 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -91,7 +93,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             if (!event.getMessage().isEphemeral())
                 event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
         } else
-            event.getMessage().delete().queueAfter(1, TimeUnit.SECONDS);
+            event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS);
     }
 
     @Override
@@ -134,36 +136,44 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
             EmbedBuilder rewindEmbed = new RewindCommand().handleRewind(selfVoiceState, 0, true);
             event.reply(user.getAsMention()).addEmbeds(rewindEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
             EmbedBuilder playPauseEmbed = new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(playPauseEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
             EmbedBuilder skipEmbed = new SkipCommand().handleSkip(selfVoiceState, memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(skipEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
             EmbedBuilder loopEmbed = new LoopCommand().handleRepeat(musicManager);
             event.reply(user.getAsMention()).addEmbeds(loopEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
             EmbedBuilder shuffleEmbed = new ShuffleCommand().handleShuffle(event.getGuild());
             event.reply(user.getAsMention()).addEmbeds(shuffleEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
             EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild(), event.getUser());
             event.reply(user.getAsMention()).addEmbeds(disconnectEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
             EmbedBuilder stopEmbed = new StopCommand().handleStop(musicManager);
             event.reply(user.getAsMention()).addEmbeds(stopEmbed.build())
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
             EmbedBuilder previousEmbed = new PreviousTrackCommand().handlePrevious(event.getGuild(), memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(previousEmbed.build())
                     .setEphemeral(false)
-                    .queue();
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         }
     }
 }
