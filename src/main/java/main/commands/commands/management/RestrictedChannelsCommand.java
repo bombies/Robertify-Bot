@@ -220,10 +220,10 @@ public class RestrictedChannelsCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nRestrict the bot to join voice channels that you set.\n\n" +
-                "**__Usages__**\n" + getUsages(Long.parseLong(guildID));
+                "**__Usages__**\n" + getUsages(Long.parseLong(prefix));
     }
 
     @Override

@@ -107,10 +107,10 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set a specific role to be a DJ\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setdj <@role|@user>`";
+                "Usage: `"+ prefix +"setdj <@role|@user>`";
     }
 
     @Override

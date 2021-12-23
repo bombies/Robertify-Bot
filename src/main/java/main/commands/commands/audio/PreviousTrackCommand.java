@@ -68,10 +68,10 @@ public class PreviousTrackCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Go back to he track that was played previously\n\n" +
-                "**Usage**: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"previous`";
+                "**Usage**: `"+ prefix +"previous`";
     }
 
     @Override

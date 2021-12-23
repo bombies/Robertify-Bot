@@ -208,14 +208,14 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Want to determine your fate? Take a chance with the 8ball!\n" +
                 "\n**__Usages__**\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball <question>` *(Ask 8ball a question)*\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball add <response>` *(Add a custom response to 8ball)*\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball remove <responseID>` *(Remove a custom response from)*\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball list` *(List all custom responses)*\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID))+"8ball clear` *(Clear all custom responses)*";
+                "`"+ prefix+"8ball <question>` *(Ask 8ball a question)*\n" +
+                "`"+ prefix+"8ball add <response>` *(Add a custom response to 8ball)*\n" +
+                "`"+ prefix+"8ball remove <responseID>` *(Remove a custom response from)*\n" +
+                "`"+ prefix+"8ball list` *(List all custom responses)*\n" +
+                "`"+ prefix+"8ball clear` *(Clear all custom responses)*";
     }
 
     @Override

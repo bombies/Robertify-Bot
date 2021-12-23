@@ -56,10 +56,10 @@ public class ViewConfigCommand implements IDevCommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "View the JSON configurations associated with the bot\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"viewconfig <filename>.json`";
+                "\nUsage: `"+ prefix+"viewconfig <filename>.json`";
     }
 
     @Override

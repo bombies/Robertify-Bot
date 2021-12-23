@@ -99,10 +99,10 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Remove DJ privileges from a specific role\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"remove <@role|@user>`";
+                "Usage: `"+ prefix +"remove <@role|@user>`";
     }
 
     @Override

@@ -84,10 +84,10 @@ public class ResumeCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Resumes the currently playing song if paused\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"resume`";
+                "\nUsage: `"+ prefix+"resume`";
     }
 
     @Override

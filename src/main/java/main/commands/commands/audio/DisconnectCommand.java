@@ -72,7 +72,7 @@ public class DisconnectCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";

@@ -57,7 +57,7 @@ public class ShutdownCommand implements IDevCommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Shuts the bot down";
     }
 }

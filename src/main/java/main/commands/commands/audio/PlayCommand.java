@@ -177,12 +177,12 @@ public class PlayCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Plays a song\n\n" +
                 "**__Usages__**\n" +
-                "`" + ServerDB.getPrefix(Long.parseLong(guildID)) + "play <song>`\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"play file` *(Must have a file attached to the message)*";
+                "`" + prefix + "play <song>`\n" +
+                "`"+ prefix +"play file` *(Must have a file attached to the message)*";
     }
 
     @Override

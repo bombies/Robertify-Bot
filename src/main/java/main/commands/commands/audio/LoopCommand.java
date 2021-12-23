@@ -149,10 +149,10 @@ public class LoopCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Set the song being replayed\n" +
-                "\nUsage `" + ServerDB.getPrefix(Long.parseLong(guildID)) + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
+                "\nUsage `" + prefix + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
     }
 
     @Override

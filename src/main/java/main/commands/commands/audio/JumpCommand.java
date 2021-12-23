@@ -120,10 +120,10 @@ public class JumpCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Skips the song by the given number of seconds\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"jump <seconds_to_jump>` *(Skips the song to a specific duration)*\n";
+                "\nUsage: `"+ prefix+"jump <seconds_to_jump>` *(Skips the song to a specific duration)*\n";
     }
 
     @Override

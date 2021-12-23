@@ -334,26 +334,26 @@ public class PermissionsCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Manage bot permissions for roles\n\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions add <@role> <" + String.join(
+                "\nUsage: `"+ prefix+"permissions add <@role> <" + String.join(
                         "|",
                         Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions adduser <@user> <" + String.join(
+                "\nUsage: `"+ prefix+"permissions adduser <@user> <" + String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions remove <@role> <" + String.join(
+                "\nUsage: `"+ prefix+"permissions remove <@role> <" + String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions removeuser <@user> <" + String.join(
+                "\nUsage: `"+ prefix+"permissions removeuser <@user> <" + String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) + ">`\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"permissions list <["+ String.join(
+                "\nUsage: `"+ prefix+"permissions list <["+ String.join(
                 "|",
                 Permission.getPermissions().toString().replaceAll("[\\[\\]]", "").split(",\\s")
                 ) +"]|@role|@user>`";

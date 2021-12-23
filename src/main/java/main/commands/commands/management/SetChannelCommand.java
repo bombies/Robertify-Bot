@@ -76,10 +76,10 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nSet the announcement channel for when a new song is being played.\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"setchannel <channelID>`";
+                "Usage: `"+ prefix +"setchannel <channelID>`";
     }
 
     @Override

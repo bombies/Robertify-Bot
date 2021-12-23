@@ -182,7 +182,7 @@ public class PollCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Want to ask your community members a question? This is the right tool for you." +
                 " You are able to poll up to 9 choices with an optional time period.\n*This is a DJ only command*\n\n**Usages**\n" +
                 "`poll <question> \"[choice]\" \"[choice]\" ...`\n" +

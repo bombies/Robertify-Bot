@@ -147,7 +147,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             }
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(msg.getGuild().getId()));
+        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(ServerDB.getPrefix(Long.parseLong(prefix))));
         eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
         msg.replyEmbeds(eb.build()).queue();
 
@@ -261,7 +261,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return null;
     }
 

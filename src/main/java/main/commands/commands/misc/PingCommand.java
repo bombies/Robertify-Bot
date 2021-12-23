@@ -30,7 +30,7 @@ public class PingCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Shows the bot's ping to discord's servers.";
     }
 }

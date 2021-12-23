@@ -85,7 +85,7 @@ public class DedicatedChannelCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Running this command will build a channel in which you can easily control the bot and" +
                 " queue songs. When this channel is created, if you want it removed all you have to do" +
                 " is right click on it and delete it. Once the channel is created you can find it at the" +

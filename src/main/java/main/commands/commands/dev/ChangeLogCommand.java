@@ -148,7 +148,7 @@ public class ChangeLogCommand implements IDevCommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Send out changelogs for the bot!";
     }
 }

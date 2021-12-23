@@ -36,7 +36,7 @@ public class SpotifyURLToURICommand implements ITestCommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return null;
     }
 

@@ -191,12 +191,12 @@ public class TogglesCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Toggle specific features on or off!\n\n**__Usages__**\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"toggles`\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"toggles <toggle_name>`\n" +
-                 "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"toggles dj <list|command>`\n";
+                "`"+ prefix +"toggles`\n" +
+                "`"+ prefix +"toggles <toggle_name>`\n" +
+                 "`"+ prefix +"toggles dj <list|command>`\n";
     }
 
     @Override

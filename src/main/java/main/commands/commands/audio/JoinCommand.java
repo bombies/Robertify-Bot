@@ -58,7 +58,7 @@ public class JoinCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Use this command to forcefully move the bot into your voice channel.\n\n" +
                 "*NOTE: This command can be made DJ only by using* `toggles dj join`";
     }

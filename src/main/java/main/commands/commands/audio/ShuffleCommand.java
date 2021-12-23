@@ -63,7 +63,7 @@ public class ShuffleCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Shuffle the current queue";
     }
 

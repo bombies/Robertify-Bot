@@ -86,10 +86,10 @@ public class RemoveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Remove a specific song from the queue\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"remove <id>`";
+                "\nUsage: `"+ prefix+"remove <id>`";
     }
 
     @Override

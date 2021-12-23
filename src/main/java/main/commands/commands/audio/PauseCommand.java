@@ -87,7 +87,7 @@ public class PauseCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Pauses the song currently playing";
     }
 }

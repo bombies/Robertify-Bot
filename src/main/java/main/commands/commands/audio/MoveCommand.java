@@ -109,10 +109,10 @@ public class MoveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "\nMove a specific track to a specific position in the queue\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"move <id> <position>`";
+                "\nUsage: `"+ prefix+"move <id> <position>`";
     }
 
     @Override

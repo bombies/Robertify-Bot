@@ -10,7 +10,7 @@ public interface ICommand {
 
     String getName();
 
-    String getHelp(String guildID);
+    String getHelp(String prefix);
 
     default String getUsages(long guildID) {
         return null;

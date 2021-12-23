@@ -88,9 +88,9 @@ public class SeekCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Jump to a specific position in the current song\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"seek <mm:ss>`\n";
+                "\nUsage: `"+ prefix+"seek <mm:ss>`\n";
     }
 }

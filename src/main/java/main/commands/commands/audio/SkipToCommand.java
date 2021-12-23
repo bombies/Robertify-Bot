@@ -83,10 +83,10 @@ public class SkipToCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
                 "Skip to a specific song in the queue\n" +
-                "\nUsage: `"+ ServerDB.getPrefix(Long.parseLong(guildID))+"skipto <id>`";
+                "\nUsage: `"+ prefix+"skipto <id>`";
     }
 
     @Override

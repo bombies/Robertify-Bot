@@ -68,7 +68,7 @@ public class VolumeCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "control the volume of the bot";
     }
 

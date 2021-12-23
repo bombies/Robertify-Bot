@@ -88,10 +88,10 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nUnban a user from the bot\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"unban <user>`";
+                "Usage: `"+ prefix +"unban <user>`";
     }
 
     @Override

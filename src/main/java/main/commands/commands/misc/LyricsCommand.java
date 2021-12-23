@@ -122,7 +122,7 @@ public class LyricsCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Get the lyrics for the song being played\n\n" +
                 "**__Usages__**\n" +
                 "`lyrics` *(Fetches the lyrics for the song being currently played)*\n" +

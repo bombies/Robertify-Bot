@@ -124,10 +124,10 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public String getHelp(String guildID) {
+    public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nBan a user from the bot\n\n" +
-                "Usage: `"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"ban <user>`";
+                "Usage: `"+ prefix +"ban <user>`";
     }
 
     @Override
