@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
@@ -109,8 +110,24 @@ public class Listener extends ListenerAdapter {
             if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
                 event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
                         .queue();
-            } else
-                manager.handle(event);
+            } else {
+                try {
+                    manager.handle(event);
+                } catch (InsufficientPermissionException e) {
+                    try {
+                        if (e.getMessage().contains("Permission.MESSAGE_EMBED_LINKS")) {
+                            event.getChannel().sendMessage("""
+                                            ⚠️ I don't have permission to send embeds!
+
+                                            Please tell an admin to enable the `Embed Links` permission for my role in this
+                                             channel in order for my commands to work!""")
+                                    .queue();
+                        } else {
+                            logger.error("Insufficient permissions", e);
+                        }
+                    } catch (InsufficientPermissionException ignored) {}
+                }
+            }
         }
     }
 

@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -285,6 +286,15 @@ public class CommandManager {
                 final Guild guild = e.getGuild();
                 final Message msg = e.getMessage();
                 final var toggles = new TogglesConfig();
+
+                if (!guild.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+                    e.getChannel().sendMessage("""
+                                    ⚠️ I do not have permissions to send embeds!
+
+                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
+                            .queue();
+                    return;
+                }
 
                 if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                     if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))

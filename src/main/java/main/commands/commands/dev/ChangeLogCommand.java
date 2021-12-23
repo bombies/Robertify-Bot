@@ -5,6 +5,7 @@ import main.commands.IDevCommand;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.TimeFormat;
+import main.exceptions.NoEmbedPermissionException;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
@@ -98,6 +99,7 @@ public class ChangeLogCommand implements IDevCommand {
 
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
+
         msg.replyEmbeds(eb.build()).queue();
     }
 
