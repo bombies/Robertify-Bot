@@ -65,7 +65,8 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                         List.of(
                                 Triple.of("Management Commands", "help:management", "💼"),
                                 Triple.of("Music Commands", "help:music", "🎶"),
-                                Triple.of("Miscellaneous Commands", "help:misc", "⚒️")
+                                Triple.of("Miscellaneous Commands", "help:misc", "⚒️"),
+                                Triple.of("Utility Commands", "help:utility", "❓")
                         ),
                         e -> {
                              if (e.getMessage().getMessageReference() == null)
@@ -203,6 +204,9 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             case "help:misc" -> {
                 event.editMessageEmbeds(getHelpEmbed(HelpType.MISCELLANEOUS, prefix).build()).queue();
             }
+            case "help:utility" -> {
+                event.editMessageEmbeds(getHelpEmbed(HelpType.UTILITY, prefix).build()).queue();
+            }
         }
     }
 
@@ -235,19 +239,40 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
 
         switch (type) {
             case MANAGEMENT -> {
-                for (ICommand cmd : manager.getManagementCommands())
-                    sb.append("`").append(cmd.getName()).append("`, ");
+                List<ICommand> managementCommands = manager.getManagementCommands();
+                for (ICommand cmd : managementCommands)
+                    sb.append("`").append(cmd.getName()).append(
+                            managementCommands.get(managementCommands.size()-1).equals(cmd) ?
+                                    "`" : "`, "
+                    );
                 eb.addField("Management Commands", sb.toString(), false);
             }
             case MISCELLANEOUS -> {
+                List<ICommand> miscCommands = manager.getMiscCommands();
                 for (ICommand cmd : manager.getMiscCommands())
-                    sb.append("`").append(cmd.getName()).append("`, ");
+                    sb.append("`").append(cmd.getName()).append(
+                            miscCommands.get(miscCommands.size()-1).equals(cmd) ?
+                                    "`" : "`, "
+                    );
                 eb.addField("Miscellaneous Commands", sb.toString(), false);
             }
             case MUSIC -> {
-                for (ICommand cmd : manager.getMusicCommands())
-                    sb.append("`").append(cmd.getName()).append("`, ");
+                List<ICommand> musicCommands = manager.getMusicCommands();
+                for (ICommand cmd : musicCommands)
+                    sb.append("`").append(cmd.getName()).append(
+                            musicCommands.get(musicCommands.size()-1).equals(cmd) ?
+                                    "`" : "`, "
+                    );
                 eb.addField("Music Commands", sb.toString(), false);
+            }
+            case UTILITY -> {
+                List<ICommand> utilityCommands = manager.getUtilityCommands();
+                for (ICommand cmd : utilityCommands)
+                    sb.append("`").append(cmd.getName()).append(
+                            utilityCommands.get(utilityCommands.size()-1).equals(cmd) ?
+                                    "`" : "`, "
+                    );
+                eb.addField("Utility Commands", sb.toString(), false);
             }
         }
 
@@ -267,6 +292,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     enum HelpType {
         MANAGEMENT,
         MUSIC,
-        MISCELLANEOUS
+        MISCELLANEOUS,
+        UTILITY
     }
 }

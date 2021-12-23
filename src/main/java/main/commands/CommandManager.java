@@ -51,6 +51,8 @@ public class CommandManager {
     private final List<ICommand> managementCommands = new ArrayList<>();
     @Getter
     private final List<ICommand> miscCommands = new ArrayList<>();
+    @Getter
+    private final List<ICommand> utilityCommands = new ArrayList<>();
 
 
     public CommandManager(EventWaiter waiter) {
@@ -153,6 +155,12 @@ public class CommandManager {
                 new EightBallCommand(),
                 new PollCommand()
         );
+
+        addUtilityCommands(
+                new TutorialCommand(),
+                new HelpCommand(),
+                new SuggestionCommand()
+        );
     }
 
     private void addCommands(ICommand... cmds) {
@@ -196,6 +204,17 @@ public class CommandManager {
                 throw new IllegalArgumentException("A command with this name already exists!");
 
             miscCommands.add(cmd);
+        }
+    }
+
+    private void addUtilityCommands(ICommand... cmds) {
+        for (ICommand cmd : cmds) {
+            boolean nameFound = this.utilityCommands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
+
+            if (nameFound)
+                throw new IllegalArgumentException("A command with this name already exists!");
+
+            utilityCommands.add(cmd);
         }
     }
 
