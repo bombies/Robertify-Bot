@@ -33,6 +33,6 @@ classes
 target
 .env
 vpsDataBackup
-json/
+./json/
 databases
 localaudio
