@@ -46,7 +46,9 @@ public class ShutdownCommand implements IDevCommand {
                 new DedicatedChannelConfig().updateMessage(g);
         }
 
-        FileUtils.cleanDirectory(new File(Config.get(ENV.AUDIO_DIR) + "/"));
+        try {
+            FileUtils.cleanDirectory(new File(Config.get(ENV.AUDIO_DIR) + "/"));
+        } catch (IllegalArgumentException ignored) {}
 
         BotCommons.shutdown(ctx.getJDA());
     }
