@@ -3,6 +3,9 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
 
@@ -28,6 +31,16 @@ public class JoinCommand implements ICommand {
         }
 
         VoiceChannel channel = memberVoiceState.getChannel();
+
+        if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+            final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            if (!restrictedChannelsConfig.isRestrictedChannel(guild.getId(), channel.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                return EmbedUtils.embedMessage("I can't join this channel!" +
+                        "\n\nI am restricted to only join\n"
+                        + restrictedChannelsConfig.restrictedChannelsToString(guild.getId(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)).build();
+            }
+        }
+
         if (selfVoiceState.inVoiceChannel()) {
             guild.moveVoiceMember(selfVoiceState.getMember(), channel)
                     .queue();
