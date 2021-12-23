@@ -33,10 +33,7 @@ public class RestrictedChannelsCommand implements ICommand {
         final List<String> args = ctx.getArgs();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n**__Usages__**\n" +
-                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels add <channelID>`\n" +
-                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels remove <channelID>`\n" +
-                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels list`").build())
+            msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n" + getUsages(guild.getIdLong())).build())
                     .queue();
         } else {
             switch (args.get(0).toLowerCase()) {
@@ -44,10 +41,7 @@ public class RestrictedChannelsCommand implements ICommand {
                 case "remove" -> remove(msg, args);
                 case "list" -> list(msg);
                 default -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n**__Usages__**\n" +
-                                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels add <channelID>`\n" +
-                                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels remove <channelID>`\n" +
-                                    "`"+ ServerDB.getPrefix(guild.getIdLong()) +"restrictedchannels list`").build())
+                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(guild.getIdLong())).build())
                             .queue();
                 }
             }
@@ -229,10 +223,14 @@ public class RestrictedChannelsCommand implements ICommand {
     public String getHelp(String guildID) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
                 "\nRestrict the bot to join voice channels that you set.\n\n" +
-                "**__Usages__**\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"restrictedchannels add <channelID>`\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"restrictedchannels remove <channelID>`\n" +
-                "`"+ ServerDB.getPrefix(Long.parseLong(guildID)) +"restrictedchannels list`";
+                "**__Usages__**\n" + getUsages(Long.parseLong(guildID));
+    }
+
+    private String getUsages(long guildID) {
+        return "**__Usages__**\n" +
+                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels add <channelID>`\n" +
+                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels remove <channelID>`\n" +
+                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels list`";
     }
 
     @Override
