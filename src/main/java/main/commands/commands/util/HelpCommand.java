@@ -46,6 +46,10 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         upsertCommand(g);
     }
 
+    public void initCommandWithoutUpsertion() {
+        setInteractionCommand(getCommand());
+    }
+
     private InteractionCommand getCommand() {
         return InteractionCommand.create()
                 .setCommand(Command.of(

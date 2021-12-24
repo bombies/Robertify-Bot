@@ -93,6 +93,7 @@ public class Listener extends ListenerAdapter {
 
         new AudioDB().cacheAllTracks();
 
+        initSelectionMenus();
         AbstractMongoDatabase.initAllCaches();
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
@@ -281,5 +282,9 @@ public class Listener extends ListenerAdapter {
         scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())).getTime(), TimeUnit.MILLISECONDS);
     }
 
+
+    private static void initSelectionMenus() {
+        new HelpCommand().initCommandWithoutUpsertion();
+    }
 
 }
