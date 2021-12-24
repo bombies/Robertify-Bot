@@ -4,7 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
+import main.commands.ICommand;
 import main.commands.commands.audio.*;
+import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
@@ -100,7 +102,6 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         final String id = event.getButton().getId();
         final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final AudioPlayer audioPlayer = musicManager.audioPlayer;
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final User user = event.getUser();
@@ -125,47 +126,116 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             return;
         }
 
+        final var toggles = new TogglesConfig();
+        final var guild = event.getGuild();
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
+            if (!djCheck(new RewindCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder rewindEmbed = new RewindCommand().handleRewind(selfVoiceState, 0, true);
             event.reply(user.getAsMention()).addEmbeds(rewindEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
+            if (!djCheck(new PauseCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder playPauseEmbed = new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(playPauseEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
+            if (!djCheck(new SkipCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder skipEmbed = new SkipCommand().handleSkip(selfVoiceState, memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(skipEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
+            if (!djCheck(new LoopCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder loopEmbed = new LoopCommand().handleRepeat(musicManager);
             event.reply(user.getAsMention()).addEmbeds(loopEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
+            if (!djCheck(new ShuffleCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder shuffleEmbed = new ShuffleCommand().handleShuffle(event.getGuild());
             event.reply(user.getAsMention()).addEmbeds(shuffleEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
+            if (!djCheck(new DisconnectCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild(), event.getUser());
             event.reply(user.getAsMention()).addEmbeds(disconnectEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
+            if (!djCheck(new StopCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder stopEmbed = new StopCommand().handleStop(musicManager);
             event.reply(user.getAsMention()).addEmbeds(stopEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
+            if (!djCheck(new PreviousTrackCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
             EmbedBuilder previousEmbed = new PreviousTrackCommand().handlePrevious(event.getGuild(), memberVoiceState);
             event.reply(user.getAsMention()).addEmbeds(previousEmbed.build())
                     .setEphemeral(false)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         }
+    }
+
+    private boolean djCheck(ICommand command, Guild guild, User user) {
+        final var toggles = new TogglesConfig();
+        if (toggles.isDJToggleSet(guild, command)) {
+            if (toggles.getDJToggle(guild, command)) {
+                return GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_DJ);
+            }
+        }
+
+        return true;
     }
 }
