@@ -45,10 +45,9 @@ public class AudioLoader implements AudioLoadResultHandler {
     public void trackLoaded(AudioTrack audioTrack) {
         sendTrackLoadedMessage(audioTrack);
 
-        if (!announceMsg) {
-            logger.info("Adding {} as an unannounced track", audioTrack.getInfo().title);
+        if (!announceMsg)
             RobertifyAudioManager.getUnannouncedTracks().add(audioTrack);
-        }
+
 
         trackRequestedByUser.put(audioTrack, sender);
         musicManager.scheduler.queue(audioTrack);
@@ -104,10 +103,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         }
 
         if (!announceMsg)
-            for (final AudioTrack track : tracks) {
-                logger.info("Adding {} as an unannounced track", track.getInfo().title);
+            for (final AudioTrack track : tracks)
                 RobertifyAudioManager.getUnannouncedTracks().add(track);
-            }
 
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);

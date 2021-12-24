@@ -69,7 +69,6 @@ public class TrackScheduler extends AudioEventAdapter {
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
             if (RobertifyAudioManager.getUnannouncedTracks().contains(track)) {
-                logger.info("{} is an unannounced track", track.getInfo().title);
                 RobertifyAudioManager.getUnannouncedTracks().remove(track);
                 return;
             }
