@@ -82,7 +82,7 @@ public class Listener extends ListenerAdapter {
         for (Guild g : botDB.getGuilds()) {
             permConfig.initGuild(g.getId());
 
-            initSlashCommands(g);
+            initNeededSlashCommands(g);
             rescheduleUnbans(g);
 
             if (new DedicatedChannelConfig().isChannelSet(g.getId()))
@@ -213,6 +213,10 @@ public class Listener extends ListenerAdapter {
         new EightBallCommand().initCommand(g);
         new JoinSlashCommand().initCommand(g);
         new SuggestionCommand().initCommand(g);
+    }
+
+    public void initNeededSlashCommands(Guild g) {
+        // Only slash commands that NEED to be updated in each guild.
     }
 
     private static void rescheduleUnbans(Guild g) {

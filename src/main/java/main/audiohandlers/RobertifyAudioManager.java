@@ -30,7 +30,9 @@ public class RobertifyAudioManager extends AbstractModule {
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
-    private static final HashMap<AudioTrack, User> trackRequestedByUser = new HashMap<>();
+    private static final HashMap<AudioTrack, User> tracksRequestedByUsers = new HashMap<>();
+    @Getter
+    private static final List<AudioTrack> unannouncedTracks = new ArrayList<>();
     @Getter
     private final AudioPlayerManager audioPlayerManager;
 
@@ -63,7 +65,8 @@ public class RobertifyAudioManager extends AbstractModule {
     }
 
     @SneakyThrows
-    public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+    public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
         final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
@@ -84,7 +87,31 @@ public class RobertifyAudioManager extends AbstractModule {
         );
     }
 
-    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
+    @SneakyThrows
+    public void loadAndPlayFromDedicatedChannel(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadTrack(
+                trackUrl,
+                musicManager,
+                ctx,
+                false,
+                botMsg
+        );
+    }
+
+    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
         final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
@@ -125,7 +152,7 @@ public class RobertifyAudioManager extends AbstractModule {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            CommandContext ctx, boolean announceMsg, Message botMsg) {
 
-        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
+        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg);
         final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
@@ -133,7 +160,7 @@ public class RobertifyAudioManager extends AbstractModule {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender) {
 
-        final AudioLoader loader = new AudioLoader(sender, musicManager, trackRequestedByUser, trackUrl, announceMsg, botMsg);
+        final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg);
         final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
@@ -155,11 +182,11 @@ public class RobertifyAudioManager extends AbstractModule {
     }
 
     public static User getRequester(AudioTrack track) {
-        return trackRequestedByUser.get(track);
+        return tracksRequestedByUsers.get(track);
     }
 
     public static void removeRequester(AudioTrack track, User requester) {
-        trackRequestedByUser.remove(track, requester);
+        tracksRequestedByUsers.remove(track, requester);
     }
 
     public static RobertifyAudioManager getInstance() {

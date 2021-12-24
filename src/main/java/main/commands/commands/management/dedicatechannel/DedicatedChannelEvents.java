@@ -73,19 +73,11 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
 
         if (!message.startsWith(ServerDB.getPrefix(guild.getIdLong())) && !user.isBot()) {
-            final var toggleConfig = new TogglesConfig();
-            final boolean originalAnnouncementToggle = toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
-
-            if (originalAnnouncementToggle) {
-                toggleConfig.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
-                config.setOriginalAnnouncementToggle(guild.getId(), true);
-            }
-
             if (!GeneralUtils.isUrl(message))
                 message = "ytsearch:" + message;
 
             RobertifyAudioManager.getInstance()
-                    .loadAndPlay(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
+                    .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
                             new CommandContext(event, null), null);
         }
 

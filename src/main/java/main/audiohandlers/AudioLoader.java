@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.requests.ratelimit.BotRateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,6 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final String trackUrl;
     private final Message botMsg;
 
-
     public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg) {
         this.guild = musicManager.scheduler.getGuild();
@@ -43,8 +43,12 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
-        if (announceMsg)
-            sendTrackLoadedMessage(audioTrack);
+        sendTrackLoadedMessage(audioTrack);
+
+        if (!announceMsg) {
+            logger.info("Adding {} as an unannounced track", audioTrack.getInfo().title);
+            RobertifyAudioManager.getUnannouncedTracks().add(audioTrack);
+        }
 
         trackRequestedByUser.put(audioTrack, sender);
         musicManager.scheduler.queue(audioTrack);
@@ -73,8 +77,10 @@ public class AudioLoader implements AudioLoadResultHandler {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
         if (trackUrl.startsWith("ytsearch:")) {
-            if (announceMsg)
-                sendTrackLoadedMessage(tracks.get(0));
+            sendTrackLoadedMessage(tracks.get(0));
+
+            if (!announceMsg)
+               RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0));
 
             trackRequestedByUser.put(tracks.get(0), sender);
             musicManager.scheduler.queue(tracks.get(0));
@@ -96,6 +102,12 @@ public class AudioLoader implements AudioLoadResultHandler {
             new DedicatedChannelConfig().getTextChannel(guild.getId())
                     .sendMessageEmbeds(eb.build()).queue();
         }
+
+        if (!announceMsg)
+            for (final AudioTrack track : tracks) {
+                logger.info("Adding {} as an unannounced track", track.getInfo().title);
+                RobertifyAudioManager.getUnannouncedTracks().add(track);
+            }
 
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);

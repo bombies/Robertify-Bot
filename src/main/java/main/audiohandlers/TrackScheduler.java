@@ -1,6 +1,5 @@
 package main.audiohandlers;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -39,8 +38,6 @@ public class TrackScheduler extends AudioEventAdapter {
     public ConcurrentLinkedQueue<AudioTrack> queue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
-    private boolean announceNowPlaying;
-    private boolean errorOccurred = false;
     private Message lastSentMsg = null;
     @Getter
     private final Guild guild;
@@ -50,7 +47,6 @@ public class TrackScheduler extends AudioEventAdapter {
         this.queue = new ConcurrentLinkedQueue<>();
         this.pastQueue = new Stack<>();
         this.guild = guild;
-        this.announceNowPlaying = new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
     }
 
     public void queue(AudioTrack track) {
@@ -71,21 +67,10 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
-        final TogglesConfig toggleConfig = new TogglesConfig();
-        announceNowPlaying = toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
-
         if (!repeating) {
-            if (!announceNowPlaying) {
-                final DedicatedChannelConfig config = new DedicatedChannelConfig();
-                boolean originalAnnouncementToggle = config.getOriginalAnnouncementToggle(guild.getId());
-                if (toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES) != originalAnnouncementToggle) {
-                    if (config.isChannelSet(guild.getId())) {
-                        toggleConfig.setToggle(
-                                guild, Toggles.ANNOUNCE_MESSAGES,
-                                config.getOriginalAnnouncementToggle(guild.getId())
-                        );
-                    }
-                }
+            if (RobertifyAudioManager.getUnannouncedTracks().contains(track)) {
+                logger.info("{} is an unannounced track", track.getInfo().title);
+                RobertifyAudioManager.getUnannouncedTracks().remove(track);
                 return;
             }
 
@@ -123,10 +108,8 @@ public class TrackScheduler extends AudioEventAdapter {
             this.player.stopTrack();
             this.player.startTrack(nextTrack, false);
         } catch (IllegalStateException e) {
-            announceNowPlaying = false;
             this.player.stopTrack();
             this.player.startTrack(nextTrack.makeClone(), false);
-            announceNowPlaying = new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
@@ -135,22 +118,19 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        if (!errorOccurred) {
-            if (repeating) {
-                if (track != null) {
-                    if (RobertifyAudioManager.getTrackRequestedByUser().containsKey(track))
-                        RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
-                    try {
-                        player.playTrack(track.makeClone());
-                    } catch (UnsupportedOperationException e) {
-                        track.setPosition(0);
-                    }
-                } else
-                    nextTrack();
-            } else if (endReason.mayStartNext) {
-                pastQueue.push(track.makeClone());
-                nextTrack();
-            }
+        if (repeating) {
+            if (track != null) {
+                if (RobertifyAudioManager.getTracksRequestedByUsers().containsKey(track))
+                    RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
+                try {
+                    player.playTrack(track.makeClone());
+                } catch (UnsupportedOperationException e) {
+                    track.setPosition(0);
+                }
+            } else nextTrack();
+        } else if (endReason.mayStartNext) {
+            pastQueue.push(track.makeClone());
+            nextTrack();
         }
     }
 
