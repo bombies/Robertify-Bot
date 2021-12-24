@@ -104,7 +104,6 @@ public class Listener extends ListenerAdapter {
         String prefix = ServerDB.getPrefix(event.getGuild().getIdLong());
         String raw = event.getMessage().getContentRaw();
 
-        // Making sure the user isn't a bot or webhook command
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
@@ -145,7 +144,6 @@ public class Listener extends ListenerAdapter {
         Guild guild = event.getGuild();
 
         BotDB botUtils = new BotDB();
-        BanDB banUtils = new BanDB();
 
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
@@ -217,6 +215,7 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new SuggestionCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
