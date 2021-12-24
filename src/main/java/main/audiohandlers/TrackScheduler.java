@@ -1,5 +1,6 @@
 package main.audiohandlers;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
@@ -70,8 +71,23 @@ public class TrackScheduler extends AudioEventAdapter {
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        final TogglesConfig toggleConfig = new TogglesConfig();
+        announceNowPlaying = toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES);
+
         if (!repeating) {
-            if (!announceNowPlaying) return;
+            if (!announceNowPlaying) {
+                final DedicatedChannelConfig config = new DedicatedChannelConfig();
+                boolean originalAnnouncementToggle = config.getOriginalAnnouncementToggle(guild.getId());
+                if (toggleConfig.getToggle(guild, Toggles.ANNOUNCE_MESSAGES) != originalAnnouncementToggle) {
+                    if (config.isChannelSet(guild.getId())) {
+                        toggleConfig.setToggle(
+                                guild, Toggles.ANNOUNCE_MESSAGES,
+                                config.getOriginalAnnouncementToggle(guild.getId())
+                        );
+                    }
+                }
+                return;
+            }
 
             final var requester = RobertifyAudioManager.getRequester(track);
             TextChannel announcementChannel = new BotDB().getAnnouncementChannelObject(this.guild.getIdLong());
@@ -100,7 +116,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
         AudioTrack nextTrack = this.queue.poll();
 
-        if (nextTrack != null) nextTrack.setPosition(0L);
+        if (nextTrack != null)
+            nextTrack.setPosition(0L);
 
         try {
             this.player.stopTrack();

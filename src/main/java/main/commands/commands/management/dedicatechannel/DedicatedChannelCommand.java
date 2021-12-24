@@ -3,6 +3,8 @@ package main.commands.commands.management.dedicatechannel;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.commands.commands.management.toggles.togglesconfig.Toggles;
+import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
@@ -66,6 +68,7 @@ public class DedicatedChannelCommand implements ICommand {
                             .queue(message -> {
                                 dediChannelConfig.setChannelAndMessage(guild.getId(), textChannel.getId(), message.getId());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
+                                dediChannelConfig.setOriginalAnnouncementToggle(guild.getId(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
                             });
 
                     msg.addReaction("✅").queue();

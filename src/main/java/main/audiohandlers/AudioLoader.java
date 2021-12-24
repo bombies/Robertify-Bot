@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.commands.CommandContext;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -44,26 +43,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
-        if (announceMsg) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + audioTrack.getInfo().title
-                    + "` by `" + audioTrack.getInfo().author + "`");
-
-            if (botMsg != null)
-                botMsg.editMessageEmbeds(eb.build()).queue();
-            else {
-                new DedicatedChannelConfig().getTextChannel(guild.getId())
-                        .sendMessageEmbeds(eb.build()).queue();
-            }
-        } else {
-            TogglesConfig toggleConfig = new TogglesConfig();
-            DedicatedChannelConfig config = new DedicatedChannelConfig();
-
-            if (config.isChannelSet(guild.getId()))
-                toggleConfig.setToggle(
-                        guild, Toggles.ANNOUNCE_MESSAGES,
-                        config.getOriginalAnnouncementToggle(guild.getId())
-                );
-        }
+        if (announceMsg)
+            sendTrackLoadedMessage(audioTrack);
 
         trackRequestedByUser.put(audioTrack, sender);
         musicManager.scheduler.queue(audioTrack);
@@ -75,30 +56,25 @@ public class AudioLoader implements AudioLoadResultHandler {
             new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
     }
 
+    private void sendTrackLoadedMessage(AudioTrack audioTrack) {
+        EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + audioTrack.getInfo().title
+                + "` by `" + audioTrack.getInfo().author + "`");
+
+        if (botMsg != null)
+            botMsg.editMessageEmbeds(eb.build()).queue();
+        else {
+            new DedicatedChannelConfig().getTextChannel(guild.getId())
+                    .sendMessageEmbeds(eb.build()).queue();
+        }
+    }
+
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
         if (trackUrl.startsWith("ytsearch:")) {
-            if (announceMsg) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.get(0).getInfo().title
-                        + "` by `" + tracks.get(0).getInfo().author + "`");
-                if (botMsg != null) {
-                    botMsg.editMessageEmbeds(eb.build()).queue();
-                } else {
-                    new DedicatedChannelConfig().getTextChannel(guild.getId())
-                            .sendMessageEmbeds(eb.build()).queue();
-                }
-            } else {
-                TogglesConfig toggleConfig = new TogglesConfig();
-                DedicatedChannelConfig config = new DedicatedChannelConfig();
-
-                if (config.isChannelSet(guild.getId()))
-                    toggleConfig.setToggle(
-                            guild, Toggles.ANNOUNCE_MESSAGES,
-                            config.getOriginalAnnouncementToggle(guild.getId())
-                    );
-            }
+            if (announceMsg)
+                sendTrackLoadedMessage(tracks.get(0));
 
             trackRequestedByUser.put(tracks.get(0), sender);
             musicManager.scheduler.queue(tracks.get(0));
@@ -151,7 +127,6 @@ public class AudioLoader implements AudioLoadResultHandler {
             guild.getAudioManager().closeAudioConnection();
 
         logger.error("[FATAL ERROR] Could not load track!", e);
-
 
         EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
         if (botMsg != null)

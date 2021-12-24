@@ -78,7 +78,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (originalAnnouncementToggle) {
                 toggleConfig.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
-                config.setOriginalAnnouncementToggle(guild.getId(), originalAnnouncementToggle);
+                config.setOriginalAnnouncementToggle(guild.getId(), true);
             }
 
             if (!GeneralUtils.isUrl(message))

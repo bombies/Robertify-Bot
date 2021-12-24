@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.bombies</groupId>
   <artifactId>Robertify-Bot</artifactId>
-  <version>1.5.2-SNAPSHOT</version>
+  <version>1.5.8-SNAPSHOT</version>
   <build>
     <plugins>
       <plugin>
