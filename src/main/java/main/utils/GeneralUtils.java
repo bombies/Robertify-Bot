@@ -238,7 +238,6 @@ public class GeneralUtils {
             case "?", "^", "[", ".", "$", "{", "&", "(", "+", ")", "|", "<", ">", "]", "}"
                 -> delimiter = "\\\\" + delimiter;
         }
-        System.out.println(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*");
 
         return string.replaceAll(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "");
     }

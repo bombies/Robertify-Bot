@@ -34,6 +34,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
@@ -45,6 +47,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class CommandManager {
+    private final static Logger logger = LoggerFactory.getLogger(CommandManager.class);
+
     private final List<ICommand> commands = new ArrayList<>();
     @Getter
     private final List<ICommand> musicCommands = new ArrayList<>();
