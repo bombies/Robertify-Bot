@@ -407,7 +407,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getCommandId().equals(getName())) return;
+        if (!event.getName().equals(getName())) return;
 
         event.replyEmbeds(handleSuggestion(event.getUser(), event.getOption("suggestion").getAsString()))
                 .setEphemeral(true)
