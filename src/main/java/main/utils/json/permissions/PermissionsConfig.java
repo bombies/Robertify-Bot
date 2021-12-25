@@ -9,6 +9,7 @@ import main.utils.json.AbstractJSONConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -307,17 +308,25 @@ public class PermissionsConfig extends AbstractJSONConfig {
                 code = perm.getCode(); break;
             }
 
-        JSONObject object = getJSONObject()
-                .getJSONObject(gid)
-                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
-
         List<String> ret = new ArrayList<>();
 
-        for (String s : object.keySet())
-            if (object.getJSONArray(s).toList().contains(code))
-                ret.add(s);
+        try {
+            JSONObject object = getJSONObject()
+                    .getJSONObject(gid)
+                    .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
-        return ret;
+            for (String s : object.keySet())
+                if (object.getJSONArray(s).toList().contains(code))
+                    ret.add(s);
+
+            return ret;
+        } catch (JSONException e) {
+            final var obj = getJSONObject();
+            final var guildObj = obj.getJSONObject(gid);
+            guildObj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
+            setJSON(obj);
+            return ret;
+        }
     }
 
     public List<Role> getRolesForPermission(Guild g, Permission p) {
