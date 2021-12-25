@@ -85,9 +85,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         if (event.getAuthor().isBot()) {
             if (!event.getMessage().isEphemeral())
-                event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+                event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler()
+                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                );
         } else
-            event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS);
+            event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS, null, new ErrorHandler()
+                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+            );
     }
 
     @Override
