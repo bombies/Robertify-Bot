@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONException;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -89,8 +90,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
 
         var config = new EightBallConfig();
 
-        if (config.getResponses(guild.getId()).contains(phraseToAdd))
-            return EmbedUtils.embedMessage("This is already a response!");
+        try {
+            if (config.getResponses(guild.getId()).contains(phraseToAdd))
+                return EmbedUtils.embedMessage("This is already a response!");
+        } catch (JSONException e) {
+            config.addGuild(guild.getId());
+        }
 
         config.addResponse(guild.getId(), phraseToAdd);
         return EmbedUtils.embedMessage("Added `"+phraseToAdd+"` as a response!");
@@ -102,8 +107,13 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
 
         var config = new EightBallConfig();
 
-        if (index > config.getResponses(guild.getId()).size() || index < 0)
+        try {
+            if (index > config.getResponses(guild.getId()).size() || index < 0)
+                return EmbedUtils.embedMessage("This is not a response!");
+        } catch (JSONException e) {
+            config.addGuild(guild.getId());
             return EmbedUtils.embedMessage("This is not a response!");
+        }
 
         var eb = EmbedUtils.embedMessage("Removed `"+config.getResponses(guild.getId()).get(index)+"` as a response!");
         config.removeResponse(guild.getId(), index);

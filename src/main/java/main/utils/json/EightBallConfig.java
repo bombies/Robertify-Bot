@@ -46,6 +46,12 @@ public class EightBallConfig extends AbstractJSONConfig {
         setJSON(obj);
     }
 
+    public void addGuild(String gid) {
+        var obj = getJSONObject();
+        obj.put(gid, new JSONArray());
+        setJSON(obj);
+    }
+
     public EightBallConfig addResponse(String gid, String response) {
         var obj = getJSONObject();
         obj.getJSONArray(gid).put(response);
