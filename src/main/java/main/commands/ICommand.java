@@ -12,7 +12,7 @@ public interface ICommand {
 
     String getHelp(String prefix);
 
-    default String getUsages(long guildID) {
+    default String getUsages(String prefix) {
         return null;
     }
 

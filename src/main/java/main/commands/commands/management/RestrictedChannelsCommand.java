@@ -31,9 +31,10 @@ public class RestrictedChannelsCommand implements ICommand {
 
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
+        final String prefix = new ServerDB().getServerPrefix(guild.getIdLong());
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n" + getUsages(guild.getIdLong())).build())
+            msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n" + getUsages(prefix)).build())
                     .queue();
         } else {
             switch (args.get(0).toLowerCase()) {
@@ -41,7 +42,7 @@ public class RestrictedChannelsCommand implements ICommand {
                 case "remove" -> remove(msg, args);
                 case "list" -> list(msg);
                 default -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(guild.getIdLong())).build())
+                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(prefix)).build())
                             .queue();
                 }
             }
@@ -222,16 +223,16 @@ public class RestrictedChannelsCommand implements ICommand {
     @Override
     public String getHelp(String prefix) {
         return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
-                "\nRestrict the bot to join voice channels that you set.\n\n" +
-                "**__Usages__**\n" + getUsages(Long.parseLong(prefix));
+                "\nRestrict the bot to join voice channels that you set.\n\n"
+                + getUsages(prefix);
     }
 
     @Override
-    public String getUsages(long guildID) {
+    public String getUsages(String prefix) {
         return "**__Usages__**\n" +
-                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels add <channelID>`\n" +
-                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels remove <channelID>`\n" +
-                "`"+ ServerDB.getPrefix(guildID) +"restrictedchannels list`";
+                "`"+ prefix +"restrictedchannels add <channelID>`\n" +
+                "`"+ prefix +"restrictedchannels remove <channelID>`\n" +
+                "`"+ prefix +"restrictedchannels list`";
     }
 
     @Override
