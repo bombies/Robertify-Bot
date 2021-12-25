@@ -15,11 +15,15 @@ import main.utils.database.sqlite3.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
 public class NowPlayingCommand implements ICommand {
+    private final Logger logger = LoggerFactory.getLogger(NowPlayingCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
@@ -79,13 +83,13 @@ public class NowPlayingCommand implements ICommand {
         final User requester = RobertifyAudioManager.getRequester(track);
         eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ " - "+info.author+"`" + (
                 ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
-                        " [ Requested by " + requester.getAsMention() + " ]"
+                        "\n\n~ Requested by " + requester.getAsMention()
                         :
                         ""
         ) +
-                "\n\n`[0:00]`" +
-                GeneralUtils.progressBar(progress, GeneralUtils.ProgressBar.DURATION) + "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`\n\n" +
-                "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition())+"`\n" +
+                "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
+                GeneralUtils.progressBar(progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`") + "\n\n" +
+                (info.isStream ? "📺 **[Livestream]**\n" : "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition()) + "`\n") +
                 "\n🔇 " + GeneralUtils.progressBar((double)(audioPlayer.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊");
 
         eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, BotConstants.ICON_URL.toString());
