@@ -48,7 +48,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         setJSON(obj);
     }
 
-    private synchronized void updateConfig() {
+    public synchronized void updateConfig() {
         var obj = getJSONObject();
 
         for (Guild g : new BotDB().getGuilds())

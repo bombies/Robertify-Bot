@@ -33,7 +33,7 @@ public class EightBallConfig extends AbstractJSONConfig {
         setJSON(jsonObject);
     }
 
-    private synchronized void updateConfig() {
+    public synchronized void updateConfig() {
         var obj = getJSONObject();
 
         for (Guild g : new BotDB().getGuilds())

@@ -148,8 +148,8 @@ public class Listener extends ListenerAdapter {
 
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
-        new DedicatedChannelConfig().initConfig();
-        new EightBallConfig().initConfig();
+        new DedicatedChannelConfig().updateConfig();
+        new EightBallConfig().updateConfig();
 
         botUtils.addGuild(guild.getIdLong())
                 .announceNewTrack(guild.getIdLong(), true)
