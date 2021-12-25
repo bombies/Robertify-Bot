@@ -6,7 +6,7 @@
 
     <groupId>com.bombies</groupId>
     <artifactId>Robertify-Bot</artifactId>
-    <version>1.5.19</version>
+    <version>1.5.20</version>
 
     <dependencies>
         <dependency>
