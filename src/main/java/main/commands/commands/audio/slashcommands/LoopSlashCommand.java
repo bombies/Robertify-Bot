@@ -33,14 +33,17 @@ public class LoopSlashCommand extends InteractiveCommand {
                 .setCommand(Command.of(
                         commandName,
                         "Replay the current song being played",
-                        List.of(CommandOption.of(
-                                OptionType.STRING,
-                                "queue",
-                                "Toggle whether you want the current queue to be repeated or not",
-                                false,
-                                List.of("queue")
-                        )),
                         List.of(),
+                        List.of(
+                                SubCommand.of(
+                                    "track",
+                                    "Toggle looping the currently playing track"
+                                ),
+                                SubCommand.of(
+                                        "queue",
+                                        "Toggle looping the current queue"
+                                )
+                        ),
                         djPredicate
                 )).build();
     }
@@ -70,12 +73,15 @@ public class LoopSlashCommand extends InteractiveCommand {
             return;
         }
 
-        if (event.getOptions().isEmpty()) {
-            event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
-                    .setEphemeral(false).queue();
-        } else {
-            event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
-                    .setEphemeral(false).queue();
+        switch (event.getSubcommandName()) {
+            case "track" -> {
+                event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
+                        .setEphemeral(false).queue();
+            }
+            case "queue" -> {
+                event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
+                        .setEphemeral(false).queue();
+            }
         }
     }
 }

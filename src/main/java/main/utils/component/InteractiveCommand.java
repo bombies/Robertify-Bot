@@ -207,7 +207,6 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         }
 
         public InteractionCommand build() {
-            InteractionCommand interactionCommand = new InteractionCommand(command, selectionDialogues);
             return new InteractionCommand(command, selectionDialogues);
         }
     }
