@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.constants.BotConstants;
 import main.constants.TimeFormat;
 import main.exceptions.NoEmbedPermissionException;
 import main.utils.GeneralUtils;
@@ -64,6 +65,9 @@ public class ChangeLogCommand implements IDevCommand {
 
         logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
+        eb.setThumbnail(BotConstants.ROBERTIFY_CHRISTMAS_LOGO_TRANSPARENT.toString());
+        eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
+
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
         for (Guild g : guilds) {
@@ -98,6 +102,9 @@ public class ChangeLogCommand implements IDevCommand {
             logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n\n");
 
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
+        eb.setThumbnail(BotConstants.ROBERTIFY_CHRISTMAS_LOGO_TRANSPARENT.toString());
+        eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
+
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
         msg.replyEmbeds(eb.build()).queue();
