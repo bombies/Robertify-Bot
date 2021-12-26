@@ -43,6 +43,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                 case "accept" -> accept(msg, args);
                 case "deny", "reject" -> deny(msg, args);
                 case "ban" -> ban(msg, args);
+                case "unban" -> unban(msg, args);
                 default -> sendSuggestion(msg, args);
             }
         }
@@ -337,7 +338,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var user = Robertify.api.getUserById(id);
+        final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
