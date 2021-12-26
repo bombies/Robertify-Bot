@@ -17,6 +17,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
+import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
@@ -68,7 +69,6 @@ public class Robertify {
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
                     .setChunkingFilter(ChunkingFilter.ALL)
-
                     // Event Listeners
                     .addEventListeners(
                             VoiceChannelEvents.waiter,
@@ -77,7 +77,8 @@ public class Robertify {
                             new VoiceChannelEvents(),
                             new DedicatedChannelEvents(),
                             new PollEvents(),
-                            new SuggestionCategoryDeletionEvents()
+                            new SuggestionCategoryDeletionEvents(),
+                            new ReportsEvents()
                     )
 
                     // Slash Commands

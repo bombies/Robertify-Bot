@@ -22,14 +22,13 @@ public class ReportsConfig extends AbstractJSONConfig {
 
         obj.put(ReportsConfigField.CATEGORY.toString(), -1L);
         obj.put(ReportsConfigField.CHANNEL.toString(), -1L);
-        obj.put(ReportsConfigField.OPENED_REPORTS.toString(), new JSONArray());
         obj.put(ReportsConfigField.BANNED_USERS.toString(), new JSONArray());
 
         setJSON(obj);
     }
 
     public void initChannels(long categoryID, long channelID) {
-        if (!isSetup())
+        if (isSetup())
             throw new IllegalStateException("The reports category has already been setup!");
 
         final var obj = getJSONObject();
@@ -45,7 +44,6 @@ public class ReportsConfig extends AbstractJSONConfig {
 
         obj.put(ReportsConfigField.CATEGORY.toString(), -1L);
         obj.put(ReportsConfigField.CHANNEL.toString(), -1L);
-        obj.put(ReportsConfigField.OPENED_REPORTS.toString(), new JSONArray());
 
         setJSON(obj);
     }

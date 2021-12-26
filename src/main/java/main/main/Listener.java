@@ -24,6 +24,7 @@ import main.utils.json.AbstractJSONConfig;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.reports.ReportsConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.suggestions.SuggestionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -75,6 +76,7 @@ public class Listener extends ListenerAdapter {
         new EightBallConfig().initConfig();
         new RestrictedChannelsConfig().initConfig();
         new SuggestionsConfig().initConfig();
+        new ReportsConfig().initConfig();
         new ServerDB();
 
         BanDB.initBannedUserMap();

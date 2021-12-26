@@ -25,6 +25,7 @@ import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
 import main.commands.commands.util.TutorialCommand;
+import main.commands.commands.util.reports.ReportsCommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
@@ -99,6 +100,7 @@ public class CommandManager {
                 new JoinCommand(),
                 new RestrictedChannelsCommand(),
                 new SuggestionCommand(),
+                new ReportsCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -165,7 +167,8 @@ public class CommandManager {
         addUtilityCommands(
                 new TutorialCommand(),
                 new HelpCommand(),
-                new SuggestionCommand()
+                new SuggestionCommand(),
+                new ReportsCommand()
         );
     }
 
