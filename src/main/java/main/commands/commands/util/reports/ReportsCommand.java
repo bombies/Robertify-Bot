@@ -39,7 +39,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         } else {
             switch (args.get(0).toLowerCase()) {
                 case "setup" -> setup(msg);
-                case "address" -> address(msg, args);
+                case "address", "addr", "sort", "handle" -> address(msg, args);
                 case "ban" -> ban(msg, args);
                 case "unban" -> unban(msg, args);
                 default -> sendReport(user, msg);
