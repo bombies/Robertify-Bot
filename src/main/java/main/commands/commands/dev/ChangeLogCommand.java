@@ -102,7 +102,7 @@ public class ChangeLogCommand implements IDevCommand {
             logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n\n");
 
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
-        eb.setThumbnail(BotConstants.ROBERTIFY_CHRISTMAS_LOGO_TRANSPARENT.toString());
+        eb.setThumbnail(BotConstants.ROBERTIFY_LOGO_TRANSPARENT.toString());
         eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
 
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
