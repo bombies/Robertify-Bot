@@ -48,7 +48,7 @@ public class PermissionsConfig extends AbstractJSONConfig {
         setJSON(obj);
     }
 
-    private void update() {
+    public void update() {
         var jsonObj = getJSONObject();
 
         for (Guild guild : Robertify.api.getGuilds()) {
@@ -85,6 +85,7 @@ public class PermissionsConfig extends AbstractJSONConfig {
         JSONObject serverObj = new JSONObject();
         for (int i : Permission.getCodes())
             serverObj.put(String.valueOf(i), new JSONArray());
+        serverObj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
         obj.put(gid, serverObj);
 
         setJSON(obj);

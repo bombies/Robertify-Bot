@@ -68,7 +68,7 @@ public class Listener extends ListenerAdapter {
         PermissionsConfig permConfig = new PermissionsConfig();
 
 //        new PermissionsDB().init();
-        permConfig.initConfig();
+        permConfig.update();
         new ChangeLogConfig().initConfig();
         new TogglesConfig().initConfig();
         new DedicatedChannelConfig().initConfig();
