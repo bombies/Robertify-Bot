@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.bombies</groupId>
   <artifactId>Robertify-Bot</artifactId>
-  <version>1.5.27</version>
+  <version>1.6.0</version>
   <build>
     <plugins>
       <plugin>
@@ -89,6 +89,11 @@
       <id>jfrog-duncte123</id>
       <name>jfrog-duncte123</name>
       <url>https://duncte123.jfrog.io/artifactory/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>bintray</name>
+      <url>https://jcenter.bintray.com</url>
     </repository>
   </repositories>
   <dependencies>

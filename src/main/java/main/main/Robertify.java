@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,12 +64,12 @@ public class Robertify {
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.GUILD_EMOJIS,
                             GatewayIntent.DIRECT_MESSAGES,
-                            GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_PRESENCES
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
-                    .setChunkingFilter(ChunkingFilter.ALL)
+                    .setMemberCachePolicy(MemberCachePolicy.ALL)
+                    .setChunkingFilter(ChunkingFilter.NONE)
+
                     // Event Listeners
                     .addEventListeners(
                             VoiceChannelEvents.waiter,
@@ -113,11 +114,9 @@ public class Robertify {
                     .addEventListeners(new PaginationEvents())
 
                     .enableCache(
-                            CacheFlag.ACTIVITY,
-                            CacheFlag.CLIENT_STATUS,
                             CacheFlag.VOICE_STATE,
-                            CacheFlag.ONLINE_STATUS,
-                            CacheFlag.MEMBER_OVERRIDES
+                            CacheFlag.MEMBER_OVERRIDES,
+                            CacheFlag.ONLINE_STATUS
                     )
                     .build();
 
