@@ -6,7 +6,6 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.constants.BotConstants;
 import main.constants.TimeFormat;
-import main.exceptions.NoEmbedPermissionException;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
