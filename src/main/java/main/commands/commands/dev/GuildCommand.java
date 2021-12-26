@@ -18,6 +18,7 @@ public class GuildCommand implements IDevCommand {
         final var guilds = new BotDB().getGuilds();
         final List<String> guildNames = new ArrayList<>();
 
+        guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");
         for (var guild : guilds) guildNames.add(guild.getName() + " (" + guild.getMembers().size() + " members in cache)");
 
         GeneralUtils.setCustomEmbed("Guilds");
