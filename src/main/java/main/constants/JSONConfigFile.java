@@ -7,7 +7,8 @@ public enum JSONConfigFile {
     DEDICATED_CHANNELS("dedicatedchannels.json"),
     EIGHT_BALL("8ball.json"),
     RESTRICTED_CHANNELS("restrictedchannels.json"),
-    SUGGESTIONS("suggestions.json");
+    SUGGESTIONS("suggestions.json"),
+    REPORTS("reports.json");
 
     private final String str;
 

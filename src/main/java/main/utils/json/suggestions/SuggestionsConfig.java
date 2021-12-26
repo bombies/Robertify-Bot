@@ -45,7 +45,6 @@ public class SuggestionsConfig extends AbstractJSONConfig {
         obj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), -1L);
         obj.put(SuggestionsConfigField.ACCEPTED_CHANNEL.toString(), -1L);
         obj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), -1L);
-        obj.put(SuggestionsConfigField.BANNED_USERS.toString(), new JSONArray());
 
         setJSON(obj);
     }
