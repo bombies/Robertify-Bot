@@ -102,6 +102,11 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>4.4.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.sedmelluq</groupId>
+            <artifactId>jda-nas</artifactId>
+            <version>1.1.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>
@@ -123,6 +128,11 @@
             <id>jfrog-duncte123</id>
             <name>jfrog-duncte123</name>
             <url>https://duncte123.jfrog.io/artifactory/maven</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
