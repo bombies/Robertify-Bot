@@ -1,17 +1,15 @@
 package main.commands.commands.management.dedicatechannel;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.management.permissions.Permission;
-import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,7 +29,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
     public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
-        final DedicatedChannelConfig config = new DedicatedChannelConfig();
+        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
         if (!config.isChannelSet(guild.getId())) return;
@@ -42,7 +40,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        final DedicatedChannelConfig config = new DedicatedChannelConfig();
+        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
         if (!config.isChannelSet(guild.getId())) return;
@@ -99,7 +97,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
-        final DedicatedChannelConfig config = new DedicatedChannelConfig();
+        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
 
         if (!config.isChannelSet(event.getGuild().getId())) return;
         if (!event.getTextChannel().getId().equals(config.getChannelID(event.getGuild().getId()))) return;

@@ -7,7 +7,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
+import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -74,7 +74,7 @@ public class RestrictedChannelsCommand implements ICommand {
         final VoiceChannel voiceChannel = guild.getVoiceChannelById(id);
         final TextChannel textChannel = guild.getTextChannelById(id);
         final long channelId;
-        final RestrictedChannelsConfig.ChannelType field;
+        final LegacyRestrictedChannelsConfig.ChannelType field;
 
         if (voiceChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
@@ -88,7 +88,7 @@ public class RestrictedChannelsCommand implements ICommand {
             }
 
             channelId = voiceChannel.getIdLong();
-            field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
+            field = LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                 msg.replyEmbeds(EmbedUtils.embedMessage("""
@@ -101,7 +101,7 @@ public class RestrictedChannelsCommand implements ICommand {
             }
 
             channelId = textChannel.getIdLong();
-            field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
+            field = LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
         } else {
             msg.replyEmbeds(EmbedUtils.embedMessage("The ID provided was not of a valid voice or text channel" +
                             " in this server.").build())
@@ -110,7 +110,7 @@ public class RestrictedChannelsCommand implements ICommand {
         }
 
         try {
-            new RestrictedChannelsConfig().addChannel(guild.getId(), channelId, field);
+            new LegacyRestrictedChannelsConfig().addChannel(guild.getId(), channelId, field);
             msg.replyEmbeds(EmbedUtils.embedMessage("You have successfully added <#"
                             + channelId + "> as a restricted "+ field +" channel!").build())
                     .queue();
@@ -148,7 +148,7 @@ public class RestrictedChannelsCommand implements ICommand {
         final VoiceChannel voiceChannel = guild.getVoiceChannelById(id);
         final TextChannel textChannel = guild.getTextChannelById(id);
         final long channelId;
-        final RestrictedChannelsConfig.ChannelType field;
+        final LegacyRestrictedChannelsConfig.ChannelType field;
 
         if (voiceChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
@@ -162,7 +162,7 @@ public class RestrictedChannelsCommand implements ICommand {
             }
 
             channelId = voiceChannel.getIdLong();
-            field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
+            field = LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                 msg.replyEmbeds(EmbedUtils.embedMessage("""
@@ -175,7 +175,7 @@ public class RestrictedChannelsCommand implements ICommand {
             }
 
             channelId = textChannel.getIdLong();
-            field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
+            field = LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
         } else {
             msg.replyEmbeds(EmbedUtils.embedMessage("The ID provided was not of a valid voice or text channel" +
                             " in this server.").build())
@@ -184,7 +184,7 @@ public class RestrictedChannelsCommand implements ICommand {
         }
 
         try {
-            new RestrictedChannelsConfig().removeChannel(guild.getId(), channelId, field);
+            new LegacyRestrictedChannelsConfig().removeChannel(guild.getId(), channelId, field);
             msg.replyEmbeds(EmbedUtils.embedMessage("You have successfully removed <#"
                             + channelId + "> as a restricted "+ field +" channel!").build())
                     .queue();
@@ -198,11 +198,11 @@ public class RestrictedChannelsCommand implements ICommand {
     }
 
     public void list(Message msg) {
-        final var config = new RestrictedChannelsConfig();
+        final var config = new LegacyRestrictedChannelsConfig();
 
         try {
-            final var tcs = config.restrictedChannelsToString(msg.getGuild().getId(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
-            final var vcs = config.restrictedChannelsToString(msg.getGuild().getId(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
+            final var tcs = config.restrictedChannelsToString(msg.getGuild().getId(), LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
+            final var vcs = config.restrictedChannelsToString(msg.getGuild().getId(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
 
             EmbedBuilder embedBuilder = EmbedUtils.embedMessage("Listing all restricted channels");
             embedBuilder.addField("Text Channels", tcs == null ? "No channels" : tcs.isEmpty() ? "No channels" : tcs, false);

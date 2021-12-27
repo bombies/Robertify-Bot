@@ -22,13 +22,14 @@ import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.config.ViewConfigCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.poll.PollCommand;
+import main.commands.commands.util.BotInfoCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
 import main.commands.commands.util.TutorialCommand;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
+import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +43,6 @@ import javax.annotation.Nullable;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -101,6 +101,7 @@ public class CommandManager {
                 new RestrictedChannelsCommand(),
                 new SuggestionCommand(),
                 new ReportsCommand(),
+                new BotInfoCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -168,7 +169,8 @@ public class CommandManager {
                 new TutorialCommand(),
                 new HelpCommand(),
                 new SuggestionCommand(),
-                new ReportsCommand()
+                new ReportsCommand(),
+                new BotInfoCommand()
         );
     }
 
@@ -308,11 +310,11 @@ public class CommandManager {
                     if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
                         return;
 
-                    final var rcConfig = new RestrictedChannelsConfig();
+                    final var rcConfig = new LegacyRestrictedChannelsConfig();
                     if (!rcConfig.isRestrictedChannel(
                             guild.getId(),
                             msg.getTextChannel().getIdLong(),
-                            RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
+                            LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
                     )) {
                       return;
                     }

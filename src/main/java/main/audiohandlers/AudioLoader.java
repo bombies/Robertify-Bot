@@ -4,15 +4,12 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.commands.commands.management.toggles.togglesconfig.Toggles;
-import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.internal.requests.ratelimit.BotRateLimiter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +52,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (musicManager.scheduler.playlistRepeating)
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+            new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
@@ -66,7 +63,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new DedicatedChannelConfig().getTextChannel(guild.getId())
+            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }
@@ -87,8 +84,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (musicManager.scheduler.playlistRepeating)
                 musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-            if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-                new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+            if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+                new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             return;
         }
 
@@ -98,7 +95,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
           botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new DedicatedChannelConfig().getTextChannel(guild.getId())
+            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
@@ -114,8 +111,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (musicManager.scheduler.playlistRepeating)
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+            new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
     }
 
     @Override
@@ -125,7 +122,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new DedicatedChannelConfig().getTextChannel(guild.getId())
+            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }
@@ -141,7 +138,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new DedicatedChannelConfig().getTextChannel(guild.getId())
+            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }

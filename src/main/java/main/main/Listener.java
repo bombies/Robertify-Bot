@@ -15,17 +15,17 @@ import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.sqlite3.AudioDB;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.EightBallConfig;
-import main.utils.json.AbstractJSONConfig;
+import main.utils.json.legacy.LegacyEightBallConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
+import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.reports.ReportsConfig;
-import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
+import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.suggestions.SuggestionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
@@ -65,16 +65,16 @@ public class Listener extends ListenerAdapter {
             for (Guild g : Robertify.api.getGuilds())
                 botDB.addGuild(g.getIdLong());
 
-        AbstractJSONConfig.initDirectory();
-        PermissionsConfig permConfig = new PermissionsConfig();
+        AbstractJSONFile.initDirectory();
+        LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
 
 //        new PermissionsDB().init();
         permConfig.update();
         new ChangeLogConfig().initConfig();
         new TogglesConfig().initConfig();
-        new DedicatedChannelConfig().initConfig();
-        new EightBallConfig().initConfig();
-        new RestrictedChannelsConfig().initConfig();
+        new LegacyDedicatedChannelConfig().initConfig();
+        new LegacyEightBallConfig().initConfig();
+        new LegacyRestrictedChannelsConfig().initConfig();
         new SuggestionsConfig().initConfig();
         new ReportsConfig().initConfig();
         new ServerDB();
@@ -87,16 +87,18 @@ public class Listener extends ListenerAdapter {
             initNeededSlashCommands(g);
             rescheduleUnbans(g);
 
-            if (new DedicatedChannelConfig().isChannelSet(g.getId()))
-                new DedicatedChannelConfig().updateMessage(g);
+            if (new LegacyDedicatedChannelConfig().isChannelSet(g.getId()))
+                new LegacyDedicatedChannelConfig().updateMessage(g);
         }
 
-        logger.info("Watching {} guilds", botDB.getGuilds().size());
-
-        new AudioDB().cacheAllTracks();
+//        new AudioDB().cacheAllTracks();
 
         initSelectionMenus();
         AbstractMongoDatabase.initAllCaches();
+
+        logger.info("Watching {} guilds", botDB.getGuilds().size());
+        BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
+
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
 
@@ -148,10 +150,10 @@ public class Listener extends ListenerAdapter {
 
         BotDB botUtils = new BotDB();
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
         TogglesConfig togglesConfig = new TogglesConfig();
-        new DedicatedChannelConfig().updateConfig();
-        new EightBallConfig().updateConfig();
+        new LegacyDedicatedChannelConfig().updateConfig();
+        new LegacyEightBallConfig().updateConfig();
 
         botUtils.addGuild(guild.getIdLong())
                 .announceNewTrack(guild.getIdLong(), true)
@@ -218,6 +220,7 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new LeaveSlashCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

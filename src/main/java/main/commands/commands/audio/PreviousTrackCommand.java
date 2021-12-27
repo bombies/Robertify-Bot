@@ -3,8 +3,7 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -56,8 +55,8 @@ public class PreviousTrackCommand implements ICommand {
             audioPlayer.playTrack(previouslyPlayedTracks.pop());
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
+            new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
 
         return EmbedUtils.embedMessage("Now playing the previous track!");
     }

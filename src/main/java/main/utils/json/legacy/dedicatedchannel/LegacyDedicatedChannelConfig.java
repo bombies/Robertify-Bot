@@ -1,4 +1,4 @@
-package main.utils.json.dedicatedchannel;
+package main.utils.json.legacy.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
@@ -12,7 +12,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.AbstractJSONConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -28,8 +28,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class DedicatedChannelConfig extends AbstractJSONConfig {
-    public DedicatedChannelConfig() {
+public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
+    public LegacyDedicatedChannelConfig() {
         super(JSONConfigFile.DEDICATED_CHANNELS);
     }
 
@@ -58,7 +58,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         setJSON(obj);
     }
 
-    public synchronized DedicatedChannelConfig setChannel(String gid, String cid) {
+    public synchronized LegacyDedicatedChannelConfig setChannel(String gid, String cid) {
         var obj = getJSONObject();
 
         var guild = new JSONObject();
@@ -69,7 +69,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         return this;
     }
 
-    public synchronized DedicatedChannelConfig setMessage(String gid, String mid) {
+    public synchronized LegacyDedicatedChannelConfig setMessage(String gid, String mid) {
         var obj = getJSONObject();
 
         var guild = obj.getJSONObject(gid);
@@ -80,7 +80,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         return this;
     }
 
-    public synchronized DedicatedChannelConfig setChannelAndMessage(String gid, String cid, String mid) {
+    public synchronized LegacyDedicatedChannelConfig setChannelAndMessage(String gid, String cid, String mid) {
         var obj = getJSONObject();
 
         var guild = new JSONObject();
@@ -92,7 +92,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         return this;
     }
 
-    public synchronized DedicatedChannelConfig setOriginalAnnouncementToggle(String gid, boolean toggle) {
+    public synchronized LegacyDedicatedChannelConfig setOriginalAnnouncementToggle(String gid, boolean toggle) {
         var obj = getJSONObject();
 
         var guild = obj.getJSONObject(gid);
@@ -107,7 +107,7 @@ public class DedicatedChannelConfig extends AbstractJSONConfig {
         return getJSONObject().getJSONObject(gid).getBoolean(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString());
     }
 
-    public synchronized DedicatedChannelConfig removeChannel(String gid) {
+    public synchronized LegacyDedicatedChannelConfig removeChannel(String gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
 

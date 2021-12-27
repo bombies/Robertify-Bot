@@ -1,4 +1,4 @@
-package main.utils.json.permissions;
+package main.utils.json.legacy.permissions;
 
 import main.utils.json.GenericJSONField;
 

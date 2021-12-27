@@ -1,11 +1,11 @@
-package main.utils.json.permissions;
+package main.utils.json.legacy.permissions;
 
 import lombok.SneakyThrows;
 import main.commands.commands.management.permissions.Permission;
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.AbstractJSONConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionsConfig extends AbstractJSONConfig {
-    final Logger logger = LoggerFactory.getLogger(PermissionsConfig.class);
+public class LegacyPermissionsConfig extends AbstractJSONFile {
+    final Logger logger = LoggerFactory.getLogger(LegacyPermissionsConfig.class);
 
-    public PermissionsConfig() {
+    public LegacyPermissionsConfig() {
         super(JSONConfigFile.PERMISSIONS);
     }
 

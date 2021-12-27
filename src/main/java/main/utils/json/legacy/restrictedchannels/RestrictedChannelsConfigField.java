@@ -1,4 +1,4 @@
-package main.utils.json.restrictedchannels;
+package main.utils.json.legacy.restrictedchannels;
 
 import main.utils.json.GenericJSONField;
 

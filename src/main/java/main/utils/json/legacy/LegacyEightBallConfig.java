@@ -1,4 +1,4 @@
-package main.utils.json;
+package main.utils.json.legacy;
 
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
@@ -10,9 +10,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EightBallConfig extends AbstractJSONConfig {
+public class LegacyEightBallConfig extends AbstractJSONFile {
 
-    public EightBallConfig() {
+    public LegacyEightBallConfig() {
         super(JSONConfigFile.EIGHT_BALL);
     }
 
@@ -52,21 +52,21 @@ public class EightBallConfig extends AbstractJSONConfig {
         setJSON(obj);
     }
 
-    public EightBallConfig addResponse(String gid, String response) {
+    public LegacyEightBallConfig addResponse(String gid, String response) {
         var obj = getJSONObject();
         obj.getJSONArray(gid).put(response);
         setJSON(obj);
         return this;
     }
 
-    public EightBallConfig removeResponse(String gid, int responseIndex) {
+    public LegacyEightBallConfig removeResponse(String gid, int responseIndex) {
         var obj = getJSONObject();
         obj.getJSONArray(gid).remove(responseIndex);
         setJSON(obj);
         return this;
     }
 
-    public EightBallConfig removeAllResponses(String gid) {
+    public LegacyEightBallConfig removeAllResponses(String gid) {
         var obj = getJSONObject();
         obj.getJSONArray(gid).clear();
         setJSON(obj);

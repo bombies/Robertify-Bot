@@ -9,8 +9,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
+import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -75,11 +74,11 @@ public class PlayCommand implements ICommand {
             return;
         } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(ctx.getGuild(), Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
-                if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getId(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                final var restrictedChannelsConfig = new LegacyRestrictedChannelsConfig();
+                if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getId(), memberVoiceState.getChannel().getIdLong(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                     msg.replyEmbeds(EmbedUtils.embedMessage("I can't join this channel!" +
                                     "\n\nI am restricted to only join\n"
-                                    + restrictedChannelsConfig.restrictedChannelsToString(ctx.getGuild().getId(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)).build())
+                                    + restrictedChannelsConfig.restrictedChannelsToString(ctx.getGuild().getId(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)).build())
                             .queue();
                     return;
                 }

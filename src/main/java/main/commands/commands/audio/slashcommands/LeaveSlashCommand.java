@@ -3,6 +3,7 @@ package main.commands.commands.audio.slashcommands;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -78,9 +79,18 @@ public class LeaveSlashCommand extends InteractiveCommand {
 
         GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         musicManager.scheduler.queue.clear();
-        musicManager.scheduler.player.stopTrack();
+
+        if (musicManager.scheduler.player.getPlayingTrack() != null)
+            musicManager.scheduler.player.stopTrack();
 
         event.getGuild().getAudioManager().closeAudioConnection();
+
+        if (new LegacyDedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
+            new LegacyDedicatedChannelConfig().updateMessage(event.getGuild());
+
+        musicManager.scheduler.repeating = false;
+        musicManager.scheduler.playlistRepeating = false;
+        musicManager.scheduler.getPastQueue().clear();
 
         eb = EmbedUtils.embedMessage("Disconnected!");
         event.getHook().sendMessageEmbeds(eb.build()).queue();

@@ -6,8 +6,7 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -68,7 +67,7 @@ public class PermissionsCommand implements ICommand {
             return;
 
         try {
-            new PermissionsConfig().initConfig();
+            new LegacyPermissionsConfig().initConfig();
             msg.addReaction("✅").queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -88,7 +87,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new PermissionsConfig().addRoleToPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
+            new LegacyPermissionsConfig().addRoleToPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalAccessException e) {
@@ -107,7 +106,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new PermissionsConfig().addPermissionToUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
+            new LegacyPermissionsConfig().addPermissionToUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
@@ -126,7 +125,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new PermissionsConfig().removePermissionFromUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
+            new LegacyPermissionsConfig().removePermissionFromUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
@@ -188,7 +187,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new PermissionsConfig().removeRoleFromPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
+            new LegacyPermissionsConfig().removeRoleFromPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IOException e) {
@@ -263,7 +262,7 @@ public class PermissionsCommand implements ICommand {
                 eb = EmbedUtils.embedMessage("**List of Permissions**\n\n`" + perms + "`");
             msg.replyEmbeds(eb.build()).queue();
         } else {
-            PermissionsConfig permissionsConfig = new PermissionsConfig();
+            LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
 
             if (GeneralUtils.stringIsID(GeneralUtils.getDigitsOnly(args.get(1)))) {
                 String id = GeneralUtils.getDigitsOnly(args.get(1));

@@ -11,21 +11,4 @@
     <root level="info">
         <appender-ref ref="STDOUT" />
     </root>
-
-<!--    <property name="LOG_FILE" value="logs/LogFile" />-->
-<!--    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-<!--        <file>${LOG_FILE}.log</file>-->
-<!--        <append>true</append>-->
-<!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
-<!--            &lt;!&ndash; daily rollover &ndash;&gt;-->
-<!--            <fileNamePattern>${LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>-->
-
-<!--            &lt;!&ndash; keep 30 days' worth of history capped at 3GB total size &ndash;&gt;-->
-<!--            <maxHistory>30</maxHistory>-->
-<!--            <totalSizeCap>3GB</totalSizeCap>-->
-<!--        </rollingPolicy>-->
-<!--        <encoder>-->
-<!--            <pattern>%d{HH:mm:ss.SSS} %boldGreen(%-15.-15logger{0}) %highlight(%-6level) %msg%n</pattern>-->
-<!--        </encoder>-->
-<!--    </appender>-->
 </configuration>

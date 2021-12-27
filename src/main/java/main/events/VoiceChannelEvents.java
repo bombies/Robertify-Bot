@@ -3,12 +3,9 @@ package main.events;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -37,11 +34,13 @@ public class VoiceChannelEvents extends ListenerAdapter {
             if (musicManager.audioPlayer.isPaused())
                 musicManager.audioPlayer.setPaused(false);
 
-            musicManager.audioPlayer.stopTrack();
+            if (musicManager.audioPlayer.getPlayingTrack() != null)
+                musicManager.audioPlayer.stopTrack();
+
             musicManager.scheduler.queue.clear();
 
-            if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
-                new DedicatedChannelConfig().updateMessage(event.getGuild());
+            if (new LegacyDedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
+                new LegacyDedicatedChannelConfig().updateMessage(event.getGuild());
 
         } else {
              VoiceChannel channelLeft = event.getChannelLeft();

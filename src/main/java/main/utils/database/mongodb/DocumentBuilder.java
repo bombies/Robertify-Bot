@@ -2,6 +2,7 @@ package main.utils.database.mongodb;
 
 import lombok.SneakyThrows;
 import main.utils.component.InvalidBuilderException;
+import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONObject;
 
@@ -18,6 +19,11 @@ public class DocumentBuilder {
 
     public <T> DocumentBuilder addField(String key, T value) {
         obj.put(key, value);
+        return this;
+    }
+
+    public <T> DocumentBuilder addField(GenericJSONField key, T value) {
+        obj.put(key.toString(), value);
         return this;
     }
 

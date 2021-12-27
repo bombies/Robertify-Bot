@@ -4,95 +4,87 @@ import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class AbstractMongoCache<T extends AbstractMongoDatabase> extends AbstractMongoDatabase {
-    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache<? extends AbstractMongoDatabase>> INSTANCES = new HashMap<>();
+public class AbstractMongoCache extends AbstractMongoDatabase implements AbstractJSON {
+    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache> INSTANCES = new HashMap<>();
 
     @Getter
-    private final T mongoDB;
+    private final AbstractMongoDatabase mongoDB;
     @Getter
     private MongoCollection<Document> collection;
-    private JSONObject collectionJSONCache;
+    private JSONObject cache;
 
-    AbstractMongoCache(T mongoDB) {
+    AbstractMongoCache(AbstractMongoDatabase mongoDB) {
         super(mongoDB);
         this.mongoDB = mongoDB;
         this.collection = mongoDB.getCollection();
-        this.collectionJSONCache = collectionToJSON(this.collection);
+        this.cache = collectionToJSON(this.collection);
     }
 
     @Override
     public void init() {
-        // NOTHING
+        mongoDB.init();
     }
 
     public void updateCache() {
         this.collection = mongoDB.getCollection();
-        this.collectionJSONCache = collectionToJSON(this.collection);
+        this.cache = collectionToJSON(this.collection);
     }
 
     @SneakyThrows
     public void updateCache(MongoCollection<Document> collection) {
         this.collection = collection;
-        this.collectionJSONCache = collectionToJSON(collection);
+        this.cache = collectionToJSON(collection);
     }
 
     @SneakyThrows
     public void updateCache(Document document) {
-        final String id = (String) document.get("_id");
-        final JSONArray collectionArr = this.collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
+        final ObjectId id = document.getObjectId("_id");
+        final JSONArray collectionArr = this.cache.getJSONArray(CacheField.DOCUMENTS.toString());
 
-        collectionArr.remove(getIndexOfObjectInArray(collectionArr, CacheField.ID, id));
+        collectionArr.remove(getIndexOfObjectInArray(collectionArr, id));
         collectionArr.put(new JSONObject(document.toJson()));
 
         upsertDocument(document);
     }
 
-    public JSONObject getJSON() {
-        return collectionJSONCache;
+    public <T> void updateCache(JSONObject obj, GenericJSONField identifier, T identifierValue) {
+        updateCache(obj, identifier.toString(), identifierValue);
+    }
+
+    public <T> void updateCache(JSONObject obj, String identifier, T identifierValue) {
+        if (!obj.has(identifier))
+            throw new IllegalArgumentException("The JSON object must have the identifier passed!");
+
+        final T id = (T) obj.get(identifier);
+        Document document = findSpecificDocument(identifier, identifierValue);
+
+        if (document == null)
+            throw new NullPointerException("There was no document found with that identifier value!");
+
+        updateCache(Document.parse(obj.toString()));
+    }
+
+    public JSONObject getCacheJSON() {
+        return cache;
     }
 
     public JSONObject getJSON(String id) {
-        var arr = collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
+        var arr = cache.getJSONArray(CacheField.DOCUMENTS.toString());
         return arr.getJSONObject(getIndexOfObjectInArray(arr, CacheField.ID, id));
     }
 
     public JSONObject getJSONByGuild(String gid) {
-        var arr = collectionJSONCache.getJSONArray(CacheField.DOCUMENTS.toString());
+        var arr = cache.getJSONArray(CacheField.DOCUMENTS.toString());
         return arr.getJSONObject(getIndexOfObjectInArray(arr, CacheField.GUILD_ID, gid));
-    }
-
-    private int getIndexOfObjectInArray(JSONArray array, GenericJSONField field, Object object) {
-        if (!arrayHasObject(array, field, object))
-            throw new NullPointerException("There was no such object found in the array!");
-
-        for (int i = 0; i < array.length(); i++)
-            if (array.getJSONObject(i).get(field.toString()).equals(object))
-                return i;
-        return -1;
-    }
-
-    private boolean arrayHasObject(JSONArray array, GenericJSONField field, Object object) {
-        for (int i = 0; i < array.length(); i++)
-            if (array.getJSONObject(i).get(field.toString()).equals(object))
-                return true;
-        return false;
-    }
-
-    public static <T extends AbstractMongoDatabase> AbstractMongoCache<? extends AbstractMongoDatabase> ins(T db) {
-        if (INSTANCES.containsKey(db.getClass())) {
-            return INSTANCES.get(db.getClass());
-        } else {
-            AbstractMongoCache<T> abstractMongoCache = new AbstractMongoCache<>(db);
-            INSTANCES.put(db.getClass(), abstractMongoCache);
-            return abstractMongoCache;
-        }
     }
 
     private JSONObject collectionToJSON(MongoCollection<Document> collection) {
@@ -105,6 +97,10 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         return collectionObj;
     }
 
+    public JSONArray getCache() {
+        return cache.getJSONArray(CacheField.DOCUMENTS.toString());
+    }
+
     enum CacheField implements GenericJSONField {
         DOCUMENTS("documents"),
         GUILD_ID("guild_id"),
@@ -113,6 +109,39 @@ public class AbstractMongoCache<T extends AbstractMongoDatabase> extends Abstrac
         private final String str;
 
         CacheField(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    boolean arrayHasObject(JSONArray array, ObjectId object) {
+        for (int i = 0; i < array.length(); i++) {
+            if (array.getJSONObject(i).getJSONObject("_id").getString("$oid").equals(object.toString()))
+                return true;
+        }
+        return false;
+    }
+
+    int getIndexOfObjectInArray(JSONArray array, ObjectId object) {
+        if (!arrayHasObject(array, object))
+            throw new NullPointerException("There was no such object found in the array!");
+
+        for (int i = 0; i < array.length(); i++)
+            if (array.getJSONObject(i).getJSONObject("_id").getString("$oid").equals(object.toString()))
+                return i;
+        return -1;
+    }
+
+    public enum Fields implements GenericJSONField {
+        DOCUMENTS("documents");
+
+        private final String str;
+
+        Fields(String str) {
             this.str = str;
         }
 

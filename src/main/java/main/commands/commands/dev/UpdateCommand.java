@@ -3,7 +3,7 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -41,7 +41,7 @@ public class UpdateCommand implements IDevCommand {
             return;
         }
 
-        var conf = new DedicatedChannelConfig();
+        var conf = new LegacyDedicatedChannelConfig();
 
         try {
             switch (args.get(1).toLowerCase()) {

@@ -1,8 +1,8 @@
-package main.utils.json.restrictedchannels;
+package main.utils.json.legacy.restrictedchannels;
 
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.AbstractJSONConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,10 +12,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RestrictedChannelsConfig extends AbstractJSONConfig {
-    private final Logger logger = LoggerFactory.getLogger(RestrictedChannelsConfig.class);
+public class LegacyRestrictedChannelsConfig extends AbstractJSONFile {
+    private final Logger logger = LoggerFactory.getLogger(LegacyRestrictedChannelsConfig.class);
 
-    public RestrictedChannelsConfig() {
+    public LegacyRestrictedChannelsConfig() {
         super(JSONConfigFile.RESTRICTED_CHANNELS);
     }
 

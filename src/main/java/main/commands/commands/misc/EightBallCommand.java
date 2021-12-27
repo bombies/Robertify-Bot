@@ -7,8 +7,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.EightBallConfig;
+import main.utils.json.legacy.LegacyEightBallConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -88,7 +87,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (phraseToAdd == null)
             return EmbedUtils.embedMessage("You need to provide a response to add!");
 
-        var config = new EightBallConfig();
+        var config = new LegacyEightBallConfig();
 
         try {
             if (config.getResponses(guild.getId()).contains(phraseToAdd))
@@ -105,7 +104,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new EightBallConfig();
+        var config = new LegacyEightBallConfig();
 
         try {
             if (index > config.getResponses(guild.getId()).size() || index < 0)
@@ -124,7 +123,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new EightBallConfig();
+        var config = new LegacyEightBallConfig();
         config.removeAllResponses(guild.getId());
 
         return EmbedUtils.embedMessage("You have cleared all of your custom responses!");
@@ -134,7 +133,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new EightBallConfig();
+        var config = new LegacyEightBallConfig();
         final var responses = config.getResponses(guild.getId());
 
         if (responses.isEmpty())
@@ -176,7 +175,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                 "Very doubtful."
                 );
 
-        final var customAnswers = new EightBallConfig().getResponses(guild.getId());
+        final var customAnswers = new LegacyEightBallConfig().getResponses(guild.getId());
 
         final var random = new Random().nextDouble();
 

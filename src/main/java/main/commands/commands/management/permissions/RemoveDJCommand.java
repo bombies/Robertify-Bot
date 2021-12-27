@@ -5,8 +5,7 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -68,7 +67,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, Role role) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
         try {
             permissionsConfig.removeRoleFromPermission(guild.getId(), role.getId(), Permission.ROBERTIFY_DJ);
             return EmbedUtils.embedMessage("Removed " + role.getAsMention() + " as a DJ!");
@@ -81,7 +80,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, User user) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
         try {
             permissionsConfig.removePermissionFromUser(guild.getId(), user.getId(), Permission.ROBERTIFY_DJ);
             return EmbedUtils.embedMessage("Removed " + user.getAsMention() + " as a DJ!");

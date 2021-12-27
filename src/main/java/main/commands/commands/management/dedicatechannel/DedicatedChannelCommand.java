@@ -9,7 +9,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -33,7 +33,7 @@ public class DedicatedChannelCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getId())) {
+        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId())) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The request channel has already been setup!").build())
                     .queue();
             return;
@@ -51,7 +51,7 @@ public class DedicatedChannelCommand implements ICommand {
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    var dediChannelConfig = new DedicatedChannelConfig();
+                    var dediChannelConfig = new LegacyDedicatedChannelConfig();
 
                     ChannelManager manager = textChannel.getManager();
                     manager.setPosition(0).queue();

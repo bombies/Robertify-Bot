@@ -6,7 +6,7 @@ import main.constants.ENV;
 import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
-import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.annotations.ReplaceWith;
@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -126,7 +127,7 @@ public class GeneralUtils {
 
         List<Role> userRoles = sender.getRoles();
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
 
         for (Role r : userRoles)
             if (permissionsConfig.getRolesForPermission(guild.getId(), perm).contains(r.getId()) ||
@@ -147,7 +148,7 @@ public class GeneralUtils {
         List<Role> userRoles = sender.getRoles();
         int pass = 0;
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
 
 
         for (Role r : userRoles) {
@@ -247,6 +248,40 @@ public class GeneralUtils {
         for (int i = startIndex; i < args.size(); i++)
             arg.append(args.get(i)).append((i < args.size() - 1) ? " " : "");
         return  arg.toString();
+    }
+
+    public static long getTimeFromMillis(long time, TimeUnit unit) {
+        return GeneralUtils.getTimeFromSeconds(TimeUnit.MILLISECONDS.toSeconds(time), unit);
+    }
+
+    public static long getTimeFromSeconds(long time, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> ((time % 86400) % 3600) % 60;
+            case MINUTES -> ((time % 86400 ) % 3600 ) / 60;
+            case HOURS -> (time % 86400 ) / 3600;
+            default -> throw new IllegalArgumentException("The enum provided isn't a supported enum!");
+        };
+    }
+
+    public static long getTimeFromMillis(Duration duration, TimeUnit unit) {
+        return switch (unit) {
+            case SECONDS -> duration.toSeconds() % 60;
+            case MINUTES ->  duration.toMinutes() % 60;
+            case HOURS -> duration.toHours() % 24;
+            case DAYS -> duration.toDays();
+            default -> throw new IllegalArgumentException("The enum provided isn't a supported enum!");
+        };
+    }
+
+    public static String getDurationString(long duration) {
+        long second = GeneralUtils.getTimeFromMillis(Duration.ofMillis(duration), TimeUnit.SECONDS);
+        long minute = GeneralUtils.getTimeFromMillis(Duration.ofMillis(duration), TimeUnit.MINUTES);
+        long hour = GeneralUtils.getTimeFromMillis(Duration.ofMillis(duration), TimeUnit.HOURS);
+        long day = GeneralUtils.getTimeFromMillis(Duration.ofMillis(duration), TimeUnit.DAYS);
+        return ((day > 0) ? day + ((day > 1) ? " days, " : " day, ") : "")
+                + ((hour > 0) ? hour + ((hour > 1) ? " hours, " : " hour, ") : "")
+                + ((minute > 0) ? minute + ((minute > 1) ? " minutes, " : " minute, ") : "")
+                + second + ((second > 1) ? " seconds" : " second");
     }
 
     public static String formatDate(long date, TimeFormat style) {

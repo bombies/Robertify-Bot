@@ -24,7 +24,7 @@ public class MongoTestCommand implements ITestCommand {
             return;
         }
 
-        MongoTestDB db = new MongoTestDB();
+        MongoTestDB db = MongoTestDB.ins();
 
         switch (args.get(0).toLowerCase()) {
             case "add" -> {
@@ -72,7 +72,7 @@ public class MongoTestCommand implements ITestCommand {
 
             case "cache" -> {
                 try {
-                    msg.reply("```json\n" + new TestMongoCache().cacheTest() + "```").queue();
+                    msg.reply("```json\n" + TestMongoCache.getInstance().cacheTest() + "```").queue();
                     msg.addReaction("✅").queue();
                 } catch (Exception e) {
                     e.printStackTrace();

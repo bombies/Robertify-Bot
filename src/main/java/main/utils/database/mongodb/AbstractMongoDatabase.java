@@ -12,10 +12,14 @@ import main.constants.ENV;
 import main.events.MongoEventListener;
 import main.main.Config;
 import main.utils.database.mongodb.cache.AbstractMongoCache;
+import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.database.mongodb.cache.TestMongoCache;
+import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
+import org.bson.types.ObjectId;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public abstract class AbstractMongoDatabase {
     private final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
@@ -33,7 +38,7 @@ public abstract class AbstractMongoDatabase {
     @Getter
     private MongoCollection<Document> collection;
 
-    public AbstractMongoDatabase(Database.MONGO db) {
+    private AbstractMongoDatabase(Database.MONGO db) {
         final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
         final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
                 .applyConnectionString(CONNECTION_STRING)
@@ -83,9 +88,9 @@ public abstract class AbstractMongoDatabase {
     public abstract void init();
 
     public static void initAllCaches() {
-        var testDb = new MongoTestDB();
-
-        TestMongoCache.setCache((AbstractMongoCache<MongoTestDB>) AbstractMongoCache.ins(testDb));
+//        TestMongoCache.initCache();
+        BotInfoCache.initCache();
+        GuildsDBCache.initCache();
     }
 
     MongoCollection<Document> getCollection(String name) {
@@ -97,17 +102,26 @@ public abstract class AbstractMongoDatabase {
     }
 
     protected void upsertDocument(Document doc) {
-        String id = doc.getString("_id");
+        ObjectId id = doc.getObjectId("_id");
 
         Document oldDoc = null;
         for (var document : collection.find())
-            if (document.getString("_id").equals(id))
+            if (document.getObjectId("_id").equals(id))
                 oldDoc = document;
 
-        if (oldDoc == null)
+        if (oldDoc != null)
+            removeDocument(oldDoc);
+        addDocument(doc);
+    }
+
+    protected void upsertDocument(String key, Object value, Document doc) {
+        try {
+            Document oldDoc = findSpecificDocument(key, value);
+            removeDocument(doc);
             addDocument(doc);
-        else
-            updateDocument(oldDoc, doc);
+        } catch (NoSuchElementException e) {
+            addDocument(doc);
+        }
     }
 
     protected void upsertDocument(JSONObject obj) {
@@ -188,6 +202,14 @@ public abstract class AbstractMongoDatabase {
         updateDocument(document, key, newValue);
     }
 
+    protected boolean documentExists(GenericJSONField key, String value) {
+        return findDocument(key.toString(), value).hasNext();
+    }
+
+    protected boolean documentExists(GenericJSONField key, Object value) {
+        return findDocument(key.toString(), value).hasNext();
+    }
+
     protected boolean documentExists(String key, String value) {
         return findDocument(key, value).hasNext();
     }
@@ -204,6 +226,10 @@ public abstract class AbstractMongoDatabase {
         return collection.find(eq(key, value)).iterator();
     }
 
+    protected Iterator<Document> findDocument(String key, Object value) {
+        return collection.find(eq(key, value)).iterator();
+    }
+
     protected Document findSpecificDocument(String key, String value) {
         return collection.find(eq(key, value)).iterator().next();
     }
@@ -214,6 +240,14 @@ public abstract class AbstractMongoDatabase {
 
     protected Document findSpecificDocument(String key, JSONObject value) {
         return collection.find(eq(key, value)).iterator().next();
+    }
+
+    protected Document findSpecificDocument(String key, Object value) {
+        return collection.find(eq(key, value)).iterator().next();
+    }
+
+    protected Document findSpecificDocument(GenericJSONField key, Object value) {
+        return findSpecificDocument(key.toString(), value);
     }
 
     protected Iterator<Document> findDocument(String key, Document value) {

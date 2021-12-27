@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 
 public class MongoTestDB extends AbstractMongoDatabase {
     private final static Logger logger = LoggerFactory.getLogger(MongoTestDB.class);
+    private final static MongoTestDB INSTANCE = new MongoTestDB();
 
-
-    public MongoTestDB() {
+    private MongoTestDB() {
         super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_TEST);
     }
 
@@ -46,12 +46,16 @@ public class MongoTestDB extends AbstractMongoDatabase {
     }
 
     private void updateCache() {
-        TestMongoCache.getCache().updateCache();
+        TestMongoCache.getInstance().updateCache();
         logger.info("Updated test cache");
     }
 
     @Override
     public void init() {
 
+    }
+
+    public static MongoTestDB ins() {
+        return INSTANCE;
     }
 }

@@ -22,6 +22,10 @@ public enum Database {
         MAIN("Learning0"),
 
         ROBERTIFY_DATABASE(Config.get(ENV.MONGO_DATABASE_NAME)),
+
+        // Collections
+        ROBERTIFY_BOT_INFO("main"),
+        ROBERTIFY_GUILDS("guilds"),
         ROBERTIFY_PERMISSIONS("permissions"),
         ROBERTIFY_TEST("test");
 

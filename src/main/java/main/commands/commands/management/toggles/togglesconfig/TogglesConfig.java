@@ -5,14 +5,14 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.AbstractJSONConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class TogglesConfig extends AbstractJSONConfig {
+public class TogglesConfig extends AbstractJSONFile {
     private final JSONConfigFile file = JSONConfigFile.TOGGLES;
 
     public TogglesConfig() {

@@ -11,7 +11,7 @@ import main.commands.commands.management.toggles.togglesconfig.Toggles;
 import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
 import main.main.Listener;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -107,15 +107,13 @@ public class TrackScheduler extends AudioEventAdapter {
             nextTrack.setPosition(0L);
 
         try {
-            this.player.stopTrack();
             this.player.startTrack(nextTrack, false);
         } catch (IllegalStateException e) {
-            this.player.stopTrack();
             this.player.startTrack(nextTrack.makeClone(), false);
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getId()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId()))
+            new LegacyDedicatedChannelConfig().updateMessage(guild);
     }
 
     @Override
