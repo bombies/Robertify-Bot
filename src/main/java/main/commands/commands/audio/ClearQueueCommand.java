@@ -8,6 +8,7 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -24,18 +25,6 @@ public class ClearQueueCommand implements ICommand {
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
-
-        BotDB botUtils = new BotDB();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
-
-            EmbedBuilder eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
 
         GeneralUtils.setCustomEmbed("Queue");
 

@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
+import main.main.Robertify;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.main.Listener;
@@ -77,7 +79,7 @@ public class TrackScheduler extends AudioEventAdapter {
             }
 
             final var requester = RobertifyAudioManager.getRequester(track);
-            TextChannel announcementChannel = new BotDB().getAnnouncementChannelObject(this.guild.getIdLong());
+            TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
             EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                     + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                     " [" + requester.getAsMention() + "]"

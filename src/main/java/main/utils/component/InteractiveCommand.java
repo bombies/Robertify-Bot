@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import main.commands.CommandManager;
 import main.commands.commands.management.permissions.Permission;
+import main.main.Robertify;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
@@ -113,7 +114,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         }
 
         private void addCommandToAllGuilds(Command command) {
-            for (Guild g : new BotDB().getGuilds())
+            for (Guild g : Robertify.api.getGuilds())
                 addCommandToSpecificGuild(g, command);
         }
 

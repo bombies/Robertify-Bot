@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.main.Robertify;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.BotConstants;
@@ -56,12 +58,9 @@ public class ChangeLogCommand implements IDevCommand {
 
     private void send(Message msg) {
         var config = new ChangeLogConfig();
-        var botUtils = new BotDB();
         var logsToString = new StringBuilder();
         var logs = config.getCurrentChangelog();
-        var guilds = botUtils.getGuilds();
-
-        botUtils.createConnection();
+        var guilds = Robertify.api.getGuilds();
 
         logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
         EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
@@ -74,8 +73,7 @@ public class ChangeLogCommand implements IDevCommand {
             if (!new TogglesConfig().getToggle(msg.getGuild(), Toggles.ANNOUNCE_CHANGELOGS))
                 continue;
 
-            botUtils.createConnection();
-            TextChannel announcementChannel = botUtils.getAnnouncementChannelObject(g.getIdLong());
+            TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
 
             if (announcementChannel == null) continue;
 

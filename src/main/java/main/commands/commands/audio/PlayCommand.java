@@ -3,6 +3,7 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.main.Listener;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.ENV;
@@ -42,16 +43,7 @@ public class PlayCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        BotDB botUtils = new BotDB();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
-
-            eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
+        Listener.checkIfAnnouncementChannelIsSet(ctx.getGuild(), ctx.getChannel());
 
         if (args.isEmpty()) {
             eb = EmbedUtils.embedMessage("You must provide the name or link of a song to play!");

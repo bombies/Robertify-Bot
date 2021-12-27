@@ -11,6 +11,7 @@ import main.utils.component.InteractiveCommand;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -86,12 +87,12 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (new BotDB().isDeveloper(user.getId()))
             return EmbedUtils.embedMessage("You cannot ban a developer of Robertify!");
 
-        if (BanDB.isUserBannedLazy(guild.getIdLong(), user.getIdLong()))
+        if (new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
             return EmbedUtils.embedMessage("This user is already banned.");
 
         if (bannedUntil == null) { // Perm ban
-            new BanDB().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis());
-            BanDB.addBannedUser(guild.getIdLong(), user.getIdLong(), null);
+            new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
+
             user.openPrivateChannel().queue(channel -> {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned permanently in **"+guild.getName()+"**!")
                         .build())
@@ -101,8 +102,8 @@ public class BanCommand extends InteractiveCommand implements ICommand {
             });
             return EmbedUtils.embedMessage("You have banned " + user.getAsMention());
         } else {
-            new BanDB().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
-            BanDB.addBannedUser(guild.getIdLong(), user.getIdLong(), bannedUntil);
+            new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
+
             user.openPrivateChannel().queue(channel -> {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
                                 .build())

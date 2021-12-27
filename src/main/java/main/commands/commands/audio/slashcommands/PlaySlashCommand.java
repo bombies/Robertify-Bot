@@ -3,6 +3,7 @@ package main.commands.commands.audio.slashcommands;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.PlayCommand;
+import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.sqlite3.BotDB;
@@ -54,16 +55,7 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         EmbedBuilder eb;
 
-        BotDB botUtils = new BotDB();
-        if (!botUtils.isAnnouncementChannelSet(event.getGuild().getIdLong())) {
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(event.getGuild().getIdLong(), event.getChannel().getIdLong())
-                    .closeConnection();
-
-            eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            event.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
+        Listener.checkIfAnnouncementChannelIsSet(event.getGuild(), event.getTextChannel());
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
@@ -81,8 +73,6 @@ public class PlaySlashCommand extends InteractiveCommand {
                     .queue();
             return;
         }
-
-        botUtils.createConnection();
 
         String link = event.getOption("track").getAsString();
 

@@ -6,6 +6,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.ENV;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
@@ -27,7 +28,7 @@ public class ShutdownCommand implements IDevCommand {
         EmbedBuilder eb = EmbedUtils.embedMessage("Now shutting down...");
         ctx.getMessage().replyEmbeds(eb.build()).queue();
 
-        for (Guild g : new BotDB().getGuilds()) {
+        for (Guild g : Robertify.api.getGuilds()) {
             var selfMember = g.getSelfMember();
             var musicManager = RobertifyAudioManager.getInstance().getMusicManager(g);
             var queue = musicManager.scheduler.queue;

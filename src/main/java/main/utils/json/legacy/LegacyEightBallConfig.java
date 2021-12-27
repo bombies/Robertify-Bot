@@ -1,6 +1,7 @@
 package main.utils.json.legacy;
 
 import main.constants.JSONConfigFile;
+import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
@@ -28,7 +29,7 @@ public class LegacyEightBallConfig extends AbstractJSONFile {
 
         final var jsonObject = new JSONObject();
 
-        for (Guild guild : new BotDB().getGuilds())
+        for (Guild guild : Robertify.api.getGuilds())
             jsonObject.put(guild.getId(), new JSONArray());
 
         setJSON(jsonObject);
@@ -37,7 +38,7 @@ public class LegacyEightBallConfig extends AbstractJSONFile {
     public synchronized void updateConfig() {
         var obj = getJSONObject();
 
-        for (Guild g : new BotDB().getGuilds())
+        for (Guild g : Robertify.api.getGuilds())
             try {
                 obj.getJSONArray(g.getId());
             } catch (JSONException e) {

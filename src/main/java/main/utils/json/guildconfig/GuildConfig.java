@@ -62,6 +62,13 @@ public class GuildConfig implements AbstractJSON {
         cache.setField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL, id);
     }
 
+    public boolean announcementChannelIsSet(long gid) {
+        if (!guildHasInfo(gid))
+            throw new NullPointerException("This guild doesn't have any information!");
+
+        return getAnnouncementChannelID(gid) != -1;
+    }
+
     public List<BannedUser> getBannedUsers(long gid) {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any information!");
@@ -108,7 +115,7 @@ public class GuildConfig implements AbstractJSON {
                 .put(GuildsDB.Field.BANNED_USER.toString(), uid)
                 .put(GuildsDB.Field.BANNED_BY.toString(), modId)
                 .put(GuildsDB.Field.BANNED_AT.toString(), bannedAt)
-                .put(GuildsDB.Field.BANNED_UNTIL.toString(), bannedAt)
+                .put(GuildsDB.Field.BANNED_UNTIL.toString(), bannedUntil)
         );
 
         cache.setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
@@ -125,6 +132,21 @@ public class GuildConfig implements AbstractJSON {
         bannedUsers.remove(getIndexOfObjectInArray(bannedUsers, GuildsDB.Field.BANNED_USER, uid));
 
         cache.setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
+    }
+
+    public long getTimeUntilUnban(long gid, long uid) {
+        if (!isBannedUser(gid, uid))
+            throw new IllegalArgumentException("This user isn't banned!");
+
+        final var bannedUser = getBannedUsers(gid).stream()
+                .filter(user -> user.user == uid)
+                .findFirst()
+                .orElse(null);
+
+        if (bannedUser == null)
+            throw new NullPointerException("Now how did this happen?");
+
+        return bannedUser.bannedUntil - bannedUser.bannedAt;
     }
 
     public boolean isBannedUser(long gid, long uid) {

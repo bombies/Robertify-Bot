@@ -6,6 +6,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
@@ -25,22 +26,7 @@ public class JumpCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
         final Member self = ctx.getSelfMember();
-        GuildVoiceState selfVoiceState = self.getVoiceState();
-
-        EmbedBuilder eb;
-
-        BotDB botUtils = new BotDB();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
-
-            eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-
+        final GuildVoiceState selfVoiceState = self.getVoiceState();
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 

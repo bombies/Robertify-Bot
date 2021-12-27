@@ -8,6 +8,7 @@ import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,16 +31,15 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        BotDB botUtils = new BotDB();
+        var guildConfig = new GuildConfig();
 
         if (args.isEmpty()) {
             TextChannel channel = ctx.getChannel();
-            if (botUtils.getAnnouncementChannel(guild.getIdLong()) == channel.getIdLong()) {
+            if (guildConfig.getAnnouncementChannelID(guild.getIdLong()) == channel.getIdLong()) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("This is already the announcement channel.");
                 msg.replyEmbeds(eb.build()).queue();
             } else {
-                botUtils.createConnection();
-                botUtils.setAnnouncementChannel(guild.getIdLong(), channel.getIdLong());
+                guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
                 EmbedBuilder eb = EmbedUtils.embedMessage("Set the announcement channel to: " + channel.getAsMention());
                 msg.replyEmbeds(eb.build()).queue();
@@ -61,13 +61,11 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
                 return;
             }
 
-            botUtils.setAnnouncementChannel(guild.getIdLong(), channel.getIdLong());
+            guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
             EmbedBuilder eb =  EmbedUtils.embedMessage("You've set the announcement channel to: " +  channel.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         }
-
-        botUtils.closeConnection();
     }
 
     @Override
@@ -118,7 +116,7 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         var channel = event.getOption("channel").getAsGuildChannel();
-        var botUtils = new BotDB();
+        var guildConfig = new GuildConfig();
 
         if (!(channel instanceof TextChannel)) {
             event.replyEmbeds(EmbedUtils.embedMessage("The channel must be a **text** channel!").build())
@@ -126,13 +124,13 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        if (botUtils.getAnnouncementChannel(event.getGuild().getIdLong()) == channel.getIdLong()) {
+        if (guildConfig.getAnnouncementChannelID(event.getGuild().getIdLong()) == channel.getIdLong()) {
             event.replyEmbeds(EmbedUtils.embedMessage(channel.getAsMention() + " is already the announcement channel").build())
                     .setEphemeral(true).queue();
             return;
         }
 
-        botUtils.setAnnouncementChannel(event.getGuild().getIdLong(), channel.getIdLong());
+        guildConfig.setAnnouncementChannelID(event.getGuild().getIdLong(), channel.getIdLong());
         event.replyEmbeds(EmbedUtils.embedMessage("You have set the announcement channel to: " + channel.getAsMention()).build())
                 .setEphemeral(false)
                 .queue();

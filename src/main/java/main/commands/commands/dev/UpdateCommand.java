@@ -2,6 +2,7 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -46,7 +47,7 @@ public class UpdateCommand implements IDevCommand {
         try {
             switch (args.get(1).toLowerCase()) {
                 case "all" -> {
-                    for (Guild g : new BotDB().getGuilds()) {
+                    for (Guild g : Robertify.api.getGuilds()) {
                         conf.updateButtons(g);
                         conf.updateTopic(g);
                         conf.updateMessage(g);
@@ -59,7 +60,7 @@ public class UpdateCommand implements IDevCommand {
                     conf.updateButtons();
                 }
                 case "message" -> {
-                    for (Guild g : new BotDB().getGuilds())
+                    for (Guild g : Robertify.api.getGuilds())
                         conf.updateMessage(g);
                 }
                 default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arg").build()).queue();

@@ -25,18 +25,6 @@ public class RemoveCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
 
-        BotDB botUtils = new BotDB();
-        if (!botUtils.isAnnouncementChannelSet(ctx.getGuild().getIdLong())) {
-            
-            botUtils.createConnection();
-            botUtils.setAnnouncementChannel(ctx.getGuild().getIdLong(), ctx.getChannel().getIdLong())
-                    .closeConnection();
-
-            EmbedBuilder eb = EmbedUtils.embedMessage("There was no announcement channel set! Setting it to this channel.\n" +
-                    "\n_You can change the announcement channel by using the \"setchannel\" command._");
-            ctx.getChannel().sendMessageEmbeds(eb.build()).queue();
-        }
-
         GeneralUtils.setCustomEmbed("Queue");
 
         if (queue.isEmpty()) {

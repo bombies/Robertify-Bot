@@ -2,6 +2,7 @@ package main.utils.database.mongodb;
 
 import main.commands.commands.management.permissions.Permission;
 import main.constants.Database;
+import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -15,7 +16,7 @@ public class PermissionsDB extends AbstractMongoDatabase {
     }
 
     public void init() {
-        for (Guild g : new BotDB().getGuilds()) {
+        for (Guild g : Robertify.api.getGuilds()) {
             if (findDocument(Fields.GUILD_ID.toString(), g.getId()) == null)
                 continue;
 

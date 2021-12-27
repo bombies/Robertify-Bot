@@ -5,6 +5,7 @@ import main.constants.Database;
 import main.constants.DatabaseTable;
 import main.constants.ENV;
 import main.main.Config;
+import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
 import org.jetbrains.annotations.NotNull;
 
@@ -73,7 +74,7 @@ public class ServerDB extends AbstractSQLiteDatabase {
 
     @SneakyThrows
     public static void initPrefixMap() {
-        for (Guild g : new BotDB().getGuilds()) {
+        for (Guild g : Robertify.api.getGuilds()) {
             String serverPrefix = new ServerDB().getServerPrefix(g.getIdLong());
 
             if (serverPrefix != null)

@@ -32,6 +32,7 @@ import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -65,15 +66,10 @@ public class Listener extends ListenerAdapter {
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
 
-        BotDB botDB = new BotDB();
-        if (botDB.getGuilds().isEmpty())
-            for (Guild g : Robertify.api.getGuilds())
-                botDB.addGuild(g.getIdLong());
 
         AbstractJSONFile.initDirectory();
         LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
 
-//        new PermissionsDB().init();
         permConfig.update();
         new ChangeLogConfig().initConfig();
         new LegacyTogglesConfig().initConfig();
@@ -82,11 +78,8 @@ public class Listener extends ListenerAdapter {
         new LegacyRestrictedChannelsConfig().initConfig();
         new LegacySuggestionsConfig().initConfig();
         new LegacyReportsConfig().initConfig();
-        new ServerDB();
 
-        BanDB.initBannedUserMap();
-        ServerDB.initPrefixMap();
-        for (Guild g : botDB.getGuilds()) {
+        for (Guild g : Robertify.api.getGuilds()) {
             permConfig.initGuild(g.getId());
 
             initNeededSlashCommands(g);
@@ -100,7 +93,7 @@ public class Listener extends ListenerAdapter {
 
         initSelectionMenus();
 
-        logger.info("Watching {} guilds", botDB.getGuilds().size());
+        logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
 
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
@@ -116,7 +109,7 @@ public class Listener extends ListenerAdapter {
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
-            if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), user.getIdLong())) {
+            if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), user.getIdLong())) {
                 event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
                         .queue();
             } else {
@@ -142,7 +135,7 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (BanDB.isUserBannedLazy(event.getGuild().getIdLong(), event.getUser().getIdLong()))
+        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
     }
@@ -172,9 +165,6 @@ public class Listener extends ListenerAdapter {
         new TogglesConfig().update();
 
         logger.info("Joined {}", guild.getName());
-
-        ServerDB.initPrefixMap();
-        BanDB.initBannedUserMap();
     }
 
     @Override
@@ -188,6 +178,19 @@ public class Listener extends ListenerAdapter {
         new GuildConfig().removeGuild(guild.getIdLong());
 
         logger.info("Left {}", guild.getName());
+    }
+
+    public static void checkIfAnnouncementChannelIsSet(Guild guild, TextChannel channel) {
+        var guildConfig = new GuildConfig();
+        if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
+
+            guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
+
+            channel.sendMessageEmbeds(EmbedUtils.embedMessage("""
+                    There was no announcement channel set! Setting it to this channel.
+
+                    _You can change the announcement channel by using the "setchannel" command._""").build()).queue();
+        }
     }
 
     public void initSlashCommands() {
@@ -234,15 +237,15 @@ public class Listener extends ListenerAdapter {
     }
 
     private static void rescheduleUnbans(Guild g) {
-        final var banUtils = new BanDB();
-        final var map = BanDB.getBannedUsers().get(g.getIdLong());
+        final var banUtils = new GuildConfig();
+        final var map = new GuildConfig().getBannedUsersWithUnbanTimes(g.getIdLong());
 
         for (long user : map.keySet()) {
             if (map.get(user) == null) continue;
             if (map.get(user) - System.currentTimeMillis() <= 0) {
                 try {
                     banUtils.unbanUser(g.getIdLong(), user);
-                    map.remove(user);
+                    sendUnbanMessage(user, g);
                 } catch (IllegalArgumentException e) {
                     map.remove(user);
                 }
@@ -252,51 +255,43 @@ public class Listener extends ListenerAdapter {
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             final Runnable task = () -> {
                 banUtils.unbanUser(user, g.getIdLong());
-                map.remove(user);
 
-                Robertify.api.retrieveUserById(user).queue(user1 -> {
-                    user1.openPrivateChannel().queue(channel -> {
-                        channel.sendMessageEmbeds(
-                                EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
-                                        .build()
-                        ).queue(success -> {}, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                                    logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
-                                }));
-                    });
-                });
+                sendUnbanMessage(user, g);
             };
-            scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), user)).getTime(), TimeUnit.MILLISECONDS);
+            scheduler.schedule(task, new GuildConfig().getTimeUntilUnban(g.getIdLong(), user), TimeUnit.MILLISECONDS);
 
         }
     }
 
     public static void scheduleUnban(Guild g, User u) {
-        final BanDB banUtils = new BanDB();
-        final var map = BanDB.getBannedUsers().get(g.getIdLong());
+        final GuildConfig banUtils = new GuildConfig();
+        final var map = banUtils.getBannedUsersWithUnbanTimes(g.getIdLong());
         final var scheduler = Executors.newScheduledThreadPool(1);
 
         final Runnable task = () -> {
-            if (!BanDB.isUserBannedLazy(g.getIdLong(), u.getIdLong()))
+            if (!new GuildConfig().isBannedUser(g.getIdLong(), u.getIdLong()))
                 return;
 
             banUtils.unbanUser(g.getIdLong(), u.getIdLong());
-            map.remove(u.getIdLong());
 
-            u.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(
-                        EmbedUtils.embedMessage("You have been unbanned from Robertify in **" + g.getName() + "**")
-                                .build()
-                ).queue(success -> {
-                }, new ErrorHandler()
-                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                            logger.warn("Was not able to send an unban message to " + u.getAsTag() + "(" + u.getIdLong() + ")");
-                        }));
-            });
+            sendUnbanMessage(u.getIdLong(), g);
         };
-        scheduler.schedule(task, new Date(banUtils.getUnbanTime(g.getIdLong(), u.getIdLong())).getTime(), TimeUnit.MILLISECONDS);
+        scheduler.schedule(task, new GuildConfig().getTimeUntilUnban(g.getIdLong(), u.getIdLong()), TimeUnit.MILLISECONDS);
     }
 
+    private static void sendUnbanMessage(long user, Guild g) {
+        Robertify.api.retrieveUserById(user).queue(user1 -> {
+            user1.openPrivateChannel().queue(channel -> {
+                channel.sendMessageEmbeds(
+                        EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
+                                .build()
+                ).queue(success -> {}, new ErrorHandler()
+                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
+                            logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
+                        }));
+            });
+        });
+    }
 
     private static void initSelectionMenus() {
         new HelpCommand().initCommandWithoutUpsertion();
