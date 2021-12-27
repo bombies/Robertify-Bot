@@ -15,6 +15,7 @@ import main.commands.commands.management.permissions.Permission;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
@@ -274,7 +275,7 @@ public class CommandManager {
         long timeLeft = System.currentTimeMillis() - CooldownManager.INSTANCE.getCooldown(e.getAuthor());
         if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= CooldownManager.DEFAULT_COOLDOWN) {
             String[] split = e.getMessage().getContentRaw()
-                    .replaceFirst("(?i)" + Pattern.quote(ServerDB.getPrefix(e.getGuild().getIdLong())), "")
+                    .replaceFirst("(?i)" + Pattern.quote(new GuildConfig().getPrefix(e.getGuild().getIdLong())), "")
                     .split("\\s+");
 
             String invoke = split[0].toLowerCase();

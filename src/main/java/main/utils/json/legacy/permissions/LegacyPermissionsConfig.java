@@ -6,6 +6,7 @@ import main.constants.JSONConfigFile;
 import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
+import net.dv8tion.jda.annotations.ReplaceWith;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import org.json.JSONArray;
@@ -18,6 +19,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
+@ReplaceWith("PermissionsConfig")
 public class LegacyPermissionsConfig extends AbstractJSONFile {
     final Logger logger = LoggerFactory.getLogger(LegacyPermissionsConfig.class);
 

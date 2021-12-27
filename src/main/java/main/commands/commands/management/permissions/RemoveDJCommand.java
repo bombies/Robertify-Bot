@@ -6,6 +6,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -67,9 +68,9 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, Role role) {
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
-            permissionsConfig.removeRoleFromPermission(guild.getId(), role.getId(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
             return EmbedUtils.embedMessage("Removed " + role.getAsMention() + " as a DJ!");
         } catch (IllegalAccessException e) {
             return EmbedUtils.embedMessage("This role never was a DJ in the first place");
@@ -80,9 +81,9 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, User user) {
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
-            permissionsConfig.removePermissionFromUser(guild.getId(), user.getId(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
             return EmbedUtils.embedMessage("Removed " + user.getAsMention() + " as a DJ!");
         } catch (IllegalArgumentException e) {
             return EmbedUtils.embedMessage("This user never was a DJ in the first place");

@@ -6,6 +6,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -68,9 +69,9 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
 
     private EmbedBuilder handleSetDJ(Guild guild, Role role) {
         EmbedBuilder eb;
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
-            permissionsConfig.addRoleToPermission(guild.getId(), role.getId(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
             eb = EmbedUtils.embedMessage("Set " + role.getAsMention() + " as a DJ!");
             return eb;
         } catch (IllegalAccessException e) {
@@ -85,9 +86,9 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
 
     private EmbedBuilder handleSetDJ(Guild guild, User user) {
         EmbedBuilder eb;
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
-            permissionsConfig.addPermissionToUser(guild.getId(), user.getId(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
             eb = EmbedUtils.embedMessage("Set " + user.getAsMention() + " as a DJ!");
             return eb;
         } catch (IllegalArgumentException e) {

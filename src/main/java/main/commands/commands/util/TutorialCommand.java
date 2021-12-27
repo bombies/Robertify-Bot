@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -23,7 +24,7 @@ public class TutorialCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final User user = ctx.getAuthor();
         final Message msg = ctx.getMessage();
-        final String prefix = ServerDB.getPrefix(guild.getIdLong());
+        final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
 
         GeneralUtils.setCustomEmbed("Tutorial");
 

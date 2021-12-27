@@ -5,6 +5,8 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
+import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -58,6 +60,7 @@ public class GuildsDB extends AbstractMongoDatabase{
 
     protected static void update() {
         new TogglesConfig().update();
+        new PermissionsConfig().update();
     }
 
     public enum Field implements GenericJSONField {

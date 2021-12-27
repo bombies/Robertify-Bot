@@ -3,6 +3,7 @@ package main.commands.commands.management.dedicatechannel;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.ENV;
@@ -62,7 +63,7 @@ public class DedicatedChannelCommand implements ICommand {
                     eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
                     eb.setTitle("No song playing...");
                     eb.setImage("https://i.imgur.com/1HDoSgP.png");
-                    eb.setFooter("Prefix for this server is: " + ServerDB.getPrefix(guild.getIdLong()));
+                    eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
 
                     textChannel.sendMessage("**__Queue:__**\nJoin a voice channel and start playing songs!").setEmbeds(eb.build())

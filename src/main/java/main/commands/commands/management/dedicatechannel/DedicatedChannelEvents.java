@@ -6,6 +6,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
@@ -73,7 +74,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (!message.startsWith(ServerDB.getPrefix(guild.getIdLong())) && !user.isBot()) {
+        if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot()) {
             if (!GeneralUtils.isUrl(message))
                 message = "ytsearch:" + message;
 

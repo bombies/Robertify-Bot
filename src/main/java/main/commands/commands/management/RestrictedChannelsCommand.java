@@ -3,6 +3,7 @@ package main.commands.commands.management;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
@@ -32,7 +33,7 @@ public class RestrictedChannelsCommand implements ICommand {
 
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
-        final String prefix = new ServerDB().getServerPrefix(guild.getIdLong());
+        final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
 
         if (args.isEmpty()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n" + getUsages(prefix)).build())

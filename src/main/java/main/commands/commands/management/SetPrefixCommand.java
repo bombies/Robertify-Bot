@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,9 +32,7 @@ public class SetPrefixCommand implements ICommand {
             EmbedBuilder eb = EmbedUtils.embedMessage("Your prefix can't contain \"`\"");
             msg.replyEmbeds(eb.build()).queue();
         } else {
-            ServerDB serverUtils = new ServerDB();
-
-            serverUtils.updateServerPrefix(guild.getIdLong(), args.get(0)).closeConnection();
+            new GuildConfig().setPrefix(guild.getIdLong(), args.get(0));
 
             EmbedBuilder eb = EmbedUtils.embedMessage("You have set the bot's prefix to `" + args.get(0) + "`");
             msg.replyEmbeds(eb.build()).queue();

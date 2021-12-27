@@ -30,4 +30,16 @@ public enum Permission {
             ret.add(p.name());
         return ret;
     }
+
+    public static Permission parse(int code) {
+        switch (code) {
+            case 0 -> {
+                return ROBERTIFY_ADMIN;
+            }
+            case 1 -> {
+                return ROBERTIFY_DJ;
+            }
+            default -> throw new IllegalArgumentException("Invalid code!");
+        }
+    }
 }

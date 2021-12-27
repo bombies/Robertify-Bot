@@ -7,6 +7,7 @@ import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.annotations.ReplaceWith;
@@ -127,15 +128,15 @@ public class GeneralUtils {
 
         List<Role> userRoles = sender.getRoles();
 
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
 
         for (Role r : userRoles)
-            if (permissionsConfig.getRolesForPermission(guild.getId(), perm).contains(r.getId()) ||
-                    permissionsConfig.getRolesForPermission(guild.getId(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
+            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), perm).contains(r.getId()) ||
+                    permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
                 return true;
 
 
-        return permissionsConfig.getUsersForPermission(guild.getId(), perm.name()).contains(sender.getId());
+        return permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.name()).contains(sender.getId());
     }
 
     public static boolean hasPerms(Guild guild, User sender, Permission perm) {
@@ -148,16 +149,15 @@ public class GeneralUtils {
         List<Role> userRoles = sender.getRoles();
         int pass = 0;
 
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
-
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
 
         for (Role r : userRoles) {
-            if (permissionsConfig.getRolesForPermission(guild.getId(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
+            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
                 return true;
             for (Permission p : perms) {
-                if (permissionsConfig.getRolesForPermission(guild.getId(), p).contains(r.getId()))
+                if (permissionsConfig.getRolesForPermission(guild.getIdLong(), p).contains(r.getId()))
                     pass++;
-                else if (permissionsConfig.getUsersForPermission(guild.getId(), p.name()).contains(sender.getId()))
+                else if (permissionsConfig.getUsersForPermission(guild.getIdLong(), p.name()).contains(sender.getId()))
                     pass++;
             }
         }

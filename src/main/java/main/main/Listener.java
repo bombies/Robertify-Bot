@@ -28,6 +28,7 @@ import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
+import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -61,6 +62,9 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        AbstractMongoDatabase.initAllCaches();
+        AbstractMongoDatabase.updateAllCaches();
+
         BotDB botDB = new BotDB();
         if (botDB.getGuilds().isEmpty())
             for (Guild g : Robertify.api.getGuilds())
@@ -95,8 +99,6 @@ public class Listener extends ListenerAdapter {
 //        new AudioDB().cacheAllTracks();
 
         initSelectionMenus();
-        AbstractMongoDatabase.initAllCaches();
-        AbstractMongoDatabase.updateAllCaches();
 
         logger.info("Watching {} guilds", botDB.getGuilds().size());
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
@@ -108,7 +110,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         User user = event.getAuthor();
-        String prefix = ServerDB.getPrefix(event.getGuild().getIdLong());
+        String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
         String raw = event.getMessage().getContentRaw();
 
         if (user.isBot() || event.isWebhookMessage()) return;
@@ -167,7 +169,7 @@ public class Listener extends ListenerAdapter {
 
         // MongoDB
         new GuildConfig().addGuild(guild.getIdLong());
-
+        new TogglesConfig().update();
 
         logger.info("Joined {}", guild.getName());
 

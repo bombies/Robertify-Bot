@@ -7,6 +7,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -87,7 +88,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new LegacyPermissionsConfig().addRoleToPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
+            new PermissionsConfig().addRoleToPermission(msg.getGuild().getIdLong(), role.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalAccessException e) {
@@ -106,7 +107,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new LegacyPermissionsConfig().addPermissionToUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
+            new PermissionsConfig().addPermissionToUser(msg.getGuild().getIdLong(), user.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
@@ -125,7 +126,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new LegacyPermissionsConfig().removePermissionFromUser(msg.getGuild().getId(), user.getId(), Permission.valueOf(perm));
+            new PermissionsConfig().removePermissionFromUser(msg.getGuild().getIdLong(), user.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
@@ -187,7 +188,7 @@ public class PermissionsCommand implements ICommand {
         String perm = (String) checks[2];
 
         try {
-            new LegacyPermissionsConfig().removeRoleFromPermission(msg.getGuild().getId(), role.getId(), Permission.valueOf(perm));
+            new PermissionsConfig().removeRoleFromPermission(msg.getGuild().getIdLong(), role.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IOException e) {
@@ -262,7 +263,7 @@ public class PermissionsCommand implements ICommand {
                 eb = EmbedUtils.embedMessage("**List of Permissions**\n\n`" + perms + "`");
             msg.replyEmbeds(eb.build()).queue();
         } else {
-            LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+            PermissionsConfig permissionsConfig = new PermissionsConfig();
 
             if (GeneralUtils.stringIsID(GeneralUtils.getDigitsOnly(args.get(1)))) {
                 String id = GeneralUtils.getDigitsOnly(args.get(1));
@@ -276,19 +277,19 @@ public class PermissionsCommand implements ICommand {
                 }
 
                 if (user == null) {
-                    List<Integer> permCodes = permissionsConfig.getPermissionsForRoles(msg.getGuild().getId(), role.getId());
+                    List<Integer> permCodes = permissionsConfig.getPermissionsForRoles(msg.getGuild().getIdLong(), role.getIdLong());
                     sendPermMessage(permCodes, msg, role);
                 } else {
-                    List<Integer> permCodes = permissionsConfig.getPermissionsForUser(msg.getGuild().getId(), user.getId());
+                    List<Integer> permCodes = permissionsConfig.getPermissionsForUser(msg.getGuild().getIdLong(), user.getIdLong());
                     sendPermMessage(permCodes, msg, user);
                 }
             } else {
                 if (Permission.getPermissions().contains(args.get(1).toUpperCase())) {
                     List<Role> roles = new ArrayList<>();
                     List<User> users = new ArrayList<>();
-                    for (String s : permissionsConfig.getRolesForPermission(msg.getGuild().getId(), args.get(1).toUpperCase()))
+                    for (long s : permissionsConfig.getRolesForPermission(msg.getGuild().getIdLong(), args.get(1).toUpperCase()))
                         roles.add(msg.getGuild().getRoleById(s));
-                    for (String s : permissionsConfig.getUsersForPermission(msg.getGuild().getId(), args.get(1).toUpperCase()))
+                    for (long s : permissionsConfig.getUsersForPermission(msg.getGuild().getIdLong(), args.get(1).toUpperCase()))
                         users.add(Robertify.api.getUserById(s));
 
                     List<String> rolesString = new ArrayList<>();
@@ -297,15 +298,15 @@ public class PermissionsCommand implements ICommand {
                     for (User u : users)
                         rolesString.add(u.getAsMention());
 
-                    if (!roles.isEmpty()) {
-                        EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
-                                + "`**\n\n" + rolesString);
-                        msg.replyEmbeds(eb.build()).queue();
-                    } else {
-                        EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
+                    EmbedBuilder eb;
+                    if (roles.isEmpty() && users.isEmpty()) {
+                        eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
                                 + "`**\n\n`Nothing's here!`");
-                        msg.replyEmbeds(eb.build()).queue();
+                    } else {
+                        eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
+                                + "`**\n\n" + rolesString);
                     }
+                    msg.replyEmbeds(eb.build()).queue();
                 } else {
                     EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!");
                     msg.replyEmbeds(eb.build()).queue();

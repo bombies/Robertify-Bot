@@ -12,6 +12,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -164,7 +165,7 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
             eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
             eb.setTitle("No song playing...");
             eb.setImage("https://i.imgur.com/1HDoSgP.png");
-            eb.setFooter("Prefix for this server is: " + ServerDB.getPrefix(guild.getIdLong()));
+            eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
             msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
                     .setEmbeds(eb.build()).queue();

@@ -121,7 +121,7 @@ public class TogglesConfig implements AbstractJSON {
                         }
                 }
 
-            if (changesMade) TogglesConfig.cache.updateCache(Document.parse(jsonObject.toString()));
+            if (changesMade) cache.updateCache(Document.parse(jsonObject.toString()));
         }
     }
 
