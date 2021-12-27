@@ -1,4 +1,4 @@
-package main.commands.commands.management.toggles.togglesconfig;
+package main.utils.json.legacy.togglesconfig;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandManager;
@@ -6,16 +6,15 @@ import main.commands.ICommand;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
+import main.utils.json.toggles.Toggles;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class TogglesConfig extends AbstractJSONFile {
-    private final JSONConfigFile file = JSONConfigFile.TOGGLES;
-
-    public TogglesConfig() {
+public class LegacyTogglesConfig extends AbstractJSONFile {
+    public LegacyTogglesConfig() {
         super(JSONConfigFile.TOGGLES);
     }
 
@@ -94,7 +93,7 @@ public class TogglesConfig extends AbstractJSONFile {
 
     private void handleInitException(Guild g, JSONObject obj) {
         obj.put(g.getId(), new JSONObject());
-        for (Toggles errToggles: Toggles.values())
+        for (Toggles errToggles : Toggles.values())
             switch (errToggles) {
                 case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> obj.getJSONObject(g.getId()).put(errToggles.toString(), false);
                 default -> obj.getJSONObject(g.getId()).put(errToggles.toString(), true);

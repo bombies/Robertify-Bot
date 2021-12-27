@@ -1,6 +1,5 @@
 package main.utils.json.guildconfig;
 
-import lombok.Getter;
 import main.utils.database.mongodb.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.AbstractJSON;
@@ -12,8 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GuildConfig implements AbstractJSON {
-    @Getter
-    private static final HashMap<Long, HashMap<Long, Long>> bannedUsers = new HashMap<>();
     private static final GuildsDBCache cache = GuildsDBCache.getInstance();
 
     public void addGuild(long gid) {
@@ -137,6 +134,10 @@ public class GuildConfig implements AbstractJSON {
         for (var bannedUser : getBannedUsers(gid))
             if (bannedUser.user == uid) return true;
         return false;
+    }
+
+    public JSONObject getGuildObject(long gid) {
+        return cache.getCache().getJSONObject(getIndexOfObjectInArray(cache.getCache(), GuildsDB.Field.GUILD_ID, gid));
     }
 
     public boolean guildHasInfo(long gid) {

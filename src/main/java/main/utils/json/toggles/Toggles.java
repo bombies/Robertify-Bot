@@ -1,4 +1,4 @@
-package main.commands.commands.management.toggles.togglesconfig;
+package main.utils.json.toggles;
 
 import main.utils.json.GenericJSONField;
 
@@ -49,7 +49,7 @@ public enum Toggles implements GenericJSONField {
         throw new NullPointerException("No such toggle!");
     }
 
-    enum TogglesConfigField implements GenericJSONField {
+    public enum TogglesConfigField implements GenericJSONField {
         DJ_TOGGLES("dj_toggles");
 
         private final String str;

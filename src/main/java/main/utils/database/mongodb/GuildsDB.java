@@ -5,6 +5,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
+import main.utils.json.toggles.TogglesConfig;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +54,10 @@ public class GuildsDB extends AbstractMongoDatabase{
                 .addField(Field.TOGGLES_OBJECT, new JSONObject())
                 .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
                 .build();
+    }
+
+    protected static void update() {
+        new TogglesConfig().update();
     }
 
     public enum Field implements GenericJSONField {

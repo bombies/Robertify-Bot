@@ -2,13 +2,14 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
-import main.commands.commands.management.toggles.togglesconfig.Toggles;
-import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.utils.json.toggles.Toggles;
+import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.BotConstants;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

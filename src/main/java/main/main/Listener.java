@@ -9,7 +9,7 @@ import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
-import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
@@ -72,7 +72,7 @@ public class Listener extends ListenerAdapter {
 //        new PermissionsDB().init();
         permConfig.update();
         new ChangeLogConfig().initConfig();
-        new TogglesConfig().initConfig();
+        new LegacyTogglesConfig().initConfig();
         new LegacyDedicatedChannelConfig().initConfig();
         new LegacyEightBallConfig().initConfig();
         new LegacyRestrictedChannelsConfig().initConfig();
@@ -96,6 +96,7 @@ public class Listener extends ListenerAdapter {
 
         initSelectionMenus();
         AbstractMongoDatabase.initAllCaches();
+        AbstractMongoDatabase.updateAllCaches();
 
         logger.info("Watching {} guilds", botDB.getGuilds().size());
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
@@ -152,7 +153,7 @@ public class Listener extends ListenerAdapter {
         BotDB botUtils = new BotDB();
 
         LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
-        TogglesConfig togglesConfig = new TogglesConfig();
+        LegacyTogglesConfig togglesConfig = new LegacyTogglesConfig();
         new LegacyDedicatedChannelConfig().updateConfig();
         new LegacyEightBallConfig().updateConfig();
 

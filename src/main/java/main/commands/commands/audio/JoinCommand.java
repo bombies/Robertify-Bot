@@ -3,9 +3,10 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.toggles.togglesconfig.Toggles;
-import main.commands.commands.management.toggles.togglesconfig.TogglesConfig;
+import main.utils.json.toggles.Toggles;
+import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
+import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
 

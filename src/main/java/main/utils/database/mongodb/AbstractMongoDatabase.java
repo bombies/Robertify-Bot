@@ -94,6 +94,11 @@ public abstract class AbstractMongoDatabase {
         GuildsDBCache.initCache();
     }
 
+    public static void updateAllCaches() {
+        BotInfoDB.update();
+        GuildsDB.update();
+    }
+
     MongoCollection<Document> getCollection(String name) {
         return database.getCollection(name);
     }
