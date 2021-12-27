@@ -1,4 +1,4 @@
-package main.utils.json.reports;
+package main.utils.json.legacy.reports;
 
 import main.utils.json.GenericJSONField;
 

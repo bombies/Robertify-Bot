@@ -5,6 +5,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
+import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -21,29 +22,7 @@ public class GuildsDB extends AbstractMongoDatabase{
             if (documentExists(Field.GUILD_ID, guild.getIdLong()))
                 continue;
 
-            addDocument(DocumentBuilder.create()
-                    .addField(Field.GUILD_ID, guild.getIdLong())
-                    .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
-                    .addField(Field.ANNOUNCE_MESSAGES, true)
-                    .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
-                    .addField(Field.BANNED_USERS_ARRAY, new JSONArray())
-                    .addField(Field.DEDICATED_CHANNEL_OBJECT, new JSONObject()
-                            .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
-                            .put(Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1L)
-                            .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
-                    )
-                    .addField(Field.PERMISSIONS_OBJECT, new JSONObject()
-                            .put(Field.PERMISSIONS_DJ.toString(), new JSONArray())
-                            .put(Field.PERMISSIONS_ADMIN.toString(), new JSONArray())
-                            .put(Field.PERMISSIONS_USERS.toString(), new JSONObject())
-                    )
-                    .addField(Field.RESTRICTED_CHANNELS_OBJECT, new JSONObject()
-                            .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), new JSONArray())
-                            .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), new JSONArray())
-                    )
-                    .addField(Field.TOGGLES_OBJECT, new JSONObject())
-                    .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
-                    .build());
+            addDocument(getGuildDocument(guild.getIdLong()));
         }
     }
 
@@ -51,10 +30,34 @@ public class GuildsDB extends AbstractMongoDatabase{
         return INSTANCE;
     }
 
+    public static Document getGuildDocument(long gid) {
+        return DocumentBuilder.create()
+                .addField(Field.GUILD_ID, gid)
+                .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
+                .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
+                .addField(Field.BANNED_USERS_ARRAY, new JSONArray())
+                .addField(Field.DEDICATED_CHANNEL_OBJECT, new JSONObject()
+                        .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
+                        .put(Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1L)
+                        .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
+                )
+                .addField(Field.PERMISSIONS_OBJECT, new JSONObject()
+                        .put(Field.PERMISSIONS_DJ.toString(), new JSONArray())
+                        .put(Field.PERMISSIONS_ADMIN.toString(), new JSONArray())
+                        .put(Field.PERMISSIONS_USERS.toString(), new JSONObject())
+                )
+                .addField(Field.RESTRICTED_CHANNELS_OBJECT, new JSONObject()
+                        .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), new JSONArray())
+                        .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), new JSONArray())
+                )
+                .addField(Field.TOGGLES_OBJECT, new JSONObject())
+                .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
+                .build();
+    }
+
     public enum Field implements GenericJSONField {
         GUILD_ID("server_id"),
         GUILD_PREFIX("prefix"),
-        ANNOUNCE_MESSAGES("announce_messages"),
         ANNOUNCEMENT_CHANNEL("announcement_channel"),
         BANNED_USERS_ARRAY("banned_users"),
             BANNED_USER("banned_id"),

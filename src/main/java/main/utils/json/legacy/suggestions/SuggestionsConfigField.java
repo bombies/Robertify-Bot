@@ -1,4 +1,4 @@
-package main.utils.json.suggestions;
+package main.utils.json.legacy.suggestions;
 
 import main.utils.json.GenericJSONField;
 

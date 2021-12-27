@@ -1,12 +1,12 @@
-package main.utils.json.reports;
+package main.utils.json.legacy.reports;
 
 import main.constants.JSONConfigFile;
 import main.utils.json.legacy.AbstractJSONFile;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ReportsConfig extends AbstractJSONFile {
-    public ReportsConfig() {
+public class LegacyReportsConfig extends AbstractJSONFile {
+    public LegacyReportsConfig() {
         super(JSONConfigFile.REPORTS);
     }
 

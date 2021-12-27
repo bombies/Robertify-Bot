@@ -19,14 +19,15 @@ import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.LegacyEightBallConfig;
 import main.utils.json.legacy.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
-import main.utils.json.reports.ReportsConfig;
+import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
-import main.utils.json.suggestions.SuggestionsConfig;
+import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -75,8 +76,8 @@ public class Listener extends ListenerAdapter {
         new LegacyDedicatedChannelConfig().initConfig();
         new LegacyEightBallConfig().initConfig();
         new LegacyRestrictedChannelsConfig().initConfig();
-        new SuggestionsConfig().initConfig();
-        new ReportsConfig().initConfig();
+        new LegacySuggestionsConfig().initConfig();
+        new LegacyReportsConfig().initConfig();
         new ServerDB();
 
         BanDB.initBannedUserMap();
@@ -156,13 +157,16 @@ public class Listener extends ListenerAdapter {
         new LegacyEightBallConfig().updateConfig();
 
         botUtils.addGuild(guild.getIdLong())
-                .announceNewTrack(guild.getIdLong(), true)
                 .closeConnection();
 
         permissionsConfig.initGuild(guild.getId());
         togglesConfig.initConfig();
 
         initSlashCommands(guild);
+
+        // MongoDB
+        new GuildConfig().addGuild(guild.getIdLong());
+
 
         logger.info("Joined {}", guild.getName());
 
@@ -176,6 +180,9 @@ public class Listener extends ListenerAdapter {
 
         BotDB botUtils = new BotDB();
         botUtils.removeGuild(guild.getIdLong()).closeConnection();
+
+        // MongoDB
+        new GuildConfig().removeGuild(guild.getIdLong());
 
         logger.info("Left {}", guild.getName());
     }

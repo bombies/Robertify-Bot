@@ -1,4 +1,4 @@
-package main.utils.json.suggestions;
+package main.utils.json.legacy.suggestions;
 
 import main.constants.JSONConfigFile;
 import main.utils.json.legacy.AbstractJSONFile;
@@ -8,8 +8,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuggestionsConfig extends AbstractJSONFile {
-    public SuggestionsConfig() {
+public class LegacySuggestionsConfig extends AbstractJSONFile {
+    public LegacySuggestionsConfig() {
         super(JSONConfigFile.SUGGESTIONS);
     }
 

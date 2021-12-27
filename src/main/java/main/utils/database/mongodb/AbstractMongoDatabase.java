@@ -1,7 +1,10 @@
 package main.utils.database.mongodb;
 
 import com.mongodb.MongoClientSettings;
-import com.mongodb.client.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.ConnectionString;
 import com.mongodb.client.model.UpdateOptions;
@@ -11,10 +14,8 @@ import main.constants.Database;
 import main.constants.ENV;
 import main.events.MongoEventListener;
 import main.main.Config;
-import main.utils.database.mongodb.cache.AbstractMongoCache;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.mongodb.cache.TestMongoCache;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -162,6 +163,18 @@ public abstract class AbstractMongoDatabase {
         removeDocument(doc);
     }
 
+    protected void removeSpecificDocument(String key, Object value) {
+        if (!documentExists(key, value))
+            throw new NullPointerException("There is no such document found with key: " + key);
+
+        var doc = findDocument(key, value).next();
+        removeDocument(doc);
+    }
+
+    protected void removeSpecificDocument(GenericJSONField key, Object value) {
+        removeSpecificDocument(key.toString(), value);
+    }
+
     protected void updateDocument(Document document, Bson updates) {
         UpdateOptions options = new UpdateOptions().upsert(true);
         collection.updateOne(document, updates, options);
@@ -211,6 +224,10 @@ public abstract class AbstractMongoDatabase {
     }
 
     protected boolean documentExists(String key, String value) {
+        return findDocument(key, value).hasNext();
+    }
+
+    protected boolean documentExists(String key, Object value) {
         return findDocument(key, value).hasNext();
     }
 

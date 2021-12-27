@@ -2,8 +2,8 @@ package main.commands.commands.util.reports;
 
 import main.constants.BotConstants;
 import main.main.Robertify;
-import main.utils.json.reports.ReportsConfig;
-import main.utils.json.reports.ReportsConfigField;
+import main.utils.json.legacy.reports.LegacyReportsConfig;
+import main.utils.json.legacy.reports.ReportsConfigField;
 import main.utils.pagination.Page;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,7 +30,7 @@ public class ReportsEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = new ReportsConfig();
+        final var config = new LegacyReportsConfig();
 
         if (!config.isSetup()) return;
 
@@ -73,7 +73,7 @@ public class ReportsEvents extends ListenerAdapter {
             final var collectedResponses = responses.get(user.getIdLong());
             responses.remove(user.getIdLong());
 
-            final var config = new ReportsConfig();
+            final var config = new LegacyReportsConfig();
             final var openedReportsChannel = Robertify.api.getTextChannelById(config.getID(ReportsConfigField.CHANNEL));
 
             if (openedReportsChannel == null) {

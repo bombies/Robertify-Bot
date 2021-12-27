@@ -1,6 +1,6 @@
 package main.events;
 
-import main.utils.json.suggestions.SuggestionsConfig;
+import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ public class SuggestionCategoryDeletionEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = new SuggestionsConfig();
+        final var config = new LegacySuggestionsConfig();
 
         if (event.getCategory().getIdLong() != config.getCategoryID()) return;
 

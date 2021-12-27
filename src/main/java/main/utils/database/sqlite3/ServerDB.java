@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ServerDB extends AbstractSQLiteDatabase {
-    private static Map<@NotNull Long, @NotNull String> prefixes = new HashMap<>();
+    private static final Map<@NotNull Long, @NotNull String> prefixes = new HashMap<>();
 
     public ServerDB() {
         super(Database.MAIN);

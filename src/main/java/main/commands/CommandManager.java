@@ -121,7 +121,8 @@ public class CommandManager {
 //                new KotlinTestCommand(),
                 new LoadSpotifyPlaylistCommand(),
                 new LyricsTestCommand(),
-                new MongoTestCommand()
+                new MongoTestCommand(),
+                new GuildConfigTestCommand()
         );
 
         addMusicCommands(

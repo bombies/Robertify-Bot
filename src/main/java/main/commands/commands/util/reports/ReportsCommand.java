@@ -7,8 +7,8 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.sqlite3.BotDB;
-import main.utils.json.reports.ReportsConfig;
-import main.utils.json.reports.ReportsConfigField;
+import main.utils.json.legacy.reports.LegacyReportsConfig;
+import main.utils.json.legacy.reports.ReportsConfigField;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -51,7 +51,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     private void setup(Message msg) {
         if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
 
-        final var config = new ReportsConfig();
+        final var config = new LegacyReportsConfig();
 
         if (config.isSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has already been setup!").build())
@@ -77,7 +77,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     public void address(Message msg, List<String> args) {
         if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
 
-        final var config = new ReportsConfig();
+        final var config = new LegacyReportsConfig();
 
         if (!config.isSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has not been setup!").build())
@@ -139,7 +139,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     }
 
     private void sendReport(User user, Message msg) {
-        final var config = new ReportsConfig();
+        final var config = new LegacyReportsConfig();
 
         if (config.isUserBanned(user.getIdLong())) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You are banned from making reports!").build())
@@ -208,7 +208,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new ReportsConfig().banUser(user.getIdLong());
+            new LegacyReportsConfig().banUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
@@ -246,7 +246,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new ReportsConfig().unbanUser(user.getIdLong());
+            new LegacyReportsConfig().unbanUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have unbanned "
                             + user.getAsMention() + "from reports").build())
                     .queue();

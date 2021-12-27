@@ -34,6 +34,20 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         mongoDB.init();
     }
 
+    public void addToCache(Document document) {
+        getCache().put(new JSONObject(document.toJson()));
+        addDocument(document);
+    }
+
+    public void addToCache(JSONObject object) {
+        addToCache(Document.parse(object.toString()));
+    }
+
+    public <T> void removeFromCache(GenericJSONField identifier, T identifierValue) {
+        getCache().remove(getIndexOfObjectInArray(getCache(), identifier, identifierValue));
+        removeSpecificDocument(identifier.toString(), identifierValue);
+    }
+
     public void updateCache() {
         this.collection = mongoDB.getCollection();
         this.cache = collectionToJSON(this.collection);
