@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Deprecated
 public class BanDB extends AbstractSQLiteDatabase {
     @Getter
     private static final HashMap<Long, HashMap<Long, Long>> bannedUsers = new HashMap<>();

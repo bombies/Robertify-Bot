@@ -5,6 +5,7 @@ import main.utils.json.legacy.AbstractJSONFile;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+@Deprecated
 public class LegacyReportsConfig extends AbstractJSONFile {
     public LegacyReportsConfig() {
         super(JSONConfigFile.REPORTS);

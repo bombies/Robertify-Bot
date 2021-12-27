@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class LegacyRestrictedChannelsConfig extends AbstractJSONFile {
     private final Logger logger = LoggerFactory.getLogger(LegacyRestrictedChannelsConfig.class);
 

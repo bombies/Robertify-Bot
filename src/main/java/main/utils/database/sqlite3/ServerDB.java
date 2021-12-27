@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+@Deprecated
 public class ServerDB extends AbstractSQLiteDatabase {
     private static final Map<@NotNull Long, @NotNull String> prefixes = new HashMap<>();
 

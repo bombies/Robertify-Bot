@@ -29,6 +29,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+@Deprecated
 public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
     public LegacyDedicatedChannelConfig() {
         super(JSONConfigFile.DEDICATED_CHANNELS);

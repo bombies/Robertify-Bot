@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class LegacyEightBallConfig extends AbstractJSONFile {
 
     public LegacyEightBallConfig() {

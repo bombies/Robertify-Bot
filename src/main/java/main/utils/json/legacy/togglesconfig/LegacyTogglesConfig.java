@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
+@Deprecated
 public class LegacyTogglesConfig extends AbstractJSONFile {
     public LegacyTogglesConfig() {
         super(JSONConfigFile.TOGGLES);

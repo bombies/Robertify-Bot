@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class LegacySuggestionsConfig extends AbstractJSONFile {
     public LegacySuggestionsConfig() {
         super(JSONConfigFile.SUGGESTIONS);
