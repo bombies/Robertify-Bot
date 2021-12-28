@@ -174,7 +174,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final String id = args.get(1);
         final String reason;
 
-        if (args.size() > 3) reason = String.join(" ", args.subList(2, args.size()));
+        if (args.size() >= 3) reason = String.join(" ", args.subList(2, args.size()));
         else reason = null;
 
         if (!GeneralUtils.stringIsID(id)) {
