@@ -142,7 +142,8 @@ public class PermissionsConfig extends AbstractGuildConfig {
             return ret;
         } catch (JSONException e) {
             final var obj = getGuildObject(gid);
-            obj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
+            obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                    .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
             getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
             return ret;
         }
@@ -153,7 +154,8 @@ public class PermissionsConfig extends AbstractGuildConfig {
         JSONObject obj = getGuildObject(gid);
 
         for (int i = 0; i < obj.length()-1; i++) {
-            JSONArray arr = obj.getJSONArray(String.valueOf(i));
+            JSONArray arr = obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                    .getJSONArray(String.valueOf(i));
             for (int j = 0; j < arr.length(); j++)
                 if (arr.getLong(j) == rid) {
                     codes.add(i); break;
