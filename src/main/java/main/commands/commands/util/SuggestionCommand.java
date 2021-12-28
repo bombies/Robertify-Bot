@@ -362,7 +362,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
     @SneakyThrows
     private boolean isDeveloper(User user) {
-        return new BotDB().isDeveloper(user.getId());
+        return BotInfoCache.getInstance().isDeveloper(user.getIdLong());
     }
 
     @Override

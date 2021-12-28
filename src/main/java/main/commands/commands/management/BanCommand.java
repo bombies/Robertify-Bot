@@ -8,6 +8,7 @@ import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BanDB;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
@@ -84,7 +85,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You cannot ban another admin!");
 
-        if (new BotDB().isDeveloper(user.getId()))
+        if (BotInfoCache.getInstance().isDeveloper(user.getIdLong()))
             return EmbedUtils.embedMessage("You cannot ban a developer of Robertify!");
 
         if (new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))

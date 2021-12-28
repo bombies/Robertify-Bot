@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.permissions.PermissionsConfig;
@@ -64,7 +65,7 @@ public class PermissionsCommand implements ICommand {
      */
     @SneakyThrows
     private void init(Message msg) {
-        if (!new BotDB().isDeveloper(msg.getAuthor().getId()))
+        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong()))
             return;
 
         try {

@@ -10,6 +10,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InteractiveCommand;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
@@ -116,7 +117,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
-            if (!new BotDB().isDeveloper(ctx.getAuthor().getId())) {
+            if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+args.get(0)+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed();
@@ -145,7 +146,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return;
         } else if (command instanceof IDevCommand) {
-            if (!new BotDB().isDeveloper(ctx.getAuthor().getId())) {
+            if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed();
@@ -224,7 +225,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             GeneralUtils.setDefaultEmbed();
             return eb;
         } else if (command instanceof IDevCommand) {
-            if (!new BotDB().isDeveloper(user.getId())) {
+            if (!BotInfoCache.getInstance().isDeveloper(user.getIdLong())) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
                 GeneralUtils.setDefaultEmbed();
                 return eb;

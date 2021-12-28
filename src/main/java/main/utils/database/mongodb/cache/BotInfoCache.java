@@ -190,6 +190,34 @@ public class BotInfoCache extends AbstractMongoCache {
         update(obj);
     }
 
+    public void addDeveloper(long developer) {
+        if (isDeveloper(developer))
+            throw new NullPointerException("This user is already a developer!");
+
+        final var obj = getDocument();
+        final var devArr = obj.getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+
+        devArr.put(developer);
+
+        update(obj);
+    }
+
+    public void removeDeveloper(long developer) {
+        if (isDeveloper(developer))
+            throw new NullPointerException("This user isn't a developer!");
+
+        final var obj = getDocument();
+        final var devArr = obj.getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+
+        devArr.remove(getIndexOfObjectInArray(devArr, developer));
+
+        update(obj);
+    }
+
+    public boolean isDeveloper(long developer) {
+        return arrayHasObject(getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString()), developer);
+    }
+
     private JSONObject getDocument() {
         return getCache().getJSONObject(0);
     }

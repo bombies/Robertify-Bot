@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -22,7 +23,7 @@ public class DeveloperCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        final BotDB botUtils = new BotDB();
+        final var botUtils = BotInfoCache.getInstance();
 
         GeneralUtils.setCustomEmbed("Developer Tools", new Color(118, 0, 236));
 
@@ -43,12 +44,11 @@ public class DeveloperCommand implements IDevCommand {
             }
         }
 
-        botUtils.closeConnection();
         GeneralUtils.setDefaultEmbed();
     }
 
     @SneakyThrows
-    private void add(BotDB botUtils, Message msg, List<String> args) {
+    private void add(BotInfoCache botUtils, Message msg, List<String> args) {
         if (args.size() <= 1) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to add as a developer");
             msg.replyEmbeds(eb.build()).queue();
@@ -70,16 +70,13 @@ public class DeveloperCommand implements IDevCommand {
             if (developer == null)
                 throw new NullPointerException("User with id "+s+" is null");
 
-            if (botUtils.isDeveloper(s)) {
+            if (botUtils.isDeveloper(Long.parseLong(s))) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("User with id `"+s+"` is already a developer");
                 msg.replyEmbeds(eb.build()).queue();
-                botUtils.createConnection();
                 continue;
             }
 
-            botUtils.createConnection();
-
-            botUtils.addDeveloper(s);
+            botUtils.addDeveloper(Long.parseLong(s));
             stringBuilder.append(developer.getAsMention())
                     .append(", ");
             names++;
@@ -94,7 +91,7 @@ public class DeveloperCommand implements IDevCommand {
     }
 
     @SneakyThrows
-    private void remove(BotDB botUtils, Message msg, List<String> args) {
+    private void remove(BotInfoCache botUtils, Message msg, List<String> args) {
         if (args.size() <= 1) {
             EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to remove as a developer");
             msg.replyEmbeds(eb.build()).queue();
@@ -116,16 +113,13 @@ public class DeveloperCommand implements IDevCommand {
             if (developer == null)
                 throw new NullPointerException("User with id "+s+" is null");
 
-            if (!botUtils.isDeveloper(s)) {
+            if (!botUtils.isDeveloper(Long.parseLong(s))) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("User with id `"+s+"` is not a developer");
                 msg.replyEmbeds(eb.build()).queue();
-                botUtils.createConnection();
                 continue;
             }
 
-            botUtils.createConnection();
-
-            botUtils.removeDeveloper(s);
+            botUtils.removeDeveloper(Long.parseLong(s));
             stringBuilder.append(developer.getAsMention())
                     .append(", ");
             names++;

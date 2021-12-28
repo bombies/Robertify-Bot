@@ -50,7 +50,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
 
     @SneakyThrows
     private void setup(Message msg) {
-        if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
+        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
 
         final var config = BotInfoCache.getInstance();
 
@@ -76,7 +76,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
 
     @SneakyThrows
     public void address(Message msg, List<String> args) {
-        if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
+        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
 
         final var config = BotInfoCache.getInstance();
 
@@ -261,7 +261,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
 
     @SneakyThrows
     private boolean isDeveloper(User user) {
-        return new BotDB().isDeveloper(user.getId());
+        return BotInfoCache.getInstance().isDeveloper(user.getIdLong());
     }
 
     @Override
