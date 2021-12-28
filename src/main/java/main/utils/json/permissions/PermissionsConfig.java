@@ -185,14 +185,18 @@ public class PermissionsConfig extends AbstractGuildConfig {
             boolean changesMade = false;
 
             for (int code : Permission.getCodes())
-                if (!guildObj.has(String.valueOf(code))) {
+                if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                        .has(String.valueOf(code))) {
                     changesMade = true;
-                    guildObj.put(String.valueOf(code), new JSONArray());
+                    guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                            .put(String.valueOf(code), new JSONArray());
                 }
 
-            if (!guildObj.has(PermissionConfigField.USER_PERMISSIONS.toString())) {
+            if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                    .has(PermissionConfigField.USER_PERMISSIONS.toString())) {
                 changesMade = true;
-                guildObj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
+                guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                        .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
             }
 
             if (changesMade) getCache().updateCache(Document.parse(guildObj.toString()));
