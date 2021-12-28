@@ -76,7 +76,6 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         if (!obj.has(identifier))
             throw new IllegalArgumentException("The JSON object must have the identifier passed!");
 
-        final T id = (T) obj.get(identifier);
         Document document = findSpecificDocument(identifier, identifierValue);
 
         if (document == null)

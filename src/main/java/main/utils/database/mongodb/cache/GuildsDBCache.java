@@ -54,7 +54,6 @@ public class GuildsDBCache extends AbstractMongoCache {
             getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
             return true;
         } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
             return false;
         }
     }

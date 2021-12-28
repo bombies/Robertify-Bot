@@ -16,6 +16,7 @@ public class GuildConfig extends AbstractGuildConfig {
             throw new IllegalArgumentException("This guild is already added!");
 
         getCache().addToCache(GuildsDB.getGuildDocument(gid));
+        getCache().updateCache();
     }
 
     public void removeGuild(long gid) {

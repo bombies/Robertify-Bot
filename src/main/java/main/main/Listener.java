@@ -163,7 +163,6 @@ public class Listener extends ListenerAdapter {
 
         // MongoDB
         new GuildConfig().addGuild(guild.getIdLong());
-        GuildsDB.updateAllCaches();
 
         logger.info("Joined {}", guild.getName());
     }
