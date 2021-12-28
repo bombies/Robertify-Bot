@@ -13,6 +13,7 @@ import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
+import main.utils.json.toggles.Toggles;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -72,25 +73,27 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     return;
                 }
             } else {
-                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
-                if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                    event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I can't join this channel!" +
-                                    (!restrictedChannelsConfig.getRestrictedChannels(
-                                            guild.getIdLong(),
-                                            RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                                    ).isEmpty()
-                                            ?
-                                            "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
-                                                    guild.getIdLong(),
-                                                    RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                                            )
-                                            :
-                                            "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
-                                    )
-                            ).build())
-                            .queue();
-                    event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
-                    return;
+                if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                    final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+                    if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                        event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I can't join this channel!" +
+                                        (!restrictedChannelsConfig.getRestrictedChannels(
+                                                guild.getIdLong(),
+                                                RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                                        ).isEmpty()
+                                                ?
+                                                "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
+                                                        guild.getIdLong(),
+                                                        RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                                                )
+                                                :
+                                                "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                        )
+                                ).build())
+                                .queue();
+                        event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+                        return;
+                    }
                 }
             }
         }
