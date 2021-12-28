@@ -6,6 +6,7 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.reports.ReportsConfigField;
@@ -51,9 +52,9 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     private void setup(Message msg) {
         if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
 
-        final var config = new LegacyReportsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (config.isSetup()) {
+        if (config.isReportsSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has already been setup!").build())
                     .queue();
             return;
@@ -66,7 +67,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
                     .setDeny(Permission.VIEW_CHANNEL)
                     .queue(success -> {
                         guild.createTextChannel("opened-reports", category).queue(openedChannel -> {
-                            config.initChannels(category.getIdLong(), openedChannel.getIdLong());
+                            config.initReportChannels(category.getIdLong(), openedChannel.getIdLong());
                             msg.addReaction("✅").queue();
                         });
                     });
@@ -77,9 +78,9 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     public void address(Message msg, List<String> args) {
         if (!new BotDB().isDeveloper(msg.getAuthor().getId())) return;
 
-        final var config = new LegacyReportsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (!config.isSetup()) {
+        if (!config.isReportsSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has not been setup!").build())
                     .queue();
             return;
@@ -101,7 +102,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var openedRequests = Robertify.api.getTextChannelById(config.getID(ReportsConfigField.CHANNEL));
+        final var openedRequests = Robertify.api.getTextChannelById(config.getReportsID(ReportsConfigField.CHANNEL));
 
         openedRequests.retrieveMessageById(id).queue(reportMsg -> {
             final var fields = reportMsg.getEmbeds().get(0).getFields();
@@ -139,15 +140,15 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     }
 
     private void sendReport(User user, Message msg) {
-        final var config = new LegacyReportsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (config.isUserBanned(user.getIdLong())) {
+        if (config.isUserReportsBanned(user.getIdLong())) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You are banned from making reports!").build())
                     .queue();
             return;
         }
 
-        if (!config.isSetup()) {
+        if (!config.isReportsSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("You can't create a bug report at this time!").build())
                     .queue();
             return;
@@ -208,7 +209,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new LegacyReportsConfig().banUser(user.getIdLong());
+            BotInfoCache.getInstance().banReportsUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
@@ -246,7 +247,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new LegacyReportsConfig().unbanUser(user.getIdLong());
+            BotInfoCache.getInstance().unbanReportsUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have unbanned "
                             + user.getAsMention() + "from reports").build())
                     .queue();

@@ -3,6 +3,7 @@ package main.utils.database.mongodb.cache;
 import lombok.Getter;
 import main.utils.database.mongodb.BotInfoDB;
 import main.utils.database.mongodb.GuildsDB;
+import main.utils.json.legacy.reports.ReportsConfigField;
 import main.utils.json.legacy.suggestions.SuggestionsConfigField;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -124,6 +125,71 @@ public class BotInfoCache extends AbstractMongoCache {
                 .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString()) != -1L;
     }
 
+    public void initReportChannels(long categoryID, long channelID) {
+        if (isReportsSetup())
+            throw new IllegalStateException("The reports category has already been setup!");
+
+        final var obj = getDocument();
+
+        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .put(ReportsConfigField.CATEGORY.toString(), categoryID);
+        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .put(ReportsConfigField.CHANNEL.toString(), channelID);
+
+        update(obj);
+    }
+
+    public void resetReportsConfig() {
+        final var obj = getDocument();
+
+        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .put(ReportsConfigField.CATEGORY.toString(), -1L);
+        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .put(ReportsConfigField.CHANNEL.toString(), -1L);
+
+        update(obj);
+    }
+
+    public boolean isReportsSetup() {
+        return getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .getLong(ReportsConfigField.CATEGORY.toString()) != -1L;
+    }
+
+    public long getReportsID(ReportsConfigField field) {
+        return getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .getLong(field.toString());
+    }
+
+    public boolean isUserReportsBanned(long id) {
+        return arrayHasObject(getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .getJSONArray(ReportsConfigField.BANNED_USERS.toString()), id);
+    }
+
+    public void banReportsUser(long id) {
+        if (isUserReportsBanned(id))
+            throw new IllegalStateException("This user has already been banned!");
+
+        final var obj = getDocument();
+
+        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .getJSONArray(ReportsConfigField.BANNED_USERS.toString()).put(id);
+
+        update(obj);
+    }
+
+    public void unbanReportsUser(long id) {
+        if (!isUserReportsBanned(id))
+            throw new IllegalStateException("This user isn't banned!");
+
+        final var obj = getDocument();
+        final var arr = obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+                .getJSONArray(ReportsConfigField.BANNED_USERS.toString());
+
+        arr.remove(getIndexOfObjectInArray(arr, id));
+
+        update(obj);
+    }
+
     private JSONObject getDocument() {
         return getCache().getJSONObject(0);
     }
@@ -138,13 +204,5 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public String getJSON(boolean indented) {
         return indented ? getCache().toString(4) : getCache().toString();
-    }
-
-    public String getJSON() {
-        return getCache().toString(4);
-    }
-
-    public JSONObject getJSONObject() {
-        return new JSONObject(getJSON(false));
     }
 }

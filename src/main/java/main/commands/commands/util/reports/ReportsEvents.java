@@ -2,6 +2,7 @@ package main.commands.commands.util.reports;
 
 import main.constants.BotConstants;
 import main.main.Robertify;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.reports.ReportsConfigField;
 import main.utils.pagination.Page;
@@ -30,14 +31,14 @@ public class ReportsEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = new LegacyReportsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (!config.isSetup()) return;
+        if (!config.isReportsSetup()) return;
 
-        if (event.getCategory().getIdLong() != config.getID(ReportsConfigField.CATEGORY)) return;
+        if (event.getCategory().getIdLong() != config.getReportsID(ReportsConfigField.CATEGORY)) return;
 
-        final var openedReportsChannelID = config.getID(ReportsConfigField.CHANNEL);
-        config.resetConfig();
+        final var openedReportsChannelID = config.getReportsID(ReportsConfigField.CHANNEL);
+        config.resetReportsConfig();
 
         TextChannel channel = Robertify.api.getTextChannelById(openedReportsChannelID);
         if (channel != null)
@@ -73,8 +74,8 @@ public class ReportsEvents extends ListenerAdapter {
             final var collectedResponses = responses.get(user.getIdLong());
             responses.remove(user.getIdLong());
 
-            final var config = new LegacyReportsConfig();
-            final var openedReportsChannel = Robertify.api.getTextChannelById(config.getID(ReportsConfigField.CHANNEL));
+            final var config = BotInfoCache.getInstance();
+            final var openedReportsChannel = Robertify.api.getTextChannelById(config.getReportsID(ReportsConfigField.CHANNEL));
 
             if (openedReportsChannel == null) {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("Could not send your report!\n" +

@@ -1,7 +1,6 @@
 package main.events;
 
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
