@@ -10,6 +10,7 @@ import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.utils.database.mongodb.GuildsDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
@@ -72,8 +73,8 @@ public class Listener extends ListenerAdapter {
 
 //        permConfig.update();
         new ChangeLogConfig().initConfig();
-        new LegacyTogglesConfig().initConfig();
-        new LegacyDedicatedChannelConfig().initConfig();
+//        new LegacyTogglesConfig().initConfig();
+//        new LegacyDedicatedChannelConfig().initConfig();
 //        new LegacyEightBallConfig().initConfig();
         new LegacyRestrictedChannelsConfig().initConfig();
 //        new LegacySuggestionsConfig().initConfig();
@@ -85,8 +86,8 @@ public class Listener extends ListenerAdapter {
             initNeededSlashCommands(g);
             rescheduleUnbans(g);
 
-            if (new LegacyDedicatedChannelConfig().isChannelSet(g.getId()))
-                new LegacyDedicatedChannelConfig().updateMessage(g);
+            if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(g);
         }
 
 //        new AudioDB().cacheAllTracks();
@@ -148,8 +149,8 @@ public class Listener extends ListenerAdapter {
 //        BotDB botUtils = new BotDB();
 
 //        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
-        LegacyTogglesConfig togglesConfig = new LegacyTogglesConfig();
-        new LegacyDedicatedChannelConfig().updateConfig();
+//        LegacyTogglesConfig togglesConfig = new LegacyTogglesConfig();
+//        new LegacyDedicatedChannelConfig().updateConfig();
 //        new LegacyEightBallConfig().updateConfig();
 
 //        botUtils.addGuild(guild.getIdLong())

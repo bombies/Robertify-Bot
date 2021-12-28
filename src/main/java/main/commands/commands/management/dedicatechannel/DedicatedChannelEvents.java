@@ -6,6 +6,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
@@ -31,22 +32,22 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
     public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
-        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
+        final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
-        if (!config.isChannelSet(guild.getId())) return;
-        if (!config.getChannelID(guild.getId()).equals(event.getChannel().getId())) return;
+        if (!config.isChannelSet(guild.getIdLong())) return;
+        if (config.getChannelID(guild.getIdLong()) != event.getChannel().getIdLong()) return;
 
-        config.removeChannel(guild.getId());
+        config.removeChannel(guild.getIdLong());
     }
 
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
+        final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
-        if (!config.isChannelSet(guild.getId())) return;
-        if (!config.getChannelID(guild.getId()).equals(event.getChannel().getId())) return;
+        if (!config.isChannelSet(guild.getIdLong())) return;
+        if (config.getChannelID(guild.getIdLong()) != event.getChannel().getIdLong()) return;
 
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
@@ -99,10 +100,10 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
-        final LegacyDedicatedChannelConfig config = new LegacyDedicatedChannelConfig();
+        final DedicatedChannelConfig config = new DedicatedChannelConfig();
 
-        if (!config.isChannelSet(event.getGuild().getId())) return;
-        if (!event.getTextChannel().getId().equals(config.getChannelID(event.getGuild().getId()))) return;
+        if (!config.isChannelSet(event.getGuild().getIdLong())) return;
+        if (event.getTextChannel().getIdLong() != config.getChannelID(event.getGuild().getIdLong())) return;
 
         final String id = event.getButton().getId();
         final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());

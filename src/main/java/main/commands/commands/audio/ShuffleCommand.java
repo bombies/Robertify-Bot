@@ -5,6 +5,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -51,8 +52,8 @@ public class ShuffleCommand implements ICommand {
         queue.clear();
         queue.addAll(shuffledTrackList);
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
         return EmbedUtils.embedMessage("Shuffled the queue!");
     }

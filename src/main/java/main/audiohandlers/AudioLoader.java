@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -52,8 +52,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (musicManager.scheduler.playlistRepeating)
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
@@ -63,7 +63,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
+            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }
@@ -84,8 +84,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (musicManager.scheduler.playlistRepeating)
                 musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-            if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-                new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+            if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
+                new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
             return;
         }
 
@@ -95,7 +95,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
           botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
+            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
@@ -111,8 +111,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (musicManager.scheduler.playlistRepeating)
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
     }
 
     @Override
@@ -122,7 +122,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
+            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }
@@ -138,7 +138,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
-            new LegacyDedicatedChannelConfig().getTextChannel(guild.getId())
+            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }
     }

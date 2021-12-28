@@ -1,19 +1,17 @@
-package main.utils.json.legacy.dedicatedchannel;
+package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
 import main.constants.ENV;
-import main.constants.JSONConfigFile;
 import main.constants.RobertifyEmoji;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfigField;
+import main.utils.database.mongodb.GuildsDB;
+import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -24,136 +22,87 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-@Deprecated
-public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
-    public LegacyDedicatedChannelConfig() {
-        super(JSONConfigFile.DEDICATED_CHANNELS);
+public class DedicatedChannelConfig extends AbstractGuildConfig {
+
+    public synchronized void setMessage(long gid, long mid) {
+        var obj = getGuildObject(gid);
+
+        var dediChannelObj = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        dediChannelObj.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
+
+        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObj);
     }
 
-    @Override
-    public void initConfig() {
-        try {
-            makeConfigFile();
-        } catch (IllegalStateException e) {
-            updateConfig();
-            return;
-        }
+    public synchronized void setChannelAndMessage(long gid, long cid, long mid) {
+        var obj = getGuildObject(gid);
 
-        final var obj = new JSONObject();
-        for (Guild g : new BotDB().getGuilds())
-            obj.put(g.getId(), "");
-        setJSON(obj);
+        var dediChannelObject = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        dediChannelObject.put(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString(), cid);
+        dediChannelObject.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
+
+        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObject);
     }
 
-    public synchronized void updateConfig() {
-        var obj = getJSONObject();
+    public synchronized void setOriginalAnnouncementToggle(long gid, boolean toggle) {
+        var obj = getGuildObject(gid);
 
-        for (Guild g : new BotDB().getGuilds())
-            if (!obj.has(g.getId()))
-                obj.put(g.getId(), "");
+        var dedicatedChannelObj = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        dedicatedChannelObj.put(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), toggle);
 
-        setJSON(obj);
+        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dedicatedChannelObj);
     }
 
-    public synchronized LegacyDedicatedChannelConfig setChannel(String gid, String cid) {
-        var obj = getJSONObject();
-
-        var guild = new JSONObject();
-        guild.put(DedicatedChannelConfigField.CHANNEL_ID.toString(), cid);
-        obj.put(gid, guild);
-
-        setJSON(obj);
-        return this;
+    public synchronized boolean getOriginalAnnouncementToggle(long gid) {
+        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getBoolean(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString());
     }
 
-    public synchronized LegacyDedicatedChannelConfig setMessage(String gid, String mid) {
-        var obj = getJSONObject();
-
-        var guild = obj.getJSONObject(gid);
-        guild.put(DedicatedChannelConfigField.QUEUE_MESSAGE_ID.toString(), mid);
-        obj.put(gid, guild);
-
-        setJSON(obj);
-        return this;
-    }
-
-    public synchronized LegacyDedicatedChannelConfig setChannelAndMessage(String gid, String cid, String mid) {
-        var obj = getJSONObject();
-
-        var guild = new JSONObject();
-        guild.put(DedicatedChannelConfigField.CHANNEL_ID.toString(), cid);
-        guild.put(DedicatedChannelConfigField.QUEUE_MESSAGE_ID.toString(), mid);
-        obj.put(gid, guild);
-
-        setJSON(obj);
-        return this;
-    }
-
-    public synchronized LegacyDedicatedChannelConfig setOriginalAnnouncementToggle(String gid, boolean toggle) {
-        var obj = getJSONObject();
-
-        var guild = obj.getJSONObject(gid);
-        guild.put(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), toggle);
-        obj.put(gid, guild);
-
-        setJSON(obj);
-        return this;
-    }
-
-    public synchronized boolean getOriginalAnnouncementToggle(String gid) {
-        return getJSONObject().getJSONObject(gid).getBoolean(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString());
-    }
-
-    public synchronized LegacyDedicatedChannelConfig removeChannel(String gid) {
+    public synchronized void removeChannel(long gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
 
-        var obj = getJSONObject();
-        obj.remove(gid);
+        var obj = getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        obj.put(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString(), -1);
+        obj.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1);
 
-        setJSON(obj);
-        return this;
+        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, obj);
     }
 
-    public synchronized boolean isChannelSet(String gid) {
-        try {
-            getJSONObject().getJSONObject(gid);
-            return true;
-        } catch (JSONException e) {
-            return false;
-        }
+    public synchronized boolean isChannelSet(long gid) {
+        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString()) != -1;
     }
 
-    public synchronized String getChannelID(String gid) {
+    public synchronized long getChannelID(long gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
-        return getJSONObject().getJSONObject(gid).getString(DedicatedChannelConfigField.CHANNEL_ID.toString());
+        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString());
     }
 
-    public synchronized String getMessageID(String gid) {
+    public synchronized long getMessageID(long gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
-        return getJSONObject().getJSONObject(gid).getString(DedicatedChannelConfigField.QUEUE_MESSAGE_ID.toString());
+        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString());
     }
 
-    public synchronized TextChannel getTextChannel(String gid) {
+    public synchronized TextChannel getTextChannel(long gid) {
         return Robertify.api.getTextChannelById(getChannelID(gid));
     }
 
-    public synchronized Message getMessage(String gid) {
+    public synchronized Message getMessage(long gid) {
         return getTextChannel(gid).retrieveMessageById(getMessageID(gid)).complete(); // DANGER
     }
 
     public synchronized void updateMessage(Guild guild) {
-        if (!isChannelSet(guild.getId()))
+        if (!isChannelSet(guild.getIdLong()))
             return;
 
-        final var msg = getMessage(guild.getId());
+        final var msg = getMessage(guild.getIdLong());
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.audioPlayer;
         final var playingTrack = audioPlayer.getPlayingTrack();
@@ -211,21 +160,21 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
     }
 
     public void updateButtons() {
-        for (Guild g : new BotDB().getGuilds()) {
-            if (!isChannelSet(g.getId())) continue;
+        for (Guild g : Robertify.api.getGuilds()) {
+            if (!isChannelSet(g.getIdLong())) continue;
 
-            final var msg = getMessage(g.getId());
+            final var msg = getMessage(g.getIdLong());
 
             buttonUpdateRequest(msg).queue();
         }
     }
 
     public synchronized void updateButtons(Guild g) {
-            if (!isChannelSet(g.getId())) return;
+        if (!isChannelSet(g.getIdLong())) return;
 
-            final var msg = getMessage(g.getId());
+        final var msg = getMessage(g.getIdLong());
 
-            buttonUpdateRequest(msg).queue();
+        buttonUpdateRequest(msg).queue();
     }
 
     public synchronized MessageAction buttonUpdateRequest(Message msg) {
@@ -245,24 +194,24 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
     }
 
     public synchronized void updateTopic(Guild g) {
-        if (!isChannelSet(g.getId())) return;
+        if (!isChannelSet(g.getIdLong())) return;
 
-        final var channel = getTextChannel(g.getId());
+        final var channel = getTextChannel(g.getIdLong());
         channelTopicUpdateRequest(channel).queue();
     }
 
     public void updateTopic() {
-        for (Guild g : new BotDB().getGuilds()) {
-            if (!isChannelSet(g.getId())) continue;
+        for (Guild g : Robertify.api.getGuilds()) {
+            if (!isChannelSet(g.getIdLong())) continue;
 
-            final var channel = getTextChannel(g.getId());
+            final var channel = getTextChannel(g.getIdLong());
             channelTopicUpdateRequest(channel).queue();
         }
     }
 
     public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
         return channel.getManager().setTopic(
-                        RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song. " +
+                RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song. " +
                         RobertifyEmoji.REWIND_EMOJI + " Rewind the song. " +
                         RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
                         RobertifyEmoji.STOP_EMOJI + " Stop the song and clear the queue. " +
@@ -271,5 +220,11 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
                         RobertifyEmoji.SHUFFLE_EMOJI + " Shuffle the song. " +
                         RobertifyEmoji.QUIT_EMOJI + " Disconnect the bot "
         );
+    }
+
+
+    @Override
+    protected void update() {
+        // Nothing
     }
 }

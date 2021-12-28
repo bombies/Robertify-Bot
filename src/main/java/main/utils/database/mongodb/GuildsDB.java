@@ -42,7 +42,6 @@ public class GuildsDB extends AbstractMongoDatabase{
                 .addField(Field.DEDICATED_CHANNEL_OBJECT, new JSONObject()
                         .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
                         .put(Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1L)
-                        .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
                 )
                 .addField(Field.PERMISSIONS_OBJECT, new JSONObject()
                         .put(Field.PERMISSIONS_DJ.toString(), new JSONArray())

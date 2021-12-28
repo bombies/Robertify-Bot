@@ -55,14 +55,6 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
             }
 
             ((YoutubeAudioTrack) track).process(executor);
-
-            if (!audioDB.isTrackCached(spotifyID)) {
-                try {
-                    audioDB.addTrack(spotifyID, track.getInfo().identifier);
-                } catch (Exception e) {
-                    logger.error("Error occurred: {}", e.getMessage());
-                }
-            }
         }
     }
 

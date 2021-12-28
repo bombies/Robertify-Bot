@@ -8,6 +8,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -43,8 +44,8 @@ public class ShutdownCommand implements IDevCommand {
             if (selfMember.getVoiceState().inVoiceChannel())
                 g.getAudioManager().closeAudioConnection();
 
-            if (new LegacyDedicatedChannelConfig().isChannelSet(g.getId()))
-                new LegacyDedicatedChannelConfig().updateMessage(g);
+            if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(g);
         }
 
         try {

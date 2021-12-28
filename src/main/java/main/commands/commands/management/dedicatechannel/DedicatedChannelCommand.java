@@ -3,6 +3,7 @@ package main.commands.commands.management.dedicatechannel;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
@@ -35,7 +36,7 @@ public class DedicatedChannelCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId())) {
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The request channel has already been setup!").build())
                     .queue();
             return;
@@ -53,7 +54,7 @@ public class DedicatedChannelCommand implements ICommand {
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    var dediChannelConfig = new LegacyDedicatedChannelConfig();
+                    var dediChannelConfig = new DedicatedChannelConfig();
 
                     ChannelManager manager = textChannel.getManager();
                     manager.setPosition(0).queue();
@@ -68,9 +69,9 @@ public class DedicatedChannelCommand implements ICommand {
 
                     textChannel.sendMessage("**__Queue:__**\nJoin a voice channel and start playing songs!").setEmbeds(eb.build())
                             .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(guild.getId(), textChannel.getId(), message.getId());
+                                dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(guild.getId(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
+                                dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
                             });
 
                     msg.addReaction("✅").queue();

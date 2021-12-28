@@ -4,7 +4,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -58,8 +58,8 @@ public class DisconnectCommand implements ICommand {
 
         guild.getAudioManager().closeAudioConnection();
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
         musicManager.scheduler.repeating = false;
         musicManager.scheduler.playlistRepeating = false;

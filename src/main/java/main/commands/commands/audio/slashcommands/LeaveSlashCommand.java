@@ -3,6 +3,7 @@ package main.commands.commands.audio.slashcommands;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -85,8 +86,8 @@ public class LeaveSlashCommand extends InteractiveCommand {
 
         event.getGuild().getAudioManager().closeAudioConnection();
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(event.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(event.getGuild());
 
         musicManager.scheduler.repeating = false;
         musicManager.scheduler.playlistRepeating = false;

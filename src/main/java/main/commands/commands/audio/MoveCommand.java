@@ -7,6 +7,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -83,8 +84,8 @@ public class MoveCommand implements ICommand {
             return EmbedUtils.embedMessage("Could not move track with id "+id+" in the queue");
         }
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
         return EmbedUtils.embedMessage("Moved `"+trackList.get(id-1).getInfo().title
                 +"` to position `"+position+"`.");

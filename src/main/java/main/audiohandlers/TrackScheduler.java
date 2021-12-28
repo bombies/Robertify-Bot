@@ -8,12 +8,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import main.main.Robertify;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.main.Listener;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -115,8 +113,8 @@ public class TrackScheduler extends AudioEventAdapter {
             this.player.startTrack(nextTrack.makeClone(), false);
         }
 
-        if (new LegacyDedicatedChannelConfig().isChannelSet(guild.getId()))
-            new LegacyDedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
     }
 
     @Override

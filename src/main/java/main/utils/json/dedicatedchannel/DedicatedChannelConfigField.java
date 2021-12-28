@@ -1,4 +1,4 @@
-package main.utils.json.legacy.dedicatedchannel;
+package main.utils.json.dedicatedchannel;
 
 public enum DedicatedChannelConfigField {
     CHANNEL_ID("channel_id"),

@@ -3,6 +3,7 @@ package main.events;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,8 +40,8 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
             musicManager.scheduler.queue.clear();
 
-            if (new LegacyDedicatedChannelConfig().isChannelSet(event.getGuild().getId()))
-                new LegacyDedicatedChannelConfig().updateMessage(event.getGuild());
+            if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
+                new DedicatedChannelConfig().updateMessage(event.getGuild());
 
         } else {
              VoiceChannel channelLeft = event.getChannelLeft();
