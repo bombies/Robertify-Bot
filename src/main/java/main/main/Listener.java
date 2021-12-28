@@ -239,10 +239,11 @@ public class Listener extends ListenerAdapter {
 
     private static void rescheduleUnbans(Guild g) {
         final var banUtils = new GuildConfig();
-        final var map = new GuildConfig().getBannedUsersWithUnbanTimes(g.getIdLong());
+        final var map = banUtils.getBannedUsersWithUnbanTimes(g.getIdLong());
 
         for (long user : map.keySet()) {
             if (map.get(user) == null) continue;
+            if (map.get(user) == -1) continue;
             if (map.get(user) - System.currentTimeMillis() <= 0) {
                 try {
                     banUtils.unbanUser(g.getIdLong(), user);
@@ -259,7 +260,7 @@ public class Listener extends ListenerAdapter {
 
                 sendUnbanMessage(user, g);
             };
-            scheduler.schedule(task, new GuildConfig().getTimeUntilUnban(g.getIdLong(), user), TimeUnit.MILLISECONDS);
+            scheduler.schedule(task, banUtils.getTimeUntilUnban(g.getIdLong(), user), TimeUnit.MILLISECONDS);
 
         }
     }
