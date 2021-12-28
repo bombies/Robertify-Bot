@@ -3,9 +3,9 @@ package main.utils.json.permissions;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.database.mongodb.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.json.AbstractGuildConfig;
 import main.utils.json.AbstractJSON;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.legacy.permissions.PermissionConfigField;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,8 +15,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionsConfig implements AbstractJSON {
-    private static final GuildsDBCache cache = GuildsDBCache.getInstance();
+public class PermissionsConfig extends AbstractGuildConfig {
 
     public void addPermissionToUser(long guildID, long userID, Permission p) {
         var obj = getGuildObject(guildID);
@@ -28,7 +27,7 @@ public class PermissionsConfig implements AbstractJSON {
                 throw new IllegalArgumentException("User with id \"" + userID + "\" already has " + p.name() + "");
         } catch (NullPointerException e) {
             usersObj.put(String.valueOf(userID), new JSONArray());
-            cache.updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
+            getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
         }
 
         obj = getGuildObject(guildID);
@@ -40,7 +39,7 @@ public class PermissionsConfig implements AbstractJSON {
 
         usersObj.put(String.valueOf(userID), array);
 
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
     }
 
     public boolean userHasPermission(long guildID, long userID, Permission p) {
@@ -66,7 +65,7 @@ public class PermissionsConfig implements AbstractJSON {
         array.remove(getIndexOfObjectInArray(array, p.getCode()));
 
         usersObj.put(String.valueOf(userID), array);
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guildID);
     }
 
     public void removeRoleFromPermission(long gid, long rid, Permission p) throws IllegalAccessException, IOException {
@@ -77,7 +76,7 @@ public class PermissionsConfig implements AbstractJSON {
         JSONArray permArr = obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONArray(String.valueOf(p.getCode()));
         permArr.remove(getIndexOfObjectInArray(permArr, rid));
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
     }
 
     public void addRoleToPermission(long gid, long rid, Permission p) throws IllegalAccessException, IOException {
@@ -89,7 +88,7 @@ public class PermissionsConfig implements AbstractJSON {
                 .getJSONArray(String.valueOf(p.getCode()));
         permArr.put(rid);
 
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
     }
 
     public List<Long> getRolesForPermission(long gid, Permission p) {
@@ -144,7 +143,7 @@ public class PermissionsConfig implements AbstractJSON {
         } catch (JSONException e) {
             final var obj = getGuildObject(gid);
             obj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
-            cache.updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+            getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
             return ret;
         }
     }
@@ -177,12 +176,9 @@ public class PermissionsConfig implements AbstractJSON {
         return codes;
     }
 
-    private JSONObject getGuildObject(long gid) {
-        return new GuildConfig().getGuildObject(gid);
-    }
-
+    @Override
     public void update() {
-        final var cacheArr = cache.getCache();
+        final var cacheArr = getCache().getCache();
 
         for (int i = 0; i < cacheArr.length(); i++) {
             final var guildObj = cacheArr.getJSONObject(i);
@@ -199,7 +195,7 @@ public class PermissionsConfig implements AbstractJSON {
                 guildObj.put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
             }
 
-            if (changesMade) cache.updateCache(Document.parse(guildObj.toString()));
+            if (changesMade) getCache().updateCache(Document.parse(guildObj.toString()));
         }
     }
 }

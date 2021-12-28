@@ -76,7 +76,7 @@ public class Listener extends ListenerAdapter {
         new LegacyDedicatedChannelConfig().initConfig();
         new LegacyEightBallConfig().initConfig();
         new LegacyRestrictedChannelsConfig().initConfig();
-        new LegacySuggestionsConfig().initConfig();
+//        new LegacySuggestionsConfig().initConfig();
         new LegacyReportsConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {

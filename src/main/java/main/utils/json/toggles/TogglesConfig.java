@@ -5,6 +5,7 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.utils.database.mongodb.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.json.AbstractGuildConfig;
 import main.utils.json.AbstractJSON;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,9 +16,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-public class TogglesConfig implements AbstractJSON {
-    private static final GuildsDBCache cache = GuildsDBCache.getInstance();
-
+public class TogglesConfig extends AbstractGuildConfig {
     public boolean getToggle(Guild guild, Toggles toggle) {
         if (!guildHasInfo(guild.getIdLong()))
             throw new IllegalArgumentException("This guild doesn't have any information!");
@@ -50,7 +49,7 @@ public class TogglesConfig implements AbstractJSON {
     public void setToggle(Guild guild, Toggles toggle, boolean val) {
         final var obj = new GuildConfig().getGuildObject(guild.getIdLong());
         obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString()).put(toggle.toString(), val);
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
     }
 
     public void setDJToggle(Guild guild, ICommand command, boolean val) {
@@ -58,7 +57,7 @@ public class TogglesConfig implements AbstractJSON {
         obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
                 .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
-        cache.updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
+        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
     }
 
     public boolean isDJToggleSet(Guild guild, ICommand cmd) {
@@ -70,15 +69,12 @@ public class TogglesConfig implements AbstractJSON {
     }
 
     private JSONObject getTogglesObject(long gid) {
-        return new GuildConfig().getGuildObject(gid).getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
+        return getGuildObject(gid).getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
     }
 
-    public boolean guildHasInfo(long gid) {
-        return new GuildConfig().guildHasInfo(gid);
-    }
-
+    @Override
     public void update() {
-        JSONArray cacheArr = cache.getCache();
+        JSONArray cacheArr = getCache().getCache();
 
         for (int i = 0; i < cacheArr.length(); i++) {
             final JSONObject jsonObject = cacheArr.getJSONObject(i);
@@ -121,7 +117,7 @@ public class TogglesConfig implements AbstractJSON {
                         }
                 }
 
-            if (changesMade) cache.updateCache(Document.parse(jsonObject.toString()));
+            if (changesMade) getCache().updateCache(Document.parse(jsonObject.toString()));
         }
     }
 

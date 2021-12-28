@@ -1,5 +1,6 @@
 package main.events;
 
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -11,16 +12,16 @@ public class SuggestionCategoryDeletionEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = new LegacySuggestionsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (event.getCategory().getIdLong() != config.getCategoryID()) return;
+        if (event.getCategory().getIdLong() != config.getSuggestionsCategoryID()) return;
 
         final var guild = event.getGuild();
 
-        guild.getTextChannelById(config.getPendingChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
-        guild.getTextChannelById(config.getAcceptedChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
-        guild.getTextChannelById(config.getDeniedChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
+        guild.getTextChannelById(config.getSuggestionsPendingChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
+        guild.getTextChannelById(config.getSuggestionsAcceptedChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
+        guild.getTextChannelById(config.getSuggestionsDeniedChannelID()).delete().queueAfter(1, TimeUnit.SECONDS);
 
-        config.resetConfig();
+        config.resetSuggestionsConfig();
     }
 }

@@ -6,6 +6,7 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -52,9 +53,9 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     private void setup(Message msg) {
         if (!isDeveloper(msg.getAuthor())) return;
 
-        final var config = new LegacySuggestionsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        if (config.isSetup()) {
+        if (config.isSuggestionsSetup()) {
             msg.replyEmbeds(EmbedUtils.embedMessage("The suggestions channels have already been setup!").build())
                     .queue();
             return;
@@ -74,7 +75,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                                .queueAfter(1, TimeUnit.SECONDS, acceptedChannel -> {
                                   guild.createTextChannel("denied-suggestions", category)
                                           .queueAfter(1, TimeUnit.SECONDS, deniedChannel -> {
-                                              config.initChannels(category.getIdLong(), pendingChannel.getIdLong(), acceptedChannel.getIdLong(), deniedChannel.getIdLong());
+                                              config.initSuggestionChannels(category.getIdLong(), pendingChannel.getIdLong(), acceptedChannel.getIdLong(), deniedChannel.getIdLong());
                                                 msg.addReaction("✅").queue();
                                           });
                                });
@@ -108,9 +109,9 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var config = new LegacySuggestionsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getPendingChannelID());
+        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
@@ -119,7 +120,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         }
 
         pendingChannel.retrieveMessageById(id).queue(suggestion -> {
-            TextChannel acceptedChannel = Robertify.api.getTextChannelById(config.getAcceptedChannelID());
+            TextChannel acceptedChannel = Robertify.api.getTextChannelById(config.getSuggestionsAcceptedChannelID());
 
             if (acceptedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
@@ -182,9 +183,9 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var config = new LegacySuggestionsConfig();
+        final var config = BotInfoCache.getInstance();
 
-        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getPendingChannelID());
+        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
@@ -193,7 +194,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         }
 
         pendingChannel.retrieveMessageById(id).queue(suggestion -> {
-            TextChannel deniedChannel = Robertify.api.getTextChannelById(config.getDeniedChannelID());
+            TextChannel deniedChannel = Robertify.api.getTextChannelById(config.getSuggestionsDeniedChannelID());
 
             if (deniedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
@@ -257,15 +258,15 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         if (suggestion.chars().count() > 1024)
             return EmbedUtils.embedMessage("Your suggestion must be no more than 1024 characters!").build();
 
-        final var config = new LegacySuggestionsConfig();
-        final TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getPendingChannelID());
+        final var config = BotInfoCache.getInstance();
+        final TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The suggestion channels aren't setup!");
             return EmbedUtils.embedMessage("This feature isn't available right now!").build();
         }
 
-        if (config.userIsBanned(suggester.getIdLong()))
+        if (config.userIsSuggestionBanned(suggester.getIdLong()))
             return EmbedUtils.embedMessage("You have been banned from sending suggestions!").build();
 
         final EmbedBuilder eb = new EmbedBuilder();
@@ -309,7 +310,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new LegacySuggestionsConfig().banUser(user.getIdLong());
+            BotInfoCache.getInstance().banSuggestionsUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
                     + user.getAsMention() + "from suggestions").build())
                     .queue();
@@ -347,7 +348,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         }
 
         try {
-            new LegacySuggestionsConfig().unbanUser(user.getIdLong());
+            BotInfoCache.getInstance().unbanSuggestionUser(user.getIdLong());
             msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
                             + user.getAsMention() + "from suggestions").build())
                     .queue();

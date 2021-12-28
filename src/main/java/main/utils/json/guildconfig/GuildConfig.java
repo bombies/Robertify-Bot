@@ -1,8 +1,7 @@
 package main.utils.json.guildconfig;
 
 import main.utils.database.mongodb.GuildsDB;
-import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.json.AbstractJSON;
+import main.utils.json.AbstractGuildConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,28 +9,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class GuildConfig implements AbstractJSON {
-    private static final GuildsDBCache cache = GuildsDBCache.getInstance();
+public class GuildConfig extends AbstractGuildConfig {
 
     public void addGuild(long gid) {
         if (guildHasInfo(gid))
             throw new IllegalArgumentException("This guild is already added!");
 
-        cache.addToCache(GuildsDB.getGuildDocument(gid));
+        getCache().addToCache(GuildsDB.getGuildDocument(gid));
     }
 
     public void removeGuild(long gid) {
         if (!guildHasInfo(gid))
             throw new IllegalArgumentException("There is already no information for this guild");
 
-        cache.removeFromCache(GuildsDB.Field.GUILD_ID, gid);
+        getCache().removeFromCache(GuildsDB.Field.GUILD_ID, gid);
     }
 
     public String getPrefix(long gid) {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any information!");
 
-        return (String) cache.getField(gid, GuildsDB.Field.GUILD_PREFIX);
+        return (String) getCache().getField(gid, GuildsDB.Field.GUILD_PREFIX);
     }
 
     public void setPrefix(long gid, String prefix) {
@@ -41,7 +39,7 @@ public class GuildConfig implements AbstractJSON {
         if (prefix.length() > 4)
             throw new IllegalArgumentException("The prefix must be 4 or less characters!");
 
-        cache.setField(gid, GuildsDB.Field.GUILD_PREFIX, prefix);
+        getCache().setField(gid, GuildsDB.Field.GUILD_PREFIX, prefix);
     }
 
     public long getAnnouncementChannelID(long gid) {
@@ -49,9 +47,9 @@ public class GuildConfig implements AbstractJSON {
             throw new NullPointerException("This guild doesn't have any information!");
 
         try {
-            return (long) cache.getField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL);
+            return (long) getCache().getField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL);
         } catch (ClassCastException e) {
-            return (int) cache.getField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL);
+            return (int) getCache().getField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL);
         }
     }
 
@@ -59,7 +57,7 @@ public class GuildConfig implements AbstractJSON {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any information!");
 
-        cache.setField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL, id);
+        getCache().setField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL, id);
     }
 
     public boolean announcementChannelIsSet(long gid) {
@@ -73,7 +71,7 @@ public class GuildConfig implements AbstractJSON {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any information!");
 
-        final JSONArray bannedUsers = (JSONArray) cache.getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
+        final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
         final List<BannedUser> ret = new ArrayList<>();
 
         for (int i = 0; i < bannedUsers.length(); i++) {
@@ -109,7 +107,7 @@ public class GuildConfig implements AbstractJSON {
         if (isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user is already banned!");
 
-        final JSONArray bannedUsers = (JSONArray) cache.getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
+        final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
 
         bannedUsers.put(new JSONObject()
                 .put(GuildsDB.Field.BANNED_USER.toString(), uid)
@@ -118,7 +116,7 @@ public class GuildConfig implements AbstractJSON {
                 .put(GuildsDB.Field.BANNED_UNTIL.toString(), bannedUntil)
         );
 
-        cache.setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
+        getCache().setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
     }
 
     public void unbanUser(long gid, long uid) {
@@ -128,10 +126,10 @@ public class GuildConfig implements AbstractJSON {
         if (!isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user isn't banned!");
 
-        final JSONArray bannedUsers = (JSONArray) cache.getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
+        final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
         bannedUsers.remove(getIndexOfObjectInArray(bannedUsers, GuildsDB.Field.BANNED_USER, uid));
 
-        cache.setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
+        getCache().setField(gid, GuildsDB.Field.BANNED_USERS_ARRAY, bannedUsers);
     }
 
     public long getTimeUntilUnban(long gid, long uid) {
@@ -158,12 +156,9 @@ public class GuildConfig implements AbstractJSON {
         return false;
     }
 
-    public JSONObject getGuildObject(long gid) {
-        return cache.getCache().getJSONObject(getIndexOfObjectInArray(cache.getCache(), GuildsDB.Field.GUILD_ID, gid));
-    }
-
-    public boolean guildHasInfo(long gid) {
-        return cache.guildHasInfo(gid);
+    @Override
+    protected void update() {
+        // Nothing
     }
 
     public static record BannedUser(long user, long bannedBy, long bannedAt, long bannedUntil) {
