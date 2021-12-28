@@ -21,6 +21,7 @@ public class BotInfoCache extends AbstractMongoCache {
     private BotInfoCache() {
         super(BotInfoDB.ins());
         this.init();
+        updateCache();
         logger.debug("Done instantiating Bot Info cache");
     }
 
@@ -204,7 +205,7 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public void removeDeveloper(long developer) {
-        if (isDeveloper(developer))
+        if (!isDeveloper(developer))
             throw new NullPointerException("This user isn't a developer!");
 
         final var obj = getDocument();
