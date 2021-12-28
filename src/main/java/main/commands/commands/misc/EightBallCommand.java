@@ -3,6 +3,7 @@ package main.commands.commands.misc;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
+import main.utils.json.eightball.EightBallConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
@@ -88,16 +89,16 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (phraseToAdd == null)
             return EmbedUtils.embedMessage("You need to provide a response to add!");
 
-        var config = new LegacyEightBallConfig();
+        var config = new EightBallConfig();
 
         try {
-            if (config.getResponses(guild.getId()).contains(phraseToAdd))
+            if (config.getResponses(guild.getIdLong()).contains(phraseToAdd))
                 return EmbedUtils.embedMessage("This is already a response!");
         } catch (JSONException e) {
-            config.addGuild(guild.getId());
+            e.printStackTrace();
         }
 
-        config.addResponse(guild.getId(), phraseToAdd);
+        config.addResponse(guild.getIdLong(), phraseToAdd);
         return EmbedUtils.embedMessage("Added `"+phraseToAdd+"` as a response!");
     }
 
@@ -105,18 +106,17 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new LegacyEightBallConfig();
+        var config = new EightBallConfig();
 
         try {
-            if (index > config.getResponses(guild.getId()).size() || index < 0)
+            if (index > config.getResponses(guild.getIdLong()).size() || index < 0)
                 return EmbedUtils.embedMessage("This is not a response!");
         } catch (JSONException e) {
-            config.addGuild(guild.getId());
-            return EmbedUtils.embedMessage("This is not a response!");
+            e.printStackTrace();
         }
 
-        var eb = EmbedUtils.embedMessage("Removed `"+config.getResponses(guild.getId()).get(index)+"` as a response!");
-        config.removeResponse(guild.getId(), index);
+        var eb = EmbedUtils.embedMessage("Removed `"+config.getResponses(guild.getIdLong()).get(index)+"` as a response!");
+        config.removeResponse(guild.getIdLong(), index);
         return eb;
     }
 
@@ -124,8 +124,8 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new LegacyEightBallConfig();
-        config.removeAllResponses(guild.getId());
+        var config = new EightBallConfig();
+        config.removeAllResponses(guild.getIdLong());
 
         return EmbedUtils.embedMessage("You have cleared all of your custom responses!");
     }
@@ -134,8 +134,8 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
 
-        var config = new LegacyEightBallConfig();
-        final var responses = config.getResponses(guild.getId());
+        var config = new EightBallConfig();
+        final var responses = config.getResponses(guild.getIdLong());
 
         if (responses.isEmpty())
             return EmbedUtils.embedMessage("There are no custom responses!");
@@ -176,7 +176,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                 "Very doubtful."
                 );
 
-        final var customAnswers = new LegacyEightBallConfig().getResponses(guild.getId());
+        final var customAnswers = new EightBallConfig().getResponses(guild.getIdLong());
 
         final var random = new Random().nextDouble();
 

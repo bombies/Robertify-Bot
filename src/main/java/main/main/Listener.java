@@ -9,6 +9,7 @@ import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
+import main.utils.database.mongodb.GuildsDB;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
@@ -28,6 +29,7 @@ import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
+import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
@@ -47,7 +49,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -66,21 +67,20 @@ public class Listener extends ListenerAdapter {
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
 
-
         AbstractJSONFile.initDirectory();
-        LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
+//        LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
 
-        permConfig.update();
+//        permConfig.update();
         new ChangeLogConfig().initConfig();
         new LegacyTogglesConfig().initConfig();
         new LegacyDedicatedChannelConfig().initConfig();
-        new LegacyEightBallConfig().initConfig();
+//        new LegacyEightBallConfig().initConfig();
         new LegacyRestrictedChannelsConfig().initConfig();
 //        new LegacySuggestionsConfig().initConfig();
 //        new LegacyReportsConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-            permConfig.initGuild(g.getId());
+//            permConfig.initGuild(g.getId());
 
             initNeededSlashCommands(g);
             rescheduleUnbans(g);
@@ -145,24 +145,24 @@ public class Listener extends ListenerAdapter {
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
 
-        BotDB botUtils = new BotDB();
+//        BotDB botUtils = new BotDB();
 
-        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
+//        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
         LegacyTogglesConfig togglesConfig = new LegacyTogglesConfig();
         new LegacyDedicatedChannelConfig().updateConfig();
-        new LegacyEightBallConfig().updateConfig();
+//        new LegacyEightBallConfig().updateConfig();
 
-        botUtils.addGuild(guild.getIdLong())
-                .closeConnection();
+//        botUtils.addGuild(guild.getIdLong())
+//                .closeConnection();
 
-        permissionsConfig.initGuild(guild.getId());
-        togglesConfig.initConfig();
+//        permissionsConfig.initGuild(guild.getId());
+//        togglesConfig.initConfig();
 
         initSlashCommands(guild);
 
         // MongoDB
         new GuildConfig().addGuild(guild.getIdLong());
-        new TogglesConfig().update();
+        GuildsDB.updateAllCaches();
 
         logger.info("Joined {}", guild.getName());
     }
@@ -171,8 +171,8 @@ public class Listener extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
 
-        BotDB botUtils = new BotDB();
-        botUtils.removeGuild(guild.getIdLong()).closeConnection();
+//        BotDB botUtils = new BotDB();
+//        botUtils.removeGuild(guild.getIdLong()).closeConnection();
 
         // MongoDB
         new GuildConfig().removeGuild(guild.getIdLong());
