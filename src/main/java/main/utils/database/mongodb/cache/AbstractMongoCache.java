@@ -14,8 +14,6 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class AbstractMongoCache extends AbstractMongoDatabase implements AbstractJSON {
-    private static final HashMap<Class<? extends AbstractMongoDatabase>, AbstractMongoCache> INSTANCES = new HashMap<>();
-
     @Getter
     private final AbstractMongoDatabase mongoDB;
     @Getter

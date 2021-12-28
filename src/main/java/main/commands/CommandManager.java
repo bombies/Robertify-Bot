@@ -16,6 +16,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.management.toggles.TogglesCommand;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
@@ -310,16 +311,15 @@ public class CommandManager {
                 }
 
                 if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                    if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
-                        return;
-
-                    final var rcConfig = new LegacyRestrictedChannelsConfig();
-                    if (!rcConfig.isRestrictedChannel(
-                            guild.getId(),
-                            msg.getTextChannel().getIdLong(),
-                            LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
-                    )) {
-                      return;
+                    if (!GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
+                        final var rcConfig = new RestrictedChannelsConfig();
+                        if (!rcConfig.isRestrictedChannel(
+                                guild.getIdLong(),
+                                msg.getTextChannel().getIdLong(),
+                                RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
+                        )) {
+                            return;
+                        }
                     }
                 }
 

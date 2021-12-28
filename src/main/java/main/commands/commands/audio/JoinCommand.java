@@ -3,6 +3,7 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
@@ -34,11 +35,22 @@ public class JoinCommand implements ICommand {
         VoiceChannel channel = memberVoiceState.getChannel();
 
         if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-            final var restrictedChannelsConfig = new LegacyRestrictedChannelsConfig();
-            if (!restrictedChannelsConfig.isRestrictedChannel(guild.getId(), channel.getIdLong(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+            final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), channel.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                 return EmbedUtils.embedMessage("I can't join this channel!" +
-                        "\n\nI am restricted to only join\n"
-                        + restrictedChannelsConfig.restrictedChannelsToString(guild.getId(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)).build();
+                        (!restrictedChannelsConfig.getRestrictedChannels(
+                                guild.getIdLong(),
+                                RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                        ).isEmpty()
+                                ?
+                        "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
+                                guild.getIdLong(),
+                                RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                        )
+                                :
+                                "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                        )
+                ).build();
             }
         }
 

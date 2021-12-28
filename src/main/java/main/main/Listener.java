@@ -68,7 +68,7 @@ public class Listener extends ListenerAdapter {
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
 
-        AbstractJSONFile.initDirectory();
+//        AbstractJSONFile.initDirectory();
 //        LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
 
 //        permConfig.update();
@@ -76,7 +76,7 @@ public class Listener extends ListenerAdapter {
 //        new LegacyTogglesConfig().initConfig();
 //        new LegacyDedicatedChannelConfig().initConfig();
 //        new LegacyEightBallConfig().initConfig();
-        new LegacyRestrictedChannelsConfig().initConfig();
+//        new LegacyRestrictedChannelsConfig().initConfig();
 //        new LegacySuggestionsConfig().initConfig();
 //        new LegacyReportsConfig().initConfig();
 

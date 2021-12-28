@@ -2,20 +2,30 @@ package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
 import main.utils.database.mongodb.GuildsDB;
+import main.utils.json.AbstractGuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GuildsDBCache extends AbstractMongoCache {
+    private final static Logger logger = LoggerFactory.getLogger(GuildsDBCache.class);
+
     @Getter
     private static GuildsDBCache instance;
 
     GuildsDBCache() {
         super(GuildsDB.ins());
         this.init();
+        updateCache();
+        logger.debug("Done instantiating Guild cache");
     }
 
     public static void initCache() {
+        logger.debug("Instantiating new Guild cache");
         instance = new GuildsDBCache();
+        logger.debug("GUILD INFO CACHE = {}", instance.getCache());
+        AbstractGuildConfig.initCache();
     }
 
     public Object getField(long gid, GuildsDB.Field field) {
@@ -44,6 +54,7 @@ public class GuildsDBCache extends AbstractMongoCache {
             getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
             return true;
         } catch (JSONException | NullPointerException e) {
+            e.printStackTrace();
             return false;
         }
     }

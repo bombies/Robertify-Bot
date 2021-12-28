@@ -70,8 +70,6 @@ public class GeniusSongSearch {
                 return;
             }
 
-            System.out.println(result);
-
             parse(new JSONObject(result));
         } catch (MalformedURLException e) {
             throw new InternalError();

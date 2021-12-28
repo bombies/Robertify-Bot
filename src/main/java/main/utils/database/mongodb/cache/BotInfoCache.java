@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BotInfoCache extends AbstractMongoCache {
-    private final static Logger logger = LoggerFactory.getLogger(TestMongoCache.class);
+    private final static Logger logger = LoggerFactory.getLogger(BotInfoCache.class);
     @Getter
     private static BotInfoCache instance;
 
     private BotInfoCache() {
         super(BotInfoDB.ins());
         this.init();
+        logger.debug("Done instantiating Bot Info cache");
     }
 
     public void setLastStartup(long time) {
@@ -227,7 +228,9 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public static void initCache() {
+        logger.debug("Instantiating new Bot Info cache");
         instance = new BotInfoCache();
+        logger.debug("BOT INFO CACHE = {}", instance.getCache());
     }
 
     public String getJSON(boolean indented) {

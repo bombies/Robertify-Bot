@@ -4,6 +4,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Listener;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.ENV;
@@ -67,11 +68,22 @@ public class PlayCommand implements ICommand {
             return;
         } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(ctx.getGuild(), Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                final var restrictedChannelsConfig = new LegacyRestrictedChannelsConfig();
-                if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getId(), memberVoiceState.getChannel().getIdLong(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+                if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                     msg.replyEmbeds(EmbedUtils.embedMessage("I can't join this channel!" +
-                                    "\n\nI am restricted to only join\n"
-                                    + restrictedChannelsConfig.restrictedChannelsToString(ctx.getGuild().getId(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)).build())
+                                    (!restrictedChannelsConfig.getRestrictedChannels(
+                                            ctx.getGuild().getIdLong(),
+                                            RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                                    ).isEmpty()
+                                            ?
+                                            "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
+                                                    ctx.getGuild().getIdLong(),
+                                                    RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                                            )
+                                            :
+                                            "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                    )
+                            ).build())
                             .queue();
                     return;
                 }

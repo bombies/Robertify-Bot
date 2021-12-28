@@ -11,16 +11,19 @@ import main.utils.json.toggles.TogglesConfig;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class GuildsDB extends AbstractMongoDatabase{
+public class GuildsDB extends AbstractMongoDatabase {
+    private final static Logger logger = LoggerFactory.getLogger(GuildsDB.class);
     private final static GuildsDB INSTANCE = new GuildsDB();
 
-    public GuildsDB() {
+    private GuildsDB() {
         super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_GUILDS);
     }
 
     @Override
-    public void init() {
+    public synchronized void init() {
         for (var guild : Robertify.api.getGuilds()) {
             if (documentExists(Field.GUILD_ID, guild.getIdLong()))
                 continue;
@@ -29,7 +32,7 @@ public class GuildsDB extends AbstractMongoDatabase{
         }
     }
 
-    public static GuildsDB ins() {
+    public static synchronized GuildsDB ins() {
         return INSTANCE;
     }
 
@@ -52,12 +55,13 @@ public class GuildsDB extends AbstractMongoDatabase{
                         .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), new JSONArray())
                         .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), new JSONArray())
                 )
-                .addField(Field.TOGGLES_OBJECT, new JSONObject())
+                .addField(Field.TOGGLES_OBJECT, new TogglesConfig().getDefaultToggleObject())
                 .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
                 .build();
     }
 
-    protected static void update() {
+    protected static synchronized void update() {
+        logger.debug("Updating Guild cache");
         new TogglesConfig().update();
         new PermissionsConfig().update();
     }

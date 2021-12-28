@@ -89,7 +89,6 @@ public abstract class AbstractMongoDatabase {
     public abstract void init();
 
     public static void initAllCaches() {
-//        TestMongoCache.initCache();
         BotInfoCache.initCache();
         GuildsDBCache.initCache();
     }

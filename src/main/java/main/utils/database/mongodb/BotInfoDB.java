@@ -6,8 +6,11 @@ import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BotInfoDB extends AbstractMongoDatabase {
+    private final static Logger logger = LoggerFactory.getLogger(BotInfoDB.class);
     private final static BotInfoDB INSTANCE = new BotInfoDB();
 
     private BotInfoDB() {
@@ -15,7 +18,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
     }
 
     @Override
-    public void init() {
+    public synchronized void init() {
         if (getCollection().countDocuments() == 0) {
             addDocument(
                     DocumentBuilder.create()
@@ -40,6 +43,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
     }
 
     protected static void update() {
+        logger.debug("Updating Bot Info cache");
         var cache = BotInfoCache.getInstance();
 
         for (var obj : cache.getCache()) {

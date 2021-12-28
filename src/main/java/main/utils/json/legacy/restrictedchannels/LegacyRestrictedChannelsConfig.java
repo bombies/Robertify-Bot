@@ -3,6 +3,7 @@ package main.utils.json.legacy.restrictedchannels;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfigField;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
