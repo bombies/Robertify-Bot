@@ -79,7 +79,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
         getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
     }
 
-    public void addRoleToPermission(long gid, long rid, Permission p) throws IllegalAccessException, IOException {
+    public void addRoleToPermission(long gid, long rid, Permission p) throws IllegalAccessException {
         if (getRolesForPermission(gid, p).contains(rid))
             throw new IllegalAccessException("The role "+rid+" already has access to Permission with code "+ p.getCode());
 

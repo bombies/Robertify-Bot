@@ -5,6 +5,9 @@ import main.utils.json.legacy.AbstractJSONFile;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Deprecated
 public class LegacyReportsConfig extends AbstractJSONFile {
     public LegacyReportsConfig() {
@@ -59,6 +62,16 @@ public class LegacyReportsConfig extends AbstractJSONFile {
 
     public boolean isUserBanned(long id) {
         return arrayHasObject(getJSONObject().getJSONArray(ReportsConfigField.BANNED_USERS.toString()), id);
+    }
+
+    public List<Long> getBannedUsers() {
+        final var arr = getJSONObject().getJSONArray(ReportsConfigField.BANNED_USERS.toString());
+        final List<Long> ret = new ArrayList<>();
+
+        for (int i = 0; i < arr.length(); i++)
+            ret.add(arr.getLong(i));
+
+        return ret;
     }
 
     public void banUser(long id) {

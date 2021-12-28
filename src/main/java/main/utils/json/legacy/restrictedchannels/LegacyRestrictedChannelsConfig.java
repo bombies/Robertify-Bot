@@ -1,11 +1,13 @@
 package main.utils.json.legacy.restrictedchannels;
 
+import com.google.common.collect.Lists;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigField;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,13 +113,17 @@ public class LegacyRestrictedChannelsConfig extends AbstractJSONFile {
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
-        final List<Long> ret = new ArrayList<>();
-        final var arr = obj.getJSONObject(gid).getJSONArray(configField.toString());
+        try {
+            final List<Long> ret = new ArrayList<>();
+            final var arr = obj.getJSONObject(gid).getJSONArray(configField.toString());
 
-        for (int i = 0; i < arr.length(); i++)
-            ret.add(arr.getLong(i));
+            for (int i = 0; i < arr.length(); i++)
+                ret.add(arr.getLong(i));
 
-        return ret;
+            return ret;
+        } catch (JSONException e) {
+            return Lists.newArrayList();
+        }
     }
 
     public boolean isRestrictedChannel(String gid, long vcID, ChannelType type) {

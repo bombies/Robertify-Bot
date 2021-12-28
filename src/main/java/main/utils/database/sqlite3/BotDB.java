@@ -134,6 +134,23 @@ public class BotDB extends AbstractSQLiteDatabase {
         return this;
     }
 
+    @SneakyThrows
+    public List<Long> getDevelopers() {
+        if (getCon().isClosed())
+            createConnection();
+
+        Statement dbStat = getCon().createStatement();
+        String sql = "SELECT * FROM " + DatabaseTable.MAIN_BOT_DEVELOPERS + ";";
+        ResultSet dbRes = dbStat.executeQuery(sql);
+
+        final List<Long> ret = new ArrayList<>();
+
+        while (dbRes.next())
+            ret.add(Long.parseLong(dbRes.getString("developer_id")));
+
+        return ret;
+    }
+
     /**
      * Get whether the bot should announce new tracks being played
      * @return True if the track is to be announced and vice versa.
