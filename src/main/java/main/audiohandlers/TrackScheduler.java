@@ -124,7 +124,7 @@ public class TrackScheduler extends AudioEventAdapter {
                 if (RobertifyAudioManager.getTracksRequestedByUsers().containsKey(track))
                     RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
                 try {
-                    player.playTrack(track.makeClone());
+                    player.startTrack(track.makeClone(), false);
                 } catch (UnsupportedOperationException e) {
                     track.setPosition(0);
                 }
