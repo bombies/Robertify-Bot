@@ -4,6 +4,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -59,6 +60,10 @@ public class VolumeCommand implements ICommand {
         var audioPlayer = musicManager.audioPlayer;
 
         audioPlayer.setVolume(volume);
+
+        if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
+
         return EmbedUtils.embedMessage("🔊  You have set the volume of the bot to **"+volume+"%**");
     }
 
