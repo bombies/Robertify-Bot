@@ -9,24 +9,29 @@ import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
+import lombok.Getter;
 import main.audiohandlers.RobertifyAudioReference;
 import main.utils.database.sqlite3.AudioDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class SpotifyAudioTrack extends DelegatedAudioTrack {
     private final YoutubeAudioSourceManager manager;
     private final String spotifyID;
+    @Getter
+    private final String trackImage;
 
     private final Logger logger = LoggerFactory.getLogger(SpotifyAudioTrack.class);
 
-    public SpotifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager manager, String spotifyID) {
+    public SpotifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager manager, String spotifyID, String trackImage) {
         super(trackInfo);
         this.manager = manager;
         this.spotifyID = spotifyID;
+        this.trackImage = trackImage;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public AudioTrack makeClone() {
-        return new SpotifyAudioTrack(trackInfo, manager, spotifyID);
+        return new SpotifyAudioTrack(trackInfo, manager, spotifyID, trackImage);
     }
 
     @Override

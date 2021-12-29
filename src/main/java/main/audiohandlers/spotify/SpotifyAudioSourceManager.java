@@ -83,7 +83,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
                         "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
-                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
+                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), album.getImages()[0].getUrl());
                 playlist.add(track);
             }
 
@@ -119,7 +119,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
                         false, null
                 );
-                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId());
+                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), t.getAlbum().getImages()[0].getUrl());
                 playlist.add(track);
             }
 
@@ -170,7 +170,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                             false, null
                     );
 
-                    var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId());
+                    var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId(), plTrack.getAlbum().getImages()[0].getUrl());
                     finalPlaylist.add(track);
                 }
 
@@ -221,7 +221,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                     false, null
             );
 
-            return new SpotifyAudioTrack(info, youtubeManager, track.getId());
+            return new SpotifyAudioTrack(info, youtubeManager, track.getId(), track.getAlbum().getImages()[0].getUrl());
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);

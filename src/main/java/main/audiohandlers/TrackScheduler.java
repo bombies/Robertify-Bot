@@ -107,6 +107,9 @@ public class TrackScheduler extends AudioEventAdapter {
         if (nextTrack != null)
             nextTrack.setPosition(0L);
 
+        if (this.player.getPlayingTrack() != null)
+            this.player.stopTrack();
+
         try {
             this.player.startTrack(nextTrack, false);
         } catch (IllegalStateException e) {
