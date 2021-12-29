@@ -1,4 +1,4 @@
-package main.commands.commands.dev.config;
+package main.commands.commands.dev;
 
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
@@ -8,8 +8,6 @@ import main.constants.JSONConfigFile;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Message;
 import org.json.JSONObject;
 import org.slf4j.Logger;

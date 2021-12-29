@@ -1,4 +1,4 @@
-package main.commands.commands.management.toggles;
+package main.commands.commands.management;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandContext;
@@ -6,7 +6,6 @@ import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.RobertifyEmoji;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
