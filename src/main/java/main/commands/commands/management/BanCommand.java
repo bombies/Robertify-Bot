@@ -171,7 +171,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+        if (!getCommand().getCommand().permissionCheck(event)) {
             event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to execute this command!")
                             .build())
                     .setEphemeral(true)
