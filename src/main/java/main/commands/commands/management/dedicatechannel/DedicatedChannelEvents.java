@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
+import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -56,6 +57,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final User user = event.getAuthor();
 
         if (!user.isBot()) {
+            if (MongoMigrationCommand.isMigrating()) {
+                event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+                                " You are not allowed to use this feature.")
+                        .build()).queue();
+                return;
+            }
+
             if (!memberVoiceState.inVoiceChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(EmbedUtils.embedMessage("You must be in a voice channel to use this command")
                                 .build())

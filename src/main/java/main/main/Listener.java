@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
@@ -115,6 +116,13 @@ public class Listener extends ListenerAdapter {
                         .queue();
             } else {
                 try {
+                    if (MongoMigrationCommand.isMigrating()) {
+                        event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+                                        " You are not allowed to use commands.")
+                                .build()).queue();
+                        return;
+                    }
+
                     manager.handle(event);
                 } catch (InsufficientPermissionException e) {
                     try {
@@ -136,6 +144,13 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (MongoMigrationCommand.isMigrating()) {
+            event.replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+                            " You are not allowed to use commands.")
+                    .build()).queue();
+            return;
+        }
+
         if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();

@@ -80,7 +80,7 @@ public class TrackScheduler extends AudioEventAdapter {
             TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
             EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                     + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
-                    " [" + requester.getAsMention() + "]"
+                    "\n\n~ Requested by " + requester.getAsMention()
                     :
                     ""
             ));

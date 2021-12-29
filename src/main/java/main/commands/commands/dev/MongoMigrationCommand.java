@@ -1,6 +1,7 @@
 package main.commands.commands.dev;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import lombok.Getter;
 import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.IDevCommand;
@@ -39,6 +40,8 @@ import java.util.List;
 public class MongoMigrationCommand implements IDevCommand {
     private final Logger logger = LoggerFactory.getLogger(MongoMigrationCommand.class);
     private final String migrationPrefix = "[Mongo Migration]";
+    @Getter
+    private static boolean isMigrating = false;
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
@@ -73,6 +76,7 @@ public class MongoMigrationCommand implements IDevCommand {
     }
 
     private void migrateAll() {
+        isMigrating = true;
         logger.info("""
                 
                 ------------------------------------------------------
@@ -271,6 +275,7 @@ public class MongoMigrationCommand implements IDevCommand {
                 {} Data migration completed!
 
                 ------------------------------------------------------""", migrationPrefix);
+        isMigrating = false;
     }
 
     private void migrateDevelopers() {
