@@ -71,6 +71,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
                             .put(Fields.SubFields.SUGGESTIONS_BANNED_USERS.toString(), -1L)
                     );
                     case DEVELOPERS_ARRAY -> jsonObject.put(Fields.DEVELOPERS_ARRAY.toString(), new JSONArray());
+                    case RANDOM_MESSAGES -> jsonObject.put(Fields.RANDOM_MESSAGES.toString(), new JSONArray());
                 }
             }
 
@@ -86,7 +87,8 @@ public class BotInfoDB extends AbstractMongoDatabase {
         LAST_BOOTED("last_booted"),
         SUGGESTIONS_OBJECT("suggestions"),
         REPORTS_OBJECT("reports"),
-        DEVELOPERS_ARRAY("developers");
+        DEVELOPERS_ARRAY("developers"),
+        RANDOM_MESSAGES("random_messages");
 
         public enum SubFields {
             SUGGESTIONS_ACCEPTED_CHANNEL("accepted_channel"),

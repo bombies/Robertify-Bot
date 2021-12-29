@@ -7,8 +7,6 @@ import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.SeekCommand;
-import main.commands.commands.dev.personal.proj1.SearchArtistCommand;
-import main.commands.commands.dev.personal.proj1.SortPopularityCommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.Permission;
@@ -107,14 +105,13 @@ public class CommandManager {
                 //Dev Commands
                 new UpdateCommand(),
                 new DeveloperCommand(),
-                new SearchArtistCommand(),
-                new SortPopularityCommand(),
                 new ViewConfigCommand(),
                 new EvalCommand(),
                 new ChangeLogCommand(),
                 new GuildCommand(),
                 new VoiceChannelCountCommand(),
                 new MongoMigrationCommand(),
+                new RandomMessageCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -320,6 +317,8 @@ public class CommandManager {
                         }
                     }
                 }
+
+                new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
                 if (toggles.isDJToggleSet(guild, cmd)) {
                     if (toggles.getDJToggle(guild, cmd)) {

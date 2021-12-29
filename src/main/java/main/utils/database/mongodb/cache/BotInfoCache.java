@@ -220,6 +220,48 @@ public class BotInfoCache extends AbstractMongoCache {
         return arrayHasObject(getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString()), developer);
     }
 
+    public void addRandomMessage(String s) {
+        final var obj = getDocument();
+
+        if (!obj.has(BotInfoDB.Fields.RANDOM_MESSAGES.toString()))
+            obj.put(BotInfoDB.Fields.RANDOM_MESSAGES.toString(), new JSONArray());
+
+        obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString()).put(s);
+
+        update(obj);
+    }
+
+    public List<String> getRandomMessages() {
+        final List<String> ret = new ArrayList<>();
+        final var arr = getDocument().getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+
+        for (int i = 0; i < arr.length(); i++)
+            ret.add(arr.getString(i));
+
+        return ret;
+    }
+
+    public void removeMessage(int id) {
+        final var obj = getDocument();
+        final var arr = obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+
+        if (id < 0 || id > arr.length()-1)
+            throw new IndexOutOfBoundsException("The ID passed exceeds the bounds of the array!");
+
+        arr.remove(id);
+
+        update(obj);
+    }
+
+    public void clearMessages() {
+        final var obj = getDocument();
+        final var arr = obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+
+        arr.clear();
+
+        update(obj);
+    }
+
     private JSONObject getDocument() {
         return getCache().getJSONObject(0);
     }

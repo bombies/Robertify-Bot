@@ -3,6 +3,7 @@ package main.main;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.commands.RandomMessageManager;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
@@ -151,9 +152,13 @@ public class Listener extends ListenerAdapter {
             return;
         }
 
-        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong()))
+        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong())) {
             event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
+            return;
+        }
+
+        new RandomMessageManager().randomlySendMessage(event.getTextChannel());
     }
 
     @SneakyThrows
