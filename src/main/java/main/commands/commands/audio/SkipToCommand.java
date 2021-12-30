@@ -48,6 +48,7 @@ public class SkipToCommand implements ICommand {
             return EmbedUtils.embedMessage("ID provided isn't a valid ID!");
 
         final var audioPlayer = musicManager.audioPlayer;
+        final var guild = musicManager.scheduler.getGuild();
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
 
@@ -59,8 +60,10 @@ public class SkipToCommand implements ICommand {
         musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
         musicManager.scheduler.nextTrack();
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
+
+        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         return EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
     }

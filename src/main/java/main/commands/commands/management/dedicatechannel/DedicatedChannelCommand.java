@@ -1,5 +1,6 @@
 package main.commands.commands.management.dedicatechannel;
 
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
@@ -69,9 +70,14 @@ public class DedicatedChannelCommand implements ICommand {
                                 dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
                                 dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
+
+                                if (RobertifyAudioManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack() != null)
+                                    dediChannelConfig.updateMessage(guild);
+
+                                msg.addReaction("✅").queue();
                             });
 
-                    msg.addReaction("✅").queue();
+
                 },
                 new ErrorHandler()
                         .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())

@@ -8,9 +8,11 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -24,6 +26,7 @@ public class ClearQueueCommand implements ICommand {
         final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
         final Message msg = ctx.getMessage();
+        final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 
         GeneralUtils.setCustomEmbed("Queue");
@@ -49,6 +52,9 @@ public class ClearQueueCommand implements ICommand {
         }
 
         queue.clear();
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
         EmbedBuilder eb = EmbedUtils.embedMessage("The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();

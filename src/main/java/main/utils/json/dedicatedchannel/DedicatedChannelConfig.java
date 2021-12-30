@@ -3,6 +3,7 @@ package main.utils.json.dedicatedchannel;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.spotify.SpotifyAudioTrack;
+import main.commands.commands.audio.LofiCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
 import main.constants.ENV;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import java.util.ArrayList;
@@ -95,15 +97,15 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         return Robertify.api.getTextChannelById(getChannelID(gid));
     }
 
-    public synchronized Message getMessage(long gid) {
-        return getTextChannel(gid).retrieveMessageById(getMessageID(gid)).complete(); // DANGER
+    public synchronized RestAction<Message> getMessageRequest(long gid) {
+        return getTextChannel(gid).retrieveMessageById(getMessageID(gid)); // DANGER
     }
 
     public synchronized void updateMessage(Guild guild) {
         if (!isChannelSet(guild.getIdLong()))
             return;
 
-        final var msg = getMessage(guild.getIdLong());
+        final var msgRequest = getMessageRequest(guild.getIdLong());
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.audioPlayer;
         final var playingTrack = audioPlayer.getPlayingTrack();
@@ -118,13 +120,18 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setImage("https://i.imgur.com/1HDoSgP.png");
             eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-            msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
-                    .setEmbeds(eb.build()).queue();
+            msgRequest.queue(msg ->msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
+                    .setEmbeds(eb.build()).queue());
         } else {
             final var trackInfo = playingTrack.getInfo();
 
             eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
-            eb.setTitle(trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getDuration()) +"]");
+
+            eb.setTitle(
+                    LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "Lo-Fi Music"
+                            :
+                    trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getDuration()) +"]"
+            );
 
             var requester = RobertifyAudioManager.getRequester(playingTrack);
             if (requester != null)
@@ -156,9 +163,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             }
             nextTenSongs.append("```");
 
-            msg.editMessage("**__Queue__**\n" + nextTenSongs)
+            msgRequest.queue(msg -> msg.editMessage("**__Queue__**\n" + nextTenSongs)
                     .setEmbeds(eb.build())
-                    .queue();
+                    .queue());
         }
 
 
@@ -168,18 +175,18 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         for (Guild g : Robertify.api.getGuilds()) {
             if (!isChannelSet(g.getIdLong())) continue;
 
-            final var msg = getMessage(g.getIdLong());
+            final var msgRequest = getMessageRequest(g.getIdLong());
 
-            buttonUpdateRequest(msg).queue();
+            msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
         }
     }
 
     public synchronized void updateButtons(Guild g) {
         if (!isChannelSet(g.getIdLong())) return;
 
-        final var msg = getMessage(g.getIdLong());
+        final var msgRequest = getMessageRequest(g.getIdLong());
 
-        buttonUpdateRequest(msg).queue();
+        msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
     }
 
     public synchronized MessageAction buttonUpdateRequest(Message msg) {

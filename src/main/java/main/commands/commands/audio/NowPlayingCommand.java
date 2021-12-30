@@ -71,15 +71,24 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
         final User requester = RobertifyAudioManager.getRequester(track);
-        eb =  EmbedUtils.embedMessageWithTitle(info.title + " by "  + info.author,
+        eb =  EmbedUtils.embedMessageWithTitle((LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
+                ? "Lo-Fi Music"
+                        :
+                info.title + " by "  + info.author),
+
                 (((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n~ Requested by " + requester.getAsMention()
                         :
                         "") +
                 "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
+                        (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "" : (
                 GeneralUtils.progressBar(progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`") + "\n\n" +
-                (info.isStream ? "📺 **[Livestream]**\n" : "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition()) + "`\n") +
-                "\n🔇 " + GeneralUtils.progressBar((double)(audioPlayer.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊");
+                (info.isStream ?
+                        "📺 **[Livestream]**\n"
+                                :
+                        "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition()) + "`\n") +
+
+                "\n🔇 " + GeneralUtils.progressBar((double)(audioPlayer.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
         if (track instanceof SpotifyAudioTrack spotifyAudioTrack)
             eb.setThumbnail(spotifyAudioTrack.getTrackImage());

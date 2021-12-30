@@ -98,6 +98,7 @@ public class CommandManager {
                 new ReportsCommand(),
                 new BotInfoCommand(),
                 new ListDJCommand(),
+                new LofiCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -140,7 +141,8 @@ public class CommandManager {
                 new ResumeCommand(),
                 new SeekCommand(),
                 new PreviousTrackCommand(),
-                new JoinCommand()
+                new JoinCommand(),
+                new LofiCommand()
         );
 
         addManagementCommands(

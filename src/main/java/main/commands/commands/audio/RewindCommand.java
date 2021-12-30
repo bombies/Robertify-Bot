@@ -72,6 +72,9 @@ public class RewindCommand implements ICommand {
             return eb;
         }
 
+        if (track.getInfo().isStream)
+            return EmbedUtils.embedMessage("You can't rewind a stream!");
+
         if (rewindToBeginning) {
             track.setPosition(0L);
             eb = EmbedUtils.embedMessage("You have rewound the song to the beginning!");

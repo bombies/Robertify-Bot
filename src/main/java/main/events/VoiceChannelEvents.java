@@ -3,6 +3,7 @@ package main.events;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -42,6 +43,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
             if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
                 new DedicatedChannelConfig().updateMessage(event.getGuild());
 
+            LofiCommand.getLofiEnabledGuilds().remove(event.getGuild().getIdLong());
         } else {
              VoiceChannel channelLeft = event.getChannelLeft();
              GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
@@ -120,7 +122,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
                     },
                     (e) -> {},
                     1L, TimeUnit.MINUTES,
-                    () -> event.getGuild().getAudioManager().closeAudioConnection()
+                    () -> {
+                        event.getGuild().getAudioManager().closeAudioConnection();
+                        LofiCommand.getLofiEnabledGuilds().remove(event.getGuild().getIdLong());
+                    }
             );
         }
     }

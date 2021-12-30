@@ -59,6 +59,8 @@ public class DisconnectCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
+        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
+
         musicManager.scheduler.repeating = false;
         musicManager.scheduler.playlistRepeating = false;
         musicManager.scheduler.getPastQueue().clear();

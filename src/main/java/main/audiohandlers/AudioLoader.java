@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -60,9 +61,15 @@ public class AudioLoader implements AudioLoadResultHandler {
         EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + audioTrack.getInfo().title
                 + "` by `" + audioTrack.getInfo().author + "`");
 
-        if (botMsg != null)
-            botMsg.editMessageEmbeds(eb.build()).queue();
-        else {
+        if (botMsg != null) {
+            if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
+                LofiCommand.getAnnounceLofiMode().remove(guild.getIdLong());
+                botMsg.editMessageEmbeds(EmbedUtils.embedMessage("You have enabled Lo-Fi mode").build())
+                        .queue();
+            } else {
+                botMsg.editMessageEmbeds(eb.build()).queue();
+            }
+        } else {
             new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }

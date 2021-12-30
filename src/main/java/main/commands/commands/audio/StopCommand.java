@@ -68,6 +68,8 @@ public class StopCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
 
+        LofiCommand.getLofiEnabledGuilds().remove(musicManager.scheduler.getGuild().getIdLong());
+
         return EmbedUtils.embedMessage("You have stopped the track and cleared the queue.");
     }
 

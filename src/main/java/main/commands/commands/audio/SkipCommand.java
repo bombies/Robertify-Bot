@@ -29,6 +29,7 @@ public class SkipCommand implements ICommand {
     }
 
     public EmbedBuilder handleSkip(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+        final var guild = selfVoiceState.getGuild();
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
@@ -46,7 +47,7 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         AudioPlayer audioPlayer = musicManager.audioPlayer;
 
         if (audioPlayer.getPlayingTrack() == null) {
@@ -58,8 +59,10 @@ public class SkipCommand implements ICommand {
         musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
         musicManager.scheduler.nextTrack();
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
+
+        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         return EmbedUtils.embedMessage("Skipped the song!");
     }

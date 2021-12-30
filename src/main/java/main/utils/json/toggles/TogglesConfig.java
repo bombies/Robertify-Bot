@@ -93,6 +93,7 @@ public class TogglesConfig extends AbstractGuildConfig {
                     }
 
                     if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
+                        changesMade = true;
                         var djTogglesObj = new JSONObject();
 
                         for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
@@ -103,18 +104,26 @@ public class TogglesConfig extends AbstractGuildConfig {
                         var djTogglesObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
 
                         for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
-                            if (!djTogglesObj.has(musicCommand.getName()))
+                            if (!djTogglesObj.has(musicCommand.getName())) {
+                                changesMade = true;
                                 djTogglesObj.put(musicCommand.getName(), false);
+                            }
 
                         toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
                     }
                 } catch (JSONException e) {
                     for (Toggles errToggles : Toggles.values())
                         switch (errToggles) {
-                            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                                    .put(errToggles.toString(), false);
-                            default -> jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                                    .put(errToggles.toString(), true);
+                            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> {
+                                changesMade = true;
+                                jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                                        .put(errToggles.toString(), false);
+                            }
+                            default -> {
+                                changesMade = true;
+                                jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                                        .put(errToggles.toString(), true);
+                            }
                         }
                 }
 
