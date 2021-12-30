@@ -82,6 +82,7 @@ public class TrackScheduler extends AudioEventAdapter {
                     :
                     ""
             ));
+
             try {
                 announcementChannel.sendMessageEmbeds(eb.build())
                         .queue(msg -> {

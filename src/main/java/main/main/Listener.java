@@ -2,6 +2,7 @@ package main.main;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.RandomMessageManager;
 import main.commands.commands.audio.slashcommands.*;
@@ -149,6 +150,7 @@ public class Listener extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
         new GuildConfig().removeGuild(guild.getIdLong());
+        RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
         logger.info("Left {}", guild.getName());
     }
 

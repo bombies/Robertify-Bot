@@ -65,6 +65,10 @@ public class RobertifyAudioManager extends AbstractModule {
         });
     }
 
+    public void removeMusicManager(Guild guild) {
+        this.musicManagers.remove(guild.getIdLong());
+    }
+
     @SneakyThrows
     public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
