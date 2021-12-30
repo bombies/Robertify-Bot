@@ -109,7 +109,8 @@ public class Robertify {
                             new ShuffleSlashCommand(),
                             new EightBallCommand(),
                             new SuggestionCommand(),
-                            new ListDJCommand()
+                            new ListDJCommand(),
+                            new LofiSlashCommand()
                     )
 
                     // Button Listeners

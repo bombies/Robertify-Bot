@@ -70,9 +70,9 @@ public class RobertifyAudioManager extends AbstractModule {
     }
 
     @SneakyThrows
-    public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
-        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
+        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -93,9 +93,9 @@ public class RobertifyAudioManager extends AbstractModule {
     }
 
     @SneakyThrows
-    public void loadAndPlayFromDedicatedChannel(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
-        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
+    public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
+                                                GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -132,6 +132,28 @@ public class RobertifyAudioManager extends AbstractModule {
                 trackUrl,
                 musicManager,
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg,
+                event.getUser()
+        );
+    }
+
+    public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
+        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadTrack(
+                trackUrl,
+                musicManager,
+                false,
                 botMsg,
                 event.getUser()
         );

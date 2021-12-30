@@ -8,12 +8,9 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -182,7 +179,7 @@ public class PlayCommand implements ICommand {
         String finalLink = link;
         channel.sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
-                    .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg);
+                    .loadAndPlay(finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg);
         });
     }
 

@@ -110,7 +110,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 message = "ytsearch:" + message;
 
             RobertifyAudioManager.getInstance()
-                    .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
+                    .loadAndPlayFromDedicatedChannel(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
                             new CommandContext(event, null), null);
         }
 
