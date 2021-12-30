@@ -3,8 +3,8 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.GeneralUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,7 +29,6 @@ public class PreviousTrackCommand implements ICommand {
     public EmbedBuilder handlePrevious(Guild guild, GuildVoiceState memberVoiceState) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var scheduler = musicManager.scheduler;
-        final var queue = scheduler.queue;
         final var previouslyPlayedTracks = scheduler.getPastQueue();
         final var audioPlayer = musicManager.audioPlayer;
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
@@ -51,10 +50,9 @@ public class PreviousTrackCommand implements ICommand {
             audioPlayer.stopTrack();
             nowPlayingTrack.setPosition(0);
             scheduler.addToBeginningOfQueue(nowPlayingTrack);
-            audioPlayer.playTrack(previouslyPlayedTracks.pop());
-        } else {
-            audioPlayer.playTrack(previouslyPlayedTracks.pop());
         }
+
+        audioPlayer.playTrack(previouslyPlayedTracks.pop());
 
         if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
@@ -69,7 +67,7 @@ public class PreviousTrackCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
                 "Go back to he track that was played previously\n\n" +
                 "**Usage**: `"+ prefix +"previous`";
     }

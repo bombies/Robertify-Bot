@@ -5,7 +5,6 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
@@ -184,10 +183,14 @@ public class PollCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Want to ask your community members a question? This is the right tool for you." +
-                " You are able to poll up to 9 choices with an optional time period.\n*This is a DJ only command*\n\n**Usages**\n" +
-                "`poll <question> \"[choice]\" \"[choice]\" ...`\n" +
-                "`poll <question> \"[choice]\" \"[choice]\" ... <num><s|m|d|h>`\n" +
-                "\n**Example**: `poll Best poll ever? \"Yes\" \"Yes again\" 15s` *(15 second poll)*";
+        return """
+                Want to ask your community members a question? This is the right tool for you. You are able to poll up to 9 choices with an optional time period.
+                *This is a DJ only command*
+
+                **Usages**
+                `poll <question> "[choice]" "[choice]" ...`
+                `poll <question> "[choice]" "[choice]" ... <num><s|m|d|h>`
+
+                **Example**: `poll Best poll ever? "Yes" "Yes again" 15s` *(15 second poll)*""";
     }
 }

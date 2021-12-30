@@ -5,9 +5,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.sqlite3.BotDB;
+import main.utils.GeneralUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -72,7 +71,7 @@ public class SkipCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
                 "Skips a track";
     }
 

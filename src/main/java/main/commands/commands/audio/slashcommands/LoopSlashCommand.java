@@ -8,7 +8,6 @@ import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -74,14 +73,10 @@ public class LoopSlashCommand extends InteractiveCommand {
         }
 
         switch (event.getSubcommandName()) {
-            case "track" -> {
-                event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
-                        .setEphemeral(false).queue();
-            }
-            case "queue" -> {
-                event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
-                        .setEphemeral(false).queue();
-            }
+            case "track" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
+                    .setEphemeral(false).queue();
+            case "queue" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
+                    .setEphemeral(false).queue();
         }
     }
 }

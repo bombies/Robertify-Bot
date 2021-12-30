@@ -44,7 +44,7 @@ public class EvalCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        EmbedBuilder eb = null;
+        EmbedBuilder eb;
         GeneralUtils.setCustomEmbed(new Color(0, 183, 255));
 
         if (args.isEmpty()) {

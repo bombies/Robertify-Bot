@@ -1,13 +1,9 @@
 package main.commands.commands.management.permissions;
 
-import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
-import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,7 +38,6 @@ public class PermissionsCommand implements ICommand {
         }
 
         switch (args.get(0).toLowerCase()) {
-            case "init" -> init(msg);
             case "add" -> add(msg, args);
             case "adduser", "addu", "au" -> addUser(msg, args);
             case "removeuser", "remu", "ru" -> removeUser(msg, args);
@@ -54,24 +49,6 @@ public class PermissionsCommand implements ICommand {
             }
         }
         GeneralUtils.setDefaultEmbed();
-    }
-
-    /**
-     * Initialize the permission JSON files for all servers
-     * @param msg Message sent with the command
-     */
-    @SneakyThrows
-    private void init(Message msg) {
-        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong()))
-            return;
-
-        try {
-            new LegacyPermissionsConfig().initConfig();
-            msg.addReaction("✅").queue();
-        } catch (Exception e) {
-            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            msg.addReaction("❌").queue();
-        }
     }
 
     /**
@@ -345,7 +322,7 @@ public class PermissionsCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Manage bot permissions for roles\n\n" +
                 "\nUsage: `"+ prefix+"permissions add <@role> <" + String.join(
                         "|",

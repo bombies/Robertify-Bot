@@ -5,8 +5,6 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
-import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
@@ -72,7 +70,9 @@ public class JoinCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Use this command to forcefully move the bot into your voice channel.\n\n" +
-                "*NOTE: This command can be made DJ only by using* `toggles dj join`";
+        return """
+                Use this command to forcefully move the bot into your voice channel.
+
+                *NOTE: This command can be made DJ only by using* `toggles dj join`""";
     }
 }

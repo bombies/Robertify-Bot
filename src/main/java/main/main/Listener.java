@@ -57,21 +57,9 @@ public class Listener extends ListenerAdapter {
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
 
-//        AbstractJSONFile.initDirectory();
-//        LegacyPermissionsConfig permConfig = new LegacyPermissionsConfig();
-
-//        permConfig.update();
         new ChangeLogConfig().initConfig();
-//        new LegacyTogglesConfig().initConfig();
-//        new LegacyDedicatedChannelConfig().initConfig();
-//        new LegacyEightBallConfig().initConfig();
-//        new LegacyRestrictedChannelsConfig().initConfig();
-//        new LegacySuggestionsConfig().initConfig();
-//        new LegacyReportsConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-//            permConfig.initGuild(g.getId());
-
             initNeededSlashCommands(g);
             rescheduleUnbans(g);
 
@@ -152,38 +140,15 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
-
-//        BotDB botUtils = new BotDB();
-
-//        LegacyPermissionsConfig permissionsConfig = new LegacyPermissionsConfig();
-//        LegacyTogglesConfig togglesConfig = new LegacyTogglesConfig();
-//        new LegacyDedicatedChannelConfig().updateConfig();
-//        new LegacyEightBallConfig().updateConfig();
-
-//        botUtils.addGuild(guild.getIdLong())
-//                .closeConnection();
-
-//        permissionsConfig.initGuild(guild.getId());
-//        togglesConfig.initConfig();
-
-        initSlashCommands(guild);
-
-        // MongoDB
         new GuildConfig().addGuild(guild.getIdLong());
-
+        initSlashCommands(guild);
         logger.info("Joined {}", guild.getName());
     }
 
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
-
-//        BotDB botUtils = new BotDB();
-//        botUtils.removeGuild(guild.getIdLong()).closeConnection();
-
-        // MongoDB
         new GuildConfig().removeGuild(guild.getIdLong());
-
         logger.info("Left {}", guild.getName());
     }
 
@@ -273,7 +238,6 @@ public class Listener extends ListenerAdapter {
 
     public static void scheduleUnban(Guild g, User u) {
         final GuildConfig banUtils = new GuildConfig();
-        final var map = banUtils.getBannedUsersWithUnbanTimes(g.getIdLong());
         final var scheduler = Executors.newScheduledThreadPool(1);
 
         final Runnable task = () -> {
@@ -288,17 +252,11 @@ public class Listener extends ListenerAdapter {
     }
 
     private static void sendUnbanMessage(long user, Guild g) {
-        Robertify.api.retrieveUserById(user).queue(user1 -> {
-            user1.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(
-                        EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
-                                .build()
-                ).queue(success -> {}, new ErrorHandler()
-                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> {
-                            logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")");
-                        }));
-            });
-        });
+        Robertify.api.retrieveUserById(user).queue(user1 -> user1.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(
+                EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
+                        .build()
+        ).queue(success -> {}, new ErrorHandler()
+                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")")))));
     }
 
     private static void initSelectionMenus() {

@@ -5,7 +5,6 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -108,7 +107,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Set a specific role to be a DJ\n\n" +
                 "Usage: `"+ prefix +"setdj <@role|@user>`";
     }

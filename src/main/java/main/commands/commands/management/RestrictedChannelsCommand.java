@@ -6,10 +6,7 @@ import main.commands.commands.management.permissions.Permission;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -44,10 +41,8 @@ public class RestrictedChannelsCommand implements ICommand {
                 case "add" -> add(msg, args);
                 case "remove" -> remove(msg, args);
                 case "list" -> list(msg);
-                default -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(prefix)).build())
-                            .queue();
-                }
+                default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(prefix)).build())
+                        .queue();
             }
         }
     }
@@ -225,7 +220,7 @@ public class RestrictedChannelsCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
                 "\nRestrict the bot to join voice channels that you set.\n\n"
                 + getUsages(prefix);
     }

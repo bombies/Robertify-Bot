@@ -64,7 +64,7 @@ public class QueueCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Shows all the queued songs";
     }
 

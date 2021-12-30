@@ -75,7 +75,7 @@ public class RemoveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Remove a specific song from the queue\n" +
                 "\nUsage: `"+ prefix+"remove <id>`";
     }

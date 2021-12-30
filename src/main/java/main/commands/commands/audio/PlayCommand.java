@@ -182,7 +182,7 @@ public class PlayCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Plays a song\n\n" +
                 "**__Usages__**\n" +
                 "`" + prefix + "play <song>`\n" +

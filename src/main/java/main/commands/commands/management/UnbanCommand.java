@@ -7,8 +7,6 @@ import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.sqlite3.BanDB;
-import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -70,14 +68,12 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
 
         new GuildConfig().unbanUser(guild.getIdLong(), user.getIdLong());
 
-        user.openPrivateChannel().queue(channel -> {
-            channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been unbanned from **" + guild.getName() + "**").build())
-                    .queue(success -> {}, new ErrorHandler()
-                            .handle(
-                                    ErrorResponse.CANNOT_SEND_TO_USER,
-                                    e -> Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
-                            ));
-        });
+        user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been unbanned from **" + guild.getName() + "**").build())
+                .queue(success -> {}, new ErrorHandler()
+                        .handle(
+                                ErrorResponse.CANNOT_SEND_TO_USER,
+                                e -> Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
+                        )));
 
         return EmbedUtils.embedMessage("You have unbanned " + user.getAsMention());
     }
@@ -89,7 +85,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
                 "\nUnban a user from the bot\n\n" +
                 "Usage: `"+ prefix +"unban <user>`";
     }

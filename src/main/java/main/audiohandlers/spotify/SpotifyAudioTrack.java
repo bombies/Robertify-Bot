@@ -11,11 +11,9 @@ import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import com.sedmelluq.discord.lavaplayer.track.playback.MutableAudioFrame;
 import lombok.Getter;
 import main.audiohandlers.RobertifyAudioReference;
-import main.utils.database.sqlite3.AudioDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -37,8 +35,6 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         AudioItem item = manager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, spotifyID));
-
-        AudioDB audioDB = new AudioDB();
 
         if (item instanceof AudioPlaylist playlist) {
             AudioTrack track = playlist.getTracks().get(0);

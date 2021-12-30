@@ -9,10 +9,7 @@ import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.toggles.TogglesConfig;
@@ -164,7 +161,6 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             return;
         }
 
-        final var toggles = new TogglesConfig();
         final var guild = event.getGuild();
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
             if (!djCheck(new RewindCommand(), guild, user)) {
@@ -234,7 +230,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild(), event.getUser());
+            EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild());
             event.reply(user.getAsMention()).addEmbeds(disconnectEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));

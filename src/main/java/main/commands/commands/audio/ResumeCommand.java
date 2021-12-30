@@ -5,8 +5,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
+import main.utils.GeneralUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -73,7 +72,7 @@ public class ResumeCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
                 "Resumes the currently playing song if paused\n" +
                 "\nUsage: `"+ prefix+"resume`";
     }

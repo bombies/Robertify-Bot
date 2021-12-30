@@ -73,14 +73,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Future<Album> albumFuture = api.getAlbum(res.group(res.groupCount())).build().executeAsync();
             Album album = albumFuture.get();
 
-            final var audioDB = new AudioDB();
             for (TrackSimplified t : album.getTracks().getItems()) {
-//                if (audioDB.isTrackCached(t.getId())) {
-//                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
-//                    playlist.add((AudioTrack) track);
-//                    continue;
-//                }
-
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
                         "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), album.getImages()[0].getUrl());
@@ -106,14 +99,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Future<Track[]> artistFuture = api.getArtistsTopTracks(res.group(res.groupCount()), CountryCode.US).build().executeAsync();
             Track[] tracks = artistFuture.get();
 
-            final var audioDB = new AudioDB();
             for (Track t : tracks) {
-//                if (audioDB.isTrackCached(t.getId())) {
-//                    AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(t.getId()), true);
-//                    playlist.add((AudioTrack) track);
-//                    continue;
-//                }
-
                 AudioTrackInfo info = new AudioTrackInfo(
                         t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
@@ -130,7 +116,6 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
         }
     }
 
-    @SuppressWarnings("deprecation")
     private AudioItem getSpotifyPlaylist(AudioReference reference) {
         Matcher res = getSpotifyPlaylistFromString(reference.identifier);
 
@@ -146,7 +131,6 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
             final Playlist spotifyPlaylist = playlistFuture.get();
             final var playlistPaging = spotifyPlaylist.getTracks();
-            final var audioDB = new AudioDB();
 
             int offset = 0;
             do {
@@ -157,12 +141,6 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
                 for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
                     var plTrack = (Track)playlistTrack.getTrack();
-
-//                    if (audioDB.isTrackCached(plTrack.getId())) {
-//                        AudioItem track = youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(plTrack.getId()), true);
-//                        finalPlaylist.add((AudioTrack) track);
-//                        continue;
-//                    }
 
                     AudioTrackInfo info = new AudioTrackInfo(
                             playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
@@ -211,10 +189,6 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
         try {
             Future<Track> trackFuture = api.getTrack(res.group(res.groupCount())).build().executeAsync();
             Track track = trackFuture.get();
-            AudioDB audioDB = new AudioDB();
-
-//            if (audioDB.isTrackCached(track.getId()))
-//                return youtubeManager.loadTrackWithVideoId(audioDB.getYouTubeIDFromSpotify(track.getId()), true);
             AudioTrackInfo info = new AudioTrackInfo(
                     track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
                     getIdentifier(track.getName(), track.getArtists()[0].getName()),

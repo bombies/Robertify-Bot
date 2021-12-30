@@ -1,7 +1,6 @@
 package main.utils.spotify;
 
 import lombok.Getter;
-import lombok.SneakyThrows;
 import main.exceptions.InvalidSpotifyURIException;
 
 import java.util.regex.Pattern;

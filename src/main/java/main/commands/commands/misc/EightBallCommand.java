@@ -5,10 +5,8 @@ import main.commands.ICommand;
 import main.commands.commands.management.permissions.Permission;
 import main.utils.json.eightball.EightBallConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.json.legacy.LegacyEightBallConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -43,10 +41,8 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         }
 
         switch (args.get(0).toLowerCase()) {
-            case "add" -> {
-                msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getAuthor(), getResponseFromArgs(args)).build())
-                        .queue();
-            }
+            case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getAuthor(), getResponseFromArgs(args)).build())
+                    .queue();
             case "remove" -> {
                 if (args.size() < 2) {
                     msg.replyEmbeds(EmbedUtils.embedMessage("You must provide an index to remove!").build())
@@ -65,18 +61,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                 msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getAuthor(), index).build())
                         .queue();
             }
-            case "clear" -> {
-                msg.replyEmbeds(handleClear(ctx.getGuild(), ctx.getAuthor()).build())
-                        .queue();
-            }
-            case "list" -> {
-                msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getAuthor()).build())
-                        .queue();
-            }
-            default -> {
-                msg.replyEmbeds(handle8Ball(ctx.getGuild()).build())
-                        .queue();
-            }
+            case "clear" -> msg.replyEmbeds(handleClear(ctx.getGuild(), ctx.getAuthor()).build())
+                    .queue();
+            case "list" -> msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getAuthor()).build())
+                    .queue();
+            default -> msg.replyEmbeds(handle8Ball(ctx.getGuild()).build())
+                    .queue();
         }
 
         GeneralUtils.setDefaultEmbed();
@@ -144,7 +134,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         for (int i = 0; i < responses.size(); i++)
             sb.append("*").append(i).append("* → ").append(responses.get(i)).append("\n");
 
-        return EmbedUtils.embedMessage("**List of Responses**\n\n" + sb.toString());
+        return EmbedUtils.embedMessage("**List of Responses**\n\n" + sb);
     }
 
     private EmbedBuilder handle8Ball(Guild guild) {
@@ -195,7 +185,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                 return EmbedUtils.embedMessage("🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
             } else if (random > 0.5 && random < 0.75) {
                 return EmbedUtils.embedMessage("🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
-            } else if (random > 0.75 && random <= 1) {
+            } else if (random > 0.75) {
                 return EmbedUtils.embedMessage("🎱| " +  negativeAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             }
         }
@@ -297,12 +287,9 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         final var user = event.getUser();
 
         switch(event.getSubcommandName()) {
-            case "ask" -> {
-                final var question = event.getOption("question").getAsString();
-                event.replyEmbeds(handle8Ball(guild).build())
-                        .setEphemeral(false)
-                        .queue();
-            }
+            case "ask" -> event.replyEmbeds(handle8Ball(guild).build())
+                    .setEphemeral(false)
+                    .queue();
             case "add" -> {
                 final var response = event.getOption("response").getAsString();
                 event.replyEmbeds(handleAdd(guild, user, response).build())
@@ -315,16 +302,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                         .setEphemeral(false)
                         .queue();
             }
-            case "clear" -> {
-                event.replyEmbeds(handleClear(guild, user).build())
-                        .setEphemeral(false)
-                        .queue();
-            }
-            case "list" -> {
-                event.replyEmbeds(handleList(guild, user).build())
-                        .setEphemeral(false)
-                        .queue();
-            }
+            case "clear" -> event.replyEmbeds(handleClear(guild, user).build())
+                    .setEphemeral(false)
+                    .queue();
+            case "list" -> event.replyEmbeds(handleList(guild, user).build())
+                    .setEphemeral(false)
+                    .queue();
         }
     }
 }

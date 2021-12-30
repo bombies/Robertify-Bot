@@ -3,7 +3,6 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
-import main.utils.database.sqlite3.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 
 import javax.script.ScriptException;

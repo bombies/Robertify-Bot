@@ -6,7 +6,6 @@ import main.commands.commands.audio.PlayCommand;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.sqlite3.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -83,16 +82,14 @@ public class PlaySlashCommand extends InteractiveCommand {
         String finalLink = link;
         event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build())
                         .setEphemeral(false)
-                                .queue(msg -> {
-                                    RobertifyAudioManager.getInstance()
-                                            .loadAndPlay(
-                                                    finalLink,
-                                                    event.getGuild().getSelfMember().getVoiceState(),
-                                                    event.getMember().getVoiceState(),
-                                                    msg,
-                                                    event
-                                            );
-                                });
+                                .queue(msg -> RobertifyAudioManager.getInstance()
+                                        .loadAndPlay(
+                                                finalLink,
+                                                event.getGuild().getSelfMember().getVoiceState(),
+                                                event.getMember().getVoiceState(),
+                                                msg,
+                                                event
+                                        ));
 
 
     }

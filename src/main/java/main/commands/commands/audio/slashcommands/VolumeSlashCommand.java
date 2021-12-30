@@ -1,7 +1,6 @@
 package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.VolumeCommand;
-import main.commands.commands.management.permissions.Permission;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;

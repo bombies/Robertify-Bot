@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Robertify {
 
-    private static Logger logger = LoggerFactory.getLogger(Robertify.class);
+    private static final Logger logger = LoggerFactory.getLogger(Robertify.class);
 
     public static JDA api;
     public static BaringoClient baringo;

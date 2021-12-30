@@ -123,10 +123,12 @@ public class LyricsCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Get the lyrics for the song being played\n\n" +
-                "**__Usages__**\n" +
-                "`lyrics` *(Fetches the lyrics for the song being currently played)*\n" +
-                "`lyrics <songname>` *(Fetches the lyrics for a specific song)*";
+        return """
+                Get the lyrics for the song being played
+
+                **__Usages__**
+                `lyrics` *(Fetches the lyrics for the song being currently played)*
+                `lyrics <songname>` *(Fetches the lyrics for a specific song)*""";
     }
 
     @Override

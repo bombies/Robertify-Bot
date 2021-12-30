@@ -191,7 +191,7 @@ public class TogglesCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Toggle specific features on or off!\n\n**__Usages__**\n" +
                 "`"+ prefix +"toggles`\n" +
                 "`"+ prefix +"toggles <toggle_name>`\n" +

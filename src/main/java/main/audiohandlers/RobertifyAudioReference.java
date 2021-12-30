@@ -2,9 +2,6 @@ package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import lombok.Getter;
-import lombok.Setter;
-
-import java.io.Serial;
 
 public class RobertifyAudioReference extends AudioReference {
     @Getter

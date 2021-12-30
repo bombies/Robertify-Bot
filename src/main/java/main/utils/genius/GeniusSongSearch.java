@@ -4,7 +4,6 @@ import lombok.Getter;
 import main.constants.BotConstants;
 import main.constants.ENV;
 import main.main.Config;
-import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -26,7 +25,7 @@ public class GeniusSongSearch {
     private int nextPage;
     private final LinkedList<GeniusSongSearch.Hit> hits = new LinkedList<>();
 
-    public GeniusSongSearch(GeniusAPI gla, String query) throws IOException {
+    public GeniusSongSearch(GeniusAPI gla, String query) {
         this.gla = gla;
         query = URLEncoder.encode(query, StandardCharsets.UTF_8);
         try {
@@ -119,7 +118,7 @@ public class GeniusSongSearch {
             this.url = jRoot.getString("url");
             this.imageUrl = jRoot.getString("header_image_url");
             this.thumbnailUrl = jRoot.getString("song_art_image_thumbnail_url");
-            this.artist = new GeniusSongSearch.Artist(jRoot.getJSONObject("primary_artist"));
+            this.artist = new Artist(jRoot.getJSONObject("primary_artist"));
         }
 
         public String fetchLyrics() {
@@ -128,7 +127,7 @@ public class GeniusSongSearch {
 
     }
 
-    public class Artist {
+    public static class Artist {
 
         @Getter
         private final long id;

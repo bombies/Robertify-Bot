@@ -4,6 +4,7 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.GeneralUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,14 +43,11 @@ public class DisconnectCommand implements ICommand {
             return;
         }
 
-        msg.replyEmbeds(handleDisconnect(ctx.getGuild(), ctx.getAuthor()).build())
+        msg.replyEmbeds(handleDisconnect(ctx.getGuild()).build())
                 .queue();
     }
 
-    public EmbedBuilder handleDisconnect(Guild guild, User author) {
-//        if (!GeneralUtils.hasPerms(guild, author, Permission.ROBERTIFY_DJ))
-//            return EmbedUtils.embedMessage("You need to be a DJ to use this command!");
-
+    public EmbedBuilder handleDisconnect(Guild guild) {
         GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         musicManager.scheduler.queue.clear();
 
@@ -78,7 +76,7 @@ public class DisconnectCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
                 "Forces the bot to stop playing music and leave the voice channel" +
                 " if already in one.";
     }

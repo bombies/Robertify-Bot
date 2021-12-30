@@ -6,7 +6,6 @@ import main.commands.IDevCommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.database.sqlite3.BotDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,8 +27,10 @@ public class DeveloperCommand implements IDevCommand {
         GeneralUtils.setCustomEmbed("Developer Tools", new Color(118, 0, 236));
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide arguments.\n\n" +
-                    "**Valid args**: `add`, `remove`");
+            EmbedBuilder eb = EmbedUtils.embedMessage("""
+                    You must provide arguments.
+
+                    **Valid args**: `add`, `remove`""");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -38,8 +39,10 @@ public class DeveloperCommand implements IDevCommand {
             case "add" -> add(botUtils, msg, args);
             case "remove" -> remove(botUtils, msg, args);
             default -> {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Invalid arguments.\n\n" +
-                        "**Valid args**: `add`, `remove`");
+                EmbedBuilder eb = EmbedUtils.embedMessage("""
+                        Invalid arguments.
+
+                        **Valid args**: `add`, `remove`""");
                 msg.replyEmbeds(eb.build()).queue();
             }
         }
@@ -140,7 +143,7 @@ public class DeveloperCommand implements IDevCommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Developer command.";
     }
 

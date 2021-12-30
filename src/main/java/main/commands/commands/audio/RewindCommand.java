@@ -123,7 +123,7 @@ public class RewindCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Rewind the song\n" +
                 "\nUsage: `"+ prefix+"rewind` *(Rewinds the song to the beginning)*\n" +
                 "\nUsage: `"+ prefix+"rewind <seconds_to_rewind>` *(Rewinds the song by a specific duration)*\n";

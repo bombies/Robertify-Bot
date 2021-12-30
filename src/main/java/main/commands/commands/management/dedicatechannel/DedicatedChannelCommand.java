@@ -6,12 +6,9 @@ import main.commands.commands.management.permissions.Permission;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.ServerDB;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -77,10 +74,8 @@ public class DedicatedChannelCommand implements ICommand {
                     msg.addReaction("✅").queue();
                 },
                 new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
-                            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())
-                                    .queue();
-                        })
+                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())
+                                .queue())
         );
 
     }

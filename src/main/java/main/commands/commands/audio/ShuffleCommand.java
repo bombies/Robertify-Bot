@@ -6,7 +6,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,12 +13,11 @@ import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ShuffleCommand implements ICommand {
-    //TODO Add shuffle slash command
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
@@ -35,22 +33,12 @@ public class ShuffleCommand implements ICommand {
 
         if (queue.isEmpty())
             return EmbedUtils.embedMessage("There is nothing in the queue.");
-        
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
-        List<AudioTrack> shuffledTrackList = new ArrayList<>();
-        Random random = new Random();
-        int trackListSize = trackList.size();
-
-        for (AudioTrack ignored : trackList) {
-            AudioTrack trackSelected = trackList.get(random.nextInt(trackListSize));
-            while (shuffledTrackList.contains(trackSelected))
-                trackSelected = trackList.get(random.nextInt(trackListSize));
-            shuffledTrackList.add(trackSelected);
-        }
+        Collections.shuffle(trackList);
 
         queue.clear();
-        queue.addAll(shuffledTrackList);
+        queue.addAll(trackList);
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

@@ -9,9 +9,6 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.database.sqlite3.BanDB;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -77,8 +74,10 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     private EmbedBuilder handleBan(Guild guild, User user, User mod, String duration) {
         if (duration != null)
             if (!GeneralUtils.isValidDuration(duration))
-                return EmbedUtils.embedMessage("Invalid duration format.\n\n" +
-                        "*Example formats*: `1d`, `10s`, `5h`, `30m`");
+                return EmbedUtils.embedMessage("""
+                        Invalid duration format.
+
+                        *Example formats*: `1d`, `10s`, `5h`, `30m`""");
 
         Long bannedUntil = duration == null ? null : GeneralUtils.getFutureTime(duration);
 
@@ -94,24 +93,20 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (bannedUntil == null) { // Perm ban
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
 
-            user.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned permanently in **"+guild.getName()+"**!")
-                        .build())
-                        .queue(success -> {}, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                        Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
-            });
+            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned permanently in **"+guild.getName()+"**!")
+                    .build())
+                    .queue(success -> {}, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
+                                    Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")"))));
             return EmbedUtils.embedMessage("You have banned " + user.getAsMention());
         } else {
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
 
-            user.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
-                                .build())
-                        .queue(success -> {}, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                        Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")")));
-            });
+            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
+                            .build())
+                    .queue(success -> {}, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
+                                    Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")"))));
 
             Listener.scheduleUnban(guild, user);
 
@@ -127,7 +122,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
                 "\nBan a user from the bot\n\n" +
                 "Usage: `"+ prefix +"ban <user>`";
     }

@@ -3,7 +3,6 @@ package main.commands.commands.audio.slashcommands;
 import main.commands.commands.audio.NowPlayingCommand;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -48,7 +47,6 @@ public class NowPlayingSlashCommand extends InteractiveCommand {
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
-        EmbedBuilder eb;
 
         event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), selfVoiceState, memberVoiceState).build())
                 .setEphemeral(false)

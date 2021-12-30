@@ -6,8 +6,6 @@ import main.commands.commands.management.permissions.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -75,7 +73,7 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
                 "\nSet the announcement channel for when a new song is being played.\n\n" +
                 "Usage: `"+ prefix +"setchannel <channelID>`";
     }

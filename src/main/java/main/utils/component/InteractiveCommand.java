@@ -6,9 +6,7 @@ import lombok.Setter;
 import main.commands.CommandManager;
 import main.commands.commands.management.permissions.Permission;
 import main.main.Robertify;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
@@ -150,45 +148,14 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                 }
             }
 
-            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
-//                if (command.getAdminOnly() == null && command.getDjOnly() == null)
-//                    return;
-//
-//                if (command.getDjOnly() != null) {
-//                    if (command.getDjOnly()) {
-//                        final var allowedRoles = new PermissionsConfig().getRolesForPermission(g, Permission.ROBERTIFY_DJ);
-//
-//                        for (var role : g.getRoles()) {
-//                            if (!allowedRoles.contains(role))
-//                                createdCommand.updatePrivileges(g, CommandPrivilege.disableRole(role.getIdLong()))
-//                                        .queue();
-//                        }
-//                    }
-//                    return;
-//                }
-//
-//                if (command.getAdminOnly() != null)
-//                    if (command.getAdminOnly()) {
-//                        if (command.getDjOnly()) {
-//                            final var allowedRoles = new PermissionsConfig().getRolesForPermission(g, Permission.ROBERTIFY_ADMIN);
-//
-//                            for (var role : g.getRoles()) {
-//                                if (!allowedRoles.contains(role))
-//                                    createdCommand.updatePrivileges(g, CommandPrivilege.disableRole(role.getIdLong()))
-//                                            .queue();
-//                            }
-//                        }
-//                    }
-            }, new ErrorHandler()
-                    .handle(ErrorResponse.MISSING_ACCESS, e -> {
-                        logger.error("Could not create Slash Command in {}. I do not have enough permissions", g.getName());
-                    }));
+            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                    .handle(ErrorResponse.MISSING_ACCESS, e -> logger.error("Could not create Slash Command in {}. I do not have enough permissions", g.getName())));
         }
     }
 
     public static class InteractionBuilder {
         private Command command;
-        private static HashMap<String, SelectionDialogue> selectionDialogues = new HashMap<>();
+        private static final HashMap<String, SelectionDialogue> selectionDialogues = new HashMap<>();
 
         public InteractionBuilder setCommand(@NotNull Command command) {
             this.command = command;

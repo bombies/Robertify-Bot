@@ -79,7 +79,7 @@ public class ViewConfigCommand implements IDevCommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "View the JSON configurations associated with the bot\n" +
                 "\nUsage: `"+ prefix+"viewconfig <filename>.json`";
     }

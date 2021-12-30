@@ -98,7 +98,7 @@ public class MoveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "\nMove a specific track to a specific position in the queue\n" +
                 "\nUsage: `"+ prefix+"move <id> <position>`";
     }

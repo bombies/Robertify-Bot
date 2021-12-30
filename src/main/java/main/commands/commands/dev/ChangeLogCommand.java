@@ -5,11 +5,9 @@ import main.commands.IDevCommand;
 import main.main.Robertify;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.BotConstants;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -79,9 +77,7 @@ public class ChangeLogCommand implements IDevCommand {
 
             try {
                 announcementChannel.sendMessageEmbeds(eb.build()).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
-                            logger.error("Was not able to send a changelog in {}", g.getName());
-                        }));
+                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> logger.error("Was not able to send a changelog in {}", g.getName())));
             } catch (InsufficientPermissionException e) {
                 logger.error("Was not able to send a changelog in {}", g.getName());
             }

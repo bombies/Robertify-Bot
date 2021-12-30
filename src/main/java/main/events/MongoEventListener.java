@@ -5,8 +5,6 @@ import com.mongodb.event.CommandSucceededEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
-
 public class MongoEventListener implements CommandListener {
     private final Logger logger = LoggerFactory.getLogger(MongoEventListener.class);
 

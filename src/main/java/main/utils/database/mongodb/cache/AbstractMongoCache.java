@@ -11,8 +11,6 @@ import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-
 public class AbstractMongoCache extends AbstractMongoDatabase implements AbstractJSON {
     @Getter
     private final AbstractMongoDatabase mongoDB;

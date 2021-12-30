@@ -63,7 +63,7 @@ public class ClearQueueCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n\n"+
                 "Clear all the queued songs";
     }

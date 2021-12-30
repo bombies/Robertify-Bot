@@ -372,7 +372,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+getAliases().toString().replaceAll("[\\[\\]]", "")+"`\n" +
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
                 "Want to see something added to Robertify? Suggest it using this command!\n\n" +
                 "**Usage**: `"+ prefix +"suggest <suggestion>`";
     }

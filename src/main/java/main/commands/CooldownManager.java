@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.User;
 import java.util.HashMap;
 
 public class CooldownManager {
-    private HashMap<User, Long> cooldowns = new HashMap<>();
+    private final HashMap<User, Long> cooldowns = new HashMap<>();
     public static final long DEFAULT_COOLDOWN = 2L;
 
     public void setCooldown(User u, long time) {
