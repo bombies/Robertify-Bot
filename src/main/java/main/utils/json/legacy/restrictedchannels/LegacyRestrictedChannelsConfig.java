@@ -1,6 +1,5 @@
 package main.utils.json.legacy.restrictedchannels;
 
-import com.google.common.collect.Lists;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
@@ -122,7 +121,7 @@ public class LegacyRestrictedChannelsConfig extends AbstractJSONFile {
 
             return ret;
         } catch (JSONException e) {
-            return Lists.newArrayList();
+            return new ArrayList<>();
         }
     }
 

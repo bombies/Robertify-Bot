@@ -1,6 +1,5 @@
 package main.audiohandlers;
 
-import com.google.inject.*;
 import com.sedmelluq.discord.lavaplayer.player.*;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
@@ -17,7 +16,6 @@ import lombok.SneakyThrows;
 import main.audiohandlers.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
@@ -27,7 +25,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 
 import java.util.*;
 
-public class RobertifyAudioManager extends AbstractModule {
+public class RobertifyAudioManager {
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter

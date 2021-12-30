@@ -21,11 +21,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>club.minnced</groupId>
-            <artifactId>discord-webhooks</artifactId>
-            <version>0.7.5</version>
-        </dependency>
-        <dependency>
             <groupId>me.duncte123</groupId>
             <artifactId>botCommons</artifactId>
             <version>2.3.9</version>
@@ -70,11 +65,6 @@
             <groupId>org.openjdk.nashorn</groupId>
             <artifactId>nashorn-core</artifactId>
             <version>15.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.google.guice</groupId>
-            <artifactId>guice</artifactId>
-            <version>5.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
