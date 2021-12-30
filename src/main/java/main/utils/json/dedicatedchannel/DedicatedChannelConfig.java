@@ -167,8 +167,6 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                     .setEmbeds(eb.build())
                     .queue());
         }
-
-
     }
 
     public void updateButtons() {

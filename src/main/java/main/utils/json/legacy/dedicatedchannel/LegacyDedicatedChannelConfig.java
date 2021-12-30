@@ -2,6 +2,7 @@ package main.utils.json.legacy.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
 import main.constants.ENV;
@@ -180,7 +181,11 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
             if (requester != null)
                 eb.setDescription("Requested by " + requester.getAsMention());
 
-            eb.setImage(BotConstants.DEFAULT_IMAGE.toString());
+            if (playingTrack instanceof SpotifyAudioTrack spotifyAudioTrack)
+                eb.setImage(spotifyAudioTrack.getTrackImage());
+            else
+                eb.setImage(BotConstants.DEFAULT_IMAGE.toString());
+
             eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getVolume() + "%");
 
             final StringBuilder nextTenSongs = new StringBuilder();
