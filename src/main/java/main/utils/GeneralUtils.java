@@ -6,7 +6,6 @@ import main.constants.ENV;
 import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
-import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
@@ -45,7 +44,7 @@ public class GeneralUtils {
         if (s == null) return false;
         else {
             try {
-                double d = Double.parseDouble(s);
+                Double.parseDouble(s);
                 return true;
             } catch (NumberFormatException e) {
                 return false;
@@ -57,7 +56,7 @@ public class GeneralUtils {
         if (s == null) return false;
         else {
             try {
-                int d = Integer.parseInt(s);
+                Integer.parseInt(s);
                 return true;
             } catch (NumberFormatException e) {
                 return false;
@@ -108,9 +107,7 @@ public class GeneralUtils {
     public static void updateENVField(ENV field, String str) throws IOException {
         switch (field) {
             case BOT_TOKEN -> throw new IllegalAccessError("This env value can't be changed from the bot!");
-            default -> {
-                int doNothing;
-            }
+            default -> {}
         }
         String fileContent = getFileContent(".env");
         String envFieldTitle = field.name();
@@ -131,12 +128,12 @@ public class GeneralUtils {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
 
         for (Role r : userRoles)
-            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), perm).contains(r.getId()) ||
-                    permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
+            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), perm).contains(r.getIdLong()) ||
+                    permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
                 return true;
 
 
-        return permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.name()).contains(sender.getId());
+        return permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.name()).contains(sender.getIdLong());
     }
 
     public static boolean hasPerms(Guild guild, User sender, Permission perm) {
@@ -152,12 +149,12 @@ public class GeneralUtils {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
 
         for (Role r : userRoles) {
-            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getId()))
+            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
                 return true;
             for (Permission p : perms) {
-                if (permissionsConfig.getRolesForPermission(guild.getIdLong(), p).contains(r.getId()))
+                if (permissionsConfig.getRolesForPermission(guild.getIdLong(), p).contains(r.getIdLong()))
                     pass++;
-                else if (permissionsConfig.getUsersForPermission(guild.getIdLong(), p.name()).contains(sender.getId()))
+                else if (permissionsConfig.getUsersForPermission(guild.getIdLong(), p.name()).contains(sender.getIdLong()))
                     pass++;
             }
         }
@@ -304,7 +301,7 @@ public class GeneralUtils {
     public static long getFutureTime(String timeUnparsed) {
         String timeDigits       = timeUnparsed.substring(0, timeUnparsed.length()-1);
         char duration           = timeUnparsed.charAt(timeUnparsed.length()-1);
-        long scheduledDuration  = 0L;
+        long scheduledDuration;
 
         if (Integer.parseInt(timeDigits) < 0)
             throw new IllegalArgumentException("The time cannot be negative!");

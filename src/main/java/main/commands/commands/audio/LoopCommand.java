@@ -122,7 +122,7 @@ public class LoopCommand implements ICommand {
                 return eb;
             }
 
-            musicManager.scheduler.queue.offer(thisTrack);
+            musicManager.scheduler.addToBeginningOfQueue(thisTrack);
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
             musicManager.scheduler.queue.remove(thisTrack);
             eb = EmbedUtils.embedMessage("The current queue will now be looped!");
