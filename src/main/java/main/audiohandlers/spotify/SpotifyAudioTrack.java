@@ -19,6 +19,7 @@ import java.util.concurrent.TimeoutException;
 
 public class SpotifyAudioTrack extends DelegatedAudioTrack {
     private final YoutubeAudioSourceManager manager;
+    @Getter
     private final String spotifyID;
     @Getter
     private final String trackImage;
