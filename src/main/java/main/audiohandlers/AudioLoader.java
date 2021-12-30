@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -107,10 +106,6 @@ public class AudioLoader implements AudioLoadResultHandler {
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
             musicManager.scheduler.queue(track);
-
-            if (track instanceof SpotifyAudioTrack spotifyAudioTrack) {
-
-            }
         }
 
         if (musicManager.scheduler.playlistRepeating)
@@ -137,9 +132,14 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (musicManager.audioPlayer.getPlayingTrack() == null)
             guild.getAudioManager().closeAudioConnection();
 
-        logger.error("[FATAL ERROR] Could not load track!", e);
+        if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
+            logger.error("[FATAL ERROR] Could not load track!", e);
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Error loading track");
+        EmbedBuilder eb = EmbedUtils.embedMessage(
+                        e.getMessage().contains("available") ? e.getMessage() :
+                        e.getMessage().contains("format") ? e.getMessage() :
+                        "Error loading track"
+        );
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
