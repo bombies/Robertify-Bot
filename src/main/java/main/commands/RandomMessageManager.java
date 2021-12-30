@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomMessageManager {
-    private final static double CHANCE = 0.1;
+    private final static double CHANCE = 0.05;
 
     public MessageEmbed getMessage() {
         List<String> messages = BotInfoCache.getInstance().getRandomMessages();
