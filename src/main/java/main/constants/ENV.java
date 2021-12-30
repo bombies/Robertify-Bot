@@ -18,6 +18,7 @@ public enum ENV {
     GENIUS_API_KEY("genius_api_key"),
     MONGO_USERNAME("mongo_username"),
     MONGO_PASSWORD("mongo_password"),
+    MONGO_HOSTNAME("mongo_hostname"),
     MONGO_CLUSTER_NAME("mongo_cluster_name"),
     MONGO_DATABASE_NAME("mongo_database_name");
 

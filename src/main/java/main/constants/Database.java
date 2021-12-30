@@ -42,7 +42,7 @@ public enum Database {
 
         public static String getConnectionString(String db) {
 
-            return "mongodb+srv://" + Config.get(ENV.MONGO_USERNAME) + ":" + Config.get(ENV.MONGO_PASSWORD) + "@"+Config.get(ENV.MONGO_CLUSTER_NAME)+".qb5ie.azure.mongodb.net/" + db + "?retryWrites=true&w=majority";
+            return "mongodb+srv://" + Config.get(ENV.MONGO_USERNAME) + ":" + Config.get(ENV.MONGO_PASSWORD) + "@"+Config.get(ENV.MONGO_CLUSTER_NAME)+"."+Config.get(ENV.MONGO_HOSTNAME)+"/" + db + "?retryWrites=true&w=majority";
         }
     }
 }
