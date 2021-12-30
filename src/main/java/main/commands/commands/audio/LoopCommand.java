@@ -89,10 +89,10 @@ public class LoopCommand implements ICommand {
 
         if (musicManager.scheduler.repeating) {
             musicManager.scheduler.repeating = false;
-            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will no longer be repeated!");
+            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will no longer be looped!");
         } else {
             musicManager.scheduler.repeating = true;
-            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will now be replayed");
+            eb = EmbedUtils.embedMessage("`" + musicManager.audioPlayer.getPlayingTrack().getInfo().title + "` will now be looped");
         }
 
         return eb;
