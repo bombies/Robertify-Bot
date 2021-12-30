@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.json.toggles.Toggles;
@@ -70,16 +71,18 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
         final User requester = RobertifyAudioManager.getRequester(track);
-        eb =  EmbedUtils.embedMessage("🔊  `"+info.title+ " - "+info.author+"`" + (
-                ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
+        eb =  EmbedUtils.embedMessageWithTitle(info.title + " by "  + info.author,
+                (((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n~ Requested by " + requester.getAsMention()
                         :
-                        ""
-        ) +
+                        "") +
                 "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
                 GeneralUtils.progressBar(progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getDuration()) +"]`") + "\n\n" +
                 (info.isStream ? "📺 **[Livestream]**\n" : "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getDuration()-audioPlayer.getPlayingTrack().getPosition()) + "`\n") +
                 "\n🔇 " + GeneralUtils.progressBar((double)(audioPlayer.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊");
+
+        if (track instanceof SpotifyAudioTrack spotifyAudioTrack)
+            eb.setThumbnail(spotifyAudioTrack.getTrackImage());
 
         eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, BotConstants.ICON_URL.toString());
 
