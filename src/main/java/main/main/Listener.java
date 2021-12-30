@@ -157,6 +157,14 @@ public class Listener extends ListenerAdapter {
     public static void checkIfAnnouncementChannelIsSet(Guild guild, TextChannel channel) {
         var guildConfig = new GuildConfig();
         if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
+                    if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                                        "without first having an announcement channel set!").build())
+                                .queue();
+                        return;
+                    }
+            }
 
             guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 

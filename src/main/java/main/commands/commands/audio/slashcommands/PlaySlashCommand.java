@@ -6,11 +6,14 @@ import main.commands.commands.audio.PlayCommand;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -53,8 +56,22 @@ public class PlaySlashCommand extends InteractiveCommand {
         }
 
         EmbedBuilder eb;
+        final Guild guild = event.getGuild();
+        final TextChannel channel = event.getTextChannel();
 
-        Listener.checkIfAnnouncementChannelIsSet(event.getGuild(), event.getTextChannel());
+        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
+                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+                    event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                                    "without first having an announcement channel set!").build())
+                            .setEphemeral(false)
+                            .queue();
+                    return;
+                }
+            }
+        }
+
+        Listener.checkIfAnnouncementChannelIsSet(guild, channel);
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
@@ -62,7 +79,7 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(false).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 

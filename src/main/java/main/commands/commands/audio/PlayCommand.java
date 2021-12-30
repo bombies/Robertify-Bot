@@ -4,6 +4,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Listener;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
@@ -15,10 +17,7 @@ import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +39,21 @@ public class PlayCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
         final Member self = ctx.getSelfMember();
+        final Guild guild = ctx.getGuild();
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
         EmbedBuilder eb;
+
+        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
+                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+                    channel.sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                                    "without first having an announcement channel set!").build())
+                            .queue();
+                    return;
+                }
+            }
+        }
 
         Listener.checkIfAnnouncementChannelIsSet(ctx.getGuild(), ctx.getChannel());
 

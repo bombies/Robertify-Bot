@@ -6,6 +6,7 @@ import main.commands.commands.management.permissions.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,6 +34,14 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
 
         if (args.isEmpty()) {
             TextChannel channel = ctx.getChannel();
+
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+                    msg.replyEmbeds(EmbedUtils.embedMessage("The announcement channel cannot be set to this channel!")
+                            .build()).queue();
+                    return;
+                }
+
             if (guildConfig.getAnnouncementChannelID(guild.getIdLong()) == channel.getIdLong()) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("This is already the announcement channel.");
                 msg.replyEmbeds(eb.build()).queue();
@@ -58,6 +67,13 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }
+
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+                    msg.replyEmbeds(EmbedUtils.embedMessage("The announcement channel cannot be set to that channel!")
+                            .build()).queue();
+                    return;
+                }
 
             guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
