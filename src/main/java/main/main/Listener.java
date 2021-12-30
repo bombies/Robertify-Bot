@@ -9,31 +9,18 @@ import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
+import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
-import main.utils.database.mongodb.GuildsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.database.sqlite3.BanDB;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.legacy.LegacyEightBallConfig;
-import main.utils.json.legacy.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
-import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
-import main.utils.json.legacy.reports.LegacyReportsConfig;
-import main.utils.json.legacy.restrictedchannels.LegacyRestrictedChannelsConfig;
-import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
-import main.utils.json.permissions.PermissionsConfig;
-import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -253,7 +240,7 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new LeaveSlashCommand().initCommand(g);
+        new ListDJCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

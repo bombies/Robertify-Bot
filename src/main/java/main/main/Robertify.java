@@ -11,6 +11,7 @@ import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
+import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
@@ -107,7 +108,8 @@ public class Robertify {
                             new UnbanCommand(),
                             new ShuffleSlashCommand(),
                             new EightBallCommand(),
-                            new SuggestionCommand()
+                            new SuggestionCommand(),
+                            new ListDJCommand()
                     )
 
                     // Button Listeners

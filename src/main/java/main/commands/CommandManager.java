@@ -9,9 +9,7 @@ import main.commands.commands.audio.*;
 import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
-import main.commands.commands.management.permissions.Permission;
-import main.commands.commands.management.permissions.RemoveDJCommand;
-import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
@@ -19,7 +17,6 @@ import main.utils.json.toggles.Toggles;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.ViewConfigCommand;
-import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.BotInfoCommand;
 import main.commands.commands.util.HelpCommand;
@@ -100,6 +97,7 @@ public class CommandManager {
                 new SuggestionCommand(),
                 new ReportsCommand(),
                 new BotInfoCommand(),
+                new ListDJCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -151,6 +149,7 @@ public class CommandManager {
                 new SetPrefixCommand(),
                 new SetDJCommand(),
                 new RemoveDJCommand(),
+                new ListDJCommand(),
                 new TogglesCommand(),
                 new BanCommand(),
                 new UnbanCommand(),

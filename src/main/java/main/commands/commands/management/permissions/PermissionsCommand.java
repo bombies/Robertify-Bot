@@ -11,10 +11,7 @@ import main.utils.json.legacy.permissions.LegacyPermissionsConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.IMentionable;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,7 +251,7 @@ public class PermissionsCommand implements ICommand {
      * @param msg Message which contains the command
      * @param args List of arguments which can contain either the ID of a role or the name of a permission
      */
-    private void list(Message msg, List<String> args) {
+    protected void list(Message msg, List<String> args) {
         if (args.size() == 1) {
             List<String> perms = Permission.getPermissions();
             EmbedBuilder eb;
@@ -286,27 +283,13 @@ public class PermissionsCommand implements ICommand {
                 }
             } else {
                 if (Permission.getPermissions().contains(args.get(1).toUpperCase())) {
-                    List<Role> roles = new ArrayList<>();
-                    List<User> users = new ArrayList<>();
-                    for (long s : permissionsConfig.getRolesForPermission(msg.getGuild().getIdLong(), args.get(1).toUpperCase()))
-                        roles.add(msg.getGuild().getRoleById(s));
-                    for (long s : permissionsConfig.getUsersForPermission(msg.getGuild().getIdLong(), args.get(1).toUpperCase()))
-                        users.add(Robertify.api.getUserById(s));
+                    List<String> roles = getRolePerms(msg.getGuild(), args.get(1).toUpperCase());
+                    List<String> users = getUserPerms(msg.getGuild(), args.get(1).toUpperCase());
 
-                    List<String> rolesString = new ArrayList<>();
-                    for (Role r : roles)
-                        rolesString.add(r.getAsMention());
-                    for (User u : users)
-                        rolesString.add(u.getAsMention());
+                    EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles/users with permission** `" + args.get(1).toUpperCase() + "`")
+                            .addField("Roles", roles.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(roles), false)
+                            .addField("Users", users.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(users), false);
 
-                    EmbedBuilder eb;
-                    if (roles.isEmpty() && users.isEmpty()) {
-                        eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
-                                + "`**\n\n`Nothing's here!`");
-                    } else {
-                        eb = EmbedUtils.embedMessage("**List of roles/users with permission `" + args.get(1).toUpperCase()
-                                + "`**\n\n" + rolesString);
-                    }
                     msg.replyEmbeds(eb.build()).queue();
                 } else {
                     EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!");
@@ -314,6 +297,32 @@ public class PermissionsCommand implements ICommand {
                 }
             }
         }
+    }
+
+    protected List<String> getRolePerms(Guild guild, String perm) {
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        List<Role> roles = new ArrayList<>();
+        for (long s : permissionsConfig.getRolesForPermission(guild.getIdLong(), perm.toUpperCase()))
+            roles.add(guild.getRoleById(s));
+
+        List<String> rolesWithPerms = new ArrayList<>();
+        for (Role r : roles)
+            rolesWithPerms.add(r.getAsMention());
+
+        return rolesWithPerms;
+    }
+
+    protected List<String> getUserPerms(Guild guild, String perm) {
+        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        List<User> users = new ArrayList<>();
+        for (long s : permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.toUpperCase()))
+            users.add(Robertify.api.getUserById(s));
+
+        List<String> usersWithPerm = new ArrayList<>();
+        for (User u : users)
+            usersWithPerm.add(u.getAsMention());
+
+        return usersWithPerm;
     }
 
     private void sendPermMessage(List<Integer> permCodes, Message msg, IMentionable mentionable) {
