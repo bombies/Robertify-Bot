@@ -149,7 +149,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             }
 
             commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
-                    .handle(ErrorResponse.MISSING_ACCESS, e -> logger.error("Could not create Slash Command in {}. I do not have enough permissions", g.getName())));
+                    .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
         }
     }
 

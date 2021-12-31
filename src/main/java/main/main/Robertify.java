@@ -18,6 +18,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.HelpCommand;
 import main.commands.commands.util.SuggestionCommand;
+import main.commands.commands.util.UptimeCommand;
 import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -110,7 +111,8 @@ public class Robertify {
                             new EightBallCommand(),
                             new SuggestionCommand(),
                             new ListDJCommand(),
-                            new LofiSlashCommand()
+                            new LofiSlashCommand(),
+                            new UptimeCommand()
                     )
 
                     // Button Listeners

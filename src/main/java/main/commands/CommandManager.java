@@ -11,6 +11,7 @@ import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
+import main.commands.commands.util.*;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;
@@ -18,10 +19,6 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.ViewConfigCommand;
 import main.commands.commands.misc.poll.PollCommand;
-import main.commands.commands.util.BotInfoCommand;
-import main.commands.commands.util.HelpCommand;
-import main.commands.commands.util.SuggestionCommand;
-import main.commands.commands.util.TutorialCommand;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
@@ -99,6 +96,7 @@ public class CommandManager {
                 new BotInfoCommand(),
                 new ListDJCommand(),
                 new LofiCommand(),
+                new UptimeCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -170,7 +168,8 @@ public class CommandManager {
                 new HelpCommand(),
                 new SuggestionCommand(),
                 new ReportsCommand(),
-                new BotInfoCommand()
+                new BotInfoCommand(),
+                new UptimeCommand()
         );
     }
 
