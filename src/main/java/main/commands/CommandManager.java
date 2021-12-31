@@ -2,7 +2,6 @@ package main.commands;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
-import main.commands.commands.ITestCommand;
 import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
 import main.commands.commands.audio.*;
@@ -98,6 +97,7 @@ public class CommandManager {
                 new LofiCommand(),
                 new UptimeCommand(),
                 new SupportServerCommand(),
+                new ShufflePlayCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -123,6 +123,7 @@ public class CommandManager {
 
         addMusicCommands(
                 new PlayCommand(),
+                new ShufflePlayCommand(),
                 new DisconnectCommand(),
                 new StopCommand(),
                 new SkipCommand(),

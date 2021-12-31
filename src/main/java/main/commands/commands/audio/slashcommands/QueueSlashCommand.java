@@ -45,10 +45,8 @@ public class QueueSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
-        event.deferReply().queue();
-
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
@@ -60,7 +58,7 @@ public class QueueSlashCommand extends InteractiveCommand {
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
-            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
+            event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
@@ -68,7 +66,5 @@ public class QueueSlashCommand extends InteractiveCommand {
         Pages.paginate(content, 10, event);
 
         GeneralUtils.setDefaultEmbed();
-
-
     }
 }

@@ -1,7 +1,7 @@
 package main.commands.commands.dev.test
 
 import main.commands.CommandContext
-import main.commands.commands.ITestCommand
+import main.commands.ITestCommand
 import me.duncte123.botcommons.messaging.EmbedUtils
 
 class KotlinTestCommand : ITestCommand {

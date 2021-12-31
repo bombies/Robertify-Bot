@@ -1,10 +1,8 @@
 package main.commands.commands.audio.slashcommands;
 
-import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.commands.audio.PlayCommand;
+import main.commands.commands.audio.ShufflePlayCommand;
 import main.main.Listener;
-import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -18,39 +16,45 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
-public class PlaySlashCommand extends InteractiveCommand {
-    @Override @SneakyThrows
+import java.util.List;
+
+public class ShufflePlaySlashCommand extends InteractiveCommand {
+    private final String commandName = new ShufflePlayCommand().getName();
+
+    @Override
     public void initCommand() {
         setInteractionCommand(getCommand());
         upsertCommand();
     }
 
-    @Override @SneakyThrows
+    @Override
     public void initCommand(Guild g) {
         setInteractionCommand(getCommand());
         upsertCommand(g);
     }
 
-    @SneakyThrows
     private InteractionCommand getCommand() {
-        return InteractiveCommand.InteractionCommand.create()
-                .buildCommand()
-                    .setName(new PlayCommand().getName())
-                    .setDescription("Play a song! Links are accepted by either Spotify, YouTube, SoundCloud, etc...")
-                    .addOption(CommandOption.of(OptionType.STRING, "track", "The name/link of a track", true))
-                    .setPermissionCheck(djPredicate)
-                    .build()
+        return InteractionCommand.create()
+                .setCommand(Command.of(
+                        commandName,
+                        "Play a playlist/album shuffled right off the bat!",
+                        List.of(CommandOption.of(
+                                OptionType.STRING,
+                                "playlist",
+                                "The playlist/album to play",
+                                true
+                        )),
+                        djPredicate
+                ))
                 .build();
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(new PlayCommand().getName())) return;
-
-        event.deferReply().queue();
+        if (!event.getName().equals(commandName)) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
@@ -62,7 +66,7 @@ public class PlaySlashCommand extends InteractiveCommand {
         if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
                 if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                    event.replyEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
                                     "without first having an announcement channel set!").build())
                             .setEphemeral(false)
                             .queue();
@@ -79,35 +83,35 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         if (!memberVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
-            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
+            event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
+            event.replyEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
                             .build())
                     .queue();
             return;
         }
 
-        String link = event.getOption("track").getAsString();
+        String url = event.getOption("playlist").getAsString();
 
-        if (!GeneralUtils.isUrl(link)) {
-            link = "ytsearch:" + link;
+        if (url.contains("soundcloud.com") && !url.contains("sets")) {
+            event.replyEmbeds(EmbedUtils.embedMessage("This SoundCloud URL doesn't contain a playlist!").build()).queue();
+            return;
+        } else if (url.contains("youtube.com") && !url.contains("playlist") && !url.contains("list")) {
+            event.replyEmbeds(EmbedUtils.embedMessage("This YouTube URL doesn't contain a playlist!").build()).queue();
+            return;
+        } else if (!url.contains("playlist") && !url.contains("album") && !url.contains("soundcloud.com") && !url.contains("youtube.com")) {
+            event.replyEmbeds(EmbedUtils.embedMessage("You must provide the link of a valid album/playlist!").build()).queue();
+            return;
         }
 
-        String finalLink = link;
-        event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build())
-                        .setEphemeral(false)
-                                .queue(msg -> RobertifyAudioManager.getInstance()
-                                        .loadAndPlay(
-                                                finalLink,
-                                                event.getGuild().getSelfMember().getVoiceState(),
-                                                event.getMember().getVoiceState(),
-                                                msg,
-                                                event
-                                        ));
+        event.deferReply().queue();
 
-
+        event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
+            RobertifyAudioManager.getInstance()
+                    .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, addingMsg, event);
+        });
     }
 }

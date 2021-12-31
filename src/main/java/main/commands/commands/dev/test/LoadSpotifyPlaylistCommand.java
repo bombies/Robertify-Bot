@@ -8,7 +8,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.RobertifyAudioReference;
 import main.commands.CommandContext;
-import main.commands.commands.ITestCommand;
+import main.commands.ITestCommand;
 import main.utils.GeneralUtils;
 import net.dv8tion.jda.api.entities.Message;
 

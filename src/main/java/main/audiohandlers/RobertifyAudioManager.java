@@ -91,6 +91,29 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
+    public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadPlaylistShuffled(
+                trackUrl,
+                musicManager,
+                ctx,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg
+        );
+    }
+
+    @SneakyThrows
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
                                                 GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
         final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -127,6 +150,28 @@ public class RobertifyAudioManager {
         }
 
         loadTrack(
+                trackUrl,
+                musicManager,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg,
+                event.getUser()
+        );
+    }
+
+    public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event) {
+        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadPlaylistShuffled(
                 trackUrl,
                 musicManager,
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
@@ -177,7 +222,7 @@ public class RobertifyAudioManager {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            CommandContext ctx, boolean announceMsg, Message botMsg) {
 
-        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg);
+        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false);
         final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
@@ -185,7 +230,23 @@ public class RobertifyAudioManager {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender) {
 
-        final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg);
+        final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false);
+        final var audioRef = new RobertifyAudioReference(trackUrl, null);
+        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+    }
+
+    private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
+                           CommandContext ctx, boolean announceMsg, Message botMsg) {
+
+        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true);
+        final var audioRef = new RobertifyAudioReference(trackUrl, null);
+        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+    }
+
+    private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
+                           boolean announceMsg, Message botMsg, User sender) {
+
+        final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true);
         final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }

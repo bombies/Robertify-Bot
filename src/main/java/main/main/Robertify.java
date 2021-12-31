@@ -115,7 +115,8 @@ public class Robertify {
                             new ListDJCommand(),
                             new LofiSlashCommand(),
                             new UptimeCommand(),
-                            new SupportServerCommand()
+                            new SupportServerCommand(),
+                            new ShufflePlaySlashCommand()
                     )
 
                     // Button Listeners

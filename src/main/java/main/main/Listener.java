@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.RandomMessageManager;
+import main.commands.commands.audio.ShufflePlayCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
@@ -215,6 +216,8 @@ public class Listener extends ListenerAdapter {
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
         new SupportServerCommand().initCommand(g);
+        new PlaySlashCommand().initCommand(g);
+        new ShufflePlaySlashCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

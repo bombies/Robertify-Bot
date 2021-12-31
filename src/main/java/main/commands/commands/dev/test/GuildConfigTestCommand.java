@@ -1,7 +1,7 @@
 package main.commands.commands.dev.test;
 
 import main.commands.CommandContext;
-import main.commands.commands.ITestCommand;
+import main.commands.ITestCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 

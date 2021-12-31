@@ -1,7 +1,7 @@
 package main.commands.commands.dev.test;
 
 import main.commands.CommandContext;
-import main.commands.commands.ITestCommand;
+import main.commands.ITestCommand;
 import main.exceptions.InvalidSpotifyURIException;
 import main.utils.spotify.SpotifyURI;
 import net.dv8tion.jda.api.entities.Message;

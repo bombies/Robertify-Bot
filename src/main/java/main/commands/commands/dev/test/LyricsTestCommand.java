@@ -2,7 +2,7 @@ package main.commands.commands.dev.test;
 
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
-import main.commands.commands.ITestCommand;
+import main.commands.ITestCommand;
 import main.utils.GeneralUtils;
 import main.utils.genius.GeniusAPI;
 import main.utils.genius.GeniusSongSearch;

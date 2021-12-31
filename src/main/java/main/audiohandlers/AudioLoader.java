@@ -1,9 +1,11 @@
 package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.audiohandlers.spotify.SpotifyAudioTrack;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -14,6 +16,8 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,9 +31,10 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final HashMap<AudioTrack, User> trackRequestedByUser;
     private final String trackUrl;
     private final Message botMsg;
+    private final boolean loadPlaylistShuffled;
 
     public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
-                       String trackUrl, boolean announceMsg, Message botMsg) {
+                       String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled) {
         this.guild = musicManager.scheduler.getGuild();
         this.sender = sender;
         this.musicManager = musicManager;
@@ -37,6 +42,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.trackUrl = trackUrl;
         this.announceMsg = announceMsg;
         this.botMsg = botMsg;
+        this.loadPlaylistShuffled = loadPlaylistShuffled;
     }
 
     @Override
@@ -110,10 +116,14 @@ public class AudioLoader implements AudioLoadResultHandler {
             for (final AudioTrack track : tracks)
                 RobertifyAudioManager.getUnannouncedTracks().add(track);
 
+        if (loadPlaylistShuffled)
+            Collections.shuffle(tracks);
+
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
             musicManager.scheduler.queue(track);
         }
+
 
         if (musicManager.scheduler.playlistRepeating)
             musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
