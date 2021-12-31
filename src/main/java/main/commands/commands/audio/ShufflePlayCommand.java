@@ -130,6 +130,6 @@ public class ShufflePlayCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("splay");
+        return List.of("splay", "spl");
     }
 }
