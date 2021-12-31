@@ -8,8 +8,10 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -46,10 +48,10 @@ public class RemoveCommand implements ICommand {
         }
 
         final int id = Integer.parseInt(args.get(0));
-        msg.replyEmbeds(handleRemove(queue, id).build()).queue();
+        msg.replyEmbeds(handleRemove(ctx.getGuild(), queue, id).build()).queue();
     }
 
-    public EmbedBuilder handleRemove(ConcurrentLinkedQueue<AudioTrack> queue, int id) {
+    public EmbedBuilder handleRemove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id) {
         GeneralUtils.setCustomEmbed("Queue");
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
@@ -58,12 +60,18 @@ public class RemoveCommand implements ICommand {
             return eb;
         }
 
+        if (id <= 0 || id > queue.size())
+            return EmbedUtils.embedMessage("This is an invalid ID! You must provide an ID between 1 and " + queue.size());
+
         EmbedBuilder eb = EmbedUtils.embedMessage("Removing `"+trackList.get(id-1).getInfo().title
                 +"` from the queue");
 
-        if (!queue.remove(trackList.get(id-1))) {
+        if (!queue.remove(trackList.get(id-1)))
             eb =  EmbedUtils.embedMessage("Could not remove track with id "+id+" from the queue");
-        }
+
+        if (id <= 10)
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(guild);
 
         return eb;
     }

@@ -61,7 +61,7 @@ public class RemoveSlashCommand extends InteractiveCommand {
         final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
-        event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(queue, trackSelected).build())
+        event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(event.getGuild(), queue, trackSelected).build())
                 .setEphemeral(true)
                 .queue();
     }

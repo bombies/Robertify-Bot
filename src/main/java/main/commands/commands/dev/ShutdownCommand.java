@@ -1,4 +1,4 @@
-package main.commands.commands.management;
+package main.commands.commands.dev;
 
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;

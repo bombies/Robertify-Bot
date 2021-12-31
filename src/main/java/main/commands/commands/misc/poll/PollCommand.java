@@ -56,7 +56,10 @@ public class PollCommand implements ICommand {
         }
 
         msg.replyEmbeds(handlePoll(channel, ctx.getAuthor(), String.join(" ", args)).build())
-                .queue();
+                .queue(pollMsg -> {
+                    pollMsg.delete().queueAfter(5, TimeUnit.SECONDS);
+                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                });
 
         GeneralUtils.setDefaultEmbed();
     }
