@@ -66,6 +66,7 @@ public class Robertify {
                             GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.GUILD_EMOJIS,
+                            GatewayIntent.GUILD_PRESENCES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
