@@ -17,7 +17,7 @@ import org.apache.commons.io.FileUtils;
 import javax.script.ScriptException;
 import java.io.File;
 
-public class ShutdownCommand implements IDevCommand {
+public class RobertifyShutdownCommand implements IDevCommand {
     @SneakyThrows
     @Override
     public void handle(CommandContext ctx) throws ScriptException {

@@ -66,7 +66,7 @@ public class CommandManager {
                 new NowPlayingCommand(),
                 new QueueCommand(),
                 new PauseCommand(),
-                new ShutdownCommand(),
+                new RobertifyShutdownCommand(),
                 new SetChannelCommand(),
                 new RemoveCommand(),
                 new MoveCommand(),
