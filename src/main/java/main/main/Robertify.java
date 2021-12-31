@@ -63,6 +63,7 @@ public class Robertify {
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_VOICE_STATES,
+                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.GUILD_EMOJIS,
                             GatewayIntent.DIRECT_MESSAGES
