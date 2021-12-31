@@ -6,6 +6,7 @@ public enum ENV {
     JSON_DIR("json_dir"),
     BOT_NAME("bot_name"),
     BOT_COLOR("bot_color"),
+    BOT_SUPPORT_SERVER("bot_support_server"),
     ICON_URL("icon_url"),
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),

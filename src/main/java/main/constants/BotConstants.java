@@ -10,6 +10,7 @@ public enum BotConstants {
     ROBERTIFY_CHRISTMAS_LOGO("https://i.imgur.com/kVyBLi7.png"),
     ROBERTIFY_CHRISTMAS_LOGO_TRANSPARENT("https://i.imgur.com/eSoNR0X.png"),
     ROBERTIFY_EMBED_TITLE(Config.get(ENV.BOT_NAME)),
+    SUPPORT_SERVER(Config.get(ENV.BOT_SUPPORT_SERVER)),
     BANNED_MESSAGE("You are banned from using commands in this server!"),
     DEFAULT_IMAGE("https://i.imgur.com/VNQvjve.png"),
     USER_AGENT("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");

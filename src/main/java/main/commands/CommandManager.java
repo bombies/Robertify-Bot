@@ -97,6 +97,7 @@ public class CommandManager {
                 new ListDJCommand(),
                 new LofiCommand(),
                 new UptimeCommand(),
+                new SupportServerCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -169,7 +170,8 @@ public class CommandManager {
                 new SuggestionCommand(),
                 new ReportsCommand(),
                 new BotInfoCommand(),
-                new UptimeCommand()
+                new UptimeCommand(),
+                new SupportServerCommand()
         );
     }
 

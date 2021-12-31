@@ -13,6 +13,7 @@ import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.util.SupportServerCommand;
 import main.commands.commands.util.UptimeCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.commands.commands.misc.EightBallCommand;
@@ -213,6 +214,7 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new SupportServerCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
