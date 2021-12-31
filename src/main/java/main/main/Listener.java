@@ -213,9 +213,6 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new ListDJCommand().initCommand(g);
-        new LofiSlashCommand().initCommand(g);
-        new UptimeCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
