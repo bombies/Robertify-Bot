@@ -70,7 +70,7 @@ public class Robertify {
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .setChunkingFilter(ChunkingFilter.NONE)
+                    .setChunkingFilter(ChunkingFilter.ALL)
 
                     // Event Listeners
                     .addEventListeners(
@@ -120,7 +120,8 @@ public class Robertify {
 
                     .enableCache(
                             CacheFlag.VOICE_STATE,
-                            CacheFlag.MEMBER_OVERRIDES
+                            CacheFlag.MEMBER_OVERRIDES,
+                            CacheFlag.ONLINE_STATUS
                     )
                     .build();
 
