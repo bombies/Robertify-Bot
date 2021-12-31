@@ -129,13 +129,10 @@ public class Listener extends ListenerAdapter {
             return;
         }
 
-        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong())) {
+        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
-            return;
-        }
 
-        new RandomMessageManager().randomlySendMessage(event.getTextChannel());
     }
 
     @SneakyThrows

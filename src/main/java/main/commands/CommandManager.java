@@ -318,7 +318,8 @@ public class CommandManager {
                     }
                 }
 
-                new RandomMessageManager().randomlySendMessage(ctx.getChannel());
+                if (getMusicCommands().contains(cmd))
+                    new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
                 if (toggles.isDJToggleSet(guild, cmd)) {
                     if (toggles.getDJToggle(guild, cmd)) {
