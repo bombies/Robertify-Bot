@@ -69,6 +69,10 @@ public class TrackScheduler extends AudioEventAdapter {
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
         if (!repeating) {
+            if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
+
+            if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
+
             if (RobertifyAudioManager.getUnannouncedTracks().contains(track)) {
                 RobertifyAudioManager.getUnannouncedTracks().remove(track);
                 return;
@@ -91,8 +95,9 @@ public class TrackScheduler extends AudioEventAdapter {
                                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
                             lastSentMsg = msg;
                         });
-            } catch (InsufficientPermissionException ignored) {
-            }
+            } catch (NullPointerException e) {
+                new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
+            } catch (InsufficientPermissionException ignored) {}
         }
     }
 

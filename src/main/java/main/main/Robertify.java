@@ -19,6 +19,7 @@ import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
+import main.events.AnnouncementChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
@@ -80,7 +81,8 @@ public class Robertify {
                             new DedicatedChannelEvents(),
                             new PollEvents(),
                             new SuggestionCategoryDeletionEvents(),
-                            new ReportsEvents()
+                            new ReportsEvents(),
+                            new AnnouncementChannelEvents()
                     )
 
                     // Slash Commands
