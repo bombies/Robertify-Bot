@@ -14,12 +14,9 @@ import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
-import main.commands.commands.util.SupportServerCommand;
-import main.commands.commands.util.UptimeCommand;
+import main.commands.commands.util.*;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.commands.commands.misc.EightBallCommand;
-import main.commands.commands.util.HelpCommand;
-import main.commands.commands.util.SuggestionCommand;
 import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
@@ -218,6 +215,7 @@ public class Listener extends ListenerAdapter {
         new SupportServerCommand().initCommand(g);
         new PlaySlashCommand().initCommand(g);
         new ShufflePlaySlashCommand().initCommand(g);
+        new VoteCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

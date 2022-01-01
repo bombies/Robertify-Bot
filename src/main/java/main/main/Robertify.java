@@ -16,10 +16,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.poll.PollEvents;
-import main.commands.commands.util.HelpCommand;
-import main.commands.commands.util.SuggestionCommand;
-import main.commands.commands.util.SupportServerCommand;
-import main.commands.commands.util.UptimeCommand;
+import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -116,7 +113,8 @@ public class Robertify {
                             new LofiSlashCommand(),
                             new UptimeCommand(),
                             new SupportServerCommand(),
-                            new ShufflePlaySlashCommand()
+                            new ShufflePlaySlashCommand(),
+                            new VoteCommand()
                     )
 
                     // Button Listeners

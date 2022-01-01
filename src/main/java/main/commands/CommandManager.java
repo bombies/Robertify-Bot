@@ -98,6 +98,7 @@ public class CommandManager {
                 new UptimeCommand(),
                 new SupportServerCommand(),
                 new ShufflePlayCommand(),
+                new VoteCommand(),
 //                new LyricsCommand(),
 
                 //Dev Commands
@@ -118,7 +119,8 @@ public class CommandManager {
                 new LoadSpotifyPlaylistCommand(),
                 new LyricsTestCommand(),
                 new MongoTestCommand(),
-                new GuildConfigTestCommand()
+                new GuildConfigTestCommand(),
+                new ImageTestCommand()
         );
 
         addMusicCommands(
