@@ -61,11 +61,15 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-            initNeededSlashCommands(g);
+            initSlashCommands(g);
             rescheduleUnbans(g);
 
-            if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(g);
+            try {
+                if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
+                    new DedicatedChannelConfig().updateMessage(g);
+            } catch (NullPointerException e) {
+                new DedicatedChannelConfig().removeChannel(g.getIdLong());
+            }
         }
 
 //        new AudioDB().cacheAllTracks();
@@ -201,6 +205,7 @@ public class Listener extends ListenerAdapter {
         new VolumeSlashCommand().initCommand(g);
         new SetDJCommand().initCommand(g);
         new RemoveDJCommand().initCommand(g);
+        new ListDJCommand().initCommand(g);
         new SeekSlashCommand().initCommand(g);
         new BanCommand().initCommand(g);
         new UnbanCommand().initCommand(g);
@@ -208,6 +213,11 @@ public class Listener extends ListenerAdapter {
         new EightBallCommand().initCommand(g);
         new JoinSlashCommand().initCommand(g);
         new SuggestionCommand().initCommand(g);
+        new VoteCommand().initCommand(g);
+        new ShufflePlaySlashCommand().initCommand(g);
+        new UptimeCommand().initCommand(g);
+        new LofiSlashCommand().initCommand(g);
+        new SupportServerCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
