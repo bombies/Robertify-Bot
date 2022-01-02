@@ -74,6 +74,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Album album = albumFuture.get();
 
             for (TrackSimplified t : album.getTracks().getItems()) {
+                if (t == null) continue;
+
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
                         "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
                 var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), album.getImages()[0].getUrl());
@@ -100,6 +102,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
             Track[] tracks = artistFuture.get();
 
             for (Track t : tracks) {
+                if (t == null) continue;
+
                 AudioTrackInfo info = new AudioTrackInfo(
                         t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
@@ -141,6 +145,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
                 for (PlaylistTrack playlistTrack : playlistTrackPaging.getItems()) {
                     var plTrack = (Track)playlistTrack.getTrack();
+
+                    if (plTrack == null) continue;
 
                     AudioTrackInfo info = new AudioTrackInfo(
                             playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
