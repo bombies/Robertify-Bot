@@ -26,9 +26,16 @@ public class ImageBuilder {
            return this;
     }
 
-    public ImageBuilder addText(String text, Color textColor) {
+    public ImageBuilder setBackground(Image img) {
+        graphics.drawImage(img, 0,0, null);
+        return this;
+    }
+
+    public ImageBuilder addText(String text, Color textColor, Font font,
+                                int x, int y) {
         graphics.setColor(textColor);
-        graphics.drawString(text, width/2, height/2);
+        graphics.setFont(font);
+        graphics.drawString(text, x, y);
         return this;
     }
 

@@ -1,15 +1,19 @@
 package main.commands.commands.dev.test;
 
+import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
 import main.utils.ImageBuilder;
+import main.utils.imgur.ImgurUtils;
 
+import javax.imageio.ImageIO;
 import javax.script.ScriptException;
 import java.awt.*;
+import java.awt.image.RenderedImage;
 import java.io.File;
 
 public class ImageTestCommand implements ITestCommand {
-    @Override
+    @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
 
@@ -21,9 +25,14 @@ public class ImageTestCommand implements ITestCommand {
             return;
         }
 
-        File file = ImageBuilder.create(250, 75)
-                .setBackground(Color.BLUE)
-                .addText(String.join(" ", args), Color.WHITE)
+        File file = ImageBuilder.create(934, 282)
+                .setBackground(ImageIO.read(new File("static/Card.png")))
+                .addText(
+                        String.join(" ", args),
+                        Color.WHITE,
+                        new Font("Times New Roman", Font.BOLD, 50),
+                        934/2, 282/2
+                )
                 .build("test.png");
 
         ctx.getMessage().reply(file).queue(success -> file.delete());
