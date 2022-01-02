@@ -1,5 +1,6 @@
 package main.commands.commands.dev;
 
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
@@ -14,10 +15,14 @@ public class VoiceChannelCountCommand implements IDevCommand {
         if (!permissionCheck(ctx)) return;
 
         int vcCount = 0;
-        for (var guild : Robertify.api.getGuilds())
+        int currentlyPlayingCount = 0;
+        for (var guild : Robertify.api.getGuilds()) {
             vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
+            currentlyPlayingCount += RobertifyAudioManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack() != null ? 1 : 0;
+        }
 
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("🔊 I am currently in **" + vcCount + "** voice channels").build())
+        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("🔊 I am currently in **" + vcCount + "** voice channels\n" +
+                        "I am currently playing music in **"+currentlyPlayingCount+"** of those channels.").build())
                 .queue();
     }
 
