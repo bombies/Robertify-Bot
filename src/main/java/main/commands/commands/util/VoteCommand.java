@@ -19,8 +19,9 @@ public class VoteCommand extends InteractiveCommand implements ICommand {
                         "You may press on each of the buttons below to vote for us.")
                         .build())
                 .setActionRow(
-                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Link #1"),
-                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Link #2")
+                        Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Discord Extreme List")
                 )
                 .queue();
     }
@@ -64,8 +65,9 @@ public class VoteCommand extends InteractiveCommand implements ICommand {
                         "You may press on each of the buttons below to vote for us.")
                 .build())
                 .addActionRow(
-                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Link #1"),
-                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Link #2")
+                        Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Discord Extreme List")
                 )
                 .queue();
     }
