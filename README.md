@@ -48,12 +48,12 @@ to set the requests channel up.
 ### Step 2
 
 - In order to start playing music, just type the name of the song or the link. The song will automatically be played or added to the queue.
-  - ![Requests Channel Queue Example](https://i.imgur.com/arWjIu4.gif)
+  - ![Requests Channel Queue Example](https://i.imgur.com/wNSKaJN.gif)
 
 ### Step 3
 
 - Control the bot using the buttons! The buttons in blue (primary buttons) are the main controls for the bot. They include the previous, rewind, pause/play, stop and skip buttons. In the next row of buttons, there are options to loop the currently playing song, shuffle the queue and disconnect the bot.
-  - ![Requests Channel Interaction Example](https://i.imgur.com/Tuc8hdm.gif)
+  - ![Requests Channel Interaction Example](https://i.imgur.com/qpZkmaG.gif)
 
 ## Help
 Confused about something? Try taking a look at the **help menu** that comes with tbe bot! You can see all help commands and even get help with a specific command. <br><br>
