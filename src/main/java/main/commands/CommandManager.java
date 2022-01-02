@@ -111,6 +111,7 @@ public class CommandManager {
                 new VoiceChannelCountCommand(),
                 new MongoMigrationCommand(),
                 new RandomMessageCommand(),
+                new ReloadConfigCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
