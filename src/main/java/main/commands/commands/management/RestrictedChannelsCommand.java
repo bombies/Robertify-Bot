@@ -2,7 +2,7 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;

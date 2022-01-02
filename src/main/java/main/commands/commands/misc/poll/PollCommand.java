@@ -3,7 +3,7 @@ package main.commands.commands.misc.poll;
 import lombok.Getter;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.utils.json.toggles.Toggles;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
@@ -32,9 +32,12 @@ public class PollCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)
+            && !GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_POLLS)) {
             ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have enough permissions " +
-                    "to execute this command!").build())
+                    "to execute this command!\n\n" +
+                            "You must either have `"+Permission.ROBERTIFY_DJ.name()+"`," +
+                            " or `"+Permission.ROBERTIFY_POLLS.name()+"`!").build())
                     .queue();
             return;
         }

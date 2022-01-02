@@ -1,7 +1,7 @@
 package main.utils.json.legacy.permissions;
 
 import lombok.SneakyThrows;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
 import main.utils.database.sqlite3.BotDB;

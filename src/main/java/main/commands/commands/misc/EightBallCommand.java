@@ -2,7 +2,7 @@ package main.commands.commands.misc;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.utils.json.eightball.EightBallConfig;
 import main.utils.json.toggles.Toggles;
 import main.utils.GeneralUtils;
@@ -41,7 +41,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         }
 
         switch (args.get(0).toLowerCase()) {
-            case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getAuthor(), getResponseFromArgs(args)).build())
+            case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getAuthor(), String.join(" ", args.subList(1, args.size()))).build())
                     .queue();
             case "remove" -> {
                 if (args.size() < 2) {
@@ -73,12 +73,15 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleAdd(Guild guild, User user, String phraseToAdd) {
-        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
+        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
+            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+                    "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         if (phraseToAdd == null)
             return EmbedUtils.embedMessage("You need to provide a response to add!");
 
+        if (phraseToAdd.isEmpty())
+            return EmbedUtils.embedMessage("You need to provide a response to add!");
         var config = new EightBallConfig();
 
         try {
@@ -93,8 +96,9 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleRemove(Guild guild, User user, int index) {
-        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
+        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
+            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+                    "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
 
@@ -111,8 +115,9 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleClear(Guild guild, User user) {
-        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
+        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
+            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+                    "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
         config.removeAllResponses(guild.getIdLong());
@@ -121,8 +126,9 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     private EmbedBuilder handleList(Guild guild, User user) {
-        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command");
+        if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
+            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+                    "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
         final var responses = config.getResponses(guild.getIdLong());
@@ -193,15 +199,6 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         return EmbedUtils.embedMessage("Something went wrong!");
     }
 
-    private String getResponseFromArgs(List<String> args) {
-        final StringBuilder sb = new StringBuilder();
-
-        for (String s : args.subList(1, args.size()))
-            sb.append(s).append(" ");
-
-        return sb.toString();
-    }
-
     @Override
     public String getName() {
         return "8ball";
@@ -213,7 +210,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                 "\n**__Usages__**\n" +
                 "`"+ prefix+"8ball <question>` *(Ask 8ball a question)*\n" +
                 "`"+ prefix+"8ball add <response>` *(Add a custom response to 8ball)*\n" +
-                "`"+ prefix+"8ball remove <responseID>` *(Remove a custom response from)*\n" +
+                "`"+ prefix+"8ball remove <responseID>` *(Remove a custom response from 8ball)*\n" +
                 "`"+ prefix+"8ball list` *(List all custom responses)*\n" +
                 "`"+ prefix+"8ball clear` *(Clear all custom responses)*";
     }

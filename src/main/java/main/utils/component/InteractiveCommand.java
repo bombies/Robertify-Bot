@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import lombok.Setter;
 import main.commands.CommandManager;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;

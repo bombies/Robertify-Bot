@@ -1,11 +1,8 @@
 package main.utils.json.permissions;
 
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.utils.database.mongodb.GuildsDB;
-import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.AbstractGuildConfig;
-import main.utils.json.AbstractJSON;
-import main.utils.json.guildconfig.GuildConfig;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,7 +31,15 @@ public class PermissionsConfig extends AbstractGuildConfig {
         usersObj = obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
-        JSONArray array = usersObj.getJSONArray(String.valueOf(userID));
+        JSONArray array;
+
+        try {
+            array = usersObj.getJSONArray(String.valueOf(userID));
+        } catch (JSONException e) {
+            usersObj.put(String.valueOf(userID), new JSONArray());
+            array = usersObj.getJSONArray(String.valueOf(userID));
+        }
+
         array.put(p.getCode());
 
         usersObj.put(String.valueOf(userID), array);
@@ -48,7 +53,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
         if (!userObj.has(String.valueOf(userID)))
-            throw new NullPointerException("There is no user with ID: \""+userID+"\"");
+            return false;
 
         return userObj.getJSONArray(String.valueOf(userID)).toList().contains(p.getCode());
     }

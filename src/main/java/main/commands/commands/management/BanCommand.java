@@ -3,7 +3,7 @@ package main.commands.commands.management;
 import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -28,8 +28,9 @@ import java.util.List;
 public class BanCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!")
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
+            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                     .build())
                     .queue();
             return;
@@ -82,7 +83,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         Long bannedUntil = duration == null ? null : GeneralUtils.getFutureTime(duration);
 
         if (GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You cannot ban another admin!");
+            return EmbedUtils.embedMessage("You cannot ban an admin!");
 
         if (BotInfoCache.getInstance().isDeveloper(user.getIdLong()))
             return EmbedUtils.embedMessage("You cannot ban a developer of Robertify!");
@@ -157,7 +158,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
                                         false
                                 )
                         ),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN),
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_BAN),
                         true
                 )).build();
     }
@@ -167,7 +168,8 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to execute this command!")
+            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                             .build())
                     .setEphemeral(true)
                     .queue();

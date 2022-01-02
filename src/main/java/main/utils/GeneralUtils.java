@@ -1,6 +1,6 @@
 package main.utils;
 
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
 import main.constants.RobertifyEmoji;
@@ -121,7 +121,9 @@ public class GeneralUtils {
 
     public static boolean  hasPerms(Guild guild, Member sender, Permission perm) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
-        || sender.isOwner()) return true;
+                || new PermissionsConfig().userHasPermission(guild.getIdLong(), sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
+                || sender.isOwner())
+            return true;
 
         List<Role> userRoles = sender.getRoles();
 
@@ -141,7 +143,10 @@ public class GeneralUtils {
     }
 
     public static boolean hasPerms(Guild guild, Member sender, Permission... perms) {
-        if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)) return true;
+        if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
+        || new PermissionsConfig().userHasPermission(guild.getIdLong(), sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
+        || sender.isOwner())
+            return true;
 
         List<Role> userRoles = sender.getRoles();
         int pass = 0;

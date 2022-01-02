@@ -11,6 +11,7 @@ import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand
 import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
 import main.commands.commands.util.*;
+import main.constants.Permission;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.Toggles;

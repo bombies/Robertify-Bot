@@ -1,11 +1,14 @@
-package main.commands.commands.management.permissions;
+package main.constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public enum Permission {
     ROBERTIFY_ADMIN(0),
-    ROBERTIFY_DJ(1);
+    ROBERTIFY_DJ(1),
+    ROBERTIFY_POLLS(2),
+    ROBERTIFY_BAN(3),
+    ROBERTIFY_8BALL(8);
 
     private final int code;
 

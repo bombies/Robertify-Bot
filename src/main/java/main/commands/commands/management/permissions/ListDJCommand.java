@@ -2,6 +2,7 @@ package main.commands.commands.management.permissions;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;

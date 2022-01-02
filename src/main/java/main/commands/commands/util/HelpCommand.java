@@ -101,7 +101,16 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("*Select an option to view the commands I have to offer!*");
+            EmbedBuilder eb = EmbedUtils.embedMessage("""
+                            Join our [support server](https://discord.gg/VbjmtfJDvU)!
+
+                            *Select an option to view the commands I have to offer!*""")
+                    .addField("💼 Management Commands", "*Configure and control how Robertify operates in this guild!*", true)
+                    .addField("🎶 Music Commands", "*Play music and control songs. You can do so much with these commands to make your experience immersive.*", true)
+                    .addBlankField(true)
+                    .addField("⚒️ Miscellaneous Commands", "*Tired of playing music all the time? Well, here are some commands you can play around with!*", true)
+                    .addField("❓ Utility Commands", "*Curious about the bot? These are the commands for you to explore!*", true)
+                    .addBlankField(true);
             msg.replyEmbeds(eb.build()).queue(repliedMsg ->
                     {
                         try {

@@ -5,7 +5,7 @@ import lombok.Getter;
 import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.IDevCommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;

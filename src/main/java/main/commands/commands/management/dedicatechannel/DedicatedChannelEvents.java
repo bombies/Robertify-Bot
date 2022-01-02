@@ -6,7 +6,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.dev.MongoMigrationCommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.GeneralUtils;

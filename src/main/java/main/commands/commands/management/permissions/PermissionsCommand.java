@@ -2,6 +2,7 @@ package main.commands.commands.management.permissions;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.json.permissions.PermissionsConfig;
@@ -235,7 +236,7 @@ public class PermissionsCommand implements ICommand {
             if (perms.isEmpty())
                 eb = EmbedUtils.embedMessage("There are no permissions yet!");
             else
-                eb = EmbedUtils.embedMessage("**List of Permissions**\n\n`" + perms + "`");
+                eb = EmbedUtils.embedMessage("**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
             msg.replyEmbeds(eb.build()).queue();
         } else {
             PermissionsConfig permissionsConfig = new PermissionsConfig();

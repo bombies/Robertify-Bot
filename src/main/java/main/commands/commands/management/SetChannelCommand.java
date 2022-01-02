@@ -2,7 +2,7 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;

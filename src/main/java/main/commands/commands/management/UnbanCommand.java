@@ -2,7 +2,7 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.commands.commands.management.permissions.Permission;
+import main.constants.Permission;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -26,8 +26,9 @@ import java.util.List;
 public class UnbanCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!")
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
+            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                             .build())
                     .queue();
             return;
@@ -113,7 +114,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
                                 "The user to unban",
                                 true
                         )),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN),
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_BAN),
                         true
                 )).build();
     }
@@ -123,7 +124,8 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to execute this command!")
+            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                     .build())
                     .setEphemeral(true)
                     .queue();
