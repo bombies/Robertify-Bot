@@ -51,6 +51,10 @@ public class SpotifyAudioTrack extends DelegatedAudioTrack {
                         && (audioTrack.getInfo().author.toLowerCase().contains(trackInfo.author.toLowerCase())
                         || audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase()))
                 ) {
+                    if (audioTrack.getInfo().title.contains("clean")
+                            && !trackInfo.title.contains("clean"))
+                        continue;
+
                     track = audioTrack;
                     break;
                 }

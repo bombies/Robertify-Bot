@@ -4,8 +4,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
-import main.commands.RandomMessageManager;
-import main.commands.commands.audio.ShufflePlayCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
@@ -61,7 +59,7 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-            initSlashCommands(g);
+            initNeededSlashCommands(g);
             rescheduleUnbans(g);
 
             try {

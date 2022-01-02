@@ -87,7 +87,7 @@ public class JumpCommand implements ICommand {
 
         time = TimeUnit.SECONDS.toMillis(time);
 
-        if (time > track.getDuration() - time) {
+        if (time > track.getDuration() - track.getPosition()) {
             eb = EmbedUtils.embedMessage("This duration cannot be more than the time left!");
             return eb;
         }
