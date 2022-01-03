@@ -67,7 +67,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
     private AudioTrack search(AudioPlaylist playlist) {
         for (AudioTrack audioTrack : playlist.getTracks()) {
 
-            logger.info("{} - {} [{}]", audioTrack.getInfo().title, audioTrack.getInfo().author, audioTrack.getDuration());
+//            logger.info("{} - {} [{}]", audioTrack.getInfo().title, audioTrack.getInfo().author, audioTrack.getDuration());
 
             if (audioTrack.getDuration() >= trackInfo.length - 7000
                     && audioTrack.getDuration() <= trackInfo.length + 5000
