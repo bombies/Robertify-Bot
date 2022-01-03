@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
+import main.constants.BotConstants;
 import main.main.Robertify;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -156,7 +157,14 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                             false, null
                     );
 
-                    var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, plTrack.getId(), plTrack.getAlbum().getImages()[0].getUrl());
+                    var track = new SpotifyAudioTrack(
+                            info,
+                            youtubeManager,
+                            soundCloudManager,
+                            plTrack.getId(),
+                            plTrack.getAlbum().getImages().length >= 1 ? plTrack.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString()
+                    );
+
                     finalPlaylist.add(track);
                 }
 
