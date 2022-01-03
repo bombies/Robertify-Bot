@@ -14,6 +14,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
+import main.constants.BotConstants;
 import main.main.Robertify;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -118,7 +119,7 @@ public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigu
                         false, null
                 );
 
-                var constructedTrack = new DeezerAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getCoverXl());
+                var constructedTrack = new DeezerAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum() != null ? track.getAlbum().getCoverXl() : BotConstants.DEFAULT_IMAGE.toString());
                 topTracks.add(constructedTrack);
             }
 
@@ -157,7 +158,7 @@ public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigu
                             false, null
                     );
 
-                    var constructedTrack = new DeezerAudioTrack(info ,youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getCoverXl());
+                    var constructedTrack = new DeezerAudioTrack(info ,youtubeManager, soundCloudManager, track.getId(), track.getAlbum() != null ? track.getAlbum().getCoverXl() : BotConstants.DEFAULT_IMAGE.toString());
                     finalPlaylist.add(constructedTrack);
                 }
 
@@ -189,7 +190,7 @@ public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigu
                     false, null
             );
 
-            return new DeezerAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getCoverXl());
+            return new DeezerAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum() != null ? track.getAlbum().getCoverXl() : BotConstants.DEFAULT_IMAGE.toString());
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);

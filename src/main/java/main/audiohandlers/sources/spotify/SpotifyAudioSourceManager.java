@@ -112,7 +112,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
                         false, null
                 );
-                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages()[0].getUrl());
+                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages().length >= 1 ? t.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString());
                 playlist.add(track);
             }
 
