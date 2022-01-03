@@ -96,15 +96,17 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
 
         String url = event.getOption("playlist").getAsString();
 
-        if (url.contains("soundcloud.com") && !url.contains("sets")) {
-            event.replyEmbeds(EmbedUtils.embedMessage("This SoundCloud URL doesn't contain a playlist!").build()).queue();
-            return;
-        } else if (url.contains("youtube.com") && !url.contains("playlist") && !url.contains("list")) {
-            event.replyEmbeds(EmbedUtils.embedMessage("This YouTube URL doesn't contain a playlist!").build()).queue();
-            return;
-        } else if (!url.contains("playlist") && !url.contains("album") && !url.contains("soundcloud.com") && !url.contains("youtube.com")) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You must provide the link of a valid album/playlist!").build()).queue();
-            return;
+        if (!url.contains("deezer.page.link")) {
+            if (url.contains("soundcloud.com") && !url.contains("sets")) {
+                event.replyEmbeds(EmbedUtils.embedMessage("This SoundCloud URL doesn't contain a playlist!").build()).queue();
+                return;
+            } else if (url.contains("youtube.com") && !url.contains("playlist") && !url.contains("list")) {
+                event.replyEmbeds(EmbedUtils.embedMessage("This YouTube URL doesn't contain a playlist!").build()).queue();
+                return;
+            } else if (!url.contains("playlist") && !url.contains("album") && !url.contains("soundcloud.com") && !url.contains("youtube.com")) {
+                event.replyEmbeds(EmbedUtils.embedMessage("You must provide the link of a valid album/playlist!").build()).queue();
+                return;
+            }
         }
 
         event.deferReply().queue();

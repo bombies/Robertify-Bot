@@ -1,5 +1,6 @@
 package main.main;
 
+import api.deezer.DeezerApi;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -47,6 +48,8 @@ public class Robertify {
 
     public static JDA api;
     public static BaringoClient baringo;
+    @Getter
+    private static DeezerApi deezerApi;
     @Getter
     private static SpotifyApi spotifyApi;
     @Getter
@@ -137,6 +140,8 @@ public class Robertify {
                     .setClientSecret(Config.get(ENV.SPOTIFY_CLIENT_SECRET))
                     .setRedirectUri(SpotifyHttpManager.makeUri("http://localhost/callback/"))
                     .build();
+
+            deezerApi = new DeezerApi();
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(new RefreshSpotifyToken(), 0, 1, TimeUnit.HOURS);

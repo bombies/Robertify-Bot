@@ -13,7 +13,8 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import main.audiohandlers.spotify.SpotifyAudioSourceManager;
+import main.audiohandlers.sources.deezer.DeezerAudioSourceManager;
+import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
 import main.utils.json.toggles.Toggles;
 import main.utils.json.toggles.TogglesConfig;
@@ -39,8 +40,8 @@ public class RobertifyAudioManager {
         this.musicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager()));
-
+        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager(), SoundCloudAudioSourceManager.createDefault()));
+        audioPlayerManager.registerSourceManager(new DeezerAudioSourceManager(new YoutubeAudioSourceManager(), SoundCloudAudioSourceManager.createDefault()));
         audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
         audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());

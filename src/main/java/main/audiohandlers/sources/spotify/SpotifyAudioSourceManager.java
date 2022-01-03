@@ -1,14 +1,14 @@
-package main.audiohandlers.spotify;
+package main.audiohandlers.sources.spotify;
 
 import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.main.Robertify;
-import main.utils.database.sqlite3.AudioDB;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -39,10 +39,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
     private final SpotifyApi api = Robertify.getSpotifyApi();
     private final YoutubeAudioSourceManager youtubeManager;
+    private final SoundCloudAudioSourceManager soundCloudManager;
     private final List<Function<AudioReference, AudioItem>> loaders;
 
-    public SpotifyAudioSourceManager(YoutubeAudioSourceManager youtubeManager) {
+    public SpotifyAudioSourceManager(YoutubeAudioSourceManager youtubeManager, SoundCloudAudioSourceManager soundCloudManager) {
         this.youtubeManager = youtubeManager;
+        this.soundCloudManager = soundCloudManager;
         this.loaders = Arrays.asList(this::getSpotifyTrack, this::getSpotifyAlbum, this::getSpotifyPlaylist, this::getSpotifyArtist);
     }
 
@@ -78,7 +80,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
                         "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
-                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), album.getImages()[0].getUrl());
+                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), album.getImages()[0].getUrl());
                 playlist.add(track);
             }
 
@@ -109,7 +111,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
                         false, null
                 );
-                var track = new SpotifyAudioTrack(info, youtubeManager, t.getId(), t.getAlbum().getImages()[0].getUrl());
+                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages()[0].getUrl());
                 playlist.add(track);
             }
 
@@ -154,7 +156,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                             false, null
                     );
 
-                    var track = new SpotifyAudioTrack(info, youtubeManager, plTrack.getId(), plTrack.getAlbum().getImages()[0].getUrl());
+                    var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, plTrack.getId(), plTrack.getAlbum().getImages()[0].getUrl());
                     finalPlaylist.add(track);
                 }
 
@@ -201,7 +203,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                     false, null
             );
 
-            return new SpotifyAudioTrack(info, youtubeManager, track.getId(), track.getAlbum().getImages()[0].getUrl());
+            return new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getImages()[0].getUrl());
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);

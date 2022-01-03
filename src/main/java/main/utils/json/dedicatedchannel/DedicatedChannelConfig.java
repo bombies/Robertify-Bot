@@ -2,7 +2,8 @@ package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
+import main.audiohandlers.sources.RobertifyAudioTrack;
+import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.commands.audio.LofiCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
@@ -137,8 +138,8 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             if (requester != null)
                 eb.setDescription("Requested by " + requester.getAsMention());
 
-            if (playingTrack instanceof SpotifyAudioTrack spotifyAudioTrack)
-                eb.setImage(spotifyAudioTrack.getTrackImage());
+            if (playingTrack instanceof RobertifyAudioTrack robertifyAudioTrack)
+                eb.setImage(robertifyAudioTrack.getTrackImage());
             else
                 eb.setImage(BotConstants.DEFAULT_IMAGE.toString());
 

@@ -6,7 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
+import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.genius.GeniusAPI;

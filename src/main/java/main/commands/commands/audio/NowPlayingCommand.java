@@ -5,14 +5,13 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.spotify.SpotifyAudioTrack;
+import main.audiohandlers.sources.RobertifyAudioTrack;
+import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.json.toggles.Toggles;
-import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -90,8 +89,8 @@ public class NowPlayingCommand implements ICommand {
 
                 "\n🔇 " + GeneralUtils.progressBar((double)(audioPlayer.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
-        if (track instanceof SpotifyAudioTrack spotifyAudioTrack)
-            eb.setThumbnail(spotifyAudioTrack.getTrackImage());
+        if (track instanceof RobertifyAudioTrack robertifyAudioTrack)
+            eb.setThumbnail(robertifyAudioTrack.getTrackImage());
 
         eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, BotConstants.ICON_URL.toString());
 
