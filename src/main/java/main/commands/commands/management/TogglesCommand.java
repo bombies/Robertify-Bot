@@ -5,7 +5,7 @@ import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.Permission;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.constants.RobertifyEmoji;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
@@ -95,7 +95,16 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **ON**");
                     }
                 }
-                case "requester", "5" -> {
+                case "globalannouncements", "5" -> {
+                    if (config.getToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS)) {
+                        config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, false);
+                        eb = EmbedUtils.embedMessage("You have toggled global announcements **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, true);
+                        eb = EmbedUtils.embedMessage("You have toggled global announcements **ON**");
+                    }
+                }
+                case "requester", "6" -> {
                     if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
                         eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **OFF**");
@@ -104,7 +113,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
-                case "8ball", "6" -> {
+                case "8ball", "7" -> {
                     if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                         config.setToggle(guild, Toggles.EIGHT_BALL, false);
                         eb = EmbedUtils.embedMessage("You have toggled the 8ball command **OFF**");
@@ -113,7 +122,7 @@ public class TogglesCommand implements ICommand {
                         eb = EmbedUtils.embedMessage("You have toggled the 8ball command **ON**");
                     }
                 }
-                case "polls", "poll", "7" -> {
+                case "polls", "poll", "8" -> {
                     if (config.getToggle(guild, Toggles.POLLS)) {
                         config.setToggle(guild, Toggles.POLLS, false);
                         eb = EmbedUtils.embedMessage("You have toggled the polls command **OFF**");

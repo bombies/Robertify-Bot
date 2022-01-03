@@ -26,7 +26,7 @@ import main.utils.json.legacy.suggestions.LegacySuggestionsConfig;
 import main.utils.json.legacy.togglesconfig.LegacyTogglesConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

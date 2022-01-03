@@ -6,7 +6,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;

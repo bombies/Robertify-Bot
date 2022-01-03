@@ -16,7 +16,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.sources.deezer.DeezerAudioSourceManager;
 import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;

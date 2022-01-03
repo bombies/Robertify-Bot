@@ -14,7 +14,7 @@ import main.commands.commands.util.*;
 import main.constants.Permission;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.ViewConfigCommand;
@@ -113,6 +113,7 @@ public class CommandManager {
                 new MongoMigrationCommand(),
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
+                new AnnouncementCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),

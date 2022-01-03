@@ -4,7 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.json.eightball.EightBallConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.toggles.TogglesConfig;

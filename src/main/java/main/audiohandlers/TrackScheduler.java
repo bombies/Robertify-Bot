@@ -9,7 +9,7 @@ import lombok.Getter;
 import main.main.Robertify;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.main.Listener;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;

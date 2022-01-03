@@ -4,7 +4,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.constants.BotConstants;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;

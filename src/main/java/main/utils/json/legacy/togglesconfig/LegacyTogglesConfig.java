@@ -6,7 +6,7 @@ import main.commands.ICommand;
 import main.constants.JSONConfigFile;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.json.legacy.AbstractJSONFile;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONException;
 import org.json.JSONObject;

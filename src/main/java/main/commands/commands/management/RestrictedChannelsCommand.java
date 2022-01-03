@@ -5,7 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;

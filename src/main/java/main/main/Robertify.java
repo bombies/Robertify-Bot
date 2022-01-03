@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import lombok.Getter;
 import main.commands.commands.audio.slashcommands.*;
+import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.UnbanCommand;
@@ -123,7 +124,10 @@ public class Robertify {
                     )
 
                     // Button Listeners
-                    .addEventListeners(new PaginationEvents())
+                    .addEventListeners(
+                            new PaginationEvents(),
+                            new AnnouncementCommand()
+                    )
 
                     .enableCache(
                             CacheFlag.VOICE_STATE,

@@ -4,7 +4,7 @@ import lombok.Getter;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
-import main.utils.json.toggles.Toggles;
+import main.constants.Toggles;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
