@@ -20,6 +20,7 @@ Robertify supports all sources and formats supported by [lavaplayer](https://git
 ### Available Sources
 - YouTube
 - Spotify
+- Deezer
 - SoundCloud
 - Bandcamp
 - Twitch Streams
