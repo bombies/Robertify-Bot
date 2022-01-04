@@ -118,9 +118,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.target>16</maven.compiler.target>
     <kotlin.version>1.6.10</kotlin.version>
-    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.source>16</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>

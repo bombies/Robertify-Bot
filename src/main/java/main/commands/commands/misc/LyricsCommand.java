@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -69,8 +70,8 @@ public class LyricsCommand implements ICommand {
                 return;
             }
 
-            if (!(playingTrack instanceof SpotifyAudioTrack)) {
-                msg.replyEmbeds(EmbedUtils.embedMessage("This command is only supported by Spotify tracks!").build())
+            if (!(playingTrack instanceof RobertifyAudioTrack)) {
+                msg.replyEmbeds(EmbedUtils.embedMessage("This command is only supported by Spotify/Deezer tracks!").build())
                         .queue();
                 return;
             }

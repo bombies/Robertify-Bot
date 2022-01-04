@@ -10,6 +10,7 @@ import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
+import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.util.*;
 import main.constants.Permission;
 import main.utils.json.guildconfig.GuildConfig;
@@ -100,7 +101,7 @@ public class CommandManager {
                 new SupportServerCommand(),
                 new ShufflePlayCommand(),
                 new VoteCommand(),
-//                new LyricsCommand(),
+                new LyricsCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -148,7 +149,8 @@ public class CommandManager {
                 new SeekCommand(),
                 new PreviousTrackCommand(),
                 new JoinCommand(),
-                new LofiCommand()
+                new LofiCommand(),
+                new LyricsCommand()
         );
 
         addManagementCommands(
