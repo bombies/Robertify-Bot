@@ -120,7 +120,8 @@ public class Robertify {
                             new UptimeCommand(),
                             new SupportServerCommand(),
                             new ShufflePlaySlashCommand(),
-                            new VoteCommand()
+                            new VoteCommand(),
+                            new DonateCommand()
                     )
 
                     // Button Listeners

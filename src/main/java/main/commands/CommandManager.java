@@ -102,6 +102,7 @@ public class CommandManager {
                 new ShufflePlayCommand(),
                 new VoteCommand(),
                 new LyricsCommand(),
+                new DonateCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -180,7 +181,8 @@ public class CommandManager {
                 new ReportsCommand(),
                 new BotInfoCommand(),
                 new UptimeCommand(),
-                new SupportServerCommand()
+                new SupportServerCommand(),
+                new DonateCommand()
         );
     }
 
