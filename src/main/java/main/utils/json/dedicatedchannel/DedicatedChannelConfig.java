@@ -148,19 +148,22 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             final StringBuilder nextTenSongs = new StringBuilder();
             nextTenSongs.append("```");
             if (queueAsList.size() > 10) {
+                int index = 1;
                 for (AudioTrack track : queueAsList.subList(0, 10))
-                    nextTenSongs.append("→ ").append(track.getInfo().title)
+                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().title)
                             .append(" - ").append(track.getInfo().author)
                             .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
                             .append("]\n");
             } else {
                 if (queue.size() == 0)
                     nextTenSongs.append("Songs in the queue will appear here.");
-                else
+                else {
+                    int index = 1;
                     for (AudioTrack track : queueAsList)
-                        nextTenSongs.append("→ ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
+                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
                                 .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
                                 .append("]\n");
+                }
             }
             nextTenSongs.append("```");
 
