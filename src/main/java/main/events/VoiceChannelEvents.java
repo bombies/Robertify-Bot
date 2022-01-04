@@ -120,7 +120,11 @@ public class VoiceChannelEvents extends ListenerAdapter {
                             return channelJoined.equals(channelLeft);
                         }
                     },
-                    (e) -> {},
+                    (e) -> {
+                        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+                        if (musicManager.audioPlayer.isPaused() && !musicManager.isForcePaused())
+                            musicManager.audioPlayer.setPaused(false);;
+                    },
                     1L, TimeUnit.MINUTES,
                     () -> {
                         event.getGuild().getAudioManager().closeAudioConnection();
