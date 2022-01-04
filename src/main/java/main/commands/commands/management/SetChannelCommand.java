@@ -55,7 +55,9 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
             String id = GeneralUtils.getDigitsOnly(args.get(0));
 
             if (!GeneralUtils.stringIsID(id)) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("ID passed isn't a valid ID!");
+                EmbedBuilder eb = EmbedUtils.embedMessage("ID provided isn't a valid ID!\n" +
+                        "Make sure to either **mention** the channel, or provide its **ID**")
+                        .setImage("https://i.imgur.com/Qg0BQ3f.png");
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }

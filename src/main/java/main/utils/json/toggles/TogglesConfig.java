@@ -21,7 +21,12 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!guildHasInfo(guild.getIdLong()))
             throw new IllegalArgumentException("This guild doesn't have any information!");
 
-        return getTogglesObject(guild.getIdLong()).getBoolean(toggle.toString());
+        try {
+            return getTogglesObject(guild.getIdLong()).getBoolean(toggle.toString());
+        } catch (JSONException e) {
+            update();
+            return true;
+        }
     }
 
     public HashMap<String, Boolean> getDJToggles(Guild g) {

@@ -50,6 +50,14 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
 
         String id = GeneralUtils.getDigitsOnly(args.get(0));
 
+        if (!GeneralUtils.stringIsID(id)) {
+            msg.replyEmbeds(EmbedUtils.embedMessage("That is an invalid ID!\nMake sure to either **mention** a user or provide their **ID**")
+                            .setImage("https://i.imgur.com/V6pbhEZ.png")
+                            .build())
+                    .queue();
+            return;
+        }
+
         Role role = guild.getRoleById(id);
         User user = Robertify.api.getUserById(id);
 

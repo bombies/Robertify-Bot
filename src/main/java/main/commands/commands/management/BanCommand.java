@@ -48,7 +48,10 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         final var id = GeneralUtils.getDigitsOnly(args.get(0));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to ban.").build())
+            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to ban\n" +
+                            "Make sure to either **mention** the channel, or provide its **ID**")
+                            .setImage("https://i.imgur.com/1tMlhM2.png")
+                            .build())
                     .queue();
             return;
         }

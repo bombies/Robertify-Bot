@@ -63,7 +63,10 @@ public class RestrictedChannelsCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid voice channel ID!").build())
+            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid voice channel ID!\n" +
+                            "Make sure to either **mention** the channel, or provide its **ID**")
+
+                            .build())
                     .queue();
             return;
         }

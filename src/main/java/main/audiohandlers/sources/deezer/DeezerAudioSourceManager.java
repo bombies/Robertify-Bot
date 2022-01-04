@@ -13,7 +13,6 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
-import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.constants.BotConstants;
 import main.main.Robertify;
 import org.apache.http.client.config.RequestConfig;

@@ -25,6 +25,7 @@ import main.events.AnnouncementChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
+import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import me.duncte123.botcommons.web.WebUtils;
