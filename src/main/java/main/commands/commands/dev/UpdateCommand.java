@@ -3,6 +3,8 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.json.AbstractGuildConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,6 +32,10 @@ public class UpdateCommand implements IDevCommand {
         }
 
         switch (args.get(0).toLowerCase()) {
+            case "db" -> {
+                AbstractMongoDatabase.updateAllCaches();
+                msg.addReaction("✅").queue();
+            }
             case "dedichannel", "dc" -> handleDedicatedChannelUpdates(msg, args);
             default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid args!").build()).queue();
         }
