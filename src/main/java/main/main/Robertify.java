@@ -70,7 +70,6 @@ public class Robertify {
                             GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.GUILD_EMOJIS,
-                            GatewayIntent.GUILD_PRESENCES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
@@ -132,8 +131,7 @@ public class Robertify {
 
                     .enableCache(
                             CacheFlag.VOICE_STATE,
-                            CacheFlag.MEMBER_OVERRIDES,
-                            CacheFlag.ONLINE_STATUS
+                            CacheFlag.MEMBER_OVERRIDES
                     )
                     .build();
 
