@@ -94,7 +94,14 @@ public class TrackScheduler extends AudioEventAdapter {
                                 lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
                                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
                             lastSentMsg = msg;
-                        });
+                        }, new ErrorHandler()
+                                .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
+                                        .queue(nonEmbedMsg -> {
+                                            if (lastSentMsg != null)
+                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                        })
+                        ));
             } catch (NullPointerException e) {
                 new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
             } catch (InsufficientPermissionException ignored) {}

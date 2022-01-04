@@ -84,8 +84,15 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
         User user = event.getAuthor();
-        String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
-        String raw = event.getMessage().getContentRaw();
+        final String prefix;
+
+        try {
+            prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+        } catch (NullPointerException ignored) {
+            return;
+        }
+
+        final String raw = event.getMessage().getContentRaw();
 
         if (user.isBot() || event.isWebhookMessage()) return;
 

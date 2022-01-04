@@ -46,7 +46,12 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
-        if (!config.isChannelSet(guild.getIdLong())) return;
+        try {
+            if (!config.isChannelSet(guild.getIdLong())) return;
+        } catch (NullPointerException ignored) {
+            return;
+        }
+
         if (config.getChannelID(guild.getIdLong()) != event.getChannel().getIdLong()) return;
 
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
