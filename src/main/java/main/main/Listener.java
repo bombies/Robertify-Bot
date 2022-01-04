@@ -216,6 +216,7 @@ public class Listener extends ListenerAdapter {
         new UptimeCommand().initCommand(g);
         new LofiSlashCommand().initCommand(g);
         new SupportServerCommand().initCommand(g);
+        new DonateCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
