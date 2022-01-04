@@ -114,6 +114,7 @@ public class CommandManager {
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
                 new AnnouncementCommand(),
+                new HostInfoCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
