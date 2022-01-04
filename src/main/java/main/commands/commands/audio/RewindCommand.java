@@ -134,6 +134,6 @@ public class RewindCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("r", "rep", "repeat");
+        return List.of("r", "rep", "repeat", "replay");
     }
 }
