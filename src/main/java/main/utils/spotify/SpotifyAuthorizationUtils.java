@@ -1,6 +1,5 @@
 package main.utils.spotify;
 
-import lombok.Getter;
 import lombok.SneakyThrows;
 import main.main.Robertify;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
