@@ -90,7 +90,7 @@ public class TogglesConfig extends AbstractGuildConfig {
             final JSONObject jsonObject = cacheArr.getJSONObject(i);
             boolean changesMade = false;
 
-            for (Toggles toggle : Toggles.values())
+            for (Toggles toggle : Toggles.values()) {
                 try {
                     JSONObject toggleObj = jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
 
@@ -136,6 +136,7 @@ public class TogglesConfig extends AbstractGuildConfig {
                             }
                         }
                 }
+            }
 
             if (changesMade) getCache().updateCache(Document.parse(jsonObject.toString()));
         }
