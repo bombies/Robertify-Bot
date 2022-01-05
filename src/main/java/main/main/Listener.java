@@ -20,6 +20,7 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -53,6 +54,12 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        // Initialize the JSON directory
+        // This is a deprecated feature and is marked for removed
+        // Until everything is fully removed, this method needs to be enabled
+        // For a proper first-boot.
+//        AbstractJSONFile.initDirectory();
+
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
 
