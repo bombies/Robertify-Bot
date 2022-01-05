@@ -77,8 +77,6 @@ public class Listener extends ListenerAdapter {
             }
         }
 
-//        new AudioDB().cacheAllTracks();
-
         initSelectionMenus();
 
         logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
@@ -235,7 +233,6 @@ public class Listener extends ListenerAdapter {
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new DonateCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
