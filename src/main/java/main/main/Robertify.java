@@ -156,7 +156,7 @@ public class Robertify {
             deezerApi = new DeezerApi();
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            scheduler.scheduleAtFixedRate(new RefreshSpotifyToken(), 0, 1, TimeUnit.HOURS);
+            scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
 
             try {
                 baringo = new BaringoClient.Builder()
@@ -167,14 +167,6 @@ public class Robertify {
             }
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-        }
-    }
-
-    private static class RefreshSpotifyToken implements Runnable {
-
-        @Override
-        public void run() {
-            SpotifyAuthorizationUtils.setTokens();
         }
     }
 }

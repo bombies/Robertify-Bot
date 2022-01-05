@@ -1,5 +1,6 @@
 package main.utils.spotify;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import main.main.Robertify;
 import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
@@ -39,5 +40,17 @@ public class SpotifyAuthorizationUtils {
 
     public static void setTokens() {
         Robertify.getSpotifyApi().setAccessToken(getClientCredentials().getAccessToken());
+    }
+
+    private static class RefreshSpotifyToken implements Runnable {
+
+        @Override
+        public void run() {
+            SpotifyAuthorizationUtils.setTokens();
+        }
+    }
+
+    public static Runnable doTokenRefresh() {
+        return new RefreshSpotifyToken();
     }
 }
