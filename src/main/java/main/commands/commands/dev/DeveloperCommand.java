@@ -68,7 +68,7 @@ public class DeveloperCommand implements IDevCommand {
                 continue;
             }
 
-            User developer = Robertify.api.getUserById(s);
+            User developer = GeneralUtils.retrieveUser(s);
 
             if (developer == null)
                 throw new NullPointerException("User with id "+s+" is null");
@@ -111,7 +111,7 @@ public class DeveloperCommand implements IDevCommand {
                 continue;
             }
 
-            User developer = Robertify.api.getUserById(s);
+            User developer = GeneralUtils.retrieveUser(s);
 
             if (developer == null)
                 throw new NullPointerException("User with id "+s+" is null");

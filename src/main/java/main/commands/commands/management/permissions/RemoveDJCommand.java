@@ -59,7 +59,7 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
         }
 
         Role role = guild.getRoleById(id);
-        User user = Robertify.api.getUserById(id);
+        User user = GeneralUtils.retrieveUser(id);
 
         if (role == null && user == null) {
             eb = EmbedUtils.embedMessage("Please provide a valid role/user ID!");

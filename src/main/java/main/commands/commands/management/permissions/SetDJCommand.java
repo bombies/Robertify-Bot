@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         }
 
         if (args.isEmpty()) {
-            eb = EmbedUtils.embedMessage("You must provide a role to set as a DJ role!");
+            eb = EmbedUtils.embedMessage("You must provide a user/role to set as a DJ role!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -59,7 +60,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         }
 
         Role role = guild.getRoleById(id);
-        User user = Robertify.api.getUserById(id);
+        User user = GeneralUtils.retrieveUser(id);
 
         if (role == null && user == null) {
             eb = EmbedUtils.embedMessage("Please provide a valid role/user ID!");

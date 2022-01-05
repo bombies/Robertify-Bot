@@ -111,7 +111,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             final var reproduction = fields.get(2).getValue();
             final var comments = fields.get(3).getValue();
 
-            final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(reporter));
+            final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(reporter));
 
             user.openPrivateChannel().queue(channel -> {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessageWithTitle(
@@ -200,7 +200,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(id));
+        final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
@@ -238,7 +238,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(id));
+        final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())

@@ -134,7 +134,7 @@ public class PermissionsCommand implements ICommand {
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         } else {
-            user = Robertify.api.getUserById(id);
+            user = GeneralUtils.retrieveUser(id);
             if (user == null) {
                 EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid role ID!");
                 msg.replyEmbeds(eb.build()).queue();
@@ -244,7 +244,7 @@ public class PermissionsCommand implements ICommand {
             if (GeneralUtils.stringIsID(GeneralUtils.getDigitsOnly(args.get(1)))) {
                 String id = GeneralUtils.getDigitsOnly(args.get(1));
                 Role role = msg.getGuild().getRoleById(id);
-                User user = Robertify.api.getUserById(id);
+                User user = GeneralUtils.retrieveUser(id);
 
                 if (role == null && user == null) {
                     EmbedBuilder eb = EmbedUtils.embedMessage("There was no role or user found with that ID!");
@@ -294,7 +294,7 @@ public class PermissionsCommand implements ICommand {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         List<User> users = new ArrayList<>();
         for (long s : permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.toUpperCase()))
-            users.add(Robertify.api.getUserById(s));
+            users.add(GeneralUtils.retrieveUser(s));
 
         List<String> usersWithPerm = new ArrayList<>();
         for (User u : users)

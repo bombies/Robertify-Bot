@@ -6,6 +6,7 @@ import main.constants.ENV;
 import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,16 +172,16 @@ public class GeneralUtils {
         return hasPerms(guild, guild.getMember(sender), perm);
     }
 
-    @Deprecated @ForRemoval
-    @ReplaceWith("progressBar(String percent, ProgressBar barType)")
-    public static String progressBar(double percent) {
-        StringBuilder str = new StringBuilder();
-        for(int i=0; i<12; i++)
-            if(i == (int)(percent*12))
-                str.append("\uD83D\uDD18"); // 🔘
-            else
-                str.append("▬");
-        return str.toString();
+    public static User retrieveUser(long id) {
+        try {
+            return Robertify.api.retrieveUserById(id).complete();
+        } catch (ErrorResponseException e) {
+            return null;
+        }
+    }
+
+    public static User retrieveUser(String id) {
+        return retrieveUser(Long.parseLong(id));
     }
 
     public static String progressBar(double percent, ProgressBar barType) {

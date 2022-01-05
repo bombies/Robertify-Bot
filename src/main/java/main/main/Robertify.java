@@ -31,6 +31,7 @@ import main.utils.spotify.SpotifyAuthorizationUtils;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -69,12 +70,11 @@ public class Robertify {
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.GUILD_EMOJIS,
                             GatewayIntent.DIRECT_MESSAGES
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .setChunkingFilter(ChunkingFilter.ALL)
+                    .setChunkingFilter(ChunkingFilter.NONE)
 
                     // Event Listeners
                     .addEventListeners(
@@ -134,6 +134,14 @@ public class Robertify {
                             CacheFlag.VOICE_STATE,
                             CacheFlag.MEMBER_OVERRIDES
                     )
+                    .disableCache(
+                            CacheFlag.ACTIVITY,
+                            CacheFlag.EMOTE,
+                            CacheFlag.CLIENT_STATUS,
+                            CacheFlag.ROLE_TAGS,
+                            CacheFlag.ONLINE_STATUS
+                    )
+                    .setActivity(Activity.listening("Starting up..."))
                     .build();
 
             YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.YOUTUBE_PAPISID));

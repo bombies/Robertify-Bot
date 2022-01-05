@@ -140,7 +140,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             suggestion.delete().queue();
 
-            Robertify.api.getUserById(GeneralUtils.getDigitsOnly(suggester))
+            GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(suggester))
                     .openPrivateChannel().queue(channel -> {
                         final EmbedBuilder acceptedEmbed = new EmbedBuilder();
                         acceptedEmbed.setColor(new Color(77, 255, 69));
@@ -214,7 +214,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             suggestion.delete().queue();
 
-            Robertify.api.getUserById(GeneralUtils.getDigitsOnly(suggester))
+            GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(suggester))
                     .openPrivateChannel().queue(channel -> {
                         final EmbedBuilder deniedEmbed = new EmbedBuilder();
                         deniedEmbed.setTitle("Suggestions");
@@ -301,7 +301,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(id));
+        final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
@@ -339,7 +339,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var user = Robertify.api.getUserById(GeneralUtils.getDigitsOnly(id));
+        final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
             msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())

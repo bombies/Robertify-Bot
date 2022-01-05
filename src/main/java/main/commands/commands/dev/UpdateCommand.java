@@ -33,7 +33,7 @@ public class UpdateCommand implements IDevCommand {
 
         switch (args.get(0).toLowerCase()) {
             case "db" -> {
-                AbstractMongoDatabase.updateAllCaches();
+                AbstractMongoDatabase.initAllCaches();
                 msg.addReaction("✅").queue();
             }
             case "dedichannel", "dc" -> handleDedicatedChannelUpdates(msg, args);
