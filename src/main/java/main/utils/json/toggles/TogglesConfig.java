@@ -46,7 +46,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         final var djToggles = getDJToggles(g);
 
         if (!djToggles.containsKey(cmd.getName()))
-            throw new NullPointerException("Invalid command passed!");
+            throw new NullPointerException("Invalid command passed! [Command: "+cmd.getName()+"]");
 
         return djToggles.get(cmd.getName().toLowerCase());
     }
