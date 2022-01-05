@@ -55,7 +55,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         // Initialize the JSON directory
-        // This is a deprecated feature and is marked for removed
+        // This is a deprecated feature and is marked for removal
         // Until everything is fully removed, this method needs to be enabled
         // For a proper first-boot.
 //        AbstractJSONFile.initDirectory();
