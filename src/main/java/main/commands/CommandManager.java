@@ -182,7 +182,8 @@ public class CommandManager {
                 new BotInfoCommand(),
                 new UptimeCommand(),
                 new SupportServerCommand(),
-                new DonateCommand()
+                new DonateCommand(),
+                new VoteCommand()
         );
     }
 
