@@ -13,6 +13,7 @@ import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.util.*;
+import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.commands.commands.misc.EightBallCommand;
 import main.constants.BotConstants;
@@ -61,6 +62,7 @@ public class Listener extends ListenerAdapter {
 
         AbstractMongoDatabase.initAllCaches();
         AbstractMongoDatabase.updateAllCaches();
+        logger.info("Initialized and updated all caches");
 
         new ChangeLogConfig().initConfig();
 
@@ -77,6 +79,7 @@ public class Listener extends ListenerAdapter {
         }
 
         initSelectionMenus();
+        StatisticsDB.startDailyUpdateCheck();
 
         logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());

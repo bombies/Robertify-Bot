@@ -17,10 +17,13 @@ import main.main.Config;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.GenericJSONField;
+import org.bson.BSONObject;
+import org.bson.BsonArray;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 import org.bson.types.ObjectId;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +34,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public abstract class AbstractMongoDatabase {
-    private final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
 
     private final MongoClient client;
     @Getter
@@ -91,6 +94,7 @@ public abstract class AbstractMongoDatabase {
     public static void initAllCaches() {
         BotInfoCache.initCache();
         GuildsDBCache.initCache();
+        new StatisticsDB().init();
     }
 
     public static void updateAllCaches() {
@@ -201,11 +205,27 @@ public abstract class AbstractMongoDatabase {
     protected void updateDocument(Document document, JSONObject json) {
         final List<Bson> updates = new ArrayList<>();
 
-        for (String key : json.keySet())
+        for (String key : json.keySet()) {
+            if (key.equals("_id")) continue;
+
+            final var value = json.get(key);
+
+            if (value instanceof JSONObject obj) {
+                updates.add(Updates.combine(
+                        Updates.set(key, Document.parse(obj.toString()))
+                ));
+                continue;
+            } else if (value instanceof JSONArray arr) {
+                updates.add(Updates.combine(
+                        Updates.set(key, BsonArray.parse(arr.toString()))
+                ));
+                continue;
+            }
+
             updates.add(Updates.combine(
-                    Updates.set(key, json.get(key)),
-                    Updates.currentTimestamp("lastUpdated")
+                    Updates.set(key, json.get(key))
             ));
+        }
 
         updateDocument(document, updates);
     }

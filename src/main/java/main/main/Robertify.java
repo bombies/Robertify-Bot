@@ -68,14 +68,12 @@ public class Robertify {
         try {
             api = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
-                            GatewayIntent.GUILD_MEMBERS,
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
                     .setAudioSendFactory(new NativeAudioSendFactory())
-                    .setMemberCachePolicy(MemberCachePolicy.ALL)
                     .setChunkingFilter(ChunkingFilter.NONE)
 
                     // Event Listeners
@@ -133,8 +131,7 @@ public class Robertify {
                     )
 
                     .enableCache(
-                            CacheFlag.VOICE_STATE,
-                            CacheFlag.MEMBER_OVERRIDES
+                            CacheFlag.VOICE_STATE
                     )
                     .disableCache(
                             CacheFlag.ACTIVITY,
