@@ -7,6 +7,7 @@ import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,8 +20,10 @@ import java.util.concurrent.TimeUnit;
 
 public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON {
     private static final Logger logger = LoggerFactory.getLogger(StatisticsDB.class);
+    private final static StatisticsDB INSTANCE = new StatisticsDB();
+    private final static Document document = INSTANCE.getCollection().find().iterator().next();
 
-    public StatisticsDB() {
+    private StatisticsDB() {
         super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_STATS);
     }
 
@@ -87,14 +90,14 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
             }
             return ret;
         } else { // Specified month
-            final var pastMonths = currYearStats.getJSONArray(Fields.PAST_MONTHS.toString());
             try {
+                final var pastMonths = currYearStats.getJSONArray(Fields.PAST_MONTHS.toString());
                 final var monthObj = pastMonths.getJSONObject(getIndexOfObjectInArray(pastMonths, Fields.MONTH, month));
 
                 if (!monthObj.has(String.valueOf(day))) return 0;
 
                 return monthObj.getJSONObject(String.valueOf(day)).getJSONObject(Fields.STATS.toString()).getLong(stat.toString());
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | JSONException e) {
                 return 0;
             } catch (Exception e) {
                 logger.error("An unexpected error occurred!", e);
@@ -103,11 +106,11 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         throw new UnexpectedException("How did this happen?");
     }
 
-    public long getStatForDay(int day, Statistic stat) {
+    private long getStatForDay(int day, Statistic stat) {
         return getStatForDay(day, -1, stat);
     }
 
-    public long getStatForWeek(Statistic stat) {
+    private long getStatForWeek(Statistic stat) {
         final var calendar = Calendar.getInstance();
         final var dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
 
@@ -121,7 +124,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         return  ret;
     }
 
-    public long getStatForMonth(int month, Statistic stat) {
+    private long getStatForMonth(int month, Statistic stat) {
         long ret = 0;
 
         for (int i = 1; i <= 32; i++)
@@ -130,7 +133,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         return ret;
     }
 
-    public long getStatForYear(Statistic stat) {
+    private long getStatForYear(Statistic stat) {
         long ret = 0;
 
         for (int i = 0; i < 12; i++)
@@ -145,7 +148,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
     }
 
     private Document getDocument(){
-        return getCollection().find().iterator().next();
+        return document;
     }
 
     // Boring back-end stuff incoming!
@@ -385,5 +388,9 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         public String toString() {
             return str;
         }
+    }
+
+    public static StatisticsDB ins() {
+        return INSTANCE;
     }
 }

@@ -94,7 +94,7 @@ public abstract class AbstractMongoDatabase {
     public static void initAllCaches() {
         BotInfoCache.initCache();
         GuildsDBCache.initCache();
-        new StatisticsDB().init();
+        StatisticsDB.ins().init();
     }
 
     public static void updateAllCaches() {

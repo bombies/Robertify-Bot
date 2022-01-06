@@ -13,6 +13,7 @@ import main.commands.commands.management.TogglesCommand;
 import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.util.*;
 import main.constants.Permission;
+import main.constants.Statistic;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
@@ -23,6 +24,7 @@ import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.statistics.StatisticsManager;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -117,6 +119,7 @@ public class CommandManager {
                 new ReloadConfigCommand(),
                 new AnnouncementCommand(),
                 new HostInfoCommand(),
+                new StatisticsCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -339,13 +342,23 @@ public class CommandManager {
                     if (toggles.getDJToggle(guild, cmd)) {
                         if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
                             cmd.handle(ctx);
+                            if (!(cmd instanceof StatisticsCommand))
+                                StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                         } else {
                             msg.replyEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
                                             " to run this command!").build())
                                     .queue();
                         }
-                    } else cmd.handle(ctx);
-                } else cmd.handle(ctx);
+                    } else {
+                        cmd.handle(ctx);
+                        if (!(cmd instanceof StatisticsCommand))
+                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+                    }
+                } else {
+                    cmd.handle(ctx);
+                    if (!(cmd instanceof StatisticsCommand))
+                        StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+                }
             }
             CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
         } else {
