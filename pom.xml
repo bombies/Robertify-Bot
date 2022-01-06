@@ -115,7 +115,7 @@
         <dependency>
             <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>master</version>
+            <version>4.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.sedmelluq</groupId>
