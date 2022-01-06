@@ -2,8 +2,8 @@ package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.sources.RobertifyAudioTrack;
-import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.commands.audio.LofiCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
@@ -108,9 +108,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
         final var msgRequest = getMessageRequest(guild.getIdLong());
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        final var audioPlayer = musicManager.audioPlayer;
+        final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
-        final var queue = musicManager.scheduler.queue;
+        final var queue = musicManager.getScheduler().queue;
         final var queueAsList = new ArrayList<>(queue);
 
         EmbedBuilder eb = new EmbedBuilder();

@@ -1,6 +1,7 @@
 package main.commands.commands.management.dedicatechannel;
 
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -141,7 +142,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (event.getTextChannel().getIdLong() != config.getChannelID(event.getGuild().getIdLong())) return;
 
         final String id = event.getButton().getId();
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final User user = event.getUser();

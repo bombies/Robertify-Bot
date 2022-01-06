@@ -1,7 +1,8 @@
 package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.SkipToCommand;
@@ -65,8 +66,8 @@ public class SkipSlashCommand extends InteractiveCommand {
                     .setEphemeral(false)
                     .queue();
         } else {
-            final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+            final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
             final int tracksToSkip = GeneralUtils.longToInt(event.getOption("trackstoskip").getAsLong());
             event.getHook().sendMessageEmbeds(new SkipToCommand().handleSkip(queue, musicManager, tracksToSkip).build())
                     .setEphemeral(false)

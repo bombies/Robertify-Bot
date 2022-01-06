@@ -1,6 +1,8 @@
 package main.commands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -51,7 +53,7 @@ public class VolumeCommand implements ICommand {
             return EmbedUtils.embedMessage("You can't set the volume to that value");
 
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
-        var audioPlayer = musicManager.audioPlayer;
+        var audioPlayer = musicManager.getPlayer();
 
         audioPlayer.setVolume(volume);
 

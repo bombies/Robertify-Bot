@@ -203,12 +203,12 @@ public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigu
 
     @Override
     public void encodeTrack(AudioTrack track, DataOutput output) {
-        throw new UnsupportedOperationException("Not supported by this audio source manager");
+        // Nothing to encode
     }
 
     @Override
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
-        throw new UnsupportedOperationException("Not supported by this audio source manager");
+        return new DeezerAudioTrack(trackInfo, youtubeManager, soundCloudManager, null, null);
     }
 
     @Override

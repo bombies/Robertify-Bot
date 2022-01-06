@@ -1,6 +1,7 @@
 package main.commands.commands.audio;
 
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -48,25 +49,9 @@ public class DisconnectCommand implements ICommand {
     }
 
     public EmbedBuilder handleDisconnect(Guild guild) {
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        musicManager.scheduler.queue.clear();
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
-        if (musicManager.scheduler.player.getPlayingTrack() != null)
-            musicManager.scheduler.player.stopTrack();
-
-        guild.getAudioManager().closeAudioConnection();
-
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
-
-        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
-
-        musicManager.scheduler.repeating = false;
-        musicManager.scheduler.playlistRepeating = false;
-        musicManager.scheduler.getPastQueue().clear();
-
-        if (musicManager.scheduler.player.isPaused())
-            musicManager.scheduler.player.setPaused(false);
+        musicManager.leave();
 
         return EmbedUtils.embedMessage("Disconnected!");
     }

@@ -1,10 +1,11 @@
 package main.commands.commands.audio.slashcommands;
 
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.commands.commands.audio.LofiCommand;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -58,8 +59,6 @@ public class LeaveSlashCommand extends InteractiveCommand {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-
-
         if (!selfVoiceState.inVoiceChannel()) {
             eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
@@ -78,20 +77,9 @@ public class LeaveSlashCommand extends InteractiveCommand {
             return;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        musicManager.scheduler.queue.clear();
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
 
-        if (musicManager.scheduler.player.getPlayingTrack() != null)
-            musicManager.scheduler.player.stopTrack();
-
-        event.getGuild().getAudioManager().closeAudioConnection();
-
-        if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(event.getGuild());
-
-        musicManager.scheduler.repeating = false;
-        musicManager.scheduler.playlistRepeating = false;
-        musicManager.scheduler.getPastQueue().clear();
+        musicManager.leave();
 
         eb = EmbedUtils.embedMessage("Disconnected!");
         event.getHook().sendMessageEmbeds(eb.build()).queue();

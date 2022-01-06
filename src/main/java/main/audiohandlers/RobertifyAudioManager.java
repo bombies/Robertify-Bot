@@ -1,18 +1,18 @@
 package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.player.*;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.*;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.sources.deezer.DeezerAudioSourceManager;
 import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
@@ -23,10 +23,14 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class RobertifyAudioManager {
+    private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
+
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
@@ -50,9 +54,6 @@ public class RobertifyAudioManager {
         audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
         audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
         audioPlayerManager.registerSourceManager(new LocalAudioSourceManager());
-
-        AudioSourceManagers.registerRemoteSources(audioPlayerManager);
-        AudioSourceManagers.registerLocalSource(audioPlayerManager);
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -71,8 +72,8 @@ public class RobertifyAudioManager {
     @SneakyThrows
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
@@ -117,6 +118,7 @@ public class RobertifyAudioManager {
     @SneakyThrows
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
                                                 GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
+
         final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))

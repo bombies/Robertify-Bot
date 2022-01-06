@@ -1,14 +1,13 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.legacy.dedicatedchannel.LegacyDedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -21,8 +20,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
 
@@ -47,8 +46,8 @@ public class SkipToCommand implements ICommand {
         if (id > queue.size() || id <= 0)
             return EmbedUtils.embedMessage("ID provided isn't a valid ID!");
 
-        final var audioPlayer = musicManager.audioPlayer;
-        final var guild = musicManager.scheduler.getGuild();
+        final var audioPlayer = musicManager.getPlayer();
+        final var guild = musicManager.getGuild();
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
 
@@ -57,8 +56,8 @@ public class SkipToCommand implements ICommand {
 
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.getPlayingTrack().setPosition(0);
-        musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
-        musicManager.scheduler.nextTrack();
+        musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
+        musicManager.getScheduler().nextTrack();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

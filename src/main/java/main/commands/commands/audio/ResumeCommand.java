@@ -1,7 +1,8 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -45,8 +46,8 @@ public class ResumeCommand implements ICommand {
             return;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {
             eb = EmbedUtils.embedMessage("There is nothing playing");

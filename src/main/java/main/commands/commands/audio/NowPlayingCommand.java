@@ -1,9 +1,8 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.commands.CommandContext;
@@ -56,8 +55,8 @@ public class NowPlayingCommand implements ICommand {
             return eb;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        AudioPlayer audioPlayer = musicManager.audioPlayer;
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        var audioPlayer = musicManager.getPlayer();
         AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null) {

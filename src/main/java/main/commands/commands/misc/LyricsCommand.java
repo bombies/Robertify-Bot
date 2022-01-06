@@ -1,13 +1,11 @@
 package main.commands.commands.misc;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.SneakyThrows;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.RobertifyAudioTrack;
-import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.genius.GeniusAPI;
@@ -60,8 +58,8 @@ public class LyricsCommand implements ICommand {
                 return;
             }
 
-            final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-            final AudioPlayer audioPlayer = musicManager.audioPlayer;
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+            final var audioPlayer = musicManager.getPlayer();
             final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
 
             if (playingTrack == null) {

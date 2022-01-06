@@ -1,6 +1,6 @@
 package main.commands.commands.dev.test;
 
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
@@ -28,7 +28,7 @@ public class PlaySpotifyURICommand implements ITestCommand {
             var uri = SpotifyURI.parse(args.get(0));
             RobertifyAudioManager.getInstance().joinVoiceChannel(ctx.getChannel(), ctx.getSelfMember().getVoiceState(), ctx.getMember().getVoiceState());
 
-            final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         } catch (InvalidSpotifyURIException e) {
             msg.reply(e.getMessage()).queue();
         }

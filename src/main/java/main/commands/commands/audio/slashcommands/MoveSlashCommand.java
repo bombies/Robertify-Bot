@@ -1,7 +1,8 @@
 package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.MoveCommand;
 import main.utils.GeneralUtils;
@@ -67,8 +68,8 @@ public class MoveSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final int id = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());
 

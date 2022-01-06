@@ -1,6 +1,8 @@
 package main.commands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -28,9 +30,9 @@ public class PreviousTrackCommand implements ICommand {
 
     public EmbedBuilder handlePrevious(Guild guild, GuildVoiceState memberVoiceState) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        final var scheduler = musicManager.scheduler;
+        final var scheduler = musicManager.getScheduler();
         final var previouslyPlayedTracks = scheduler.getPastQueue();
-        final var audioPlayer = musicManager.audioPlayer;
+        final var audioPlayer = musicManager.getPlayer();
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel())
@@ -54,8 +56,8 @@ public class PreviousTrackCommand implements ICommand {
 
         audioPlayer.playTrack(previouslyPlayedTracks.pop());
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
 
         return EmbedUtils.embedMessage("Now playing the previous track!");
     }

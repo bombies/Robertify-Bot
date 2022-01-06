@@ -1,7 +1,8 @@
 package main.commands.commands.audio;
 
 import lombok.Getter;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -48,9 +49,9 @@ public class LofiCommand implements ICommand {
     }
 
     public MessageEmbed handleLofi(Guild guild, Member member, TextChannel channel) {
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        final var audioPlayer = musicManager.audioPlayer;
-        final var queue = musicManager.scheduler.queue;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var audioPlayer = musicManager.getPlayer();
+        final var queue = musicManager.getScheduler().queue;
 
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
@@ -86,12 +87,12 @@ public class LofiCommand implements ICommand {
 
         if (lofiEnabledGuilds.contains(guild.getIdLong())) {
             lofiEnabledGuilds.remove(guild.getIdLong());
-            musicManager.scheduler.nextTrack();
+            musicManager.getScheduler().nextTrack();
 
             return EmbedUtils.embedMessage("You have disabled Lo-Fi mode").build();
         } else {
             queue.clear();
-            musicManager.scheduler.getPastQueue().clear();
+            musicManager.getScheduler().getPastQueue().clear();
             audioPlayer.stopTrack();
 
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))

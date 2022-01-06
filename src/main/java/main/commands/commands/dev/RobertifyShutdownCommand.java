@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.ENV;
@@ -30,20 +32,9 @@ public class RobertifyShutdownCommand implements IDevCommand {
         for (Guild g : Robertify.api.getGuilds()) {
             var selfMember = g.getSelfMember();
             var musicManager = RobertifyAudioManager.getInstance().getMusicManager(g);
-            var queue = musicManager.scheduler.queue;
-            var audioPlayer = musicManager.audioPlayer;
-
-            if (audioPlayer.getPlayingTrack() != null)
-                audioPlayer.stopTrack();
-
-            if (!queue.isEmpty())
-                queue.clear();
 
             if (selfMember.getVoiceState().inVoiceChannel())
-                g.getAudioManager().closeAudioConnection();
-
-            if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(g);
+                musicManager.leave();
         }
 
         try {

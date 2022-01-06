@@ -2,7 +2,8 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -43,32 +44,33 @@ public class StopCommand implements ICommand {
             return;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
 
         msg.replyEmbeds(handleStop(musicManager).build()).queue();
     }
 
     public EmbedBuilder handleStop(GuildMusicManager musicManager) {
-        AudioPlayer audioPlayer = musicManager.audioPlayer;
-        AudioTrack track = audioPlayer.getPlayingTrack();
+        final var audioPlayer = musicManager.getPlayer();
+        final var scheduler = musicManager.getScheduler();
+        final AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null)
             return EmbedUtils.embedMessage("There is nothing playing!");
 
 
-        musicManager.scheduler.player.stopTrack();
-        musicManager.scheduler.queue.clear();
-        musicManager.scheduler.getPastQueue().clear();
-        musicManager.scheduler.repeating = false;
-        musicManager.scheduler.playlistRepeating = false;
+        audioPlayer.stopTrack();
+        scheduler.queue.clear();
+        scheduler.getPastQueue().clear();
+        scheduler.repeating = false;
+        scheduler.playlistRepeating = false;
 
-        if (musicManager.scheduler.player.isPaused())
-            musicManager.scheduler.player.setPaused(false);
+        if (audioPlayer.isPaused())
+            audioPlayer.setPaused(false);
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
+            new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
 
-        LofiCommand.getLofiEnabledGuilds().remove(musicManager.scheduler.getGuild().getIdLong());
+        LofiCommand.getLofiEnabledGuilds().remove(musicManager.getGuild().getIdLong());
 
         return EmbedUtils.embedMessage("You have stopped the track and cleared the queue.");
     }

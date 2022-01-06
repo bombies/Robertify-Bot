@@ -1,7 +1,8 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -21,8 +22,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ClearQueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final var queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();

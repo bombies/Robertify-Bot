@@ -1,7 +1,8 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -57,8 +58,8 @@ public class SeekCommand implements ICommand {
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
             return EmbedUtils.embedMessage("You must bein the same voice channel I am in order to use this command");
 
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
-        final AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
             return EmbedUtils.embedMessage("There is nothing playing!");

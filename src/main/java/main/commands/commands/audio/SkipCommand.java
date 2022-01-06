@@ -1,7 +1,8 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -47,8 +48,8 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {
             eb = EmbedUtils.embedMessage("There is nothing to skip!");
@@ -56,8 +57,8 @@ public class SkipCommand implements ICommand {
         }
 
         audioPlayer.getPlayingTrack().setPosition(0);
-        musicManager.scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
-        musicManager.scheduler.nextTrack();
+        musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
+        musicManager.getScheduler().nextTrack();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

@@ -2,13 +2,12 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.BotDB;
-import main.utils.database.sqlite3.ServerDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -36,8 +35,8 @@ public class RewindCommand implements ICommand {
             return;
         }
 
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        AudioPlayer audioPlayer = musicManager.audioPlayer;
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        var audioPlayer = musicManager.getPlayer();
         AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null) {
@@ -62,8 +61,8 @@ public class RewindCommand implements ICommand {
     }
 
     public EmbedBuilder handleRewind(GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
-        final AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final var audioPlayer = musicManager.getPlayer();
         final AudioTrack track = audioPlayer.getPlayingTrack();
         EmbedBuilder eb;
 

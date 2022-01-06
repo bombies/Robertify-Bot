@@ -1,6 +1,8 @@
 package main.commands.commands.management.dedicatechannel;
 
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
@@ -71,7 +73,7 @@ public class DedicatedChannelCommand implements ICommand {
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
                                 dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
 
-                                if (RobertifyAudioManager.getInstance().getMusicManager(guild).audioPlayer.getPlayingTrack() != null)
+                                if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
                                     dediChannelConfig.updateMessage(guild);
 
                                 msg.addReaction("✅").queue();

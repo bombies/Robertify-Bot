@@ -1,5 +1,6 @@
 package main.audiohandlers.sources;
 
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
@@ -87,5 +88,10 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
     @Override
     public AudioTrack makeClone() {
         return new RobertifyAudioTrack(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, id, trackImage);
+    }
+
+    @Override
+    public AudioSourceManager getSourceManager() {
+        return super.getSourceManager();
     }
 }

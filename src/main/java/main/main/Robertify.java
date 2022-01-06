@@ -6,6 +6,7 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
+import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
@@ -25,10 +26,10 @@ import main.events.AnnouncementChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.GeneralUtils;
-import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import me.duncte123.botcommons.web.WebUtils;
+import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -41,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
+import java.net.URI;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,7 @@ public class Robertify {
 
     private static final Logger logger = LoggerFactory.getLogger(Robertify.class);
 
+    @Getter
     public static JDA api;
     public static BaringoClient baringo;
     @Getter
@@ -63,7 +66,6 @@ public class Robertify {
         GeneralUtils.setDefaultEmbed();
 
         try {
-
             api = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_MEMBERS,
@@ -141,6 +143,7 @@ public class Robertify {
                             CacheFlag.ROLE_TAGS,
                             CacheFlag.ONLINE_STATUS
                     )
+                    .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."))
                     .build();
 

@@ -1,17 +1,15 @@
 package main.events;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.*;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,17 +26,17 @@ public class VoiceChannelEvents extends ListenerAdapter {
     @Override
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
-            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            musicManager.scheduler.repeating = false;
-            musicManager.scheduler.playlistRepeating = false;
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+            musicManager.getScheduler().repeating = false;
+            musicManager.getScheduler().playlistRepeating = false;
 
-            if (musicManager.audioPlayer.isPaused())
-                musicManager.audioPlayer.setPaused(false);
+            if (musicManager.getPlayer().isPaused())
+                musicManager.getPlayer().setPaused(false);
 
-            if (musicManager.audioPlayer.getPlayingTrack() != null)
-                musicManager.audioPlayer.stopTrack();
+            if (musicManager.getPlayer().getPlayingTrack() != null)
+                musicManager.getPlayer().stopTrack();
 
-            musicManager.scheduler.queue.clear();
+            musicManager.getScheduler().queue.clear();
 
             if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
                 new DedicatedChannelConfig().updateMessage(event.getGuild());
@@ -86,16 +84,16 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (!channel.equals(voiceState.getChannel())) return;
 
         if (channel.getMembers().size() == 1) {
-            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            musicManager.audioPlayer.setPaused(true);
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+            musicManager.getPlayer().setPaused(true);
         }
     }
 
     void resumeSong(GenericGuildVoiceUpdateEvent event) {
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        if (musicManager.audioPlayer.isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        if (musicManager.getPlayer().isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
              && !musicManager.isForcePaused())
-            musicManager.audioPlayer.setPaused(false);
+            musicManager.getPlayer().setPaused(false);
     }
 
     void doAutoLeave(GenericGuildVoiceUpdateEvent event, VoiceChannel channelLeft) {
@@ -121,14 +119,13 @@ public class VoiceChannelEvents extends ListenerAdapter {
                         }
                     },
                     (e) -> {
-                        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-                        if (musicManager.audioPlayer.isPaused() && !musicManager.isForcePaused())
-                            musicManager.audioPlayer.setPaused(false);;
+                        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+                        if (musicManager.getPlayer().isPaused() && !musicManager.isForcePaused())
+                            musicManager.getPlayer().setPaused(false);;
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-                        event.getGuild().getAudioManager().closeAudioConnection();
-                        LofiCommand.getLofiEnabledGuilds().remove(event.getGuild().getIdLong());
+                        RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
                     }
             );
         }

@@ -225,12 +225,12 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
     @Override
     public void encodeTrack(AudioTrack track, DataOutput output) {
-        throw new UnsupportedOperationException("Not supported by this audio source manager");
+        // Nothing
     }
 
     @Override
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
-        throw new UnsupportedOperationException("Not supported by this audio source manager");
+        throw new UnsupportedOperationException("This operation is not supported");
     }
 
     @Override

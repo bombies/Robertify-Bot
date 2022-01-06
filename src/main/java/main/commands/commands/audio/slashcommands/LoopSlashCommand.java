@@ -1,7 +1,8 @@
 package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LoopCommand;
 import main.utils.component.InteractiveCommand;
@@ -59,8 +60,8 @@ public class LoopSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final AudioPlayer audioPlayer = musicManager.audioPlayer;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var audioPlayer = musicManager.getPlayer();
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final var memberVoiceState = event.getMember().getVoiceState();
 

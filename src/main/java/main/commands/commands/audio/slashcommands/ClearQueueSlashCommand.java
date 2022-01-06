@@ -1,7 +1,8 @@
 package main.commands.commands.audio.slashcommands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ClearQueueCommand;
 import main.constants.Permission;
@@ -47,8 +48,8 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
-        final GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.scheduler.queue;
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var queue = musicManager.getScheduler().queue;
 
         GeneralUtils.setCustomEmbed("Queue");
 

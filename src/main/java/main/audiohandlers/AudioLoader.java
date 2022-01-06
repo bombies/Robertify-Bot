@@ -4,6 +4,8 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -32,7 +34,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled) {
-        this.guild = musicManager.scheduler.getGuild();
+
+        this.guild = musicManager.getGuild();
         this.sender = sender;
         this.musicManager = musicManager;
         this.trackRequestedByUser = trackRequestedByUser;
@@ -51,13 +54,16 @@ public class AudioLoader implements AudioLoadResultHandler {
 
 
         trackRequestedByUser.put(audioTrack, sender);
-        musicManager.scheduler.queue(audioTrack);
 
-        if (musicManager.scheduler.playlistRepeating)
-            musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
+        final var scheduler = musicManager.getScheduler();
+        scheduler.queue(audioTrack);
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (scheduler.playlistRepeating)
+            scheduler.setSavedQueue(guild, scheduler.queue);
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
+
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
@@ -89,13 +95,16 @@ public class AudioLoader implements AudioLoadResultHandler {
                RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0));
 
             trackRequestedByUser.put(tracks.get(0), sender);
-            musicManager.scheduler.queue(tracks.get(0));
 
-            if (musicManager.scheduler.playlistRepeating)
-                musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
+            final var scheduler = musicManager.getScheduler();
 
-            if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-                new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+            scheduler.queue(tracks.get(0));
+
+            if (scheduler.playlistRepeating)
+                scheduler.setSavedQueue(guild, scheduler.queue);
+
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(guild);
             return;
         }
 
@@ -116,17 +125,18 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (loadPlaylistShuffled)
             Collections.shuffle(tracks);
 
+        final var scheduler = musicManager.getScheduler();
+
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
-            musicManager.scheduler.queue(track);
+            scheduler.queue(track);
         }
 
+        if (scheduler.playlistRepeating)
+            scheduler.setSavedQueue(guild, scheduler.queue);
 
-        if (musicManager.scheduler.playlistRepeating)
-            musicManager.scheduler.setSavedQueue(guild, musicManager.scheduler.queue);
-
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.scheduler.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.scheduler.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
     }
 
     @Override
@@ -143,8 +153,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException e) {
-        if (musicManager.audioPlayer.getPlayingTrack() == null)
-            guild.getAudioManager().closeAudioConnection();
+            if (musicManager.getPlayer().getPlayingTrack() == null)
+                musicManager.getGuild().getAudioManager().closeAudioConnection();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
             logger.error("[FATAL ERROR] Could not load track!", e);
