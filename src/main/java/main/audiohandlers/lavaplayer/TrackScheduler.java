@@ -105,7 +105,8 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
                                             if (lastSentMsg != null)
                                                 lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
                                                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                        })
+                                        }, new ErrorHandler()
+                                                .handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}))
                         ));
             } catch (NullPointerException e) {
                 new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
