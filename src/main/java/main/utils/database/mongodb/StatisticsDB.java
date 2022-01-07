@@ -1,5 +1,6 @@
 package main.utils.database.mongodb;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import main.constants.Database;
 import main.constants.Statistic;
@@ -13,15 +14,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.rmi.UnexpectedException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON {
     private static final Logger logger = LoggerFactory.getLogger(StatisticsDB.class);
-    private final static StatisticsDB INSTANCE = new StatisticsDB();
-    private final static Document document = INSTANCE.getCollection().find().iterator().next();
+    private static StatisticsDB INSTANCE = new StatisticsDB();
+    private static Document document = INSTANCE.getCollection().find().iterator().next();
+
+    // Temporary Caches
+    @Getter
+    private static List<Long> channelsJoined = new ArrayList<>();
+    @Getter
+    private static List<Long> listeners = new ArrayList<>();
+    @Getter
+    private static List<String> songsPlayed = new ArrayList<>();
 
     private StatisticsDB() {
         super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_STATS);
@@ -42,6 +53,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
                 .put(statistic.toString(), val);
 
         updateDocument(document, jsonObj);
+        updateDocument();
     }
 
     @SneakyThrows
@@ -147,11 +159,15 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         return new JSONObject(getDocument().toJson());
     }
 
-    private Document getDocument(){
+    private Document getDocument() {
         return document;
     }
 
     // Boring back-end stuff incoming!
+    private void updateDocument() {
+        document = INSTANCE.getCollection().find().iterator().next();
+    }
+
     @Override
     public void init() {
         if (getCollection().countDocuments() == 0) {
@@ -162,6 +178,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
             );
         }
         update();
+        updateDocument();
     }
 
     public void update() {
@@ -169,8 +186,10 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         final JSONObject jsonObject = new JSONObject(document.toJson());
 
         if (!jsonObject.has(Fields.CURRENT_YEAR.toString())) {
-            jsonObject.put(Fields.CURRENT_YEAR.toString(), initYear());
+            jsonObject.put(Fields.CURRENT_YEAR.toString(), initYear())
+                    .put("lastUpdated", System.currentTimeMillis());
             updateDocument(document, jsonObject);
+
             return;
         }
 
@@ -184,6 +203,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         if (!currentYearObj.getString(Fields.YEAR.toString()).equals(String.valueOf(yearVal))) {
             updateYear(jsonObject);
             updateDocument(document, jsonObject);
+            resetCaches();
             return;
         }
 
@@ -192,6 +212,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         if (currentMonthObj.getInt(Fields.MONTH.toString()) != monthVal) {
             updateMonth(jsonObject);
             updateDocument(document, jsonObject);
+            resetCaches();
             return;
         }
 
@@ -200,6 +221,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         if (currentDayObj.getInt(Fields.DAY_OF_MONTH.toString()) != dayOfMonth) {
             updateDay(jsonObject);
             updateDocument(document, jsonObject);
+            resetCaches();
         }
     }
 
@@ -252,7 +274,14 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
 
         pastYearsArr.put(yearObj);
         object.remove(Fields.CURRENT_YEAR.toString());
-        object.put(Fields.CURRENT_YEAR.toString(), initYear());
+        object.put(Fields.CURRENT_YEAR.toString(), initYear())
+                .put("lastUpdated", System.currentTimeMillis());
+    }
+
+    private void resetCaches() {
+        listeners = new ArrayList<>();
+        channelsJoined = new ArrayList<>();
+        songsPlayed = new ArrayList<>();
     }
 
     private void updateMonth(JSONObject object) {
@@ -285,6 +314,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         pastMonthsArr.put(monthObj);
         currYearObj.remove(Fields.CURRENT_MONTH.toString());
         currYearObj.put(Fields.CURRENT_MONTH.toString(), initMonth());
+        object.put("lastUpdated", System.currentTimeMillis());
     }
 
     private void updateDay(JSONObject object) {
@@ -303,6 +333,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         pastDaysArr.put(pastDayObj);
         currDayObj.clear();
         currMonthObj.put(Fields.CURRENT_DAY.toString(), initDay());
+        object.put("lastUpdated", System.currentTimeMillis());
     }
 
     private JSONObject initYear() {
@@ -352,7 +383,13 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         logger.info("Starting statistic executor service");
         executorService.scheduleAtFixedRate(
                 () -> {
-                    new StatisticsDB().update();
+                    Long lastUpdated = StatisticsDB.INSTANCE.getDocument().getLong("lastUpdated");
+
+                    if (lastUpdated != null) {
+                        if (System.currentTimeMillis() - lastUpdated >= TimeUnit.HOURS.toMillis(24))
+                            new StatisticsDB().update();
+                    } else
+                        new StatisticsDB().update();
                 }, 1, 1, TimeUnit.HOURS
         );
     }
@@ -391,6 +428,8 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
     }
 
     public static StatisticsDB ins() {
+        if (INSTANCE == null)
+            INSTANCE = new StatisticsDB();
         return INSTANCE;
     }
 }

@@ -8,12 +8,15 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lombok.Getter;
 import main.audiohandlers.AbstractTrackScheduler;
 import main.audiohandlers.RobertifyAudioManager;
+import main.constants.Statistic;
 import main.main.Robertify;
+import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.constants.Toggles;
 import main.main.Listener;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.statistics.StatisticsManager;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -144,7 +147,10 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
                 } catch (UnsupportedOperationException e) {
                     track.setPosition(0);
                 }
-            } else nextTrack();
+            } else {
+                nextTrack();
+                repeating = false;
+            }
         } else if (endReason.mayStartNext) {
             pastQueue.push(track.makeClone());
             nextTrack();
