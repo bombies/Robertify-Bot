@@ -33,7 +33,7 @@ public class StatisticsCommand implements IDevCommand {
     }
 
     public void getStats(Message msg, StatisticsDB.TimeFormat format) {
-        final var db = StatisticsDB.ins();
+        final var db = StatisticsDB.INSTANCE;
         final var commandsUsed = db.getCurrentStatistic(Statistic.COMMANDS_USED, format);
 
         String periodStr = null;

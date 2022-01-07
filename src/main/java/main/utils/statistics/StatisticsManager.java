@@ -12,7 +12,7 @@ public class StatisticsManager {
     private StatisticsManager() {};
 
     public void incrementStatistic(long increment, Statistic statistic) {
-        executorService.execute(() -> StatisticsDB.ins().incrementStatistic(increment, statistic));
+        executorService.execute(() -> StatisticsDB.INSTANCE.incrementStatistic(increment, statistic));
     }
 
     public static StatisticsManager ins() {

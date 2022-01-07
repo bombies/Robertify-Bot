@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
 
 public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON {
     private static final Logger logger = LoggerFactory.getLogger(StatisticsDB.class);
-    private static StatisticsDB INSTANCE = new StatisticsDB();
-    private static Document document = INSTANCE.getCollection().find().iterator().next();
+    public static final StatisticsDB INSTANCE = new StatisticsDB();
+    private static Document document;
 
     // Temporary Caches
     @Getter
@@ -425,11 +425,5 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         public String toString() {
             return str;
         }
-    }
-
-    public static StatisticsDB ins() {
-        if (INSTANCE == null)
-            INSTANCE = new StatisticsDB();
-        return INSTANCE;
     }
 }
