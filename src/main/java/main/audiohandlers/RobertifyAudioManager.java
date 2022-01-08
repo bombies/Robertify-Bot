@@ -22,6 +22,7 @@ import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.statistics.StatisticsManager;
 import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -259,17 +260,29 @@ public class RobertifyAudioManager {
 
     public void joinVoiceChannel(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         if (!selfVoiceState.inVoiceChannel()) {
-            AudioManager audioManager = selfVoiceState.getGuild().getAudioManager();
+            final AudioManager audioManager = selfVoiceState.getGuild().getAudioManager();
+            final var vc = memberVoiceState.getChannel();
 
             try {
                 audioManager.openAudioConnection(memberVoiceState.getChannel());
-                audioManager.setSelfDeafened(true);
+
+                if (vc.getType().equals(ChannelType.STAGE)) {
+                    final var self = selfVoiceState.getMember();
+
+                    if (self.hasPermission(vc, Permission.REQUEST_TO_SPEAK) ||
+                            self.hasPermission(vc, Permission.VOICE_MUTE_OTHERS)) {
+                        vc.getGuild().requestToSpeak();
+                    } else {
+                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("I need to have the `"+Permission.REQUEST_TO_SPEAK.getName()+"` permission " +
+                                        "for me to properly play music in this stage channel.")
+                                .build()).queue();
+                    }
+                } else audioManager.setSelfDeafened(true);
             } catch (InsufficientPermissionException e) {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
                         .queue();
                 throw e;
             }
-
         }
     }
 
