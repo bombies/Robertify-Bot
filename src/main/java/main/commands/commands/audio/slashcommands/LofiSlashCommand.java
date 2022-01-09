@@ -2,6 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +43,7 @@ public class LofiSlashCommand extends InteractiveCommand {
             event.getHook().sendMessageEmbeds(new LofiCommand().handleLofi(event.getGuild(), event.getMember(), event.getTextChannel()))
                     .queue();
         } catch (IllegalArgumentException e) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Enabling Lo-Fi mode...").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Enabling Lo-Fi mode...").build())
                     .queue(botMsg -> {
                         LofiCommand.getLofiEnabledGuilds().add(event.getGuild().getIdLong());
                         LofiCommand.getAnnounceLofiMode().add(event.getGuild().getIdLong());

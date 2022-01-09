@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -29,12 +30,14 @@ public class PermissionsCommand implements ICommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        GeneralUtils.setCustomEmbed("Permissions", new Color(109, 254, 99));
+        final var guild = ctx.getGuild();
+
+        GeneralUtils.setCustomEmbed(guild, "Permissions", new Color(109, 254, 99));
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide arguments!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!");
             msg.replyEmbeds(eb.build()).queue();
-            GeneralUtils.setDefaultEmbed();
+            GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         }
 
@@ -45,11 +48,11 @@ public class PermissionsCommand implements ICommand {
             case "remove" -> remove(msg, args);
             case "list" -> list(msg, args);
             default -> {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Invalid argument!");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid argument!");
                 msg.replyEmbeds(eb.build()).queue();
             }
         }
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     /**
@@ -63,12 +66,14 @@ public class PermissionsCommand implements ICommand {
         Role role = (Role) checks[1];
         String perm = (String) checks[2];
 
+        final var guild = msg.getGuild();
+
         try {
-            new PermissionsConfig().addRoleToPermission(msg.getGuild().getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ role.getAsMention());
+            new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalAccessException e) {
-            EmbedBuilder eb = EmbedUtils.embedMessage(role.getAsMention() + " already has permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " already has permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -82,12 +87,14 @@ public class PermissionsCommand implements ICommand {
         User user = (User) checks[1];
         String perm = (String) checks[2];
 
+        final var guild = msg.getGuild();
+
         try {
-            new PermissionsConfig().addPermissionToUser(msg.getGuild().getIdLong(), user.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = EmbedUtils.embedMessage("Added permission `"+perm+"` to: "+ user.getAsMention());
+            new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
-            EmbedBuilder eb = EmbedUtils.embedMessage(user.getAsMention() + " already has permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " already has permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -101,12 +108,14 @@ public class PermissionsCommand implements ICommand {
         User user = (User) checks[1];
         String perm = (String) checks[2];
 
+        final var guild = msg.getGuild();
+
         try {
-            new PermissionsConfig().removePermissionFromUser(msg.getGuild().getIdLong(), user.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ user.getAsMention());
+            new PermissionsConfig().removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
-            EmbedBuilder eb = EmbedUtils.embedMessage(user.getAsMention() + " doesn't have permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " doesn't have permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -115,12 +124,14 @@ public class PermissionsCommand implements ICommand {
     }
 
     private Object[] userChecks(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a user!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a user!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         } else if (args.size() < 3) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a permission to add to the user!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a permission to add to the user!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         }
@@ -130,20 +141,20 @@ public class PermissionsCommand implements ICommand {
 
         User user;
         if (!GeneralUtils.stringIsID(id)) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid user!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         } else {
             user = GeneralUtils.retrieveUser(id);
             if (user == null) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid role ID!");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid role ID!");
                 msg.replyEmbeds(eb.build()).queue();
                 return new Object[] { false, null, null };
             }
         }
 
         if (!Permission.getPermissions().contains(perm)) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!\n" +
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid permission!\n" +
                     "\n**Valid permissions**\n`"+ Permission.getPermissions() +"`");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
@@ -163,15 +174,17 @@ public class PermissionsCommand implements ICommand {
         Role role = (Role) checks[1];
         String perm = (String) checks[2];
 
+        final var guild = msg.getGuild();
+
         try {
-            new PermissionsConfig().removeRoleFromPermission(msg.getGuild().getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = EmbedUtils.embedMessage("Removed permission `"+perm+"` from: "+ role.getAsMention());
+            new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ role.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IOException e) {
             logger.error("[FATAL ERROR] There was an error reading from/writing to the JSON file!", e);
             msg.addReaction("❌").queue();
         } catch (IllegalAccessException e) {
-            EmbedBuilder eb = EmbedUtils.embedMessage(role.getAsMention() + " does not have permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " does not have permission to `"+perm+"`!");
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -187,12 +200,14 @@ public class PermissionsCommand implements ICommand {
      * @return Array of objects containing if the checks were successful, the role object and the permission name object
      */
     private Object[] checks(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a role!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a role!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         } else if (args.size() < 3) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a permission to add to the role!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a permission to add to the role!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         }
@@ -202,20 +217,20 @@ public class PermissionsCommand implements ICommand {
 
         Role role;
         if (!GeneralUtils.stringIsID(id)) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid role ID!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid role ID!");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
         } else {
             role = msg.getGuild().getRoleById(id);
             if (role == null) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid role ID!");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid role ID!");
                 msg.replyEmbeds(eb.build()).queue();
                 return new Object[] { false, null, null };
             }
         }
 
         if (!Permission.getPermissions().contains(perm)) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!\n" +
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid permission!\n" +
                     "\n**Valid permissions**\n`"+ Permission.getPermissions() +"`");
             msg.replyEmbeds(eb.build()).queue();
             return new Object[] { false, null, null };
@@ -230,13 +245,15 @@ public class PermissionsCommand implements ICommand {
      * @param args List of arguments which can contain either the ID of a role or the name of a permission
      */
     protected void list(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() == 1) {
             List<String> perms = Permission.getPermissions();
             EmbedBuilder eb;
             if (perms.isEmpty())
-                eb = EmbedUtils.embedMessage("There are no permissions yet!");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "There are no permissions yet!");
             else
-                eb = EmbedUtils.embedMessage("**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
             msg.replyEmbeds(eb.build()).queue();
         } else {
             PermissionsConfig permissionsConfig = new PermissionsConfig();
@@ -247,7 +264,7 @@ public class PermissionsCommand implements ICommand {
                 User user = GeneralUtils.retrieveUser(id);
 
                 if (role == null && user == null) {
-                    EmbedBuilder eb = EmbedUtils.embedMessage("There was no role or user found with that ID!");
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There was no role or user found with that ID!");
                     msg.replyEmbeds(eb.build()).queue();
                     return;
                 }
@@ -264,13 +281,13 @@ public class PermissionsCommand implements ICommand {
                     List<String> roles = getRolePerms(msg.getGuild(), args.get(1).toUpperCase());
                     List<String> users = getUserPerms(msg.getGuild(), args.get(1).toUpperCase());
 
-                    EmbedBuilder eb = EmbedUtils.embedMessage("**List of roles/users with permission** `" + args.get(1).toUpperCase() + "`")
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**List of roles/users with permission** `" + args.get(1).toUpperCase() + "`")
                             .addField("Roles", roles.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(roles), false)
                             .addField("Users", users.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(users), false);
 
                     msg.replyEmbeds(eb.build()).queue();
                 } else {
-                    EmbedBuilder eb = EmbedUtils.embedMessage("Invalid permission!");
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid permission!");
                     msg.replyEmbeds(eb.build()).queue();
                 }
             }
@@ -304,14 +321,16 @@ public class PermissionsCommand implements ICommand {
     }
 
     private void sendPermMessage(List<Integer> permCodes, Message msg, IMentionable mentionable) {
+        final var guild = msg.getGuild();
+
         if (permCodes.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("This user/role has no permissions!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "This user/role has no permissions!");
             msg.replyEmbeds(eb.build()).queue();
         } else {
             List<String> permString = new ArrayList<>();
             for (int i : permCodes)
                 permString.add(Permission.getPermissions().get(i));
-            EmbedBuilder eb = EmbedUtils.embedMessage("**Permissions for** " + mentionable.getAsMention() + "\n\n`" + permString + "`");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**Permissions for** " + mentionable.getAsMention() + "\n\n`" + permString + "`");
             msg.replyEmbeds(eb.build()).queue();
         }
     }

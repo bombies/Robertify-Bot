@@ -1,7 +1,9 @@
 package main.commands;
 
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -12,13 +14,13 @@ import java.util.Random;
 public class RandomMessageManager {
     private final static double CHANCE = 0.05;
 
-    public MessageEmbed getMessage() {
+    public MessageEmbed getMessage(Guild guild) {
         List<String> messages = BotInfoCache.getInstance().getRandomMessages();
 
         if (messages.isEmpty())
             throw new NullPointerException("There are no random messages!");
 
-        return EmbedUtils.embedMessage(messages.get(new Random().nextInt(messages.size())))
+        return RobertifyEmbedUtils.embedMessage(guild, messages.get(new Random().nextInt(messages.size())))
                 .setTitle("✨ Robertify Notice")
                 .setTimestamp(Instant.now())
                 .build();
@@ -48,6 +50,6 @@ public class RandomMessageManager {
         if (!hasMessages()) return;
 
         if (new Random().nextDouble() <= CHANCE)
-            channel.sendMessageEmbeds(getMessage()).queue();
+            channel.sendMessageEmbeds(getMessage(channel.getGuild())).queue();
     }
 }

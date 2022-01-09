@@ -7,6 +7,7 @@ import main.constants.Permission;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.guildconfig.GuildConfig;
@@ -28,8 +29,10 @@ import java.util.List;
 public class BanCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
+        final var guild = ctx.getGuild();
+
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                     .build())
                     .queue();
@@ -40,7 +43,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a user to ban!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a user to ban!").build())
                     .queue();
             return;
         }
@@ -48,7 +51,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         final var id = GeneralUtils.getDigitsOnly(args.get(0));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to ban\n" +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban\n" +
                             "Make sure to either **mention** the channel, or provide its **ID**")
                             .setImage("https://i.imgur.com/1tMlhM2.png")
                             .build())
@@ -59,7 +62,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         final Member member = Robertify.api.getGuildById(ctx.getGuild().getIdLong()).getMemberById(id);
 
         if (member == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to ban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban.").build())
                     .queue();
             return;
         }
@@ -78,7 +81,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     private EmbedBuilder handleBan(Guild guild, User user, User mod, String duration) {
         if (duration != null)
             if (!GeneralUtils.isValidDuration(duration))
-                return EmbedUtils.embedMessage("""
+                return RobertifyEmbedUtils.embedMessage(guild, """
                         Invalid duration format.
 
                         *Example formats*: `1d`, `10s`, `5h`, `30m`""");
@@ -86,27 +89,27 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         Long bannedUntil = duration == null ? null : GeneralUtils.getFutureTime(duration);
 
         if (GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
-            return EmbedUtils.embedMessage("You cannot ban an admin!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You cannot ban an admin!");
 
         if (BotInfoCache.getInstance().isDeveloper(user.getIdLong()))
-            return EmbedUtils.embedMessage("You cannot ban a developer of Robertify!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You cannot ban a developer of Robertify!");
 
         if (new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
-            return EmbedUtils.embedMessage("This user is already banned.");
+            return RobertifyEmbedUtils.embedMessage(guild, "This user is already banned.");
 
         if (bannedUntil == null) { // Perm ban
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
 
-            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned permanently in **"+guild.getName()+"**!")
+            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned permanently in **"+guild.getName()+"**!")
                     .build())
                     .queue(success -> {}, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
                                     Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")"))));
-            return EmbedUtils.embedMessage("You have banned " + user.getAsMention());
+            return RobertifyEmbedUtils.embedMessage(guild, "You have banned " + user.getAsMention());
         } else {
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
 
-            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
+            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
                             .build())
                     .queue(success -> {}, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
@@ -114,7 +117,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
 
             Listener.scheduleUnban(guild, user);
 
-            return EmbedUtils.embedMessage("You have banned " + user.getAsMention() + " for `"+ GeneralUtils.formatDuration(duration)
+            return RobertifyEmbedUtils.embedMessage(guild, "You have banned " + user.getAsMention() + " for `"+ GeneralUtils.formatDuration(duration)
                     +"`");
         }
     }
@@ -171,7 +174,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                             .build())
                     .setEphemeral(true)

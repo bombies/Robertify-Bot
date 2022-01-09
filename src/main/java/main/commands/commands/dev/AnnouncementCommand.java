@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.Toggles;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -32,13 +33,14 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Provide an announcement!").build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Provide an announcement!").build()).queue();
         } else {
             String announcement = String.join(" ", args).replaceAll("\\\\n", "\n");
 
-            msg.replyEmbeds(EmbedUtils.embedMessage("**Are you sure you want to send this announcement?**\n\n" + announcement).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "**Are you sure you want to send this announcement?**\n\n" + announcement).build())
                     .setActionRow(
                             Button.of(ButtonStyle.SUCCESS, "devannouncement:yes", "Yes"),
                             Button.of(ButtonStyle.DANGER, "devannouncement:no", "No")
@@ -51,9 +53,11 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
     public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith("devannouncement:")) return;
 
+        final var g = event.getGuild();
+
         switch (event.getButton().getId().split(":")[1]) {
             case "yes" -> {
-                event.replyEmbeds(EmbedUtils.embedMessage("Now sending announcement to all guilds!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(g, "Now sending announcement to all guilds!").build())
                         .queue(success -> {
                             event.getMessage().editMessageComponents(ActionRow.of(
                                             Button.of(ButtonStyle.SUCCESS, "devannouncement:yes", "Yes").asDisabled(),
@@ -71,8 +75,8 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
 
                                     try {
                                         guild.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
-                                                .sendMessageEmbeds(EmbedUtils.embedMessageWithTitle(
-                                                                        "❗ IMPORTANT: Global Announcement",
+                                                .sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                                                                "❗ IMPORTANT: Global Announcement",
                                                                         "Announcement from: " + event.getUser().getAsMention() + "\n\n"
                                                                                 + event.getMessage().getEmbeds().get(0).getDescription().replaceFirst("\\*\\*Are you sure you want to send this announcement\\?\\*\\*\n\n", "")
                                                                 )
@@ -88,7 +92,7 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
                         });
             }
             case "no" -> {
-                event.replyEmbeds(EmbedUtils.embedMessage("The announcement will not be sent!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(g, "The announcement will not be sent!").build())
                         .queue(success -> {
                             event.getMessage().editMessageComponents(ActionRow.of(
                                         Button.of(ButtonStyle.SUCCESS, "devannouncement:yes", "Yes").asDisabled(),

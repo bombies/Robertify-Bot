@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,15 +21,16 @@ public class VolumeCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
         if (ctx.getArgs().isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide what volume you'd like to set the bot to").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide what volume you'd like to set the bot to").build())
                     .queue();
             return;
         }
 
         if (!GeneralUtils.stringIsInt(ctx.getArgs().get(0))) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide an integer as the volume").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide an integer as the volume").build())
                     .queue();
             return;
         }
@@ -43,14 +45,16 @@ public class VolumeCommand implements ICommand {
     }
 
     public EmbedBuilder handleVolumeChange(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int volume) {
+        final var guild = selfVoiceState.getGuild();
+
         if (!selfVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("You can't use this command while I'm not in a voice channel");
+            return RobertifyEmbedUtils.embedMessage(guild, "You can't use this command while I'm not in a voice channel");
 
         if (memberVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return EmbedUtils.embedMessage("You must be in the same voice channel as I am to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as I am to use this command");
 
         if (volume < 0 || volume > 100)
-            return EmbedUtils.embedMessage("You can't set the volume to that value");
+            return RobertifyEmbedUtils.embedMessage(guild, "You can't set the volume to that value");
 
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
         var audioPlayer = musicManager.getPlayer();
@@ -60,7 +64,7 @@ public class VolumeCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
 
-        return EmbedUtils.embedMessage("🔊  You have set the volume of the bot to **"+volume+"%**");
+        return RobertifyEmbedUtils.embedMessage(guild, "🔊  You have set the volume of the bot to **"+volume+"%**");
     }
 
     @Override

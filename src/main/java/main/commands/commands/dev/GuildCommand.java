@@ -21,9 +21,9 @@ public class GuildCommand implements IDevCommand {
         guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");
         for (var guild : guilds) guildNames.add(guild.getName() + " (" + guild.getMembers().size() + " members in cache)");
 
-        GeneralUtils.setCustomEmbed("Guilds");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Guilds");
         Pages.paginate(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @Override

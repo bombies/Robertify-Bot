@@ -158,7 +158,7 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     @Override
-    protected void update() {
+    public void update() {
         // Nothing
     }
 

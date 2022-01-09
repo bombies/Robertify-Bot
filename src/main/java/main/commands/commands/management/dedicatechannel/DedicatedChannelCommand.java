@@ -6,12 +6,14 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.constants.Toggles;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
+import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,23 +29,24 @@ import java.util.List;
 public class DedicatedChannelCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
+        final var guild = ctx.getGuild();
+
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to execute this command")
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to execute this command")
                     .build()).queue();
             return;
         }
 
         final Message msg = ctx.getMessage();
-        final Guild guild = ctx.getGuild();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The request channel has already been setup!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The request channel has already been setup!").build())
                     .queue();
             return;
         }
 
         if (!ctx.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MANAGE_CHANNEL)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("""
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                             I do not have enough permissions to do this!
                             Please give my role the `Manage Channels` permission in order for me to execute this command.
 
@@ -54,6 +57,7 @@ public class DedicatedChannelCommand implements ICommand {
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
+                    var theme = new ThemesConfig().getTheme(guild.getIdLong());
                     var dediChannelConfig = new DedicatedChannelConfig();
 
                     ChannelManager manager = textChannel.getManager();
@@ -61,9 +65,9 @@ public class DedicatedChannelCommand implements ICommand {
                     dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
 
                     EmbedBuilder eb = new EmbedBuilder();
-                    eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
+                    eb.setColor(theme.getColor());
                     eb.setTitle("No song playing...");
-                    eb.setImage("https://i.imgur.com/1HDoSgP.png");
+                    eb.setImage(theme.getIdleBanner());
                     eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
 
@@ -82,7 +86,7 @@ public class DedicatedChannelCommand implements ICommand {
 
                 },
                 new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())
+                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                                 .queue())
         );
 

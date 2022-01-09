@@ -103,7 +103,7 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
     }
 
     @Override
-    protected void update() {
+    public void update() {
 
     }
 }

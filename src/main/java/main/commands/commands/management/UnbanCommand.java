@@ -6,6 +6,7 @@ import main.constants.Permission;
 import main.main.Listener;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -26,8 +27,10 @@ import java.util.List;
 public class UnbanCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
+        final var guild = ctx.getGuild();
+
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                             .build())
                     .queue();
@@ -38,7 +41,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a user to unban!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a user to unban!").build())
                     .queue();
             return;
         }
@@ -46,7 +49,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
         final var id = GeneralUtils.getDigitsOnly(args.get(0));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to unban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())
                     .queue();
             return;
         }
@@ -54,7 +57,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
         final Member member = Robertify.api.getGuildById(ctx.getGuild().getIdLong()).getMemberById(id);
 
         if (member == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid user to unban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())
                     .queue();
             return;
         }
@@ -65,18 +68,18 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
 
     private EmbedBuilder handleUnban(Guild guild, User user) {
         if (!new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
-            return EmbedUtils.embedMessage("This user is not banned.");
+            return RobertifyEmbedUtils.embedMessage(guild, "This user is not banned.");
 
         new GuildConfig().unbanUser(guild.getIdLong(), user.getIdLong());
 
-        user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(EmbedUtils.embedMessage("You have been unbanned from **" + guild.getName() + "**").build())
+        user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been unbanned from **" + guild.getName() + "**").build())
                 .queue(success -> {}, new ErrorHandler()
                         .handle(
                                 ErrorResponse.CANNOT_SEND_TO_USER,
                                 e -> Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
                         )));
 
-        return EmbedUtils.embedMessage("You have unbanned " + user.getAsMention());
+        return RobertifyEmbedUtils.embedMessage(guild, "You have unbanned " + user.getAsMention());
     }
 
     @Override
@@ -124,7 +127,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run this command!\n\n" +
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                     .build())
                     .setEphemeral(true)

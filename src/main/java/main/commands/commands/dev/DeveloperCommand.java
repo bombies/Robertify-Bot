@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,11 +24,12 @@ public class DeveloperCommand implements IDevCommand {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
         final var botUtils = BotInfoCache.getInstance();
+        final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed("Developer Tools", new Color(118, 0, 236));
+        GeneralUtils.setCustomEmbed(guild, "Developer Tools", new Color(118, 0, 236));
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("""
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
                     You must provide arguments.
 
                     **Valid args**: `add`, `remove`""");
@@ -39,7 +41,7 @@ public class DeveloperCommand implements IDevCommand {
             case "add" -> add(botUtils, msg, args);
             case "remove" -> remove(botUtils, msg, args);
             default -> {
-                EmbedBuilder eb = EmbedUtils.embedMessage("""
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
                         Invalid arguments.
 
                         **Valid args**: `add`, `remove`""");
@@ -47,13 +49,15 @@ public class DeveloperCommand implements IDevCommand {
             }
         }
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @SneakyThrows
     private void add(BotInfoCache botUtils, Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() <= 1) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to add as a developer");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to add as a developer");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -63,7 +67,7 @@ public class DeveloperCommand implements IDevCommand {
 
         for (String s : args.subList(1, args.size())) {
             if (!GeneralUtils.stringIsID(s)) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("`"+s+"` is an invalid ID.");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "`"+s+"` is an invalid ID.");
                 msg.replyEmbeds(eb.build()).queue();
                 continue;
             }
@@ -74,7 +78,7 @@ public class DeveloperCommand implements IDevCommand {
                 throw new NullPointerException("User with id "+s+" is null");
 
             if (botUtils.isDeveloper(Long.parseLong(s))) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("User with id `"+s+"` is already a developer");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "User with id `"+s+"` is already a developer");
                 msg.replyEmbeds(eb.build()).queue();
                 continue;
             }
@@ -89,14 +93,16 @@ public class DeveloperCommand implements IDevCommand {
 
         stringBuilder.append(args.size() > 2 ? "as developers" : "as a developer");
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(stringBuilder.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, stringBuilder.toString());
         msg.replyEmbeds(eb.build()).queue();
     }
 
     @SneakyThrows
     private void remove(BotInfoCache botUtils, Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() <= 1) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a user to remove as a developer");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to remove as a developer");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -106,7 +112,7 @@ public class DeveloperCommand implements IDevCommand {
 
         for (String s : args.subList(1, args.size())) {
             if (!GeneralUtils.stringIsID(s)) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("`"+s+"` is an invalid ID.");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "`"+s+"` is an invalid ID.");
                 msg.replyEmbeds(eb.build()).queue();
                 continue;
             }
@@ -117,7 +123,7 @@ public class DeveloperCommand implements IDevCommand {
                 throw new NullPointerException("User with id "+s+" is null");
 
             if (!botUtils.isDeveloper(Long.parseLong(s))) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("User with id `"+s+"` is not a developer");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "User with id `"+s+"` is not a developer");
                 msg.replyEmbeds(eb.build()).queue();
                 continue;
             }
@@ -132,7 +138,7 @@ public class DeveloperCommand implements IDevCommand {
 
         stringBuilder.append(args.size() > 2 ? "as developers" : "as a developer");
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(stringBuilder.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, stringBuilder.toString());
         msg.replyEmbeds(eb.build()).queue();
     }
 

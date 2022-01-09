@@ -4,12 +4,16 @@ import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.database.mongodb.GuildsDB;
 import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AbstractMongoCache extends AbstractMongoDatabase implements AbstractJSON {
     @Getter
@@ -66,8 +70,30 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         upsertDocument(document);
     }
 
+    public void updateCacheObjects(List<JSONObject> objects) {
+        final List<Document> documents = new ArrayList<>();
+        objects.forEach(object -> documents.add(Document.parse(object.toString())));
+        updateCache(documents);
+    }
+
+    public void updateCache(List<Document> documents) {
+        for (var document: documents) {
+            final ObjectId id = document.getObjectId("_id");
+            final JSONArray collectionArr = this.cache.getJSONArray(CacheField.DOCUMENTS.toString());
+
+            collectionArr.remove(getIndexOfObjectInArray(collectionArr, id));
+            collectionArr.put(new JSONObject(document.toJson()));
+        }
+
+        upsertManyDocuments(documents);
+    }
+
     public <T> void updateCache(JSONObject obj, GenericJSONField identifier, T identifierValue) {
         updateCache(obj, identifier.toString(), identifierValue);
+    }
+
+    public void updateGuild(JSONObject obj, long gid) {
+        updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
     }
 
     public <T> void updateCache(JSONObject obj, String identifier, T identifierValue) {

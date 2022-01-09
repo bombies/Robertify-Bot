@@ -2,6 +2,7 @@ package main.commands.commands.util;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,7 +17,8 @@ public class DonateCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
 
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessageWithTitle(
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
+                ctx.getGuild(),
                 "Donations",
                 "Thank you for taking the interesting in donating to us! This simple gesture " +
                         "means a lot. Donating to Robertify would help maintain upkeep.\n" +
@@ -65,7 +67,8 @@ public class DonateCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        event.replyEmbeds(EmbedUtils.embedMessageWithTitle(
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
+                        event.getGuild(),
                         "Donations",
                         "Thank you for taking the interesting in donating to us! This simple gesture " +
                                 "means a lot. Donating to Robertify would help maintain upkeep.\n" +

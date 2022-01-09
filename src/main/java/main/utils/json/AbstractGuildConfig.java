@@ -13,7 +13,7 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
     @Getter
     private static GuildsDBCache cache;
 
-    protected abstract void update();
+    public abstract void update();
 
     public JSONObject getGuildObject(long gid) {
         if (!guildHasInfo(gid))

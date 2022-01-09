@@ -3,6 +3,7 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.Statistic;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.StatisticsDB;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Message;
@@ -53,8 +54,8 @@ public class StatisticsCommand implements IDevCommand {
             }
         }
 
-        msg.replyEmbeds(EmbedUtils.embedMessageWithTitle(
-                "Stats For " + periodStr,
+        msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(msg.getGuild(),
+                        "Stats For " + periodStr,
                 "These are the current stats for **"+periodStr.toUpperCase()+"**"
         )
                         .addField("Commands Executed", String.valueOf(commandsUsed), false)

@@ -3,6 +3,7 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -44,11 +45,13 @@ public class EvalCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
+
         EmbedBuilder eb;
-        GeneralUtils.setCustomEmbed(new Color(0, 183, 255));
+        GeneralUtils.setCustomEmbed(guild, new Color(0, 183, 255));
 
         if (args.isEmpty()) {
-            eb = EmbedUtils.embedMessage("You must provide a snippet to evaluate!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a snippet to evaluate!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -72,18 +75,18 @@ public class EvalCommand implements IDevCommand {
                             "\n})();");
 
             if (out != null) {
-                eb = EmbedUtils.embedMessage("```java\n" + src + "```");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "```java\n" + src + "```");
                 eb.addField("Result", out.toString(), false);
             } else
-                eb = EmbedUtils.embedMessage("```java\nExecuted without error.```");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "```java\nExecuted without error.```");
 
         } catch (Exception e) {
-            eb = EmbedUtils.embedMessage("```java\n" + e.getMessage() +"```");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "```java\n" + e.getMessage() +"```");
         }
 
         msg.replyEmbeds(eb.build()).queue();
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @Override

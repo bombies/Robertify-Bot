@@ -8,6 +8,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.pagination.Pages;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,16 +28,16 @@ public class QueueCommand implements ICommand {
         final var queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "There is nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         sendQueue(queue, ctx.getChannel(), ctx.getAuthor());
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     private void sendQueue(ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {

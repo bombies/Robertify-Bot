@@ -4,7 +4,9 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.json.themes.ThemesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 
 import javax.script.ScriptException;
@@ -14,8 +16,8 @@ public class BotInfoCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
 
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("\t")
-                        .setThumbnail(BotConstants.ROBERTIFY_LOGO_TRANSPARENT.toString())
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "\t")
+                        .setThumbnail(new ThemesConfig().getTheme(ctx.getGuild().getIdLong()).getTransparent())
                         .addField("Developers", "<@274681651945144321>", false)
                         .addField("About Me", "Robertify is a music bot programmed completely " +
                         "in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (main Developer) " +

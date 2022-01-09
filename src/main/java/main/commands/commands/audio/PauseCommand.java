@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -31,17 +32,17 @@ public class PauseCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
             return eb;
         }
 
@@ -49,18 +50,18 @@ public class PauseCommand implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing");
             return eb;
         }
 
         if (audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
             musicManager.setForcePaused(false);
-            eb = EmbedUtils.embedMessage("You have resumed the music!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!");
         } else {
             audioPlayer.setPaused(true);
             musicManager.setForcePaused(true);
-            eb = EmbedUtils.embedMessage("You have paused the music!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You have paused the music!");
         }
 
         return eb;

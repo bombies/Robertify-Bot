@@ -7,6 +7,7 @@ import main.constants.Permission;
 import main.constants.Toggles;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -32,9 +33,11 @@ public class PollCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
+        final var guild = ctx.getGuild();
+
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)
             && !GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_POLLS)) {
-            ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("You do not have enough permissions " +
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions " +
                     "to execute this command!\n\n" +
                             "You must either have `"+Permission.ROBERTIFY_DJ.name()+"`," +
                             " or `"+Permission.ROBERTIFY_POLLS.name()+"`!").build())
@@ -49,12 +52,12 @@ public class PollCommand implements ICommand {
         if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS))
             return;
 
-        GeneralUtils.setCustomEmbed("Polls");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Polls");
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide arguments!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!").build())
                     .queue();
-            GeneralUtils.setDefaultEmbed();
+            GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         }
 
@@ -64,16 +67,17 @@ public class PollCommand implements ICommand {
                     msg.delete().queueAfter(5, TimeUnit.SECONDS);
                 });
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     public EmbedBuilder handlePoll(TextChannel channel, User sender,  String question) {
         final Pattern choiceWithDurationRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s[0-9]+[sSmMhHdD]\\s$");
         final Pattern choiceRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s$");
+        final var guild = channel.getGuild();
 
         question += " ";
         if (!choiceWithDurationRegex.matcher(question).matches() && !choiceRegex.matcher(question).matches())
-            return EmbedUtils.embedMessage("""
+            return RobertifyEmbedUtils.embedMessage(guild, """
                     Invalid format!
 
                     **__Correct Formats__**
@@ -94,7 +98,7 @@ public class PollCommand implements ICommand {
                 endTime = GeneralUtils.getFutureTime(durationStr);
                 duration = GeneralUtils.getStaticTime(durationStr);
             } catch (Exception e) {
-                return EmbedUtils.embedMessage(e.getMessage());
+                return RobertifyEmbedUtils.embedMessage(guild, e.getMessage());
             }
         }
 
@@ -108,13 +112,13 @@ public class PollCommand implements ICommand {
         choices.removeIf(s -> s.isEmpty() || s.isBlank());
 
         if (choices.size() < 2)
-            return EmbedUtils.embedMessage("You must provide at least 2 options");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must provide at least 2 options");
 
         if (choices.size() > 9)
-            return EmbedUtils.embedMessage("You must set at most 9 options");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must set at most 9 options");
 
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("**" + question + "**");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**" + question + "**");
 
         eb.appendDescription(
                 (
@@ -148,7 +152,7 @@ public class PollCommand implements ICommand {
                         doPollEnd(msg, sender, finalQuestion, choices, finalDuration);
                 });
 
-        return EmbedUtils.embedMessage("Sent poll");
+        return RobertifyEmbedUtils.embedMessage(guild, "Sent poll");
     }
 
     private void doPollEnd(Message msg, User sender, String question, List<String> choices, long timeToEnd) {
@@ -166,7 +170,7 @@ public class PollCommand implements ICommand {
                         winner = i;
                 }
 
-                EmbedBuilder eb = EmbedUtils.embedMessage("**" + question + " [ENDED]**\n\n");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), "**" + question + " [ENDED]**\n\n");
                 eb.setThumbnail("https://i.imgur.com/owL8bGL.png");
                 eb.appendDescription("\n");
                 eb.addField("🎊 POLL WINNER 🎊", choices.get(winner-1) + "\n\n", false);

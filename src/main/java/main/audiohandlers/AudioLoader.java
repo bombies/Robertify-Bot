@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.commands.audio.LofiCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -67,13 +68,13 @@ public class AudioLoader implements AudioLoadResultHandler {
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
-        EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + audioTrack.getInfo().title
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().title
                 + "` by `" + audioTrack.getInfo().author + "`");
 
         if (botMsg != null) {
             if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
                 LofiCommand.getAnnounceLofiMode().remove(guild.getIdLong());
-                botMsg.editMessageEmbeds(EmbedUtils.embedMessage("You have enabled Lo-Fi mode").build())
+                botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have enabled Lo-Fi mode").build())
                         .queue();
             } else {
                 botMsg.editMessageEmbeds(eb.build()).queue();
@@ -108,7 +109,7 @@ public class AudioLoader implements AudioLoadResultHandler {
             return;
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Added to queue: `" + tracks.size()
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
                 + "` tracks from `" + audioPlaylist.getName() + "`");
 
         if (botMsg != null)
@@ -141,7 +142,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = EmbedUtils.embedMessage("Nothing was found for `" + trackUrl.replace("ytsearch:", "")
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `" + trackUrl.replace("ytsearch:", "")
                 + "`. Try being more specific. *(Adding name of the artiste)*");
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
@@ -159,9 +160,9 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
             logger.error("[FATAL ERROR] Could not load track!", e);
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(
-                        e.getMessage().contains("available") ? e.getMessage() :
-                        e.getMessage().contains("format") ? e.getMessage() :
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild,
+                e.getMessage().contains("available") ? e.getMessage()
+                        : e.getMessage().contains("format") ? e.getMessage() :
                         "Error loading track"
         );
         if (botMsg != null)

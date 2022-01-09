@@ -6,6 +6,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,11 +21,12 @@ public class DisconnectCommand implements ICommand {
         final Member self = ctx.getSelfMember();
         final GuildVoiceState selfState = self.getVoiceState();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
         EmbedBuilder eb;
 
         if (!selfState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "I'm already not in a voice channel!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -33,13 +35,13 @@ public class DisconnectCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in the same voice channel as me for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in the same voice channel as me for this to work");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -53,7 +55,7 @@ public class DisconnectCommand implements ICommand {
 
         musicManager.leave();
 
-        return EmbedUtils.embedMessage("Disconnected!");
+        return RobertifyEmbedUtils.embedMessage(guild, "Disconnected!");
     }
 
     @Override

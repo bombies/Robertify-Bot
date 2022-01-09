@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.RemoveCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -53,7 +54,7 @@ public class RemoveSlashCommand extends InteractiveCommand {
         event.deferReply().queue();
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }

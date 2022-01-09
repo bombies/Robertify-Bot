@@ -8,14 +8,17 @@ import main.commands.IDevCommand;
 import main.constants.BotConstants;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
 import main.utils.database.sqlite3.ServerDB;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.themes.ThemesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -49,7 +52,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     }
 
     public void initCommandWithoutUpsertion() {
-        setInteractionCommand(getCommand());
+        super.initCommandWithoutUpsertion(getCommand());
     }
 
     private InteractionCommand getCommand() {
@@ -69,20 +72,12 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                         "Select an option",
                         Pair.of(1,1),
                         List.of(
-                                Triple.of("Management Commands", "help:management", "💼"),
-                                Triple.of("Music Commands", "help:music", "🎶"),
-                                Triple.of("Miscellaneous Commands", "help:misc", "⚒️"),
-                                Triple.of("Utility Commands", "help:utility", "❓")
+                                Triple.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
+                                Triple.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
+                                Triple.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
+                                Triple.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
                         ),
-                        e -> {
-                             if (e.getMessage().getMessageReference() == null)
-                                 return true;
-
-                            var msgID = e.getMessage().getMessageReference().getMessageIdLong();
-                            Message msg = e.getJDA().getTextChannelById(e.getTextChannel().getIdLong())
-                                    .retrieveMessageById(msgID).complete(); // BAD BAD BAD PREDICATE | TODO FIGURE OUT A NEW ONE!
-                            return e.getUser().getIdLong() == msg.getAuthor().getIdLong();
-                        }
+                        menuPredicate
                 )).build();
     }
 
@@ -91,9 +86,11 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
+        final var guild = ctx.getGuild();
         final String prefix = new GuildConfig().getPrefix(ctx.getGuild().getIdLong());
 
         GeneralUtils.setCustomEmbed(
+                ctx.getGuild(),
                 "Help Command",
                 "Type \"" + prefix + "help <command>\" to get more help on a specific command."
         );
@@ -101,7 +98,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("""
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
                             Join our [support server](https://discord.gg/VbjmtfJDvU)!
 
                             *Select an option to view the commands I have to offer!*""")
@@ -123,13 +120,13 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                     }
             );
 
-            GeneralUtils.setDefaultEmbed();
+            GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
             if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+args.get(0)+"`");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+args.get(0)+"`");
                 msg.replyEmbeds(eb.build()).queue();
-                GeneralUtils.setDefaultEmbed();
+                GeneralUtils.setDefaultEmbed(ctx.getGuild());
                 return;
             }
 
@@ -137,12 +134,12 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             for (ICommand cmd : manager.getDevCommands())
                 stringBuilder.append("`").append(cmd.getName()).append("`, ");
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("**Developer Commands**\n\n" +
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**Developer Commands**\n\n" +
                     "**Prefix**: `" + prefix + "`");
             eb.addField("Commands", stringBuilder.toString(), false);
             msg.replyEmbeds(eb.build()).queue();
 
-            GeneralUtils.setDefaultEmbed();
+            GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         }
 
@@ -150,24 +147,25 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
         ICommand command = manager.getCommand(search);
 
         if (command == null) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
             msg.replyEmbeds(eb.build()).queue();
-            GeneralUtils.setDefaultEmbed();
+            GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (command instanceof IDevCommand) {
             if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
                 msg.replyEmbeds(eb.build()).queue();
-                GeneralUtils.setDefaultEmbed();
+                GeneralUtils.setDefaultEmbed(ctx.getGuild());
                 return;
             }
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(prefix));
-        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp(prefix));
+        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        eb.setAuthor("Help Command ["+command.getName()+"]", null, theme.getTransparent());
         msg.replyEmbeds(eb.build()).queue();
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @Override @SneakyThrows
@@ -178,11 +176,14 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
             final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
 
             GeneralUtils.setCustomEmbed(
+                    event.getGuild(),
                     "Help Command",
                     "Type \"" + prefix + "help <command>\" to get more help on a specific command."
             );
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("""
+            final var guild = event.getGuild();
+
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
                             Join our [support server](https://discord.gg/VbjmtfJDvU)!
 
                             *Select an option to view the commands I have to offer!*""")
@@ -202,61 +203,64 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                     .setEphemeral(true).queue();
         }
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 
     @Override @SneakyThrows
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().equals(menuName)) return;
 
-        var optionSelected = event.getSelectedOptions();
-        final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+        final var guild = event.getGuild();
 
         if (!getSelectionDialogue(menuName).checkPermission(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You can't interact with this menu!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
                     .setEphemeral(true).queue();
             return;
         }
 
+        var optionSelected = event.getSelectedOptions();
+        final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+
         switch (optionSelected.get(0).getValue()) {
             case "help:management" -> {
-                event.editMessageEmbeds(getHelpEmbed(HelpType.MANAGEMENT, prefix).build()).queue();
+                event.editMessageEmbeds(getHelpEmbed(guild, HelpType.MANAGEMENT, prefix).build()).queue();
             }
             case "help:music" -> {
-                event.editMessageEmbeds(getHelpEmbed(HelpType.MUSIC, prefix).build()).queue();
+                event.editMessageEmbeds(getHelpEmbed(guild, HelpType.MUSIC, prefix).build()).queue();
             }
             case "help:misc" -> {
-                event.editMessageEmbeds(getHelpEmbed(HelpType.MISCELLANEOUS, prefix).build()).queue();
+                event.editMessageEmbeds(getHelpEmbed(guild, HelpType.MISCELLANEOUS, prefix).build()).queue();
             }
             case "help:utility" -> {
-                event.editMessageEmbeds(getHelpEmbed(HelpType.UTILITY, prefix).build()).queue();
+                event.editMessageEmbeds(getHelpEmbed(guild, HelpType.UTILITY, prefix).build()).queue();
             }
         }
     }
 
     @SneakyThrows
     private EmbedBuilder searchCommand(CommandManager manager, String search, Guild guild, User user) {
-        ICommand command = manager.getCommand(search);
+        final ICommand command = manager.getCommand(search);
 
         if (command == null) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
-            GeneralUtils.setDefaultEmbed();
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
+            GeneralUtils.setDefaultEmbed(guild);
             return eb;
         } else if (command instanceof IDevCommand) {
             if (!BotInfoCache.getInstance().isDeveloper(user.getIdLong())) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("Nothing found for: `"+search+"`");
-                GeneralUtils.setDefaultEmbed();
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
+                GeneralUtils.setDefaultEmbed(guild);
                 return eb;
             }
         }
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(command.getHelp(guild.getId()));
-        eb.setAuthor("Help Command ["+command.getName()+"]", null, BotConstants.ICON_URL.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp(guild.getId()));
+        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        eb.setAuthor("Help Command ["+command.getName()+"]", null, theme.getTransparent());
         return eb;
     }
 
-    private EmbedBuilder getHelpEmbed(HelpType type, String prefix) {
-        EmbedBuilder eb = EmbedUtils.embedMessage("Here are your commands!\n\n" +
+    private EmbedBuilder getHelpEmbed(Guild guild, HelpType type, String prefix) {
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Here are your commands!\n\n" +
                 "**Prefix**: `"+prefix+"`");
         CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
         StringBuilder sb = new StringBuilder();

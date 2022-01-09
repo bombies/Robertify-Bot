@@ -1,6 +1,7 @@
 package main.utils.pagination;
 
 import main.constants.MessageButton;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -53,7 +54,7 @@ public class PaginationEvents extends ListenerAdapter {
             event.editMessageEmbeds(pages.get(currentPage.get(msg)).getEmbed()).queue();
 
         } else {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You do not have permission to interact with this button.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to interact with this button.");
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
         }
     }

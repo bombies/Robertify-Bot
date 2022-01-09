@@ -2,7 +2,7 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
+import main.utils.RobertifyEmbedUtils;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -12,6 +12,7 @@ public class HostInfoCommand implements IDevCommand {
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
 
+        final var guild = ctx.getGuild();
         String os = System.getProperty("os.name");
         String osVer = System.getProperty("os.version");
         String osArch = System.getProperty("os.arch");
@@ -21,7 +22,8 @@ public class HostInfoCommand implements IDevCommand {
         long maxMemory = Runtime.getRuntime().maxMemory() / 1048576;
         long memoryInUse = Runtime.getRuntime().totalMemory() / 1048576;
 
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessageWithTitle(
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
+                guild,
                 "Host Information",
                 "\t"
                 )

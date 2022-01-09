@@ -8,6 +8,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -35,12 +36,13 @@ public class RewindCommand implements ICommand {
             return;
         }
 
-        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        var audioPlayer = musicManager.getPlayer();
-        AudioTrack track = audioPlayer.getPlayingTrack();
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final var audioPlayer = musicManager.getPlayer();
+        final var track = audioPlayer.getPlayingTrack();
+        final var guild = ctx.getGuild();
 
         if (track == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -51,7 +53,7 @@ public class RewindCommand implements ICommand {
             if (GeneralUtils.stringIsInt(ctx.getArgs().get(0)))
                 time = Long.parseLong(ctx.getArgs().get(0));
             else {
-                eb = EmbedUtils.embedMessage("You must provide a valid duration to rewind");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid duration to rewind");
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }
@@ -64,54 +66,56 @@ public class RewindCommand implements ICommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final AudioTrack track = audioPlayer.getPlayingTrack();
+        final var guild = selfVoiceState.getGuild();
         EmbedBuilder eb;
 
         if (track == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
         if (track.getInfo().isStream)
-            return EmbedUtils.embedMessage("You can't rewind a stream!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You can't rewind a stream!");
 
         if (rewindToBeginning) {
             track.setPosition(0L);
-            eb = EmbedUtils.embedMessage("You have rewound the song to the beginning!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song to the beginning!");
         } else {
             if (time <= 0) {
-                eb = EmbedUtils.embedMessage("The duration cannot be negative or zero!");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "The duration cannot be negative or zero!");
                 return eb;
             }
 
             time = TimeUnit.SECONDS.toMillis(time);
 
             if (time > track.getPosition()) {
-                eb = EmbedUtils.embedMessage("This duration cannot be more than the current time in the song");
+                eb = RobertifyEmbedUtils.embedMessage(guild, "This duration cannot be more than the current time in the song");
                 return eb;
             }
 
             track.setPosition(track.getPosition() - time);
-            eb = EmbedUtils.embedMessage("You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
         }
 
         return eb;
     }
 
     public EmbedBuilder checks(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+        final var guild = selfVoiceState.getGuild();
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
             return eb;
         }
 

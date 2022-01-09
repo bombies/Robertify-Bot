@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.commands.RandomMessageManager;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Message;
 
@@ -72,7 +73,7 @@ public class RandomMessageCommand implements IDevCommand {
         for (int i = 0; i < messages.size(); i++)
             sb.append(i).append(" - ").append("*").append(messages.get(i)).append("*\n");
 
-        msg.replyEmbeds(EmbedUtils.embedMessage(sb.toString()).build()).queue();
+        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), sb.toString()).build()).queue();
     }
 
     public void clear(Message msg) {

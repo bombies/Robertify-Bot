@@ -7,6 +7,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,15 +25,16 @@ public class SkipToCommand implements ICommand {
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
+        final var guild = ctx.getGuild();
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to skip to.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to skip to.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!GeneralUtils.stringIsInt(args.get(0))) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("ID provided **must** be a valid integer!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "ID provided **must** be a valid integer!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -44,7 +46,7 @@ public class SkipToCommand implements ICommand {
 
     public EmbedBuilder handleSkip(ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
         if (id > queue.size() || id <= 0)
-            return EmbedUtils.embedMessage("ID provided isn't a valid ID!");
+            return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "ID provided isn't a valid ID!");
 
         final var audioPlayer = musicManager.getPlayer();
         final var guild = musicManager.getGuild();
@@ -64,7 +66,7 @@ public class SkipToCommand implements ICommand {
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
-        return EmbedUtils.embedMessage("Skipped to **track #"+id+"**!");
+        return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "Skipped to **track #"+id+"**!");
     }
 
     @Override

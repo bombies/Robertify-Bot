@@ -3,6 +3,7 @@ package main.commands.commands.util;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -16,7 +17,8 @@ public class UptimeCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         ctx.getMessage().replyEmbeds(
-                EmbedUtils.embedMessage(
+                RobertifyEmbedUtils.embedMessage(
+                        ctx.getGuild(),
                         GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup())
                 ).build()
         ).queue();
@@ -58,7 +60,8 @@ public class UptimeCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         event.replyEmbeds(
-                EmbedUtils.embedMessage(
+                RobertifyEmbedUtils.embedMessage(
+                        event.getGuild(),
                         GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup())
                 ).build()
         ).setEphemeral(false).queue();

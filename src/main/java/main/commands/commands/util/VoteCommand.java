@@ -2,6 +2,7 @@ package main.commands.commands.util;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -15,7 +16,7 @@ import javax.script.ScriptException;
 public class VoteCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("Thank you for taking the interest in supporting us!\n" +
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Thank you for taking the interest in supporting us!\n" +
                         "You may press on each of the buttons below to vote for us.")
                         .build())
                 .setActionRow(
@@ -61,7 +62,7 @@ public class VoteCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        event.replyEmbeds(EmbedUtils.embedMessage("Thank you for taking the interest in supporting us!\n" +
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Thank you for taking the interest in supporting us!\n" +
                         "You may press on each of the buttons below to vote for us.")
                 .build())
                 .addActionRow(

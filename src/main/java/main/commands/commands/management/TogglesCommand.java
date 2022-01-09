@@ -8,6 +8,7 @@ import main.constants.Permission;
 import main.constants.Toggles;
 import main.constants.RobertifyEmoji;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,7 +34,7 @@ public class TogglesCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, sender, Permission.ROBERTIFY_ADMIN))
             return;
 
-        GeneralUtils.setCustomEmbed("Toggles");
+        GeneralUtils.setCustomEmbed(guild, "Toggles");
 
         var config = new TogglesConfig();
         if (args.isEmpty()) {
@@ -41,7 +42,7 @@ public class TogglesCommand implements ICommand {
             var toggleNames = new StringBuilder();
             var toggleStatuses = new StringBuilder();
 
-            EmbedBuilder eb = EmbedUtils.embedMessage("\t");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "\t");
 
             int toggleID = 0;
             for (Toggles toggle : Toggles.values()) {
@@ -62,82 +63,82 @@ public class TogglesCommand implements ICommand {
                 case "restrictedvoice", "1", "rvc", "rvchannels" -> {
                     if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                         config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
-                        eb = EmbedUtils.embedMessage("You have toggled restricted voice channels **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
-                        eb = EmbedUtils.embedMessage("You have toggled restricted voice channels **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **ON**");
                     }
                 }
                 case "restrictedtext", "2", "rtc", "rtchannels" -> {
                     if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                         config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
-                        eb = EmbedUtils.embedMessage("You have toggled restricted text channels **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
-                        eb = EmbedUtils.embedMessage("You have toggled restricted text channels **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **ON**");
                     }
                 }
                 case "announcements", "3" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
-                        eb = EmbedUtils.embedMessage("You have toggled announcing player messages **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
-                        eb = EmbedUtils.embedMessage("You have toggled announcing player messages **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **ON**");
                     }
                 }
                 case "changelog", "4" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_CHANGELOGS)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, false);
-                        eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, true);
-                        eb = EmbedUtils.embedMessage("You have toggled announcing changelogs **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **ON**");
                     }
                 }
                 case "globalannouncements", "5" -> {
                     if (config.getToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS)) {
                         config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, false);
-                        eb = EmbedUtils.embedMessage("You have toggled global announcements **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, true);
-                        eb = EmbedUtils.embedMessage("You have toggled global announcements **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **ON**");
                     }
                 }
                 case "requester", "6" -> {
                     if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
-                        eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
-                        eb = EmbedUtils.embedMessage("You have toggled showing the requester in now playing messages **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
                 case "8ball", "7" -> {
                     if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                         config.setToggle(guild, Toggles.EIGHT_BALL, false);
-                        eb = EmbedUtils.embedMessage("You have toggled the 8ball command **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.EIGHT_BALL, true);
-                        eb = EmbedUtils.embedMessage("You have toggled the 8ball command **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **ON**");
                     }
                 }
                 case "polls", "poll", "8" -> {
                     if (config.getToggle(guild, Toggles.POLLS)) {
                         config.setToggle(guild, Toggles.POLLS, false);
-                        eb = EmbedUtils.embedMessage("You have toggled the polls command **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **OFF**");
                     } else {
                         config.setToggle(guild, Toggles.POLLS, true);
-                        eb = EmbedUtils.embedMessage("You have toggled the polls command **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
-                default -> eb = EmbedUtils.embedMessage("Invalid toggle!");
+                default -> eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid toggle!");
             }
             msg.replyEmbeds(eb.build()).queue();
         }
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(guild);
     }
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {
@@ -155,16 +156,16 @@ public class TogglesCommand implements ICommand {
                 ICommand command = commandManager.getCommand(args.get(1));
 
                 if (command == null)
-                    return EmbedUtils.embedMessage("`"+args.get(1)+"` is an invalid command!");
+                    return RobertifyEmbedUtils.embedMessage(guild, "`"+args.get(1)+"` is an invalid command!");
 
                 switch (Boolean.toString(config.getDJToggle(guild, command))) {
                     case "true" -> {
                         config.setDJToggle(guild, command, false);
-                        return EmbedUtils.embedMessage("You have toggled DJ only mode for the `"+command.getName()+"` command to: **OFF**");
+                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **OFF**");
                     }
                     case "false" -> {
                         config.setDJToggle(guild, command, true);
-                        return EmbedUtils.embedMessage("You have toggled DJ only mode for the `"+command.getName()+"` command to: **ON**");
+                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **ON**");
                     }
                     default -> logger.error("Did not receive either true or false. Lol?? How??");
                 }
@@ -178,7 +179,7 @@ public class TogglesCommand implements ICommand {
         var toggleNames = new StringBuilder();
         var toggleStatuses = new StringBuilder();
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("\t");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "\t");
 
         for (ICommand toggle : musicCmds) {
             toggleNames.append(toggle.getName()).append("\n");

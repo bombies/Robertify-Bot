@@ -7,6 +7,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -22,9 +23,10 @@ public class SeekCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the position you would like to jump to").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the position you would like to jump to").build())
                     .queue();
             return;
         }
@@ -32,7 +34,7 @@ public class SeekCommand implements ICommand {
         var position = ctx.getArgs().get(0);
 
         if (!Pattern.matches("^\\d{2}:\\d{2}$", position)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the position in the format `mm:ss`").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the position in the format `mm:ss`").build())
                     .queue();
             return;
         }
@@ -49,36 +51,38 @@ public class SeekCommand implements ICommand {
     }
 
     public EmbedBuilder handleSeek(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int mins, int sec) {
+        final var guild = selfVoiceState.getGuild();
+
         if (!selfVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("I must be in a voice channel for this command to work");
+            return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel for this command to work");
 
         if (!memberVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("You must be in the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
-            return EmbedUtils.embedMessage("You must bein the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must bein the same voice channel I am in order to use this command");
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
-            return EmbedUtils.embedMessage("There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
 
         if (mins < 0 || mins > 59)
-            return EmbedUtils.embedMessage("You must provide a valid amount of minutes.");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of minutes.");
 
 
         if (sec < 0 || sec > 59)
-            return EmbedUtils.embedMessage("You must provide a valid amount of seconds.");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of seconds.");
 
 
         long totalDurationInMillis = TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
         if (totalDurationInMillis > audioPlayer.getPlayingTrack().getDuration())
-            return EmbedUtils.embedMessage("The position provided is greater than the length of the playing track");
+            return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
 
         audioPlayer.getPlayingTrack().setPosition(totalDurationInMillis);
-        return EmbedUtils.embedMessage("You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
+        return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
                 ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
 
     }

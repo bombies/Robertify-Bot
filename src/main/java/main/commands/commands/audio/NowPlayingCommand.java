@@ -10,6 +10,7 @@ import main.commands.ICommand;
 import main.constants.Toggles;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,17 +42,17 @@ public class NowPlayingCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
             return eb;
         }
 
@@ -60,7 +61,7 @@ public class NowPlayingCommand implements ICommand {
         AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
@@ -68,7 +69,7 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getPlayingTrack().getPosition() / track.getDuration();
         final User requester = RobertifyAudioManager.getRequester(track);
-        eb =  EmbedUtils.embedMessageWithTitle((LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
+        eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
                 ? "Lo-Fi Music"
                         :
                 info.title + " by "  + info.author),

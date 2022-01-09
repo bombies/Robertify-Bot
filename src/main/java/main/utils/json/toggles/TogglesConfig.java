@@ -14,7 +14,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class TogglesConfig extends AbstractGuildConfig {
     public boolean getToggle(Guild guild, Toggles toggle) {
@@ -57,17 +59,17 @@ public class TogglesConfig extends AbstractGuildConfig {
     }
 
     public void setToggle(Guild guild, Toggles toggle, boolean val) {
-        final var obj = new GuildConfig().getGuildObject(guild.getIdLong());
+        final var obj = getGuildObject(guild.getIdLong());
         obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString()).put(toggle.toString(), val);
-        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
+        getCache().updateGuild(obj, guild.getIdLong());
     }
 
     public void setDJToggle(Guild guild, ICommand command, boolean val) {
-        final var obj = new GuildConfig().getGuildObject(guild.getIdLong());
+        final var obj = getGuildObject(guild.getIdLong());
         obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
                 .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
-        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, guild.getIdLong());
+        getCache().updateGuild(obj, guild.getIdLong());
     }
 
     public boolean isDJToggleSet(Guild guild, ICommand cmd) {
@@ -85,25 +87,30 @@ public class TogglesConfig extends AbstractGuildConfig {
     @Override
     public void update() {
         JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
+        final List<JSONObject> objectsToUpdate = new ArrayList<>();
+        boolean globalChangesMade = false;
 
         for (int i = 0; i < cacheArr.length(); i++) {
+            var localChangesMade = false;
             final JSONObject jsonObject = cacheArr.getJSONObject(i);
-            boolean changesMade = false;
 
             for (Toggles toggle : Toggles.values()) {
                 try {
                     JSONObject toggleObj = jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
 
                     if (!toggleObj.has(toggle.toString())) {
-                        changesMade = true;
+                        globalChangesMade = true;
+                        localChangesMade = true;
                         switch (toggle) {
                             case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
                             default -> toggleObj.put(toggle.toString(), true);
                         }
+
                     }
 
                     if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
-                        changesMade = true;
+                        globalChangesMade = true;
+                        localChangesMade = true;
                         var djTogglesObj = new JSONObject();
 
                         for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
@@ -115,7 +122,8 @@ public class TogglesConfig extends AbstractGuildConfig {
 
                         for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
                             if (!djTogglesObj.has(musicCommand.getName())) {
-                                changesMade = true;
+                                globalChangesMade = true;
+                                localChangesMade = true;
                                 djTogglesObj.put(musicCommand.getName(), false);
                             }
 
@@ -125,21 +133,23 @@ public class TogglesConfig extends AbstractGuildConfig {
                     for (Toggles errToggles : Toggles.values())
                         switch (errToggles) {
                             case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> {
-                                changesMade = true;
+                                globalChangesMade = true;
+                                localChangesMade = true;
                                 jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
                                         .put(errToggles.toString(), false);
                             }
                             default -> {
-                                changesMade = true;
+                                globalChangesMade = true;
+                                localChangesMade = true;
                                 jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
                                         .put(errToggles.toString(), true);
                             }
                         }
                 }
             }
-
-            if (changesMade) getCache().updateCache(Document.parse(jsonObject.toString()));
+            if (localChangesMade) objectsToUpdate.add(jsonObject);
         }
+        if (globalChangesMade) getCache().updateCacheObjects(objectsToUpdate);
     }
 
     public JSONObject getDefaultToggleObject() {

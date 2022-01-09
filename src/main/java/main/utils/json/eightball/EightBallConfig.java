@@ -44,7 +44,7 @@ public class EightBallConfig extends AbstractGuildConfig {
     }
 
     @Override
-    protected void update() {
+    public void update() {
         // Nothing
     }
 }

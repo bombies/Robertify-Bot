@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.PlayCommand;
 import main.main.Listener;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -49,20 +50,21 @@ public class PlaySlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
+        final var guild = event.getGuild();
+
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
 
         EmbedBuilder eb;
-        final Guild guild = event.getGuild();
         final TextChannel channel = event.getTextChannel();
 
         if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
                 if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
                                     "without first having an announcement channel set!").build())
                             .setEphemeral(false)
                             .queue();
@@ -78,13 +80,13 @@ public class PlaySlashCommand extends InteractiveCommand {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!")
                             .build())
                     .queue();
             return;
@@ -97,7 +99,7 @@ public class PlaySlashCommand extends InteractiveCommand {
         }
 
         String finalLink = link;
-        event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build())
+        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build())
                         .setEphemeral(false)
                                 .queue(msg -> RobertifyAudioManager.getInstance()
                                         .loadAndPlay(

@@ -3,6 +3,7 @@ package main.commands.commands.management;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
@@ -34,22 +35,24 @@ public class RestrictedChannelsCommand implements ICommand {
         final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Insufficient arguments!\n\n" + getUsages(prefix)).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Insufficient arguments!\n\n" + getUsages(prefix)).build())
                     .queue();
         } else {
             switch (args.get(0).toLowerCase()) {
                 case "add" -> add(msg, args);
                 case "remove" -> remove(msg, args);
                 case "list" -> list(msg);
-                default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arguments!\n\n" + getUsages(prefix)).build())
+                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arguments!\n\n" + getUsages(prefix)).build())
                         .queue();
             }
         }
     }
 
     public void add(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("""
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                     You must provide the voice channel you want to restrict
                     **TIP**: You must enable *developer mode* to view the ID of the voice or text channel. (https://bit.ly/32wGtRz)
 
@@ -63,7 +66,7 @@ public class RestrictedChannelsCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid voice channel ID!\n" +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid voice channel ID!\n" +
                             "Make sure to either **mention** the channel, or provide its **ID**")
 
                             .build())
@@ -71,7 +74,6 @@ public class RestrictedChannelsCommand implements ICommand {
             return;
         }
 
-        final var guild = msg.getGuild();
         final VoiceChannel voiceChannel = guild.getVoiceChannelById(GeneralUtils.getDigitsOnly(id));
         final TextChannel textChannel = guild.getTextChannelById(GeneralUtils.getDigitsOnly(id));
         final long channelId;
@@ -79,7 +81,7 @@ public class RestrictedChannelsCommand implements ICommand {
 
         if (voiceChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                msg.replyEmbeds(EmbedUtils.embedMessage("""
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
                                     *Looking to toggle this feature on? Do* `toggle restrictedvoice`""")
@@ -92,7 +94,7 @@ public class RestrictedChannelsCommand implements ICommand {
             field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                msg.replyEmbeds(EmbedUtils.embedMessage("""
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
                                     *Looking to toggle this feature on? Do* `toggle restrictedtext`""")
@@ -104,7 +106,7 @@ public class RestrictedChannelsCommand implements ICommand {
             channelId = textChannel.getIdLong();
             field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
         } else {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The ID provided was not of a valid voice or text channel" +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The ID provided was not of a valid voice or text channel" +
                             " in this server.").build())
                     .queue();
             return;
@@ -112,11 +114,11 @@ public class RestrictedChannelsCommand implements ICommand {
 
         try {
             new RestrictedChannelsConfig().addChannel(guild.getIdLong(), channelId, field);
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have successfully added <#"
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully added <#"
                             + channelId + "> as a restricted "+ field +" channel!").build())
                     .queue();
         } catch (IllegalStateException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                     .queue();
         } catch (Exception e) {
             logger.error("Unexpected error!", e);
@@ -125,8 +127,10 @@ public class RestrictedChannelsCommand implements ICommand {
     }
 
     public void remove(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("""
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                     You must provide the voice channel you want to remove from the restriction list
                     **TIP**: You must enable *developer mode* to view the ID of the voice or text channel. (https://bit.ly/32wGtRz)
 
@@ -140,12 +144,11 @@ public class RestrictedChannelsCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid voice channel ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid voice channel ID!").build())
                     .queue();
             return;
         }
 
-        final var guild = msg.getGuild();
         final VoiceChannel voiceChannel = guild.getVoiceChannelById(GeneralUtils.getDigitsOnly(id));
         final TextChannel textChannel = guild.getTextChannelById(GeneralUtils.getDigitsOnly(id));
         final long channelId;
@@ -153,7 +156,7 @@ public class RestrictedChannelsCommand implements ICommand {
 
         if (voiceChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                msg.replyEmbeds(EmbedUtils.embedMessage("""
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
                                     *Looking to toggle this feature on? Do* `toggle restrictedvoice`""")
@@ -166,7 +169,7 @@ public class RestrictedChannelsCommand implements ICommand {
             field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
             if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                msg.replyEmbeds(EmbedUtils.embedMessage("""
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
                                     *Looking to toggle this feature on? Do* `toggle restrictedtext`""")
@@ -178,7 +181,7 @@ public class RestrictedChannelsCommand implements ICommand {
             channelId = textChannel.getIdLong();
             field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
         } else {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The ID provided was not of a valid voice or text channel" +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The ID provided was not of a valid voice or text channel" +
                             " in this server.").build())
                     .queue();
             return;
@@ -186,11 +189,11 @@ public class RestrictedChannelsCommand implements ICommand {
 
         try {
             new RestrictedChannelsConfig().removeChannel(guild.getIdLong(), channelId, field);
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have successfully removed <#"
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully removed <#"
                             + channelId + "> as a restricted "+ field +" channel!").build())
                     .queue();
         } catch (IllegalStateException | NullPointerException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                     .queue();
         } catch (Exception e) {
             logger.error("Unexpected error!", e);
@@ -200,12 +203,13 @@ public class RestrictedChannelsCommand implements ICommand {
 
     public void list(Message msg) {
         final var config = new RestrictedChannelsConfig();
+        final var guild = msg.getGuild();
 
         try {
-            final var tcs = config.restrictedChannelsToString(msg.getGuild().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
-            final var vcs = config.restrictedChannelsToString(msg.getGuild().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
+            final var tcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
+            final var vcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
 
-            EmbedBuilder embedBuilder = EmbedUtils.embedMessage("Listing all restricted channels");
+            EmbedBuilder embedBuilder = RobertifyEmbedUtils.embedMessage(guild, "Listing all restricted channels");
             embedBuilder.addField("Text Channels", tcs == null ? "No channels" : tcs.isEmpty() ? "No channels" : tcs, false);
             embedBuilder.addField("Voice Channels", vcs == null ? "No channels" : vcs.isEmpty() ? "No channels" : vcs, false);
 

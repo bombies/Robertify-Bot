@@ -3,9 +3,8 @@ package main.commands.commands.util;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
-import main.utils.database.sqlite3.ServerDB;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -26,17 +25,17 @@ public class TutorialCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
 
-        GeneralUtils.setCustomEmbed("Tutorial");
+        GeneralUtils.setCustomEmbed(guild, "Tutorial");
 
         if (userInTutorial(user)) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You are already in the tutorial!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You are already in the tutorial!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         usersInTutorial.add(user);
 
-        EmbedBuilder welcomeEmbed = EmbedUtils.embedMessage("\t");
+        EmbedBuilder welcomeEmbed = RobertifyEmbedUtils.embedMessage(guild, "\t");
         welcomeEmbed.addField(
                 "Welcome",
                 "Welcome to Robertify; a Discord music bot with an easily understood interface and is easy to use!",
@@ -57,7 +56,7 @@ public class TutorialCommand implements ICommand {
                 false
         );
         msg.replyEmbeds(welcomeEmbed.build()).queue(welcomeMsg -> {
-            EmbedBuilder playingSongFromYoutube = EmbedUtils.embedMessage("\t");
+            EmbedBuilder playingSongFromYoutube = RobertifyEmbedUtils.embedMessage(guild, "\t");
             playingSongFromYoutube.addField(
                     "Playing Songs From YouTube",
                     """
@@ -72,7 +71,7 @@ public class TutorialCommand implements ICommand {
             playingSongFromYoutube.setImage("https://i.imgur.com/27lnaYZ.gif");
             playingSongFromYoutube.setFooter(getNextMessage(10));
             msg.replyEmbeds(playingSongFromYoutube.build()).queueAfter(10, TimeUnit.SECONDS, youTubeMessage -> {
-                EmbedBuilder playingSongFromSpotify = EmbedUtils.embedMessage("\t");
+                EmbedBuilder playingSongFromSpotify = RobertifyEmbedUtils.embedMessage(guild,"\t");
                 playingSongFromSpotify.addField(
                         "Playing Songs From Spotify",
                         """
@@ -87,7 +86,7 @@ public class TutorialCommand implements ICommand {
                 playingSongFromSpotify.setImage("https://i.imgur.com/vxhvN79.gif");
                 playingSongFromSpotify.setFooter(getNextMessage(10));
                 msg.replyEmbeds(playingSongFromSpotify.build()).queueAfter(10, TimeUnit.SECONDS, spotifyMessage -> {
-                    EmbedBuilder queueManipulation = EmbedUtils.embedMessage("\t");
+                    EmbedBuilder queueManipulation = RobertifyEmbedUtils.embedMessage(guild, "\t");
                     queueManipulation.addField(
                             "What is the queue?",
                             "The queue is the sequence of songs awaiting to be played by the bot.",
@@ -121,7 +120,7 @@ public class TutorialCommand implements ICommand {
                     queueManipulation.setImage("https://i.imgur.com/1PWkKef.gif");
                     queueManipulation.setFooter(getNextMessage(20));
                     msg.replyEmbeds(queueManipulation.build()).queueAfter(10, TimeUnit.SECONDS, queueManipMsg -> {
-                        EmbedBuilder playerManipulation = EmbedUtils.embedMessage("\t");
+                        EmbedBuilder playerManipulation = RobertifyEmbedUtils.embedMessage(guild, "\t");
                         playerManipulation.addField(
                                 "How do I skip a song?",
                                 "You can easily skip a song by running `"+prefix+"skip`",
@@ -151,7 +150,7 @@ public class TutorialCommand implements ICommand {
                         );
                         playerManipulation.setImage("https://i.imgur.com/N1FrmXW.gif");
                         msg.replyEmbeds(playerManipulation.build()).queueAfter(20, TimeUnit.SECONDS, playerManipulationMsg -> {
-                            EmbedBuilder endOfTutorial = EmbedUtils.embedMessage("That's the end of the tutorial!\n" +
+                            EmbedBuilder endOfTutorial = RobertifyEmbedUtils.embedMessage(guild, "That's the end of the tutorial!\n" +
                                     "Need more help? Trying running the `help` command!\n" +
                                     "Thanks for using Robertify! 💖\n" +
                                     "\n*- Robertify Dev Team*");
@@ -163,7 +162,7 @@ public class TutorialCommand implements ICommand {
             });
         });
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override

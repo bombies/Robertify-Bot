@@ -8,6 +8,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -28,10 +29,10 @@ public class ClearQueueCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(guild, "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is already nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is already nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -39,13 +40,13 @@ public class ClearQueueCommand implements ICommand {
         if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
-                    EmbedBuilder eb = EmbedUtils.embedMessage("You need to be a DJ to use this command when there's other users in the channel!");
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to use this command when there's other users in the channel!");
                     msg.replyEmbeds(eb.build()).queue();
                     return;
                 }
             }
         } else {
-            EmbedBuilder eb = EmbedUtils.embedMessage("The bot isn't in a voice channel.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The bot isn't in a voice channel.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -55,10 +56,10 @@ public class ClearQueueCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("The queue was cleared!");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override

@@ -4,6 +4,7 @@ import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -51,7 +52,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
         EmbedBuilder eb;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            eb  = EmbedUtils.embedMessage("You need to be a DJ to use this command!");
+            eb  = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
@@ -60,19 +61,19 @@ public class LeaveSlashCommand extends InteractiveCommand {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("I'm already not in a voice channel!");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "I'm already not in a voice channel!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
@@ -81,7 +82,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
 
         musicManager.leave();
 
-        eb = EmbedUtils.embedMessage("Disconnected!");
+        eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "Disconnected!");
         event.getHook().sendMessageEmbeds(eb.build()).queue();
     }
 }

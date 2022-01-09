@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 
 import javax.script.ScriptException;
@@ -23,7 +24,7 @@ public class VoiceChannelCountCommand implements IDevCommand {
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
         }
 
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("🔊 I am currently in **" + vcCount + "** voice channels\n" +
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "🔊 I am currently in **" + vcCount + "** voice channels\n" +
                         "I am currently playing music in **"+currentlyPlayingCount+"** of those channels.").build())
                 .queue();
     }

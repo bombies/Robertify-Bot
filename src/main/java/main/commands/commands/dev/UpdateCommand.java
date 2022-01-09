@@ -3,6 +3,7 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -24,9 +25,10 @@ public class UpdateCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide arguments!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!").build())
                     .queue();
             return;
         }
@@ -37,13 +39,15 @@ public class UpdateCommand implements IDevCommand {
                 msg.addReaction("✅").queue();
             }
             case "dedichannel", "dc" -> handleDedicatedChannelUpdates(msg, args);
-            default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid args!").build()).queue();
+            default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid args!").build()).queue();
         }
     }
 
     public void handleDedicatedChannelUpdates(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide more arguments!").build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide more arguments!").build()).queue();
             return;
         }
 
@@ -64,7 +68,7 @@ public class UpdateCommand implements IDevCommand {
                     for (Guild g : Robertify.api.getGuilds())
                         conf.updateMessage(g);
                 }
-                default -> msg.replyEmbeds(EmbedUtils.embedMessage("Invalid arg").build()).queue();
+                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arg").build()).queue();
             }
             msg.addReaction("✅").queue();
         } catch (Exception e) {

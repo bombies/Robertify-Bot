@@ -3,6 +3,7 @@ package main.commands.commands.misc;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.eightball.EightBallConfig;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
@@ -31,10 +32,10 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.EIGHT_BALL))
             return;
 
-        GeneralUtils.setCustomEmbed("");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "");
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide something for me to respond to...")
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You must provide something for me to respond to...")
                     .build())
                     .queue();
             return;
@@ -45,13 +46,13 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                     .queue();
             case "remove" -> {
                 if (args.size() < 2) {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("You must provide an index to remove!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You must provide an index to remove!").build())
                             .queue();
                     return;
                 }
 
                 if (!GeneralUtils.stringIsInt(args.get(1))) {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a valid integer as the index!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You must provide a valid integer as the index!").build())
                             .queue();
                     return;
                 }
@@ -69,78 +70,78 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                     .queue();
         }
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     private EmbedBuilder handleAdd(Guild guild, User user, String phraseToAdd) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         if (phraseToAdd == null)
-            return EmbedUtils.embedMessage("You need to provide a response to add!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You need to provide a response to add!");
 
         if (phraseToAdd.isEmpty())
-            return EmbedUtils.embedMessage("You need to provide a response to add!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You need to provide a response to add!");
         var config = new EightBallConfig();
 
         try {
             if (config.getResponses(guild.getIdLong()).contains(phraseToAdd))
-                return EmbedUtils.embedMessage("This is already a response!");
+                return RobertifyEmbedUtils.embedMessage(guild, "This is already a response!");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         config.addResponse(guild.getIdLong(), phraseToAdd);
-        return EmbedUtils.embedMessage("Added `"+phraseToAdd+"` as a response!");
+        return RobertifyEmbedUtils.embedMessage(guild, "Added `"+phraseToAdd+"` as a response!");
     }
 
     private EmbedBuilder handleRemove(Guild guild, User user, int index) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
 
         try {
             if (index > config.getResponses(guild.getIdLong()).size() || index < 0)
-                return EmbedUtils.embedMessage("This is not a response!");
+                return RobertifyEmbedUtils.embedMessage(guild, "This is not a response!");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        var eb = EmbedUtils.embedMessage("Removed `"+config.getResponses(guild.getIdLong()).get(index)+"` as a response!");
+        var eb = RobertifyEmbedUtils.embedMessage(guild, "Removed `"+config.getResponses(guild.getIdLong()).get(index)+"` as a response!");
         config.removeResponse(guild.getIdLong(), index);
         return eb;
     }
 
     private EmbedBuilder handleClear(Guild guild, User user) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
         config.removeAllResponses(guild.getIdLong());
 
-        return EmbedUtils.embedMessage("You have cleared all of your custom responses!");
+        return RobertifyEmbedUtils.embedMessage(guild, "You have cleared all of your custom responses!");
     }
 
     private EmbedBuilder handleList(Guild guild, User user) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
-            return EmbedUtils.embedMessage("You do not have enough permissions to execute this command" +
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
 
         var config = new EightBallConfig();
         final var responses = config.getResponses(guild.getIdLong());
 
         if (responses.isEmpty())
-            return EmbedUtils.embedMessage("There are no custom responses!");
+            return RobertifyEmbedUtils.embedMessage(guild, "There are no custom responses!");
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < responses.size(); i++)
             sb.append("*").append(i).append("* → ").append(responses.get(i)).append("\n");
 
-        return EmbedUtils.embedMessage("**List of Responses**\n\n" + sb);
+        return RobertifyEmbedUtils.embedMessage(guild, "**List of Responses**\n\n" + sb);
     }
 
     private EmbedBuilder handle8Ball(Guild guild) {
@@ -178,25 +179,25 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
 
         if (!customAnswers.isEmpty()) {
             if (random < 0.11) {
-                return EmbedUtils.embedMessage("🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
             } else if (random > 0.11 && random < 0.22) {
-                return EmbedUtils.embedMessage("🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             } else if (random > 0.22 && random < 0.33) {
-                return EmbedUtils.embedMessage("🎱| " +  negativeAnswers.get(new Random().nextInt(negativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  negativeAnswers.get(new Random().nextInt(negativeAnswers.size())));
             } else if (random > 0.33) {
-                return EmbedUtils.embedMessage("🎱| " +  customAnswers.get(new Random().nextInt(customAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  customAnswers.get(new Random().nextInt(customAnswers.size())));
             }
         } else {
             if (random < 0.5) {
-                return EmbedUtils.embedMessage("🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
             } else if (random > 0.5 && random < 0.75) {
-                return EmbedUtils.embedMessage("🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             } else if (random > 0.75) {
-                return EmbedUtils.embedMessage("🎱| " +  negativeAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  negativeAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             }
         }
 
-        return EmbedUtils.embedMessage("Something went wrong!");
+        return RobertifyEmbedUtils.embedMessage(guild, "Something went wrong!");
     }
 
     @Override

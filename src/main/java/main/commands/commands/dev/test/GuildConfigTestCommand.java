@@ -2,6 +2,7 @@ package main.commands.commands.dev.test;
 
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 
@@ -24,7 +25,7 @@ public class GuildConfigTestCommand implements ITestCommand {
             final var announcementChannel = config.getAnnouncementChannelID(guild.getIdLong());
             final var bannedUsers = config.getBannedUsers(guild.getIdLong());
 
-            msg.replyEmbeds(EmbedUtils.embedMessage("\t")
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "\t")
                     .addField("Has Info", String.valueOf(guildHasInfo), false)
                     .addField("Prefix", prefix, false)
                     .addField("Announcement Channel", String.valueOf(announcementChannel), false)

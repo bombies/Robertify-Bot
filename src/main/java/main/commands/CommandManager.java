@@ -14,6 +14,7 @@ import main.commands.commands.misc.LyricsCommand;
 import main.commands.commands.util.*;
 import main.constants.Permission;
 import main.constants.Statistic;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
@@ -105,6 +106,7 @@ public class CommandManager {
                 new VoteCommand(),
                 new LyricsCommand(),
                 new DonateCommand(),
+                new ThemeCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -168,7 +170,8 @@ public class CommandManager {
                 new BanCommand(),
                 new UnbanCommand(),
                 new DedicatedChannelCommand(),
-                new RestrictedChannelsCommand()
+                new RestrictedChannelsCommand(),
+                new ThemeCommand()
         );
 
         addMiscCommands(
@@ -298,7 +301,7 @@ public class CommandManager {
                 if (cmd.requiresPermission())
                     if (!hasAllPermissions(cmd, e.getGuild().getSelfMember())) {
                         final var permissionsRequired = cmd.getPermissionsRequired();
-                        e.getMessage().replyEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to do this\n" +
+                        e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(), "I do not have enough permissions to do this\n" +
                                 "Please give my role the following permission(s):\n\n" +
                                         "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
                                         "*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*")
@@ -345,7 +348,7 @@ public class CommandManager {
                             if (!(cmd instanceof StatisticsCommand))
                                 StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                         } else {
-                            msg.replyEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                             " to run this command!").build())
                                     .queue();
                         }
@@ -363,7 +366,7 @@ public class CommandManager {
             CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
         } else {
             long time_left = CooldownManager.DEFAULT_COOLDOWN - TimeUnit.MILLISECONDS.toSeconds(timeLeft);
-            EmbedBuilder eb = EmbedUtils.embedMessageWithTitle("⚠  Slow down!",
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessageWithTitle(e.getGuild(), "⚠  Slow down!",
                     "You must wait `" + time_left
                             + " " + ((time_left <= 1) ? "second`" : "seconds`") + " before running another command!");
             e.getMessage().replyEmbeds(eb.build()).queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS));

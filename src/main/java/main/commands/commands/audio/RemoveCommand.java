@@ -7,6 +7,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,23 +26,24 @@ public class RemoveCommand implements ICommand {
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
+        final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(),  "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to remove from the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to remove from the queue.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!GeneralUtils.stringIsInt(args.get(0))) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as the ID.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid integer as the ID.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -51,22 +53,22 @@ public class RemoveCommand implements ICommand {
     }
 
     public EmbedBuilder handleRemove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id) {
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(guild, "Queue");
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
             return eb;
         }
 
         if (id <= 0 || id > queue.size())
-            return EmbedUtils.embedMessage("This is an invalid ID! You must provide an ID between 1 and " + queue.size());
+            return RobertifyEmbedUtils.embedMessage(guild, "This is an invalid ID! You must provide an ID between 1 and " + queue.size());
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Removing `"+trackList.get(id-1).getInfo().title
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removing `"+trackList.get(id-1).getInfo().title
                 +"` from the queue");
 
         if (!queue.remove(trackList.get(id-1)))
-            eb =  EmbedUtils.embedMessage("Could not remove track with id "+id+" from the queue");
+            eb =  RobertifyEmbedUtils.embedMessage(guild, "Could not remove track with id "+id+" from the queue");
 
         if (id <= 10)
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))

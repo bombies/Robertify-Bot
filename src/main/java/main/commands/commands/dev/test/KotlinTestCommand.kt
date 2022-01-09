@@ -7,7 +7,7 @@ import me.duncte123.botcommons.messaging.EmbedUtils
 class KotlinTestCommand : ITestCommand {
     override fun handle(ctx: CommandContext) {
         if (!permissionCheck(ctx)) {
-            ctx.message.replyEmbeds(EmbedUtils.embedMessage("You do not have permission to run test commands")
+            ctx.message.replyEmbeds(RobertifyEmbedUtils.embedMessage("You do not have permission to run test commands")
                 .build()).queue()
             return;
         }

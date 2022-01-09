@@ -3,12 +3,14 @@ package main.commands.commands.dev;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.constants.Toggles;
 import main.constants.BotConstants;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,11 +38,12 @@ public class ChangeLogCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed("Change Log");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Change Log");
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide arguments");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments");
             msg.replyEmbeds(eb.build()).queue();
         } else {
             switch (args.get(0).toLowerCase()) {
@@ -51,23 +54,23 @@ public class ChangeLogCommand implements IDevCommand {
             }
         }
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     private void send(Message msg) {
-        var config = new ChangeLogConfig();
-        var logsToString = new StringBuilder();
-        var logs = config.getCurrentChangelog();
-        var guilds = Robertify.api.getGuilds();
+        final var config = new ChangeLogConfig();
+        final var logsToString = new StringBuilder();
+        final var logs = config.getCurrentChangelog();
+        final var guild = msg.getGuild();
+        final var guilds = Robertify.api.getGuilds();
 
         logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
-        EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
-        eb.setThumbnail(BotConstants.ROBERTIFY_LOGO_TRANSPARENT.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
         eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
-
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
         for (Guild g : guilds) {
+            eb.setThumbnail(new ThemesConfig().getTheme(g.getIdLong()).getTransparent());
             if (!new TogglesConfig().getToggle(msg.getGuild(), Toggles.ANNOUNCE_CHANGELOGS))
                 continue;
 
@@ -88,15 +91,16 @@ public class ChangeLogCommand implements IDevCommand {
     }
 
     private void view(Message msg) {
-        var config = new ChangeLogConfig();
-        var logs = config.getCurrentChangelog();
-        var logsToString = new StringBuilder();
+        final var config = new ChangeLogConfig();
+        final var logs = config.getCurrentChangelog();
+        final var logsToString = new StringBuilder();
+        final var guild = msg.getGuild();
 
         for (int i = 0; i < logs.size(); i++)
             logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n\n");
 
-        EmbedBuilder eb = EmbedUtils.embedMessage(logsToString.toString());
-        eb.setThumbnail(BotConstants.ROBERTIFY_LOGO_TRANSPARENT.toString());
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
+        eb.setThumbnail(new ThemesConfig().getTheme(msg.getGuild().getIdLong()).getTransparent());
         eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
 
         eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
@@ -105,8 +109,10 @@ public class ChangeLogCommand implements IDevCommand {
     }
 
     private void remove(List<String> args, Message msg) {
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a changelog to remove");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a changelog to remove");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -115,7 +121,7 @@ public class ChangeLogCommand implements IDevCommand {
         if (GeneralUtils.stringIsInt(args.get(1))) {
             id = Integer.parseInt(args.get(1));
         } else {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as an ID!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid integer as an ID!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -123,7 +129,7 @@ public class ChangeLogCommand implements IDevCommand {
         var config = new ChangeLogConfig();
 
         if (id < 0 || id > config.getCurrentChangelog().size()-1) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("The ID cannot be less than 0 or more than the current amount of logs");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The ID cannot be less than 0 or more than the current amount of logs");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -134,7 +140,7 @@ public class ChangeLogCommand implements IDevCommand {
 
     private void add(List<String> args, Message msg) {
         if (args.size() < 2) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a changelog to add");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), "You must provide a changelog to add");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }

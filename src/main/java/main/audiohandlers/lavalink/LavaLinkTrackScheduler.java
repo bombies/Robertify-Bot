@@ -11,6 +11,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.constants.Toggles;
 import main.main.Listener;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -81,7 +82,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
 
         final var requester = RobertifyAudioManager.getRequester(track);
         TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
-        EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                 + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                 "\n\n~ Requested by " + requester.getAsMention()
                 :

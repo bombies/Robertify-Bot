@@ -3,6 +3,7 @@ package main.commands.commands.audio.slashcommands;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ShufflePlayCommand;
 import main.main.Listener;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -54,7 +55,7 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
         if (!event.getName().equals(commandName)) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
@@ -66,7 +67,7 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
         if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
                 if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    event.replyEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You cannot run this command in this channel " +
                                     "without first having an announcement channel set!").build())
                             .setEphemeral(false)
                             .queue();
@@ -82,13 +83,13 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be in a voice channel for this to work");
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command!")
                             .build())
                     .queue();
             return;
@@ -98,20 +99,20 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
 
         if (!url.contains("deezer.page.link")) {
             if (url.contains("soundcloud.com") && !url.contains("sets")) {
-                event.replyEmbeds(EmbedUtils.embedMessage("This SoundCloud URL doesn't contain a playlist!").build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "This SoundCloud URL doesn't contain a playlist!").build()).queue();
                 return;
             } else if (url.contains("youtube.com") && !url.contains("playlist") && !url.contains("list")) {
-                event.replyEmbeds(EmbedUtils.embedMessage("This YouTube URL doesn't contain a playlist!").build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "This YouTube URL doesn't contain a playlist!").build()).queue();
                 return;
             } else if (!url.contains("playlist") && !url.contains("album") && !url.contains("soundcloud.com") && !url.contains("youtube.com")) {
-                event.replyEmbeds(EmbedUtils.embedMessage("You must provide the link of a valid album/playlist!").build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must provide the link of a valid album/playlist!").build()).queue();
                 return;
             }
         }
 
         event.deferReply().queue();
 
-        event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("Adding to queue...").build()).queue(addingMsg -> {
+        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
                     .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, addingMsg, event);
         });

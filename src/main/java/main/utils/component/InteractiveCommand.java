@@ -33,12 +33,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public abstract class InteractiveCommand extends ListenerAdapter {
-    final static Logger logger = LoggerFactory.getLogger(InteractiveCommand.class);
+    private final static Logger logger = LoggerFactory.getLogger(InteractiveCommand.class);
 
     @Setter @Getter
     private static InteractionCommand interactionCommand;
 
-    public Predicate<SlashCommandEvent> djPredicate = e -> {
+    protected Predicate<SlashCommandEvent> djPredicate = e -> {
         final TogglesConfig config = new TogglesConfig();
 
         if (!config.isDJToggleSet(e.getGuild(), e.getName()))
@@ -51,18 +51,35 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
     };
 
+    protected Predicate<SelectionMenuEvent> menuPredicate = e -> {
+        if (e.getMessage().getMessageReference() == null)
+            return true;
+
+        var msgID = e.getMessage().getMessageReference().getMessageIdLong();
+        Message msg = e.getJDA().getTextChannelById(e.getTextChannel().getIdLong())
+                .retrieveMessageById(msgID).complete();
+        return e.getUser().getIdLong() == msg.getAuthor().getIdLong();
+    };
+
     public abstract void initCommand();
     public abstract void initCommand(Guild g);
 
-    public static void upsertCommand() {
+    protected void initCommandWithoutUpsertion(InteractionCommand command) {
+        if (command == null)
+            throw new IllegalStateException("Cannot initialize an interaction command as it is null.");
+
+        setInteractionCommand(command);
+    }
+
+    protected static void upsertCommand() {
         interactionCommand.pushToAllGuilds();
     }
 
-    public static void upsertCommand(Guild g) {
+    protected static void upsertCommand(Guild g) {
         interactionCommand.pushToGuild(g);
     }
 
-    public SelectionDialogue getSelectionDialogue(String name) {
+    protected SelectionDialogue getSelectionDialogue(String name) {
         return interactionCommand.getSelectionDialogues().get(name);
     }
 
@@ -94,11 +111,11 @@ public abstract class InteractiveCommand extends ListenerAdapter {
                     .setPlaceholder(selectionDialogue.getPlaceholder())
                     .setRequiredRange(selectionDialogue.range.getLeft(), selectionDialogue.range.getLeft());
 
-            for (Triple<String, String, String> val : selectionDialogue.getOptions())
+            for (Triple<String, String, Emoji> val : selectionDialogue.getOptions())
                 if (val.getRight() == null)
                     builder.addOption(val.getLeft(), val.getMiddle());
                 else
-                    builder.addOption(val.getLeft(), val.getMiddle(), Emoji.fromUnicode(val.getRight()));
+                    builder.addOption(val.getLeft(), val.getMiddle(), val.getRight());
 
             return builder.build();
         }
@@ -494,7 +511,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private String name;
         private String placeholder;
         private Pair<Integer, Integer> range;
-        private final List<Triple<String, String, String>> options = new ArrayList<>();
+        private final List<Triple<String, String, Emoji>> options = new ArrayList<>();
         private Predicate<SelectionMenuEvent> predicate;
         private final InteractionBuilder builder;
 
@@ -522,8 +539,8 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return this;
         }
 
-        public SelectionDialogueBuilder addOption(String label, String value, String emoji) {
-            options.add(Triple.of(label.toLowerCase(), value.toLowerCase(), emoji));
+        public SelectionDialogueBuilder addOption(String label, String value, Emoji emoji) {
+                options.add(Triple.of(label.toLowerCase(), value.toLowerCase(), emoji));
             return this;
         }
 
@@ -561,11 +578,11 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         @Getter @NotNull
         private final Pair<Integer, Integer> range;
         @Getter @NotNull
-        private final List<Triple<String, String, String>> options;
+        private final List<Triple<String, String, Emoji>> options;
         @Nullable
         private final Predicate<SelectionMenuEvent> permissionCheck;
 
-        private SelectionDialogue(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, String>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck) {
+        private SelectionDialogue(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck) {
             this.name = name.toLowerCase();
             this.placeholder = placeholder;
             this.range = range;
@@ -587,7 +604,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
          * @param options This of pair of options to be presented List(Pair(Label, Value))
          * @return A new fancy selection menu
          */
-        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, String>> options) {
+        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, Emoji>> options) {
             return new SelectionDialogue(name, placeholder, range, options, null);
         }
 
@@ -600,7 +617,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
          * @param permissionCheck The check that can be performed when a user interacts with the selection menu
          * @return A new fancy selection menu
          */
-        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, String>> options, Predicate<SelectionMenuEvent> permissionCheck) {
+        public static SelectionDialogue of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, Emoji>> options, Predicate<SelectionMenuEvent> permissionCheck) {
             return new SelectionDialogue(name, placeholder, range, options, permissionCheck);
         }
     }

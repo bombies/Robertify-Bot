@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -31,9 +32,8 @@ public class ShuffleCommand implements ICommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var queue = musicManager.getScheduler().queue;
 
-
         if (queue.isEmpty())
-            return EmbedUtils.embedMessage("There is nothing in the queue.");
+            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
         Collections.shuffle(trackList);
@@ -44,7 +44,7 @@ public class ShuffleCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        return EmbedUtils.embedMessage("Shuffled the queue!");
+        return RobertifyEmbedUtils.embedMessage(guild, "Shuffled the queue!");
     }
 
     @Override

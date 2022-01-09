@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -37,25 +38,25 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
 
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
                 if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("The announcement channel cannot be set to this channel!")
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to this channel!")
                             .build()).queue();
                     return;
                 }
 
             if (guildConfig.getAnnouncementChannelID(guild.getIdLong()) == channel.getIdLong()) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("This is already the announcement channel.");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "This is already the announcement channel.");
                 msg.replyEmbeds(eb.build()).queue();
             } else {
                 guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
-                EmbedBuilder eb = EmbedUtils.embedMessage("Set the announcement channel to: " + channel.getAsMention());
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Set the announcement channel to: " + channel.getAsMention());
                 msg.replyEmbeds(eb.build()).queue();
             }
         } else {
             String id = GeneralUtils.getDigitsOnly(args.get(0));
 
             if (!GeneralUtils.stringIsID(id)) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("ID provided isn't a valid ID!\n" +
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "ID provided isn't a valid ID!\n" +
                         "Make sure to either **mention** the channel, or provide its **ID**")
                         .setImage("https://i.imgur.com/Qg0BQ3f.png");
                 msg.replyEmbeds(eb.build()).queue();
@@ -65,21 +66,21 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
             TextChannel channel = Robertify.api.getGuildById(guild.getIdLong()).getTextChannelById(id);
 
             if (channel == null) {
-                EmbedBuilder eb = EmbedUtils.embedMessage("That ID doesn't belong to any channel in this guild!");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any channel in this guild!");
                 msg.replyEmbeds(eb.build()).queue();
                 return;
             }
 
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
                 if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("The announcement channel cannot be set to that channel!")
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to that channel!")
                             .build()).queue();
                     return;
                 }
 
             guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
-            EmbedBuilder eb =  EmbedUtils.embedMessage("You've set the announcement channel to: " +  channel.getAsMention());
+            EmbedBuilder eb =  RobertifyEmbedUtils.embedMessage(guild, "You've set the announcement channel to: " +  channel.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         }
     }
@@ -131,23 +132,24 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        var channel = event.getOption("channel").getAsGuildChannel();
-        var guildConfig = new GuildConfig();
+        final var channel = event.getOption("channel").getAsGuildChannel();
+        final var guildConfig = new GuildConfig();
+        final var guild = event.getGuild();
 
         if (!(channel instanceof TextChannel)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("The channel must be a **text** channel!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The channel must be a **text** channel!").build())
                     .setEphemeral(true).queue();
             return;
         }
 
         if (guildConfig.getAnnouncementChannelID(event.getGuild().getIdLong()) == channel.getIdLong()) {
-            event.replyEmbeds(EmbedUtils.embedMessage(channel.getAsMention() + " is already the announcement channel").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, channel.getAsMention() + " is already the announcement channel").build())
                     .setEphemeral(true).queue();
             return;
         }
 
         guildConfig.setAnnouncementChannelID(event.getGuild().getIdLong(), channel.getIdLong());
-        event.replyEmbeds(EmbedUtils.embedMessage("You have set the announcement channel to: " + channel.getAsMention()).build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have set the announcement channel to: " + channel.getAsMention()).build())
                 .setEphemeral(false)
                 .queue();
     }

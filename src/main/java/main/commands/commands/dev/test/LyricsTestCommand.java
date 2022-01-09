@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.genius.GeniusAPI;
 import main.utils.genius.GeniusSongSearch;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -45,7 +46,7 @@ public class LyricsTestCommand implements ITestCommand {
         GeniusSongSearch.Hit hit = songSearch.getHits().get(0);
 
         try {
-            channel.sendMessageEmbeds(EmbedUtils.embedMessageWithTitle(hit.getTitle(), hit.fetchLyrics()).build()).queue();
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(ctx.getGuild(), hit.getTitle(), hit.fetchLyrics()).build()).queue();
         } catch (IllegalArgumentException e) {
             File file = new File("lyricstest.txt");
             file.createNewFile();

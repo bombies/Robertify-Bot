@@ -7,6 +7,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -27,21 +28,22 @@ public class ResumeCommand implements ICommand {
 
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
+        final var guild = ctx.getGuild();
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = EmbedUtils.embedMessage("You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -50,19 +52,19 @@ public class ResumeCommand implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {
-            eb = EmbedUtils.embedMessage("There is nothing playing");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!audioPlayer.isPaused()) {
-            eb = EmbedUtils.embedMessage("The player isn't paused!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "The player isn't paused!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         audioPlayer.setPaused(false);
-        eb = EmbedUtils.embedMessage("You have resumed the song!");
+        eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the song!");
         msg.replyEmbeds(eb.build()).queue();
     }
 

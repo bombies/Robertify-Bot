@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
@@ -36,7 +37,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide a suggestion!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), "You must provide a suggestion!").build())
                     .queue();
         } else {
             switch (args.get(0).toLowerCase()) {
@@ -56,7 +57,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final var config = BotInfoCache.getInstance();
 
         if (config.isSuggestionsSetup()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The suggestions channels have already been setup!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), "The suggestions channels have already been setup!").build())
                     .queue();
             return;
         }
@@ -85,7 +86,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     }
 
     private void sendSuggestion(Message msg, List<String> args) {
-        msg.replyEmbeds(handleSuggestion(msg.getAuthor(), String.join(" ", args)))
+        msg.replyEmbeds(handleSuggestion(msg.getGuild(), msg.getAuthor(), String.join(" ", args)))
                 .queue(sentMessage -> {
                     msg.delete().queueAfter(10, TimeUnit.SECONDS);
                     sentMessage.delete().queueAfter(11, TimeUnit.SECONDS);
@@ -95,8 +96,10 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     private void accept(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a suggestion to accept").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a suggestion to accept").build())
                     .queue();
             return;
         }
@@ -104,7 +107,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -115,7 +118,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
-            msg.replyEmbeds(EmbedUtils.embedMessage("This feature isn't available right now!").build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build()).queue();
             return;
         }
 
@@ -124,7 +127,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             if (acceptedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
-                msg.replyEmbeds(EmbedUtils.embedMessage("This feature isn't available right now!").build()).queue();
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build()).queue();
                 return;
             }
             List<MessageEmbed.Field> embedField = suggestion.getEmbeds().get(0).getFields();
@@ -157,7 +160,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             msg.addReaction("✅").queue();
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("That ID doesn't belong to any pending suggestion!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any pending suggestion!").build())
                             .queue();
                 }));
     }
@@ -165,8 +168,10 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     private void deny(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a suggestion to reject").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a suggestion to reject").build())
                     .queue();
             return;
         }
@@ -178,7 +183,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         else reason = null;
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -189,7 +194,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
-            msg.replyEmbeds(EmbedUtils.embedMessage("This feature isn't available right now!").build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build()).queue();
             return;
         }
 
@@ -198,7 +203,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             if (deniedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
-                msg.replyEmbeds(EmbedUtils.embedMessage("This feature isn't available right now!").build()).queue();
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build()).queue();
                 return;
             }
             List<MessageEmbed.Field> embedField = suggestion.getEmbeds().get(0).getFields();
@@ -233,7 +238,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
             msg.addReaction("✅").queue();
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("That ID doesn't belong to any pending suggestion!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any pending suggestion!").build())
                             .queue();
                 }));
     }
@@ -254,20 +259,20 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         return eb.build();
     }
 
-    private MessageEmbed handleSuggestion(User suggester, String suggestion) {
+    private MessageEmbed handleSuggestion(Guild guild, User suggester, String suggestion) {
         if (suggestion.chars().count() > 1024)
-            return EmbedUtils.embedMessage("Your suggestion must be no more than 1024 characters!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, "Your suggestion must be no more than 1024 characters!").build();
 
         final var config = BotInfoCache.getInstance();
         final TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The suggestion channels aren't setup!");
-            return EmbedUtils.embedMessage("This feature isn't available right now!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build();
         }
 
         if (config.userIsSuggestionBanned(suggester.getIdLong()))
-            return EmbedUtils.embedMessage("You have been banned from sending suggestions!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, "You have been banned from sending suggestions!").build();
 
         final EmbedBuilder eb = new EmbedBuilder();
 
@@ -279,7 +284,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         eb.setTimestamp(Instant.now());
 
         pendingChannel.sendMessageEmbeds(eb.build()).queue();
-        return EmbedUtils.embedMessage("You have successfully sent your suggestion!\n\n" +
+        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully sent your suggestion!\n\n" +
                 "*Be sure to be on the lookout for a response in your DMs! Ensure your direct messages are enabled" +
                 " else you will not receive any updates on your suggestion.*").build();
     }
@@ -287,8 +292,10 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     private void ban(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a user to ban").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to ban").build())
                     .queue();
             return;
         }
@@ -296,7 +303,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -304,18 +311,18 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid user!").build())
                     .queue();
             return;
         }
 
         try {
             BotInfoCache.getInstance().banSuggestionsUser(user.getIdLong());
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                     + user.getAsMention() + "from suggestions").build())
                     .queue();
         } catch (IllegalStateException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
             msg.addReaction("❌").queue();
@@ -325,8 +332,10 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     private void unban(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a user to ban").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to ban").build())
                     .queue();
             return;
         }
@@ -334,7 +343,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -342,18 +351,18 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid user!").build())
                     .queue();
             return;
         }
 
         try {
             BotInfoCache.getInstance().unbanSuggestionUser(user.getIdLong());
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                             + user.getAsMention() + "from suggestions").build())
                     .queue();
         } catch (IllegalStateException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
             msg.addReaction("❌").queue();
@@ -411,7 +420,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        event.replyEmbeds(handleSuggestion(event.getUser(), event.getOption("suggestion").getAsString()))
+        event.replyEmbeds(handleSuggestion(event.getGuild(), event.getUser(), event.getOption("suggestion").getAsString()))
                 .setEphemeral(true)
                 .queue();
     }

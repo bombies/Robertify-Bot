@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
@@ -32,7 +33,7 @@ public class LofiCommand implements ICommand {
             msg.replyEmbeds(handleLofi(guild, ctx.getMember(), ctx.getChannel()))
                     .queue();
         } catch (IllegalArgumentException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Enabling Lo-Fi mode...").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Enabling Lo-Fi mode...").build())
                     .queue(botMsg -> {
                         lofiEnabledGuilds.add(guild.getIdLong());
                         announceLofiMode.add(guild.getIdLong());
@@ -57,17 +58,17 @@ public class LofiCommand implements ICommand {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("You need to be in a voice channel for this to work").build();
+            return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build();
 
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            return EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!")
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!")
                     .build();
         } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                 if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                    return EmbedUtils.embedMessage("I can't join this channel!" +
+                    return RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
                             (!restrictedChannelsConfig.getRestrictedChannels(
                                     guild.getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
@@ -89,7 +90,7 @@ public class LofiCommand implements ICommand {
             lofiEnabledGuilds.remove(guild.getIdLong());
             musicManager.getScheduler().nextTrack();
 
-            return EmbedUtils.embedMessage("You have disabled Lo-Fi mode").build();
+            return RobertifyEmbedUtils.embedMessage(guild, "You have disabled Lo-Fi mode").build();
         } else {
             queue.clear();
             musicManager.getScheduler().getPastQueue().clear();

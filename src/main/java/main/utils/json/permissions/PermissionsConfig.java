@@ -186,27 +186,32 @@ public class PermissionsConfig extends AbstractGuildConfig {
     @Override
     public void update() {
         final var cacheArr = getCache().getCache();
+        final List<JSONObject> objectToUpdate = new ArrayList<>();
 
+        boolean globalChangesMade = false;
         for (int i = 0; i < cacheArr.length(); i++) {
+            boolean localChangesMade = false;
             final var guildObj = cacheArr.getJSONObject(i);
-            boolean changesMade = false;
 
             for (int code : Permission.getCodes())
                 if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                         .has(String.valueOf(code))) {
-                    changesMade = true;
+                    globalChangesMade = true;
+                    localChangesMade = true;
                     guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                             .put(String.valueOf(code), new JSONArray());
                 }
 
             if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                     .has(PermissionConfigField.USER_PERMISSIONS.toString())) {
-                changesMade = true;
+                globalChangesMade = true;
+                localChangesMade = true;
                 guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                         .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
             }
 
-            if (changesMade) getCache().updateCache(Document.parse(guildObj.toString()));
+            if (localChangesMade) objectToUpdate.add(guildObj);
         }
+        if (globalChangesMade) getCache().updateCacheObjects(objectToUpdate);
     }
 }

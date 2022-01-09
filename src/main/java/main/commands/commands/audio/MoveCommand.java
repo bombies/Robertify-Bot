@@ -6,6 +6,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -24,25 +25,26 @@ public class MoveCommand implements ICommand {
         final var queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
+        final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Queue");
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the ID of a song to move in the queue and the position to move it to.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to move in the queue and the position to move it to.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         } else if (args.size() < 2) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide the position to move it the song to.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the position to move it the song to.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (!GeneralUtils.stringIsInt(args.get(0))) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as the ID.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid integer as the ID.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         } else if (!GeneralUtils.stringIsInt(args.get(1))) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("You must provide a valid integer as the position.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid integer as the position.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -52,24 +54,24 @@ public class MoveCommand implements ICommand {
 
         msg.replyEmbeds(handleMove(ctx.getGuild(), queue, id, position).build()).queue();
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     public EmbedBuilder handleMove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(guild, "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
             return eb;
         }
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (id <= 0 || id > trackList.size()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid song id.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That isn't a valid song id.");
             return eb;
         } else if (position <= 0 || position > trackList.size()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("That isn't a valid position id.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That isn't a valid position id.");
             return eb;
         }
 
@@ -79,13 +81,13 @@ public class MoveCommand implements ICommand {
         prevList.add(position-1, trackList.get(id-1));
         if (!queue.addAll(prevList)) {
             queue.addAll(trackList);
-            return EmbedUtils.embedMessage("Could not move track with id "+id+" in the queue");
+            return RobertifyEmbedUtils.embedMessage(guild, "Could not move track with id "+id+" in the queue");
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        return EmbedUtils.embedMessage("Moved `"+trackList.get(id-1).getInfo().title
+        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+trackList.get(id-1).getInfo().title
                 +"` to position `"+position+"`.");
     }
 

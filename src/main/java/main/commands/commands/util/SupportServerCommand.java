@@ -3,6 +3,7 @@ package main.commands.commands.util;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -18,7 +19,7 @@ import javax.script.ScriptException;
 public class SupportServerCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        ctx.getMessage().replyEmbeds(EmbedUtils.embedMessage("Click on the button below to join our support server").build())
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Click on the button below to join our support server").build())
                 .setActionRow(Button.of(ButtonStyle.LINK, BotConstants.SUPPORT_SERVER.toString(), "Support Server", Emoji.fromUnicode("🗣️")))
                 .queue();
     }
@@ -57,7 +58,7 @@ public class SupportServerCommand extends InteractiveCommand implements ICommand
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        event.replyEmbeds(EmbedUtils.embedMessage("Click on the button below to join our support server").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Click on the button below to join our support server").build())
                 .setEphemeral(true)
                 .addActionRow(Button.of(ButtonStyle.LINK, BotConstants.SUPPORT_SERVER.toString(), "Support Server", Emoji.fromUnicode("🗣️")))
                 .queue();

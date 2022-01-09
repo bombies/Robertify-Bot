@@ -18,6 +18,7 @@ import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
 import main.commands.CommandContext;
 import main.constants.Statistic;
 import main.constants.Toggles;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.statistics.StatisticsManager;
@@ -262,6 +263,7 @@ public class RobertifyAudioManager {
         if (!selfVoiceState.inVoiceChannel()) {
             final AudioManager audioManager = selfVoiceState.getGuild().getAudioManager();
             final var vc = memberVoiceState.getChannel();
+            final var guild = channel.getGuild();
 
             try {
                 audioManager.openAudioConnection(memberVoiceState.getChannel());
@@ -273,13 +275,13 @@ public class RobertifyAudioManager {
                             self.hasPermission(vc, Permission.VOICE_MUTE_OTHERS)) {
                         vc.getGuild().requestToSpeak();
                     } else {
-                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("I need to have the `"+Permission.REQUEST_TO_SPEAK.getName()+"` permission " +
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I need to have the `"+Permission.REQUEST_TO_SPEAK.getName()+"` permission " +
                                         "for me to properly play music in this stage channel.")
                                 .build()).queue();
                     }
                 } else audioManager.setSelfDeafened(true);
             } catch (InsufficientPermissionException e) {
-                channel.sendMessageEmbeds(EmbedUtils.embedMessage("I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
                         .queue();
                 throw e;
             }

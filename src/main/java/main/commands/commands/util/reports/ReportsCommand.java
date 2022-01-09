@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.sqlite3.BotDB;
@@ -55,7 +56,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         final var config = BotInfoCache.getInstance();
 
         if (config.isReportsSetup()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has already been setup!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), "The reports category has already been setup!").build())
                     .queue();
             return;
         }
@@ -76,18 +77,20 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
 
     @SneakyThrows
     public void address(Message msg, List<String> args) {
+        final var guild = msg.getGuild();
+
         if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
 
         final var config = BotInfoCache.getInstance();
 
         if (!config.isReportsSetup()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("The reports category has not been setup!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The reports category has not been setup!").build())
                     .queue();
             return;
         }
 
         if (args.size() < 3) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a report to address" +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a report to address" +
                             " and the message to address it with!").build())
                     .queue();
             return;
@@ -97,7 +100,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         String developerMsg = String.join(" ", args.subList(2, args.size()));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -114,7 +117,8 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(reporter));
 
             user.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(EmbedUtils.embedMessageWithTitle(
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
+                        guild,
                         "Bug Reports",
                         "Your bug report has been handled."
                         )
@@ -133,7 +137,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             });
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
-                    msg.replyEmbeds(EmbedUtils.embedMessage("That ID doesn't belong to any opened report!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any opened report!").build())
                             .queue();
                 }));
 
@@ -141,28 +145,30 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
 
     private void sendReport(User user, Message msg) {
         final var config = BotInfoCache.getInstance();
+        final var guild = msg.getGuild();
 
         if (config.isUserReportsBanned(user.getIdLong())) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You are banned from making reports!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You are banned from making reports!").build())
                     .queue();
             return;
         }
 
         if (!config.isReportsSetup()) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You can't create a bug report at this time!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't create a bug report at this time!").build())
                     .queue();
             return;
         }
 
         if (activeReports.contains(user.getIdLong())) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must complete your opened report form " +
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must complete your opened report form " +
                     "before submitting another one!").build()).queue();
             return;
         }
 
         user.openPrivateChannel().queue(channel -> {
             channel.sendMessageEmbeds(
-                    EmbedUtils.embedMessageWithTitle(
+                    RobertifyEmbedUtils.embedMessageWithTitle(
+                                guild,
                                 "Bug Reports",
                                     """
                                             Please answer the following questions in order to file a bug report
@@ -177,7 +183,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
                         msg.addReaction("✅").queue();
                     }, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, e -> {
-                                msg.replyEmbeds(EmbedUtils.embedMessage("You must have your private messages " +
+                                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must have your private messages " +
                                         "opened before using this command!").build()).queue();
                             }));
         });
@@ -186,8 +192,10 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     private void ban(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a user to ban").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to ban").build())
                     .queue();
             return;
         }
@@ -195,7 +203,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -203,18 +211,18 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid user!").build())
                     .queue();
             return;
         }
 
         try {
             BotInfoCache.getInstance().banReportsUser(user.getIdLong());
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have banned "
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
         } catch (IllegalStateException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
             msg.addReaction("❌").queue();
@@ -224,8 +232,10 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     private void unban(Message msg, List<String> args) {
         if (!isDeveloper(msg.getAuthor())) return;
 
+        final var guild = msg.getGuild();
+
         if (args.size() < 2) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("You must provide the ID of a user to ban").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a user to ban").build())
                     .queue();
             return;
         }
@@ -233,7 +243,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         final String id = args.get(1);
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid ID!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
                     .queue();
             return;
         }
@@ -241,18 +251,18 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
         final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(id));
 
         if (user == null) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("Invalid user!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid user!").build())
                     .queue();
             return;
         }
 
         try {
             BotInfoCache.getInstance().unbanReportsUser(user.getIdLong());
-            msg.replyEmbeds(EmbedUtils.embedMessage("You have unbanned "
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have unbanned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
         } catch (IllegalStateException e) {
-            msg.replyEmbeds(EmbedUtils.embedMessage(e.getMessage()).build()).queue();
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
             msg.addReaction("❌").queue();

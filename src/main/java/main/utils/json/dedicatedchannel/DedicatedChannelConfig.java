@@ -12,18 +12,24 @@ import main.constants.RobertifyEmoji;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.themes.ThemesConfig;
+import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
@@ -99,7 +105,16 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized RestAction<Message> getMessageRequest(long gid) {
-        return getTextChannel(gid).retrieveMessageById(getMessageID(gid)); // DANGER
+        try {
+            return getTextChannel(gid).retrieveMessageById(getMessageID(gid));
+        } catch (MissingAccessException e) {
+            if (new GuildConfig().announcementChannelIsSet(gid)) {
+                TextChannel channel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(gid));
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
+                        .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}));
+            }
+            return null;
+        }
     }
 
     public synchronized void updateMessage(Guild guild) {
@@ -107,18 +122,22 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             return;
 
         final var msgRequest = getMessageRequest(guild.getIdLong());
+
+        if (msgRequest == null) return;
+
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var queue = musicManager.getScheduler().queue;
         final var queueAsList = new ArrayList<>(queue);
+        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
 
         EmbedBuilder eb = new EmbedBuilder();
 
         if (playingTrack == null) {
-            eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
+            eb.setColor(theme.getColor());
             eb.setTitle("No song playing...");
-            eb.setImage("https://i.imgur.com/1HDoSgP.png");
+            eb.setImage(theme.getIdleBanner());
             eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
             msgRequest.queue(msg ->msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
@@ -126,7 +145,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         } else {
             final var trackInfo = playingTrack.getInfo();
 
-            eb.setColor(GeneralUtils.parseColor(Config.get(ENV.BOT_COLOR)));
+            eb.setColor(theme.getColor());
 
             eb.setTitle(
                     LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "Lo-Fi Music"
@@ -141,7 +160,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             if (playingTrack instanceof RobertifyAudioTrack robertifyAudioTrack)
                 eb.setImage(robertifyAudioTrack.getTrackImage());
             else
-                eb.setImage(BotConstants.DEFAULT_IMAGE.toString());
+                eb.setImage(theme.getNowPlayingBanner());
 
             eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getVolume() + "%");
 
@@ -178,6 +197,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             if (!isChannelSet(g.getIdLong())) continue;
 
             final var msgRequest = getMessageRequest(g.getIdLong());
+            if (msgRequest == null) continue;
 
             msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
         }
@@ -187,6 +207,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         if (!isChannelSet(g.getIdLong())) return;
 
         final var msgRequest = getMessageRequest(g.getIdLong());
+        if (msgRequest == null) return;
 
         msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
     }
@@ -238,7 +259,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
 
     @Override
-    protected void update() {
+    public void update() {
         // Nothing
     }
 }

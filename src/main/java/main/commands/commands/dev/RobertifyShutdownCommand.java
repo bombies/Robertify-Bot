@@ -9,6 +9,7 @@ import main.commands.IDevCommand;
 import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -26,7 +27,7 @@ public class RobertifyShutdownCommand implements IDevCommand {
         if (!permissionCheck(ctx))
             return;
 
-        EmbedBuilder eb = EmbedUtils.embedMessage("Now shutting down...");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Now shutting down...");
         ctx.getMessage().replyEmbeds(eb.build()).queue();
 
         for (Guild g : Robertify.api.getGuilds()) {

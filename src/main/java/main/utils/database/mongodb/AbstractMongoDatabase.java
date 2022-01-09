@@ -5,10 +5,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.*;
 import com.mongodb.ConnectionString;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
 import lombok.Getter;
 import main.constants.Database;
 import main.constants.ENV;
@@ -110,6 +108,35 @@ public abstract class AbstractMongoDatabase {
         collection.insertOne(doc);
     }
 
+    protected void addManyDocuments(List<Document> docs) {
+        collection.insertMany(docs);
+    }
+
+    protected void upsertManyDocuments(List<Document> docs) {
+        List<WriteModel<? extends Document>> bulkWriteModels = new ArrayList<>();
+        
+        for (var doc : docs) {
+            ObjectId id = doc.getObjectId("_id");
+
+            Document oldDoc = null;
+            for (var document : collection.find())
+                if (document.getObjectId("_id").equals(id))
+                    oldDoc = document;
+
+            if (oldDoc != null)
+                bulkWriteModels.add(new DeleteOneModel<>(oldDoc));
+            bulkWriteModels.add(new InsertOneModel<>(doc));
+        }
+
+        collection.bulkWrite(bulkWriteModels);
+    }
+
+    protected void upsertManyDocument(List<JSONObject> objects) {
+        final List<Document> documents = new ArrayList<>();
+        objects.forEach(object -> documents.add(Document.parse(object.toString())));
+        upsertManyDocuments(documents);
+    }
+
     protected void upsertDocument(Document doc) {
         ObjectId id = doc.getObjectId("_id");
 
@@ -145,8 +172,8 @@ public abstract class AbstractMongoDatabase {
         collection.deleteOne(doc);
     }
 
-    protected void removeDocument(JSONObject obj) {
-        collection.deleteOne(Document.parse(obj.toString()));
+    protected void removeManyDocuments(Bson bsonQuery) {
+        collection.deleteMany(bsonQuery);
     }
 
     /**

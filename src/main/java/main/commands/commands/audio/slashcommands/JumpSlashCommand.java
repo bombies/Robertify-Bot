@@ -1,6 +1,7 @@
 package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.JumpCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
@@ -45,7 +46,7 @@ public class JumpSlashCommand extends InteractiveCommand {
         event.deferReply().queue();
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }

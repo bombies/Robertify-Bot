@@ -10,6 +10,7 @@ import main.audiohandlers.AbstractTrackScheduler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.constants.Statistic;
 import main.main.Robertify;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -85,7 +86,7 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
 
             final var requester = RobertifyAudioManager.getRequester(track);
             TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
-            EmbedBuilder eb = EmbedUtils.embedMessage("Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
                     + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                     "\n\n~ Requested by " + requester.getAsMention()
                     :

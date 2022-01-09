@@ -8,11 +8,14 @@ import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.MongoMigrationCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.ThemeCommand;
 import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.util.*;
+import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.commands.commands.misc.EightBallCommand;
@@ -70,6 +73,7 @@ public class Listener extends ListenerAdapter {
         for (Guild g : Robertify.api.getGuilds()) {
             initNeededSlashCommands(g);
             rescheduleUnbans(g);
+            GeneralUtils.setDefaultEmbed(g);
 
             try {
                 if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
@@ -91,7 +95,8 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
-        User user = event.getAuthor();
+        final User user = event.getAuthor();
+        final var guild = event.getGuild();
         final String prefix;
 
         try {
@@ -106,12 +111,12 @@ public class Listener extends ListenerAdapter {
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
             if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), user.getIdLong())) {
-                event.getMessage().replyEmbeds(EmbedUtils.embedMessage("You are banned from using commands in this server!").build())
+                event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You are banned from using commands in this server!").build())
                         .queue();
             } else {
                 try {
                     if (MongoMigrationCommand.isMigrating()) {
-                        event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+                        event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
                                         " You are not allowed to use commands.")
                                 .build()).queue();
                         return;
@@ -138,15 +143,17 @@ public class Listener extends ListenerAdapter {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        final var guild = event.getGuild();
+
         if (MongoMigrationCommand.isMigrating()) {
-            event.replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
                             " You are not allowed to use commands.")
                     .build()).queue();
             return;
         }
 
-        if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), event.getUser().getIdLong()))
-            event.replyEmbeds(EmbedUtils.embedMessage(BotConstants.BANNED_MESSAGE.toString()).build())
+        if (new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
 
     }
@@ -173,7 +180,7 @@ public class Listener extends ListenerAdapter {
         if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
                     if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                        channel.sendMessageEmbeds(EmbedUtils.embedMessage("You cannot run this command in this channel " +
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
                                         "without first having an announcement channel set!").build())
                                 .queue();
                         return;
@@ -182,7 +189,7 @@ public class Listener extends ListenerAdapter {
 
             guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
 
-            channel.sendMessageEmbeds(EmbedUtils.embedMessage("""
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                     There was no announcement channel set! Setting it to this channel.
 
                     _You can change the announcement channel by using the "setchannel" command._""").build()).queue();
@@ -232,10 +239,12 @@ public class Listener extends ListenerAdapter {
         new LofiSlashCommand().initCommand(g);
         new SupportServerCommand().initCommand(g);
         new DonateCommand().initCommand(g);
+        new ThemeCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new ThemeCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
@@ -283,7 +292,7 @@ public class Listener extends ListenerAdapter {
 
     private static void sendUnbanMessage(long user, Guild g) {
         Robertify.api.retrieveUserById(user).queue(user1 -> user1.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(
-                EmbedUtils.embedMessage("You have been unbanned from Robertify in **"+g.getName()+"**")
+                RobertifyEmbedUtils.embedMessage(g, "You have been unbanned from Robertify in **"+g.getName()+"**")
                         .build()
         ).queue(success -> {}, new ErrorHandler()
                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")")))));
@@ -291,6 +300,7 @@ public class Listener extends ListenerAdapter {
 
     private static void initSelectionMenus() {
         new HelpCommand().initCommandWithoutUpsertion();
+        new ThemeCommand().initCommandWithoutUpsertion();
     }
 
 }

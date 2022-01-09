@@ -8,6 +8,7 @@ import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.dev.MongoMigrationCommand;
 import main.constants.Permission;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.GeneralUtils;
@@ -61,14 +62,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         if (!user.isBot()) {
             if (MongoMigrationCommand.isMigrating()) {
-                event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I am migrating databases at the moment!" +
+                event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
                                 " You are not allowed to use this feature.")
                         .build()).queue();
                 return;
             }
 
             if (!memberVoiceState.inVoiceChannel()) {
-                event.getMessage().reply(user.getAsMention()).setEmbeds(EmbedUtils.embedMessage("You must be in a voice channel to use this command")
+                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                                 .build())
                         .queue();
                 event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -77,7 +78,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (selfVoiceState.inVoiceChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-                    event.getMessage().reply(user.getAsMention()).setEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command")
+                    event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
                                     .build())
                             .queue();
                     event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -87,7 +88,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                     final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                     if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                        event.getMessage().replyEmbeds(EmbedUtils.embedMessage("I can't join this channel!" +
+                        event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
                                         (!restrictedChannelsConfig.getRestrictedChannels(
                                                 guild.getIdLong(),
                                                 RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
@@ -145,32 +146,32 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
+        final var guild = event.getGuild();
         final User user = event.getUser();
 
         if (!selfVoiceState.inVoiceChannel()) {
-            event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("I must be in a voice channel to do this.").build())
+            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to do this.").build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command")
+            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
                     .build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command")
+            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
                             .build())
                     .queue();
             return;
         }
 
-        final var guild = event.getGuild();
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
             if (!djCheck(new RewindCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -182,7 +183,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
             if (!djCheck(new PauseCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -194,7 +195,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
             if (!djCheck(new SkipCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -206,7 +207,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
             if (!djCheck(new LoopCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -218,7 +219,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
             if (!djCheck(new ShuffleCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -230,7 +231,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
             if (!djCheck(new DisconnectCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -242,7 +243,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
             if (!djCheck(new StopCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
@@ -254,7 +255,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
             if (!djCheck(new PreviousTrackCommand(), guild, user)) {
-                event.reply(user.getAsMention()).addEmbeds(EmbedUtils.embedMessage("You must be a DJ" +
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;

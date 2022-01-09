@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.QueueCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.pagination.Pages;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -46,8 +47,10 @@ public class QueueSlashCommand extends InteractiveCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(commandName)) return;
 
+        final var guild = event.getGuild();
+
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to run this command!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
                     .queue();
             return;
         }
@@ -55,10 +58,10 @@ public class QueueSlashCommand extends InteractiveCommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
-        GeneralUtils.setCustomEmbed("Queue");
+        GeneralUtils.setCustomEmbed(event.getGuild(), "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = EmbedUtils.embedMessage("There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
@@ -66,6 +69,6 @@ public class QueueSlashCommand extends InteractiveCommand {
         var content = new QueueCommand().getContent(queue, new ArrayList<>(queue));
         Pages.paginate(content, 10, event);
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }

@@ -12,6 +12,7 @@ import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.ThemeCommand;
 import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -63,7 +64,6 @@ public class Robertify {
 
     public static void main(String[] args) {
         WebUtils.setUserAgent("Mozilla/Robertify / bombies#4445");
-        GeneralUtils.setDefaultEmbed();
 
         try {
             api = JDABuilder.createDefault(
@@ -121,7 +121,8 @@ public class Robertify {
                             new SupportServerCommand(),
                             new ShufflePlaySlashCommand(),
                             new VoteCommand(),
-                            new DonateCommand()
+                            new DonateCommand(),
+                            new ThemeCommand()
                     )
 
                     // Button Listeners

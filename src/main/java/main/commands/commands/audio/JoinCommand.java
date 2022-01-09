@@ -3,6 +3,7 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
@@ -26,7 +27,7 @@ public class JoinCommand implements ICommand {
 
     public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
         if (!memberVoiceState.inVoiceChannel()) {
-            return EmbedUtils.embedMessage("You must be in a voice channel to use this command")
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                     .build();
         }
 
@@ -35,7 +36,7 @@ public class JoinCommand implements ICommand {
         if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
             final var restrictedChannelsConfig = new RestrictedChannelsConfig();
             if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), channel.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                return EmbedUtils.embedMessage("I can't join this channel!" +
+                return RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
                         (!restrictedChannelsConfig.getRestrictedChannels(
                                 guild.getIdLong(),
                                 RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
@@ -55,11 +56,11 @@ public class JoinCommand implements ICommand {
         if (selfVoiceState.inVoiceChannel()) {
             guild.moveVoiceMember(selfVoiceState.getMember(), channel)
                     .queue();
-            return EmbedUtils.embedMessage("I have moved to " + channel.getAsMention()).build();
+            return RobertifyEmbedUtils.embedMessage(guild, "I have moved to " + channel.getAsMention()).build();
         } else {
             RobertifyAudioManager.getInstance()
                     .joinVoiceChannel(textChannel, selfVoiceState, memberVoiceState);
-            return EmbedUtils.embedMessage("I have joined " + channel.getAsMention()).build();
+            return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
         }
     }
 

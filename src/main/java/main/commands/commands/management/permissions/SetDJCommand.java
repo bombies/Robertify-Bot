@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.permissions.PermissionsConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
@@ -33,18 +34,18 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         final User sender = ctx.getAuthor();
         final Guild guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed("Set DJ");
+        GeneralUtils.setCustomEmbed(guild, "Set DJ");
 
         EmbedBuilder eb;
 
         if (!GeneralUtils.hasPerms(guild, sender, Permission.ROBERTIFY_ADMIN)) {
-            eb = EmbedUtils.embedMessage("You don't have permission to run this command!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You don't have permission to run this command!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (args.isEmpty()) {
-            eb = EmbedUtils.embedMessage("You must provide a user/role to set as a DJ role!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a user/role to set as a DJ role!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -52,7 +53,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         String id = GeneralUtils.getDigitsOnly(args.get(0));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(EmbedUtils.embedMessage("That is an invalid ID!\nMake sure to either **mention** a user or provide their **ID**")
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That is an invalid ID!\nMake sure to either **mention** a user or provide their **ID**")
                             .setImage("https://i.imgur.com/V6pbhEZ.png")
                             .build())
                     .queue();
@@ -63,7 +64,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         User user = GeneralUtils.retrieveUser(id);
 
         if (role == null && user == null) {
-            eb = EmbedUtils.embedMessage("Please provide a valid role/user ID!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "Please provide a valid role/user ID!");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -73,7 +74,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         else
             msg.replyEmbeds(handleSetDJ(guild, user).build()).queue();
 
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(guild);
     }
 
     private EmbedBuilder handleSetDJ(Guild guild, Role role) {
@@ -81,14 +82,14 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
-            eb = EmbedUtils.embedMessage("Set " + role.getAsMention() + " as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "Set " + role.getAsMention() + " as a DJ!");
             return eb;
         } catch (IllegalAccessException e) {
-            eb = EmbedUtils.embedMessage("This role has already been set as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "This role has already been set as a DJ!");
             return eb;
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            eb = EmbedUtils.embedMessage("An unexpected error occurred!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
             return eb;
         }
     }
@@ -98,14 +99,14 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
-            eb = EmbedUtils.embedMessage("Set " + user.getAsMention() + " as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "Set " + user.getAsMention() + " as a DJ!");
             return eb;
         } catch (IllegalArgumentException e) {
-            eb = EmbedUtils.embedMessage("This user has already been set as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "This user has already been set as a DJ!");
             return eb;
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            eb = EmbedUtils.embedMessage("An unexpected error occurred!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
             return eb;
         }
     }
@@ -176,13 +177,13 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(EmbedUtils.embedMessage("You need to be a DJ to use this command!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        GeneralUtils.setCustomEmbed("Set DJ");
+        GeneralUtils.setCustomEmbed(event.getGuild(), "Set DJ");
         switch  (event.getSubcommandName()) {
             case "role" -> {
                 var role = event.getOption("role").getAsRole();
@@ -197,6 +198,6 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
                         .queue();
             }
         }
-        GeneralUtils.setDefaultEmbed();
+        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }

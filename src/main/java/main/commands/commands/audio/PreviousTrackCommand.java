@@ -6,6 +6,7 @@ import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,16 +37,16 @@ public class PreviousTrackCommand implements ICommand {
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!");
 
         if (!selfVoiceState.inVoiceChannel())
-            return EmbedUtils.embedMessage("I must be in a voice channel to execute this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to execute this command!");
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return EmbedUtils.embedMessage("You must be in the same voice channel as me to use this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!");
 
         if (previouslyPlayedTracks.size() == 0)
-            return EmbedUtils.embedMessage("There are no tracks played previously");
+            return RobertifyEmbedUtils.embedMessage(guild, "There are no tracks played previously");
 
         if (audioPlayer.getPlayingTrack() != null) {
             final var nowPlayingTrack = audioPlayer.getPlayingTrack();
@@ -59,7 +60,7 @@ public class PreviousTrackCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
 
-        return EmbedUtils.embedMessage("Now playing the previous track!");
+        return RobertifyEmbedUtils.embedMessage(guild, "Now playing the previous track!");
     }
 
     @Override

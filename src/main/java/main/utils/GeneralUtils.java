@@ -8,6 +8,7 @@ import main.constants.TimeFormat;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.json.themes.ThemesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.annotations.ReplaceWith;
@@ -404,58 +405,73 @@ public class GeneralUtils {
         writer.close();
     }
 
-    public static void setDefaultEmbed() {
-        EmbedUtils.setEmbedBuilder(
+    public static void setDefaultEmbed(Guild guild) {
+        final ThemesConfig themesConfig = new ThemesConfig();
+        final var theme = themesConfig.getTheme(guild.getIdLong());
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
-                        .setColor(EMBED_COLOR)
-                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, BotConstants.ICON_URL.toString())
+                        .setColor(theme.getColor())
+                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, theme.getTransparent())
         );
     }
 
-    public static void setCustomEmbed(Color color) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, Color color) {
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
                         .setColor(color)
         );
     }
 
-    public static void setCustomEmbed(String author, Color color) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, String author, Color color) {
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
                         .setColor(color)
                         .setAuthor(author, null, BotConstants.ICON_URL.toString())
         );
     }
 
-    public static void setCustomEmbed(String author) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, String author) {
+        final ThemesConfig themesConfig = new ThemesConfig();
+        final var theme = themesConfig.getTheme(guild.getIdLong());
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
-                        .setColor(EMBED_COLOR)
-                        .setAuthor(author, null, BotConstants.ICON_URL.toString())
+                        .setColor(theme.getColor())
+                        .setAuthor(author, null, theme.getTransparent())
         );
     }
 
-    public static void setCustomEmbed(String author, String footer) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, String author, String footer) {
+        final ThemesConfig themesConfig = new ThemesConfig();
+        final var theme = themesConfig.getTheme(guild.getIdLong());
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
-                        .setColor(EMBED_COLOR)
-                        .setAuthor(author,null, BotConstants.ICON_URL.toString())
+                        .setColor(theme.getColor())
+                        .setAuthor(author,null, theme.getTransparent())
                         .setFooter(footer)
         );
     }
 
-    public static void setCustomEmbed(String author, @Nullable String title, String footer) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, String author, @Nullable String title, String footer) {
+        final ThemesConfig themesConfig = new ThemesConfig();
+        final var theme = themesConfig.getTheme(guild.getIdLong());
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
-                        .setAuthor(author, null, BotConstants.ICON_URL.toString())
-                        .setColor(EMBED_COLOR)
+                        .setAuthor(author, null, theme.getTransparent())
+                        .setColor(theme.getColor())
                         .setTitle(title)
                         .setFooter(footer)
         );
     }
 
-    public static void setCustomEmbed(String title, Color color, String footer) {
-        EmbedUtils.setEmbedBuilder(
+    public static void setCustomEmbed(Guild guild, String title, Color color, String footer) {
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
                 () -> new EmbedBuilder()
                         .setColor(color)
                         .setTitle(title)
