@@ -31,7 +31,7 @@ public class DedicatedChannelCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to execute this command")
                     .build()).queue();
             return;

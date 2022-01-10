@@ -326,7 +326,7 @@ public class CommandManager {
                 }
 
                 if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                    if (!GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) {
+                    if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
                         final var rcConfig = new RestrictedChannelsConfig();
                         if (!rcConfig.isRestrictedChannel(
                                 guild.getIdLong(),
@@ -343,7 +343,7 @@ public class CommandManager {
 
                 if (toggles.isDJToggleSet(guild, cmd)) {
                     if (toggles.getDJToggle(guild, cmd)) {
-                        if (GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+                        if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                             cmd.handle(ctx);
                             if (!(cmd instanceof StatisticsCommand))
                                 StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);

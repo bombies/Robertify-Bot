@@ -35,8 +35,8 @@ public class PollCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)
-            && !GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_POLLS)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_DJ)
+            && !GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_POLLS)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions " +
                     "to execute this command!\n\n" +
                             "You must either have `"+Permission.ROBERTIFY_DJ.name()+"`," +

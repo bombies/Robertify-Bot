@@ -19,6 +19,7 @@ import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -147,7 +148,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final var guild = event.getGuild();
-        final User user = event.getUser();
+        final Member user = event.getMember();
 
         if (!selfVoiceState.inVoiceChannel()) {
             event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to do this.").build())
@@ -269,7 +270,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         }
     }
 
-    private boolean djCheck(ICommand command, Guild guild, User user) {
+    private boolean djCheck(ICommand command, Guild guild, Member user) {
         final var toggles = new TogglesConfig();
         if (toggles.isDJToggleSet(guild, command)) {
             if (toggles.getDJToggle(guild, command)) {

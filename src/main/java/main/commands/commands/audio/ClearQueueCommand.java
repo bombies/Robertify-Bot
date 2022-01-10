@@ -39,7 +39,7 @@ public class ClearQueueCommand implements ICommand {
 
         if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
-                if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_DJ)) {
+                if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to use this command when there's other users in the channel!");
                     msg.replyEmbeds(eb.build()).queue();
                     return;

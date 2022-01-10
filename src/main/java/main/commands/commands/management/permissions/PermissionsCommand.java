@@ -25,7 +25,7 @@ public class PermissionsCommand implements ICommand {
     
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_ADMIN))
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_ADMIN))
             return;
 
         final List<String> args = ctx.getArgs();

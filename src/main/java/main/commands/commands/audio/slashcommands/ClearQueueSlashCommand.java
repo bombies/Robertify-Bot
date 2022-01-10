@@ -38,7 +38,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
                 .setCommand(Command.of(
                         commandName,
                         "Clear the queue of all its contents",
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_DJ)
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ)
                 ))
                 .build();
     }

@@ -28,7 +28,7 @@ public class RestrictedChannelsCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Guild guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(guild, ctx.getAuthor(), Permission.ROBERTIFY_ADMIN)) return;
+        if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) return;
 
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();

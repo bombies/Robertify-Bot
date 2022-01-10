@@ -31,7 +31,7 @@ public class TogglesCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(guild, sender, Permission.ROBERTIFY_ADMIN))
+        if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN))
             return;
 
         GeneralUtils.setCustomEmbed(guild, "Toggles");

@@ -141,10 +141,6 @@ public class GeneralUtils {
         return permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.name()).contains(sender.getIdLong());
     }
 
-    public static boolean hasPerms(Guild guild, User sender, Permission perm) {
-        return hasPerms(guild, guild.getMember(sender), perm);
-    }
-
     public static boolean hasPerms(Guild guild, Member sender, Permission... perms) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
         || new PermissionsConfig().userHasPermission(guild.getIdLong(), sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
@@ -167,10 +163,6 @@ public class GeneralUtils {
             }
         }
         return pass >= perms.length;
-    }
-
-    public static boolean hasPerms(Guild guild, User sender, Permission... perm) {
-        return hasPerms(guild, guild.getMember(sender), perm);
     }
 
     public static User retrieveUser(long id) {

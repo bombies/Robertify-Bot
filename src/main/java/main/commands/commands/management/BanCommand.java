@@ -31,7 +31,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_BAN)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                     .build())
@@ -68,17 +68,17 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         }
 
         if (args.size() == 1) {
-            msg.replyEmbeds(handleBan(ctx.getGuild(), member.getUser(), ctx.getAuthor(), null).build())
+            msg.replyEmbeds(handleBan(ctx.getGuild(), member, ctx.getAuthor(), null).build())
                     .queue();
         } else {
             final var duration = args.get(1);
-            msg.replyEmbeds(handleBan(ctx.getGuild(), member.getUser(), ctx.getAuthor(), duration).build())
+            msg.replyEmbeds(handleBan(ctx.getGuild(), member, ctx.getAuthor(), duration).build())
                     .queue();
         }
     }
 
     @SneakyThrows
-    private EmbedBuilder handleBan(Guild guild, User user, User mod, String duration) {
+    private EmbedBuilder handleBan(Guild guild, Member user, User mod, String duration) {
         if (duration != null)
             if (!GeneralUtils.isValidDuration(duration))
                 return RobertifyEmbedUtils.embedMessage(guild, """
@@ -100,22 +100,22 @@ public class BanCommand extends InteractiveCommand implements ICommand {
         if (bannedUntil == null) { // Perm ban
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
 
-            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned permanently in **"+guild.getName()+"**!")
+             user.getUser().openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned permanently in **"+guild.getName()+"**!")
                     .build())
                     .queue(success -> {}, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                    Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")"))));
+                                    Listener.logger.warn("Was not able to send an unban message to " + user.getUser().getAsTag() + "("+user.getIdLong()+")"))));
             return RobertifyEmbedUtils.embedMessage(guild, "You have banned " + user.getAsMention());
         } else {
             new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
 
-            user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
+            user.getUser().openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned for `"+GeneralUtils.formatDuration(duration)+"` in **"+guild.getName()+"**!")
                             .build())
                     .queue(success -> {}, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) ->
-                                    Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "("+user.getIdLong()+")"))));
+                                    Listener.logger.warn("Was not able to send an unban message to " + user.getUser().getAsTag() + "("+user.getIdLong()+")"))));
 
-            Listener.scheduleUnban(guild, user);
+            Listener.scheduleUnban(guild, user.getUser());
 
             return RobertifyEmbedUtils.embedMessage(guild, "You have banned " + user.getAsMention() + " for `"+ GeneralUtils.formatDuration(duration)
                     +"`");
@@ -164,7 +164,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
                                         false
                                 )
                         ),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_BAN),
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_BAN),
                         true
                 )).build();
     }
@@ -182,7 +182,7 @@ public class BanCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var userToBan = event.getOption("user").getAsUser();
+        final var userToBan = event.getOption("user").getAsMember();
         final var duration = event.getOption("duration") == null ? null : event.getOption("duration").getAsString();
 
         event.replyEmbeds(handleBan(event.getGuild(), userToBan, event.getUser(), duration).build())

@@ -12,6 +12,7 @@ import main.utils.json.toggles.TogglesConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -42,7 +43,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         }
 
         switch (args.get(0).toLowerCase()) {
-            case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getAuthor(), String.join(" ", args.subList(1, args.size()))).build())
+            case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), ctx.getMember(), String.join(" ", args.subList(1, args.size()))).build())
                     .queue();
             case "remove" -> {
                 if (args.size() < 2) {
@@ -59,12 +60,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
 
                 int index = Integer.parseInt(args.get(1));
 
-                msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getAuthor(), index).build())
+                msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getMember(), index).build())
                         .queue();
             }
-            case "clear" -> msg.replyEmbeds(handleClear(ctx.getGuild(), ctx.getAuthor()).build())
+            case "clear" -> msg.replyEmbeds(handleClear(ctx.getGuild(), ctx.getMember()).build())
                     .queue();
-            case "list" -> msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getAuthor()).build())
+            case "list" -> msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getMember()).build())
                     .queue();
             default -> msg.replyEmbeds(handle8Ball(ctx.getGuild()).build())
                     .queue();
@@ -73,7 +74,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
-    private EmbedBuilder handleAdd(Guild guild, User user, String phraseToAdd) {
+    private EmbedBuilder handleAdd(Guild guild, Member user, String phraseToAdd) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
@@ -96,7 +97,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         return RobertifyEmbedUtils.embedMessage(guild, "Added `"+phraseToAdd+"` as a response!");
     }
 
-    private EmbedBuilder handleRemove(Guild guild, User user, int index) {
+    private EmbedBuilder handleRemove(Guild guild, Member user, int index) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
@@ -115,7 +116,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         return eb;
     }
 
-    private EmbedBuilder handleClear(Guild guild, User user) {
+    private EmbedBuilder handleClear(Guild guild, Member user) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
@@ -126,7 +127,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         return RobertifyEmbedUtils.embedMessage(guild, "You have cleared all of your custom responses!");
     }
 
-    private EmbedBuilder handleList(Guild guild, User user) {
+    private EmbedBuilder handleList(Guild guild, Member user) {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_8BALL.name()+"`!");
@@ -282,7 +283,7 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         final var guild = event.getGuild();
-        final var user = event.getUser();
+        final var user = event.getMember();
 
         switch(event.getSubcommandName()) {
             case "ask" -> event.replyEmbeds(handle8Ball(guild).build())

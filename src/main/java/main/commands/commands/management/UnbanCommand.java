@@ -29,7 +29,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_BAN)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_BAN)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to run this command!\n\n" +
                                     "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
                             .build())
@@ -117,7 +117,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
                                 "The user to unban",
                                 true
                         )),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_BAN),
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_BAN),
                         true
                 )).build();
     }

@@ -38,7 +38,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!GeneralUtils.hasPerms(guild, sender, Permission.ROBERTIFY_ADMIN)) {
+        if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You don't have permission to run this command!");
             msg.replyEmbeds(eb.build()).queue();
             return;
@@ -168,7 +168,7 @@ public class SetDJCommand extends InteractiveCommand implements ICommand {
                                         ))
                                 )
                         ),
-                        (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_ADMIN)
+                        (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_ADMIN)
                 )).build();
     }
 

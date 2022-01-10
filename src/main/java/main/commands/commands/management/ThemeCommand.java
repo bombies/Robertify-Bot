@@ -30,7 +30,7 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
                 .setCommand(Command.of(
                         getName(),
                         "Set the colour of the bot!",
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getUser(), Permission.ROBERTIFY_THEME)
+                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_THEME)
                 ))
                 .addSelectionDialogue(SelectionDialogue.of(
                         menuName,
@@ -54,7 +54,7 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
 
     @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_THEME)) {
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_THEME)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You do not have enough permissions to execute this command" +
                             "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
                     .queue();
