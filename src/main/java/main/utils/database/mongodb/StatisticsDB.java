@@ -133,6 +133,8 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
         for (int i = dayOfWeek; i > 0; i--)
             ret += getStatForDay(i, stat);
 
+        ret += getStatForDay(dayOfWeek, stat);
+
         return  ret;
     }
 
