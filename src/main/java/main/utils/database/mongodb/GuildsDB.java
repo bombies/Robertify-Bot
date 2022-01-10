@@ -2,6 +2,7 @@ package main.utils.database.mongodb;
 
 import main.constants.Database;
 import main.constants.ENV;
+import main.constants.RobertifyTheme;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
@@ -57,6 +58,7 @@ public class GuildsDB extends AbstractMongoDatabase {
                 )
                 .addField(Field.TOGGLES_OBJECT, new TogglesConfig().getDefaultToggleObject())
                 .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
+                .addField(Field.THEME, RobertifyTheme.GREEN.name().toLowerCase())
                 .build();
     }
 
@@ -88,7 +90,8 @@ public class GuildsDB extends AbstractMongoDatabase {
             RESTRICTED_CHANNELS_TEXT("text_channels"),
         TOGGLES_OBJECT("toggles"),
             TOGGLES_DJ("dj_toggles"),
-        EIGHT_BALL_ARRAY("eight_ball");
+        EIGHT_BALL_ARRAY("eight_ball"),
+        THEME("theme");
 
         private final String str;
 
