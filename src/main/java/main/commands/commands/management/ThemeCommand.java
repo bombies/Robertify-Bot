@@ -54,7 +54,12 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
 
     @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_THEME)) return;
+        if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getAuthor(), Permission.ROBERTIFY_THEME)) {
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You do not have enough permissions to execute this command" +
+                            "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
+                    .queue();
+            return;
+        }
 
         final var guild = ctx.getGuild();
 
@@ -72,6 +77,13 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         final var guild = event.getGuild();
+
+        if (!getCommand().getCommand().permissionCheck(event)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
+                    "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
+                    .setEphemeral(true).queue();
+            return;
+        }
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
                 guild,
