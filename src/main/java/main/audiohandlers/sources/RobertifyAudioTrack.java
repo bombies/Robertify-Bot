@@ -2,6 +2,7 @@ package main.audiohandlers.sources;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.*;
@@ -61,7 +62,10 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
             if (track == null)
                 track = fallback;
 
-            ((YoutubeAudioTrack) track).process(executor);
+            if (track instanceof YoutubeAudioTrack ytTrack)
+                ytTrack.process(executor);
+            else if (track instanceof SoundCloudAudioTrack scTrack)
+                scTrack.process(executor);
         }
     }
 
