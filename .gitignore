@@ -27,10 +27,12 @@ hs_err_pid*
 *.iml
 *.ipr
 *.iws
-classes
+.gradle/
+classes/
 
 # Other files
 target
+build/
 *.json
 .env
 vpsDataBackup
