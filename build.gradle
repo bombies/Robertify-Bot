@@ -60,7 +60,7 @@ dependencies {
 group = 'com.bombies'
 version = '2.6.0'
 description = 'Robertify-Bot'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_16
 
 publishing {
     publications {
