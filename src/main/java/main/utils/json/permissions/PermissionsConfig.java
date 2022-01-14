@@ -98,9 +98,17 @@ public class PermissionsConfig extends AbstractGuildConfig {
 
     public List<Long> getRolesForPermission(long gid, Permission p) {
         List<Long> ret = new ArrayList<>();
-        JSONArray arr = getGuildObject(gid)
-                .getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                .getJSONArray(String.valueOf(p.getCode()));
+        JSONObject object = getGuildObject(gid)
+                .getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString());
+
+        JSONArray arr;
+
+        try {
+            arr = object.getJSONArray(String.valueOf(p.getCode()));
+        } catch (JSONException e) {
+            object.put(String.valueOf(p.getCode()), new JSONObject());
+            arr = object.getJSONArray(String.valueOf(p.getCode()));
+        }
 
         for (int i = 0; i < arr.length(); i++)
             ret.add(arr.getLong(i));
