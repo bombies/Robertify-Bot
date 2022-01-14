@@ -84,7 +84,7 @@ public class Listener extends ListenerAdapter {
         }
 
         initSelectionMenus();
-        StatisticsDB.startDailyUpdateCheck();
+//        StatisticsDB.startDailyUpdateCheck();
 
         logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
