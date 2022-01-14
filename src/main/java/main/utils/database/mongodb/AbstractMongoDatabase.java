@@ -33,49 +33,21 @@ import java.util.NoSuchElementException;
 public abstract class AbstractMongoDatabase {
     private static final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
 
-    private final MongoClient client;
-    @Getter
+//    private final MongoClient client;
+//    @Getter
     private final MongoDatabase database;
     @Getter
     private MongoCollection<Document> collection;
 
-    private AbstractMongoDatabase(Database.MONGO db) {
-        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
-        final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
-                .applyConnectionString(CONNECTION_STRING)
-                .build();
-
-        client = MongoClients.create(CLIENT_SETTINGS);
-
-        try {
-            database = client.getDatabase(db.toString());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("There was no database with the name " + db);
-        }
-
-        this.collection = null;
-    }
-
     public AbstractMongoDatabase(AbstractMongoDatabase db) {
-        this.client = db.client;
         this.database = db.database;
         this.collection = db.collection;
     }
 
     public AbstractMongoDatabase(Database.MONGO db, Database.MONGO collection) {
-        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
-        final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
-                .applyConnectionString(CONNECTION_STRING)
-                .addCommandListener(new MongoEventListener())
-                .build();
-
-        client = MongoClients.create(CLIENT_SETTINGS);
-
-        try {
-            database = client.getDatabase(db.toString());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("There was no database with the name " + db);
-        }
+        final var database = MongoConnectionManager.ins()
+                .connect(db).database();
+        this.database = database;
 
         try {
             this.collection = database.getCollection(collection.toString());

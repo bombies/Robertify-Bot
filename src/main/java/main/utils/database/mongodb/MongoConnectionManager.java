@@ -11,9 +11,8 @@ import main.main.Config;
 
 public class MongoConnectionManager {
 
-    private MongoConnectionManager INSTANCE;
-    private ConnectionString connectionString;
-    private MongoClient client;
+    private static MongoConnectionManager INSTANCE;
+    private final MongoClient client;
     private MongoDatabase database;
 
     private MongoConnectionManager() {
@@ -41,7 +40,7 @@ public class MongoConnectionManager {
         return database;
     }
 
-    public MongoConnectionManager ins() {
+    public static MongoConnectionManager ins() {
         if (INSTANCE == null)
             INSTANCE = new MongoConnectionManager();
         return INSTANCE;
