@@ -345,8 +345,8 @@ public class CommandManager {
                     if (toggles.getDJToggle(guild, cmd)) {
                         if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                             cmd.handle(ctx);
-                            if (!(cmd instanceof StatisticsCommand))
-                                StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+//                            if (!(cmd instanceof StatisticsCommand))
+//                                StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                         } else {
                             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                             " to run this command!").build())
@@ -354,13 +354,13 @@ public class CommandManager {
                         }
                     } else {
                         cmd.handle(ctx);
-                        if (!(cmd instanceof StatisticsCommand))
-                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+//                        if (!(cmd instanceof StatisticsCommand))
+//                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                     }
                 } else {
                     cmd.handle(ctx);
-                    if (!(cmd instanceof StatisticsCommand))
-                        StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+//                    if (!(cmd instanceof StatisticsCommand))
+//                        StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                 }
             }
             CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
