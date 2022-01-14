@@ -23,7 +23,7 @@ public class GeniusSongSearch {
     private int status;
     @Getter
     private int nextPage;
-    private final LinkedList<GeniusSongSearch.Hit> hits = new LinkedList<>();
+    private final LinkedList<Hit> hits = new LinkedList<>();
 
     public GeniusSongSearch(GeniusAPI gla, String query) {
         this.gla = gla;
@@ -90,7 +90,7 @@ public class GeniusSongSearch {
     }
 
 
-    public LinkedList<GeniusSongSearch.Hit> getHits() {
+    public LinkedList<Hit> getHits() {
         return hits;
     }
 

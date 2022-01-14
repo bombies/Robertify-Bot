@@ -2,7 +2,6 @@ package main.utils.json;
 
 import lombok.Getter;
 import main.utils.database.mongodb.GuildsDB;
-import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import org.json.JSONObject;
 import org.slf4j.Logger;

@@ -2,7 +2,6 @@ package main.utils.json.legacy;
 
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
-import main.utils.database.sqlite3.BotDB;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONException;

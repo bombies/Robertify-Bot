@@ -2,12 +2,13 @@ package main.audiohandlers.lavaplayer;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import main.audiohandlers.AbstractMusicManager;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import lombok.Getter;
 import lombok.Setter;
-import main.audiohandlers.AbstractMusicManager;
-import main.commands.commands.audio.LofiCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.Guild;
+
+import main.commands.commands.audio.LofiCommand;
 
 public class GuildMusicManager implements AbstractMusicManager {
     @Getter

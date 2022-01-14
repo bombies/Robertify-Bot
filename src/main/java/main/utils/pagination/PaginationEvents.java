@@ -2,7 +2,6 @@ package main.utils.pagination;
 
 import main.constants.MessageButton;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

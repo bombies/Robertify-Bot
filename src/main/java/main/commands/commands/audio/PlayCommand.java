@@ -13,7 +13,6 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.slf4j.Logger;

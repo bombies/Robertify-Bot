@@ -2,9 +2,7 @@ package main.commands.commands.util.reports;
 
 import main.constants.BotConstants;
 import main.main.Robertify;
-import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.json.legacy.reports.LegacyReportsConfig;
 import main.utils.json.legacy.reports.ReportsConfigField;
 import main.utils.pagination.Page;
 import me.duncte123.botcommons.messaging.EmbedUtils;

@@ -7,7 +7,6 @@ import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;

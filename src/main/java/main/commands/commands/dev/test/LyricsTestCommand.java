@@ -7,7 +7,6 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.genius.GeniusAPI;
 import main.utils.genius.GeniusSongSearch;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

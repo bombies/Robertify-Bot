@@ -1,9 +1,9 @@
 package main.main;
 
 import io.github.cdimascio.dotenv.Dotenv;
+
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
-
 import java.nio.file.Path;
 
 public class Config {

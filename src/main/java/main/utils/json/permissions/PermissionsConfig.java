@@ -3,7 +3,6 @@ package main.utils.json.permissions;
 import main.constants.Permission;
 import main.utils.database.mongodb.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
-import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

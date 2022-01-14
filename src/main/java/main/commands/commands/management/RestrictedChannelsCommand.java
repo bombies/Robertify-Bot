@@ -9,7 +9,6 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

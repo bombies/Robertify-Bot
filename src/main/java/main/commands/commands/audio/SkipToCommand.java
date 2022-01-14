@@ -1,7 +1,6 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
@@ -9,7 +8,6 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 

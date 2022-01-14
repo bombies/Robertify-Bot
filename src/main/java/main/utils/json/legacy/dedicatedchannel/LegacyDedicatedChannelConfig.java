@@ -2,7 +2,6 @@ package main.utils.json.legacy.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.BotConstants;
