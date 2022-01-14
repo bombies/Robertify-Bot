@@ -6,7 +6,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.mongodb.driver" level="WARN" additivity="true"/>
+<!--    <logger name="org.mongodb.driver" level="WARN" additivity="true"/>-->
 
     <root level="info">
         <appender-ref ref="STDOUT" />

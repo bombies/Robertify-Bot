@@ -28,14 +28,14 @@ public class GuildsDBCache extends AbstractMongoCache {
         AbstractGuildConfig.initCache();
     }
 
-    public Object getField(long gid, GuildsDB.Field field) {
+    public synchronized Object getField(long gid, GuildsDB.Field field) {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any info!");
 
         return getGuildInfo(gid).get(field.toString());
     }
 
-    public void setField(long gid, GuildsDB.Field field, Object value) {
+    public synchronized void setField(long gid, GuildsDB.Field field, Object value) {
         if (!guildHasInfo(gid))
             throw new NullPointerException("This guild doesn't have any info!");
 
@@ -44,12 +44,12 @@ public class GuildsDBCache extends AbstractMongoCache {
         updateCache(guildInfo, GuildsDB.Field.GUILD_ID, gid);
     }
 
-    public JSONObject getGuildInfo(long gid) {
+    public synchronized JSONObject getGuildInfo(long gid) {
         if (!guildHasInfo(gid)) return null;
         return getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
     }
 
-    public boolean guildHasInfo(long gid) {
+    public synchronized boolean guildHasInfo(long gid) {
         try {
             getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
             return true;

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class GuildsDB extends AbstractMongoDatabase {
     private final static Logger logger = LoggerFactory.getLogger(GuildsDB.class);
-    private final static GuildsDB INSTANCE = new GuildsDB();
+    private static GuildsDB INSTANCE;
 
     private GuildsDB() {
         super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_GUILDS);
@@ -26,7 +26,7 @@ public class GuildsDB extends AbstractMongoDatabase {
     @Override
     public synchronized void init() {
         for (var guild : Robertify.api.getGuilds()) {
-            if (documentExists(Field.GUILD_ID, guild.getIdLong()))
+            if (specificDocumentExists(Field.GUILD_ID, guild.getIdLong()))
                 continue;
 
             addDocument(getGuildDocument(guild.getIdLong()));
@@ -34,6 +34,8 @@ public class GuildsDB extends AbstractMongoDatabase {
     }
 
     public static synchronized GuildsDB ins() {
+        if (INSTANCE == null)
+            INSTANCE = new GuildsDB();
         return INSTANCE;
     }
 

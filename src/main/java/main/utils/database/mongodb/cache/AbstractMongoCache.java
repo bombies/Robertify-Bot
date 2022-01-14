@@ -77,6 +77,8 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
     }
 
     public void updateCache(List<Document> documents) {
+        System.out.println("Updating cache");
+
         for (var document: documents) {
             final ObjectId id = document.getObjectId("_id");
             final JSONArray collectionArr = this.cache.getJSONArray(CacheField.DOCUMENTS.toString());

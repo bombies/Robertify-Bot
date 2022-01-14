@@ -91,7 +91,7 @@ public abstract class AbstractMongoDatabase {
     public static void initAllCaches() {
         BotInfoCache.initCache();
         GuildsDBCache.initCache();
-        StatisticsDB.INSTANCE.init();
+//        StatisticsDB.INSTANCE.init();
     }
 
     public static void updateAllCaches() {
@@ -273,6 +273,10 @@ public abstract class AbstractMongoDatabase {
         return findDocument(key.toString(), value).hasNext();
     }
 
+    protected boolean specificDocumentExists(GenericJSONField key, Object value) {
+        return findSpecificDocument(key.toString(), value) != null;
+    }
+
     protected boolean documentExists(String key, String value) {
         return findDocument(key, value).hasNext();
     }
@@ -310,7 +314,11 @@ public abstract class AbstractMongoDatabase {
     }
 
     protected Document findSpecificDocument(String key, Object value) {
-        return collection.find(eq(key, value)).iterator().next();
+        try {
+            return collection.find(eq(key, value)).iterator().next();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     protected Document findSpecificDocument(GenericJSONField key, Object value) {
