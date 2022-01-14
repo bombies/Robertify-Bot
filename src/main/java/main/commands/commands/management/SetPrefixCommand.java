@@ -31,6 +31,8 @@ public class SetPrefixCommand implements ICommand {
         } else if (args.get(0).contains("`")) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Your prefix can't contain \"`\"");
             msg.replyEmbeds(eb.build()).queue();
+        } else if (args.get(0).contains("/")) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Your prefix can't contain `/`").build()).queue();
         } else {
             new GuildConfig().setPrefix(guild.getIdLong(), args.get(0));
 
