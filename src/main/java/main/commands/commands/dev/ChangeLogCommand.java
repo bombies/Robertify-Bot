@@ -63,11 +63,12 @@ public class ChangeLogCommand implements IDevCommand {
         final var guilds = Robertify.api.getGuilds();
 
         logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
-        eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
-        eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
         for (Guild g : guilds) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
+            eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
+            eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
+
             eb.setThumbnail(new ThemesConfig().getTheme(g.getIdLong()).getTransparent());
             if (!new TogglesConfig().getToggle(msg.getGuild(), Toggles.ANNOUNCE_CHANGELOGS))
                 continue;
