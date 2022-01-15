@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.Toggles;
-import main.utils.database.mongodb.GuildsDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.AbstractGuildConfig;
 import net.dv8tion.jda.api.entities.Guild;

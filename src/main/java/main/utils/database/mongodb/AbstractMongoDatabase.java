@@ -1,19 +1,14 @@
 package main.utils.database.mongodb;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
-import com.mongodb.ConnectionString;
 import lombok.Getter;
 import main.constants.Database;
-import main.constants.ENV;
-import main.events.MongoEventListener;
-import main.main.Config;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.databases.BotInfoDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
 import org.bson.Document;
@@ -33,8 +28,6 @@ import java.util.NoSuchElementException;
 public abstract class AbstractMongoDatabase {
     private static final Logger logger = LoggerFactory.getLogger(AbstractMongoDatabase.class);
 
-//    private final MongoClient client;
-//    @Getter
     private final MongoDatabase database;
     @Getter
     private MongoCollection<Document> collection;

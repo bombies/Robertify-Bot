@@ -1,10 +1,12 @@
-package main.utils.database.mongodb;
+package main.utils.database.mongodb.databases;
 
 import main.constants.Database;
 import main.constants.ENV;
 import main.constants.RobertifyTheme;
 import main.main.Config;
 import main.main.Robertify;
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.database.mongodb.DocumentBuilder;
 import main.utils.json.GenericJSONField;
 import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -64,7 +66,7 @@ public class GuildsDB extends AbstractMongoDatabase {
                 .build();
     }
 
-    protected static synchronized void update() {
+    public static synchronized void update() {
         logger.debug("Updating Guild cache");
         new TogglesConfig().update();
         new PermissionsConfig().update();

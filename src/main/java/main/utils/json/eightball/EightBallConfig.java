@@ -1,8 +1,7 @@
 package main.utils.json.eightball;
 
-import main.utils.database.mongodb.GuildsDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
-import main.utils.json.legacy.LegacyEightBallConfig;
 import org.json.JSONArray;
 
 import java.util.ArrayList;

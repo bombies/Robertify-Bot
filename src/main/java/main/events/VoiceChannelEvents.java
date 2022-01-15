@@ -1,14 +1,9 @@
 package main.events;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
-import main.constants.Statistic;
-import main.utils.database.mongodb.StatisticsDB;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.statistics.StatisticsManager;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;

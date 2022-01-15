@@ -2,7 +2,7 @@ package main.commands.commands.dev.test;
 
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
-import main.utils.database.mongodb.MongoTestDB;
+import main.utils.database.mongodb.databases.MongoTestDB;
 import main.utils.database.mongodb.cache.TestMongoCache;
 import net.dv8tion.jda.api.entities.Message;
 import org.json.JSONObject;

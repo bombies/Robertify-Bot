@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
-import main.utils.database.mongodb.GuildsDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;

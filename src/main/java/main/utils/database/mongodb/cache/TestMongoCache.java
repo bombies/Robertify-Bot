@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
-import main.utils.database.mongodb.MongoTestDB;
+import main.utils.database.mongodb.databases.MongoTestDB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

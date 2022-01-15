@@ -1,6 +1,6 @@
 package main.utils.json.guildconfig;
 
-import main.utils.database.mongodb.GuildsDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,6 +1,8 @@
-package main.utils.database.mongodb;
+package main.utils.database.mongodb.databases;
 
 import main.constants.Database;
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.database.mongodb.DocumentBuilder;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
@@ -42,7 +44,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
         }
     }
 
-    protected static void update() {
+    public static void update() {
         logger.debug("Updating Bot Info cache");
         var cache = BotInfoCache.getInstance();
 

@@ -4,8 +4,7 @@ import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.constants.Statistic;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.database.mongodb.StatisticsDB;
-import me.duncte123.botcommons.messaging.EmbedUtils;
+import main.utils.database.mongodb.databases.StatisticsDB;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;

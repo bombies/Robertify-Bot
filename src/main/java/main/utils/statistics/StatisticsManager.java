@@ -1,7 +1,7 @@
 package main.utils.statistics;
 
 import main.constants.Statistic;
-import main.utils.database.mongodb.StatisticsDB;
+import main.utils.database.mongodb.databases.StatisticsDB;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

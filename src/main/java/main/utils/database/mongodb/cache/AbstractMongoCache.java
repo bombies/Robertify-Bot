@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.GuildsDB;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;

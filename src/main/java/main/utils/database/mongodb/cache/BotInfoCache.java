@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
-import main.utils.database.mongodb.BotInfoDB;
+import main.utils.database.mongodb.databases.BotInfoDB;
 import main.utils.json.legacy.reports.ReportsConfigField;
 import main.utils.json.legacy.suggestions.SuggestionsConfigField;
 import org.json.JSONArray;
