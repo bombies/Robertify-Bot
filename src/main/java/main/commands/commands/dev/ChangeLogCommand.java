@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class ChangeLogCommand implements IDevCommand {
@@ -64,6 +66,8 @@ public class ChangeLogCommand implements IDevCommand {
 
         logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
 
+        final ExecutorService executorService = Executors.newCachedThreadPool();
+
         for (Guild g : guilds) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
             eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
@@ -78,8 +82,8 @@ public class ChangeLogCommand implements IDevCommand {
             if (announcementChannel == null) continue;
 
             try {
-                announcementChannel.sendMessageEmbeds(eb.build()).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> logger.error("Was not able to send a changelog in {}", g.getName())));
+                executorService.execute(() -> announcementChannel.sendMessageEmbeds(eb.build()).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> logger.error("Was not able to send a changelog in {}", g.getName()))));
             } catch (InsufficientPermissionException e) {
                 logger.error("Was not able to send a changelog in {}", g.getName());
             }
