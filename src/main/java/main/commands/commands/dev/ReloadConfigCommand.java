@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.commands.RandomMessageManager;
+import main.constants.ENV;
 import main.main.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +19,7 @@ public class ReloadConfigCommand implements IDevCommand {
 
         try {
             Config.reload();
+            RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
             ctx.getMessage().addReaction("✅").queue();
         } catch (Exception e) {
             logger.error("There was an unexpected error!", e);

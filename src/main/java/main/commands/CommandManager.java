@@ -338,7 +338,7 @@ public class CommandManager {
                     }
                 }
 
-                if (getMusicCommands().contains(cmd))
+                if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
                     new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
                 if (toggles.isDJToggleSet(guild, cmd)) {
@@ -378,5 +378,28 @@ public class CommandManager {
             if (!selfMember.hasPermission(perm))
                 return false;
         return true;
+    }
+
+    private boolean commandTypeHasCommandWithName(CommandType type, String name) {
+        List<ICommand> listToUse = new ArrayList<>();
+
+        switch (type) {
+            case MANAGEMENT -> listToUse = getManagementCommands();
+            case MUSIC -> listToUse = getMusicCommands();
+            case MISC -> listToUse = getMiscCommands();
+            case UTILITY -> listToUse = getUtilityCommands();
+        }
+
+        for (var cmd : listToUse)
+            if (cmd.getName().equals(name))
+                return true;
+        return false;
+    }
+
+    private enum CommandType {
+        MANAGEMENT,
+        MUSIC,
+        MISC,
+        UTILITY
     }
 }

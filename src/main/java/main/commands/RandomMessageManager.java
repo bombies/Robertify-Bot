@@ -1,5 +1,6 @@
 package main.commands;
 
+import lombok.Setter;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
@@ -13,7 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomMessageManager {
-    private final static double CHANCE = Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE));
+    @Setter
+    private static double chance = Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE));
 
     public MessageEmbed getMessage(Guild guild) {
         List<String> messages = BotInfoCache.getInstance().getRandomMessages();
@@ -28,7 +30,7 @@ public class RandomMessageManager {
     }
 
     public boolean hasMessages() {
-        return !getMessages().isEmpty();
+        return getMessages().size() != 0;
     }
 
     public void addMessage(String s) {
@@ -50,7 +52,7 @@ public class RandomMessageManager {
     public void randomlySendMessage(TextChannel channel) {
         if (!hasMessages()) return;
 
-        if (new Random().nextDouble() <= CHANCE)
+        if (new Random().nextDouble() <= chance)
             channel.sendMessageEmbeds(getMessage(channel.getGuild())).queue();
     }
 }
