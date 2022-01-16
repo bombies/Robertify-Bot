@@ -118,7 +118,8 @@ public class Robertify {
                             new ShufflePlaySlashCommand(),
                             new VoteCommand(),
                             new DonateCommand(),
-                            new ThemeCommand()
+                            new ThemeCommand(),
+                            new WebsiteCommand()
                     )
 
                     // Button Listeners

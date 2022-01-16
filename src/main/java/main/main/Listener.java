@@ -238,11 +238,12 @@ public class Listener extends ListenerAdapter {
         new SupportServerCommand().initCommand(g);
         new DonateCommand().initCommand(g);
         new ThemeCommand().initCommand(g);
+        new WebsiteCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new ThemeCommand().initCommand(g);
+        new WebsiteCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

@@ -119,6 +119,7 @@ public class CommandManager {
                 new AnnouncementCommand(),
                 new HostInfoCommand(),
                 new StatisticsCommand(),
+                new WebsiteCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -187,7 +188,8 @@ public class CommandManager {
                 new UptimeCommand(),
                 new SupportServerCommand(),
                 new DonateCommand(),
-                new VoteCommand()
+                new VoteCommand(),
+                new WebsiteCommand()
         );
     }
 
