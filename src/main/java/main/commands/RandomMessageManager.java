@@ -1,8 +1,9 @@
 package main.commands;
 
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 public class RandomMessageManager {
-    private final static double CHANCE = 0.05;
+    private final static double CHANCE = Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE));
 
     public MessageEmbed getMessage(Guild guild) {
         List<String> messages = BotInfoCache.getInstance().getRandomMessages();

@@ -1,4 +1,4 @@
-package main.commands.commands.misc;
+package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
@@ -7,6 +7,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.genius.GeniusAPI;
 import main.utils.genius.GeniusSongSearch;
@@ -122,7 +123,8 @@ public class LyricsCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return """
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n\n" +
+                """
                 Get the lyrics for the song being played
 
                 **__Usages__**

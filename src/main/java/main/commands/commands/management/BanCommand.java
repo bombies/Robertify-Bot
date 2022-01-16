@@ -11,7 +11,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.guildconfig.GuildConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -129,9 +128,8 @@ public class BanCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
-                "\nBan a user from the bot\n\n" +
-                "Usage: `"+ prefix +"ban <user>`";
+        return "Ban a user from the bot\n\n" +
+                "Usage: `"+ prefix +"ban <@user>`";
     }
 
     @Override

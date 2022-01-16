@@ -10,7 +10,7 @@ import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
-import main.commands.commands.misc.LyricsCommand;
+import main.commands.commands.audio.LyricsCommand;
 import main.commands.commands.util.*;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
@@ -139,6 +139,7 @@ public class CommandManager {
                 new SkipCommand(),
                 new NowPlayingCommand(),
                 new QueueCommand(),
+                new VolumeCommand(),
                 new PauseCommand(),
                 new RemoveCommand(),
                 new MoveCommand(),

@@ -1,8 +1,5 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -10,7 +7,6 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -18,7 +14,6 @@ import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClearQueueCommand implements ICommand {
     @Override
@@ -69,8 +64,7 @@ public class ClearQueueCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
-                "Permission Required: `"+Permission.ROBERTIFY_DJ+"`\n\n"+
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n"+
                 "Clear all the queued songs";
     }
 

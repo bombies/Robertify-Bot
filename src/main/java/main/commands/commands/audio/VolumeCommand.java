@@ -1,14 +1,11 @@
 package main.commands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -74,7 +71,10 @@ public class VolumeCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "control the volume of the bot";
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
+                "Control the volume of the bot\n\n" +
+                "**__Usages__**\n`" +
+                prefix + "volume <0-100>`";
     }
 
     @Override

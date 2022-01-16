@@ -9,7 +9,6 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -89,9 +88,8 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
-                "\nUnban a user from the bot\n\n" +
-                "Usage: `"+ prefix +"unban <user>`";
+        return "Unban a user from the bot\n\n" +
+                "Usage: `"+ prefix +"unban <@user>`";
     }
 
     @Override

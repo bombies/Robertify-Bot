@@ -1,14 +1,9 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -94,8 +89,7 @@ public class SeekCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
-                "Jump to a specific position in the current song\n" +
+        return "Jump to a specific position in the current song\n" +
                 "\nUsage: `"+ prefix+"seek <mm:ss>`\n";
     }
 }

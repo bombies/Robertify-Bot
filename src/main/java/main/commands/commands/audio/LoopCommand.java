@@ -2,15 +2,12 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import lavalink.client.player.IPlayer;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -145,7 +142,7 @@ public class LoopCommand implements ICommand {
     @Override
     public String getHelp(String prefix) {
         return "Aliases: `"+ GeneralUtils.listToString(getAliases()) +"`\n" +
-                "Set the song being replayed\n" +
+                "Set the song being currently played or the queue to constantly loop\n" +
                 "\nUsage `" + prefix + "loop [queue]` *(Add `queue` to start repeating the current queue)*";
     }
 

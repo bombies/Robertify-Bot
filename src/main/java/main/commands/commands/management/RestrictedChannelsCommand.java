@@ -227,7 +227,7 @@ public class RestrictedChannelsCommand implements ICommand {
     @Override
     public String getHelp(String prefix) {
         return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
-                "\nRestrict the bot to join voice channels that you set.\n\n"
+                "\nRestrict the bot to join voice/text channels that you set.\n\n"
                 + getUsages(prefix);
     }
 
