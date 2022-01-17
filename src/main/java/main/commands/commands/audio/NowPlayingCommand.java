@@ -7,9 +7,9 @@ import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Toggles;
-import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -89,7 +89,7 @@ public class NowPlayingCommand implements ICommand {
         if (track instanceof RobertifyAudioTrack robertifyAudioTrack)
             eb.setThumbnail(robertifyAudioTrack.getTrackImage());
 
-        eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, BotConstants.ICON_URL.toString());
+        eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
 
         return eb;
     }
