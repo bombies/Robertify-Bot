@@ -42,7 +42,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
                 item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-                    logger.info("Searching YouTube...");
+//                    logger.info("Searching YouTube...");
                     track = search(newPlaylist);
                 }
             }
@@ -51,7 +51,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
                 item = soundCloudAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "scsearch:"), null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-                    logger.info("Searching SoundCloud...");
+//                    logger.info("Searching SoundCloud...");
                     track = search(newPlaylist);
                 }
             }
