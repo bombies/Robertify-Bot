@@ -53,7 +53,7 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final Member member = Robertify.api.getGuildById(ctx.getGuild().getIdLong()).getMemberById(id);
+        final Member member = Robertify.api.getGuildById(ctx.getGuild().getIdLong()).retrieveMemberById(id).complete();
 
         if (member == null) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())
