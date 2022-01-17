@@ -34,8 +34,6 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
         AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
 
         if (item instanceof AudioPlaylist playlist) {
-            final var fallback = playlist.getTracks().get(0);
-
 //            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title, trackInfo.author, trackInfo.length);
 //            logger.info("Searching YouTube Music...");
             AudioTrack track = search(playlist);
@@ -44,7 +42,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
                 item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-//                    logger.info("Searching YouTube...");
+                    logger.info("Searching YouTube...");
                     track = search(newPlaylist);
                 }
             }
@@ -53,13 +51,10 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
                 item = soundCloudAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "scsearch:"), null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-//                    logger.info("Searching SoundCloud...");
+                    logger.info("Searching SoundCloud...");
                     track = search(newPlaylist);
                 }
             }
-
-            if (track == null)
-                track = fallback;
 
             if (track instanceof YoutubeAudioTrack ytTrack)
                 ytTrack.process(executor);
@@ -75,8 +70,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
             if (audioTrack.getDuration() >= trackInfo.length - 7000
                     && audioTrack.getDuration() <= trackInfo.length + 5000
-                    && (audioTrack.getInfo().author.toLowerCase().contains(trackInfo.author.toLowerCase())
-                    || audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase()))
+                    && (audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase()))
             ) {
                 if (audioTrack.getInfo().title.contains("clean")
                         && !trackInfo.title.contains("clean"))

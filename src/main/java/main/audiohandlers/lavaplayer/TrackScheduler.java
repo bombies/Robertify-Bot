@@ -5,16 +5,15 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import main.audiohandlers.AbstractTrackScheduler;
-import main.utils.json.toggles.TogglesConfig;
 import lombok.Getter;
+import main.audiohandlers.AbstractTrackScheduler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.constants.Toggles;
-import main.main.Listener;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -157,19 +156,30 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
 
     @Override
     public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-        Listener.logger.error("Track stuck. Attempting to replay the song.");
-        handleTrackException(player, track);
+        if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
+
+        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
+
+        TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
+        try {
+            announcementChannel.sendMessageEmbeds(
+                            RobertifyEmbedUtils.embedMessage(
+                                            guild,
+                                            "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
+                                    .build()
+                    )
+                    .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+        } catch (NullPointerException e) {
+            new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
+        } catch (InsufficientPermissionException ignored) {}
+
+        nextTrack();
     }
 
     @Override
     public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
         logger.error("There was an exception with playing the track. Handling it.");
         exception.printStackTrace();
-        handleTrackException(player, track);
-    }
-
-    private void handleTrackException(AudioPlayer player, AudioTrack track) {
-        // TODO handling exceptions
     }
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
