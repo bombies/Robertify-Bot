@@ -5,7 +5,6 @@ import main.commands.IDevCommand;
 import main.commands.RandomMessageManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
@@ -69,10 +68,10 @@ public class RandomMessageCommand implements IDevCommand {
     public void list(Message msg) {
         final var messages = new RandomMessageManager().getMessages();
         final var sb = new StringBuilder();
-
+        sb.append("```\n");
         for (int i = 0; i < messages.size(); i++)
             sb.append(i).append(" - ").append("*").append(messages.get(i)).append("*\n");
-
+        sb.append("```");
         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), sb.toString()).build()).queue();
     }
 
