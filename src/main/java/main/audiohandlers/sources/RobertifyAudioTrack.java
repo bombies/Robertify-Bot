@@ -3,8 +3,7 @@ package main.audiohandlers.sources;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
+import com.sedmelluq.discord.lavaplayer.source.youtube.*;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import lombok.Getter;
@@ -32,20 +31,20 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
-        AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
+        AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
 
         if (item instanceof AudioPlaylist playlist) {
             final var fallback = playlist.getTracks().get(0);
 
 //            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title, trackInfo.author, trackInfo.length);
-//            logger.info("Searching YouTube...");
+//            logger.info("Searching YouTube Music...");
             AudioTrack track = search(playlist);
 
             if (track == null) {
-                item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
+                item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-//                    logger.info("Searching YouTube Music...");
+//                    logger.info("Searching YouTube...");
                     track = search(newPlaylist);
                 }
             }
