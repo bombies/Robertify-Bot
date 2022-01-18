@@ -106,13 +106,32 @@ public class LyricsCommand implements ICommand {
                         return;
                     }
 
-                    GeniusSongSearch.Hit hit = songSearch.getHits().get(0);
+                    final GeniusSongSearch.Hit hit = songSearch.getHits().get(0);
+                    final String lyrics = hit.fetchLyrics();
 
-                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(),
-                                    hit.fetchLyrics())
-                                    .setThumbnail(hit.getImageUrl())
-                                    .build())
-                            .queue();
+                    try {
+
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(),
+                                                lyrics)
+                                        .setThumbnail(hit.getImageUrl())
+                                        .build())
+                                .queue();
+                    } catch (IllegalArgumentException e) {
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(), "Found lyrics!").build())
+                                .queue();
+
+                        final int numOfChars = lyrics.length();
+
+                        int i = 0;
+                        do {
+                            ctx.getChannel().sendMessage(
+                                    lyrics.substring(i, Math.min(i + 2000, numOfChars))
+                            ).queue();
+
+                            i += 2000;
+                        } while (i < numOfChars);
+
+                    }
                 });
     }
 
