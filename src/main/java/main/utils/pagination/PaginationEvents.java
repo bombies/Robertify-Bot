@@ -63,6 +63,13 @@ public class PaginationEvents extends ListenerAdapter {
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith("menupage")) return;
 
+        if (!event.getUser().getId().equals(event.getComponentId().split(":")[1])) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to interact with this selection menu").build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
         if (!currentPage.containsKey(event.getMessage().getIdLong()))
             currentPage.put(event.getMessage().getIdLong(), 0);
 
