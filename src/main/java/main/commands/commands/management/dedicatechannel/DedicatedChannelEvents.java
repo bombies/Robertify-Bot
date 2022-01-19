@@ -58,7 +58,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final User user = event.getAuthor();
 
-        if (!user.isBot()) {
+        if (!user.isBot() && !event.isWebhookMessage()) {
             if (MongoMigrationCommand.isMigrating()) {
                 event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
                                 " You are not allowed to use this feature.")
@@ -110,7 +110,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         String message = event.getMessage().getContentRaw();
 
-        if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot()) {
+        if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
             if (!GeneralUtils.isUrl(message))
                 message = "ytsearch:" + message;
 
