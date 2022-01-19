@@ -69,28 +69,17 @@ public class PaginationEvents extends ListenerAdapter {
         final var msg = event.getMessage();
 
         switch (event.getSelectedOptions().get(0).getValue().split(":")[1]) {
-            case "nextPage" -> {
-                currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) + 1);
-                event.editSelectionMenu(
-                        Pages.getSelectionMenu(
-                                event.getUser(),
-                                Pages.getMenuPages(msg.getIdLong())
-                                        .get(currentPage.get(msg.getIdLong()))
-                                        .getOptions()
-                        )
-                ).queue();
-            }
-            case "previousPage" -> {
-                currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) - 1);
-                event.editSelectionMenu(
-                        Pages.getSelectionMenu(
-                                event.getUser(),
-                                Pages.getMenuPages(msg.getIdLong())
-                                        .get(currentPage.get(msg.getIdLong()))
-                                        .getOptions()
-                        )
-                ).queue();
-            }
+            case "nextPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) + 1);
+            case "previousPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) - 1);
         }
+
+        event.editSelectionMenu(
+                Pages.getSelectionMenu(
+                        event.getUser(),
+                        Pages.getMenuPages(msg.getIdLong())
+                                .get(currentPage.get(msg.getIdLong()))
+                                .getOptions()
+                )
+        ).queue();
     }
 }
