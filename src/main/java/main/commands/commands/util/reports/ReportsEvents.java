@@ -4,7 +4,7 @@ import main.constants.BotConstants;
 import main.main.Robertify;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.legacy.reports.ReportsConfigField;
-import main.utils.pagination.Page;
+import main.utils.pagination.MessagePage;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -102,8 +102,8 @@ public class ReportsEvents extends ListenerAdapter {
         }
     }
 
-    List<Page> getQuestions() {
-        final List<Page> ret = new ArrayList<>();
+    List<MessagePage> getQuestions() {
+        final List<MessagePage> ret = new ArrayList<>();
 
         ret.add(getQuestionPage("Which command/feature does the bug originate from?"));
         ret.add(getQuestionPage("Describe **in detail** how this bug can be replicated"));
@@ -112,8 +112,8 @@ public class ReportsEvents extends ListenerAdapter {
         return ret;
     }
 
-    private Page getQuestionPage(String q) {
-        return new Page(EmbedUtils.embedMessageWithTitle("Bug Reports", q)
+    private MessagePage getQuestionPage(String q) {
+        return new MessagePage(EmbedUtils.embedMessageWithTitle("Bug Reports", q)
                 .setThumbnail(BotConstants.ROBERTIFY_LOGO.toString())
                 .setFooter("NOTE: Any abuse of this system will result in a ban")
                 .setTimestamp(Instant.now())
@@ -135,11 +135,11 @@ public class ReportsEvents extends ListenerAdapter {
         return curPage;
     }
 
-    private Page getNextPage(long userID) {
+    private MessagePage getNextPage(long userID) {
         return getQuestions().get(incrementPage(userID));
     }
 
-    Page getFirstPage(long userID) {
+    MessagePage getFirstPage(long userID) {
         responses.put(userID, new ArrayList<>());
         return getQuestions().get(getCurrentPage(userID));
     }

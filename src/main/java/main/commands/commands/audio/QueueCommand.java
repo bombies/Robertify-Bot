@@ -2,15 +2,12 @@ package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.pagination.Pages;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -45,7 +42,7 @@ public class QueueCommand implements ICommand {
 
         List<String> content = getContent(queue, trackList);
 
-        Pages.paginate(channel, user, content, 10);
+        Pages.paginateMessage(channel, user, content, 10);
     }
 
     public List<String> getContent(ConcurrentLinkedQueue<AudioTrack> queue, List<AudioTrack> trackList) {

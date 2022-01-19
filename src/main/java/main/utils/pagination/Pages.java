@@ -1,15 +1,21 @@
 package main.utils.pagination;
 
+import lombok.SneakyThrows;
+import main.constants.InteractionLimits;
 import main.constants.MessageButton;
 import main.constants.RobertifyEmoji;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.builders.selectionmenu.SelectionMenuOption;
+import main.utils.component.builders.selectionmenu.SelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +23,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Pages {
-    private static final HashMap<Long, List<Page>> messages = new HashMap<>();
+    private static final HashMap<Long, List<MessagePage>> messages = new HashMap<>();
+    private static final HashMap<Long, List<MenuPage>> menuMessages = new HashMap<>();
+
     private static final Paginator paginator = new Paginator(
             Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString()),
             Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString()),
@@ -25,11 +33,11 @@ public abstract class Pages {
             Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())
     );
 
-    public static Message paginate(TextChannel channel, User user, List<Page> pages) {
+    public static Message paginateMessage(TextChannel channel, User user, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        channel.sendMessageEmbeds(pages.get(0).getEmbed()).queue(msg -> {
-            if (pages.size() > 1) {
+        channel.sendMessageEmbeds(messagePages.get(0).getEmbed()).queue(msg -> {
+            if (messagePages.size() > 1) {
                 msg.editMessageComponents(
                         ActionRow.of(
                                 Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFrontEmoji()),
@@ -39,7 +47,7 @@ public abstract class Pages {
                         )
                 ).queue();
 
-                messages.put(msg.getIdLong(), pages);
+                messages.put(msg.getIdLong(), messagePages);
                 ret.set(msg);
             }
         });
@@ -47,12 +55,12 @@ public abstract class Pages {
         return ret.get();
     }
 
-    public static Message paginate(SlashCommandEvent event, List<Page> pages) {
+    public static Message paginateMessage(SlashCommandEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        ReplyAction replyAction = event.replyEmbeds(pages.get(0).getEmbed()).setEphemeral(true);
+        ReplyAction replyAction = event.replyEmbeds(messagePages.get(0).getEmbed()).setEphemeral(true);
 
-        if (pages.size() > 1) {
+        if (messagePages.size() > 1) {
             replyAction = replyAction.addActionRows(
                     ActionRow.of(
                             Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + event.getUser().getId(), paginator.getFrontEmoji()),
@@ -64,9 +72,9 @@ public abstract class Pages {
         }
 
         replyAction.queue(msg -> {
-           if (pages.size() > 1) {
+           if (messagePages.size() > 1) {
                msg.retrieveOriginal().queue(msg2 -> {
-                   messages.put(msg2.getIdLong(), pages);
+                   messages.put(msg2.getIdLong(), messagePages);
                    ret.set(msg2);
                });
            }
@@ -75,28 +83,28 @@ public abstract class Pages {
         return ret.get();
     }
 
-    public static Message paginate(TextChannel channel, User user, List<String> content, int maxPerPage) {
-        List<Page> pages = new ArrayList<>();
+    public static Message paginateMessage(TextChannel channel, User user, List<String> content, int maxPerPage) {
+        List<MessagePage> messagePages = new ArrayList<>();
 
-        logic(channel.getGuild(), pages, content, maxPerPage);
+        messageLogic(channel.getGuild(), messagePages, content, maxPerPage);
 
-        return paginate(channel, user, pages);
+        return paginateMessage(channel, user, messagePages);
     }
 
-    public static Message paginate(List<String> content, int maxPerPage, SlashCommandEvent event) {
-        List<Page> pages = new ArrayList<>();
+    public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandEvent event) {
+        List<MessagePage> messagePages = new ArrayList<>();
 
-        logic(event.getGuild(), pages, content, maxPerPage);
+        messageLogic(event.getGuild(), messagePages, content, maxPerPage);
 
-        return paginate(event, pages);
+        return paginateMessage(event, messagePages);
     }
 
-    private static void logic(Guild guild, List<Page> pages, List<String> content, int maxPerPage) {
+    private static void messageLogic(Guild guild, List<MessagePage> messagePages, List<String> content, int maxPerPage) {
         if (content.size() <= maxPerPage) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "\t");
             for (String str : content)
                 eb.appendDescription(str + "\n");
-            pages.add(new Page(eb.build()));
+            messagePages.add(new MessagePage(eb.build()));
         } else {
             int pagesRequired = (int)Math.ceil((double)content.size() / maxPerPage);
 
@@ -109,12 +117,84 @@ public abstract class Pages {
                     eb.appendDescription(content.get(lastIndex) + "\n");
                     lastIndex++;
                 }
-                pages.add(new Page(eb.build()));
+                messagePages.add(new MessagePage(eb.build()));
             }
         }
     }
 
-    public static List<Page> getPages(long msg) {
+    public static List<MessagePage> getMessagePages(long msg) {
         return messages.get(msg);
     }
+
+    @SneakyThrows
+    public static void paginateMenu(Message msg, List<SelectionMenuOption> options) {
+        List<MenuPage> menuPages = menuLogic(msg, options);
+
+        final var firstPage = menuPages.get(0);
+
+        SelectionMenu menu = SelectionMenuBuilder.of(
+                "menuPage:" + msg.getAuthor().getId(),
+                "Select an option",
+                Pair.of(1, 1),
+                firstPage.getOptions().subList(0, Math.min(options.size(), InteractionLimits.SELECTION_MENU))
+        ).build();
+
+        msg.editMessageComponents(ActionRow.of(menu))
+                .queue(success -> menuMessages.put(msg.getIdLong(), menuPages));
+    }
+
+    private static List<MenuPage> menuLogic(Message msg, List<SelectionMenuOption> options) {
+        final List<MenuPage> menuPages = new ArrayList<>();
+
+        if (options.size() <= InteractionLimits.SELECTION_MENU) {
+            MenuPage menuPage = new MenuPage();
+            for (final var option : options)
+                menuPage.addOption(option);
+            menuPages.add(menuPage);
+        } else {
+
+            final int pagesRequired = (int)Math.ceil((double)options.size() / InteractionLimits.SELECTION_MENU);
+            final int pageControllers = 1 + (int)Math.ceil(((pagesRequired-1) * (4))/2.0);
+            final int actualPagesRequired = (int)Math.ceil((double)(options.size() + pageControllers) / InteractionLimits.SELECTION_MENU);
+
+            int lastIndex = 0;
+            for (int i = 0; i < actualPagesRequired; i++) {
+                final MenuPage tempPage = new MenuPage();
+                for (int j = 0; j < InteractionLimits.SELECTION_MENU; j++) {
+                    if (lastIndex == options.size()) break;
+
+                    if (j == 0 && i != 0) {
+                        tempPage.addOption(SelectionMenuOption.of("Previous Page", "menuPage:previousPage:" + msg.getId()));
+                        continue;
+                    }
+
+                    if (j == InteractionLimits.SELECTION_MENU - 1) {
+                        tempPage.addOption(SelectionMenuOption.of("Next Page", "menuPage:nextPage:" + msg.getId()));
+                        continue;
+                    }
+
+                    tempPage.addOption(options.get(lastIndex));
+                    lastIndex++;
+                }
+                menuPages.add(tempPage);
+            }
+        }
+
+        return menuPages;
+    }
+
+    public static List<MenuPage> getMenuPages(long msg) {
+        return menuMessages.get(msg);
+    }
+
+    @SneakyThrows
+    public static SelectionMenu getSelectionMenu(User user, List<SelectionMenuOption> options) {
+        return SelectionMenuBuilder.of(
+                "menuPage:" + user.getIdLong(),
+                "Select an option",
+                Pair.of(1, 1),
+                options.subList(0, Math.min(options.size(), InteractionLimits.SELECTION_MENU))
+        ).build();
+    }
+
 }

@@ -129,7 +129,8 @@ public class CommandManager {
                 new LyricsTestCommand(),
                 new MongoTestCommand(),
                 new GuildConfigTestCommand(),
-                new ImageTestCommand()
+                new ImageTestCommand(),
+                new MenuPaginationTestCommand()
         );
 
         addMusicCommands(

@@ -9,6 +9,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import lombok.Getter;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
+import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.BanCommand;
 import main.commands.commands.management.SetChannelCommand;
 import main.commands.commands.management.ThemeCommand;
@@ -120,6 +121,11 @@ public class Robertify {
                             new DonateCommand(),
                             new ThemeCommand(),
                             new WebsiteCommand()
+                    )
+
+                    // Test Listeners
+                    .addEventListeners(
+                            new MenuPaginationTestCommand()
                     )
 
                     // Button Listeners

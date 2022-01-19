@@ -22,7 +22,7 @@ public class GuildCommand implements IDevCommand {
         for (var guild : guilds) guildNames.add(guild.getName() + " (" + guild.getMembers().size() + " members in cache)");
 
         GeneralUtils.setCustomEmbed(ctx.getGuild(), "Guilds");
-        Pages.paginate(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
+        Pages.paginateMessage(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
