@@ -78,6 +78,9 @@ public class PaginationEvents extends ListenerAdapter {
         switch (event.getSelectedOptions().get(0).getValue().split(":")[1]) {
             case "nextPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) + 1);
             case "previousPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) - 1);
+            default -> {
+                return;
+            }
         }
 
         event.editSelectionMenu(
