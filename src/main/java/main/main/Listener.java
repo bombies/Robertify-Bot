@@ -166,6 +166,7 @@ public class Listener extends ListenerAdapter {
         Guild guild = event.getGuild();
         new GuildConfig().addGuild(guild.getIdLong());
         initSlashCommands(guild);
+        GeneralUtils.setDefaultEmbed(guild);
         logger.info("Joined {}", guild.getName());
     }
 
