@@ -16,7 +16,7 @@ public class FavouriteTracksDB extends AbstractMongoDatabase {
         // Nothing to init
     }
 
-    public static FavouriteTracksDB ins() {
+    public synchronized static FavouriteTracksDB ins() {
         if (INSTANCE == null)
             INSTANCE = new FavouriteTracksDB();
         return INSTANCE;
