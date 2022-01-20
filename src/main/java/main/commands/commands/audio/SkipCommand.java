@@ -57,10 +57,8 @@ public class SkipCommand implements ICommand {
         audioPlayer.getPlayingTrack().setPosition(0);
         musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
 
-        if (scheduler.repeating || scheduler.playlistRepeating) {
+        if (scheduler.repeating)
             scheduler.repeating = false;
-            scheduler.playlistRepeating = false;
-        }
 
         musicManager.getScheduler().nextTrack();
 
