@@ -23,7 +23,7 @@ public class MenuPaginationTestCommand extends ListenerAdapter implements ITestC
             options.add(SelectionMenuOption.of("Test " + i, "Test:" + i));
 
         ctx.getMessage().reply("Menu Pagination Test")
-                .queue(success -> Pages.paginateMenu(success, options));
+                .queue(success -> Pages.paginateMenu(ctx.getAuthor(), success, options));
     }
 
     @Override

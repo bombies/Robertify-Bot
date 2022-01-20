@@ -1,7 +1,10 @@
 package main.utils.pagination;
 
+import main.commands.commands.audio.FavouriteTracksCommand;
 import main.constants.MessageButton;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.database.mongodb.cache.FavouriteTracksCache;
+import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
@@ -75,21 +78,32 @@ public class PaginationEvents extends ListenerAdapter {
 
         final var msg = event.getMessage();
 
+        int currentPage = PaginationEvents.currentPage.get(msg.getIdLong());
         switch (event.getSelectedOptions().get(0).getValue().split(":")[1]) {
-            case "nextPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) + 1);
-            case "previousPage" -> currentPage.put(msg.getIdLong(), currentPage.get(msg.getIdLong()) - 1);
+            case "nextPage" -> PaginationEvents.currentPage.put(msg.getIdLong(), currentPage + 1);
+            case "previousPage" -> PaginationEvents.currentPage.put(msg.getIdLong(), currentPage - 1);
             default -> {
                 return;
             }
         }
 
+        currentPage = PaginationEvents.currentPage.get(msg.getIdLong());
+
+        MenuPage menuPage = Pages.getMenuPages(msg.getIdLong())
+                .get(currentPage);
+
+        int finalCurrentPage = currentPage;
         event.editSelectionMenu(
                 Pages.getSelectionMenu(
                         event.getUser(),
-                        Pages.getMenuPages(msg.getIdLong())
-                                .get(currentPage.get(msg.getIdLong()))
-                                .getOptions()
+                        menuPage.getOptions()
                 )
-        ).queue();
+        ).queue(s -> {
+            final var tracks = FavouriteTracksCache.getInstance().getTracks(event.getMember().getIdLong());
+            final var theme = new ThemesConfig().getTheme(event.getGuild().getIdLong());
+            FavouriteTracksCommand.setDefaultEmbed(event.getMember(), tracks, theme);
+            msg.editMessageEmbeds(Pages.getPaginatedEmbed(msg.getGuild(), menuPage.toStringList(), 25, finalCurrentPage, true))
+                    .queue();
+        });
     }
 }

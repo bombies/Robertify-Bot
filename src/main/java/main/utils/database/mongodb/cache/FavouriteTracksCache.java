@@ -37,7 +37,7 @@ public class FavouriteTracksCache extends AbstractMongoCache {
         addToCache(getDefaultDocument(uid));
     }
 
-    public synchronized void addTrack(long uid, String trackID, TrackSource source) {
+    public synchronized void addTrack(long uid, String trackID, String title, String author,  TrackSource source) {
         if (!userHasInfo(uid))
             addUser(uid);
 
@@ -49,6 +49,8 @@ public class FavouriteTracksCache extends AbstractMongoCache {
         jsonArray.put(
                 new JSONObject()
                         .put(FavouriteTracksDB.Field.TRACK_ID.toString(), trackID)
+                        .put(FavouriteTracksDB.Field.TRACK_TITLE.toString(), title)
+                        .put(FavouriteTracksDB.Field.TRACK_AUTHOR.toString(), author)
                         .put(FavouriteTracksDB.Field.TRACK_SOURCE.toString(), source.name().toLowerCase())
         );
 
@@ -79,6 +81,8 @@ public class FavouriteTracksCache extends AbstractMongoCache {
             ret.add(
                     new Track(
                             actualObj.getString(FavouriteTracksDB.Field.TRACK_ID.toString()),
+                            actualObj.getString(FavouriteTracksDB.Field.TRACK_TITLE.toString()),
+                            actualObj.getString(FavouriteTracksDB.Field.TRACK_AUTHOR.toString()),
                             TrackSource.parse(actualObj.getString(FavouriteTracksDB.Field.TRACK_SOURCE.toString()))
                     )
             );
@@ -96,7 +100,7 @@ public class FavouriteTracksCache extends AbstractMongoCache {
         if (getTracks(uid).isEmpty()) return false;
 
         for (final var track : getTracks(uid))
-            if (track.trackID().equals(trackID))
+            if (track.id().equals(trackID))
                 return true;
         return false;
     }
@@ -124,5 +128,5 @@ public class FavouriteTracksCache extends AbstractMongoCache {
                 .build();
     }
 
-    public static record Track(String trackID, TrackSource source) {}
+    public static record Track(String id, String title, String author, TrackSource source) {}
 }

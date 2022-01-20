@@ -26,6 +26,8 @@ public class FavouriteTracksDB extends AbstractMongoDatabase {
         USER_ID("user_id"),
         TRACKS_ARRAY("tracks"),
         TRACK_ID("track_id"),
+        TRACK_TITLE("track_title"),
+        TRACK_AUTHOR("track_author"),
         TRACK_SOURCE("track_source");
 
         private final String str;

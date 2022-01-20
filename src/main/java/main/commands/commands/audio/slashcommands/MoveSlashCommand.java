@@ -40,7 +40,7 @@ public class MoveSlashCommand extends InteractiveCommand {
                         List.of(
                                 CommandOption.of(
                                         OptionType.INTEGER,
-                                        "trackID",
+                                        "id",
                                         "The ID of the track in the queue to move",
                                         true
                                 ),

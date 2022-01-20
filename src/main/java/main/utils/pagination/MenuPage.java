@@ -24,4 +24,17 @@ public class MenuPage {
     public SelectionMenuOption getOption(int i) {
         return options.get(i);
     }
+
+    public List<String> toStringList() {
+        final List<String> ret = new ArrayList<>();
+        for (SelectionMenuOption option : options) {
+            if (option.toString().contains("Next Page") ||
+                    option.toString().contains("Previous Page")
+            ) continue;
+
+            ret.add(option.toString());
+        }
+
+        return ret;
+    }
 }

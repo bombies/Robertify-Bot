@@ -67,4 +67,9 @@ public class SelectionMenuOption {
             return new SelectionMenuOption(label, id, emoji, predicate);
         }
     }
+
+    @Override
+    public String toString() {
+        return label;
+    }
 }

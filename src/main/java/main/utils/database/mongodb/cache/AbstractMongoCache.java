@@ -35,8 +35,8 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
     }
 
     public void addToCache(Document document) {
-        getCache().put(new JSONObject(document.toJson()));
         addDocument(document);
+        updateCache();
     }
 
     public void addToCache(JSONObject object) {

@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import lombok.Getter;
+import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
@@ -120,7 +121,8 @@ public class Robertify {
                             new VoteCommand(),
                             new DonateCommand(),
                             new ThemeCommand(),
-                            new WebsiteCommand()
+                            new WebsiteCommand(),
+                            new FavouriteTracksCommand()
                     )
 
                     // Test Listeners

@@ -94,6 +94,29 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
+    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, TextChannel channel, User user, Message botMsg) {
+
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(channel, selfVoiceState, memberVoiceState);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadTrack(
+                trackUrl,
+                musicManager,
+                user,
+                new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
+                botMsg
+        );
+    }
+
+    @SneakyThrows
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg) {
         final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -221,6 +244,14 @@ public class RobertifyAudioManager {
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
                 botMsg
         );
+    }
+
+    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
+                           User user, boolean announceMsg, Message botMsg) {
+
+        final AudioLoader loader = new AudioLoader(user, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false);
+        final var audioRef = new RobertifyAudioReference(trackUrl, null);
+        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,

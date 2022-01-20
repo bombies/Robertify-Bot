@@ -140,21 +140,21 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             suggestion.delete().queue();
 
-            GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(suggester))
-                    .openPrivateChannel().queue(channel -> {
-                        final EmbedBuilder acceptedEmbed = new EmbedBuilder();
-                        acceptedEmbed.setColor(new Color(77, 255, 69));
-                        acceptedEmbed.setTitle("Suggestions");
-                        acceptedEmbed.setDescription("**Your suggestion has been accepted!**" +
-                                "\nYou will see it appear in the next changelog");
-                        acceptedEmbed.addField("Suggestion", pendingSuggestion, false);
+            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
+                    .queue(user -> {
+                        user.openPrivateChannel().queue(channel -> {
+                            final EmbedBuilder acceptedEmbed = new EmbedBuilder();
+                            acceptedEmbed.setColor(new Color(77, 255, 69));
+                            acceptedEmbed.setTitle("Suggestions");
+                            acceptedEmbed.setDescription("**Your suggestion has been accepted!**" +
+                                    "\nYou will see it appear in the next changelog");
+                            acceptedEmbed.addField("Suggestion", pendingSuggestion, false);
 
-                        channel.sendMessageEmbeds(acceptedEmbed.build())
-                                .queue(null, new ErrorHandler()
-                                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
+                            channel.sendMessageEmbeds(acceptedEmbed.build())
+                                    .queue(success -> msg.addReaction("✅").queue(), new ErrorHandler()
+                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
+                        });
                     });
-
-            msg.addReaction("✅").queue();
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any pending suggestion!").build())
@@ -216,23 +216,23 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
 
             suggestion.delete().queue();
 
-            GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(suggester))
-                    .openPrivateChannel().queue(channel -> {
-                        final EmbedBuilder deniedEmbed = new EmbedBuilder();
-                        deniedEmbed.setTitle("Suggestions");
-                        deniedEmbed.setColor(new Color(187, 0, 0));
-                        deniedEmbed.setDescription("**Your suggestion has been denied**");
-                        deniedEmbed.addField("Suggestion", pendingSuggestion, false);
+            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
+                    .queue(user -> {
+                        user.openPrivateChannel().queue(channel -> {
+                            final EmbedBuilder deniedEmbed = new EmbedBuilder();
+                            deniedEmbed.setTitle("Suggestions");
+                            deniedEmbed.setColor(new Color(187, 0, 0));
+                            deniedEmbed.setDescription("**Your suggestion has been denied**");
+                            deniedEmbed.addField("Suggestion", pendingSuggestion, false);
 
-                        if (reason != null)
-                            deniedEmbed.addField("Reason", reason, false);
+                            if (reason != null)
+                                deniedEmbed.addField("Reason", reason, false);
 
-                        channel.sendMessageEmbeds(deniedEmbed.build())
-                                .queue(null, new ErrorHandler()
-                                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
+                            channel.sendMessageEmbeds(deniedEmbed.build())
+                                    .queue(success -> msg.addReaction("✅").queue(), new ErrorHandler()
+                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
+                        });
                     });
-
-            msg.addReaction("✅").queue();
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any pending suggestion!").build())
