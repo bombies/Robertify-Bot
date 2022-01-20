@@ -1,23 +1,17 @@
 package main.commands.commands.management.dedicatechannel;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
+import main.constants.Toggles;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.constants.Toggles;
-import main.constants.ENV;
-import main.main.Config;
-import main.utils.GeneralUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.managers.ChannelManager;
@@ -120,7 +114,8 @@ public class DedicatedChannelCommand implements ICommand {
         END(IDENTIFIER + "end"),
         LOOP(IDENTIFIER + "loop"),
         SHUFFLE(IDENTIFIER + "shuffle"),
-        DISCONNECT(IDENTIFIER + "disconnect");
+        DISCONNECT(IDENTIFIER + "disconnect"),
+        FAVOURITE(IDENTIFIER + "favourite");
 
         private final String str;
 

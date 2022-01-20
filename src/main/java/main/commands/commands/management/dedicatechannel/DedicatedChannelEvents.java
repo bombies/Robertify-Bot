@@ -264,6 +264,18 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(false)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
+        } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
+            if (!djCheck(new FavouriteTracksCommand(), guild, user)) {
+                event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
+            event.reply(user.getAsMention()).addEmbeds(new FavouriteTracksCommand().handleAdd(event.getMember()))
+                    .setEphemeral(false)
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         }
     }
 

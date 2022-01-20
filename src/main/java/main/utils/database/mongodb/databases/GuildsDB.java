@@ -8,8 +8,6 @@ import main.main.Robertify;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.DocumentBuilder;
 import main.utils.json.GenericJSONField;
-import main.utils.json.permissions.PermissionsConfig;
-import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -69,8 +67,8 @@ public class GuildsDB extends AbstractMongoDatabase {
     public static synchronized void update() {
         logger.debug("Updating Guild cache");
         new TogglesConfig().update();
-        new PermissionsConfig().update();
-        new ThemesConfig().update();
+//        new PermissionsConfig().update();
+//        new ThemesConfig().update();
     }
 
     public enum Field implements GenericJSONField {

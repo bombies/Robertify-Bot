@@ -74,11 +74,14 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             GeneralUtils.setDefaultEmbed(g);
 
+            DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
             try {
-                if (new DedicatedChannelConfig().isChannelSet(g.getIdLong()))
-                    new DedicatedChannelConfig().updateMessage(g);
+                if (dedicatedChannelConfig.isChannelSet(g.getIdLong())) {
+                    dedicatedChannelConfig.updateMessage(g);
+                    dedicatedChannelConfig.updateButtons(g);
+                }
             } catch (NullPointerException e) {
-                new DedicatedChannelConfig().removeChannel(g.getIdLong());
+                dedicatedChannelConfig.removeChannel(g.getIdLong());
             }
         }
 
