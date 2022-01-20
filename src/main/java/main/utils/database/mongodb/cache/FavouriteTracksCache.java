@@ -93,6 +93,8 @@ public class FavouriteTracksCache extends AbstractMongoCache {
             return false;
         }
 
+        if (getTracks(uid).isEmpty()) return false;
+
         for (final var track : getTracks(uid))
             if (track.trackID().equals(trackID))
                 return true;
