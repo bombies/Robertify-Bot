@@ -1,16 +1,15 @@
 package main.commands.commands.audio;
 
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -41,7 +40,7 @@ public class DisconnectCommand implements ICommand {
         }
 
         if (!memberVoiceState.getChannel().equals(selfState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfState.getChannel().getAsMention());
             msg.replyEmbeds(eb.build()).queue();
             return;
         }

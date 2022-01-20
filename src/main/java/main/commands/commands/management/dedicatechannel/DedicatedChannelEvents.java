@@ -76,7 +76,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (selfVoiceState.inVoiceChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-                    event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
+                    event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                                     .build())
                             .queue();
                     event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -154,14 +154,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
+            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                     .build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command")
+            event.reply(user.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .queue();
             return;

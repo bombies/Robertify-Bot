@@ -1,14 +1,11 @@
 package main.commands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -37,13 +34,13 @@ public class PreviousTrackCommand implements ICommand {
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
 
         if (!selfVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to execute this command!");
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
 
         if (previouslyPlayedTracks.size() == 0)
             return RobertifyEmbedUtils.embedMessage(guild, "There are no tracks played previously");

@@ -86,7 +86,7 @@ public class PlaySlashCommand extends InteractiveCommand {
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!")
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .queue();
             return;

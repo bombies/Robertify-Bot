@@ -67,13 +67,13 @@ public class LeaveSlashCommand extends InteractiveCommand {
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command");
+            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
