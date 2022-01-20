@@ -47,6 +47,7 @@ public class SkipCommand implements ICommand {
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
+        final var scheduler = musicManager.getScheduler();
 
         if (audioPlayer.getPlayingTrack() == null) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing to skip!");
@@ -55,6 +56,12 @@ public class SkipCommand implements ICommand {
 
         audioPlayer.getPlayingTrack().setPosition(0);
         musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
+
+        if (scheduler.repeating || scheduler.playlistRepeating) {
+            scheduler.repeating = false;
+            scheduler.playlistRepeating = false;
+        }
+
         musicManager.getScheduler().nextTrack();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
