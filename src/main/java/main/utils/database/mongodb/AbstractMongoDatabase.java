@@ -6,9 +6,8 @@ import com.mongodb.client.model.*;
 import lombok.Getter;
 import main.constants.Database;
 import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.mongodb.databases.BotInfoDB;
-import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
 import org.bson.Document;
@@ -57,11 +56,12 @@ public abstract class AbstractMongoDatabase {
         BotInfoCache.initCache();
         GuildsDBCache.initCache();
 //        StatisticsDB.INSTANCE.init();
+        FavouriteTracksCache.initCache();
     }
 
     public static void updateAllCaches() {
-        BotInfoDB.update();
-        GuildsDB.update();
+//        BotInfoDB.update();
+//        GuildsDB.update();
     }
 
     MongoCollection<Document> getCollection(String name) {

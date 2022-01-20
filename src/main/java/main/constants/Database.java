@@ -28,7 +28,8 @@ public enum Database {
         ROBERTIFY_GUILDS("guilds"),
         ROBERTIFY_PERMISSIONS("permissions"),
         ROBERTIFY_TEST("test"),
-        ROBERTIFY_STATS("statistics");
+        ROBERTIFY_STATS("statistics"),
+        ROBERTIFY_FAVOURITE_TRACKS("favouritetracks");
 
         private final String str;
 
