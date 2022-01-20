@@ -120,6 +120,7 @@ public class CommandManager {
                 new HostInfoCommand(),
                 new StatisticsCommand(),
                 new WebsiteCommand(),
+                new FavouriteTracksCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -156,7 +157,8 @@ public class CommandManager {
                 new PreviousTrackCommand(),
                 new JoinCommand(),
                 new LofiCommand(),
-                new LyricsCommand()
+                new LyricsCommand(),
+                new FavouriteTracksCommand()
         );
 
         addManagementCommands(
