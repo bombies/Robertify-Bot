@@ -105,7 +105,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
         try {
             arr = object.getJSONArray(String.valueOf(p.getCode()));
         } catch (JSONException e) {
-            object.put(String.valueOf(p.getCode()), new JSONObject());
+            object.put(String.valueOf(p.getCode()), new JSONArray());
             arr = object.getJSONArray(String.valueOf(p.getCode()));
         }
 
