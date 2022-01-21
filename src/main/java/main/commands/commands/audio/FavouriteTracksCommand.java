@@ -164,14 +164,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
             );
 
         final var theme = new ThemesConfig().getTheme(guild.getIdLong());
-        Pages.setEmbedStyle(
-                () -> new EmbedBuilder()
-                        .setColor(theme.getColor())
-                        .setTitle(member.getEffectiveName() + "'s Favourite Tracks")
-                        .setFooter("Select the song from the options below to add it to the queue. | " + tracks.size() + " tracks")
-                        .setDescription("*The tracks on this page are*\n\n")
-                        .setThumbnail(member.getEffectiveAvatarUrl())
-        );
+        setDefaultEmbed(member, tracks, theme);
         Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
 
