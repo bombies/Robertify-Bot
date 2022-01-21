@@ -82,7 +82,7 @@ public class LyricsCommand implements ICommand {
         }
 
         AtomicReference<String> finalQuery = new AtomicReference<>(query);
-        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `"+query+"`").build())
+        ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `"+query+"`").build())
                 .queue(lookingMsg -> {
 
                     GeniusAPI geniusAPI = new GeniusAPI();
@@ -117,18 +117,18 @@ public class LyricsCommand implements ICommand {
                                         .build())
                                 .queue();
                     } catch (IllegalArgumentException e) {
-                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(), "Found lyrics!").build())
-                                .queue();
-
                         final int numOfChars = lyrics.length();
 
-                        int i = 0;
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(), lyrics.substring(0, 4096)).build())
+                                .queue();
+
+                        int i = 4096;
                         do {
-                            ctx.getChannel().sendMessage(
-                                    lyrics.substring(i, Math.min(i + 2000, numOfChars))
+                            ctx.getChannel().sendMessageEmbeds(
+                                    RobertifyEmbedUtils.embedMessage(guild, lyrics.substring(i, Math.min(i + 4096, numOfChars))).build()
                             ).queue();
 
-                            i += 2000;
+                            i += 4096;
                         } while (i < numOfChars);
 
                     }
