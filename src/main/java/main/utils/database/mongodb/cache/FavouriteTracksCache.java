@@ -42,7 +42,7 @@ public class FavouriteTracksCache extends AbstractMongoCache {
             addUser(uid);
 
         if (trackIsAdded(uid, trackID))
-            throw new IllegalArgumentException("This track has already been added!");
+            throw new IllegalArgumentException("This track has already been added as a favourite track!");
 
         JSONObject userInfo = getUserInfo(uid);
         JSONArray jsonArray = userInfo.getJSONArray(FavouriteTracksDB.Field.TRACKS_ARRAY.toString());
