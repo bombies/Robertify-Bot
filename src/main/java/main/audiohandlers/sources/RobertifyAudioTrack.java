@@ -34,7 +34,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
         AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
 
         if (item instanceof AudioPlaylist playlist) {
-//            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title, trackInfo.author, trackInfo.length);
+//            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title.split("[(\\-]")[0].strip(), trackInfo.author, trackInfo.length);
 //            logger.info("Searching YouTube Music...");
             AudioTrack track = search(playlist);
 
@@ -70,7 +70,8 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
             if (audioTrack.getDuration() >= trackInfo.length - 7000
                     && audioTrack.getDuration() <= trackInfo.length + 5000
-                    && (audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase()))
+                    && (audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase().split("[(\\-]")[0].strip()) ||
+                    audioTrack.getInfo().title.toLowerCase().contains(trackInfo.title.toLowerCase()))
             ) {
                 if (audioTrack.getInfo().title.contains("clean")
                         && !trackInfo.title.contains("clean"))
