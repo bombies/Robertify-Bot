@@ -59,11 +59,11 @@ public class StopCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
 
 
+        scheduler.repeating = false;
+        scheduler.playlistRepeating = false;
         audioPlayer.stopTrack();
         scheduler.queue.clear();
         scheduler.getPastQueue().clear();
-        scheduler.repeating = false;
-        scheduler.playlistRepeating = false;
 
         if (audioPlayer.isPaused())
             audioPlayer.setPaused(false);
