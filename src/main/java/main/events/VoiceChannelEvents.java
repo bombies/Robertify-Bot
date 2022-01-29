@@ -4,6 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -48,7 +49,8 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
-             doAutoLeave(event, channelLeft);
+             if (!new GuildConfig().get247(event.getGuild().getIdLong()))
+                doAutoLeave(event, channelLeft);
         }
     }
 

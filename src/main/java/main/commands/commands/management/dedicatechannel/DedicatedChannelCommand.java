@@ -86,7 +86,6 @@ public class DedicatedChannelCommand implements ICommand {
                                 e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I cannot execute this command because 2FA is required in this server!\n\n" +
                                         "*Tip: Try disabling 2FA temporarily and running the command again. After successful execution, you may turn 2FA on again.*").build()).queue())
         );
-
     }
 
     @Override
