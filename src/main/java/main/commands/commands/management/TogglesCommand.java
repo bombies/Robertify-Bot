@@ -5,15 +5,14 @@ import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.Permission;
-import main.constants.Toggles;
 import main.constants.RobertifyEmoji;
+import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,6 @@ public class TogglesCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final User sender = ctx.getAuthor();
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
@@ -129,6 +127,15 @@ public class TogglesCommand implements ICommand {
                     } else {
                         config.setToggle(guild, Toggles.POLLS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
+                    }
+                }
+                case "tips", "9" -> {
+                    if (config.getToggle(guild, Toggles.TIPS)) {
+                        config.setToggle(guild, Toggles.TIPS, false);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.TIPS, true);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);

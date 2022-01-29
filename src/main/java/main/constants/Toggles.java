@@ -10,7 +10,8 @@ public enum Toggles implements GenericJSONField {
     GLOBAL_ANNOUNCEMENTS("global_announcements"),
     SHOW_REQUESTER("show_requester"),
     EIGHT_BALL("8ball"),
-    POLLS("polls");
+    POLLS("polls"),
+    TIPS("tips");
 
     private final String str;
 
@@ -48,6 +49,9 @@ public enum Toggles implements GenericJSONField {
             }
             case GLOBAL_ANNOUNCEMENTS -> {
                 return "globalannouncements";
+            }
+            case TIPS -> {
+                return "tips";
             }
         }
         throw new NullPointerException("No such toggle!");

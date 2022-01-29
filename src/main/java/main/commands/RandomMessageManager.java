@@ -2,9 +2,11 @@ package main.commands;
 
 import lombok.Setter;
 import main.constants.ENV;
+import main.constants.Toggles;
 import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -50,6 +52,9 @@ public class RandomMessageManager {
     }
 
     public void randomlySendMessage(TextChannel channel) {
+        if (!new TogglesConfig().getToggle(channel.getGuild(), Toggles.TIPS))
+            return;
+
         if (!hasMessages()) return;
 
         if (new Random().nextDouble() <= chance)
