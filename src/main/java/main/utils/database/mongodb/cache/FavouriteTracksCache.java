@@ -68,6 +68,17 @@ public class FavouriteTracksCache extends AbstractMongoCache {
         updateCache(userInfo, FavouriteTracksDB.Field.USER_ID, uid);
     }
 
+    public synchronized void clearTracks(long uid) {
+        if (!userHasInfo(uid))
+            throw new NullPointerException("This user doesn't have any information");
+
+        JSONObject userInfo = getUserInfo(uid);
+        JSONArray jsonArray = userInfo.getJSONArray(FavouriteTracksDB.Field.TRACKS_ARRAY.toString());
+        jsonArray.clear();
+
+        updateCache(userInfo, FavouriteTracksDB.Field.USER_ID, uid);
+    }
+
     public synchronized List<Track> getTracks(long uid) {
         if (!userHasInfo(uid))
             addUser(uid);

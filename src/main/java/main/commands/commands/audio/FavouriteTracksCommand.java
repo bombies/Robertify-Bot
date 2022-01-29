@@ -60,6 +60,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
                     final int id = Integer.parseInt(args.get(1));
                     msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getAuthor(), id)).queue();
                 }
+                case "clear" -> msg.replyEmbeds(handleClear(ctx.getGuild(), ctx.getAuthor())).queue();
                 case "list" -> handeList(channel, member);
             }
         }
@@ -131,6 +132,25 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
             config.removeTrack(user.getIdLong(), id-1);
             final var trackRemoved = trackList.get(id-1);
             return RobertifyEmbedUtils.embedMessage(guild, "You have removed `"+trackRemoved.title()+" by "+trackRemoved.author()+"` as a favourite track!").build();
+        } catch (NullPointerException e) {
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any favourite tracks!").build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!" +
+                    "\nPlease run the `support` command to join our support server and query the issue.").build();
+        }
+    }
+
+    private MessageEmbed handleClear(Guild guild, User user) {
+        final var config = FavouriteTracksCache.getInstance();
+        final var trackList = config.getTracks(user.getIdLong());
+
+        if (trackList.isEmpty())
+            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any tracks to clear!").build();
+
+        try {
+            config.clearTracks(user.getIdLong());
+            return RobertifyEmbedUtils.embedMessage(guild, "You have cleared all your favourite tracks!").build();
         } catch (NullPointerException e) {
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have any favourite tracks!").build();
         } catch (Exception e) {
@@ -262,6 +282,10 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
                                                                 true
                                                         )
                                                 )
+                                        ),
+                                        SubCommand.of(
+                                                "clear",
+                                                "Clear all of your favourite tracks!"
                                         )
                                 )
                         )
@@ -282,6 +306,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
                         .setEphemeral(true)
                         .queue();
             }
+            case "clear" -> event.replyEmbeds(handleClear(event.getGuild(), event.getUser())).setEphemeral(true).queue();
         }
     }
 
