@@ -2,12 +2,13 @@ package main.commands.commands.util;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
-import main.constants.BotConstants;
+import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.themes.ThemesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 
 import javax.script.ScriptException;
 import java.time.Instant;
@@ -25,7 +26,12 @@ public class BotInfoCommand implements ICommand {
                         "his efforts into it ever since.", false)
                         .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup()), false)
                         .setTimestamp(Instant.now())
-                .build()).queue();
+                .build())
+                .setActionRow(
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/terms", "Terms of Service", RobertifyTheme.ORANGE.getEmoji()),
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/privacypolicy", "Privacy Policy", RobertifyTheme.BLUE.getEmoji())
+                )
+                .queue();
     }
 
     @Override
