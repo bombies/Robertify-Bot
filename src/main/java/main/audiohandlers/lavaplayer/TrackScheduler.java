@@ -26,12 +26,13 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class TrackScheduler extends AudioEventAdapter implements AbstractTrackScheduler {
 
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final static HashMap<Long, ScheduledFuture<?>> disconnectExecutors = new HashMap<>();
 
     public final AudioPlayer player;
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
@@ -69,6 +70,11 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
 
     @Override
     public void onTrackStart(AudioPlayer player, AudioTrack track) {
+        if (disconnectExecutors.containsKey(guild.getIdLong())) {
+            disconnectExecutors.get(guild.getIdLong()).cancel(false);
+            disconnectExecutors.remove(guild.getIdLong());
+        }
+
         if (!repeating) {
             if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
 
@@ -111,9 +117,13 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
     }
 
     public void nextTrack() {
-        if (this.queue.isEmpty())
+        if (this.queue.isEmpty()) {
             if (playlistRepeating)
                 this.queue = new ConcurrentLinkedQueue<>(savedQueue.get(this.guild));
+            else {
+                scheduleDisconnect(true);
+            }
+        }
 
         AudioTrack nextTrack = this.queue.poll();
 
@@ -151,6 +161,8 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
         } else if (endReason.mayStartNext) {
             pastQueue.push(track.makeClone());
             nextTrack();
+        } else if (endReason.equals(AudioTrackEndReason.STOPPED)) {
+            scheduleDisconnect(true);
         }
     }
 
@@ -208,5 +220,29 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
 
     public AudioTrack peekLastPlayedTrack() {
         return pastQueue.peek();
+    }
+
+    public void scheduleDisconnect(boolean announceMsg) {
+        scheduleDisconnect(announceMsg, 5, TimeUnit.MINUTES);
+    }
+
+    public void scheduleDisconnect(boolean announceMsg, long delay, TimeUnit timeUnit) {
+        ScheduledFuture<?> schedule = executor.schedule(() -> {
+            final var channel = guild.getSelfMember().getVoiceState().getChannel();
+
+            if (channel != null) {
+                guild.getAudioManager().closeAudioConnection();
+                disconnectExecutors.remove(guild.getIdLong());
+
+                final var guildConfig = new GuildConfig();
+
+                if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
+                    Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
+                            .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
+                            .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+            }
+        }, delay, timeUnit);
+
+        disconnectExecutors.putIfAbsent(guild.getIdLong(), schedule);
     }
 }

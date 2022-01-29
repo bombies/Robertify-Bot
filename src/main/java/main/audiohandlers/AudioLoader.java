@@ -4,6 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.audiohandlers.lavaplayer.GuildMusicManager;
+import main.commands.commands.audio.LofiCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,13 +15,10 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import main.audiohandlers.lavaplayer.GuildMusicManager;
-import main.commands.commands.audio.LofiCommand;
-import main.utils.RobertifyEmbedUtils;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class AudioLoader implements AudioLoadResultHandler {
     private final Logger logger = LoggerFactory.getLogger(AudioLoader.class);
@@ -149,6 +149,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
                     .sendMessageEmbeds(eb.build()).queue();
         }
+
+        musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
