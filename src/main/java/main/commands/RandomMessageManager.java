@@ -26,7 +26,8 @@ public class RandomMessageManager {
             throw new NullPointerException("There are no random messages!");
 
         return RobertifyEmbedUtils.embedMessage(guild, messages.get(new Random().nextInt(messages.size())))
-                .setTitle("✨ Robertify Notice")
+                .setTitle("✨ Robertify Tip")
+                .setFooter("You can toggle tips by running \"toggle tips\"")
                 .setTimestamp(Instant.now())
                 .build();
     }
