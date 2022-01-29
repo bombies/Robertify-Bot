@@ -111,12 +111,17 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
-            if (!GeneralUtils.isUrl(message))
-                message = "ytsearch:" + message;
+            final boolean addToBeginning = message.endsWith("-n") || message.endsWith("-next");
+
+            if (!GeneralUtils.isUrl(message.replaceAll("\\s-(n|next)$", "")))
+                message = "ytsearch:" + (
+                        (message.endsWith("-n")) ? message.replaceAll("\\s-n$", "") :
+                                (message.endsWith("-next") ? message.replaceAll("\\s-next$", "") : message)
+                        );
 
             RobertifyAudioManager.getInstance()
                     .loadAndPlayFromDedicatedChannel(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
-                            new CommandContext(event, null), null);
+                            new CommandContext(event, null), null, addToBeginning);
         }
 
         if (event.getAuthor().isBot()) {

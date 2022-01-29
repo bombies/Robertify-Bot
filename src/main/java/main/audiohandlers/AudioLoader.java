@@ -31,9 +31,10 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final String trackUrl;
     private final Message botMsg;
     private final boolean loadPlaylistShuffled;
+    private final boolean addToBeginning;
 
     public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
-                       String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled) {
+                       String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
         this.sender = sender;
@@ -43,6 +44,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.announceMsg = announceMsg;
         this.botMsg = botMsg;
         this.loadPlaylistShuffled = loadPlaylistShuffled;
+        this.addToBeginning = addToBeginning;
     }
 
     @Override
@@ -56,7 +58,11 @@ public class AudioLoader implements AudioLoadResultHandler {
         trackRequestedByUser.put(audioTrack, sender);
 
         final var scheduler = musicManager.getScheduler();
-        scheduler.queue(audioTrack);
+
+        if (addToBeginning)
+            scheduler.addToBeginningOfQueue(audioTrack);
+        else
+            scheduler.queue(audioTrack);
 
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
@@ -98,7 +104,10 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             final var scheduler = musicManager.getScheduler();
 
-            scheduler.queue(tracks.get(0));
+            if (addToBeginning)
+                scheduler.addToBeginningOfQueue(tracks.get(0));
+            else
+                scheduler.queue(tracks.get(0));
 
             if (scheduler.playlistRepeating)
                 scheduler.setSavedQueue(guild, scheduler.queue);
@@ -127,9 +136,14 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         final var scheduler = musicManager.getScheduler();
 
+        if (addToBeginning)
+            scheduler.addToBeginningOfQueue(tracks);
+
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.put(track, sender);
-            scheduler.queue(track);
+
+            if (!addToBeginning)
+                scheduler.queue(track);
         }
 
         if (scheduler.playlistRepeating)

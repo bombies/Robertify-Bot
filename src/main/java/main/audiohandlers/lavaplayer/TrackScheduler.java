@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.*;
 
@@ -206,6 +207,13 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
     public void addToBeginningOfQueue(AudioTrack track) {
         final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
         newQueue.offer(track);
+        newQueue.addAll(queue);
+        queue = newQueue;
+    }
+
+    public void addToBeginningOfQueue(List<AudioTrack> tracks) {
+        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
+        tracks.forEach(newQueue::offer);
         newQueue.addAll(queue);
         queue = newQueue;
     }

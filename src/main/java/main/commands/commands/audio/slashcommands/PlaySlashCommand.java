@@ -9,7 +9,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -18,6 +17,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class PlaySlashCommand extends InteractiveCommand {
     @Override @SneakyThrows
@@ -35,12 +36,38 @@ public class PlaySlashCommand extends InteractiveCommand {
     @SneakyThrows
     private InteractionCommand getCommand() {
         return InteractiveCommand.InteractionCommand.create()
-                .buildCommand()
-                    .setName(new PlayCommand().getName())
-                    .setDescription("Play a song! Links are accepted by either Spotify, YouTube, SoundCloud, etc...")
-                    .addOption(CommandOption.of(OptionType.STRING, "track", "The name/link of a track", true))
-                    .setPermissionCheck(djPredicate)
-                    .build()
+                .setCommand(Command.of(
+                        new PlayCommand().getName(),
+                        "Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
+                        List.of(),
+                        List.of(
+                                SubCommand.of(
+                                        "tracks",
+                                        "Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.STRING,
+                                                        "tracks",
+                                                        "The name/url of the track/album/playlist to play",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "nexttracks",
+                                        "Add songs to the beginning of the queue! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.STRING,
+                                                        "tracks",
+                                                        "The name/url of the track/album/playlist to play",
+                                                        true
+                                                )
+                                        )
+                                )
+                        ),
+                        djPredicate
+                ))
                 .build();
     }
 
@@ -92,24 +119,35 @@ public class PlaySlashCommand extends InteractiveCommand {
             return;
         }
 
-        String link = event.getOption("track").getAsString();
+        switch (event.getSubcommandName()) {
+            case "tracks" -> {
+                String link = event.getOption("tracks").getAsString();
+                if (!GeneralUtils.isUrl(link))
+                    link = "ytsearch:" + link;
 
-        if (!GeneralUtils.isUrl(link)) {
-            link = "ytsearch:" + link;
+                handlePlayTracks(event, guild, member, link, false);
+            }
+            case "nexttracks" -> {
+                String link = event.getOption("tracks").getAsString();
+                if (!GeneralUtils.isUrl(link))
+                    link = "ytsearch:" + link;
+
+                handlePlayTracks(event, guild, member, link, true);
+            }
         }
+    }
 
-        String finalLink = link;
+    private void handlePlayTracks(SlashCommandEvent event, Guild guild, Member member, String link, boolean addToBeginning) {
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build())
-                        .setEphemeral(false)
-                                .queue(msg -> RobertifyAudioManager.getInstance()
-                                        .loadAndPlay(
-                                                finalLink,
-                                                event.getGuild().getSelfMember().getVoiceState(),
-                                                event.getMember().getVoiceState(),
-                                                msg,
-                                                event
-                                        ));
-
-
+                .setEphemeral(false)
+                .queue(msg -> RobertifyAudioManager.getInstance()
+                        .loadAndPlay(
+                                link,
+                                guild.getSelfMember().getVoiceState(),
+                                member.getVoiceState(),
+                                msg,
+                                event,
+                                addToBeginning
+                        ));
     }
 }

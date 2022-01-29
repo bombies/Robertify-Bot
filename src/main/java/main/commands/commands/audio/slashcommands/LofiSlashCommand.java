@@ -4,7 +4,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -53,7 +52,8 @@ public class LofiSlashCommand extends InteractiveCommand {
                                         event.getGuild().getSelfMember().getVoiceState(),
                                         event.getMember().getVoiceState(),
                                         botMsg,
-                                        event
+                                        event,
+                                        false
                                 );
                     });
         }

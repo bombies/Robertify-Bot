@@ -249,6 +249,7 @@ public class Listener extends ListenerAdapter {
         // Only slash commands that NEED to be updated in each guild.
         new WebsiteCommand().initCommand(g);
         new FavouriteTracksCommand().initCommand(g);
+        new PlaySlashCommand().initCommand(g);
 //        new TwentyFourSevenCommand().initCommand(g);
     }
 

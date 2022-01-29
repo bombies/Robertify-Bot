@@ -143,7 +143,7 @@ public class PlayCommand implements ICommand {
 
                                         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
                                             RobertifyAudioManager.getInstance()
-                                                    .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg);
+                                                    .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg, false);
                                         });
                                     })
                                     .exceptionally(e -> {
@@ -157,7 +157,7 @@ public class PlayCommand implements ICommand {
                             File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
                             channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
                                 RobertifyAudioManager.getInstance()
-                                        .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg);
+                                        .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg, false);
                             });
                         }
                     } catch (IllegalArgumentException e) {
@@ -177,16 +177,28 @@ public class PlayCommand implements ICommand {
             return;
         }
 
-        String link = String.join(" ", args);
+        String link = "";
+        boolean addToBeginning = false;
 
-        if (!GeneralUtils.isUrl(link)) {
-            link = "ytsearch:" + link;
+        if (args.size() >= 2) {
+            switch (args.get(args.size()-1).toLowerCase()) {
+                case "-n", "-next" -> {
+                    link = String.join(" ", args.subList(0, args.size()-1));
+                    addToBeginning = true;
+                }
+            }
+        } else {
+            link = String.join(" ", args);
         }
 
+        if (!GeneralUtils.isUrl(link))
+            link = "ytsearch:" + link;
+
         String finalLink = link;
+        boolean finalAddToBeginning = addToBeginning;
         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
-                    .loadAndPlay(finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg);
+                    .loadAndPlay(finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg, finalAddToBeginning);
         });
     }
 
@@ -201,6 +213,7 @@ public class PlayCommand implements ICommand {
                 "Plays a song\n\n" +
                 "**__Usages__**\n" +
                 "`" + prefix + "play <song>`\n" +
+                "`"+ prefix +"play <song> -next` *(Add tracks to the beginning of the queue)*\n" +
                 "`"+ prefix +"play file` *(Must have a file attached to the message)*";
     }
 

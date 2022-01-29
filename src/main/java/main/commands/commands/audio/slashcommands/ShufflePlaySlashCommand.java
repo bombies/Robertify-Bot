@@ -7,7 +7,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -114,7 +113,7 @@ public class ShufflePlaySlashCommand extends InteractiveCommand {
 
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
-                    .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, addingMsg, event);
+                    .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, addingMsg, event, false);
         });
     }
 }

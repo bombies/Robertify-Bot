@@ -369,9 +369,9 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
 
         event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
             switch (source) {
-                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg);
-                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg);
-                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg);
+                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
+                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
+                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
             }
         });
     }

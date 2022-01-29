@@ -1,17 +1,14 @@
 package main.commands.commands.audio;
 
 import lombok.Getter;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
@@ -43,7 +40,8 @@ public class LofiCommand implements ICommand {
                                         guild.getSelfMember().getVoiceState(),
                                         ctx.getMember().getVoiceState(),
                                         ctx,
-                                        botMsg
+                                        botMsg,
+                                        false
                                 );
                     });
         }

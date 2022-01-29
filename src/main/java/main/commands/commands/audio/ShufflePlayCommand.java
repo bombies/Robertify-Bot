@@ -3,15 +3,14 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.Toggles;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 
@@ -109,7 +108,7 @@ public class ShufflePlayCommand implements ICommand {
 
         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
-                    .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, ctx, addingMsg);
+                    .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, ctx, addingMsg, false);
         });
     }
 
