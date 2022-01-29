@@ -82,6 +82,9 @@ public class DedicatedChannelCommand implements ICommand {
                 new ErrorHandler()
                         .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                                 .queue())
+                        .handle(ErrorResponse.MFA_NOT_ENABLED,
+                                e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I cannot execute this command because 2FA is required in this server!\n\n" +
+                                        "*Tip: Try disabling 2FA temporarily and running the command again. After successful execution, you may turn 2FA on again.*").build()).queue())
         );
 
     }
