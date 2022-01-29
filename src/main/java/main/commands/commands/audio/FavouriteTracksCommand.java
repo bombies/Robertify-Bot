@@ -41,7 +41,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
             handeList(channel, member);
         } else {
             switch (args.get(0).toLowerCase()) {
-                case "add" -> msg.replyEmbeds(handleAdd(member)).queue();
+                case "add" -> msg.replyEmbeds(handleAdd(ctx.getGuild(), member)).queue();
                 case "remove" -> {
                     final var guild = msg.getGuild();
 
@@ -66,10 +66,9 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
         }
     }
 
-    public MessageEmbed handleAdd(@NotNull Member member) {
+    public MessageEmbed handleAdd(Guild guild, @NotNull Member member) {
         final var config = FavouriteTracksCache.getInstance();
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(member.getGuild());
-        final var guild = musicManager.getGuild();
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var memberVoiceState = member.getVoiceState();
@@ -299,7 +298,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
 
         switch (event.getSubcommandName()) {
             case "view" -> handeSlashList(event);
-            case "add" -> event.replyEmbeds(handleAdd(event.getMember())).setEphemeral(true).queue();
+            case "add" -> event.replyEmbeds(handleAdd(event.getGuild(), event.getMember())).setEphemeral(true).queue();
             case "remove" -> {
                 int id = (int)event.getOption("id").getAsLong();
                 event.replyEmbeds(handleRemove(event.getGuild(), event.getUser(), id))

@@ -272,7 +272,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            event.reply(user.getAsMention()).addEmbeds(new FavouriteTracksCommand().handleAdd(event.getMember()))
+            event.reply(user.getAsMention()).addEmbeds(new FavouriteTracksCommand().handleAdd(event.getGuild(), event.getMember()))
                     .setEphemeral(false)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
