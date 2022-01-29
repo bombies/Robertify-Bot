@@ -24,7 +24,9 @@ public class TogglesConfig extends AbstractGuildConfig {
         try {
             return getTogglesObject(guild.getIdLong()).getBoolean(toggle.toString());
         } catch (JSONException e) {
-            update();
+            JSONObject togglesObject = getTogglesObject(guild.getIdLong());
+            togglesObject.put(toggle.toString(), true);
+            getCache().setField(guild.getIdLong(), GuildsDB.Field.TOGGLES_OBJECT, togglesObject);
             return true;
         }
     }
