@@ -66,7 +66,7 @@ public class GuildsDB extends AbstractMongoDatabase {
 
     public static synchronized void update() {
         logger.debug("Updating Guild cache");
-        new TogglesConfig().update();
+//        new TogglesConfig().update();
 //        new PermissionsConfig().update();
 //        new ThemesConfig().update();
     }
@@ -93,7 +93,8 @@ public class GuildsDB extends AbstractMongoDatabase {
         TOGGLES_OBJECT("toggles"),
             TOGGLES_DJ("dj_toggles"),
         EIGHT_BALL_ARRAY("eight_ball"),
-        THEME("theme");
+        THEME("theme"),
+        TWENTY_FOUR_SEVEN("twenty_four_seven_mode");
 
         private final String str;
 

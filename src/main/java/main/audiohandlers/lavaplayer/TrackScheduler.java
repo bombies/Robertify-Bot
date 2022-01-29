@@ -227,19 +227,24 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
     }
 
     public void scheduleDisconnect(boolean announceMsg, long delay, TimeUnit timeUnit) {
+        if (new GuildConfig().get247(guild.getIdLong()))
+            return;
+
         ScheduledFuture<?> schedule = executor.schedule(() -> {
             final var channel = guild.getSelfMember().getVoiceState().getChannel();
 
-            if (channel != null) {
-                guild.getAudioManager().closeAudioConnection();
-                disconnectExecutors.remove(guild.getIdLong());
+            if (!new GuildConfig().get247(guild.getIdLong())) {
+                if (channel != null) {
+                    guild.getAudioManager().closeAudioConnection();
+                    disconnectExecutors.remove(guild.getIdLong());
 
-                final var guildConfig = new GuildConfig();
+                    final var guildConfig = new GuildConfig();
 
-                if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
-                    Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
-                            .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
-                            .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+                    if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
+                        Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
+                                .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
+                                .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+                }
             }
         }, delay, timeUnit);
 

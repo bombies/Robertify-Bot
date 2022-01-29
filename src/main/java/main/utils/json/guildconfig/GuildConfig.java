@@ -157,6 +157,25 @@ public class GuildConfig extends AbstractGuildConfig {
         return false;
     }
 
+    public boolean get247(long gid) {
+        if (!guildHasInfo(gid))
+            throw new NullPointerException("This guild doesn't have any information!");
+
+        if (!getCache().hasField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN)) {
+            getCache().setField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN, false);
+            return false;
+        }
+
+        return (boolean) getCache().getField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN);
+    }
+
+    public void set247(long gid, boolean status) {
+        if (!guildHasInfo(gid))
+            throw new NullPointerException("This guild doesn't have any information!");
+
+        getCache().setField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN, status);
+    }
+
     @Override
     public void update() {
         // Nothing

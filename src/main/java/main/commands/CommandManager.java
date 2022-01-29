@@ -121,6 +121,7 @@ public class CommandManager {
                 new StatisticsCommand(),
                 new WebsiteCommand(),
                 new FavouriteTracksCommand(),
+                new TwentyFourSevenCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -173,7 +174,8 @@ public class CommandManager {
                 new UnbanCommand(),
                 new DedicatedChannelCommand(),
                 new RestrictedChannelsCommand(),
-                new ThemeCommand()
+                new ThemeCommand(),
+                new TwentyFourSevenCommand()
         );
 
         addMiscCommands(
