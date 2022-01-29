@@ -18,7 +18,7 @@ public class WebsiteCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         ctx.getMessage().replyEmbeds(getEmbed(ctx.getGuild()))
-                .setActionRow(Button.of(ButtonStyle.LINK, "http://bombies-dev.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
+                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
                 .queue();
     }
 
@@ -62,7 +62,7 @@ public class WebsiteCommand extends InteractiveCommand implements ICommand {
         if (!event.getName().equals(getName())) return;
 
         event.replyEmbeds(getEmbed(event.getGuild()))
-                .addActionRow(Button.of(ButtonStyle.LINK, "http://bombies-dev.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
+                .addActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
                 .setEphemeral(true)
                 .queue();
     }
