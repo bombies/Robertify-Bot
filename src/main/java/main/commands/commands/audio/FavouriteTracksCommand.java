@@ -66,7 +66,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
         }
     }
 
-    public MessageEmbed handleAdd(Member member) {
+    public MessageEmbed handleAdd(@NotNull Member member) {
         final var config = FavouriteTracksCache.getInstance();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(member.getGuild());
         final var guild = musicManager.getGuild();
