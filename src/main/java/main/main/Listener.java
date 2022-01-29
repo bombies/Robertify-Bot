@@ -7,10 +7,7 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.MongoMigrationCommand;
-import main.commands.commands.management.BanCommand;
-import main.commands.commands.management.SetChannelCommand;
-import main.commands.commands.management.ThemeCommand;
-import main.commands.commands.management.UnbanCommand;
+import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
@@ -244,12 +241,15 @@ public class Listener extends ListenerAdapter {
         new DonateCommand().initCommand(g);
         new ThemeCommand().initCommand(g);
         new WebsiteCommand().initCommand(g);
+        new FavouriteTracksCommand().initCommand(g);
+//        new TwentyFourSevenCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
         new WebsiteCommand().initCommand(g);
         new FavouriteTracksCommand().initCommand(g);
+//        new TwentyFourSevenCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

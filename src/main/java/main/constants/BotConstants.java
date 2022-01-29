@@ -1,6 +1,7 @@
 package main.constants;
 
 import main.main.Config;
+import main.utils.GeneralUtils;
 
 public enum BotConstants {
     SPOTIFY_EMOJI("<:spotify:893153435438940181>"),
@@ -24,5 +25,10 @@ public enum BotConstants {
     @Override
     public String toString() {
         return str;
+    }
+
+    public static String getInsufficientPermsMessage(Permission... permsNeeded) {
+        return "You do not have enough permissions to execute this!\n\n" +
+                "You need: `"+ GeneralUtils.arrayToString(permsNeeded) +"`";
     }
 }

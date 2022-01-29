@@ -11,10 +11,7 @@ import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
-import main.commands.commands.management.BanCommand;
-import main.commands.commands.management.SetChannelCommand;
-import main.commands.commands.management.ThemeCommand;
-import main.commands.commands.management.UnbanCommand;
+import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
@@ -122,7 +119,8 @@ public class Robertify {
                             new DonateCommand(),
                             new ThemeCommand(),
                             new WebsiteCommand(),
-                            new FavouriteTracksCommand()
+                            new FavouriteTracksCommand(),
+                            new TwentyFourSevenCommand()
                     )
 
                     // Test Listeners

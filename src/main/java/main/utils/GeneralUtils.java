@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -74,6 +75,10 @@ public class GeneralUtils {
                     .append(i != list.size() - 1 ? ", " : "");
         }
         return sb.toString();
+    }
+
+    public static <E> String arrayToString(E[] arr) {
+        return listToString(Arrays.stream(arr).toList());
     }
 
     public static int longToInt(long l) {
