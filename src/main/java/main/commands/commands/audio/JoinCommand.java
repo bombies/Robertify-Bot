@@ -3,11 +3,10 @@ package main.commands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
@@ -55,11 +54,15 @@ public class JoinCommand implements ICommand {
 
         if (selfVoiceState.inVoiceChannel()) {
             guild.moveVoiceMember(selfVoiceState.getMember(), channel)
-                    .queue();
+                    .queue(success -> RobertifyAudioManager.getInstance().getMusicManager(guild)
+                            .getScheduler().scheduleDisconnect(true));
             return RobertifyEmbedUtils.embedMessage(guild, "I have moved to " + channel.getAsMention()).build();
         } else {
             RobertifyAudioManager.getInstance()
                     .joinVoiceChannel(textChannel, selfVoiceState, memberVoiceState);
+
+            RobertifyAudioManager.getInstance().getMusicManager(guild)
+                    .getScheduler().scheduleDisconnect(true);
             return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
         }
     }
