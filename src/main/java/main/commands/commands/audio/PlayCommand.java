@@ -186,6 +186,7 @@ public class PlayCommand implements ICommand {
                     link = String.join(" ", args.subList(0, args.size()-1));
                     addToBeginning = true;
                 }
+                default -> link = String.join(" ", args.subList(0, args.size()-1));
             }
         } else {
             link = String.join(" ", args);
