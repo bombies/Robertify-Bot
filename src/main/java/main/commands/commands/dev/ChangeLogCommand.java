@@ -69,7 +69,7 @@ public class ChangeLogCommand implements IDevCommand {
         final ExecutorService executorService = Executors.newCachedThreadPool();
 
         for (Guild g : guilds) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(g, logsToString.toString());
             eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
             eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
 
