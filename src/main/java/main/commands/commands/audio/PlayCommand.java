@@ -55,11 +55,25 @@ public class PlayCommand implements ICommand {
         Listener.checkIfAnnouncementChannelIsSet(guild, channel);
 
         if (args.isEmpty()) {
-            if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().isPaused()) {
-                RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().setPaused(false);
+            final var player = RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer();
+
+            if (player.isPaused()) {
+                player.setPaused(false);
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!").build())
                         .queue();
                 return;
+            } else if (
+                    ctx.getEvent().getMessage().getContentRaw()
+                    .split(" ")[0]
+                    .replaceFirst(new GuildConfig().getPrefix(guild.getIdLong()), "")
+                    .equalsIgnoreCase("p")
+            ) {
+                if (player.getPlayingTrack() != null) {
+                    player.setPaused(true);
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have paused the music!").build())
+                            .queue();
+                    return;
+                }
             }
 
             eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the name or link of a song to play!");
