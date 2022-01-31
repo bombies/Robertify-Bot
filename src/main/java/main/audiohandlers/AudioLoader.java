@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +28,13 @@ public class AudioLoader implements LoadResultHandler {
     private final User sender;
     private final AbstractMusicManager musicManager;
     private final boolean announceMsg;
-    private final HashMap<AudioTrack, User> trackRequestedByUser;
+    private final HashMap<Long, List<String>> trackRequestedByUser;
     private final String trackUrl;
     private final Message botMsg;
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
 
-    public AudioLoader(User sender, AbstractMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
+    public AudioLoader(User sender, AbstractMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
@@ -55,7 +56,8 @@ public class AudioLoader implements LoadResultHandler {
             RobertifyAudioManager.getUnannouncedTracks().add(audioTrack);
 
 
-        trackRequestedByUser.put(audioTrack, sender);
+        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getTrack());
 
         final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 
@@ -121,8 +123,9 @@ public class AudioLoader implements LoadResultHandler {
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(tracks);
 
+        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
         for (final AudioTrack track : tracks) {
-            trackRequestedByUser.put(track, sender);
+            trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getTrack());
 
             if (!addToBeginning)
                 scheduler.queue(track);
@@ -142,7 +145,8 @@ public class AudioLoader implements LoadResultHandler {
         if (!announceMsg)
             RobertifyAudioManager.getUnannouncedTracks().add(list.get(0));
 
-        trackRequestedByUser.put(list.get(0), sender);
+        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + list.get(0).getTrack());
 
         final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 

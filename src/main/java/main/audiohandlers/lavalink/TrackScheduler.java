@@ -29,14 +29,14 @@ import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.*;
 
-public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implements AbstractTrackScheduler {
+public class TrackScheduler extends PlayerEventListenerAdapter implements AbstractTrackScheduler {
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
-    private final Logger logger = LoggerFactory.getLogger(LavaLinkTrackScheduler.class);
+    private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private final static HashMap<Long, ScheduledFuture<?>> disconnectExecutors = new HashMap<>();
 
     private final Guild guild;
-    private Link audioPlayer;
+    private final Link audioPlayer;
     @Getter
     private final Stack<AudioTrack> pastQueue;
     public ConcurrentLinkedQueue<AudioTrack> queue;
@@ -44,7 +44,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
     public boolean playlistRepeating = false;
     private Message lastSentMsg = null;
 
-    public LavaLinkTrackScheduler(Guild guild, Link audioPlayer) {
+    public TrackScheduler(Guild guild, Link audioPlayer) {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
         this.queue = new ConcurrentLinkedQueue<>();
@@ -79,11 +79,11 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
             return;
         }
 
-        final var requester = RobertifyAudioManager.getRequester(track);
+        final var requester = RobertifyAudioManager.getRequester(guild, track);
         TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().getTitle() + "` by `"+track.getInfo().getAuthor() +"`"
-                + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
-                "\n\n~ Requested by " + requester.getAsMention()
+                + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
+                "\n\n~ Requested by " + requester
                 :
                 ""
         ));
@@ -133,8 +133,6 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
     public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         if (repeating) {
             if (track != null) {
-                if (RobertifyAudioManager.getTracksRequestedByUsers().containsKey(track))
-                    RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
                 try {
                     player.playTrack(track);
                 } catch (UnsupportedOperationException e) {
@@ -177,7 +175,11 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
         ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);
 
-        LavaLinkTrackScheduler.savedQueue.put(guild, savedQueue);
+        TrackScheduler.savedQueue.put(guild, savedQueue);
+    }
+
+    public void clearSavedQueue(Guild guild) {
+        savedQueue.remove(guild);
     }
 
     public void addToBeginningOfQueue(AudioTrack track) {

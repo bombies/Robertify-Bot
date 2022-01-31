@@ -68,14 +68,14 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getTrackPosition() / track.getInfo().getLength();
         Filters filters = audioPlayer.getFilters();
-        final User requester = RobertifyAudioManager.getRequester(track);
+        final String requester = RobertifyAudioManager.getRequester(guild, track);
         eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
                 ? "Lo-Fi Music"
                         :
                 info.getTitle() + " by "  + info.getAuthor()),
 
                 (((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
-                        "\n\n~ Requested by " + requester.getAsMention()
+                        "\n\n~ Requested by " + requester
                         :
                         "") +
                 "\n\n "+ (info.isStream() ? "" : "`[0:00]`") +

@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 public class GuildMusicManager implements AbstractMusicManager {
     private final Guild guild;
     @Getter
-    private final LavaLinkTrackScheduler scheduler;
+    private final TrackScheduler scheduler;
     @Getter
     private final JdaLink link;
     @Getter
@@ -23,7 +23,7 @@ public class GuildMusicManager implements AbstractMusicManager {
     public GuildMusicManager(Guild guild) {
         this.guild = guild;
         this.link = Robertify.getLavalink().getLink(guild);
-        this.scheduler = new LavaLinkTrackScheduler(guild, link);
+        this.scheduler = new TrackScheduler(guild, link);
         link.getPlayer().addListener(this.scheduler);
     }
 
@@ -35,7 +35,9 @@ public class GuildMusicManager implements AbstractMusicManager {
 
         getScheduler().repeating = false;
         getScheduler().playlistRepeating = false;
+        getScheduler().clearSavedQueue(guild);
         getScheduler().getPastQueue().clear();
+        RobertifyAudioManager.clearRequesters(guild);
 
         if (getLink().getPlayer().isPaused())
             getLink().getPlayer().setPaused(false);

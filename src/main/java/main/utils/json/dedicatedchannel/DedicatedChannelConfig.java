@@ -148,9 +148,8 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                     trackInfo.getTitle() + " by " + trackInfo.getAuthor() + " ["+ GeneralUtils.formatTime(playingTrack.getInfo().getLength()) +"]"
             );
 
-            var requester = RobertifyAudioManager.getRequester(playingTrack);
-            if (requester != null)
-                eb.setDescription("Requested by " + requester.getAsMention());
+            var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
+            eb.setDescription("Requested by " + requester);
 
             if (trackInfo.getSourceName().equals("spotify"))
                 eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.getIdentifier()));

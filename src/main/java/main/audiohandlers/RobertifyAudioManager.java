@@ -27,7 +27,10 @@ public class RobertifyAudioManager {
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
-    private static final HashMap<AudioTrack, User> tracksRequestedByUsers = new HashMap<>();
+    /*
+    Each guild will have a list that consists of tracks formatted "userid:trackstring"
+     */
+    private static final HashMap<Long, List<String>> tracksRequestedByUsers = new HashMap<>();
     @Getter
     private static final List<AudioTrack> unannouncedTracks = new ArrayList<>();
 
@@ -325,12 +328,22 @@ public class RobertifyAudioManager {
         }
     }
 
-    public static User getRequester(AudioTrack track) {
-        return tracksRequestedByUsers.get(track);
+    public static String getRequester(Guild guild, AudioTrack track) {
+        return "<@" +
+                tracksRequestedByUsers.get(guild.getIdLong())
+                        .stream()
+                        .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getTrack()))
+                        .findFirst().get()
+                        .split(":")[0]
+                + ">";
     }
 
-    public static void removeRequester(AudioTrack track, User requester) {
-        tracksRequestedByUsers.remove(track, requester);
+    public static void removeRequester(Guild guild, AudioTrack track, User requester) {
+        tracksRequestedByUsers.get(guild.getIdLong()).remove(requester.getId() + ":" + track.getTrack());
+    }
+
+    public static void clearRequesters(Guild guild) {
+        tracksRequestedByUsers.remove(guild.getIdLong());
     }
 
     public static RobertifyAudioManager getInstance() {
