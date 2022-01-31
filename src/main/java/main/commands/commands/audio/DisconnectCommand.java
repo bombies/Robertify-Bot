@@ -50,7 +50,7 @@ public class DisconnectCommand implements ICommand {
     }
 
     public EmbedBuilder handleDisconnect(Guild guild) {
-        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         musicManager.leave();
 

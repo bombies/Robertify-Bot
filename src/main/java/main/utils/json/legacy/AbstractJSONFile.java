@@ -1,16 +1,15 @@
 package main.utils.json.legacy;
 
-import main.utils.json.AbstractJSON;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import org.json.JSONObject;
-
-import java.io.File;
 import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;
 import main.utils.GeneralUtils;
+import main.utils.json.AbstractJSON;
+import org.json.JSONObject;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 

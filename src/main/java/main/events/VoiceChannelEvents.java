@@ -28,7 +28,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
     @Override
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
         if (event.getMember().equals(event.getGuild().getSelfMember())) {
-            final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             musicManager.getScheduler().repeating = false;
             musicManager.getScheduler().playlistRepeating = false;
 
@@ -87,13 +87,13 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (!channel.equals(voiceState.getChannel())) return;
 
         if (channel.getMembers().size() == 1) {
-            final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             musicManager.getPlayer().setPaused(true);
         }
     }
 
     void resumeSong(GenericGuildVoiceUpdateEvent event) {
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         if (musicManager.getPlayer().isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
              && !musicManager.isForcePaused())
             musicManager.getPlayer().setPaused(false);
@@ -122,13 +122,13 @@ public class VoiceChannelEvents extends ListenerAdapter {
                         }
                     },
                     (e) -> {
-                        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+                        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
                         if (musicManager.getPlayer().isPaused() && !musicManager.isForcePaused())
                             musicManager.getPlayer().setPaused(false);;
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-                        RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild()).leave();
+                        RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
                     }
             );
         }

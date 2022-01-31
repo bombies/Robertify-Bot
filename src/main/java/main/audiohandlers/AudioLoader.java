@@ -1,10 +1,10 @@
 package main.audiohandlers;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import lavalink.client.io.FriendlyException;
+import lavalink.client.io.LoadResultHandler;
+import lavalink.client.player.track.AudioPlaylist;
+import lavalink.client.player.track.AudioTrack;
+import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AudioLoader implements AudioLoadResultHandler {
+public class AudioLoader implements LoadResultHandler {
     private final Logger logger = LoggerFactory.getLogger(AudioLoader.class);
 
     private final Guild guild;
@@ -57,7 +57,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         trackRequestedByUser.put(audioTrack, sender);
 
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(audioTrack);
@@ -73,8 +73,8 @@ public class AudioLoader implements AudioLoadResultHandler {
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().title
-                + "` by `" + audioTrack.getInfo().author + "`");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().getTitle()
+                + "` by `" + audioTrack.getInfo().getAuthor() + "`");
 
         if (botMsg != null) {
             if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
@@ -95,25 +95,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
         if (trackUrl.startsWith("ytsearch:")) {
-            sendTrackLoadedMessage(tracks.get(0));
 
-            if (!announceMsg)
-               RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0));
-
-            trackRequestedByUser.put(tracks.get(0), sender);
-
-            final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
-
-            if (addToBeginning)
-                scheduler.addToBeginningOfQueue(tracks.get(0));
-            else
-                scheduler.queue(tracks.get(0));
-
-            if (scheduler.playlistRepeating)
-                scheduler.setSavedQueue(guild, scheduler.queue);
-
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
             return;
         }
 
@@ -134,7 +116,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (loadPlaylistShuffled)
             Collections.shuffle(tracks);
 
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(tracks);
@@ -154,6 +136,29 @@ public class AudioLoader implements AudioLoadResultHandler {
     }
 
     @Override
+    public void searchResultLoaded(List<AudioTrack> list) {
+        sendTrackLoadedMessage(list.get(0));
+
+        if (!announceMsg)
+            RobertifyAudioManager.getUnannouncedTracks().add(list.get(0));
+
+        trackRequestedByUser.put(list.get(0), sender);
+
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+
+        if (addToBeginning)
+            scheduler.addToBeginningOfQueue(list.get(0));
+        else
+            scheduler.queue(list.get(0));
+
+        if (scheduler.playlistRepeating)
+            scheduler.setSavedQueue(guild, scheduler.queue);
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
+    }
+
+    @Override
     public void noMatches() {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `" + trackUrl.replace("ytsearch:", "")
                 + "`. Try being more specific. *(Adding name of the artiste)*");
@@ -164,12 +169,12 @@ public class AudioLoader implements AudioLoadResultHandler {
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
-        ((LavaLinkGuildMusicManager) musicManager).getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        ((GuildMusicManager) musicManager).getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
-            if (((LavaLinkGuildMusicManager) musicManager).getPlayer().getPlayingTrack() == null)
+            if (((GuildMusicManager) musicManager).getPlayer().getPlayingTrack() == null)
                 musicManager.getGuild().getAudioManager().closeAudioConnection();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))

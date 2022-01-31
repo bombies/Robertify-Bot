@@ -1,8 +1,7 @@
 package main.utils.json.dedicatedchannel;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.commands.commands.audio.LofiCommand;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
 import main.constants.RobertifyEmoji;
@@ -13,6 +12,7 @@ import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -120,7 +120,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
         if (msgRequest == null) return;
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var queue = musicManager.getScheduler().queue;
@@ -135,7 +135,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setImage(theme.getIdleBanner());
             eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-            msgRequest.queue(msg ->msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
+            msgRequest.queue(msg -> msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
                     .setEmbeds(eb.build()).queue());
         } else {
             final var trackInfo = playingTrack.getInfo();
@@ -145,28 +145,28 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setTitle(
                     LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "Lo-Fi Music"
                             :
-                    trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getDuration()) +"]"
+                    trackInfo.getTitle() + " by " + trackInfo.getAuthor() + " ["+ GeneralUtils.formatTime(playingTrack.getInfo().getLength()) +"]"
             );
 
             var requester = RobertifyAudioManager.getRequester(playingTrack);
             if (requester != null)
                 eb.setDescription("Requested by " + requester.getAsMention());
 
-            if (playingTrack instanceof RobertifyAudioTrack robertifyAudioTrack)
-                eb.setImage(robertifyAudioTrack.getTrackImage());
+            if (trackInfo.getSourceName().equals("spotify"))
+                eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.getIdentifier()));
             else
                 eb.setImage(theme.getNowPlayingBanner());
 
-            eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getVolume() + "%");
+            eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getFilters().getVolume() + "%");
 
             final StringBuilder nextTenSongs = new StringBuilder();
             nextTenSongs.append("```");
             if (queueAsList.size() > 10) {
                 int index = 1;
                 for (AudioTrack track : queueAsList.subList(0, 10))
-                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().title)
-                            .append(" - ").append(track.getInfo().author)
-                            .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
+                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().getTitle())
+                            .append(" - ").append(track.getInfo().getAuthor())
+                            .append(" [").append(GeneralUtils.formatTime(track.getInfo().getLength()))
                             .append("]\n");
             } else {
                 if (queue.size() == 0)
@@ -174,8 +174,8 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 else {
                     int index = 1;
                     for (AudioTrack track : queueAsList)
-                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
-                                .append(" [").append(GeneralUtils.formatTime(track.getDuration()))
+                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().getTitle()).append(" - ").append(track.getInfo().getAuthor())
+                                .append(" [").append(GeneralUtils.formatTime(track.getInfo().getLength()))
                                 .append("]\n");
                 }
             }

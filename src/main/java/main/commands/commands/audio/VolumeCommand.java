@@ -53,10 +53,10 @@ public class VolumeCommand implements ICommand {
         if (volume < 0 || volume > 100)
             return RobertifyEmbedUtils.embedMessage(guild, "You can't set the volume to that value");
 
-        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(memberVoiceState.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
         var audioPlayer = musicManager.getPlayer();
 
-        audioPlayer.setVolume(volume);
+        audioPlayer.getFilters().setVolume((float)volume/100);
 
         if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());

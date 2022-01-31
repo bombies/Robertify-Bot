@@ -45,7 +45,7 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
 
@@ -54,8 +54,7 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
-        audioPlayer.getPlayingTrack().setPosition(0);
-        musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
+        musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack());
 
         if (scheduler.repeating)
             scheduler.repeating = false;

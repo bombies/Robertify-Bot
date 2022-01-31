@@ -1,22 +1,9 @@
 package main.audiohandlers;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lavalink.client.player.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
-import main.audiohandlers.sources.deezer.DeezerAudioSourceManager;
-import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
+import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.CommandContext;
 import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
@@ -39,51 +26,22 @@ public class RobertifyAudioManager {
 
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
-    private final Map<Long, LavaLinkGuildMusicManager> lavalinkMusicManagers;
     @Getter
     private static final HashMap<AudioTrack, User> tracksRequestedByUsers = new HashMap<>();
     @Getter
     private static final List<AudioTrack> unannouncedTracks = new ArrayList<>();
-    @Getter
-    private final AudioPlayerManager audioPlayerManager;
 
     private RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();
-        this.lavalinkMusicManagers = new HashMap<>();
-        this.audioPlayerManager = new DefaultAudioPlayerManager();
-
-        audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager(), SoundCloudAudioSourceManager.createDefault()));
-        audioPlayerManager.registerSourceManager(new DeezerAudioSourceManager(new YoutubeAudioSourceManager(), SoundCloudAudioSourceManager.createDefault()));
-        audioPlayerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        audioPlayerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        audioPlayerManager.registerSourceManager(new BandcampAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new VimeoAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new BeamAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new HttpAudioSourceManager());
-        audioPlayerManager.registerSourceManager(new LocalAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
-        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (guildID) -> {
-            final GuildMusicManager guildMusicManager = new GuildMusicManager(audioPlayerManager, guild);
-
-            guild.getAudioManager().setSendingHandler(guildMusicManager.getSendHandler());
-            return guildMusicManager;
-        });
-    }
-
-    public LavaLinkGuildMusicManager getLavaLinkMusicManager(Guild guild) {
-        return this.lavalinkMusicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new LavaLinkGuildMusicManager(guild));
+        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new GuildMusicManager(guild));
     }
 
     public void removeMusicManager(Guild guild) {
+        this.musicManagers.get(guild.getIdLong()).destroy();
         this.musicManagers.remove(guild.getIdLong());
-    }
-
-    public void removeLavalinkMusicManager(Guild guild) {
-        this.lavalinkMusicManagers.get(guild.getIdLong()).destroy();
-        this.lavalinkMusicManagers.remove(guild.getIdLong());
     }
 
     @SneakyThrows
@@ -91,7 +49,7 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, CommandContext ctx,
                             Message botMsg, boolean addToBeginning) {
 
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
@@ -117,7 +75,7 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, TextChannel channel,
                             User user, Message botMsg, boolean addToBeginning) {
 
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
@@ -142,7 +100,7 @@ public class RobertifyAudioManager {
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx,
                                     Message botMsg, boolean addToBeginning) {
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -169,7 +127,7 @@ public class RobertifyAudioManager {
                                                 GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
                                                 boolean addToBeginning) {
 
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -194,7 +152,7 @@ public class RobertifyAudioManager {
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandEvent event, boolean addToBeginning) {
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -219,7 +177,7 @@ public class RobertifyAudioManager {
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                     boolean addToBeginning) {
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -244,7 +202,7 @@ public class RobertifyAudioManager {
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                                 boolean addToBeginning) {
-        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
@@ -269,7 +227,7 @@ public class RobertifyAudioManager {
     public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState,
                                  GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
                                  boolean addToBeginning) {
-        final var musicManager = getLavaLinkMusicManager(channel.getGuild());
+        final var musicManager = getMusicManager(channel.getGuild());
 
         try {
 //            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
@@ -292,8 +250,7 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(user, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        final var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
     private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
@@ -301,8 +258,7 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        final var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
     private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
@@ -310,8 +266,7 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        final var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
     private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
@@ -319,8 +274,7 @@ public class RobertifyAudioManager {
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        final var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
     private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
@@ -328,11 +282,10 @@ public class RobertifyAudioManager {
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        final var audioRef = new RobertifyAudioReference(trackUrl, null);
-        this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    public void joinVCLavaLink(TextChannel channel, VoiceChannel vc, LavaLinkGuildMusicManager musicManager) {
+    public void joinVCLavaLink(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
         try {
             musicManager.getLink().connect(vc);
         } catch (InsufficientPermissionException e) {

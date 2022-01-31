@@ -1,15 +1,12 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import lavalink.client.player.IPlayer;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -52,7 +49,7 @@ public class JumpCommand implements ICommand {
             return eb;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(selfVoiceState.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         AudioTrack track = audioPlayer.getPlayingTrack();
 
@@ -66,15 +63,15 @@ public class JumpCommand implements ICommand {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the amount of seconds to jump in the song!");
                 return eb;
             } else
-                return doActualJump(ctx.getGuild(), ctx.getArgs().get(0), track);
+                return doActualJump(ctx.getGuild(), ctx.getArgs().get(0), audioPlayer, track);
         else {
             if (input == null)
                 throw new NullPointerException("Input string cannot be null");
-            return doActualJump(ctx.getGuild(), input, track);
+            return doActualJump(ctx.getGuild(), input, audioPlayer, track);
         }
     }
 
-    private EmbedBuilder doActualJump(Guild guild, String input, AudioTrack track) {
+    private EmbedBuilder doActualJump(Guild guild, String input, IPlayer player, AudioTrack track) {
         long time;
         EmbedBuilder eb;
         if (GeneralUtils.stringIsInt(input))
@@ -91,12 +88,12 @@ public class JumpCommand implements ICommand {
 
         time = TimeUnit.SECONDS.toMillis(time);
 
-        if (time > track.getDuration() - track.getPosition()) {
+        if (time > track.getInfo().getLength() - player.getTrackPosition()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "This duration cannot be more than the time left!");
             return eb;
         }
 
-        track.setPosition(track.getPosition() + time);
+        player.seekTo(player.getTrackPosition() + time);
 
         return RobertifyEmbedUtils.embedMessage(guild, "Successfully jumped `"+input+"` seconds ahead!");
     }

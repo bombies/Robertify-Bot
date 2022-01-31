@@ -1,21 +1,16 @@
 package main.commands.commands.audio.slashcommands;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.RemoveCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class RemoveSlashCommand extends InteractiveCommand {
     private final String commandName = new RemoveCommand().getName();
@@ -60,7 +55,7 @@ public class RemoveSlashCommand extends InteractiveCommand {
         }
 
         final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
         event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(event.getGuild(), queue, trackSelected).build())

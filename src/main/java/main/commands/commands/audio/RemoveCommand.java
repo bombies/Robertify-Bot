@@ -1,15 +1,12 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -22,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class RemoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
@@ -64,7 +61,7 @@ public class RemoveCommand implements ICommand {
         if (id <= 0 || id > queue.size())
             return RobertifyEmbedUtils.embedMessage(guild, "This is an invalid ID! You must provide an ID between 1 and " + queue.size());
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removing `"+trackList.get(id-1).getInfo().title
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removing `"+trackList.get(id-1).getInfo().getTitle()
                 +"` from the queue");
 
         if (!queue.remove(trackList.get(id-1)))

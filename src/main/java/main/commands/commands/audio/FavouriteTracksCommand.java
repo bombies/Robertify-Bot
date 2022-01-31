@@ -1,9 +1,6 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.deezer.DeezerAudioTrack;
-import main.audiohandlers.sources.spotify.SpotifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.RobertifyTheme;
@@ -68,7 +65,7 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
 
     public MessageEmbed handleAdd(Guild guild, @NotNull Member member) {
         final var config = FavouriteTracksCache.getInstance();
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var memberVoiceState = member.getVoiceState();
@@ -93,21 +90,21 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
         String id;
         TrackSource source;
 
-        if (playingTrack instanceof SpotifyAudioTrack sTrack) {
-            id = sTrack.getId();
-            source = TrackSource.SPOTIFY;
-        } else if (playingTrack instanceof DeezerAudioTrack dTrack) {
-            id = dTrack.getId();
-            source = TrackSource.DEEZER;
-        } else if (playingTrack instanceof YoutubeAudioTrack yTrack) {
-            id = yTrack.getIdentifier();
-            source = TrackSource.YOUTUBE;
-        } else
-            return RobertifyEmbedUtils.embedMessage(guild, "The track from this source cannot be added as a favourite track!").build();
+//        if (playingTrack instanceof SpotifyAudioTrack sTrack) {
+//            id = sTrack.getId();
+//            source = TrackSource.SPOTIFY;
+//        } else if (playingTrack instanceof DeezerAudioTrack dTrack) {
+//            id = dTrack.getId();
+//            source = TrackSource.DEEZER;
+//        } else if (playingTrack instanceof YoutubeAudioTrack yTrack) {
+//            id = yTrack.getIdentifier();
+//            source = TrackSource.YOUTUBE;
+//        } else
+//            return RobertifyEmbedUtils.embedMessage(guild, "The track from this source cannot be added as a favourite track!").build();
 
         try {
-            config.addTrack(member.getIdLong(), id, trackInfo.title, trackInfo.author, source);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have added `"+playingTrack.getInfo().title+" - "+ playingTrack.getInfo().author +"` as a favourite track!").build();
+//            config.addTrack(member.getIdLong(), id, trackInfo.title, trackInfo.author, source);
+            return RobertifyEmbedUtils.embedMessage(guild, "You have added `"+playingTrack.getInfo().getTitle()+" - "+ playingTrack.getInfo().getAuthor() +"` as a favourite track!").build();
         } catch (IllegalArgumentException e) {
             return RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build();
         } catch (Exception e) {

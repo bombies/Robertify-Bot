@@ -1,10 +1,10 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lavalink.client.player.IPlayer;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -30,7 +30,7 @@ public class LoopCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         var audioPlayer = musicManager.getPlayer();
 
         if (checks(selfVoiceState, memberVoiceState, audioPlayer) != null) {
@@ -86,8 +86,8 @@ public class LoopCommand implements ICommand {
     public EmbedBuilder handleRepeat(AbstractMusicManager musicManager) {
         final var guild = musicManager.getGuild();
 
-        final var player = ((LavaLinkGuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var player = ((GuildMusicManager) musicManager).getPlayer();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 
         if (player.getPlayingTrack() == null)
             return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
@@ -96,10 +96,10 @@ public class LoopCommand implements ICommand {
 
         if (scheduler.repeating) {
             scheduler.repeating = false;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().title + "` will no longer be looped!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().getTitle() + "` will no longer be looped!");
         } else {
             scheduler.repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().title + "` will now be looped");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().getTitle() + "` will now be looped");
         }
 
         return eb;
@@ -107,7 +107,7 @@ public class LoopCommand implements ICommand {
 
     public EmbedBuilder handleQueueRepeat(AbstractMusicManager musicManager, IPlayer audioPlayer, Guild guild) {
         EmbedBuilder eb;
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
 
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;
@@ -121,8 +121,7 @@ public class LoopCommand implements ICommand {
                 return eb;
             }
 
-            AudioTrack thisTrack = audioPlayer.getPlayingTrack().makeClone();
-            thisTrack.setPosition(0L);
+            AudioTrack thisTrack = audioPlayer.getPlayingTrack();
 
             if (scheduler.queue.isEmpty()) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue to repeat!\n");

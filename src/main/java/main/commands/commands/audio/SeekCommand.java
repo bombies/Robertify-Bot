@@ -57,7 +57,7 @@ public class SeekCommand implements ICommand {
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
             return RobertifyEmbedUtils.embedMessage(guild, "You must bein the same voice channel I am in order to use this command");
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(selfVoiceState.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
@@ -73,10 +73,10 @@ public class SeekCommand implements ICommand {
 
         long totalDurationInMillis = TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
-        if (totalDurationInMillis > audioPlayer.getPlayingTrack().getDuration())
+        if (totalDurationInMillis > audioPlayer.getPlayingTrack().getInfo().getLength())
             return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
 
-        audioPlayer.getPlayingTrack().setPosition(totalDurationInMillis);
+        audioPlayer.seekTo(totalDurationInMillis);
         return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
                 ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
 

@@ -57,7 +57,7 @@ public class LoopSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final var memberVoiceState = event.getMember().getVoiceState();

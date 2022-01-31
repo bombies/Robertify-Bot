@@ -55,8 +55,8 @@ public class PlayCommand implements ICommand {
         Listener.checkIfAnnouncementChannelIsSet(guild, channel);
 
         if (args.isEmpty()) {
-            if (RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild).getPlayer().isPaused()) {
-                RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild).getPlayer().setPaused(false);
+            if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().isPaused()) {
+                RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().setPaused(false);
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!").build())
                         .queue();
                 return;

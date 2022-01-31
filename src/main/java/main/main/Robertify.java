@@ -4,7 +4,6 @@ import api.deezer.DeezerApi;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.FavouriteTracksCommand;
@@ -160,9 +159,6 @@ public class Robertify {
                     .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."))
                     .build();
-
-            YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.YOUTUBE_PAPISID));
-            YoutubeHttpContextFilter.setPSID(Config.get(ENV.YOUTUBE_PSID));
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))

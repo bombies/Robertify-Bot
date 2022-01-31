@@ -1,10 +1,9 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.RobertifyAudioTrack;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -59,7 +58,7 @@ public class LyricsCommand implements ICommand {
                 return;
             }
 
-            final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
             final var audioPlayer = musicManager.getPlayer();
             final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
 
@@ -69,14 +68,14 @@ public class LyricsCommand implements ICommand {
                 return;
             }
 
-            if (!(playingTrack instanceof RobertifyAudioTrack)) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify/Deezer tracks!").build())
+            if (!playingTrack.getInfo().getSourceName().equals("spotify")) {
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify tracks!").build())
                         .queue();
                 return;
             }
 
             AudioTrackInfo trackInfo = playingTrack.getInfo();
-            query = trackInfo.title + " by " + trackInfo.author;
+            query = trackInfo.getTitle() + " by " + trackInfo.getAuthor();
         } else {
             query = String.join(" ", args);
         }

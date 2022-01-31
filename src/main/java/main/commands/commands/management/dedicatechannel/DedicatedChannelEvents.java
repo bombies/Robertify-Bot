@@ -4,7 +4,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
-import main.commands.commands.dev.MongoMigrationCommand;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -59,13 +58,6 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final User user = event.getAuthor();
 
         if (!user.isBot() && !event.isWebhookMessage()) {
-            if (MongoMigrationCommand.isMigrating()) {
-                event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
-                                " You are not allowed to use this feature.")
-                        .build()).queue();
-                return;
-            }
-
             if (!memberVoiceState.inVoiceChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                                 .build())
@@ -146,7 +138,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (event.getTextChannel().getIdLong() != config.getChannelID(event.getGuild().getIdLong())) return;
 
         final String id = event.getButton().getId();
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final var guild = event.getGuild();

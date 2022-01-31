@@ -42,7 +42,7 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
         if (config.get247(guild.getIdLong())) {
             config.set247(guild.getIdLong(), false);
 
-            RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+            RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().scheduleDisconnect(true);
 
             return RobertifyEmbedUtils.embedMessage(guild, "You have turned 24/7 mode **off**").build();

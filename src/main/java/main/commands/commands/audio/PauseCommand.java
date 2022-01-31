@@ -42,7 +42,7 @@ public class PauseCommand implements ICommand {
             return eb;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {

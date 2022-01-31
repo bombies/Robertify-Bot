@@ -1,15 +1,11 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -36,7 +32,7 @@ public class RewindCommand implements ICommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final var track = audioPlayer.getPlayingTrack();
         final var guild = ctx.getGuild();
@@ -63,7 +59,7 @@ public class RewindCommand implements ICommand {
     }
 
     public EmbedBuilder handleRewind(GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(selfVoiceState.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final AudioTrack track = audioPlayer.getPlayingTrack();
         final var guild = selfVoiceState.getGuild();
@@ -74,11 +70,11 @@ public class RewindCommand implements ICommand {
             return eb;
         }
 
-        if (track.getInfo().isStream)
+        if (track.getInfo().isStream())
             return RobertifyEmbedUtils.embedMessage(guild, "You can't rewind a stream!");
 
         if (rewindToBeginning) {
-            track.setPosition(0L);
+            audioPlayer.seekTo(0L);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song to the beginning!");
         } else {
             if (time <= 0) {
@@ -88,12 +84,12 @@ public class RewindCommand implements ICommand {
 
             time = TimeUnit.SECONDS.toMillis(time);
 
-            if (time > track.getPosition()) {
+            if (time > audioPlayer.getTrackPosition()) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "This duration cannot be more than the current time in the song");
                 return eb;
             }
 
-            track.setPosition(track.getPosition() - time);
+            audioPlayer.seekTo(audioPlayer.getTrackPosition() - time);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
         }
 

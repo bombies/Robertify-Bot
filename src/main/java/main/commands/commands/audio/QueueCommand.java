@@ -1,7 +1,7 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class QueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         final var queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
 
@@ -50,7 +50,7 @@ public class QueueCommand implements ICommand {
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" - "+info.author+" `["+ GeneralUtils.formatTime(track.getDuration())+"]`");
+            content.add("**#"+(i+1)+".** "+info.getTitle()+" - "+info.getAuthor()+" `["+ GeneralUtils.formatTime(track.getInfo().getLength())+"]`");
         }
         return content;
     }

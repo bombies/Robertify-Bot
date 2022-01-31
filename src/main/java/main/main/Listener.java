@@ -6,21 +6,23 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
-import main.commands.commands.dev.MongoMigrationCommand;
-import main.commands.commands.management.*;
+import main.commands.commands.management.BanCommand;
+import main.commands.commands.management.SetChannelCommand;
+import main.commands.commands.management.ThemeCommand;
+import main.commands.commands.management.UnbanCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.util.*;
+import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.commands.commands.misc.EightBallCommand;
-import main.constants.BotConstants;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.AbstractJSONFile;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -114,13 +116,6 @@ public class Listener extends ListenerAdapter {
                         .queue();
             } else {
                 try {
-                    if (MongoMigrationCommand.isMigrating()) {
-                        event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
-                                        " You are not allowed to use commands.")
-                                .build()).queue();
-                        return;
-                    }
-
                     manager.handle(event);
                 } catch (InsufficientPermissionException e) {
                     try {
@@ -144,13 +139,6 @@ public class Listener extends ListenerAdapter {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         final var guild = event.getGuild();
 
-        if (MongoMigrationCommand.isMigrating()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I am migrating databases at the moment!" +
-                            " You are not allowed to use commands.")
-                    .build()).queue();
-            return;
-        }
-
         if (new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
@@ -171,10 +159,9 @@ public class Listener extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
         new GuildConfig().removeGuild(guild.getIdLong());
-        RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+        RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .destroy();
         RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
-        RobertifyAudioManager.getInstance().removeLavalinkMusicManager(event.getGuild());
         logger.info("Left {}", guild.getName());
     }
 

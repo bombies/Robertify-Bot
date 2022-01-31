@@ -54,14 +54,14 @@ public class JoinCommand implements ICommand {
 
         if (selfVoiceState.inVoiceChannel()) {
             guild.moveVoiceMember(selfVoiceState.getMember(), channel)
-                    .queue(success -> RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+                    .queue(success -> RobertifyAudioManager.getInstance().getMusicManager(guild)
                             .getScheduler().scheduleDisconnect(true));
             return RobertifyEmbedUtils.embedMessage(guild, "I have moved to " + channel.getAsMention()).build();
         } else {
             RobertifyAudioManager.getInstance()
                     .joinVoiceChannel(textChannel, selfVoiceState, memberVoiceState);
 
-            RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+            RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().scheduleDisconnect(true);
             return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
         }

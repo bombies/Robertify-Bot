@@ -1,10 +1,10 @@
 package main.audiohandlers.lavalink;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lavalink.client.io.Link;
 import lavalink.client.player.IPlayer;
 import lavalink.client.player.event.PlayerEventListenerAdapter;
+import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
 import main.audiohandlers.AbstractTrackScheduler;
 import main.audiohandlers.RobertifyAudioManager;
@@ -81,7 +81,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
 
         final var requester = RobertifyAudioManager.getRequester(track);
         TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author+"`"
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().getTitle() + "` by `"+track.getInfo().getAuthor() +"`"
                 + ((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) && requester != null) ?
                 "\n\n~ Requested by " + requester.getAsMention()
                 :
@@ -115,9 +115,6 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
 
         AudioTrack nextTrack = queue.poll();
 
-        if (nextTrack != null)
-            nextTrack.setPosition(0);
-
         if (getMusicPlayer().getPlayingTrack() != null)
             getMusicPlayer().stopTrack();
 
@@ -125,7 +122,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
             if (nextTrack != null)
                 getMusicPlayer().playTrack(nextTrack);
         } catch (IllegalStateException e) {
-            getMusicPlayer().playTrack(nextTrack.makeClone());
+            getMusicPlayer().playTrack(nextTrack);
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
@@ -139,13 +136,13 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
                 if (RobertifyAudioManager.getTracksRequestedByUsers().containsKey(track))
                     RobertifyAudioManager.removeRequester(track, RobertifyAudioManager.getRequester(track));
                 try {
-                    player.playTrack(track.makeClone());
+                    player.playTrack(track);
                 } catch (UnsupportedOperationException e) {
-                    track.setPosition(0);
+                    player.seekTo(0);
                 }
             } else nextTrack();
         } else if (endReason.mayStartNext) {
-            pastQueue.push(track.makeClone());
+            pastQueue.push(track);
             nextTrack();
         }
     }
@@ -161,7 +158,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
             announcementChannel.sendMessageEmbeds(
                             RobertifyEmbedUtils.embedMessage(
                                             guild,
-                                            "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
+                                            "`" + track.getInfo().getTitle() + "` by `" + track.getInfo().getAuthor() + "` could not be played!\nSkipped to the next song. (If available)")
                                     .build()
                     )
                     .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
@@ -179,9 +176,6 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
         ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);
-
-        for (AudioTrack track : savedQueue)
-            track.setPosition(0L);
 
         LavaLinkTrackScheduler.savedQueue.put(guild, savedQueue);
     }
@@ -213,7 +207,7 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
 
             if (!new GuildConfig().get247(guild.getIdLong())) {
                 if (channel != null) {
-                    RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+                    RobertifyAudioManager.getInstance().getMusicManager(guild)
                                     .leave();
                     disconnectExecutors.remove(guild.getIdLong());
 

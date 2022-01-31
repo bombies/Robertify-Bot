@@ -1,22 +1,16 @@
 package main.commands.commands.audio.slashcommands;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ClearQueueCommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ClearQueueSlashCommand extends InteractiveCommand {
     private final String commandName = new ClearQueueCommand().getName();
@@ -49,7 +43,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
         final var guild = event.getGuild();
 

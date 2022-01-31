@@ -1,6 +1,5 @@
 package main.commands.commands.dev;
 
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
 import main.commands.RandomMessageManager;
@@ -21,8 +20,6 @@ public class ReloadConfigCommand implements IDevCommand {
         try {
             Config.reload();
             RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
-            YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.YOUTUBE_PAPISID));
-            YoutubeHttpContextFilter.setPSID(Config.get(ENV.YOUTUBE_PSID));
 
             ctx.getMessage().addReaction("✅").queue();
         } catch (Exception e) {

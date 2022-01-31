@@ -8,7 +8,6 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.json.legacy.reports.ReportsConfigField;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -102,7 +101,7 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final var openedRequests = Robertify.api.getTextChannelById(config.getReportsID(ReportsConfigField.CHANNEL));
+        final var openedRequests = Robertify.api.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
 
         openedRequests.retrieveMessageById(id).queue(reportMsg -> {
             final var fields = reportMsg.getEmbeds().get(0).getFields();

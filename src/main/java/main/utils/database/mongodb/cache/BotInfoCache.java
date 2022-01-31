@@ -2,8 +2,7 @@ package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
 import main.utils.database.mongodb.databases.BotInfoDB;
-import main.utils.json.legacy.reports.ReportsConfigField;
-import main.utils.json.legacy.suggestions.SuggestionsConfigField;
+import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -277,5 +276,41 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public String getJSON(boolean indented) {
         return indented ? getCache().toString(4) : getCache().toString();
+    }
+
+    public enum ReportsConfigField implements GenericJSONField {
+        CHANNEL("channel"),
+        CATEGORY("category"),
+        BANNED_USERS("banned_users");
+
+        private final String str;
+
+        ReportsConfigField(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    public enum SuggestionsConfigField implements GenericJSONField {
+        SUGGESTIONS_CATEGORY("suggestions_category"),
+        ACCEPTED_CHANNEL("accepted_channel"),
+        PENDING_CHANNEL("pending_channel"),
+        DENIED_CHANNEL("denied_channel"),
+        BANNED_USERS("banned_users");
+
+        private final String str;
+
+        SuggestionsConfigField(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
     }
 }

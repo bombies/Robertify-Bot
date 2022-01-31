@@ -1,9 +1,9 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
@@ -45,14 +45,14 @@ public class StopCommand implements ICommand {
             return;
         }
 
-        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
 
         msg.replyEmbeds(handleStop(musicManager).build()).queue();
     }
 
     public EmbedBuilder handleStop(AbstractMusicManager musicManager) {
-        final var audioPlayer = ((LavaLinkGuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var audioPlayer = ((GuildMusicManager) musicManager).getPlayer();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
         final var guild = musicManager.getGuild();
         final AudioTrack track = audioPlayer.getPlayingTrack();
 

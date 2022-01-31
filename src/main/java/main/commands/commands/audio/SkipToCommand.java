@@ -1,9 +1,9 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
+import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
@@ -47,8 +47,8 @@ public class SkipToCommand implements ICommand {
         if (id > queue.size() || id <= 0)
             return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "ID provided isn't a valid ID!");
 
-        final var audioPlayer = ((LavaLinkGuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+        final var audioPlayer = ((GuildMusicManager) musicManager).getPlayer();
+        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
         final var guild = musicManager.getGuild();
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
@@ -57,8 +57,8 @@ public class SkipToCommand implements ICommand {
             songsToRemoveFromQueue.add(currentQueue.get(i));
 
         queue.removeAll(songsToRemoveFromQueue);
-        audioPlayer.getPlayingTrack().setPosition(0);
-        scheduler.getPastQueue().push(audioPlayer.getPlayingTrack().makeClone());
+        audioPlayer.seekTo(0);
+        scheduler.getPastQueue().push(audioPlayer.getPlayingTrack());
         scheduler.nextTrack();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
