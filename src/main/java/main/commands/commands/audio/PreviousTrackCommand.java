@@ -48,7 +48,6 @@ public class PreviousTrackCommand implements ICommand {
         if (audioPlayer.getPlayingTrack() != null) {
             final var nowPlayingTrack = audioPlayer.getPlayingTrack();
             audioPlayer.stopTrack();
-            audioPlayer.seekTo(0);
             scheduler.addToBeginningOfQueue(nowPlayingTrack);
         }
 

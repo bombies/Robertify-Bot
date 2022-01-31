@@ -112,11 +112,45 @@
     </dependency>
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-test</artifactId>
+      <artifactId>kotlin-test-junit</artifactId>
       <version>1.6.10</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>kotlin-test</artifactId>
+          <groupId>org.jetbrains.kotlin</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.github.freyacodes</groupId>
+        <artifactId>Lavalink-Client</artifactId>
+        <exclusions>
+          <exclusion>
+            <artifactId>lavaplayer</artifactId>
+            <groupId>com.sedmelluq</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>json</artifactId>
+            <groupId>org.json</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.jagrosh</groupId>
+        <artifactId>jda-utilities</artifactId>
+        <exclusions>
+          <exclusion>
+            <artifactId>json</artifactId>
+            <groupId>org.json</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <properties>
     <maven.compiler.target>16</maven.compiler.target>
     <kotlin.version>1.6.10</kotlin.version>
