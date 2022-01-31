@@ -87,23 +87,20 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
 
         final var trackInfo = playingTrack.getInfo();
 
-        String id;
+        String id = trackInfo.getIdentifier();
         TrackSource source;
 
-//        if (playingTrack instanceof SpotifyAudioTrack sTrack) {
-//            id = sTrack.getId();
-//            source = TrackSource.SPOTIFY;
-//        } else if (playingTrack instanceof DeezerAudioTrack dTrack) {
-//            id = dTrack.getId();
-//            source = TrackSource.DEEZER;
-//        } else if (playingTrack instanceof YoutubeAudioTrack yTrack) {
-//            id = yTrack.getIdentifier();
-//            source = TrackSource.YOUTUBE;
-//        } else
-//            return RobertifyEmbedUtils.embedMessage(guild, "The track from this source cannot be added as a favourite track!").build();
+        switch (playingTrack.getInfo().getSourceName()) {
+            case "spotify" -> source = TrackSource.SPOTIFY;
+            case "deezer" -> source = TrackSource.DEEZER;
+            case "youtube" -> source = TrackSource.YOUTUBE;
+            default -> {
+                return RobertifyEmbedUtils.embedMessage(guild, "The track from this source cannot be added as a favourite track!").build();
+            }
+        }
 
         try {
-//            config.addTrack(member.getIdLong(), id, trackInfo.title, trackInfo.author, source);
+            config.addTrack(member.getIdLong(), id, trackInfo.getTitle(), trackInfo.getAuthor(), source);
             return RobertifyEmbedUtils.embedMessage(guild, "You have added `"+playingTrack.getInfo().getTitle()+" - "+ playingTrack.getInfo().getAuthor() +"` as a favourite track!").build();
         } catch (IllegalArgumentException e) {
             return RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build();
