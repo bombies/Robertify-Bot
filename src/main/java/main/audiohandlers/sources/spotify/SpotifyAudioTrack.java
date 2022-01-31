@@ -11,9 +11,4 @@ public class SpotifyAudioTrack extends RobertifyAudioTrack {
                              String spotifyID, String trackImage, SpotifyAudioSourceManager sourceManager) {
         super(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, spotifyID, trackImage, sourceManager);
     }
-
-    @Override
-    public String toString() {
-        return "SpotifyTrack(id="+getId()+")";
-    }
 }

@@ -83,7 +83,7 @@
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test</artifactId>
+            <artifactId>kotlin-test-junit</artifactId>
             <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
@@ -98,37 +98,44 @@
             <version>1.1.0</version>
         </dependency>
         <dependency>
-            <groupId>com.github.natanbc</groupId>
-            <artifactId>lavadsp</artifactId>
-            <version>0.7.7</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
             <version>1.0.3</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.9</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
             <version>fac5a3caf8</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sedmelluq</groupId>
-                    <artifactId>lavaplayer</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Topis-Lavalink-Plugins</groupId>
-            <artifactId>Spotify-SourceManager</artifactId>
-            <version>1.0.17</version>
         </dependency>
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.github.freyacodes</groupId>
+                <artifactId>Lavalink-Client</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sedmelluq</groupId>
+                        <artifactId>lavaplayer</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.json</groupId>
+                        <artifactId>json</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.jagrosh</groupId>
+                <artifactId>jda-utilities</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.json</groupId>
+                        <artifactId>json</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
         <repository>

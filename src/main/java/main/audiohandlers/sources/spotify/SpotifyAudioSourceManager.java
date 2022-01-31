@@ -80,7 +80,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
                 if (t == null) continue;
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
-                        "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
+                        t.getId(), false, "https://open.spotify.com/track/" + t.getId());
                 var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), album.getImages()[0].getUrl(), this);
                 playlist.add(track);
             }
@@ -109,8 +109,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
                 AudioTrackInfo info = new AudioTrackInfo(
                         t.getName(), t.getArtists()[0].getName(), t.getDurationMs(),
-                        getIdentifier(t.getName(), t.getArtists()[0].getName()),
-                        false, null
+                        t.getId(),
+                        false, "https://open.spotify.com/track/" + t.getId()
                 );
                 var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages().length >= 1 ? t.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(), this);
                 playlist.add(track);
@@ -152,9 +152,9 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
                     if (plTrack == null) continue;
 
                     AudioTrackInfo info = new AudioTrackInfo(
-                            playlistTrack.getTrack().getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
-                            getIdentifier(plTrack.getName(), plTrack.getArtists()[0].getName()),
-                            false, null
+                            plTrack.getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(),
+                            plTrack.getId(),
+                            false, "https://open.spotify.com/track/" + plTrack.getId()
                     );
 
                     var track = new SpotifyAudioTrack(
@@ -208,8 +208,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
             Track track = trackFuture.get();
             AudioTrackInfo info = new AudioTrackInfo(
                     track.getName(), track.getArtists()[0].getName(), track.getDurationMs(),
-                    getIdentifier(track.getName(), track.getArtists()[0].getName()),
-                    false, null
+                    track.getId(),
+                    false, "https://open.spotify.com/track/" + track.getId()
             );
             return new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getImages()[0].getUrl(), this);
         } catch (Exception e) {
@@ -220,16 +220,19 @@ public class SpotifyAudioSourceManager implements AudioSourceManager {
 
     @Override
     public boolean isTrackEncodable(AudioTrack track) {
-        return false;
+        return true;
     }
 
     @Override @SneakyThrows
     public void encodeTrack(AudioTrack track, DataOutput output) {
-        logger.info("Encoding track...");
+        logger.info("Encoding track...\nIdentifier: {}", track.getIdentifier());
 
         var spotifyTrack = (SpotifyAudioTrack) track;
+
         writeNullableText(output, spotifyTrack.getId());
         writeNullableText(output, spotifyTrack.getTrackImage());
+
+        logger.info("Finished encoding track...");
     }
 
     @Override @SneakyThrows

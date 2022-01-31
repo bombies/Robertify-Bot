@@ -1,5 +1,6 @@
 package main.audiohandlers.sources;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -7,9 +8,11 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import lombok.Getter;
-import main.audiohandlers.RobertifyAudioReference;
+import main.audiohandlers.RobertifyAudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.CompletableFuture;
 
 public class RobertifyAudioTrack extends DelegatedAudioTrack {
     private final Logger logger = LoggerFactory.getLogger(RobertifyAudioTrack.class);
@@ -25,6 +28,8 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
     public RobertifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager youtubeAudioSourceManager, SoundCloudAudioSourceManager soundCloudAudioSourceManager,
                                String id, String trackImage, AudioSourceManager sourceManager) {
         super(trackInfo);
+        logger.info("Constructing track...\nID: {}\nTitle: {}\nAuthor: {}\nLength: {}\nIs Stream: {}\nuri: {}",
+                trackInfo.identifier, trackInfo.title, trackInfo.author, trackInfo.length, trackInfo.isStream, trackInfo.uri);
         this.youtubeAudioSourceManager = youtubeAudioSourceManager;
         this.soundCloudAudioSourceManager = soundCloudAudioSourceManager;
         this.id = id;
@@ -36,7 +41,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
     public void process(LocalAudioTrackExecutor executor) throws Exception {
         logger.info("Processing...");
 
-        AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
+        var item = loadItem("ytmsearch:" + trackInfo.title + " by " + trackInfo.author);
 
         if (item instanceof AudioPlaylist playlist) {
             logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title.split("[(\\-]")[0].strip(), trackInfo.author, trackInfo.length);
@@ -44,7 +49,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
             AudioTrack track = search(playlist);
 
             if (track == null) {
-                item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
+                item = loadItem("ytsearch:" + trackInfo.title + " by " + trackInfo.author);
 
                 if (item instanceof AudioPlaylist newPlaylist) {
                     logger.info("Searching YouTube...");
@@ -53,7 +58,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
             }
 
             if (track == null) {
-                item = soundCloudAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "scsearch:"), null, id));
+                item = loadItem("scsearch:" + trackInfo.title + " by " + trackInfo.author);
 
                 if (item instanceof AudioPlaylist newPlaylist) {
                     logger.info("Searching SoundCloud...");
@@ -93,6 +98,34 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
             }
         }
         return null;
+    }
+
+    private AudioItem loadItem(String query) {
+        var cf = new CompletableFuture<AudioItem>();
+
+        RobertifyAudioManager.getInstance().getAudioPlayerManager().loadItem(query, new AudioLoadResultHandler() {
+            @Override
+            public void trackLoaded(AudioTrack track) {
+                cf.complete(track);
+            }
+
+            @Override
+            public void playlistLoaded(AudioPlaylist playlist) {
+                cf.complete(playlist);
+            }
+
+            @Override
+            public void noMatches() {
+                cf.complete(null);
+            }
+
+            @Override
+            public void loadFailed(FriendlyException exception) {
+                cf.completeExceptionally(exception);
+            }
+        });
+
+        return cf.join();
     }
 
     @Override
