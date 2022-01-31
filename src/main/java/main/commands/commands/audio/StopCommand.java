@@ -1,8 +1,9 @@
 package main.commands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
@@ -44,14 +45,14 @@ public class StopCommand implements ICommand {
             return;
         }
 
-        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
 
         msg.replyEmbeds(handleStop(musicManager).build()).queue();
     }
 
-    public EmbedBuilder handleStop(GuildMusicManager musicManager) {
-        final var audioPlayer = musicManager.getPlayer();
-        final var scheduler = musicManager.getScheduler();
+    public EmbedBuilder handleStop(AbstractMusicManager musicManager) {
+        final var audioPlayer = ((LavaLinkGuildMusicManager) musicManager).getPlayer();
+        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
         final var guild = musicManager.getGuild();
         final AudioTrack track = audioPlayer.getPlayingTrack();
 
@@ -68,10 +69,10 @@ public class StopCommand implements ICommand {
         if (audioPlayer.isPaused())
             audioPlayer.setPaused(false);
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            new DedicatedChannelConfig().updateMessage(guild);
 
-        LofiCommand.getLofiEnabledGuilds().remove(musicManager.getGuild().getIdLong());
+        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         return RobertifyEmbedUtils.embedMessage(guild, "You have stopped the track and cleared the queue.");
     }

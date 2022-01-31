@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class RemoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();

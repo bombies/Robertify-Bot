@@ -171,7 +171,10 @@ public class Listener extends ListenerAdapter {
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
         new GuildConfig().removeGuild(guild.getIdLong());
+        RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+                        .destroy();
         RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
+        RobertifyAudioManager.getInstance().removeLavalinkMusicManager(event.getGuild());
         logger.info("Left {}", guild.getName());
     }
 

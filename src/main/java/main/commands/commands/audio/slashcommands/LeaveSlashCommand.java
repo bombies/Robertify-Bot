@@ -78,7 +78,7 @@ public class LeaveSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
 
         musicManager.leave();
 

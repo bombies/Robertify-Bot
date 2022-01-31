@@ -2,6 +2,7 @@ package main.constants;
 
 public enum ENV {
     BOT_TOKEN("bot_token"),
+    OWNER_ID("owner_id"),
     DATABASE_DIR("database_dir"),
     JSON_DIR("json_dir"),
     BOT_NAME("bot_name"),
@@ -10,6 +11,8 @@ public enum ENV {
     ICON_URL("icon_url"),
     RANDOM_MESSAGE_CHANCE("random_message_chance"),
     PREFIX("prefix"),
+    LAVALINK_NODE("lavalink_node"),
+    LAVALINK_NODE_PASSWORD("lavalink_node_password"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
     YOUTUBE_PAPISID("youtube_papisid"),

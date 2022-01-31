@@ -36,7 +36,7 @@ public class RewindCommand implements ICommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final var track = audioPlayer.getPlayingTrack();
         final var guild = ctx.getGuild();
@@ -63,7 +63,7 @@ public class RewindCommand implements ICommand {
     }
 
     public EmbedBuilder handleRewind(GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final AudioTrack track = audioPlayer.getPlayingTrack();
         final var guild = selfVoiceState.getGuild();

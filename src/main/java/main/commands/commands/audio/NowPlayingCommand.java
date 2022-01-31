@@ -54,7 +54,7 @@ public class NowPlayingCommand implements ICommand {
             return eb;
         }
 
-        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         var audioPlayer = musicManager.getPlayer();
         AudioTrack track = audioPlayer.getPlayingTrack();
 

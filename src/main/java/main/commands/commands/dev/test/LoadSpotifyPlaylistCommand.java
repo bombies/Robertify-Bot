@@ -37,7 +37,7 @@ public class LoadSpotifyPlaylistCommand implements ITestCommand {
         List<AudioTrack> loadedTracks = new ArrayList<>();
 
         Future<Void> voidFuture = RobertifyAudioManager.getInstance().getAudioPlayerManager()
-                .loadItemOrdered(RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild()),
+                .loadItemOrdered(RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild()),
                         audioRef.identifier, new AudioLoadResultHandler() {
                             @Override
                             public void trackLoaded(AudioTrack audioTrack) {

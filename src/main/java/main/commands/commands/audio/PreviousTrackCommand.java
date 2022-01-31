@@ -27,7 +27,7 @@ public class PreviousTrackCommand implements ICommand {
     }
 
     public EmbedBuilder handlePrevious(Guild guild, GuildVoiceState memberVoiceState) {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var scheduler = musicManager.getScheduler();
         final var previouslyPlayedTracks = scheduler.getPastQueue();
         final var audioPlayer = musicManager.getPlayer();

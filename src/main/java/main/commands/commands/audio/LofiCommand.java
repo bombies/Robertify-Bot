@@ -48,7 +48,7 @@ public class LofiCommand implements ICommand {
     }
 
     public MessageEmbed handleLofi(Guild guild, Member member, TextChannel channel) {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var queue = musicManager.getScheduler().queue;
 

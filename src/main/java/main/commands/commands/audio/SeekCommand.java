@@ -57,7 +57,7 @@ public class SeekCommand implements ICommand {
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
             return RobertifyEmbedUtils.embedMessage(guild, "You must bein the same voice channel I am in order to use this command");
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)

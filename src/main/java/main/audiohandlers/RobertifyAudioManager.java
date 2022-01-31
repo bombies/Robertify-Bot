@@ -1,17 +1,19 @@
 package main.audiohandlers;
 
-import com.sedmelluq.discord.lavaplayer.player.*;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.*;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.audiohandlers.lavaplayer.GuildMusicManager;
 import main.audiohandlers.sources.deezer.DeezerAudioSourceManager;
 import main.audiohandlers.sources.spotify.SpotifyAudioSourceManager;
@@ -27,13 +29,17 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
 
     private static RobertifyAudioManager INSTANCE;
     private final Map<Long, GuildMusicManager> musicManagers;
+    private final Map<Long, LavaLinkGuildMusicManager> lavalinkMusicManagers;
     @Getter
     private static final HashMap<AudioTrack, User> tracksRequestedByUsers = new HashMap<>();
     @Getter
@@ -43,6 +49,7 @@ public class RobertifyAudioManager {
 
     private RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();
+        this.lavalinkMusicManagers = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
         audioPlayerManager.registerSourceManager(new SpotifyAudioSourceManager(new YoutubeAudioSourceManager(), SoundCloudAudioSourceManager.createDefault()));
@@ -66,8 +73,17 @@ public class RobertifyAudioManager {
         });
     }
 
+    public LavaLinkGuildMusicManager getLavaLinkMusicManager(Guild guild) {
+        return this.lavalinkMusicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new LavaLinkGuildMusicManager(guild));
+    }
+
     public void removeMusicManager(Guild guild) {
         this.musicManagers.remove(guild.getIdLong());
+    }
+
+    public void removeLavalinkMusicManager(Guild guild) {
+        this.lavalinkMusicManagers.get(guild.getIdLong()).destroy();
+        this.lavalinkMusicManagers.remove(guild.getIdLong());
     }
 
     @SneakyThrows
@@ -75,12 +91,13 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, CommandContext ctx,
                             Message botMsg, boolean addToBeginning) {
 
-        final var musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -100,12 +117,13 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, TextChannel channel,
                             User user, Message botMsg, boolean addToBeginning) {
 
-        final var musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(channel, selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(channel, selfVoiceState, memberVoiceState);
+            joinVCLavaLink(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -124,13 +142,14 @@ public class RobertifyAudioManager {
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, CommandContext ctx,
                                     Message botMsg, boolean addToBeginning) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -150,13 +169,14 @@ public class RobertifyAudioManager {
                                                 GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
                                                 boolean addToBeginning) {
 
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -174,13 +194,14 @@ public class RobertifyAudioManager {
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandEvent event, boolean addToBeginning) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -198,13 +219,14 @@ public class RobertifyAudioManager {
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                     boolean addToBeginning) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -222,13 +244,14 @@ public class RobertifyAudioManager {
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                                 boolean addToBeginning) {
-        final GuildMusicManager musicManager = getMusicManager(memberVoiceState.getGuild());
+        final var musicManager = getLavaLinkMusicManager(memberVoiceState.getGuild());
 
         if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -246,10 +269,11 @@ public class RobertifyAudioManager {
     public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState,
                                  GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
                                  boolean addToBeginning) {
-        final GuildMusicManager musicManager = getMusicManager(channel.getGuild());
+        final var musicManager = getLavaLinkMusicManager(channel.getGuild());
 
         try {
-            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
+            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -263,7 +287,7 @@ public class RobertifyAudioManager {
         );
     }
 
-    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
+    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
                            User user, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
 
@@ -272,7 +296,7 @@ public class RobertifyAudioManager {
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
-    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
+    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
                            CommandContext ctx, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
 
@@ -281,7 +305,7 @@ public class RobertifyAudioManager {
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
-    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
+    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender,
                            boolean addToBeginning) {
 
@@ -290,7 +314,7 @@ public class RobertifyAudioManager {
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
-    private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
+    private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
                                       CommandContext ctx, boolean announceMsg, Message botMsg,
                                       boolean addToBeginning) {
 
@@ -299,13 +323,24 @@ public class RobertifyAudioManager {
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
     }
 
-    private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
+    private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
                                       boolean announceMsg, Message botMsg, User sender,
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
         final var audioRef = new RobertifyAudioReference(trackUrl, null);
         this.audioPlayerManager.loadItemOrdered(musicManager, audioRef, loader);
+    }
+
+    public void joinVCLavaLink(TextChannel channel, VoiceChannel vc, LavaLinkGuildMusicManager musicManager) {
+        try {
+            musicManager.getLink().connect(vc);
+        } catch (InsufficientPermissionException e) {
+            if (channel != null)
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I do not have enough permissions to join " + vc.getAsMention()).build())
+                        .queue();
+            throw e;
+        }
     }
 
     public void joinVoiceChannel(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {

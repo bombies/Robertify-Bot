@@ -28,7 +28,7 @@ public class RobertifyShutdownCommand implements IDevCommand {
 
         for (Guild g : Robertify.api.getGuilds()) {
             var selfMember = g.getSelfMember();
-            var musicManager = RobertifyAudioManager.getInstance().getMusicManager(g);
+            var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(g);
 
             if (selfMember.getVoiceState().inVoiceChannel())
                 musicManager.leave();

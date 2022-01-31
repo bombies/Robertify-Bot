@@ -243,7 +243,7 @@ public class TrackScheduler extends AudioEventAdapter implements AbstractTrackSc
 
             if (!new GuildConfig().get247(guild.getIdLong())) {
                 if (channel != null) {
-                    RobertifyAudioManager.getInstance().getMusicManager(guild)
+                    RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
                                     .leave();
                     disconnectExecutors.remove(guild.getIdLong());
 

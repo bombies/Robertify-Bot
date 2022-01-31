@@ -60,7 +60,7 @@ public class RemoveSlashCommand extends InteractiveCommand {
         }
 
         final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
         event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(event.getGuild(), queue, trackSelected).build())

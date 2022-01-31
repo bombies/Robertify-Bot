@@ -4,8 +4,8 @@ import api.deezer.DeezerApi;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
+import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
+import java.net.URI;
+import java.util.Base64;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -49,6 +51,8 @@ public class Robertify {
 
     @Getter
     public static JDA api;
+    @Getter
+    private static JdaLavalink lavalink;
     public static BaringoClient baringo;
     @Getter
     private static DeezerApi deezerApi;
@@ -61,18 +65,26 @@ public class Robertify {
         WebUtils.setUserAgent("Mozilla/Robertify / bombies#4445");
 
         try {
+            lavalink = new JdaLavalink(
+                    getIdFromToken(Config.get(ENV.BOT_TOKEN)),
+                    1,
+                    shardId -> getApi()
+            );
+
+            lavalink.addNode(URI.create(Config.get(ENV.LAVALINK_NODE)), Config.get(ENV.LAVALINK_NODE_PASSWORD));
+
             api = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_VOICE_STATES,
-                            GatewayIntent.GUILD_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
-                    .setAudioSendFactory(new NativeAudioSendFactory())
+//                    .setAudioSendFactory(new NativeAudioSendFactory())
                     .setChunkingFilter(ChunkingFilter.NONE)
 
                     // Event Listeners
                     .addEventListeners(
+                            lavalink,
                             VoiceChannelEvents.waiter,
                             commandWaiter,
                             new Listener(commandWaiter),
@@ -83,6 +95,7 @@ public class Robertify {
                             new ReportsEvents(),
                             new AnnouncementChannelEvents()
                     )
+                    .setVoiceDispatchInterceptor(lavalink.getVoiceInterceptor())
 
                     // Slash Commands
                     .addEventListeners(
@@ -172,6 +185,14 @@ public class Robertify {
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
+    }
+
+    private static String getIdFromToken(String token) {
+        return new String(
+                Base64.getDecoder().decode(
+                        token.split("\\.")[0]
+                )
+        );
     }
 }
 

@@ -120,7 +120,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
         if (msgRequest == null) return;
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var queue = musicManager.getScheduler().queue;

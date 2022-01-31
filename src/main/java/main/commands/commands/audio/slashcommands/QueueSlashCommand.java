@@ -50,7 +50,7 @@ public class QueueSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
         GeneralUtils.setCustomEmbed(event.getGuild(), "Queue");

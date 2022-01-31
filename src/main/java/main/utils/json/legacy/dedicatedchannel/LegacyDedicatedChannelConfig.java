@@ -155,7 +155,7 @@ public class LegacyDedicatedChannelConfig extends AbstractJSONFile {
             return;
 
         final var msg = getMessage(guild.getId());
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var queue = musicManager.getScheduler().queue;

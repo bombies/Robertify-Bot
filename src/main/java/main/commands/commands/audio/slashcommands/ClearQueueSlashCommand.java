@@ -49,7 +49,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
         final var guild = event.getGuild();
 

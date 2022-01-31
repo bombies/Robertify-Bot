@@ -69,7 +69,7 @@ public class MoveSlashCommand extends InteractiveCommand {
             return;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
         final int id = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());

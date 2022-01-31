@@ -26,14 +26,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implements AbstractTrackScheduler {
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(LavaLinkTrackScheduler.class);
-
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final static HashMap<Long, ScheduledFuture<?>> disconnectExecutors = new HashMap<>();
 
     private final Guild guild;
     private Link audioPlayer;
@@ -122,7 +123,8 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
             getMusicPlayer().stopTrack();
 
         try {
-            getMusicPlayer().playTrack(nextTrack);
+            if (nextTrack != null)
+                getMusicPlayer().playTrack(nextTrack);
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack.makeClone());
         }
@@ -180,6 +182,43 @@ public class LavaLinkTrackScheduler extends PlayerEventListenerAdapter implement
         newQueue.offer(track);
         newQueue.addAll(queue);
         queue = newQueue;
+    }
+
+    public void addToBeginningOfQueue(List<AudioTrack> tracks) {
+        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
+        tracks.forEach(newQueue::offer);
+        newQueue.addAll(queue);
+        queue = newQueue;
+    }
+
+    public void scheduleDisconnect(boolean announceMsg) {
+        scheduleDisconnect(announceMsg, 5, TimeUnit.MINUTES);
+    }
+
+    public void scheduleDisconnect(boolean announceMsg, long delay, TimeUnit timeUnit) {
+        if (new GuildConfig().get247(guild.getIdLong()))
+            return;
+
+        ScheduledFuture<?> schedule = executor.schedule(() -> {
+            final var channel = guild.getSelfMember().getVoiceState().getChannel();
+
+            if (!new GuildConfig().get247(guild.getIdLong())) {
+                if (channel != null) {
+                    RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)
+                                    .leave();
+                    disconnectExecutors.remove(guild.getIdLong());
+
+                    final var guildConfig = new GuildConfig();
+
+                    if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
+                        Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
+                                .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
+                                .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+                }
+            }
+        }, delay, timeUnit);
+
+        disconnectExecutors.putIfAbsent(guild.getIdLong(), schedule);
     }
 
     public void removeSavedQueue(Guild guild) {

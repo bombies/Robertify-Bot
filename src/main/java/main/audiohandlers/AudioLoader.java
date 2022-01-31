@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -25,7 +25,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     private final Guild guild;
     private final User sender;
-    private final GuildMusicManager musicManager;
+    private final AbstractMusicManager musicManager;
     private final boolean announceMsg;
     private final HashMap<AudioTrack, User> trackRequestedByUser;
     private final String trackUrl;
@@ -33,7 +33,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
 
-    public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
+    public AudioLoader(User sender, AbstractMusicManager musicManager, HashMap<AudioTrack, User> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
@@ -57,7 +57,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         trackRequestedByUser.put(audioTrack, sender);
 
-        final var scheduler = musicManager.getScheduler();
+        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(audioTrack);
@@ -102,7 +102,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             trackRequestedByUser.put(tracks.get(0), sender);
 
-            final var scheduler = musicManager.getScheduler();
+            final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
 
             if (addToBeginning)
                 scheduler.addToBeginningOfQueue(tracks.get(0));
@@ -134,7 +134,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (loadPlaylistShuffled)
             Collections.shuffle(tracks);
 
-        final var scheduler = musicManager.getScheduler();
+        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(tracks);
@@ -164,12 +164,12 @@ public class AudioLoader implements AudioLoadResultHandler {
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
-        musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        ((LavaLinkGuildMusicManager) musicManager).getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
-            if (musicManager.getPlayer().getPlayingTrack() == null)
+            if (((LavaLinkGuildMusicManager) musicManager).getPlayer().getPlayingTrack() == null)
                 musicManager.getGuild().getAudioManager().closeAudioConnection();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))

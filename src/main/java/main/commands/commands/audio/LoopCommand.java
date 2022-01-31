@@ -1,9 +1,10 @@
 package main.commands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lavalink.client.player.IPlayer;
+import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavaplayer.GuildMusicManager;
+import main.audiohandlers.lavalink.LavaLinkGuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
@@ -29,7 +30,7 @@ public class LoopCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
+        var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(ctx.getGuild());
         var audioPlayer = musicManager.getPlayer();
 
         if (checks(selfVoiceState, memberVoiceState, audioPlayer) != null) {
@@ -50,7 +51,7 @@ public class LoopCommand implements ICommand {
         msg.replyEmbeds(eb.build()).queue();
     }
 
-    public EmbedBuilder checks(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, AudioPlayer audioPlayer) {
+    public EmbedBuilder checks(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, IPlayer audioPlayer) {
         final var guild = selfVoiceState.getGuild();
         EmbedBuilder eb;
 
@@ -82,28 +83,31 @@ public class LoopCommand implements ICommand {
         return null;
     }
 
-    public EmbedBuilder handleRepeat(GuildMusicManager musicManager) {
+    public EmbedBuilder handleRepeat(AbstractMusicManager musicManager) {
         final var guild = musicManager.getGuild();
 
-        if (musicManager.getPlayer().getPlayingTrack() == null)
+        final var player = ((LavaLinkGuildMusicManager) musicManager).getPlayer();
+        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
+
+        if (player.getPlayingTrack() == null)
             return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
 
         EmbedBuilder eb;
 
-        if (musicManager.getScheduler().repeating) {
-            musicManager.getScheduler().repeating = false;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + musicManager.getPlayer().getPlayingTrack().getInfo().title + "` will no longer be looped!");
+        if (scheduler.repeating) {
+            scheduler.repeating = false;
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().title + "` will no longer be looped!");
         } else {
-            musicManager.getScheduler().repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + musicManager.getPlayer().getPlayingTrack().getInfo().title + "` will now be looped");
+            scheduler.repeating = true;
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().title + "` will now be looped");
         }
 
         return eb;
     }
 
-    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, AudioPlayer audioPlayer, Guild guild) {
+    public EmbedBuilder handleQueueRepeat(AbstractMusicManager musicManager, IPlayer audioPlayer, Guild guild) {
         EmbedBuilder eb;
-        final var scheduler = musicManager.getScheduler();
+        final var scheduler = ((LavaLinkGuildMusicManager) musicManager).getScheduler();
 
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;
@@ -126,7 +130,7 @@ public class LoopCommand implements ICommand {
             }
 
             scheduler.addToBeginningOfQueue(thisTrack);
-            scheduler.setSavedQueue(guild, musicManager.getScheduler().queue);
+            scheduler.setSavedQueue(guild, scheduler.queue);
             scheduler.queue.remove(thisTrack);
             eb = RobertifyEmbedUtils.embedMessage(guild, "The current queue will now be looped!");
         }

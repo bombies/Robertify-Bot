@@ -45,7 +45,7 @@ public class SkipCommand implements ICommand {
             return eb;
         }
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
 

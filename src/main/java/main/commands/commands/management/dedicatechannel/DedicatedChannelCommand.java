@@ -71,7 +71,7 @@ public class DedicatedChannelCommand implements ICommand {
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
                                 dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
 
-                                if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
+                                if ((RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild)).getPlayer().getPlayingTrack() != null)
                                     dediChannelConfig.updateMessage(guild);
 
                                 msg.addReaction("✅").queue();

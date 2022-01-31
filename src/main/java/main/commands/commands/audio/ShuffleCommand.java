@@ -29,7 +29,7 @@ public class ShuffleCommand implements ICommand {
     }
 
     public EmbedBuilder handleShuffle(Guild guild) {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var musicManager = RobertifyAudioManager.getInstance().getLavaLinkMusicManager(guild);
         final var queue = musicManager.getScheduler().queue;
 
         if (queue.isEmpty())
