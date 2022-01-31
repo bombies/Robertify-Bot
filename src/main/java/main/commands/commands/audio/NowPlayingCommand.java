@@ -86,7 +86,7 @@ public class NowPlayingCommand implements ICommand {
                                 :
                         "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getInfo().getLength()-audioPlayer.getTrackPosition()) + "`\n") +
 
-                "\n🔇 " + GeneralUtils.progressBar((double)(filters.getVolume())/100, GeneralUtils.ProgressBar.FILL) + " 🔊")));
+                "\n🔇 " + GeneralUtils.progressBar(filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
         if (track.getInfo().getSourceName().equals("spotify"))
             eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().getIdentifier()));

@@ -156,7 +156,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             else
                 eb.setImage(theme.getNowPlayingBanner());
 
-            eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + audioPlayer.getFilters().getVolume() + "%");
+            eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + (int)(audioPlayer.getFilters().getVolume() * 100) + "%");
 
             final StringBuilder nextTenSongs = new StringBuilder();
             nextTenSongs.append("```");
