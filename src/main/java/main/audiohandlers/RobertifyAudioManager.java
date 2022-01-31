@@ -32,7 +32,7 @@ public class RobertifyAudioManager {
      */
     private static final HashMap<Long, List<String>> tracksRequestedByUsers = new HashMap<>();
     @Getter
-    private static final List<AudioTrack> unannouncedTracks = new ArrayList<>();
+    private static final List<String> unannouncedTracks = new ArrayList<>();
 
     private RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();

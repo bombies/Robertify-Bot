@@ -53,7 +53,7 @@ public class AudioLoader implements LoadResultHandler {
         sendTrackLoadedMessage(audioTrack);
 
         if (!announceMsg)
-            RobertifyAudioManager.getUnannouncedTracks().add(audioTrack);
+            RobertifyAudioManager.getUnannouncedTracks().add(audioTrack.getTrack());
 
 
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
@@ -113,7 +113,7 @@ public class AudioLoader implements LoadResultHandler {
 
         if (!announceMsg)
             for (final AudioTrack track : tracks)
-                RobertifyAudioManager.getUnannouncedTracks().add(track);
+                RobertifyAudioManager.getUnannouncedTracks().add(track.getTrack());
 
         if (loadPlaylistShuffled)
             Collections.shuffle(tracks);
@@ -143,7 +143,7 @@ public class AudioLoader implements LoadResultHandler {
         sendTrackLoadedMessage(list.get(0));
 
         if (!announceMsg)
-            RobertifyAudioManager.getUnannouncedTracks().add(list.get(0));
+            RobertifyAudioManager.getUnannouncedTracks().add(list.get(0).getTrack());
 
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + list.get(0).getTrack());

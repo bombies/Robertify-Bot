@@ -74,8 +74,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter implements Abstra
 
         if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
 
-        if (RobertifyAudioManager.getUnannouncedTracks().contains(track)) {
-            RobertifyAudioManager.getUnannouncedTracks().remove(track);
+        if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getTrack())) {
+            RobertifyAudioManager.getUnannouncedTracks().remove(track.getTrack());
             return;
         }
 
