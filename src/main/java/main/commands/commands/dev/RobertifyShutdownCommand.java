@@ -20,7 +20,7 @@ public class RobertifyShutdownCommand implements IDevCommand {
     @SneakyThrows
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!permissionCheck(ctx))
+        if (!ctx.getAuthor().getId().equals(Config.get(ENV.OWNER_ID)))
             return;
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Now shutting down...");

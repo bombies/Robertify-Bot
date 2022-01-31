@@ -2,6 +2,8 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,7 +41,7 @@ public class EvalCommand implements IDevCommand {
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        if (!ctx.getAuthor().getId().equals("274681651945144321"))
+        if (!ctx.getAuthor().getId().equals(Config.get(ENV.OWNER_ID)))
             return;
 
         final List<String> args = ctx.getArgs();
