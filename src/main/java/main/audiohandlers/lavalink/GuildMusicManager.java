@@ -37,6 +37,7 @@ public class GuildMusicManager implements AbstractMusicManager {
         getScheduler().playlistRepeating = false;
         getScheduler().clearSavedQueue(guild);
         getScheduler().getPastQueue().clear();
+        getPlayer().getFilters().clear().commit();
         RobertifyAudioManager.clearRequesters(guild);
 
         if (getLink().getPlayer().isPaused())

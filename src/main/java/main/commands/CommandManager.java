@@ -2,6 +2,7 @@ package main.commands;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
+import main.commands.commands.audio.filters.*;
 import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
 import main.commands.commands.audio.*;
@@ -120,6 +121,11 @@ public class CommandManager {
                 new StatisticsCommand(),
                 new WebsiteCommand(),
                 new FavouriteTracksCommand(),
+                new KaraokeFilter(),
+                new NightcoreFilter(),
+                new EightDFilter(),
+                new TremoloFilter(),
+                new VibratoFilter(),
 //                new TwentyFourSevenCommand(),
 
                 //Test Commands
@@ -157,7 +163,12 @@ public class CommandManager {
                 new JoinCommand(),
                 new LofiCommand(),
                 new LyricsCommand(),
-                new FavouriteTracksCommand()
+                new FavouriteTracksCommand(),
+                new KaraokeFilter(),
+                new NightcoreFilter(),
+                new EightDFilter(),
+                new TremoloFilter(),
+                new VibratoFilter()
         );
 
         addManagementCommands(

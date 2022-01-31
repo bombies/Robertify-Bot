@@ -56,7 +56,7 @@ public class VolumeCommand implements ICommand {
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
         var audioPlayer = musicManager.getPlayer();
 
-        audioPlayer.getFilters().setVolume((float)volume/100);
+        audioPlayer.getFilters().setVolume((float)volume/100).commit();
 
         if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
