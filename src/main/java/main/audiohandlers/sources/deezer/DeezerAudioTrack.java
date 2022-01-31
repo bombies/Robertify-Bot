@@ -9,6 +9,6 @@ public class DeezerAudioTrack extends RobertifyAudioTrack {
 
     public DeezerAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager youtubeAudioSourceManager, SoundCloudAudioSourceManager soundCloudAudioSourceManager,
                             Integer deezerID, String trackImage) {
-        super(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, String.valueOf(deezerID), trackImage);
+        super(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, String.valueOf(deezerID), trackImage, new DeezerAudioSourceManager(youtubeAudioSourceManager, soundCloudAudioSourceManager));
     }
 }

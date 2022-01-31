@@ -6,12 +6,10 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
+import lombok.SneakyThrows;
 import main.constants.BotConstants;
 import main.main.Robertify;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -23,12 +21,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfigurable {
+import static com.sedmelluq.discord.lavaplayer.tools.DataFormatTools.readNullableText;
+import static com.sedmelluq.discord.lavaplayer.tools.DataFormatTools.writeNullableText;
+
+public class SpotifyAudioSourceManager implements AudioSourceManager {
     private static final Pattern SPOTIFY_TRACK_REGEX = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/track/([a-zA-z0-9]+))(?:.*)$");
     private static final Pattern SPOTIFY_ARTIST_REGEX = Pattern.compile("^(?:spotify:(artist:)|(?:http://|https://)[a-z]+\\.spotify\\.com/artist/([a-zA-z0-9]+))(?:.*)$");
     private static final Pattern SPOTIFY_ALBUM_REGEX = Pattern.compile("^(?:spotify:(track:)|(?:http://|https://)[a-z]+\\.spotify\\.com/album/([a-zA-z0-9]+))(?:.*)$");
@@ -81,7 +81,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
 
                 AudioTrackInfo info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(),
                         "ytsearch:" + t.getName() + " " + t.getArtists()[0].getName(), false, null);
-                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), album.getImages()[0].getUrl());
+                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), album.getImages()[0].getUrl(), this);
                 playlist.add(track);
             }
 
@@ -112,7 +112,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                         getIdentifier(t.getName(), t.getArtists()[0].getName()),
                         false, null
                 );
-                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages().length >= 1 ? t.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString());
+                var track = new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, t.getId(), t.getAlbum().getImages().length >= 1 ? t.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(), this);
                 playlist.add(track);
             }
 
@@ -162,7 +162,8 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                             youtubeManager,
                             soundCloudManager,
                             plTrack.getId(),
-                            plTrack.getAlbum().getImages().length >= 1 ? plTrack.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString()
+                            plTrack.getAlbum().getImages().length >= 1 ? plTrack.getAlbum().getImages()[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(),
+                            this
                     );
 
                     finalPlaylist.add(track);
@@ -210,8 +211,7 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
                     getIdentifier(track.getName(), track.getArtists()[0].getName()),
                     false, null
             );
-
-            return new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getImages()[0].getUrl());
+            return new SpotifyAudioTrack(info, youtubeManager, soundCloudManager, track.getId(), track.getAlbum().getImages()[0].getUrl(), this);
         } catch (Exception e) {
             logger.error("oops!", e);
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);
@@ -223,29 +223,26 @@ public class SpotifyAudioSourceManager implements AudioSourceManager, HttpConfig
         return false;
     }
 
-    @Override
+    @Override @SneakyThrows
     public void encodeTrack(AudioTrack track, DataOutput output) {
-        // Nothing
+        logger.info("Encoding track...");
+
+        var spotifyTrack = (SpotifyAudioTrack) track;
+        writeNullableText(output, spotifyTrack.getId());
+        writeNullableText(output, spotifyTrack.getTrackImage());
     }
 
-    @Override
+    @Override @SneakyThrows
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) {
-        throw new UnsupportedOperationException("This operation is not supported");
+        logger.info("Decoding track...");
+
+        return new SpotifyAudioTrack(trackInfo, youtubeManager, soundCloudManager,
+                readNullableText(input), readNullableText(input), this);
     }
 
     @Override
     public void shutdown() {
 
-    }
-
-    @Override
-    public void configureRequests(Function<RequestConfig, RequestConfig> configurator) {
-        //
-    }
-
-    @Override
-    public void configureBuilder(Consumer<HttpClientBuilder> configurator) {
-        //
     }
 
     private String getIdentifier(String trackName, String artistName) {

@@ -11,12 +11,9 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.tools.io.HttpConfigurable;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.constants.BotConstants;
 import main.main.Robertify;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,12 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigurable {
+public class DeezerAudioSourceManager implements AudioSourceManager {
     private static final Logger logger = LoggerFactory.getLogger(DeezerAudioSourceManager.class);
 
     private static final Pattern DEEZER_TRACK_REGEX = Pattern.compile("^(http|https)://(www\\.)?deezer\\.com/[a-z]{2,3}/track/([0-9]+)(?:.*)$");
@@ -214,16 +210,6 @@ public class DeezerAudioSourceManager implements AudioSourceManager, HttpConfigu
     @Override
     public void shutdown() {
 
-    }
-
-    @Override
-    public void configureRequests(Function<RequestConfig, RequestConfig> configurator) {
-        //
-    }
-
-    @Override
-    public void configureBuilder(Consumer<HttpClientBuilder> configurator) {
-        //
     }
 
     private String getIdentifier(String trackName, String artistName) {

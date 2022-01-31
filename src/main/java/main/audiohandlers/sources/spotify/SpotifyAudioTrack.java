@@ -8,7 +8,12 @@ import main.audiohandlers.sources.RobertifyAudioTrack;
 public class SpotifyAudioTrack extends RobertifyAudioTrack {
 
     public SpotifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager youtubeAudioSourceManager, SoundCloudAudioSourceManager soundCloudAudioSourceManager,
-                             String spotifyID, String trackImage) {
-        super(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, spotifyID, trackImage);
+                             String spotifyID, String trackImage, SpotifyAudioSourceManager sourceManager) {
+        super(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, spotifyID, trackImage, sourceManager);
+    }
+
+    @Override
+    public String toString() {
+        return "SpotifyTrack(id="+getId()+")";
     }
 }

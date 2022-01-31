@@ -2,8 +2,8 @@ package main.audiohandlers.sources;
 
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
-import com.sedmelluq.discord.lavaplayer.source.youtube.*;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
 import lombok.Getter;
@@ -16,33 +16,38 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
     private final YoutubeAudioSourceManager youtubeAudioSourceManager;
     private final SoundCloudAudioSourceManager soundCloudAudioSourceManager;
+    private final AudioSourceManager sourceManager;
     @Getter
     private final String id;
     @Getter
     private final String trackImage;
 
-    public RobertifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager youtubeAudioSourceManager, SoundCloudAudioSourceManager soundCloudAudioSourceManager, String id, String trackImage) {
+    public RobertifyAudioTrack(AudioTrackInfo trackInfo, YoutubeAudioSourceManager youtubeAudioSourceManager, SoundCloudAudioSourceManager soundCloudAudioSourceManager,
+                               String id, String trackImage, AudioSourceManager sourceManager) {
         super(trackInfo);
         this.youtubeAudioSourceManager = youtubeAudioSourceManager;
         this.soundCloudAudioSourceManager = soundCloudAudioSourceManager;
         this.id = id;
         this.trackImage = trackImage;
+        this.sourceManager = sourceManager;
     }
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
+        logger.info("Processing...");
+
         AudioItem item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "ytmsearch:"), null, id));
 
         if (item instanceof AudioPlaylist playlist) {
-//            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title.split("[(\\-]")[0].strip(), trackInfo.author, trackInfo.length);
-//            logger.info("Searching YouTube Music...");
+            logger.info("[FROM SOURCE] {} - {} [{}]", trackInfo.title.split("[(\\-]")[0].strip(), trackInfo.author, trackInfo.length);
+            logger.info("Searching YouTube Music...");
             AudioTrack track = search(playlist);
 
             if (track == null) {
                 item = youtubeAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier, null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-//                    logger.info("Searching YouTube...");
+                    logger.info("Searching YouTube...");
                     track = search(newPlaylist);
                 }
             }
@@ -51,22 +56,29 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
                 item = soundCloudAudioSourceManager.loadItem(null, new RobertifyAudioReference(trackInfo.identifier.replaceFirst("ytsearch:", "scsearch:"), null, id));
 
                 if (item instanceof AudioPlaylist newPlaylist) {
-//                    logger.info("Searching SoundCloud...");
+                    logger.info("Searching SoundCloud...");
                     track = search(newPlaylist);
                 }
             }
 
-            if (track instanceof YoutubeAudioTrack ytTrack)
-                ytTrack.process(executor);
-            else if (track instanceof SoundCloudAudioTrack scTrack)
-                scTrack.process(executor);
+//            if (track instanceof YoutubeAudioTrack ytTrack)
+//                ytTrack.process(executor);
+//            else if (track instanceof SoundCloudAudioTrack scTrack)
+//                scTrack.process(executor);
+
+            if (track instanceof InternalAudioTrack iTrack) {
+                processDelegate(iTrack, executor);
+                return;
+            }
+
+            throw new FriendlyException("No track found", FriendlyException.Severity.COMMON, new NullPointerException());
         }
     }
 
     private AudioTrack search(AudioPlaylist playlist) {
         for (AudioTrack audioTrack : playlist.getTracks()) {
 
-//            logger.info("{} - {} [{}]", audioTrack.getInfo().title, audioTrack.getInfo().author, audioTrack.getDuration());
+            logger.info("{} - {} [{}]", audioTrack.getInfo().title, audioTrack.getInfo().author, audioTrack.getDuration());
 
             if (audioTrack.getDuration() >= trackInfo.length - 7000
                     && audioTrack.getDuration() <= trackInfo.length + 5000
@@ -85,11 +97,11 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public AudioTrack makeClone() {
-        return new RobertifyAudioTrack(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, id, trackImage);
+        return new RobertifyAudioTrack(trackInfo, youtubeAudioSourceManager, soundCloudAudioSourceManager, id, trackImage, sourceManager);
     }
 
     @Override
     public AudioSourceManager getSourceManager() {
-        return super.getSourceManager();
+        return sourceManager;
     }
 }
