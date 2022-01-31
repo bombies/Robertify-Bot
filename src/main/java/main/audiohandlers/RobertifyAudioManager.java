@@ -8,11 +8,9 @@ import main.commands.CommandContext;
 import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +56,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -84,7 +82,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(channel, selfVoiceState, memberVoiceState);
-            joinVCLavaLink(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -110,7 +108,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -137,7 +135,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -162,7 +160,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -187,7 +185,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -212,7 +210,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -234,7 +232,7 @@ public class RobertifyAudioManager {
 
         try {
 //            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
-            joinVCLavaLink(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -288,7 +286,7 @@ public class RobertifyAudioManager {
         ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    public void joinVCLavaLink(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
+    public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
         try {
             musicManager.getLink().connect(vc);
         } catch (InsufficientPermissionException e) {
@@ -296,35 +294,6 @@ public class RobertifyAudioManager {
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I do not have enough permissions to join " + vc.getAsMention()).build())
                         .queue();
             throw e;
-        }
-    }
-
-    public void joinVoiceChannel(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
-        if (!selfVoiceState.inVoiceChannel()) {
-            final AudioManager audioManager = selfVoiceState.getGuild().getAudioManager();
-            final var vc = memberVoiceState.getChannel();
-            final var guild = channel.getGuild();
-
-            try {
-                audioManager.openAudioConnection(memberVoiceState.getChannel());
-
-                if (vc.getType().equals(ChannelType.STAGE)) {
-                    final var self = selfVoiceState.getMember();
-
-                    if (self.hasPermission(vc, Permission.REQUEST_TO_SPEAK) ||
-                            self.hasPermission(vc, Permission.VOICE_MUTE_OTHERS)) {
-                        vc.getGuild().requestToSpeak();
-                    } else {
-                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I need to have the `"+Permission.REQUEST_TO_SPEAK.getName()+"` permission " +
-                                        "for me to properly play music in this stage channel.")
-                                .build()).queue();
-                    }
-                } else audioManager.setSelfDeafened(true);
-            } catch (InsufficientPermissionException e) {
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have enough permissions to join " + memberVoiceState.getChannel().getAsMention()).build())
-                        .queue();
-                throw e;
-            }
         }
     }
 

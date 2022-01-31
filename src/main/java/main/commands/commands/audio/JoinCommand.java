@@ -52,19 +52,11 @@ public class JoinCommand implements ICommand {
             }
         }
 
-        if (selfVoiceState.inVoiceChannel()) {
-            guild.moveVoiceMember(selfVoiceState.getMember(), channel)
-                    .queue(success -> RobertifyAudioManager.getInstance().getMusicManager(guild)
-                            .getScheduler().scheduleDisconnect(true));
-            return RobertifyEmbedUtils.embedMessage(guild, "I have moved to " + channel.getAsMention()).build();
-        } else {
-            RobertifyAudioManager.getInstance()
-                    .joinVoiceChannel(textChannel, selfVoiceState, memberVoiceState);
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
-            RobertifyAudioManager.getInstance().getMusicManager(guild)
-                    .getScheduler().scheduleDisconnect(true);
-            return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
-        }
+        RobertifyAudioManager.getInstance()
+                .joinVoiceChannel(textChannel, memberVoiceState.getChannel(), musicManager);
+        return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
     }
 
     @Override
