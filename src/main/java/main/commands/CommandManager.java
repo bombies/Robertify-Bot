@@ -302,8 +302,6 @@ public class CommandManager {
     }
 
     public void handle(GuildMessageReceivedEvent e) throws ScriptException {
-        long timeLeft = System.currentTimeMillis() - CooldownManager.INSTANCE.getCooldown(e.getAuthor());
-        if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= CooldownManager.DEFAULT_COOLDOWN) {
             String[] split = e.getMessage().getContentRaw()
                     .replaceFirst("(?i)" + Pattern.quote(new GuildConfig().getPrefix(e.getGuild().getIdLong())), "")
                     .split("\\s+");
@@ -312,79 +310,81 @@ public class CommandManager {
             ICommand cmd = this.getCommand(invoke);
 
             if (cmd != null) {
-                if (cmd.requiresPermission())
-                    if (!hasAllPermissions(cmd, e.getGuild().getSelfMember())) {
-                        final var permissionsRequired = cmd.getPermissionsRequired();
-                        e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(), "I do not have enough permissions to do this\n" +
-                                "Please give my role the following permission(s):\n\n" +
-                                        "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
-                                        "*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*")
-                                        .build())
+                long timeLeft = System.currentTimeMillis() - CooldownManager.INSTANCE.getCooldown(e.getAuthor());
+                if (TimeUnit.MILLISECONDS.toSeconds(timeLeft) >= CooldownManager.DEFAULT_COOLDOWN) {
+                    if (cmd.requiresPermission())
+                        if (!hasAllPermissions(cmd, e.getGuild().getSelfMember())) {
+                            final var permissionsRequired = cmd.getPermissionsRequired();
+                            e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(), "I do not have enough permissions to do this\n" +
+                                                    "Please give my role the following permission(s):\n\n" +
+                                                    "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
+                                                    "*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*")
+                                            .build())
+                                    .queue();
+                            return;
+                        }
+
+                    final List<String> args = Arrays.asList(split).subList(1, split.length);
+                    final CommandContext ctx = new CommandContext(e, args);
+                    final Guild guild = e.getGuild();
+                    final Message msg = e.getMessage();
+                    final var toggles = new TogglesConfig();
+
+                    if (!guild.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+                        e.getChannel().sendMessage("""
+                                    ⚠️ I do not have permissions to send embeds!
+
+                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
                                 .queue();
                         return;
                     }
 
-                final List<String> args = Arrays.asList(split).subList(1, split.length);
-                final CommandContext ctx = new CommandContext(e, args);
-                final Guild guild = e.getGuild();
-                final Message msg = e.getMessage();
-                final var toggles = new TogglesConfig();
-
-                if (!guild.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
-                    e.getChannel().sendMessage("""
-                                    ⚠️ I do not have permissions to send embeds!
-
-                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
-                            .queue();
-                    return;
-                }
-
-                if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                    if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
-                        final var rcConfig = new RestrictedChannelsConfig();
-                        if (!rcConfig.isRestrictedChannel(
-                                guild.getIdLong(),
-                                msg.getTextChannel().getIdLong(),
-                                RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
-                        )) {
-                            return;
+                    if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                        if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
+                            final var rcConfig = new RestrictedChannelsConfig();
+                            if (!rcConfig.isRestrictedChannel(
+                                    guild.getIdLong(),
+                                    msg.getTextChannel().getIdLong(),
+                                    RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
+                            )) {
+                                return;
+                            }
                         }
                     }
-                }
 
-                if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
-                    new RandomMessageManager().randomlySendMessage(ctx.getChannel());
+                    if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
+                        new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
-                if (toggles.isDJToggleSet(guild, cmd)) {
-                    if (toggles.getDJToggle(guild, cmd)) {
-                        if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
-                            cmd.handle(ctx);
+                    if (toggles.isDJToggleSet(guild, cmd)) {
+                        if (toggles.getDJToggle(guild, cmd)) {
+                            if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
+                                cmd.handle(ctx);
 //                            if (!(cmd instanceof StatisticsCommand))
 //                                StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+                            } else {
+                                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
+                                                " to run this command!").build())
+                                        .queue();
+                            }
                         } else {
-                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                            " to run this command!").build())
-                                    .queue();
+                            cmd.handle(ctx);
+//                        if (!(cmd instanceof StatisticsCommand))
+//                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                         }
                     } else {
                         cmd.handle(ctx);
-//                        if (!(cmd instanceof StatisticsCommand))
-//                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
-                    }
-                } else {
-                    cmd.handle(ctx);
 //                    if (!(cmd instanceof StatisticsCommand))
 //                        StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
+                    }
+                    CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
+                } else {
+                    long time_left = CooldownManager.DEFAULT_COOLDOWN - TimeUnit.MILLISECONDS.toSeconds(timeLeft);
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessageWithTitle(e.getGuild(), "⚠  Slow down!",
+                            "You must wait `" + time_left
+                                    + " " + ((time_left <= 1) ? "second`" : "seconds`") + " before running another command!");
+                    e.getMessage().replyEmbeds(eb.build()).queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS));
                 }
             }
-            CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
-        } else {
-            long time_left = CooldownManager.DEFAULT_COOLDOWN - TimeUnit.MILLISECONDS.toSeconds(timeLeft);
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessageWithTitle(e.getGuild(), "⚠  Slow down!",
-                    "You must wait `" + time_left
-                            + " " + ((time_left <= 1) ? "second`" : "seconds`") + " before running another command!");
-            e.getMessage().replyEmbeds(eb.build()).queue(m -> m.delete().queueAfter(5, TimeUnit.SECONDS));
-        }
     }
 
     public boolean hasAllPermissions(ICommand cmd, Member selfMember) {
