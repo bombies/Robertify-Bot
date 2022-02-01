@@ -126,20 +126,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.github.freyacodes</groupId>
-        <artifactId>Lavalink-Client</artifactId>
-        <exclusions>
-          <exclusion>
-            <artifactId>lavaplayer</artifactId>
-            <groupId>com.sedmelluq</groupId>
-          </exclusion>
-          <exclusion>
-            <artifactId>json</artifactId>
-            <groupId>org.json</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>com.jagrosh</groupId>
         <artifactId>jda-utilities</artifactId>
         <exclusions>

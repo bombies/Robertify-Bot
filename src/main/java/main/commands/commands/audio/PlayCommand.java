@@ -15,6 +15,8 @@ import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,6 +140,7 @@ public class PlayCommand implements ICommand {
                         } catch (Exception e) {
                             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to create a " +
                                     "local audio directory. Contact the developers immediately!").build())
+                                    .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                     .queue();
 
                             logger.error("[FATAL ERROR] Could not create audio directory!", e);
@@ -164,6 +167,7 @@ public class PlayCommand implements ICommand {
                                         logger.error("[FATAL ERROR] Error when attempting to download track", e);
                                         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
                                                         "download the file. Contact the developers immediately!").build())
+                                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                                 .queue();
                                         return null;
                                     });
@@ -178,20 +182,19 @@ public class PlayCommand implements ICommand {
                         logger.error("[FATAL ERROR] Error when attempting to download track", e);
                         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
                                         "download the file. Contact the developers immediately!").build())
+                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                 .queue();
                         return;
                     }
                 }
-                default -> {
-                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid file.").build())
-                            .queue();
-                }
+                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid file.").build())
+                        .queue();
             }
 
             return;
         }
 
-        String link = "";
+        String link;
         boolean addToBeginning = false;
 
         if (args.size() >= 2) {

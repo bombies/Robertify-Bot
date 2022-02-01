@@ -54,7 +54,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -80,7 +79,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(channel, selfVoiceState, memberVoiceState);
             joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -106,7 +104,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -133,7 +130,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -158,7 +154,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -183,7 +178,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -208,7 +202,6 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-//            joinVoiceChannel(event.getTextChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
@@ -230,7 +223,6 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(channel.getGuild());
 
         try {
-//            joinVoiceChannel(ctx.getChannel(), selfVoiceState, memberVoiceState);
             joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
