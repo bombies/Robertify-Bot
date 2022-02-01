@@ -46,6 +46,6 @@ public class NightcoreFilter implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Toggle the nightcore filter";
     }
 }

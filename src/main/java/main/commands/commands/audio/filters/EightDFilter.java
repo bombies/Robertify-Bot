@@ -45,6 +45,6 @@ public class EightDFilter implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Toggle the 8d filter";
     }
 }

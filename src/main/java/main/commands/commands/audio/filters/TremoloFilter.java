@@ -44,6 +44,6 @@ public class TremoloFilter implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Toggle the tremolo filter";
     }
 }

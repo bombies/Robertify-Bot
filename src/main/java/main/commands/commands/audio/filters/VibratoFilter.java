@@ -44,6 +44,6 @@ public class VibratoFilter implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Toggle the vibrato filter";
     }
 }
