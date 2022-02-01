@@ -127,6 +127,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This feature isn't available right now!").build()).queue();
                 return;
             }
+
             List<MessageEmbed.Field> embedField = suggestion.getEmbeds().get(0).getFields();
             final String suggester = embedField.get(0).getValue();
             final String pendingSuggestion = embedField.get(1).getValue();
@@ -135,7 +136,8 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                     new Color(77, 255, 69),
                     suggester,
                     pendingSuggestion,
-                    suggestion.getEmbeds().get(0).getThumbnail().getUrl()
+                    suggestion.getEmbeds().get(0).getThumbnail().getUrl(),
+                    null
             )).queue();
 
             suggestion.delete().queue();
@@ -211,7 +213,8 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                     new Color(187, 0, 0),
                     suggester,
                     pendingSuggestion,
-                    suggestion.getEmbeds().get(0).getThumbnail().getUrl()
+                    suggestion.getEmbeds().get(0).getThumbnail().getUrl(),
+                    reason
             )).queue();
 
             suggestion.delete().queue();
@@ -240,13 +243,17 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                 }));
     }
 
-    private MessageEmbed getEmbed(Color color, String suggester, String suggestion, String thumbnail) {
+    private MessageEmbed getEmbed(Color color, String suggester, String suggestion, String thumbnail, String reason) {
         final EmbedBuilder eb = new EmbedBuilder();
 
         eb.setColor(color);
         eb.setTitle("Suggestion");
         eb.addField("Suggester",  suggester , false);
         eb.addField("Suggestion", suggestion, false);
+
+        if (reason != null)
+            eb.addField("Reason", reason, false);
+
 
         if (thumbnail != null)
             eb.setThumbnail(thumbnail);
