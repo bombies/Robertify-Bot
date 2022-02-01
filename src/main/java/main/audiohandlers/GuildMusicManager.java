@@ -13,8 +13,6 @@ public class GuildMusicManager implements AbstractMusicManager {
     private final TrackScheduler scheduler;
     @Getter
     private final JdaLink link;
-    @Getter
-    private boolean isAwaitingDeath;
     @Setter @Getter
     private boolean forcePaused;
 
@@ -40,11 +38,6 @@ public class GuildMusicManager implements AbstractMusicManager {
 
         if (getLink().getPlayer().isPaused())
             getLink().getPlayer().setPaused(false);
-
-        if (guild == null) {
-            link.destroy();
-            return;
-        }
 
         scheduler.stop();
         RobertifyAudioManager.getInstance().removeMusicManager(guild);

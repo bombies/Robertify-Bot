@@ -18,6 +18,13 @@ public class VibratoFilter implements ICommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var filters = audioPlayer.getFilters();
+        final var selfMember = ctx.getSelfMember();
+
+        if (!selfMember.getVoiceState().inVoiceChannel()) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
+                    .queue();
+            return;
+        }
 
         if (filters.getVibrato() != null) {
             filters.setVibrato(null).commit();
