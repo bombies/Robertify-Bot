@@ -32,11 +32,6 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version>
-        </dependency>
-        <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>2.2.3</version>
@@ -88,11 +83,6 @@
             <version>4.4.1</version>
         </dependency>
         <dependency>
-            <groupId>com.sedmelluq</groupId>
-            <artifactId>jda-nas</artifactId>
-            <version>1.1.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
             <version>1.0.3</version>
@@ -102,33 +92,9 @@
             <artifactId>Lavalink-Client</artifactId>
             <version>1.0.1</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.Topis-Lavalink-Plugins</groupId>
-            <artifactId>Spotify-SourceManager</artifactId>
-            <version>1.0.17</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.walkyst</groupId>
-            <artifactId>lavaplayer-fork</artifactId>
-            <version>1.3.97</version>
-        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.github.freyacodes</groupId>
-                <artifactId>Lavalink-Client</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.sedmelluq</groupId>
-                        <artifactId>lavaplayer</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.json</groupId>
-                        <artifactId>json</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
             <dependency>
                 <groupId>com.jagrosh</groupId>
                 <artifactId>jda-utilities</artifactId>
