@@ -4,7 +4,6 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -22,7 +21,7 @@ public class VoteCommand extends InteractiveCommand implements ICommand {
                 .setActionRow(
                         Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
                         Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Discord Extreme List")
+                        Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com")
                 )
                 .queue();
     }
@@ -68,7 +67,7 @@ public class VoteCommand extends InteractiveCommand implements ICommand {
                 .addActionRow(
                         Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
                         Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                        Button.of(ButtonStyle.LINK, "https://discordextremelist.xyz/en-US/bots/893558050504466482", "Discord Extreme List")
+                        Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com")
                 )
                 .queue();
     }
