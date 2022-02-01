@@ -67,6 +67,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter implements Abstra
 
     @Override
     public void onTrackStart(IPlayer player, AudioTrack track) {
+        if (disconnectExecutors.containsKey(guild.getIdLong())) {
+            disconnectExecutors.get(guild.getIdLong()).cancel(false);
+            disconnectExecutors.remove(guild.getIdLong());
+        }
+
         if (repeating) return;
 
         if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
@@ -131,6 +136,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter implements Abstra
         try {
             if (nextTrack != null)
                 getMusicPlayer().playTrack(nextTrack);
+            else
+                scheduleDisconnect(true);
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack);
         }
