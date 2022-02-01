@@ -213,6 +213,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter implements Abstra
         queue = newQueue;
     }
 
+    public void removeScheduledDisconnect(Guild guild) {
+        disconnectExecutors.get(guild.getIdLong()).cancel(false);
+        disconnectExecutors.remove(guild.getIdLong());
+    }
+
     public void scheduleDisconnect(boolean announceMsg) {
         scheduleDisconnect(announceMsg, 5, TimeUnit.MINUTES);
     }

@@ -48,6 +48,10 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
             return RobertifyEmbedUtils.embedMessage(guild, "You have turned 24/7 mode **off**").build();
         } else {
             config.set247(guild.getIdLong(), true);
+
+            RobertifyAudioManager.getInstance().getMusicManager(guild)
+                    .getScheduler().removeScheduledDisconnect(guild);
+
             return RobertifyEmbedUtils.embedMessage(guild, "You have turned 24/7 mode **on**").build();
         }
     }
