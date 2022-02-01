@@ -145,6 +145,32 @@ public class RobertifyAudioManager {
         );
     }
 
+    @SneakyThrows
+    public void loadAndPlayFromDedicatedChannelShuffled(String trackUrl, GuildVoiceState selfVoiceState,
+                                                GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
+                                                boolean addToBeginning) {
+
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
+
+        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
+            trackUrl += " audio";
+
+        try {
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadPlaylistShuffled(
+                trackUrl,
+                musicManager,
+                ctx,
+                false,
+                botMsg,
+                addToBeginning
+        );
+    }
+
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandEvent event, boolean addToBeginning) {

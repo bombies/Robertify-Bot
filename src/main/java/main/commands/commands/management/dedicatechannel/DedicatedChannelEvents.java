@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.constants.Permission;
+import main.constants.SourcePlaylistPatterns;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -103,17 +104,48 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = event.getMessage().getContentRaw();
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
-            final boolean addToBeginning = message.endsWith("-n") || message.endsWith("-next");
+            boolean addToBeginning = false;
+            final var split = message.split(" ");
 
-            if (!GeneralUtils.isUrl(message.replaceAll("\\s-(n|next)$", "")))
-                message = "ytsearch:" + (
-                        (message.endsWith("-n")) ? message.replaceAll("\\s-n$", "") :
-                                (message.endsWith("-next") ? message.replaceAll("\\s-next$", "") : message)
-                        );
+            if (split.length == 1) {
+                message = "ytseach:" + message;
+            } else {
+                switch (split[split.length-1].toLowerCase()) {
+                    case "-n", "-next" -> {
+                        message = "ytsearch:" + message.toLowerCase().replaceAll("\\s-(n|next)$", "");
+                        addToBeginning = true;
+                    }
+                    case "-s", "-shuffle" -> {
+                        var msgNoFlags = message.replaceAll("\\s-(s|shuffle)$", "");
 
-            RobertifyAudioManager.getInstance()
-                    .loadAndPlayFromDedicatedChannel(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
-                            new CommandContext(event, null), null, addToBeginning);
+                        if (!GeneralUtils.isUrl(msgNoFlags)) {
+                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the URL of an album/playlist for me to shuffle!").build())
+                                    .queue();
+                            event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+                                return;
+                        }
+
+                        if (!SourcePlaylistPatterns.isPlaylistLink(msgNoFlags)) {
+                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid Spotify/Deezer/YouTube/SoundCloud playlist or album").build())
+                                    .queue();
+                            event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+                            return;
+                        }
+
+                        message = msgNoFlags;
+                    }
+                }
+            }
+
+            if (addToBeginning)
+                RobertifyAudioManager.getInstance()
+                        .loadAndPlayFromDedicatedChannel(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
+                                new CommandContext(event, null), null, true);
+            else {
+                RobertifyAudioManager.getInstance()
+                        .loadAndPlayFromDedicatedChannelShuffled(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
+                                new CommandContext(event, null), null, false);
+            }
         }
 
         if (event.getAuthor().isBot()) {
