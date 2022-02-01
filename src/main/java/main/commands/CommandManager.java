@@ -12,6 +12,7 @@ import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand
 import main.commands.commands.management.permissions.*;
 import main.commands.commands.management.TogglesCommand;
 import main.commands.commands.audio.LyricsCommand;
+import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.util.*;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
@@ -126,7 +127,8 @@ public class CommandManager {
                 new EightDFilter(),
                 new TremoloFilter(),
                 new VibratoFilter(),
-//                new TwentyFourSevenCommand(),
+                new TwentyFourSevenCommand(),
+                new PlaytimeCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -183,14 +185,15 @@ public class CommandManager {
                 new UnbanCommand(),
                 new DedicatedChannelCommand(),
                 new RestrictedChannelsCommand(),
-                new ThemeCommand()
-//                new TwentyFourSevenCommand()
+                new ThemeCommand(),
+                new TwentyFourSevenCommand()
         );
 
         addMiscCommands(
                 new PingCommand(),
                 new EightBallCommand(),
-                new PollCommand()
+                new PollCommand(),
+                new PlaytimeCommand()
         );
 
         addUtilityCommands(
