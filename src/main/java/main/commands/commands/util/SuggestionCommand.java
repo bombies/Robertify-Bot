@@ -280,7 +280,11 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         eb.setThumbnail(suggester.getEffectiveAvatarUrl());
         eb.setTimestamp(Instant.now());
 
-        pendingChannel.sendMessageEmbeds(eb.build()).queue();
+        pendingChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
+            msg.addReaction("👍").queue();
+            msg.addReaction("👎").queue();
+        });
+
         return RobertifyEmbedUtils.embedMessage(guild, "You have successfully sent your suggestion!\n\n" +
                 "*Be sure to be on the lookout for a response in your DMs! Ensure your direct messages are enabled" +
                 " else you will not receive any updates on your suggestion.*").build();
