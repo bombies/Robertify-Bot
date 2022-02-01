@@ -9,6 +9,7 @@ import main.commands.ICommand;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.spotify.SpotifyUtils;
@@ -88,8 +89,10 @@ public class NowPlayingCommand implements ICommand {
 
                 "\n🔇 " + GeneralUtils.progressBar(filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
-        if (track.getInfo().getSourceName().equals("spotify"))
-            eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().getIdentifier()));
+        switch (track.getInfo().getSourceName()) {
+            case "spotify" -> eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().getIdentifier()));
+            case "deezer" -> eb.setThumbnail(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().getIdentifier())));
+        }
 
         eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.getUri()) ? info.getUri() : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
 

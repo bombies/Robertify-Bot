@@ -9,6 +9,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -151,10 +152,11 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
             eb.setDescription("Requested by " + requester);
 
-            if (trackInfo.getSourceName().equals("spotify"))
-                eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.getIdentifier()));
-            else
-                eb.setImage(theme.getNowPlayingBanner());
+            switch (trackInfo.getSourceName()) {
+                case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.getIdentifier()));
+                case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.getIdentifier())));
+                default -> eb.setImage(theme.getNowPlayingBanner());
+            }
 
             eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + (int)(audioPlayer.getFilters().getVolume() * 100) + "%");
 
