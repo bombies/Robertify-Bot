@@ -16,6 +16,7 @@ import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
+import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
@@ -132,7 +133,8 @@ public class Robertify {
                             new ThemeCommand(),
                             new WebsiteCommand(),
                             new FavouriteTracksCommand(),
-                            new TwentyFourSevenCommand()
+                            new TwentyFourSevenCommand(),
+                            new PlaytimeCommand()
                     )
 
                     // Test Listeners

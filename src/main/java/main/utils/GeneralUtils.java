@@ -280,7 +280,7 @@ public class GeneralUtils {
         return ((day > 0) ? day + ((day > 1) ? " days, " : " day, ") : "")
                 + ((hour > 0) ? hour + ((hour > 1) ? " hours, " : " hour, ") : "")
                 + ((minute > 0) ? minute + ((minute > 1) ? " minutes, " : " minute, ") : "")
-                + second + ((second > 1) ? " seconds" : " second");
+                + second + ((second > 1) ? " seconds" : (second == 0 ? " seconds" : " second"));
     }
 
     public static String formatDate(long date, TimeFormat style) {

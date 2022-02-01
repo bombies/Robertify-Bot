@@ -6,6 +6,7 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
+import main.commands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
@@ -107,6 +108,17 @@ public class TrackScheduler extends PlayerEventListenerAdapter implements Abstra
     }
 
     public void nextTrack() {
+        nextTrack(false, null);
+    }
+
+    public void nextTrack(boolean skipped, Long skippedAt) {
+        HashMap<Long, Long> playtime = PlaytimeCommand.playtime;
+        if (!skipped) {
+            playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + pastQueue.peek().getInfo().getLength() : pastQueue.peek().getInfo().getLength());
+        } else {
+            playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + skippedAt : skippedAt);
+        }
+
         if (queue.isEmpty())
             if (playlistRepeating)
                 this.queue = new ConcurrentLinkedQueue<>(savedQueue.get(guild));

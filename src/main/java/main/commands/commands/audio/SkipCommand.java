@@ -59,7 +59,7 @@ public class SkipCommand implements ICommand {
         if (scheduler.repeating)
             scheduler.repeating = false;
 
-        musicManager.getScheduler().nextTrack();
+        musicManager.getScheduler().nextTrack(true, audioPlayer.getTrackPosition());
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

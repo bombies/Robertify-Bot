@@ -6,14 +6,12 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.slashcommands.*;
-import main.commands.commands.management.BanCommand;
-import main.commands.commands.management.SetChannelCommand;
-import main.commands.commands.management.ThemeCommand;
-import main.commands.commands.management.UnbanCommand;
+import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
+import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.util.*;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
@@ -232,12 +230,14 @@ public class Listener extends ListenerAdapter {
         new ThemeCommand().initCommand(g);
         new WebsiteCommand().initCommand(g);
         new FavouriteTracksCommand().initCommand(g);
-//        new TwentyFourSevenCommand().initCommand(g);
+        new TwentyFourSevenCommand().initCommand(g);
+        new PlaytimeCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-//        new TwentyFourSevenCommand().initCommand(g);
+        new TwentyFourSevenCommand().initCommand(g);
+        new PlaytimeCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

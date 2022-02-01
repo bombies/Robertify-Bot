@@ -54,12 +54,12 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
 
     @Override
     public String getName() {
-        return "24/7";
+        return "247";
     }
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Toggle whether or not the bot stays in a voice channel 24/7";
     }
 
     @Override
