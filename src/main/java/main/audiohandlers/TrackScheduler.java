@@ -1,4 +1,4 @@
-package main.audiohandlers.lavalink;
+package main.audiohandlers;
 
 import lavalink.client.io.Link;
 import lavalink.client.player.IPlayer;
@@ -6,8 +6,6 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
-import main.audiohandlers.AbstractTrackScheduler;
-import main.audiohandlers.RobertifyAudioManager;
 import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;

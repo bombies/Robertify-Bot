@@ -4,7 +4,7 @@ import lavalink.client.player.IPlayer;
 import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.lavalink.GuildMusicManager;
+import main.audiohandlers.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;

@@ -4,7 +4,6 @@ import lavalink.client.io.FriendlyException;
 import lavalink.client.io.LoadResultHandler;
 import lavalink.client.player.track.AudioPlaylist;
 import lavalink.client.player.track.AudioTrack;
-import main.audiohandlers.lavalink.GuildMusicManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;

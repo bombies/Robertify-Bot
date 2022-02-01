@@ -1,11 +1,9 @@
-package main.audiohandlers.lavalink;
+package main.audiohandlers;
 
 import lavalink.client.io.jda.JdaLink;
 import lavalink.client.player.LavalinkPlayer;
 import lombok.Getter;
 import lombok.Setter;
-import main.audiohandlers.AbstractMusicManager;
-import main.audiohandlers.RobertifyAudioManager;
 import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
 
