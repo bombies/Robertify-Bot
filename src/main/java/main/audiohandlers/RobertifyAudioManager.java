@@ -263,35 +263,35 @@ public class RobertifyAudioManager {
         );
     }
 
-    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
+    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            User user, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(user, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
+    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender,
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    private void loadPlaylistShuffled(User requester, String trackUrl, AbstractMusicManager musicManager, boolean announceMsg, Message botMsg,
+    private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(requester, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
+    private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
                                       boolean announceMsg, Message botMsg, User sender,
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
     public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {

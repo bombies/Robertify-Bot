@@ -1,7 +1,6 @@
 package main.commands.commands.audio;
 
 import lavalink.client.player.track.AudioTrack;
-import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.CommandContext;
@@ -50,9 +49,9 @@ public class StopCommand implements ICommand {
         msg.replyEmbeds(handleStop(musicManager).build()).queue();
     }
 
-    public EmbedBuilder handleStop(AbstractMusicManager musicManager) {
-        final var audioPlayer = ((GuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+    public EmbedBuilder handleStop(GuildMusicManager musicManager) {
+        final var audioPlayer = musicManager.getPlayer();
+        final var scheduler = musicManager.getScheduler();
         final var guild = musicManager.getGuild();
         final AudioTrack track = audioPlayer.getPlayingTrack();
 

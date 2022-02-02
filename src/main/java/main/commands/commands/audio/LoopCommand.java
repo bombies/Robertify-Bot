@@ -2,7 +2,6 @@ package main.commands.commands.audio;
 
 import lavalink.client.player.IPlayer;
 import lavalink.client.player.track.AudioTrack;
-import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.CommandContext;
@@ -83,11 +82,11 @@ public class LoopCommand implements ICommand {
         return null;
     }
 
-    public EmbedBuilder handleRepeat(AbstractMusicManager musicManager) {
+    public EmbedBuilder handleRepeat(GuildMusicManager musicManager) {
         final var guild = musicManager.getGuild();
 
-        final var player = ((GuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var player = musicManager.getPlayer();
+        final var scheduler = musicManager.getScheduler();
 
         if (player.getPlayingTrack() == null)
             return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
@@ -105,9 +104,9 @@ public class LoopCommand implements ICommand {
         return eb;
     }
 
-    public EmbedBuilder handleQueueRepeat(AbstractMusicManager musicManager, IPlayer audioPlayer, Guild guild) {
+    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, IPlayer audioPlayer, Guild guild) {
         EmbedBuilder eb;
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var scheduler = musicManager.getScheduler();
 
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;

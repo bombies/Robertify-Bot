@@ -25,7 +25,7 @@ public class AudioLoader implements LoadResultHandler {
 
     private final Guild guild;
     private final User sender;
-    private final AbstractMusicManager musicManager;
+    private final GuildMusicManager musicManager;
     private final boolean announceMsg;
     private final HashMap<Long, List<String>> trackRequestedByUser;
     private final String trackUrl;
@@ -33,7 +33,7 @@ public class AudioLoader implements LoadResultHandler {
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
 
-    public AudioLoader(User sender, AbstractMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
+    public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();

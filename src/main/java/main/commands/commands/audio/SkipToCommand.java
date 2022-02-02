@@ -1,7 +1,6 @@
 package main.commands.commands.audio;
 
 import lavalink.client.player.track.AudioTrack;
-import main.audiohandlers.AbstractMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.CommandContext;
@@ -43,12 +42,12 @@ public class SkipToCommand implements ICommand {
         msg.replyEmbeds(handleSkip(queue, musicManager, id).build()).queue();
     }
 
-    public EmbedBuilder handleSkip(ConcurrentLinkedQueue<AudioTrack> queue, AbstractMusicManager musicManager, int id) {
+    public EmbedBuilder handleSkip(ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
         if (id > queue.size() || id <= 0)
             return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "ID provided isn't a valid ID!");
 
-        final var audioPlayer = ((GuildMusicManager) musicManager).getPlayer();
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var audioPlayer = musicManager.getPlayer();
+        final var scheduler = musicManager.getScheduler();
         final var guild = musicManager.getGuild();
         List<AudioTrack> currentQueue = new ArrayList<>(queue);
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();

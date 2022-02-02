@@ -8,7 +8,8 @@ import lombok.Setter;
 import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
 
-public class GuildMusicManager implements AbstractMusicManager {
+public class GuildMusicManager {
+    @Getter
     private final Guild guild;
     @Getter
     private final TrackScheduler scheduler;
@@ -54,10 +55,5 @@ public class GuildMusicManager implements AbstractMusicManager {
 
     public LavalinkPlayer getPlayer() {
         return link.getPlayer();
-    }
-
-    @Override
-    public Guild getGuild() {
-        return guild;
     }
 }
