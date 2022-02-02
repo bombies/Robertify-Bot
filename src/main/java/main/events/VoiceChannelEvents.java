@@ -128,7 +128,8 @@ public class VoiceChannelEvents extends ListenerAdapter {
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-                        RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
+                        if (!new GuildConfig().get247(event.getGuild().getIdLong()))
+                            RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
                     }
             );
         }
