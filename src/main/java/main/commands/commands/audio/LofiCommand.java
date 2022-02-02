@@ -36,10 +36,10 @@ public class LofiCommand implements ICommand {
                         announceLofiMode.add(guild.getIdLong());
                         RobertifyAudioManager.getInstance()
                                 .loadAndPlayFromDedicatedChannel(
+                                        ctx.getChannel(),
                                         "https://www.youtube.com/watch?v=5qap5aO4i9A&ab_channel=LofiGirl",
                                         guild.getSelfMember().getVoiceState(),
                                         ctx.getMember().getVoiceState(),
-                                        ctx,
                                         botMsg,
                                         false
                                 );

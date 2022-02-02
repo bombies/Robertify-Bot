@@ -45,8 +45,8 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, CommandContext ctx,
+    public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState,
                             Message botMsg, boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -54,7 +54,7 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -62,7 +62,7 @@ public class RobertifyAudioManager {
         loadTrack(
                 trackUrl,
                 musicManager,
-                ctx,
+                memberVoiceState.getMember().getUser(),
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
                 botMsg,
                 addToBeginning
@@ -110,9 +110,9 @@ public class RobertifyAudioManager {
         }
 
         loadPlaylistShuffled(
+                memberVoiceState.getMember().getUser(),
                 trackUrl,
                 musicManager,
-                ctx,
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
                 botMsg,
                 addToBeginning
@@ -120,8 +120,8 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
-                                                GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
+    public void loadAndPlayFromDedicatedChannel(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+                                                GuildVoiceState memberVoiceState, Message botMsg,
                                                 boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -130,7 +130,7 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -138,7 +138,7 @@ public class RobertifyAudioManager {
         loadTrack(
                 trackUrl,
                 musicManager,
-                ctx,
+                memberVoiceState.getMember().getUser(),
                 false,
                 botMsg,
                 addToBeginning
@@ -146,8 +146,8 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlayFromDedicatedChannelShuffled(String trackUrl, GuildVoiceState selfVoiceState,
-                                                GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
+    public void loadAndPlayFromDedicatedChannelShuffled(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+                                                GuildVoiceState memberVoiceState, Message botMsg,
                                                 boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -156,15 +156,15 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
 
         loadPlaylistShuffled(
+                memberVoiceState.getMember().getUser(),
                 trackUrl,
                 musicManager,
-                ctx,
                 false,
                 botMsg,
                 addToBeginning
@@ -244,19 +244,19 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState,
-                                 GuildVoiceState memberVoiceState, CommandContext ctx, Message botMsg,
+                                 GuildVoiceState memberVoiceState, Message botMsg,
                                  boolean addToBeginning) {
         final var musicManager = getMusicManager(channel.getGuild());
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
         loadTrack(
                 path,
                 musicManager,
-                ctx,
+                memberVoiceState.getMember().getUser(),
                 new TogglesConfig().getToggle(selfVoiceState.getGuild(), Toggles.ANNOUNCE_MESSAGES),
                 botMsg,
                 addToBeginning
@@ -272,14 +272,6 @@ public class RobertifyAudioManager {
     }
 
     private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
-                           CommandContext ctx, boolean announceMsg, Message botMsg,
-                           boolean addToBeginning) {
-
-        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
-    }
-
-    private void loadTrack(String trackUrl, AbstractMusicManager musicManager,
                            boolean announceMsg, Message botMsg, User sender,
                            boolean addToBeginning) {
 
@@ -287,11 +279,10 @@ public class RobertifyAudioManager {
         ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
-    private void loadPlaylistShuffled(String trackUrl, AbstractMusicManager musicManager,
-                                      CommandContext ctx, boolean announceMsg, Message botMsg,
+    private void loadPlaylistShuffled(User requester, String trackUrl, AbstractMusicManager musicManager, boolean announceMsg, Message botMsg,
                                       boolean addToBeginning) {
 
-        final AudioLoader loader = new AudioLoader(ctx.getAuthor(), musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
+        final AudioLoader loader = new AudioLoader(requester, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
         ((GuildMusicManager) musicManager).getLink().getRestClient().loadItem(trackUrl, loader);
     }
 

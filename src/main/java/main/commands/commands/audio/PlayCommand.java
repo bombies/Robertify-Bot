@@ -131,66 +131,7 @@ public class PlayCommand implements ICommand {
             }
 
             var audioFile = attachments.get(0);
-
-            switch (audioFile.getFileExtension().toLowerCase()) {
-                case "mp3", "ogg", "m4a", "wav", "flac" -> {
-                    if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {
-                        try {
-                            Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
-                        } catch (Exception e) {
-                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to create a " +
-                                    "local audio directory. Contact the developers immediately!").build())
-                                    .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
-                                    .queue();
-
-                            logger.error("[FATAL ERROR] Could not create audio directory!", e);
-                            return;
-                        }
-                    }
-
-                    try {
-                        if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
-                            audioFile.downloadToFile(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName())
-                                    .thenAccept(file -> {
-                                        try {
-                                            file.createNewFile();
-                                        } catch (IOException e) {
-                                            logger.error("[FATAL ERROR] Error when trying to create a new audio file!", e);
-                                        }
-
-                                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
-                                            RobertifyAudioManager.getInstance()
-                                                    .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg, false);
-                                        });
-                                    })
-                                    .exceptionally(e -> {
-                                        logger.error("[FATAL ERROR] Error when attempting to download track", e);
-                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
-                                                        "download the file. Contact the developers immediately!").build())
-                                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
-                                                .queue();
-                                        return null;
-                                    });
-                        } else {
-                            File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
-                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
-                                RobertifyAudioManager.getInstance()
-                                        .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, ctx, addingMsg, false);
-                            });
-                        }
-                    } catch (IllegalArgumentException e) {
-                        logger.error("[FATAL ERROR] Error when attempting to download track", e);
-                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
-                                        "download the file. Contact the developers immediately!").build())
-                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
-                                .queue();
-                        return;
-                    }
-                }
-                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid file.").build())
-                        .queue();
-            }
-
+            playLocalAudio(guild, channel, msg, member, audioFile);
             return;
         }
 
@@ -216,8 +157,71 @@ public class PlayCommand implements ICommand {
         boolean finalAddToBeginning = addToBeginning;
         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
-                    .loadAndPlay(finalLink, selfVoiceState, memberVoiceState, ctx, addingMsg, finalAddToBeginning);
+                    .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, addingMsg, finalAddToBeginning);
         });
+    }
+
+    public void playLocalAudio(Guild guild, TextChannel channel, Message msg, Member member, Message.Attachment audioFile) {
+        switch (audioFile.getFileExtension().toLowerCase()) {
+            case "mp3", "ogg", "m4a", "wav", "flac" -> {
+                if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {
+                    try {
+                        Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
+                    } catch (Exception e) {
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to create a " +
+                                        "local audio directory. Contact the developers immediately!").build())
+                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                .queue();
+
+                        logger.error("[FATAL ERROR] Could not create audio directory!", e);
+                        return;
+                    }
+                }
+
+                final var selfVoiceState = guild.getSelfMember().getVoiceState();
+                final var memberVoiceState = member.getVoiceState();
+
+                try {
+                    if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
+                        audioFile.downloadToFile(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName())
+                                .thenAccept(file -> {
+                                    try {
+                                        file.createNewFile();
+                                    } catch (IOException e) {
+                                        logger.error("[FATAL ERROR] Error when trying to create a new audio file!", e);
+                                    }
+
+                                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
+                                        RobertifyAudioManager.getInstance()
+                                                .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
+                                    });
+                                })
+                                .exceptionally(e -> {
+                                    logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
+                                                    "download the file. Contact the developers immediately!").build())
+                                            .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                            .queue();
+                                    return null;
+                                });
+                    } else {
+                        File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
+                            RobertifyAudioManager.getInstance()
+                                    .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
+                        });
+                    }
+                } catch (IllegalArgumentException e) {
+                    logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
+                                    "download the file. Contact the developers immediately!").build())
+                            .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                            .queue();
+                }
+            }
+            default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid file.").build())
+                    .queue();
+        }
     }
 
     @Override

@@ -1,23 +1,19 @@
 package main.commands.commands.management.dedicatechannel;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.constants.Permission;
 import main.constants.SourcePlaylistPatterns;
+import main.constants.Toggles;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.GeneralUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.constants.Toggles;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -101,9 +97,21 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        String message = event.getMessage().getContentRaw();
+        Message eventMessage = event.getMessage();
+        String message = eventMessage.getContentRaw();
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
+            if (!eventMessage.getAttachments().isEmpty()) {
+                var audioFile = eventMessage.getAttachments().get(0);
+                new PlayCommand().playLocalAudio(guild, event.getChannel(), eventMessage, event.getMember(), audioFile);
+
+                event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS, null, new ErrorHandler()
+                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                );
+
+                return;
+            }
+
             boolean addToBeginning = false;
             final var split = message.split(" ");
 
@@ -139,12 +147,10 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (addToBeginning)
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
-                                new CommandContext(event, null), null, true);
+                        .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
             else {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannelShuffled(message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(),
-                                new CommandContext(event, null), null, false);
+                        .loadAndPlayFromDedicatedChannelShuffled(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             }
         }
 

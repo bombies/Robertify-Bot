@@ -124,7 +124,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                     (e) -> {
                         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
                         if (musicManager.getPlayer().isPaused() && !musicManager.isForcePaused())
-                            musicManager.getPlayer().setPaused(false);;
+                            musicManager.getPlayer().setPaused(false);
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
