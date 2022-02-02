@@ -33,6 +33,14 @@ public class GuildsDB extends AbstractMongoDatabase {
         }
     }
 
+    public synchronized void addGuild(long gid) {
+        addDocument(getGuildDocument(gid));
+    }
+
+    public synchronized void removeGuild(long gid) {
+        removeDocument(findSpecificDocument(Field.GUILD_ID, gid));
+    }
+
     public static synchronized GuildsDB ins() {
         if (INSTANCE == null)
             INSTANCE = new GuildsDB();

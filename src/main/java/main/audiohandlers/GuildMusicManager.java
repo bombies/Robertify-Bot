@@ -1,5 +1,6 @@
 package main.audiohandlers;
 
+import lavalink.client.io.Link;
 import lavalink.client.io.jda.JdaLink;
 import lavalink.client.player.LavalinkPlayer;
 import lombok.Getter;
@@ -46,7 +47,9 @@ public class GuildMusicManager implements AbstractMusicManager {
     public void destroy() {
         getLink().getPlayer().removeListener(scheduler);
         getLink().resetPlayer();
-        getLink().destroy();
+
+        if (!getLink().getState().equals(Link.State.DESTROYED))
+                getLink().destroy();
     }
 
     public LavalinkPlayer getPlayer() {

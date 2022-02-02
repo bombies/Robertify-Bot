@@ -1,8 +1,8 @@
 package main.utils.json;
 
 import lombok.Getter;
-import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.databases.GuildsDB;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,5 +36,9 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
 
     public void unloadGuild(long gid) {
         cache.unloadGuild(gid);
+    }
+
+    public GuildsDB getDatabase() {
+        return ((GuildsDB) cache.getMongoDB());
     }
 }

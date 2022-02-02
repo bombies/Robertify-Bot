@@ -8,8 +8,16 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 public class GuildsDBCache extends AbstractMongoCache {
     private final static Logger logger = LoggerFactory.getLogger(GuildsDBCache.class);
+    private final static ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1);
+    private final static HashMap<Long, ScheduledFuture<?>> scheduledUnloads = new HashMap<>();
 
     @Getter
     private static GuildsDBCache instance;
@@ -80,7 +88,33 @@ public class GuildsDBCache extends AbstractMongoCache {
         if (guildJSON != null) {
             getCache().put(new JSONObject(guildJSON));
             logger.debug("Loaded guild with ID: {}", gid);
+
+            if (!scheduledUnloads.containsKey(gid)) {
+                logger.debug("Scheduling unload for guild with ID: {}", gid);
+                ScheduledFuture<?> scheduledUnload = executorService.schedule(() -> {
+                    unloadGuild(gid);
+                    scheduledUnloads.remove(gid);
+                }, 1, TimeUnit.HOURS);
+
+                scheduledUnloads.put(gid, scheduledUnload);
+            } else delayUnload(gid);
         }
+    }
+
+    private void delayUnload(long gid) {
+        if (!scheduledUnloads.containsKey(gid))
+            throw new IllegalArgumentException("There was no scheduled unload to delay for guild with ID: " + gid);
+
+        logger.info("Delaying unload for guild with ID: {}", gid);
+
+        scheduledUnloads.get(gid).cancel(false);
+        scheduledUnloads.remove(gid);
+
+        ScheduledFuture<?> scheduledUnload = executorService.schedule(() -> {
+            unloadGuild(gid);
+        }, 1, TimeUnit.HOURS);
+
+        scheduledUnloads.put(gid, scheduledUnload);
     }
 
     public synchronized void unloadGuild(long gid) {
@@ -88,7 +122,7 @@ public class GuildsDBCache extends AbstractMongoCache {
             getCache().remove(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
             logger.debug("Unloaded guild with ID: {}", gid);
         } catch (NullPointerException e) {
-            logger.warn("Guild with ID {} could not be loaded since it wasn't found in the cache!", gid);
+            logger.debug("Guild with ID {} could not be loaded since it wasn't found in the cache!", gid);
         }
     }
 }

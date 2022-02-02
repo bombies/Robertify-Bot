@@ -4,38 +4,41 @@ import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class GuildConfig extends AbstractGuildConfig {
+    private final static Logger logger = LoggerFactory.getLogger(GuildsDB.class);
 
     public void addGuild(long gid) {
         if (guildHasInfo(gid))
             throw new IllegalArgumentException("This guild is already added!");
 
-        getCache().addToCache(GuildsDB.getGuildDocument(gid));
-        getCache().updateCache();
+        getDatabase().addGuild(gid);
     }
 
     public void removeGuild(long gid) {
+        getDatabase().removeGuild(gid);
         if (!guildHasInfo(gid))
-            throw new IllegalArgumentException("There is already no information for this guild");
-
-        getCache().removeFromCache(GuildsDB.Field.GUILD_ID, gid);
+            logger.warn("There is no information for guild with ID {} in the cache.", gid);
+        else
+            unloadGuild(gid);
     }
 
     public String getPrefix(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         return (String) getCache().getField(gid, GuildsDB.Field.GUILD_PREFIX);
     }
 
     public void setPrefix(long gid, String prefix) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         if (prefix.length() > 4)
             throw new IllegalArgumentException("The prefix must be 4 or less characters!");
