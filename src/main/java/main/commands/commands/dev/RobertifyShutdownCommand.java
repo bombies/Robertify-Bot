@@ -8,8 +8,9 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
-import me.duncte123.botcommons.BotCommons;
+import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import org.apache.commons.io.FileUtils;
 
@@ -38,7 +39,13 @@ public class RobertifyShutdownCommand implements IDevCommand {
             FileUtils.cleanDirectory(new File(Config.get(ENV.AUDIO_DIR) + "/"));
         } catch (IllegalArgumentException ignored) {}
 
-        BotCommons.shutdown(ctx.getJDA());
+        JDA jda = Robertify.api;
+        jda.shutdown();
+        jda.getHttpClient().connectionPool().evictAll();
+        jda.getHttpClient().dispatcher().executorService().shutdown();
+        WebUtils.ins.shutdown();
+
+        System.exit(1000);
     }
 
     @Override
