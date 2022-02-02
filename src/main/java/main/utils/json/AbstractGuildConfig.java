@@ -16,7 +16,7 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
 
     public JSONObject getGuildObject(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         return cache.getCache().getJSONObject(getIndexOfObjectInArray(cache.getCache(), GuildsDB.Field.GUILD_ID, gid));
     }

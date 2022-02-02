@@ -39,6 +39,7 @@ public class GuildsDBCache extends AbstractMongoCache {
         if (!guildHasInfo(gid))
             loadGuild(gid);
 
+        delayUnload(gid);
         return getGuildInfo(gid).get(field.toString());
     }
 
@@ -49,12 +50,14 @@ public class GuildsDBCache extends AbstractMongoCache {
         JSONObject guildInfo = getGuildInfo(gid);
         guildInfo.put(field.toString(), value);
         updateCache(guildInfo, GuildsDB.Field.GUILD_ID, gid);
+        delayUnload(gid);
     }
 
     public synchronized boolean hasField(long gid, GuildsDB.Field field) {
         if (!guildHasInfo(gid))
             loadGuild(gid);
 
+        delayUnload(gid);
         return getGuildInfo(gid).has(field.toString());
     }
 
@@ -62,6 +65,7 @@ public class GuildsDBCache extends AbstractMongoCache {
         if (!guildHasInfo(gid))
             loadGuild(gid);
 
+        delayUnload(gid);
         try {
             return getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
         } catch (JSONException | NullPointerException e) {
@@ -101,7 +105,7 @@ public class GuildsDBCache extends AbstractMongoCache {
         }
     }
 
-    private void delayUnload(long gid) {
+    public void delayUnload(long gid) {
         if (!scheduledUnloads.containsKey(gid))
             throw new IllegalArgumentException("There was no scheduled unload to delay for guild with ID: " + gid);
 
