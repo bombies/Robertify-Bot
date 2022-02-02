@@ -74,19 +74,19 @@ public class GuildsDBCache extends AbstractMongoCache {
     }
 
     public synchronized void loadGuild(long gid) {
-        logger.info("Attempting to load guild with ID: {}", gid);
+        logger.debug("Attempting to load guild with ID: {}", gid);
         String guildJSON = getDocument(GuildsDB.Field.GUILD_ID.toString(), gid);
 
         if (guildJSON != null) {
             getCache().put(new JSONObject(guildJSON));
-            logger.info("Loaded guild with ID: {}", gid);
+            logger.debug("Loaded guild with ID: {}", gid);
         }
     }
 
     public synchronized void unloadGuild(long gid) {
         try {
             getCache().remove(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
-            logger.info("Unloaded guild with ID: {}", gid);
+            logger.debug("Unloaded guild with ID: {}", gid);
         } catch (NullPointerException e) {
             logger.warn("Guild with ID {} could not be loaded since it wasn't found in the cache!", gid);
         }
