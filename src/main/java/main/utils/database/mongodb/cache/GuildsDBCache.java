@@ -105,7 +105,7 @@ public class GuildsDBCache extends AbstractMongoCache {
         if (!scheduledUnloads.containsKey(gid))
             throw new IllegalArgumentException("There was no scheduled unload to delay for guild with ID: " + gid);
 
-        logger.info("Delaying unload for guild with ID: {}", gid);
+        logger.debug("Delaying unload for guild with ID: {}", gid);
 
         scheduledUnloads.get(gid).cancel(false);
         scheduledUnloads.remove(gid);
