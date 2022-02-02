@@ -5,9 +5,12 @@ import main.utils.json.GenericJSONField;
 public enum ChangeLogConfigField implements GenericJSONField {
     CURRENT_LOG("current_log"),
     PAST_LOGS("past_logs"),
-    LOGS("logs");
+    TITLE("title"),
+    LOGS("logs"),
+    LOG_TYPE("log_type"),
+    LOG_STRING("log_string");
 
-    private String str;
+    private final String str;
 
     ChangeLogConfigField(String str) {
         this.str = str;

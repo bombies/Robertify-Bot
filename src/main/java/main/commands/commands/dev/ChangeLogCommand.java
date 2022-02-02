@@ -2,18 +2,18 @@ package main.commands.commands.dev;
 
 import main.commands.CommandContext;
 import main.commands.IDevCommand;
-import main.main.Robertify;
-import main.utils.RobertifyEmbedUtils;
-import main.utils.json.guildconfig.GuildConfig;
-import main.constants.Toggles;
+import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
-import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -50,7 +50,10 @@ public class ChangeLogCommand implements IDevCommand {
                 case "send" -> send(msg);
                 case "view" -> view(msg);
                 case "remove" -> remove(args, msg);
-                case "add" -> add(args, msg);
+                case "clear" -> clear(msg);
+                case "settitle", "st" -> setTitle(args, msg);
+                case "addfeatue", "af" -> add(ChangeLogConfig.LogType.FEATURE, args, msg);
+                case "addbugfix", "abf" -> add(ChangeLogConfig.LogType.BUGFIX, args, msg);
             }
         }
 
@@ -59,30 +62,17 @@ public class ChangeLogCommand implements IDevCommand {
 
     private void send(Message msg) {
         final var config = new ChangeLogConfig();
-        final var logsToString = new StringBuilder();
-        final var logs = config.getCurrentChangelog();
-        final var guild = msg.getGuild();
         final var guilds = Robertify.api.getGuilds();
-
-        logs.forEach(log -> logsToString.append("**—** ").append(log).append("\n\n"));
 
         final ExecutorService executorService = Executors.newCachedThreadPool();
 
         for (Guild g : guilds) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(g, logsToString.toString());
-            eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
-            eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
-
-            eb.setThumbnail(new ThemesConfig().getTheme(g.getIdLong()).getTransparent());
-            if (!new TogglesConfig().getToggle(msg.getGuild(), Toggles.ANNOUNCE_CHANGELOGS))
-                continue;
-
             TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
 
             if (announcementChannel == null) continue;
 
             try {
-                executorService.execute(() -> announcementChannel.sendMessageEmbeds(eb.build()).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                executorService.execute(() -> announcementChannel.sendMessageEmbeds(getLogEmbed(config.getTitle(), g, false)).queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
                         .handle(ErrorResponse.MISSING_PERMISSIONS, e -> logger.error("Was not able to send a changelog in {}", g.getName()))));
             } catch (InsufficientPermissionException e) {
                 logger.error("Was not able to send a changelog in {}", g.getName());
@@ -95,20 +85,9 @@ public class ChangeLogCommand implements IDevCommand {
 
     private void view(Message msg) {
         final var config = new ChangeLogConfig();
-        final var logs = config.getCurrentChangelog();
-        final var logsToString = new StringBuilder();
         final var guild = msg.getGuild();
 
-        for (int i = 0; i < logs.size(); i++)
-            logsToString.append("**—** ").append(logs.get(i)).append(" *(").append(i).append(")*\n\n");
-
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, logsToString.toString());
-        eb.setThumbnail(new ThemesConfig().getTheme(msg.getGuild().getIdLong()).getTransparent());
-        eb.setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"");
-
-        eb.setTitle("["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]");
-
-        msg.replyEmbeds(eb.build()).queue();
+        msg.replyEmbeds(getLogEmbed(config.getTitle(), guild, true)).queue();
     }
 
     private void remove(List<String> args, Message msg) {
@@ -141,7 +120,7 @@ public class ChangeLogCommand implements IDevCommand {
         msg.addReaction("✅").queue();
     }
 
-    private void add(List<String> args, Message msg) {
+    private void add(ChangeLogConfig.LogType type, List<String> args, Message msg) {
         if (args.size() < 2) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), "You must provide a changelog to add");
             msg.replyEmbeds(eb.build()).queue();
@@ -149,9 +128,49 @@ public class ChangeLogCommand implements IDevCommand {
         }
 
         var config = new ChangeLogConfig();
-        var log = GeneralUtils.getJoinedString(args, 1);
-        config.addChangeLog(log);
+        var log = GeneralUtils.getJoinedString(args, 1).replaceAll("\\\\n", "\n");
+        config.addChangeLog(type, log);
         msg.addReaction("✅").queue();
+    }
+
+    private void setTitle(List<String> args, Message msg) {
+        if (args.size() < 2) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), "You must provide a title");
+            msg.replyEmbeds(eb.build()).queue();
+            return;
+        }
+
+        var config = new ChangeLogConfig();
+        var title = GeneralUtils.getJoinedString(args, 1).replaceAll("\\\\n", "\n");
+        config.setTitle(title);
+        msg.addReaction("✅").queue();
+    }
+
+    private void clear(Message msg) {
+        new ChangeLogConfig().clearChangeLog();
+        msg.addReaction("✅").queue();
+    }
+
+    private MessageEmbed getLogEmbed(String title, Guild guild, boolean devView) {
+        final var config = new ChangeLogConfig();
+        final var logs = config.getCurrentChangelog();
+        final var features = new StringBuilder();
+        final var bugFixes = new StringBuilder();
+
+        int i = 0;
+        for (var log : logs) {
+            switch (log.getLeft()) {
+                case FEATURE -> features.append(RobertifyEmoji.FEATURE).append(" ").append(log.getRight()).append(devView ? " ("+(i++)+")" : "").append("\n\n");
+                case BUGFIX -> bugFixes.append(RobertifyEmoji.BUG_FIX).append(" ").append(log.getRight()).append(devView ? " ("+(i++)+")"  : "").append("\n\n");
+            }
+        }
+
+        return RobertifyEmbedUtils.embedMessage(guild, "\t")
+                .setTitle("✨ " + title + " ["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]")
+                .setDescription("➕ **Features**\n" +  features + "\n🛠️ **Bug Fixes**\n" + bugFixes)
+                .setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"")
+                .setThumbnail(new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                .build();
     }
 
     @Override
