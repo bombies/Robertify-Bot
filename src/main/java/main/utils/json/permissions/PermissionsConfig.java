@@ -1,8 +1,10 @@
 package main.utils.json.permissions;
 
 import main.constants.Permission;
+import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
+import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -191,34 +193,26 @@ public class PermissionsConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update() {
-        final var cacheArr = getCache().getCache();
-        final List<JSONObject> objectToUpdate = new ArrayList<>();
+    public void update(long gid) {
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
 
-        boolean globalChangesMade = false;
-        for (int i = 0; i < cacheArr.length(); i++) {
-            boolean localChangesMade = false;
-            final var guildObj = cacheArr.getJSONObject(i);
+        final JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
+        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildsDB.Field.GUILD_ID, gid));
 
-            for (int code : Permission.getCodes())
-                if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                        .has(String.valueOf(code))) {
-                    globalChangesMade = true;
-                    localChangesMade = true;
-                    guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                            .put(String.valueOf(code), new JSONArray());
-                }
-
-            if (!guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                    .has(PermissionConfigField.USER_PERMISSIONS.toString())) {
-                globalChangesMade = true;
-                localChangesMade = true;
-                guildObj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                        .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
+        for (int code : Permission.getCodes())
+            if (!object.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                    .has(String.valueOf(code))) {
+                object.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                        .put(String.valueOf(code), new JSONArray());
             }
 
-            if (localChangesMade) objectToUpdate.add(guildObj);
+        if (!object.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                .has(PermissionConfigField.USER_PERMISSIONS.toString())) {
+            object.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
+                    .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
         }
-        if (globalChangesMade) getCache().updateCacheObjects(objectToUpdate);
+
+        getCache().updateCache(Document.parse(object.toString()));
     }
 }

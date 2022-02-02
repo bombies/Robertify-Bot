@@ -12,7 +12,7 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
     @Getter
     private static GuildsDBCache cache;
 
-    public abstract void update();
+    public abstract void update(long gid);
 
     public JSONObject getGuildObject(long gid) {
         if (!guildHasInfo(gid))
@@ -28,5 +28,13 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
 
     public boolean guildHasInfo(long gid) {
         return cache.guildHasInfo(gid);
+    }
+
+    public void loadGuild(long gid) {
+        cache.loadGuild(gid);
+    }
+
+    public void unloadGuild(long gid) {
+        cache.unloadGuild(gid);
     }
 }

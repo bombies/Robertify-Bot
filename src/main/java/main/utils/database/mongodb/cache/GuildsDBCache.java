@@ -17,7 +17,6 @@ public class GuildsDBCache extends AbstractMongoCache {
     GuildsDBCache() {
         super(GuildsDB.ins());
         this.init();
-        updateCache();
         logger.debug("Done instantiating Guild cache");
     }
 
@@ -30,14 +29,14 @@ public class GuildsDBCache extends AbstractMongoCache {
 
     public synchronized Object getField(long gid, GuildsDB.Field field) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any info!");
+            loadGuild(gid);
 
         return getGuildInfo(gid).get(field.toString());
     }
 
     public synchronized void setField(long gid, GuildsDB.Field field, Object value) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any info!");
+            loadGuild(gid);
 
         JSONObject guildInfo = getGuildInfo(gid);
         guildInfo.put(field.toString(), value);
@@ -46,14 +45,23 @@ public class GuildsDBCache extends AbstractMongoCache {
 
     public synchronized boolean hasField(long gid, GuildsDB.Field field) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any info!");
+            loadGuild(gid);
 
         return getGuildInfo(gid).has(field.toString());
     }
 
     public synchronized JSONObject getGuildInfo(long gid) {
-        if (!guildHasInfo(gid)) return null;
-        return getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
+
+        try {
+            return getCache().getJSONObject(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
+        } catch (JSONException | NullPointerException e) {
+            return null;
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred!", e);
+            return null;
+        }
     }
 
     public synchronized boolean guildHasInfo(long gid) {
@@ -62,6 +70,25 @@ public class GuildsDBCache extends AbstractMongoCache {
             return true;
         } catch (JSONException | NullPointerException e) {
             return false;
+        }
+    }
+
+    public synchronized void loadGuild(long gid) {
+        logger.info("Attempting to load guild with ID: {}", gid);
+        String guildJSON = getDocument(GuildsDB.Field.GUILD_ID.toString(), gid);
+
+        if (guildJSON != null) {
+            getCache().put(new JSONObject(guildJSON));
+            logger.info("Loaded guild with ID: {}", gid);
+        }
+    }
+
+    public synchronized void unloadGuild(long gid) {
+        try {
+            getCache().remove(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
+            logger.info("Unloaded guild with ID: {}", gid);
+        } catch (NullPointerException e) {
+            logger.warn("Guild with ID {} could not be loaded since it wasn't found in the cache!", gid);
         }
     }
 }

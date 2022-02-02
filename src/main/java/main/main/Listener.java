@@ -80,6 +80,8 @@ public class Listener extends ListenerAdapter {
             } catch (NullPointerException e) {
                 dedicatedChannelConfig.removeChannel(g.getIdLong());
             }
+
+            new GuildConfig().unloadGuild(g.getIdLong());
         }
 
         initSelectionMenus();

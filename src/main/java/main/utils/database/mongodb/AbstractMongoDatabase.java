@@ -320,6 +320,10 @@ public abstract class AbstractMongoDatabase {
             doc = findSpecificDocument(key, d);
         else if (value instanceof JSONObject j)
             doc = findSpecificDocument(key, j);
+        else if (value instanceof Long l)
+            doc = findSpecificDocument(key, l);
+        else if (value instanceof Integer i)
+            doc = findSpecificDocument(key, i);
         else
             throw new IllegalArgumentException("Invalid value type!");
 

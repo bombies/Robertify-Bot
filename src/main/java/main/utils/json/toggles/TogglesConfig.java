@@ -4,22 +4,21 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.Toggles;
-import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class TogglesConfig extends AbstractGuildConfig {
     public boolean getToggle(Guild guild, Toggles toggle) {
         if (!guildHasInfo(guild.getIdLong()))
-            throw new IllegalArgumentException("This guild doesn't have any information!");
+            loadGuild(guild.getIdLong());
 
         try {
             return getTogglesObject(guild.getIdLong()).getBoolean(toggle.toString());
@@ -85,71 +84,29 @@ public class TogglesConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update() {
-        JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
-        final List<JSONObject> objectsToUpdate = new ArrayList<>();
-        boolean globalChangesMade = false;
+    public void update(long gid) {
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
 
-        for (int i = 0; i < cacheArr.length(); i++) {
-            var localChangesMade = false;
-            final JSONObject jsonObject = cacheArr.getJSONObject(i);
+        final JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
+        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildsDB.Field.GUILD_ID, gid));
 
-            for (Toggles toggle : Toggles.values()) {
-                try {
-                    JSONObject toggleObj = jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
-
-                    if (!toggleObj.has(toggle.toString())) {
-                        globalChangesMade = true;
-                        localChangesMade = true;
-                        switch (toggle) {
-                            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
-                            default -> toggleObj.put(toggle.toString(), true);
-                        }
-
+        for (Toggles toggle : Toggles.values()) {
+            try {
+                JSONObject toggleObj = object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
+                getTogglesObject(toggleObj, toggle);
+            } catch (JSONException e) {
+                for (Toggles errToggles : Toggles.values())
+                    switch (errToggles) {
+                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                                .put(errToggles.toString(), false);
+                        default -> object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                                .put(errToggles.toString(), true);
                     }
-
-                    if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
-                        globalChangesMade = true;
-                        localChangesMade = true;
-                        var djTogglesObj = new JSONObject();
-
-                        for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
-                            djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
-
-                        toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
-                    } else {
-                        var djTogglesObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
-
-                        for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
-                            if (!djTogglesObj.has(musicCommand.getName())) {
-                                globalChangesMade = true;
-                                localChangesMade = true;
-                                djTogglesObj.put(musicCommand.getName(), false);
-                            }
-
-                        toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
-                    }
-                } catch (JSONException e) {
-                    for (Toggles errToggles : Toggles.values())
-                        switch (errToggles) {
-                            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> {
-                                globalChangesMade = true;
-                                localChangesMade = true;
-                                jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                                        .put(errToggles.toString(), false);
-                            }
-                            default -> {
-                                globalChangesMade = true;
-                                localChangesMade = true;
-                                jsonObject.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                                        .put(errToggles.toString(), true);
-                            }
-                        }
-                }
             }
-            if (localChangesMade) objectsToUpdate.add(jsonObject);
         }
-        if (globalChangesMade) getCache().updateCacheObjects(objectsToUpdate);
+
+        getCache().updateCache(Document.parse(object.toString()));
     }
 
     public JSONObject getDefaultToggleObject() {
@@ -157,28 +114,7 @@ public class TogglesConfig extends AbstractGuildConfig {
 
         for (Toggles toggle : Toggles.values())
             try {
-                if (!toggleObj.has(toggle.toString()))
-                switch (toggle) {
-                    case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
-                    default -> toggleObj.put(toggle.toString(), true);
-                }
-
-                if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
-                    var djTogglesObj = new JSONObject();
-
-                    for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
-                        djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
-
-                    toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
-                } else {
-                    var djTogglesObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
-
-                    for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
-                        if (!djTogglesObj.has(musicCommand.getName()))
-                            djTogglesObj.put(musicCommand.getName(), false);
-
-                    toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
-                }
+                getTogglesObject(toggleObj, toggle);
             } catch (JSONException e) {
                 for (Toggles errToggles : Toggles.values())
                     switch (errToggles) {
@@ -187,6 +123,31 @@ public class TogglesConfig extends AbstractGuildConfig {
                     }
             }
         return toggleObj;
+    }
+
+    private void getTogglesObject(JSONObject toggleObj, Toggles toggle) {
+        if (!toggleObj.has(toggle.toString()))
+        switch (toggle) {
+            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
+            default -> toggleObj.put(toggle.toString(), true);
+        }
+
+        if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
+            var djTogglesObj = new JSONObject();
+
+            for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+                djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
+
+            toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
+        } else {
+            var djTogglesObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
+
+            for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+                if (!djTogglesObj.has(musicCommand.getName()))
+                    djTogglesObj.put(musicCommand.getName(), false);
+
+            toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
+        }
     }
 
 }

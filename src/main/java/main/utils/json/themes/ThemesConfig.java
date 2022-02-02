@@ -2,26 +2,25 @@ package main.utils.json.themes;
 
 import main.constants.RobertifyTheme;
 import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
+import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ThemesConfig extends AbstractGuildConfig {
 
     public RobertifyTheme getTheme(long gid) {
         if (!guildHasInfo(gid))
-            throw new IllegalArgumentException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         String theme;
 
         try {
             theme = getGuildObject(gid).getString(ThemesConfigField.THEME.toString());
         } catch (JSONException e) {
-            update();
+            update(gid);
             theme = getGuildObject(gid).getString(ThemesConfigField.THEME.toString());
         }
 
@@ -30,7 +29,7 @@ public class ThemesConfig extends AbstractGuildConfig {
 
     public void setTheme(long gid, RobertifyTheme theme) {
         if (!guildHasInfo(gid))
-            throw new IllegalArgumentException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         final var obj = getGuildObject(gid);
         obj.put(ThemesConfigField.THEME.toString(), theme.name().toLowerCase());
@@ -38,21 +37,17 @@ public class ThemesConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update() {
+    public void update(long gid) {
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
+
         final JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
-        final List<JSONObject> objectsToUpdate = new ArrayList<>();
+        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildsDB.Field.GUILD_ID, gid));
 
-        boolean changesMade = false;
-        for (var obj : cacheArr) {
-            final var actualObj = (JSONObject) obj;
-
-            if (!actualObj.has(ThemesConfigField.THEME.toString())) {
-                changesMade = true;
-                actualObj.put(ThemesConfigField.THEME.toString(), RobertifyTheme.GREEN.name().toLowerCase());
-                objectsToUpdate.add(actualObj);
-            }
+        if (!object.has(ThemesConfigField.THEME.toString())) {
+            object.put(ThemesConfigField.THEME.toString(), RobertifyTheme.GREEN.name().toLowerCase());
         }
 
-        if (changesMade) getCache().updateCacheObjects(objectsToUpdate);
+        getCache().updateCache(Document.parse(object.toString()));
     }
 }

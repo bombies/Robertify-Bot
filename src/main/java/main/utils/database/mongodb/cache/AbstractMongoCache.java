@@ -26,7 +26,7 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         super(mongoDB);
         this.mongoDB = mongoDB;
         this.collection = mongoDB.getCollection();
-        this.cache = collectionToJSON(this.collection);
+        this.cache = new JSONObject().put("documents", new JSONArray());
     }
 
     @Override

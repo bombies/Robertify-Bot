@@ -256,7 +256,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
 
     @Override
-    public void update() {
+    public void update(long gid) {
         // Nothing
     }
 }

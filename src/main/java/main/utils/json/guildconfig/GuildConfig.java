@@ -45,7 +45,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public long getAnnouncementChannelID(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         try {
             return (long) getCache().getField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL);
@@ -56,21 +56,21 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public void setAnnouncementChannelID(long gid, long id) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         getCache().setField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL, id);
     }
 
     public boolean announcementChannelIsSet(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         return getAnnouncementChannelID(gid) != -1;
     }
 
     public List<BannedUser> getBannedUsers(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildsDB.Field.BANNED_USERS_ARRAY);
         final List<BannedUser> ret = new ArrayList<>();
@@ -91,7 +91,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public HashMap<Long, Long> getBannedUsersWithUnbanTimes(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         final var bannedUsers = getBannedUsers(gid);
         final HashMap<Long, Long> ret = new HashMap<>();
@@ -103,7 +103,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public void banUser(long gid, long uid, long modId, long bannedAt, long bannedUntil) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         if (isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user is already banned!");
@@ -122,7 +122,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public void unbanUser(long gid, long uid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         if (!isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user isn't banned!");
@@ -150,7 +150,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public boolean isBannedUser(long gid, long uid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         for (var bannedUser : getBannedUsers(gid))
             if (bannedUser.user == uid) return true;
@@ -159,7 +159,7 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public boolean get247(long gid) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         if (!getCache().hasField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN)) {
             getCache().setField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN, false);
@@ -171,13 +171,13 @@ public class GuildConfig extends AbstractGuildConfig {
 
     public void set247(long gid, boolean status) {
         if (!guildHasInfo(gid))
-            throw new NullPointerException("This guild doesn't have any information!");
+            loadGuild(gid);
 
         getCache().setField(gid, GuildsDB.Field.TWENTY_FOUR_SEVEN, status);
     }
 
     @Override
-    public void update() {
+    public void update(long gid) {
         // Nothing
     }
 
