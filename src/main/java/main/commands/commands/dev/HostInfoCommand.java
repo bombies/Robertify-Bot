@@ -5,6 +5,8 @@ import main.commands.IDevCommand;
 import main.utils.RobertifyEmbedUtils;
 
 import javax.script.ScriptException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 public class HostInfoCommand implements IDevCommand {
@@ -13,31 +15,23 @@ public class HostInfoCommand implements IDevCommand {
         if (!permissionCheck(ctx)) return;
 
         final var guild = ctx.getGuild();
-        String os = System.getProperty("os.name");
-        String osVer = System.getProperty("os.version");
-        String osArch = System.getProperty("os.arch");
-        String javaVer = System.getProperty("java.version");
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        long freeMemory = Runtime.getRuntime().freeMemory() / 1048576;
-        long maxMemory = Runtime.getRuntime().maxMemory() / 1048576;
-        long memoryInUse = Runtime.getRuntime().totalMemory() / 1048576;
+
+        Runtime runtime = Runtime.getRuntime();
+        NumberFormat format = NumberFormat.getInstance();
+        DecimalFormat decimalFormat = new DecimalFormat("0.00");
+        final long maxMemory = runtime.maxMemory() / 1048576;
+        final long memoryInUse = (runtime.totalMemory() - runtime.freeMemory()) / 1048576;
+        final long freeMemory = (runtime.maxMemory() / 1048576) - memoryInUse;
 
         ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
                 guild,
                 "Host Information",
                 "\t"
                 )
-                        .addField("OS Name", os, true)
-                        .addField("OS Version", osVer, true)
-                        .addField("OS Architecture", osArch, true)
-                        .addBlankField(false)
-                        .addField("Available Processors", String.valueOf(availableProcessors), true)
-                        .addField("Java Version", javaVer, true)
-                        .addBlankField(false)
-                        .addField("Free Memory (MB)", String.valueOf(freeMemory), true)
-                        .addField("Memory In Use (MB)", String.valueOf(memoryInUse), true)
-                        .addField("Max Memory (MB)", String.valueOf(maxMemory), true)
-                        .build())
+                        .addField("Usage", "```java\n" +
+                                "Total - "+format.format(maxMemory)+" MB\n" +
+                                "Used - "+format.format(memoryInUse)+" MB - "+decimalFormat.format(((double)memoryInUse/maxMemory)*100)+"%\n" +
+                                "Free - "+format.format(freeMemory)+"MB - "+decimalFormat.format(((double)freeMemory/maxMemory)*100)+"%```", false).build())
                 .queue();
 
 
