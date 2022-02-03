@@ -5,7 +5,6 @@ import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractionBuilderException;
@@ -91,7 +90,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                 "Type \"" + prefix + "help <command>\" to get more help on a specific command."
         );
 
-        CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
+        CommandManager manager = new CommandManager();
 
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
@@ -193,7 +192,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                     .addActionRow(getInteractionCommand().getSelectionMenu(menuName))
                     .setEphemeral(true).queue();
         } else {
-            final CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
+            final CommandManager manager = new CommandManager();
             final String command = event.getOption("command").getAsString();
             event.replyEmbeds(searchCommand(manager, command, event.getGuild(), event.getUser()).build())
                     .setEphemeral(true).queue();
@@ -258,7 +257,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
     private EmbedBuilder getHelpEmbed(Guild guild, HelpType type, String prefix) {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Here are your commands!\n\n" +
                 "**Prefix**: `"+prefix+"`");
-        CommandManager manager = new CommandManager(Robertify.getCommandWaiter());
+        CommandManager manager = new CommandManager();
         StringBuilder sb = new StringBuilder();
 
         switch (type) {

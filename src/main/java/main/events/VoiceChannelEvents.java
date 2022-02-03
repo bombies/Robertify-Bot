@@ -64,7 +64,6 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
         if (!voiceState.inVoiceChannel()) return;
 
-
         if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(event.getGuild().getIdLong())) {
             doAutoLeave(event, event.getChannelLeft());
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {

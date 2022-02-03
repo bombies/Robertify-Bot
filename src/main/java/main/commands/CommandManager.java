@@ -1,30 +1,28 @@
 package main.commands;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
+import main.commands.commands.audio.*;
 import main.commands.commands.audio.filters.*;
 import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
-import main.commands.commands.audio.*;
-import main.commands.commands.audio.SeekCommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
-import main.commands.commands.management.permissions.*;
-import main.commands.commands.management.TogglesCommand;
-import main.commands.commands.audio.LyricsCommand;
+import main.commands.commands.management.permissions.ListDJCommand;
+import main.commands.commands.management.permissions.PermissionsCommand;
+import main.commands.commands.management.permissions.RemoveDJCommand;
+import main.commands.commands.management.permissions.SetDJCommand;
+import main.commands.commands.misc.EightBallCommand;
+import main.commands.commands.misc.PingCommand;
 import main.commands.commands.misc.PlaytimeCommand;
+import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.util.*;
+import main.commands.commands.util.reports.ReportsCommand;
 import main.constants.Permission;
+import main.constants.Toggles;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
-import main.constants.Toggles;
-import main.commands.commands.misc.EightBallCommand;
-import main.commands.commands.misc.PingCommand;
-import main.commands.commands.dev.ViewConfigCommand;
-import main.commands.commands.misc.poll.PollCommand;
-import main.commands.commands.util.reports.ReportsCommand;
-import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -55,8 +53,7 @@ public class CommandManager {
     @Getter
     private final List<ICommand> utilityCommands = new ArrayList<>();
 
-
-    public CommandManager(EventWaiter waiter) {
+    public CommandManager() {
         addCommands(
                 new PingCommand(),
                 new PermissionsCommand(),

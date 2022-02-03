@@ -1,6 +1,5 @@
 package main.main;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
@@ -47,8 +46,8 @@ public class Listener extends ListenerAdapter {
     private final CommandManager manager;
     public static final Logger logger = LoggerFactory.getLogger(Listener.class);
 
-    public Listener(EventWaiter waiter) {
-        manager = new CommandManager(waiter);
+    public Listener() {
+        manager = new CommandManager();
     }
 
     @SneakyThrows
@@ -123,8 +122,8 @@ public class Listener extends ListenerAdapter {
                             event.getChannel().sendMessage("""
                                             ⚠️ I don't have permission to send embeds!
 
-                                            Please tell an admin to enable the `Embed Links` permission for my role in this
-                                             channel in order for my commands to work!""")
+                                            Please tell an admin to enable the `Embed Links` permission for my role in this channel in order for my commands to work!"""
+                                    )
                                     .queue();
                         } else {
                             logger.error("Insufficient permissions", e);
@@ -142,7 +141,6 @@ public class Listener extends ListenerAdapter {
         if (new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.BANNED_MESSAGE.toString()).build())
                     .queue();
-
     }
 
     @SneakyThrows
@@ -266,7 +264,6 @@ public class Listener extends ListenerAdapter {
                 sendUnbanMessage(user, g);
             };
             scheduler.schedule(task, banUtils.getTimeUntilUnban(g.getIdLong(), user), TimeUnit.MILLISECONDS);
-
         }
     }
 
@@ -297,5 +294,4 @@ public class Listener extends ListenerAdapter {
         new HelpCommand().initCommandWithoutUpsertion();
         new ThemeCommand().initCommandWithoutUpsertion();
     }
-
 }

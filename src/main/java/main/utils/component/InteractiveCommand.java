@@ -44,7 +44,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         if (!config.isDJToggleSet(e.getGuild(), e.getName()))
             return true;
 
-        if (config.getDJToggle(e.getGuild(), new CommandManager(new EventWaiter()).getCommand(e.getName())))
+        if (config.getDJToggle(e.getGuild(), new CommandManager().getCommand(e.getName())))
             return GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ);
 
         return true;

@@ -87,7 +87,7 @@ public class Robertify {
                             lavalink,
                             VoiceChannelEvents.waiter,
                             commandWaiter,
-                            new Listener(commandWaiter),
+                            new Listener(),
                             new VoiceChannelEvents(),
                             new DedicatedChannelEvents(),
                             new PollEvents(),

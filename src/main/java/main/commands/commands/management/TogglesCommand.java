@@ -1,6 +1,5 @@
 package main.commands.commands.management;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.ICommand;
@@ -148,7 +147,7 @@ public class TogglesCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {
-        final CommandManager commandManager = new CommandManager(new EventWaiter());
+        final CommandManager commandManager = new CommandManager();
         final TogglesConfig config = new TogglesConfig();
 
         if (args.size() < 2)

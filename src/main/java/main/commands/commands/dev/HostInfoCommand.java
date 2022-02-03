@@ -33,8 +33,6 @@ public class HostInfoCommand implements IDevCommand {
                                 "Used - "+format.format(memoryInUse)+" MB - "+decimalFormat.format(((double)memoryInUse/maxMemory)*100)+"%\n" +
                                 "Free - "+format.format(freeMemory)+"MB - "+decimalFormat.format(((double)freeMemory/maxMemory)*100)+"%```", false).build())
                 .queue();
-
-
     }
 
     @Override

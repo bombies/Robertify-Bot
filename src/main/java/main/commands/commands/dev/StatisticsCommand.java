@@ -39,18 +39,10 @@ public class StatisticsCommand implements IDevCommand {
         String periodStr = null;
 
         switch (format) {
-            case DAY -> {
-                periodStr = "Today";
-            }
-            case WEEK -> {
-                periodStr = "This Week";
-            }
-            case MONTH -> {
-                periodStr = "This Month";
-            }
-            case YEAR -> {
-                periodStr = "This Year";
-            }
+            case DAY -> periodStr = "Today";
+            case WEEK -> periodStr = "This Week";
+            case MONTH -> periodStr = "This Month";
+            case YEAR -> periodStr = "This Year";
         }
 
         msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(msg.getGuild(),

@@ -1,6 +1,5 @@
 package main.utils.json.toggles;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.constants.Toggles;
@@ -47,7 +46,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         final var djToggles = getDJToggles(g);
 
         if (!djToggles.containsKey(cmd.getName())) {
-            if (new CommandManager(new EventWaiter()).getMiscCommands().contains(cmd)) {
+            if (new CommandManager().getMiscCommands().contains(cmd)) {
                 setDJToggle(g, cmd, false);
                 return false;
             } else
@@ -135,14 +134,14 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
             var djTogglesObj = new JSONObject();
 
-            for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+            for (ICommand musicCommand : new CommandManager().getMusicCommands())
                 djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
 
             toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
         } else {
             var djTogglesObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.DJ_TOGGLES.toString());
 
-            for (ICommand musicCommand : new CommandManager(new EventWaiter()).getMusicCommands())
+            for (ICommand musicCommand : new CommandManager().getMusicCommands())
                 if (!djTogglesObj.has(musicCommand.getName()))
                     djTogglesObj.put(musicCommand.getName(), false);
 
