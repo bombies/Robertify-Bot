@@ -279,6 +279,11 @@ public class RobertifyAudioManager {
         musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
+    public void loadSearchResults(GuildMusicManager musicManager, User searcher, Message botMsg, String query) {
+        final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
+        musicManager.getLink().getRestClient().loadItem(query, loader);
+    }
+
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,
                                       boolean addToBeginning) {
 

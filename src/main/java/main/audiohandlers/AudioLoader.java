@@ -58,7 +58,7 @@ public class AudioLoader implements LoadResultHandler {
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getTrack());
 
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var scheduler = musicManager.getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(audioTrack);
@@ -83,7 +83,8 @@ public class AudioLoader implements LoadResultHandler {
                 botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have enabled Lo-Fi mode").build())
                         .queue();
             } else {
-                botMsg.editMessageEmbeds(eb.build()).queue();
+                botMsg.editMessageEmbeds(eb.build())
+                        .queue(success -> success.editMessageComponents().queue());
             }
         } else {
             new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
@@ -117,7 +118,7 @@ public class AudioLoader implements LoadResultHandler {
         if (loadPlaylistShuffled)
             Collections.shuffle(tracks);
 
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var scheduler = musicManager.getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(tracks);
@@ -147,7 +148,7 @@ public class AudioLoader implements LoadResultHandler {
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + list.get(0).getTrack());
 
-        final var scheduler = ((GuildMusicManager) musicManager).getScheduler();
+        final var scheduler = musicManager.getScheduler();
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(list.get(0));
@@ -172,12 +173,12 @@ public class AudioLoader implements LoadResultHandler {
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
-        ((GuildMusicManager) musicManager).getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
-            if (((GuildMusicManager) musicManager).getPlayer().getPlayingTrack() == null)
+            if (musicManager.getPlayer().getPlayingTrack() == null)
                 musicManager.getGuild().getAudioManager().closeAudioConnection();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))

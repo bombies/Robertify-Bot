@@ -7,6 +7,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.FavouriteTracksCommand;
+import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
@@ -134,7 +135,8 @@ public class Robertify {
                             new WebsiteCommand(),
                             new FavouriteTracksCommand(),
                             new TwentyFourSevenCommand(),
-                            new PlaytimeCommand()
+                            new PlaytimeCommand(),
+                            new SearchCommand()
                     )
 
                     // Test Listeners

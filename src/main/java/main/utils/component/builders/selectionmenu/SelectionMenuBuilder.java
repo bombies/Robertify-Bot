@@ -19,23 +19,60 @@ import java.util.function.Predicate;
 public class SelectionMenuBuilder {
 
     @Getter
-    @NotNull
-    private final String name;
-    @Getter @NotNull
-    private final String placeholder;
-    @Getter @NotNull
-    private final Pair<Integer, Integer> range;
-    @Getter @NotNull
-    private final List<Triple<String, String, Emoji>> options;
+    private String name;
+    @Getter
+    private String placeholder;
+    @Getter
+    private Pair<Integer, Integer> range;
+    @Getter
+    private final List<SelectionMenuOption> options;
     @Nullable
-    private final Predicate<SelectionMenuEvent> permissionCheck;
+    private Predicate<SelectionMenuEvent> permissionCheck;
 
     private SelectionMenuBuilder(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck) {
         this.name = name.toLowerCase();
         this.placeholder = placeholder;
         this.range = range;
-        this.options = options;
         this.permissionCheck = permissionCheck;
+
+        final List<SelectionMenuOption> l = new ArrayList<>();
+        for (var option : options)
+            l.add(SelectionMenuOption.of(option.getLeft(), option.getMiddle(), option.getRight()));
+
+        this.options =  l;
+    }
+
+    public SelectionMenuBuilder() {
+        this.name = null;
+        this.placeholder = null;
+        this.range = null;
+        this.permissionCheck = null;
+        this.options = new ArrayList<>();
+    }
+
+    public SelectionMenuBuilder setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public SelectionMenuBuilder setPlaceHolder(String placeholder) {
+        this.placeholder = placeholder;
+        return this;
+    }
+
+    public SelectionMenuBuilder setRange(int min, int max) {
+        this.range = Pair.of(min, max);
+        return this;
+    }
+
+    public SelectionMenuBuilder addOption(String label, String value, Emoji emoji) {
+        this.options.add(SelectionMenuOption.of(label, value, emoji));
+        return this;
+    }
+
+    public SelectionMenuBuilder setPermissionCheck(Predicate<SelectionMenuEvent> predicate) {
+        this.permissionCheck = predicate;
+        return this;
     }
 
     public boolean checkPermission(SelectionMenuEvent e) {
@@ -79,15 +116,22 @@ public class SelectionMenuBuilder {
     }
 
     public SelectionMenu build() throws InteractionBuilderException {
+        if (name == null)
+            throw new InteractionBuilderException("The name of the menu can't be null!");
+        if (placeholder == null)
+            throw new InteractionBuilderException("The placeholder for the menu can't be null!");
+        if (range == null)
+            throw new InteractionBuilderException("The range for the menu can't be null!");
+
         SelectionMenu.Builder builder = SelectionMenu.create(name)
                 .setPlaceholder(placeholder)
                 .setRequiredRange(range.getLeft(), range.getLeft());
 
-        for (Triple<String, String, Emoji> val : options)
-            if (val.getRight() == null)
-                builder.addOption(val.getLeft(), val.getMiddle());
+        for (SelectionMenuOption val : options)
+            if (val.getEmoji() == null)
+                builder.addOption(val.getLabel(), val.getValue());
             else
-                builder.addOption(val.getLeft(), val.getMiddle(), val.getRight());
+                builder.addOption(val.getLabel(), val.getValue(), val.getEmoji());
 
         return builder.build();
     }

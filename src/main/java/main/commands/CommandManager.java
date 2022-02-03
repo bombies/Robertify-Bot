@@ -103,6 +103,16 @@ public class CommandManager {
                 new LyricsCommand(),
                 new DonateCommand(),
                 new ThemeCommand(),
+                new WebsiteCommand(),
+                new FavouriteTracksCommand(),
+                new KaraokeFilter(),
+                new NightcoreFilter(),
+                new EightDFilter(),
+                new TremoloFilter(),
+                new VibratoFilter(),
+                new TwentyFourSevenCommand(),
+                new PlaytimeCommand(),
+                new SearchCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -117,15 +127,6 @@ public class CommandManager {
                 new AnnouncementCommand(),
                 new HostInfoCommand(),
                 new StatisticsCommand(),
-                new WebsiteCommand(),
-                new FavouriteTracksCommand(),
-                new KaraokeFilter(),
-                new NightcoreFilter(),
-                new EightDFilter(),
-                new TremoloFilter(),
-                new VibratoFilter(),
-                new TwentyFourSevenCommand(),
-                new PlaytimeCommand(),
 
                 //Test Commands
                 new SpotifyURLToURICommand(),
@@ -167,7 +168,8 @@ public class CommandManager {
                 new NightcoreFilter(),
                 new EightDFilter(),
                 new TremoloFilter(),
-                new VibratoFilter()
+                new VibratoFilter(),
+                new SearchCommand()
         );
 
         addManagementCommands(
