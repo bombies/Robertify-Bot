@@ -36,7 +36,7 @@ public class PlaytimeCommand extends InteractiveCommand implements ICommand {
         final var time = (playtime.get(guild.getIdLong()) == null ? 0 : playtime.get(guild.getIdLong())) + (audioPlayer.getPlayingTrack() == null ? 0 : audioPlayer.getTrackPosition());
 
         return RobertifyEmbedUtils.embedMessage(guild, "🎶 I have listened to **"+ GeneralUtils.getDurationString(time)+"** of music in this guild since my last boot.")
-                .setFooter("Last booted: " + GeneralUtils.formatDate(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup(), TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z)).build();
+                .setFooter("Last booted: " + GeneralUtils.formatDate(BotInfoCache.getInstance().getLastStartup(), TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z)).build();
     }
 
     @Override
