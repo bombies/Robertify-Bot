@@ -102,6 +102,10 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
         }
 
         String id = args.get(1);
+        final String reason;
+
+        if (args.size() >= 3) reason = String.join(" ", args.subList(2, args.size()));
+        else reason = null;
 
         if (!GeneralUtils.stringIsID(id)) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid ID!").build())
@@ -137,7 +141,7 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                     suggester,
                     pendingSuggestion,
                     suggestion.getEmbeds().get(0).getThumbnail().getUrl(),
-                    null
+                    reason
             )).queue();
 
             suggestion.delete().queue();
@@ -151,6 +155,9 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
                             acceptedEmbed.setDescription("**Your suggestion has been accepted!**" +
                                     "\nYou will see it appear in the next changelog");
                             acceptedEmbed.addField("Suggestion", pendingSuggestion, false);
+
+                            if (reason != null)
+                                acceptedEmbed.addField("Comments", reason, false);
 
                             channel.sendMessageEmbeds(acceptedEmbed.build())
                                     .queue(success -> msg.addReaction("✅").queue(), new ErrorHandler()
