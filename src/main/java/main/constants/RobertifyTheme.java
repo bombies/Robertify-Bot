@@ -13,7 +13,9 @@ public enum RobertifyTheme {
     BLUE("https://i.imgur.com/PkFNv8I.png", "https://i.imgur.com/EMPuJOU.png", "https://i.imgur.com/stJW754.png", Emoji.fromMarkdown("<:robertifyblue2:933027476752441374>"), Color.decode("#2b59ff")),
     LIGHT_BLUE("https://i.imgur.com/aS3RAfF.png", "https://i.imgur.com/IAN6WSf.png", "https://i.imgur.com/gsCGnY4.png", Emoji.fromMarkdown("<:robertifylightblue2:933027476748259328>"), Color.decode("#2bd8ff")),
     ORANGE("https://i.imgur.com/huYU6mh.png", "https://i.imgur.com/klJLrBn.png", "https://i.imgur.com/rWt38F3.png", Emoji.fromMarkdown("<:robertifyorange2:933027476672765982>"), Color.decode("#f25500")),
-    YELLOW("https://i.imgur.com/VSaar3x.png", "https://i.imgur.com/rGYC1TZ.png", "https://i.imgur.com/ZJVB0XJ.png", Emoji.fromMarkdown("<:robertifyyellow2:933027476723093514>"), Color.decode("#ffea2b"));
+    YELLOW("https://i.imgur.com/VSaar3x.png", "https://i.imgur.com/rGYC1TZ.png", "https://i.imgur.com/ZJVB0XJ.png", Emoji.fromMarkdown("<:robertifyyellow2:933027476723093514>"), Color.decode("#ffea2b")),
+    DARK("https://i.imgur.com/E81mGZT.png", "https://i.imgur.com/IRdVcCV.png", "https://i.imgur.com/Bc113Dl.png", Emoji.fromMarkdown("<:robertifydark:938828978268024873>"), Color.decode("#0f0f0f")),
+    LIGHT("https://i.imgur.com/uahL1T4.png", "https://i.imgur.com/um6vgvQ.png", "https://i.imgur.com/2LjgJ33.png", Emoji.fromMarkdown("<:robertifylight:938828978251239435>"), Color.decode("#f0f0f0"));
 
     private final String transparent;
     private final String idleChannel;
@@ -78,6 +80,12 @@ public enum RobertifyTheme {
             }
             case "yellow" -> {
                 return YELLOW;
+            }
+            case "dark" -> {
+                return DARK;
+            }
+            case "light" -> {
+                return LIGHT;
             }
             default -> throw new IllegalArgumentException("Invalid logo type!");
         }

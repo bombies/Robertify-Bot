@@ -10,8 +10,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
-import main.utils.json.toggles.TogglesConfig;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -45,7 +43,9 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
                                 Triple.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
                                 Triple.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
                                 Triple.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
-                                Triple.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji())
+                                Triple.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                                Triple.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
+                                Triple.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
                         ),
                         menuPredicate
                 ))
@@ -108,56 +108,17 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
         }
 
         final var optionSelected = event.getSelectedOptions();
-        final var config = new ThemesConfig();
-        String msg = null;
+        final RobertifyTheme theme = RobertifyTheme.parse(optionSelected.get(0).getValue().split(":")[1].toLowerCase());
+        new ThemesConfig().setTheme(guild.getIdLong(), theme);
+        String msg = "The theme has been set to **" + theme.name().toUpperCase() + "**";
 
-        switch (optionSelected.get(0).getValue()) {
-            case "themes:green" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.GREEN);
-                msg = "The theme has been set to **GREEN**";
-            }
-            case "themes:gold" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.GOLD);
-                msg = "The theme has been set to **GOLD**";
-            }
-            case "themes:pink" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.PINK);
-                msg = "The theme has been set to **PINK**";
-            }
-            case "themes:purple" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.PURPLE);
-                msg = "The theme has been set to **PURPLE**";
-            }
-            case "themes:blue" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.BLUE);
-                msg = "The theme has been set to **BLUE**";
-            }
-            case "themes:lightblue" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.LIGHT_BLUE);
-                msg = "The theme has been set to **LIGHT BLUE**";
-            }
-            case "themes:orange" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.ORANGE);
-                msg = "The theme has been set to **ORANGE**";
-            }
-            case "themes:red" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.RED);
-                msg = "The theme has been set to **RED**";
-            }
-            case "themes:yellow" -> {
-                config.setTheme(guild.getIdLong(), RobertifyTheme.YELLOW);
-                msg = "The theme has been set to **YELLOW**";
-            }
-        }
-
-        final var newTheme = config.getTheme(guild.getIdLong());
         GeneralUtils.setDefaultEmbed(guild);
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, msg)
-                        .setImage(newTheme.getTransparent())
+                        .setImage(theme.getTransparent())
                 .build()).queue();
     }
 
