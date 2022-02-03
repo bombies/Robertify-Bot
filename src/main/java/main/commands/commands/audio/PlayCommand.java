@@ -15,8 +15,10 @@ import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +160,8 @@ public class PlayCommand implements ICommand {
         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
                     .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, addingMsg, finalAddToBeginning);
-        });
+        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
+                .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, null, finalAddToBeginning)));
     }
 
     public void playLocalAudio(Guild guild, TextChannel channel, Message msg, Member member, Message.Attachment audioFile) {
@@ -209,7 +212,8 @@ public class PlayCommand implements ICommand {
                         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
                             RobertifyAudioManager.getInstance()
                                     .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
-                        });
+                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
+                                .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, null, false)));
                     }
                 } catch (IllegalArgumentException e) {
                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
