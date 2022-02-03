@@ -14,6 +14,7 @@ import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 
@@ -74,7 +75,15 @@ public class DedicatedChannelCommand implements ICommand {
                                 if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
                                     dediChannelConfig.updateMessage(guild);
 
-                                msg.addReaction("✅").queue();
+                                try {
+                                    msg.addReaction("✅").queue();
+                                } catch (InsufficientPermissionException e) {
+                                    if (e.getMessage().contains("MESSAGE_HISTORY"))
+                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have setup the requests channel!" +
+                                                "\nCheck the top of your channel list.").build())
+                                                .queue();
+                                    else e.printStackTrace();
+                                }
                             });
 
 
