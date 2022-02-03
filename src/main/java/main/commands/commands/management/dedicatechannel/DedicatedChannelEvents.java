@@ -54,9 +54,12 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final User user = event.getAuthor();
 
-        if (!user.isBot() && !event.isWebhookMessage()) {
+        Message eventMessage = event.getMessage();
+        String message = eventMessage.getContentRaw();
+
+        if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
             if (!memberVoiceState.inVoiceChannel()) {
-                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
+                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to do this")
                                 .build())
                         .queue();
                 event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -95,12 +98,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     }
                 }
             }
-        }
 
-        Message eventMessage = event.getMessage();
-        String message = eventMessage.getContentRaw();
-
-        if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
             if (!eventMessage.getAttachments().isEmpty()) {
                 var audioFile = eventMessage.getAttachments().get(0);
                 new PlayCommand().playLocalAudio(guild, event.getChannel(), eventMessage, event.getMember(), audioFile);

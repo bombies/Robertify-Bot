@@ -6,11 +6,14 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,8 +25,16 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
         final var user = ctx.getAuthor();
+        final var channel = ctx.getChannel();
         final var msg = ctx.getMessage();
         final var args = ctx.getArgs();
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == channel.getIdLong()) {
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!").build())
+                        .queue();
+                return;
+            }
 
         if (args.isEmpty()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a query!").build())
@@ -38,6 +49,12 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
     }
 
     private void getSearchResults(Guild guild, User requester, Message botMsg, String query) {
+        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        RobertifyAudioManager.getInstance()
+                .loadSearchResults(musicManager, requester, botMsg, query);
+    }
+
+    private void getSearchResults(Guild guild, User requester, InteractionHook botMsg, String query) {
         GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         RobertifyAudioManager.getInstance()
                 .loadSearchResults(musicManager, requester, botMsg, query);
@@ -84,6 +101,27 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!event.getName().equals(getName())) return;
+
+        final var guild = event.getGuild();
+
+        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+            if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == event.getTextChannel().getIdLong()) {
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!").build())
+                        .queue();
+                return;
+            }
+
+        final String query = event.getOption("query").getAsString();
+
+
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `" + query + "`").build())
+                .setEphemeral(false)
+                .queue(addingMsg -> getSearchResults(guild, event.getUser(), addingMsg, "ytsearch:" + query));
+    }
+
+    @Override
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith("searchresult:")) return;
 
@@ -95,6 +133,7 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to interact with this menu!").build())
                     .setEphemeral(true)
                     .queue();
+            return;
         }
 
         GuildVoiceState voiceState = guild.getSelfMember().getVoiceState();

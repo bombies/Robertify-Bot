@@ -10,6 +10,7 @@ import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,6 +281,11 @@ public class RobertifyAudioManager {
     }
 
     public void loadSearchResults(GuildMusicManager musicManager, User searcher, Message botMsg, String query) {
+        final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
+        musicManager.getLink().getRestClient().loadItem(query, loader);
+    }
+
+    public void loadSearchResults(GuildMusicManager musicManager, User searcher, InteractionHook botMsg, String query) {
         final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
         musicManager.getLink().getRestClient().loadItem(query, loader);
     }

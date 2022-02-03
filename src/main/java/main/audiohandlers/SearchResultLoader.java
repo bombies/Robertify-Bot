@@ -12,6 +12,7 @@ import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import java.util.List;
@@ -21,12 +22,22 @@ public class SearchResultLoader implements LoadResultHandler {
     private final User searcher;
     private final String query;
     private final Message botMsg;
+    private final InteractionHook interactionBotMsg;
 
     public SearchResultLoader(Guild guild, User searcher, String query, Message botMsg) {
         this.guild = guild;
         this.searcher = searcher;
         this.query = query;
         this.botMsg = botMsg;
+        this.interactionBotMsg = null;
+    }
+
+    public SearchResultLoader(Guild guild, User searcher, String query, InteractionHook botMsg) {
+        this.guild = guild;
+        this.searcher = searcher;
+        this.query = query;
+        this.interactionBotMsg = botMsg;
+        this.botMsg = null;
     }
 
     @Override
@@ -57,11 +68,19 @@ public class SearchResultLoader implements LoadResultHandler {
 
         SelectionMenu selectionMenu = selectionMenuBuilder.build();
 
-        botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
+        if (botMsg != null)
+            botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
+                            .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                            .setFooter("Select a result from the selection menu below")
+                            .build())
+                    .setActionRow(selectionMenu)
+                    .queue();
+        else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
                         .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
                         .setFooter("Select a result from the selection menu below")
                         .build())
-                .setActionRow(selectionMenu)
+                .addActionRow(selectionMenu)
+                .setEphemeral(false)
                 .queue();
     }
 
