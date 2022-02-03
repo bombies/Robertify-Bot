@@ -2,8 +2,6 @@ package main.utils.pagination;
 
 import lombok.SneakyThrows;
 import main.constants.InteractionLimits;
-import main.constants.MessageButton;
-import main.constants.RobertifyEmoji;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.builders.selectionmenu.SelectionMenuBuilder;
 import main.utils.component.builders.selectionmenu.SelectionMenuOption;
@@ -11,8 +9,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -28,12 +24,7 @@ public abstract class Pages {
     private static final HashMap<Long, List<MenuPage>> menuMessages = new HashMap<>();
     private static Supplier<EmbedBuilder> embedStyle = EmbedBuilder::new;
 
-    private static final Paginator paginator = new Paginator(
-            Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString()),
-            Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString()),
-            Emoji.fromMarkdown(RobertifyEmoji.PLAY_EMOJI.toString()),
-            Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())
-    );
+    private static final Paginator paginator = Paginator.getDefaultPaginator();
 
     public static Message paginateMessage(TextChannel channel, User user, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
@@ -41,12 +32,7 @@ public abstract class Pages {
         channel.sendMessageEmbeds(messagePages.get(0).getEmbed()).queue(msg -> {
             if (messagePages.size() > 1) {
                 msg.editMessageComponents(
-                        ActionRow.of(
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFrontEmoji()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPreviousEmoji()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNextEmoji()),
-                                Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEndEmoji())
-                        )
+                        Paginator.getButtons(user, false, false, true, true)
                 ).queue();
 
                 messages.put(msg.getIdLong(), messagePages);
@@ -64,12 +50,7 @@ public abstract class Pages {
 
         if (messagePages.size() > 1) {
             replyAction = replyAction.addActionRows(
-                    ActionRow.of(
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + event.getUser().getId(), paginator.getFrontEmoji()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + event.getUser().getId(), paginator.getPreviousEmoji()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + event.getUser().getId(), paginator.getNextEmoji()),
-                            Button.of(ButtonStyle.SECONDARY, MessageButton.END + event.getUser().getId(), paginator.getEndEmoji())
-                    )
+                    Paginator.getButtons(event.getUser(), false, false, true, true)
             );
         }
 

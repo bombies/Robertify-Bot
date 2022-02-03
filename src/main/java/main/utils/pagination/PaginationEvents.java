@@ -32,30 +32,31 @@ public class PaginationEvents extends ListenerAdapter {
 
         if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
             currentPage.put(msg, 0);
-            event.editMessageEmbeds(messagePages.get(0).getEmbed()).queue();
-
+            event.editMessageEmbeds(messagePages.get(0).getEmbed())
+                    .setActionRows(((currentPage.get(msg) == 0) ?
+                            Paginator.getButtons(event.getUser(), false, false, true, true) :
+                            Paginator.getButtons(event.getUser())))
+                    .queue();
         } else if (event.getButton().getId().equals(MessageButton.PREVIOUS + event.getUser().getId())) {
-            if (currentPage.get(msg) == 0) {
-                event.deferEdit().queue();
-                return;
-            }
-
-            currentPage.put(msg, currentPage.get(msg)-1);
-            event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed()).queue();
-
+                currentPage.put(msg, currentPage.get(msg) - 1);
+                event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                        .setActionRows(((currentPage.get(msg) == 0) ?
+                                Paginator.getButtons(event.getUser(), false, false, true, true) :
+                                Paginator.getButtons(event.getUser())))
+                        .queue();
         } else if (event.getButton().getId().equals(MessageButton.NEXT + event.getUser().getId())) {
-            if (currentPage.get(msg) == messagePages.size()-1) {
-                event.deferEdit().queue();
-                return;
-            }
-
-            currentPage.put(msg, currentPage.get(msg)+1);
-            event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed()).queue();
-
+                currentPage.put(msg, currentPage.get(msg) + 1);
+                event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                        .setActionRows(((currentPage.get(msg) == messagePages.size()-1) ?
+                                Paginator.getButtons(event.getUser(), true, true, false, false) :
+                                Paginator.getButtons(event.getUser())))
+                        .queue();
         } else if (event.getButton().getId().equals(MessageButton.END + event.getUser().getId())) {
             currentPage.put(msg, messagePages.size()-1);
-            event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed()).queue();
-
+            event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                    .setActionRows(((currentPage.get(msg) == messagePages.size()-1) ?
+                            Paginator.getButtons(event.getUser(), true, true, false, false) :
+                            Paginator.getButtons(event.getUser()))).queue();
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to interact with this button.");
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
