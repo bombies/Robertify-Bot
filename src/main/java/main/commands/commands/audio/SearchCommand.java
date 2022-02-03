@@ -7,6 +7,7 @@ import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -37,7 +38,8 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
             }
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a query!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a query!\n\n"
+                            + getUsages(new GuildConfig().getPrefix(guild.getIdLong()))).build())
                     .queue();
             return;
         }
@@ -67,7 +69,16 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Search for a specific song! You will be provided a list of maximum 10" +
+                " results from our library for you to choose from. It's as easy as selecting" +
+                " one of them from the selection menu and it'll be added to the queue!\n\n" +
+                getUsages(prefix);
+    }
+
+    @Override
+    public String getUsages(String prefix) {
+        return "**__Usages__**\n" +
+                "`"+prefix+"search <query>`";
     }
 
     @Override

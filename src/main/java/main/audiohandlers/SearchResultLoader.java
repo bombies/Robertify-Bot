@@ -6,6 +6,7 @@ import lavalink.client.player.track.AudioPlaylist;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackInfo;
 import lombok.SneakyThrows;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.builders.selectionmenu.SelectionMenuBuilder;
 import main.utils.json.themes.ThemesConfig;
@@ -63,7 +64,9 @@ public class SearchResultLoader implements LoadResultHandler {
         for (int i = 0; i < Math.min(10, tracks.size()); i++) {
             AudioTrackInfo info = tracks.get(i).getInfo();
             selectionMenuBuilder.addOption(info.getTitle(), info.getIdentifier(), null);
-            embedDescription.append("**").append(i+1).append(".** - ").append(info.getTitle()).append(" by ").append(info.getAuthor()).append("\n");
+            embedDescription.append("**").append(i+1).append(".** - ").append(info.getTitle()).append(" by ")
+                    .append(info.getAuthor()).append(" [").append(GeneralUtils.formatTime(info.getLength()))
+                    .append("]").append("\n");
         }
 
         SelectionMenu selectionMenu = selectionMenuBuilder.build();
