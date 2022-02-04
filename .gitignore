@@ -35,4 +35,4 @@ target
 .env
 vpsDataBackup
 localaudio
-resources
+resources/config.json
