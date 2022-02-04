@@ -69,11 +69,20 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
 
                                     GuildConfig guildConfig = new GuildConfig();
 
-                                    if (!guildConfig.announcementChannelIsSet(guild.getIdLong()))
-                                        continue;
+                                    final long channelID;
+
+                                    if (guild.getCommunityUpdatesChannel() == null) {
+                                        if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
+                                            continue;
+                                        } else {
+                                            channelID = guildConfig.getAnnouncementChannelID(guild.getIdLong());
+                                        }
+                                    } else {
+                                        channelID = guild.getCommunityUpdatesChannel().getIdLong();
+                                    }
 
                                     try {
-                                        guild.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
+                                        guild.getTextChannelById(channelID)
                                                 .sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
                                                                 "❗ IMPORTANT: Global Announcement",
                                                                         "Announcement from: " + event.getUser().getAsMention() + "\n\n"
