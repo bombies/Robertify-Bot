@@ -84,7 +84,15 @@ public class Listener extends ListenerAdapter {
         initSelectionMenus();
 //        StatisticsDB.startDailyUpdateCheck();
 
-        logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
+        final int serverCount = Robertify.api.getGuilds().size();
+
+        if (Robertify.getTopGGAPI() != null)
+            Robertify.getTopGGAPI().setStats(serverCount);
+
+        if (Robertify.getDiscordBotListAPI() != null)
+            Robertify.getDiscordBotListAPI().setStats(serverCount);
+
+        logger.info("Watching {} guilds", serverCount);
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
 
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);

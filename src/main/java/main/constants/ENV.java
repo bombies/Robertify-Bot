@@ -25,7 +25,10 @@ public enum ENV {
     MONGO_PASSWORD("mongo_password"),
     MONGO_HOSTNAME("mongo_hostname"),
     MONGO_CLUSTER_NAME("mongo_cluster_name"),
-    MONGO_DATABASE_NAME("mongo_database_name");
+    MONGO_DATABASE_NAME("mongo_database_name"),
+    TOP_GG_TOKEN("top_gg_token"),
+    DBL_TOKEN("dbl_token"),
+    VOTE_REMINDER_CHANCE("vote_reminder_chance");
 
     private final String str;
 

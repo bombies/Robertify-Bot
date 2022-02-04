@@ -27,6 +27,7 @@ import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
+import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.JDA;
@@ -35,6 +36,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.discordbots.api.client.DiscordBotListAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -54,6 +56,10 @@ public class Robertify {
     public static JDA api;
     @Getter
     private static JdaLavalink lavalink;
+    @Getter
+    private static DiscordBotListAPI topGGAPI;
+    @Getter
+    private static DBLApi discordBotListAPI;
     public static BaringoClient baringo;
     @Getter
     private static DeezerApi deezerApi;
@@ -171,6 +177,19 @@ public class Robertify {
                     .build();
 
             deezerApi = new DeezerApi();
+
+            if (!Config.get(ENV.TOP_GG_TOKEN).isEmpty())
+                topGGAPI = new DiscordBotListAPI.Builder()
+                        .token(Config.get(ENV.TOP_GG_TOKEN))
+                        .botId(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
+                        .build();
+
+            if (!Config.get(ENV.DBL_TOKEN).isEmpty())
+                discordBotListAPI = new DBLApi.Builder()
+                    .setToken(Config.get(ENV.DBL_TOKEN))
+                        .setBotID(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
+                        .build();
+
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
