@@ -22,10 +22,7 @@ import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.AbstractJSONFile;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -106,13 +103,14 @@ public class Listener extends ListenerAdapter {
             return;
         }
 
-        final String raw = event.getMessage().getContentRaw();
+        Message message = event.getMessage();
+        final String raw = message.getContentRaw();
 
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
             if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), user.getIdLong())) {
-                event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You are banned from using commands in this server!").build())
+                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You are banned from using commands in this server!").build())
                         .queue();
             } else {
                 try {
@@ -132,6 +130,17 @@ public class Listener extends ListenerAdapter {
                     } catch (InsufficientPermissionException ignored) {}
                 }
             }
+        } else if (!message.getMentionedMembers().isEmpty()) {
+            if (!message.getContentRaw().startsWith("<@!"+guild.getSelfMember().getId()+">"))
+                return;
+
+            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Hey "+event.getAuthor().getAsMention()+"! Thank you for using Robertify. :)\n" +
+                            "My prefix in this server is: `" + prefix + "`\n\n" +
+                                    "Type `"+prefix+"help` to see all the commands I offer!\n" +
+                                    "[Invite](https://robertify.me/invite) | [Commands](https://robertify.me/commands) | [Support](https://robertify.me/support)")
+                            .setFooter("Developed by bombies#4445")
+                            .build())
+                    .queue();
         }
     }
 
