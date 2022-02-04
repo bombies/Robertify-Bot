@@ -16,13 +16,18 @@ public class VoiceChannelCountCommand implements IDevCommand {
 
         int vcCount = 0;
         int currentlyPlayingCount = 0;
+        int peopleListening = 0;
         for (var guild : Robertify.api.getGuilds()) {
             vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
+
+            if (guild.getSelfMember().getVoiceState().inVoiceChannel())
+                peopleListening += guild.getSelfMember().getVoiceState().getChannel().getMembers().size();
         }
 
         ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "🔊 I am currently in **" + vcCount + "** voice channels\n" +
-                        "I am currently playing music in **"+currentlyPlayingCount+"** of those channels.").build())
+                        "I am currently playing music in **"+currentlyPlayingCount+"** of those channels.\n" +
+                        "There is currently **"+peopleListening+"** people listening to music").build())
                 .queue();
     }
 
