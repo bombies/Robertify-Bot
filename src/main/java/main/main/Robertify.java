@@ -42,7 +42,6 @@ import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
-import java.net.URI;
 import java.util.Base64;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -78,7 +77,8 @@ public class Robertify {
                     shardId -> getApi()
             );
 
-            lavalink.addNode(URI.create(Config.get(ENV.LAVALINK_NODE)), Config.get(ENV.LAVALINK_NODE_PASSWORD));
+            for (var node : Config.getLavaNodes())
+                lavalink.addNode(node.getURI(), node.getPassword());
 
             api = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
@@ -189,7 +189,6 @@ public class Robertify {
                     .setToken(Config.get(ENV.DBL_TOKEN))
                         .setBotID(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
                         .build();
-
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
