@@ -111,6 +111,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
 
             boolean addToBeginning = false;
+            boolean shuffled = false;
             final var split = message.split(" ");
 
             if (split.length == 1) {
@@ -139,6 +140,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                         }
 
                         message = msgNoFlags;
+                        shuffled = true;
                     }
                 }
             }
@@ -146,9 +148,12 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             if (addToBeginning)
                 RobertifyAudioManager.getInstance()
                         .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
-            else {
+            else if (shuffled) {
                 RobertifyAudioManager.getInstance()
                         .loadAndPlayFromDedicatedChannelShuffled(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+            } else {
+                RobertifyAudioManager.getInstance()
+                        .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             }
         }
 
