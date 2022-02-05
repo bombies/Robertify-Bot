@@ -14,6 +14,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import java.util.List;
@@ -76,13 +79,19 @@ public class SearchResultLoader implements LoadResultHandler {
                             .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
                             .setFooter("Select a result from the selection menu below")
                             .build())
-                    .setActionRow(selectionMenu)
+                    .setActionRows(
+                            ActionRow.of(selectionMenu),
+                            ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end", "End Interaction"))
+                    )
                     .queue();
         else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
                         .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
                         .setFooter("Select a result from the selection menu below")
                         .build())
-                .addActionRow(selectionMenu)
+                .addActionRows(
+                        ActionRow.of(selectionMenu),
+                        ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end", "End Interaction"))
+                )
                 .setEphemeral(false)
                 .queue();
     }

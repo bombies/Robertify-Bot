@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -172,5 +173,16 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
 
         RobertifyAudioManager.getInstance().loadAndPlay(event.getTextChannel(), "ytsearch:" + trackID,
                 voiceState, memberVoiceState, event.getMessage(), false);
+    }
+
+    @Override
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
+        if (!event.getButton().getId().startsWith("searchresult:")) return;
+
+        String id = event.getButton().getId().split(":")[1];
+        switch (id.toLowerCase()) {
+            case "end" -> event.getMessage().delete().queue();
+            default -> throw new IllegalArgumentException("How did this even happen? (ID="+id+")");
+        }
     }
 }
