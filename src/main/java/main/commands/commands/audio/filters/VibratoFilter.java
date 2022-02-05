@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 import javax.script.ScriptException;
 
@@ -22,6 +23,19 @@ public class VibratoFilter implements ICommand {
 
         if (!selfMember.getVoiceState().inVoiceChannel()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
+                    .queue();
+            return;
+        }
+
+        GuildVoiceState memberVoiceState = ctx.getMember().getVoiceState();
+        if (!memberVoiceState.inVoiceChannel()) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
+                    .queue();
+            return;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfMember.getVoiceState().getChannel())) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
                     .queue();
             return;
         }
