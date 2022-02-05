@@ -113,6 +113,7 @@ public class CommandManager {
                 new TwentyFourSevenCommand(),
                 new PlaytimeCommand(),
                 new SearchCommand(),
+                new LogCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -185,7 +186,8 @@ public class CommandManager {
                 new DedicatedChannelCommand(),
                 new RestrictedChannelsCommand(),
                 new ThemeCommand(),
-                new TwentyFourSevenCommand()
+                new TwentyFourSevenCommand(),
+                new LogCommand()
         );
 
         addMiscCommands(

@@ -1,15 +1,19 @@
 package main.commands.commands.audio;
 
 import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -50,18 +54,16 @@ public class MoveCommand implements ICommand {
         final int id = Integer.parseInt(args.get(0));
         final int position = Integer.parseInt(args.get(1));
 
-        msg.replyEmbeds(handleMove(ctx.getGuild(), queue, id, position).build()).queue();
+        msg.replyEmbeds(handleMove(ctx.getGuild(), ctx.getAuthor(), queue, id, position).build()).queue();
 
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
-    public EmbedBuilder handleMove(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
+    public EmbedBuilder handleMove(Guild guild, User mover, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
         GeneralUtils.setCustomEmbed(guild, "Queue");
 
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
-            return eb;
-        }
+        if (queue.isEmpty())
+            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
@@ -85,7 +87,10 @@ public class MoveCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+trackList.get(id-1).getInfo().getTitle()
+        AudioTrackInfo info = trackList.get(id - 1).getInfo();
+
+        new LogUtils().sendLog(guild, LogType.TRACK_MOVE, mover.getAsMention() + " has moved `"+info.getTitle()+" by "+info.getAuthor()+"` to position `"+position+"`");
+        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+ info.getTitle()
                 +"` to position `"+position+"`.");
     }
 

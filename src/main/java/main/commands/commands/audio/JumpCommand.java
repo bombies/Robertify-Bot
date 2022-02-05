@@ -7,11 +7,10 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
@@ -63,15 +62,15 @@ public class JumpCommand implements ICommand {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the amount of seconds to jump in the song!");
                 return eb;
             } else
-                return doActualJump(ctx.getGuild(), ctx.getArgs().get(0), audioPlayer, track);
+                return doActualJump(ctx.getGuild(), memberVoiceState.getMember().getUser(), ctx.getArgs().get(0), audioPlayer, track);
         else {
             if (input == null)
                 throw new NullPointerException("Input string cannot be null");
-            return doActualJump(ctx.getGuild(), input, audioPlayer, track);
+            return doActualJump(ctx.getGuild(), memberVoiceState.getMember().getUser(), input, audioPlayer, track);
         }
     }
 
-    private EmbedBuilder doActualJump(Guild guild, String input, IPlayer player, AudioTrack track) {
+    private EmbedBuilder doActualJump(Guild guild, User jumper, String input, IPlayer player, AudioTrack track) {
         long time;
         EmbedBuilder eb;
         if (GeneralUtils.stringIsInt(input))
@@ -94,6 +93,7 @@ public class JumpCommand implements ICommand {
         }
 
         player.seekTo(player.getTrackPosition() + time);
+        new LogUtils().sendLog(guild, LogType.TRACK_JUMP, jumper.getAsMention() + " has jumped `"+TimeUnit.MILLISECONDS.toSeconds(time)+"` seconds.");
 
         return RobertifyEmbedUtils.embedMessage(guild, "Successfully jumped `"+input+"` seconds ahead!");
     }

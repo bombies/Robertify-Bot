@@ -6,6 +6,8 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -61,6 +63,7 @@ public class VolumeCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
 
+        new LogUtils().sendLog(guild, LogType.VOLUME_CHANGE, memberVoiceState.getMember().getAsMention() + " has changed the volume to `"+volume+"%`");
         return RobertifyEmbedUtils.embedMessage(guild, "🔊  You have set the volume of the bot to **"+volume+"%**");
     }
 

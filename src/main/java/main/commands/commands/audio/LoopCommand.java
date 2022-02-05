@@ -2,17 +2,17 @@ package main.commands.commands.audio;
 
 import lavalink.client.player.IPlayer;
 import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -38,12 +38,12 @@ public class LoopCommand implements ICommand {
         }
 
         if (ctx.getArgs().isEmpty()) {
-            msg.replyEmbeds(handleRepeat(musicManager).build()).queue();
+            msg.replyEmbeds(handleRepeat(musicManager, ctx.getAuthor()).build()).queue();
             return;
         }
 
         if (ctx.getArgs().get(0).equalsIgnoreCase("queue") || ctx.getArgs().get(0).equalsIgnoreCase("q")) {
-            eb = handleQueueRepeat(musicManager, audioPlayer, ctx.getGuild());
+            eb = handleQueueRepeat(musicManager, ctx.getAuthor(), audioPlayer, ctx.getGuild());
         } else {
             eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Invalid arguments!");
         }
@@ -82,7 +82,7 @@ public class LoopCommand implements ICommand {
         return null;
     }
 
-    public EmbedBuilder handleRepeat(GuildMusicManager musicManager) {
+    public EmbedBuilder handleRepeat(GuildMusicManager musicManager, User looper) {
         final var guild = musicManager.getGuild();
 
         final var player = musicManager.getPlayer();
@@ -93,18 +93,21 @@ public class LoopCommand implements ICommand {
 
         EmbedBuilder eb;
 
+        AudioTrackInfo info = player.getPlayingTrack().getInfo();
         if (scheduler.repeating) {
             scheduler.repeating = false;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().getTitle() + "` will no longer be looped!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.getTitle() + "` will no longer be looped!");
         } else {
             scheduler.repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + player.getPlayingTrack().getInfo().getTitle() + "` will now be looped");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.getTitle() + "` will now be looped");
         }
+
+        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.repeating ? "looped" : "unlooped")+" `"+info.getTitle()+" by "+info.getAuthor()+"`");
 
         return eb;
     }
 
-    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, IPlayer audioPlayer, Guild guild) {
+    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, User looper,  IPlayer audioPlayer, Guild guild) {
         EmbedBuilder eb;
         final var scheduler = musicManager.getScheduler();
 
@@ -133,6 +136,7 @@ public class LoopCommand implements ICommand {
             eb = RobertifyEmbedUtils.embedMessage(guild, "The current queue will now be looped!");
         }
 
+        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.playlistRepeating ? "looped" : "unlooped")+" the queue");
         return eb;
     }
 

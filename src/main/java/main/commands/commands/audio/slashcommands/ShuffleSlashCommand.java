@@ -3,7 +3,6 @@ package main.commands.commands.audio.slashcommands;
 import main.commands.commands.audio.ShuffleCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +43,7 @@ public class ShuffleSlashCommand extends InteractiveCommand {
             return;
         }
 
-        event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild()).build())
+        event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild(), event.getUser()).build())
                 .setEphemeral(false).queue();
     }
 }

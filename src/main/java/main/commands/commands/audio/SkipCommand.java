@@ -6,6 +6,8 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -66,6 +68,7 @@ public class SkipCommand implements ICommand {
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
+        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, memberVoiceState.getMember().getAsMention() + " has skipped the song");
         return RobertifyEmbedUtils.embedMessage(guild, "Skipped the song!");
     }
 

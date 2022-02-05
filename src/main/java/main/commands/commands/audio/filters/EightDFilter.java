@@ -5,6 +5,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 import javax.script.ScriptException;
@@ -44,11 +46,13 @@ public class EightDFilter implements ICommand {
             filters.setRotation(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **off** the **8D** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the 8D filter off");
         } else {
             filters.setRotation(new Rotation()
                     .setFrequency(0.05F)).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **on** the **8D** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the 8D filter on");
         }
     }
 

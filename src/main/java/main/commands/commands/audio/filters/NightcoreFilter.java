@@ -5,6 +5,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 import javax.script.ScriptException;
@@ -44,12 +46,14 @@ public class NightcoreFilter implements ICommand {
             filters.setTimescale(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **off** the **Nightcore** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Nightcore filter off");
         } else {
             filters.setTimescale(new Timescale()
                     .setPitch(1.5F)
             ).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **on** the **Nightcore** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Nightcore filter on");
         }
     }
 

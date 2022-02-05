@@ -71,9 +71,9 @@ public class LoopSlashCommand extends InteractiveCommand {
         }
 
         switch (event.getSubcommandName()) {
-            case "track" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager).build())
+            case "track" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager, event.getUser()).build())
                     .setEphemeral(false).queue();
-            case "queue" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, audioPlayer, event.getGuild()).build())
+            case "queue" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, event.getUser(), audioPlayer, event.getGuild()).build())
                     .setEphemeral(false).queue();
         }
     }

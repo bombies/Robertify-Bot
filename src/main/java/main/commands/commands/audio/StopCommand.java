@@ -7,11 +7,10 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
 
@@ -46,10 +45,10 @@ public class StopCommand implements ICommand {
 
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
 
-        msg.replyEmbeds(handleStop(musicManager).build()).queue();
+        msg.replyEmbeds(handleStop(ctx.getAuthor(), musicManager).build()).queue();
     }
 
-    public EmbedBuilder handleStop(GuildMusicManager musicManager) {
+    public EmbedBuilder handleStop(User stopper, GuildMusicManager musicManager) {
         final var audioPlayer = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
         final var guild = musicManager.getGuild();
@@ -73,6 +72,7 @@ public class StopCommand implements ICommand {
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
+        new LogUtils().sendLog(guild, LogType.PLAYER_STOP, stopper.getAsMention() + " has stopped the player");
         return RobertifyEmbedUtils.embedMessage(guild, "You have stopped the track and cleared the queue.");
     }
 

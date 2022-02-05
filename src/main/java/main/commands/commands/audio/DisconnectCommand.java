@@ -5,11 +5,10 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.*;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -45,14 +44,15 @@ public class DisconnectCommand implements ICommand {
             return;
         }
 
-        msg.replyEmbeds(handleDisconnect(ctx.getGuild()).build())
+        msg.replyEmbeds(handleDisconnect(ctx.getGuild(), ctx.getAuthor()).build())
                 .queue();
     }
 
-    public EmbedBuilder handleDisconnect(Guild guild) {
+    public EmbedBuilder handleDisconnect(Guild guild, User disconnecter) {
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         musicManager.leave();
+        new LogUtils().sendLog(guild, LogType.BOT_DISCONNECTED, disconnecter.getAsMention() + " has disconnected the bot.");
 
         return RobertifyEmbedUtils.embedMessage(guild, "Disconnected!");
     }

@@ -6,9 +6,12 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -21,10 +24,10 @@ public class ShuffleCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
 
-        msg.replyEmbeds(handleShuffle(ctx.getGuild()).build()).queue();
+        msg.replyEmbeds(handleShuffle(ctx.getGuild(), ctx.getAuthor()).build()).queue();
     }
 
-    public EmbedBuilder handleShuffle(Guild guild) {
+    public EmbedBuilder handleShuffle(Guild guild, User shuffler) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var queue = musicManager.getScheduler().queue;
 
@@ -40,6 +43,7 @@ public class ShuffleCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
+        new LogUtils().sendLog(guild, LogType.QUEUE_SHUFFLE, shuffler.getAsMention() + " has shuffled the queue");
         return RobertifyEmbedUtils.embedMessage(guild, "Shuffled the queue!");
     }
 

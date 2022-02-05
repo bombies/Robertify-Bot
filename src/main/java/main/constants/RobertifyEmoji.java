@@ -1,5 +1,7 @@
 package main.constants;
 
+import net.dv8tion.jda.api.entities.Emoji;
+
 public enum RobertifyEmoji {
     PREVIOUS_EMOJI("<:rewind:913595299203805194>"),
     REWIND_EMOJI("<:back:913595555811307541>"),
@@ -30,5 +32,9 @@ public enum RobertifyEmoji {
     @Override
     public String toString() {
         return str;
+    }
+
+    public Emoji getEmoji() {
+        return Emoji.fromMarkdown(str);
     }
 }

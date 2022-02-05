@@ -8,8 +8,11 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -39,10 +42,10 @@ public class SkipToCommand implements ICommand {
 
         int id = Integer.parseInt(args.get(0));
 
-        msg.replyEmbeds(handleSkip(queue, musicManager, id).build()).queue();
+        msg.replyEmbeds(handleSkip(ctx.getAuthor(), queue, musicManager, id).build()).queue();
     }
 
-    public EmbedBuilder handleSkip(ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
+    public EmbedBuilder handleSkip(User skipper, ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
         if (id > queue.size() || id <= 0)
             return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "ID provided isn't a valid ID!");
 
@@ -65,6 +68,7 @@ public class SkipToCommand implements ICommand {
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
+        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
         return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "Skipped to **track #"+id+"**!");
     }
 

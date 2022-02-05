@@ -23,6 +23,7 @@ import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
 import main.events.AnnouncementChannelEvents;
+import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.pagination.PaginationEvents;
@@ -100,7 +101,8 @@ public class Robertify {
                             new PollEvents(),
                             new SuggestionCategoryDeletionEvents(),
                             new ReportsEvents(),
-                            new AnnouncementChannelEvents()
+                            new AnnouncementChannelEvents(),
+                            new LogChannelEvents()
                     )
                     .setVoiceDispatchInterceptor(lavalink.getVoiceInterceptor())
 

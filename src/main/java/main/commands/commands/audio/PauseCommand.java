@@ -4,6 +4,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -54,10 +56,12 @@ public class PauseCommand implements ICommand {
             audioPlayer.setPaused(false);
             musicManager.setForcePaused(false);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!");
+            new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, memberVoiceState.getMember().getAsMention() + " has resumed the music");
         } else {
             audioPlayer.setPaused(true);
             musicManager.setForcePaused(true);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have paused the music!");
+            new LogUtils().sendLog(guild, LogType.PLAYER_PAUSE, memberVoiceState.getMember().getAsMention() + " has paused the music");
         }
 
         return eb;

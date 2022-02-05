@@ -4,9 +4,12 @@ import lavalink.client.io.FriendlyException;
 import lavalink.client.io.LoadResultHandler;
 import lavalink.client.player.track.AudioPlaylist;
 import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -64,6 +67,9 @@ public class AudioLoader implements LoadResultHandler {
             scheduler.addToBeginningOfQueue(audioTrack);
         else
             scheduler.queue(audioTrack);
+
+        AudioTrackInfo info = audioTrack.getInfo();
+        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.getTitle() +" by "+ info.getAuthor() +"` to the queue.");
 
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
@@ -125,6 +131,7 @@ public class AudioLoader implements LoadResultHandler {
             scheduler.addToBeginningOfQueue(tracks);
 
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+audioPlaylist.getTracks().size()+"` songs from playlist `"+ audioPlaylist.getName() +"` to the queue.");
         for (final AudioTrack track : tracks) {
             trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getTrack());
 
@@ -155,6 +162,9 @@ public class AudioLoader implements LoadResultHandler {
             scheduler.addToBeginningOfQueue(list.get(0));
         else
             scheduler.queue(list.get(0));
+
+        AudioTrackInfo info = list.get(0).getInfo();
+        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.getTitle() +" by "+ info.getAuthor() +"` to the queue.");
 
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);

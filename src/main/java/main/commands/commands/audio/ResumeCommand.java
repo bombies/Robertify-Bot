@@ -5,6 +5,8 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
@@ -61,6 +63,7 @@ public class ResumeCommand implements ICommand {
 
         audioPlayer.setPaused(false);
         eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the song!");
+        new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, member.getAsMention() + " has resumed the music");
         msg.replyEmbeds(eb.build()).queue();
     }
 

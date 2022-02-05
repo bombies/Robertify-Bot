@@ -5,6 +5,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 
 import javax.script.ScriptException;
@@ -44,10 +46,12 @@ public class VibratoFilter implements ICommand {
             filters.setVibrato(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **off** the **Vibrato** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Vibrato filter off");
         } else {
             filters.setVibrato(new Vibrato()).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **on** the **Vibrato** filter").build())
                     .queue();
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Vibrato filter on");
         }
     }
 

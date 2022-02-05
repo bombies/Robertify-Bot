@@ -1,15 +1,19 @@
 package main.commands.commands.audio;
 
 import lavalink.client.player.track.AudioTrack;
+import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -55,10 +59,10 @@ public class RewindCommand implements ICommand {
             }
         }
 
-        msg.replyEmbeds(handleRewind(selfVoiceState, time, ctx.getArgs().isEmpty()).build()).queue();
+        msg.replyEmbeds(handleRewind(ctx.getAuthor(), selfVoiceState, time, ctx.getArgs().isEmpty()).build()).queue();
     }
 
-    public EmbedBuilder handleRewind(GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
+    public EmbedBuilder handleRewind(User user, GuildVoiceState selfVoiceState, long time, boolean rewindToBeginning) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
         final AudioTrack track = audioPlayer.getPlayingTrack();
@@ -70,12 +74,14 @@ public class RewindCommand implements ICommand {
             return eb;
         }
 
-        if (track.getInfo().isStream())
+        AudioTrackInfo info = track.getInfo();
+        if (info.isStream())
             return RobertifyEmbedUtils.embedMessage(guild, "You can't rewind a stream!");
 
         if (rewindToBeginning) {
             audioPlayer.seekTo(0L);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song to the beginning!");
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.getTitle()+" by "+info.getAuthor()+"` to the beginning");
         } else {
             if (time <= 0) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "The duration cannot be negative or zero!");
@@ -91,6 +97,7 @@ public class RewindCommand implements ICommand {
 
             audioPlayer.seekTo(audioPlayer.getTrackPosition() - time);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.getTitle()+" by "+info.getAuthor()+"` by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds");
         }
 
         return eb;

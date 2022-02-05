@@ -6,6 +6,8 @@ import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -55,6 +57,8 @@ public class PreviousTrackCommand implements ICommand {
 
         if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
+
+        new LogUtils().sendLog(guild, LogType.TRACK_PREVIOUS, memberVoiceState.getMember().getAsMention() + " has started to play the previous track");
 
         return RobertifyEmbedUtils.embedMessage(guild, "Now playing the previous track!");
     }

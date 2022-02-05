@@ -3,7 +3,6 @@ package main.commands.commands.audio.slashcommands;
 import main.commands.commands.audio.RewindCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -59,7 +58,7 @@ public class RewindSlashCommand extends InteractiveCommand {
             time = event.getOption("seconds").getAsLong();
         }
 
-        event.getHook().sendMessageEmbeds(new RewindCommand().handleRewind(event.getGuild().getSelfMember().getVoiceState(), time, event.getOptions().isEmpty()).build())
+        event.getHook().sendMessageEmbeds(new RewindCommand().handleRewind(event.getUser(), event.getGuild().getSelfMember().getVoiceState(), time, event.getOptions().isEmpty()).build())
                 .queue();
     }
 }

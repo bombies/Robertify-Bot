@@ -7,6 +7,8 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -47,6 +49,7 @@ public class ClearQueueCommand implements ICommand {
         }
 
         queue.clear();
+        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queue");
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

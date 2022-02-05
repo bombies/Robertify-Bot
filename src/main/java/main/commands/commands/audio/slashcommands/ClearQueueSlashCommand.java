@@ -6,6 +6,8 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -72,6 +74,8 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
         }
 
         queue.clear();
+        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " has cleared the queue");
+
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         event.getHook().sendMessageEmbeds(eb.build()).queue();

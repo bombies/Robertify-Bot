@@ -1,9 +1,12 @@
 package main.commands.commands.audio;
 
+import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -28,7 +31,7 @@ public class SeekCommand implements ICommand {
 
         var position = ctx.getArgs().get(0);
 
-        if (!Pattern.matches("^\\d{2}:\\d{2}$", position)) {
+        if (!Pattern.matches("^\\d{1,2}:\\d{2}$", position)) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the position in the format `mm:ss`").build())
                     .queue();
             return;
@@ -55,7 +58,7 @@ public class SeekCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must bein the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
@@ -73,10 +76,13 @@ public class SeekCommand implements ICommand {
 
         long totalDurationInMillis = TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
-        if (totalDurationInMillis > audioPlayer.getPlayingTrack().getInfo().getLength())
+        AudioTrackInfo info = audioPlayer.getPlayingTrack().getInfo();
+        if (totalDurationInMillis > info.getLength())
             return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
 
         audioPlayer.seekTo(totalDurationInMillis);
+        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, memberVoiceState.getMember().getAsMention() + " has seeked `"+ (mins > 9 ? mins : "0" + mins) +
+                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.getTitle()+" by "+info.getAuthor()+"`");
         return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
                 ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
 
