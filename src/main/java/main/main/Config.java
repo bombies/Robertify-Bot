@@ -50,8 +50,7 @@ public class Config {
     public static List<LavaNode> getLavaNodes() {
         try {
             final List<LavaNode> ret = new ArrayList<>();
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            File file = new File(classLoader.getResource("config.json").getFile());
+            File file = new File("./json/config.json");
 
             JSONObject jsonObject = new JSONObject(GeneralUtils.getFileContent(file.getPath()));
 
@@ -66,7 +65,7 @@ public class Config {
 
             return ret;
         } catch (NullPointerException e) {
-            Files.createFile(Path.of("src/main/resources/config.json"));
+            Files.createFile(Path.of("./json/config.json"));
             logger.warn("config.json didn't exist, so I created one.");
             return new ArrayList<>();
         }
