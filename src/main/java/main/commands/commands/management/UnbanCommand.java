@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +53,14 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final Member member = guild.retrieveMemberById(id).complete();
+        final Member member;
+        try {
+            member = ctx.getGuild().retrieveMemberById(id).complete();
+        } catch (ErrorResponseException e) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban.").build())
+                    .queue();
+            return;
+        }
 
         if (member == null) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())

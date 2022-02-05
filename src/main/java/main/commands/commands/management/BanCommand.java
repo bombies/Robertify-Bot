@@ -5,7 +5,6 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
 import main.main.Listener;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
@@ -18,6 +17,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,14 @@ public class BanCommand extends InteractiveCommand implements ICommand {
             return;
         }
 
-        final Member member = Robertify.api.getGuildById(ctx.getGuild().getIdLong()).retrieveMemberById(id).complete();
+        final Member member;
+        try {
+            member = ctx.getGuild().retrieveMemberById(id).complete();
+        } catch (ErrorResponseException e) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban.").build())
+                    .queue();
+            return;
+        }
 
         if (member == null) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban.").build())
