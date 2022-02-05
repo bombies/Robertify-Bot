@@ -87,8 +87,9 @@ public class AudioLoader implements LoadResultHandler {
                         .queue(success -> success.editMessageComponents().queue());
             }
         } else {
-            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
-                    .sendMessageEmbeds(eb.build()).queue();
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
+                        .sendMessageEmbeds(eb.build()).queue();
         }
     }
 
