@@ -39,6 +39,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                 musicManager.getPlayer().stopTrack();
 
             musicManager.getScheduler().queue.clear();
+            musicManager.getPlayer().getFilters().clear().commit();
 
             if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
                 new DedicatedChannelConfig().updateMessage(event.getGuild());

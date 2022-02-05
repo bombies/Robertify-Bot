@@ -74,6 +74,8 @@ public class Listener extends ListenerAdapter {
                     dedicatedChannelConfig.updateMessage(g);
                     dedicatedChannelConfig.updateButtons(g);
                 }
+            } catch (InsufficientPermissionException ignored) {
+
             } catch (NullPointerException e) {
                 dedicatedChannelConfig.removeChannel(g.getIdLong());
             }
