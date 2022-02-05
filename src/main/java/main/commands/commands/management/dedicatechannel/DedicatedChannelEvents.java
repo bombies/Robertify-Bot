@@ -115,7 +115,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             final var split = message.split(" ");
 
             if (split.length == 1) {
-                message = (GeneralUtils.isUrl(message) ? "" : "ytseach:")  + message;
+                message = (GeneralUtils.isUrl(message) ? "" : "ytsearch:")  + message;
             } else {
                 switch (split[split.length-1].toLowerCase()) {
                     case "-n", "-next" -> {
