@@ -52,7 +52,7 @@ public class ChangeLogCommand implements IDevCommand {
                 case "remove" -> remove(args, msg);
                 case "clear" -> clear(msg);
                 case "settitle", "st" -> setTitle(args, msg);
-                case "addfeatue", "af" -> add(ChangeLogConfig.LogType.FEATURE, args, msg);
+                case "addfeature", "af" -> add(ChangeLogConfig.LogType.FEATURE, args, msg);
                 case "addbugfix", "abf" -> add(ChangeLogConfig.LogType.BUGFIX, args, msg);
             }
         }
@@ -167,7 +167,7 @@ public class ChangeLogCommand implements IDevCommand {
 
         return RobertifyEmbedUtils.embedMessage(guild, "\t")
                 .setTitle("✨ " + title + " ["+GeneralUtils.formatDate(new Date().getTime(), TimeFormat.MM_DD_YYYY)+"]")
-                .setDescription("➕ **Features**\n" +  features + "\n🛠️ **Bug Fixes**\n" + bugFixes)
+                .setDescription((features.isEmpty() ? "" : "➕ **Features**\n" +  features) + (bugFixes.isEmpty() ? "" : "\n🛠️ **Bug Fixes**\n" + bugFixes))
                 .setFooter("Note: You can toggle changelogs for this server off by doing \"toggle changelogs\"")
                 .setThumbnail(new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
                 .build();
