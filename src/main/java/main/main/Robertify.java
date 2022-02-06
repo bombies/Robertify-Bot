@@ -37,6 +37,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.slf4j.Logger;
@@ -88,8 +89,8 @@ public class Robertify {
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
-//                    .setAudioSendFactory(new NativeAudioSendFactory())
                     .setChunkingFilter(ChunkingFilter.NONE)
+                    .setMemberCachePolicy(MemberCachePolicy.NONE)
 
                     // Event Listeners
                     .addEventListeners(
@@ -169,6 +170,15 @@ public class Robertify {
                             CacheFlag.CLIENT_STATUS,
                             CacheFlag.ROLE_TAGS,
                             CacheFlag.ONLINE_STATUS
+                    )
+                    .disableIntents(
+                            GatewayIntent.DIRECT_MESSAGE_TYPING,
+                            GatewayIntent.GUILD_BANS,
+                            GatewayIntent.GUILD_INVITES,
+                            GatewayIntent.GUILD_MEMBERS,
+                            GatewayIntent.GUILD_MESSAGE_TYPING,
+                            GatewayIntent.GUILD_PRESENCES,
+                            GatewayIntent.DIRECT_MESSAGE_REACTIONS
                     )
                     .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."))
