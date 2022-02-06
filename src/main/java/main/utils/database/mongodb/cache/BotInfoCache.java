@@ -279,8 +279,8 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public enum ReportsConfigField implements GenericJSONField {
-        CHANNEL("channel"),
-        CATEGORY("category"),
+        CHANNEL("reports_channel"),
+        CATEGORY("reports_category"),
         BANNED_USERS("banned_users");
 
         private final String str;
