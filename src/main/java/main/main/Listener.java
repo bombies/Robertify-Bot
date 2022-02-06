@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
+import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -253,10 +254,12 @@ public class Listener extends ListenerAdapter {
         new TwentyFourSevenCommand().initCommand(g);
         new PlaytimeCommand().initCommand(g);
         new SearchCommand().initCommand(g);
+        new AutoPlayCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new AutoPlayCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

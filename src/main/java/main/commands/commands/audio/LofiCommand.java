@@ -86,7 +86,7 @@ public class LofiCommand implements ICommand {
 
         if (lofiEnabledGuilds.contains(guild.getIdLong())) {
             lofiEnabledGuilds.remove(guild.getIdLong());
-            musicManager.getScheduler().nextTrack();
+            musicManager.getScheduler().nextTrack(null);
 
             return RobertifyEmbedUtils.embedMessage(guild, "You have disabled Lo-Fi mode").build();
         } else {

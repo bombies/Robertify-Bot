@@ -2,6 +2,7 @@ package main.commands;
 
 import lombok.Getter;
 import main.commands.commands.audio.*;
+import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.audio.filters.*;
 import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
@@ -114,6 +115,7 @@ public class CommandManager {
                 new PlaytimeCommand(),
                 new SearchCommand(),
                 new LogCommand(),
+                new AutoPlayCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -170,7 +172,8 @@ public class CommandManager {
                 new EightDFilter(),
                 new TremoloFilter(),
                 new VibratoFilter(),
-                new SearchCommand()
+                new SearchCommand(),
+                new AutoPlayCommand()
         );
 
         addManagementCommands(

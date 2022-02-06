@@ -1,10 +1,12 @@
-package main.audiohandlers;
+package main.audiohandlers.loaders;
 
 import lavalink.client.io.FriendlyException;
 import lavalink.client.io.LoadResultHandler;
 import lavalink.client.player.track.AudioPlaylist;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackInfo;
+import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -102,11 +104,6 @@ public class AudioLoader implements LoadResultHandler {
     @Override
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
-
-        if (trackUrl.startsWith("ytsearch:")) {
-
-            return;
-        }
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
                 + "` tracks from `" + audioPlaylist.getName() + "`");

@@ -61,7 +61,7 @@ public class SkipToCommand implements ICommand {
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
         scheduler.getPastQueue().push(audioPlayer.getPlayingTrack());
-        scheduler.nextTrack();
+        scheduler.nextTrack(null);
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

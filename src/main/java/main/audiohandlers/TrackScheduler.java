@@ -6,6 +6,8 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
+import main.utils.json.autoplay.AutoPlayConfig;
+import main.utils.json.autoplay.AutoPlayUtils;
 import main.commands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.main.Robertify;
@@ -112,11 +114,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         } catch (InsufficientPermissionException ignored) {}
     }
 
-    public void nextTrack() {
-        nextTrack(false, null);
+    public void nextTrack(AudioTrack lastTrack) {
+        nextTrack(lastTrack, false, null);
     }
 
-    public void nextTrack(boolean skipped, Long skippedAt) {
+    public void nextTrack(AudioTrack lastTrack, boolean skipped, Long skippedAt) {
         HashMap<Long, Long> playtime = PlaytimeCommand.playtime;
         if (!skipped) {
             playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + pastQueue.peek().getInfo().getLength() : pastQueue.peek().getInfo().getLength());
@@ -136,8 +138,20 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         try {
             if (nextTrack != null)
                 getMusicPlayer().playTrack(nextTrack);
-            else
-                scheduleDisconnect(true);
+            else {
+                if (lastTrack != null) {
+                    if (new AutoPlayConfig().getStatus(guild.getIdLong())) {
+                        if (lastTrack.getInfo().getSourceName().equals("youtube")) {
+                            GuildConfig guildConfig = new GuildConfig();
+                            AutoPlayUtils.loadRecommendedTracks(
+                                    guild,
+                                    guildConfig.announcementChannelIsSet(guild.getIdLong()) ? Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong())) : null,
+                                    lastTrack
+                            );
+                        }
+                    } else scheduleDisconnect(true);
+                } else scheduleDisconnect(true);
+            }
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack);
         }
@@ -155,10 +169,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 } catch (UnsupportedOperationException e) {
                     player.seekTo(0);
                 }
-            } else nextTrack();
+            } else nextTrack(null);
         } else if (endReason.mayStartNext) {
             pastQueue.push(track);
-            nextTrack();
+            nextTrack(track);
         }
     }
 
@@ -181,7 +195,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
         } catch (InsufficientPermissionException ignored) {}
 
-        nextTrack();
+        nextTrack(track);
     }
 
     @Override

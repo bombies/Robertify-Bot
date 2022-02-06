@@ -1,4 +1,4 @@
-package main.audiohandlers;
+package main.audiohandlers.loaders;
 
 import lavalink.client.io.FriendlyException;
 import lavalink.client.io.LoadResultHandler;

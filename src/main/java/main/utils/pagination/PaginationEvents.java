@@ -30,6 +30,11 @@ public class PaginationEvents extends ListenerAdapter {
         long msg = event.getMessage().getIdLong();
         List<MessagePage> messagePages = Pages.getMessagePages(msg);
 
+        if (messagePages == null) {
+            event.deferEdit().queue();
+            return;
+        }
+
         if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
             currentPage.put(msg, 0);
             event.editMessageEmbeds(messagePages.get(0).getEmbed())

@@ -3,6 +3,9 @@ package main.audiohandlers;
 import lavalink.client.player.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.loaders.AudioLoader;
+import main.audiohandlers.loaders.AutoPlayLoader;
+import main.audiohandlers.loaders.SearchResultLoader;
 import main.commands.CommandContext;
 import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
@@ -287,6 +290,11 @@ public class RobertifyAudioManager {
 
     public void loadSearchResults(GuildMusicManager musicManager, User searcher, InteractionHook botMsg, String query) {
         final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
+        musicManager.getLink().getRestClient().loadItem(query, loader);
+    }
+
+    public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, String query) {
+        final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
         musicManager.getLink().getRestClient().loadItem(query, loader);
     }
 
