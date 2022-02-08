@@ -3,8 +3,10 @@ package main.events;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LofiCommand;
+import main.commands.commands.audio.SkipCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -27,8 +29,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
-        if (event.getMember().equals(event.getGuild().getSelfMember())) {
-            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        Guild guild = event.getGuild();
+        if (event.getMember().equals(guild.getSelfMember())) {
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
             musicManager.getScheduler().repeating = false;
             musicManager.getScheduler().playlistRepeating = false;
 
@@ -41,36 +44,40 @@ public class VoiceChannelEvents extends ListenerAdapter {
             musicManager.getScheduler().queue.clear();
             musicManager.getPlayer().getFilters().clear().commit();
 
-            if (new DedicatedChannelConfig().isChannelSet(event.getGuild().getIdLong()))
-                new DedicatedChannelConfig().updateMessage(event.getGuild());
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(guild);
 
-            LofiCommand.getLofiEnabledGuilds().remove(event.getGuild().getIdLong());
+            LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
+
+            SkipCommand.clearVoteSkipInfo(guild);
         } else {
              VoiceChannel channelLeft = event.getChannelLeft();
-             GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
+             GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
              if (!selfVoiceState.inVoiceChannel()) return;
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
-             if (!new GuildConfig().get247(event.getGuild().getIdLong()))
+             if (!new GuildConfig().get247(guild.getIdLong()))
                 doAutoLeave(event, channelLeft);
         }
     }
 
     @Override
     public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
-        Member self = event.getGuild().getSelfMember();
+        Guild guild = event.getGuild();
+        Member self = guild.getSelfMember();
         GuildVoiceState voiceState = self.getVoiceState();
 
         if (!voiceState.inVoiceChannel()) return;
 
-        if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(event.getGuild().getIdLong())) {
-            doAutoLeave(event, event.getChannelLeft());
+        VoiceChannel channelLeft = event.getChannelLeft();
+        if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(guild.getIdLong())) {
+            doAutoLeave(event, channelLeft);
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
             resumeSong(event);
-        } else if (voiceState.getChannel().equals(event.getChannelLeft()) && !new GuildConfig().get247(event.getGuild().getIdLong())) {
-            doAutoLeave(event, event.getChannelLeft());
+        } else if (voiceState.getChannel().equals(channelLeft) && !new GuildConfig().get247(guild.getIdLong())) {
+            doAutoLeave(event, channelLeft);
         }
     }
 

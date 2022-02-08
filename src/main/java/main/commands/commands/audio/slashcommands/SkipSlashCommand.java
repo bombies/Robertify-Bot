@@ -8,6 +8,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -51,16 +52,27 @@ public class SkipSlashCommand extends InteractiveCommand {
 
         event.deferReply().queue();
 
+        final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
+        final var memberVoiceState = event.getMember().getVoiceState();
+
         if (!getCommand().getCommand().permissionCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
+            if (selfVoiceState.getChannel().getMembers().size() != 1) {
+                MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getTextChannel(), selfVoiceState, memberVoiceState);
+                if (embed != null) {
+                    event.getHook().sendMessageEmbeds(embed)
+                            .setEphemeral(false)
+                            .queue();
+                } else {
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Started a vote skip!").build())
+                            .setEphemeral(true)
+                            .queue();
+                }
+                return;
+            }
         }
 
         if (event.getOptions().isEmpty()) {
-            var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
-            var memberSelfVoiceState = event.getMember().getVoiceState();
-            event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberSelfVoiceState))
+            event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberVoiceState))
                     .setEphemeral(false)
                     .queue();
         } else {

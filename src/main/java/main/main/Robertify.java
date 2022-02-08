@@ -8,6 +8,7 @@ import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
+import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
@@ -104,7 +105,8 @@ public class Robertify {
                             new SuggestionCategoryDeletionEvents(),
                             new ReportsEvents(),
                             new AnnouncementChannelEvents(),
-                            new LogChannelEvents()
+                            new LogChannelEvents(),
+                            new SkipCommand()
                     )
                     .setVoiceDispatchInterceptor(lavalink.getVoiceInterceptor())
 
