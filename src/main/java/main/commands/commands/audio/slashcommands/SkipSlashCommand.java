@@ -60,7 +60,7 @@ public class SkipSlashCommand extends InteractiveCommand {
         if (event.getOptions().isEmpty()) {
             var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
             var memberSelfVoiceState = event.getMember().getVoiceState();
-            event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberSelfVoiceState).build())
+            event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberSelfVoiceState))
                     .setEphemeral(false)
                     .queue();
         } else {

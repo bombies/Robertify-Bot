@@ -90,7 +90,7 @@ public class Robertify {
                             GatewayIntent.DIRECT_MESSAGES
                     )
                     .setChunkingFilter(ChunkingFilter.NONE)
-                    .setMemberCachePolicy(MemberCachePolicy.NONE)
+                    .setMemberCachePolicy(MemberCachePolicy.VOICE)
 
                     // Event Listeners
                     .addEventListeners(

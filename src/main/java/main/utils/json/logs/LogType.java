@@ -16,6 +16,7 @@ public enum LogType {
     PLAYER_PAUSE("Player Paused", RobertifyEmoji.PAUSE_EMOJI.getEmoji(), Color.decode("#e38f22")),
     PLAYER_RESUME("Player Resumed", RobertifyEmoji.PLAY_EMOJI.getEmoji(), Color.decode("#e36622")),
     TRACK_SKIP("Track Skipped", RobertifyEmoji.END_EMOJI.getEmoji(), Color.decode("#4f82e0")),
+    TRACK_VOTE_SKIP("Vote Skip Started", RobertifyEmoji.END_EMOJI.getEmoji(), Color.decode("#4f82e0")),
     TRACK_REWIND("Track Rewound", RobertifyEmoji.REWIND_EMOJI.getEmoji(), Color.decode("#e04f9f")),
     TRACK_JUMP("Track Jumped", RobertifyEmoji.END_EMOJI.getEmoji(), Color.decode("#058f00")),
     TRACK_SEEK("Track Seeked", RobertifyEmoji.END_EMOJI.getEmoji(), Color.decode("#ffff00")),

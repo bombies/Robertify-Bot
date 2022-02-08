@@ -239,8 +239,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            EmbedBuilder skipEmbed = new SkipCommand().handleSkip(selfVoiceState, memberVoiceState);
-            event.reply(member.getAsMention()).addEmbeds(skipEmbed.build())
+            MessageEmbed skipEmbed = new SkipCommand().handleSkip(selfVoiceState, memberVoiceState);
+            event.reply(member.getAsMention()).addEmbeds(skipEmbed)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {

@@ -363,7 +363,7 @@ public class CommandManager {
                         new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
                     if (toggles.isDJToggleSet(guild, cmd)) {
-                        if (toggles.getDJToggle(guild, cmd)) {
+                        if (toggles.getDJToggle(guild, cmd) && !cmd.getName().equals("skip")) {
                             if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                                 cmd.handle(ctx);
 //                            if (!(cmd instanceof StatisticsCommand))
