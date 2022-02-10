@@ -1,5 +1,6 @@
 package main.utils.json.logs;
 
+import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -18,6 +19,9 @@ public class LogUtils {
 
     public void sendLog(Guild guild, LogType type, String message) {
         if (!config.channelIsSet(guild.getIdLong()))
+            return;
+
+        if (!new TogglesConfig().getLogToggle(guild, type))
             return;
 
         TextChannel channel = config.getChannel(guild.getIdLong());

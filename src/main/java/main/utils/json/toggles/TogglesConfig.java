@@ -6,6 +6,7 @@ import main.constants.Toggles;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
+import main.utils.json.logs.LogType;
 import net.dv8tion.jda.api.entities.Guild;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -42,6 +43,19 @@ public class TogglesConfig extends AbstractGuildConfig {
         return ret;
     }
 
+    public HashMap<String, Boolean> getLogToggles(Guild g) {
+        final HashMap<String, Boolean> ret = new HashMap<>();
+        final var obj = getTogglesObject(g.getIdLong())
+                .getJSONObject(Toggles.TogglesConfigField.LOG_TOGGLES.toString());
+
+        for (final var key : obj.keySet())
+            ret.put(key, true);
+
+        ret.replaceAll((k,v) -> obj.getBoolean(k));
+
+        return ret;
+    }
+
     public boolean getDJToggle(Guild g, ICommand cmd) {
         final var djToggles = getDJToggles(g);
 
@@ -70,12 +84,41 @@ public class TogglesConfig extends AbstractGuildConfig {
         getCache().updateGuild(obj, guild.getIdLong());
     }
 
+    public void setLogToggle(Guild guild, LogType type, boolean state) {
+        if (!isLogToggleSet(guild, type))
+            update(guild.getIdLong());
+
+        final var obj = getGuildObject(guild.getIdLong());
+        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildsDB.Field.TOGGLES_LOGS.toString())
+                .put(type.name().toLowerCase(), state);
+        getCache().updateGuild(obj, guild.getIdLong());
+    }
+
+    public boolean getLogToggle(Guild guild, LogType type) {
+        if (!isLogToggleSet(guild, type))
+            update(guild.getIdLong());
+
+        final var obj = getGuildObject(guild.getIdLong());
+        return obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildsDB.Field.TOGGLES_LOGS.toString())
+                .getBoolean(type.name().toLowerCase());
+    }
+
     public boolean isDJToggleSet(Guild guild, ICommand cmd) {
         return getDJToggles(guild).containsKey(cmd.getName().toLowerCase());
     }
 
     public boolean isDJToggleSet(Guild guild, String cmd) {
         return getDJToggles(guild).containsKey(cmd.toLowerCase());
+    }
+
+    public boolean isLogToggleSet(Guild guild, LogType type) {
+        try {
+            return getLogToggles(guild).containsKey(type.name().toLowerCase());
+        } catch (JSONException e) {
+            return false;
+        }
     }
 
     private JSONObject getTogglesObject(long gid) {
@@ -147,6 +190,25 @@ public class TogglesConfig extends AbstractGuildConfig {
 
             toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
         }
+
+        if (!toggleObj.has(Toggles.TogglesConfigField.LOG_TOGGLES.toString())) {
+            final var logObj = new JSONObject();
+
+            for (final var type : LogType.values())
+                logObj.put(type.name().toLowerCase(), true);
+
+            toggleObj.put(Toggles.TogglesConfigField.LOG_TOGGLES.toString(), logObj);
+        } else {
+            final var logObj = toggleObj.getJSONObject(Toggles.TogglesConfigField.LOG_TOGGLES.toString());
+
+            for (final var type : LogType.values())
+                if (!logObj.has(type.name().toLowerCase()))
+                    logObj.put(type.name().toLowerCase(), true);
+
+            toggleObj.put(Toggles.TogglesConfigField.LOG_TOGGLES.toString(), logObj);
+        }
+
+
     }
 
 }

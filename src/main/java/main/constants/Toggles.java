@@ -58,7 +58,8 @@ public enum Toggles implements GenericJSONField {
     }
 
     public enum TogglesConfigField implements GenericJSONField {
-        DJ_TOGGLES("dj_toggles");
+        DJ_TOGGLES("dj_toggles"),
+        LOG_TOGGLES("log_toggles");
 
         private final String str;
 

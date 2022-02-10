@@ -8,6 +8,7 @@ import main.constants.RobertifyEmoji;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.logs.LogType;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -138,6 +139,7 @@ public class TogglesCommand implements ICommand {
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
+                case "logs", "log" -> eb = handleLogToggles(guild, args);
                 default -> eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid toggle!");
             }
             msg.replyEmbeds(eb.build()).queue();
@@ -179,6 +181,41 @@ public class TogglesCommand implements ICommand {
         return null;
     }
 
+    private EmbedBuilder handleLogToggles(Guild guild, List<String> args) {
+        final CommandManager commandManager = new CommandManager();
+        final TogglesConfig config = new TogglesConfig();
+
+        if (args.size() < 2)
+            return getLogTogglesEmbed(guild, commandManager, config);
+
+        switch (args.get(1).toLowerCase()) {
+            case "list" -> {
+                return getLogTogglesEmbed(guild, commandManager, config);
+            }
+            default -> {
+                LogType logType;
+                try {
+                    logType = LogType.valueOf(args.get(1).toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return RobertifyEmbedUtils.embedMessage(guild, "`"+args.get(1)+"` is an invalid log type!");
+                }
+
+                switch (Boolean.toString(config.getLogToggle(guild, logType))) {
+                    case "true" -> {
+                        config.setLogToggle(guild, logType, false);
+                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **OFF**");
+                    }
+                    case "false" -> {
+                        config.setLogToggle(guild, logType, true);
+                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **ON**");
+                    }
+                    default -> logger.error("Did not receive either true or false. Lol?? How??");
+                }
+            }
+        }
+        return null;
+    }
+
     private EmbedBuilder getDJTogglesEmbed(Guild guild, CommandManager commandManager, TogglesConfig config) {
         var musicCmds = commandManager.getMusicCommands();
         var toggleNames = new StringBuilder();
@@ -195,6 +232,26 @@ public class TogglesCommand implements ICommand {
         eb.addField("Command", toggleNames.toString(), true);
         eb.addBlankField(true);
         eb.addField("DJ Status", toggleStatuses.toString(), true);
+
+        return eb;
+    }
+
+    private EmbedBuilder getLogTogglesEmbed(Guild guild, CommandManager commandManager, TogglesConfig config) {
+        var logTypes = LogType.values();
+        var toggleNames = new StringBuilder();
+        var toggleStatuses = new StringBuilder();
+
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "\t");
+
+        for (var toggle : logTypes) {
+            toggleNames.append(toggle.name().toLowerCase()).append("\n");
+            toggleStatuses.append(config.getLogToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
+                    .append("\n");
+        }
+
+        eb.addField("Log type", toggleNames.toString(), true);
+        eb.addBlankField(true);
+        eb.addField("Log Status", toggleStatuses.toString(), true);
 
         return eb;
     }

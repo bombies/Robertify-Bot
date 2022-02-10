@@ -69,6 +69,7 @@ public class SkipToCommand implements ICommand {
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         new LogUtils().sendLog(guild, LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
+        SkipCommand.clearVoteSkipInfo(guild);
         return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "Skipped to **track #"+id+"**!");
     }
 

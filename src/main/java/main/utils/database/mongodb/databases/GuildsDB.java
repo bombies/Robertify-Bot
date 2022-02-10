@@ -3,6 +3,7 @@ package main.utils.database.mongodb.databases;
 import main.constants.Database;
 import main.constants.ENV;
 import main.constants.RobertifyTheme;
+import main.constants.Toggles;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.database.mongodb.AbstractMongoDatabase;
@@ -99,7 +100,8 @@ public class GuildsDB extends AbstractMongoDatabase {
             RESTRICTED_CHANNELS_VOICE("voice_channels"),
             RESTRICTED_CHANNELS_TEXT("text_channels"),
         TOGGLES_OBJECT("toggles"),
-            TOGGLES_DJ("dj_toggles"),
+            TOGGLES_DJ(Toggles.TogglesConfigField.DJ_TOGGLES.toString()),
+            TOGGLES_LOGS(Toggles.TogglesConfigField.LOG_TOGGLES.toString()),
         EIGHT_BALL_ARRAY("eight_ball"),
         THEME("theme"),
         TWENTY_FOUR_SEVEN("twenty_four_seven_mode");

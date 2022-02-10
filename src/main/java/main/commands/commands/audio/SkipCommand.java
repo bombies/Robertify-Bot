@@ -128,6 +128,15 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         voters.remove(guild.getIdLong());
         voteSkips.remove(guild.getIdLong());
         voteSkipStarters.remove(guild.getIdLong());
+
+        if (voteSkipMessages.get(guild.getIdLong()) != null) {
+            Pair<Long, Long> pair = voteSkipMessages.get(guild.getIdLong());
+            guild.getTextChannelById(pair.getLeft()).retrieveMessageById(pair.getRight()).complete()
+                    .editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track was skipped.")
+                            .build())
+                    .queue();
+        }
+
         voteSkipMessages.remove(guild.getIdLong());
     }
 
@@ -164,6 +173,8 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
     private void doVoteSkip(Guild guild) {
         Pair<Long, Long> pair = voteSkipMessages.get(guild.getIdLong());
         Message message = guild.getTextChannelById(pair.getLeft()).retrieveMessageById(pair.getRight()).complete();
+
+        voteSkipMessages.remove(guild.getIdLong());
 
         skip(guild);
         message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track has been vote skipped!").build())
