@@ -138,8 +138,17 @@ public class TogglesCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
                     }
                 }
+                case "voteskips", "voteskip", "vs", "10" -> {
+                    if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
+                        config.setToggle(guild, Toggles.VOTE_SKIPS, false);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **OFF**");
+                    } else {
+                        config.setToggle(guild, Toggles.VOTE_SKIPS, true);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **ON**");
+                    }
+                }
                 case "dj" -> eb = handleDJToggles(guild, args);
-                case "logs", "log" -> eb = handleLogToggles(guild, args);
+                case "logs", "log", "l" -> eb = handleLogToggles(guild, args);
                 default -> eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid toggle!");
             }
             msg.replyEmbeds(eb.build()).queue();

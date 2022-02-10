@@ -4,7 +4,9 @@ import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
 import main.constants.Permission;
+import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -45,13 +47,20 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         }
 
         if (new TogglesConfig().getDJToggle(guild, this)) {
-            if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
-                if (selfVoiceState.getChannel().getMembers().size() != 1) {
-                    MessageEmbed embed = handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState);
-                    if (embed != null)
-                        msg.replyEmbeds(handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState)).queue();
+            if (new TogglesConfig().getToggle(guild, Toggles.VOTE_SKIPS)) {
+                if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
+                    if (selfVoiceState.getChannel().getMembers().size() != 1) {
+                        MessageEmbed embed = handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState);
+                        if (embed != null)
+                            msg.replyEmbeds(handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState)).queue();
+                    } else msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
                 } else msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
-            } else msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
+            } else  {
+                if (GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
+                    msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
+                } else msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ)).build())
+                        .queue();
+            }
         } else msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
     }
 
