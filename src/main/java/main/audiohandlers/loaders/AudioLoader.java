@@ -181,7 +181,8 @@ public class AudioLoader implements LoadResultHandler {
                     .sendMessageEmbeds(eb.build()).queue();
         }
 
-        musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        if (musicManager.getScheduler().queue.isEmpty())
+            musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
