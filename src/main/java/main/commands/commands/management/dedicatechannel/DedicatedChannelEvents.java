@@ -115,12 +115,12 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             final var split = message.split(" ");
 
             if (split.length == 1) {
-                message = (GeneralUtils.isUrl(message) ? "" : "ytsearch:")  + message + (GeneralUtils.isUrl(message) ? "" : " audio");
+                message = (GeneralUtils.isUrl(message) ? "" : "ytsearch:")  + message;
             } else {
                 switch (split[split.length-1].toLowerCase()) {
                     case "-n", "-next" -> {
                         String msgNoFlags = message.replaceAll("\\s-(n|next)$", "");
-                        message = GeneralUtils.isUrl(msgNoFlags) ? "" : "ytsearch:" + msgNoFlags + " audio";
+                        message = GeneralUtils.isUrl(msgNoFlags) ? "" : "ytsearch:" + msgNoFlags;
                         addToBeginning = true;
                     }
                     case "-s", "-shuffle" -> {
@@ -143,7 +143,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                         message = msgNoFlags;
                         shuffled = true;
                     }
-                    default -> message = GeneralUtils.isUrl(message) ? "" : "ytsearch:" + message + " audio";
+                    default -> message = GeneralUtils.isUrl(message) ? "" : "ytsearch:" + message;
                 }
             }
 

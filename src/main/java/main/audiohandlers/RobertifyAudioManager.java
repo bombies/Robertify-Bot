@@ -54,8 +54,6 @@ public class RobertifyAudioManager {
                             Message botMsg, boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
 
         try {
             joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
