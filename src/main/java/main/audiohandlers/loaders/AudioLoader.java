@@ -15,6 +15,7 @@ import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ public class AudioLoader implements LoadResultHandler {
     private final Message botMsg;
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
+    private final TextChannel announcementChannel;
 
     public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
@@ -50,6 +52,7 @@ public class AudioLoader implements LoadResultHandler {
         this.botMsg = botMsg;
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
+        this.announcementChannel = botMsg.getTextChannel();
     }
 
     @Override
@@ -64,6 +67,7 @@ public class AudioLoader implements LoadResultHandler {
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getTrack());
 
         final var scheduler = musicManager.getScheduler();
+        scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(audioTrack);
@@ -123,6 +127,7 @@ public class AudioLoader implements LoadResultHandler {
             Collections.shuffle(tracks);
 
         final var scheduler = musicManager.getScheduler();
+        scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(tracks);
@@ -154,6 +159,7 @@ public class AudioLoader implements LoadResultHandler {
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + list.get(0).getTrack());
 
         final var scheduler = musicManager.getScheduler();
+        scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(list.get(0));

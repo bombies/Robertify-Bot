@@ -6,6 +6,7 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
+import lombok.Setter;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.json.autoplay.AutoPlayUtils;
 import main.commands.commands.misc.PlaytimeCommand;
@@ -38,6 +39,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     private final Guild guild;
     private final Link audioPlayer;
+    @Setter
+    private TextChannel announcementChannel = null;
     @Getter
     private final Stack<AudioTrack> pastQueue;
     public ConcurrentLinkedQueue<AudioTrack> queue;
@@ -70,7 +73,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     @Override
     public void onTrackStart(IPlayer player, AudioTrack track) {
         if (disconnectExecutors.containsKey(guild.getIdLong())) {
-            disconnectExecutors.get(guild.getIdLong()).cancel(false);
+            disconnectExecutors.get(guild.getIdLong()).cancel(true);
             disconnectExecutors.remove(guild.getIdLong());
         }
 
@@ -78,40 +81,40 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
 
-        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
-
         if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getTrack())) {
             RobertifyAudioManager.getUnannouncedTracks().remove(track.getTrack());
             return;
         }
 
         final var requester = RobertifyAudioManager.getRequester(guild, track);
-        TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().getTitle() + "` by `"+track.getInfo().getAuthor() +"`"
-                + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
-                "\n\n~ Requested by " + requester
-                :
-                ""
-        ));
 
-        try {
-            announcementChannel.sendMessageEmbeds(eb.build())
-                    .queue(msg -> {
-                        if (lastSentMsg != null)
-                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                        lastSentMsg = msg;
-                    }, new ErrorHandler()
-                            .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
-                                    .queue(nonEmbedMsg -> {
-                                        if (lastSentMsg != null)
-                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                    })
-                            ));
-        } catch (NullPointerException e) {
-            new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
-        } catch (InsufficientPermissionException ignored) {}
+        if (announcementChannel != null) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().getTitle() + "` by `"+track.getInfo().getAuthor() +"`"
+                    + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
+                    "\n\n~ Requested by " + requester
+                    :
+                    ""
+            ));
+
+            try {
+                announcementChannel.sendMessageEmbeds(eb.build())
+                        .queue(msg -> {
+                            if (lastSentMsg != null)
+                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                            lastSentMsg = msg;
+                        }, new ErrorHandler()
+                                .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
+                                        .queue(nonEmbedMsg -> {
+                                            if (lastSentMsg != null)
+                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                        })
+                                ));
+            } catch (NullPointerException e) {
+                new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
+            } catch (InsufficientPermissionException ignored) {}
+        }
     }
 
     public void nextTrack(AudioTrack lastTrack) {
@@ -244,6 +247,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         ScheduledFuture<?> schedule = executor.schedule(() -> {
             final var channel = guild.getSelfMember().getVoiceState().getChannel();
+
+            if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
+                return;
 
             if (!new GuildConfig().get247(guild.getIdLong())) {
                 if (channel != null) {
