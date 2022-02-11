@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractPostgresTable {
+public abstract class AbstractPostgresTable {
     private final Connection connection;
 
     protected AbstractPostgresTable(Connection connection) {
@@ -35,4 +35,6 @@ public class AbstractPostgresTable {
 
         return ret;
     }
+
+    public abstract void init();
 }
