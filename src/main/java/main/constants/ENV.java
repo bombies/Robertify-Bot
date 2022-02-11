@@ -22,6 +22,10 @@ public enum ENV {
     MONGO_HOSTNAME("mongo_hostname"),
     MONGO_CLUSTER_NAME("mongo_cluster_name"),
     MONGO_DATABASE_NAME("mongo_database_name"),
+    POSTGRES_USERNAME("postgres_username"),
+    POSTGRES_PASSWORD("postgres_password"),
+    POSTGRES_HOST("postgres_host"),
+    POSTGRES_PORT("postgres_port"),
     TOP_GG_TOKEN("top_gg_token"),
     DBL_TOKEN("dbl_token"),
     VOTE_REMINDER_CHANCE("vote_reminder_chance");
