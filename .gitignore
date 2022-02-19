@@ -36,3 +36,6 @@ target
 vpsDataBackup
 localaudio
 resources/config.json
+Lavalink/application.yml
+Lavalink/plugins
+Lavalink/logs

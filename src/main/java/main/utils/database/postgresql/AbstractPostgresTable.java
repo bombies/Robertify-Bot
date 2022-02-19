@@ -1,5 +1,6 @@
 package main.utils.database.postgresql;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.sql.Connection;
@@ -9,9 +10,12 @@ import java.util.List;
 
 public abstract class AbstractPostgresTable {
     private final Connection connection;
+    @Getter
+    private final String tableName;
 
-    protected AbstractPostgresTable(Connection connection) {
+    protected AbstractPostgresTable(Connection connection, String tableName) {
         this.connection = connection;
+        this.tableName = tableName;
     }
 
     @SneakyThrows
@@ -20,6 +24,12 @@ public abstract class AbstractPostgresTable {
         while (resultSet.next())
             return resultSet.getObject(column, clazz);
         return null;
+    }
+
+    @SneakyThrows
+    public boolean tableExists() {
+        ResultSet tables = connection.getMetaData().getTables(null, null, tableName, null);
+        return tables.next();
     }
 
     @SneakyThrows

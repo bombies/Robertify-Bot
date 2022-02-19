@@ -7,12 +7,15 @@ import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
 import lombok.Setter;
-import main.utils.json.autoplay.AutoPlayConfig;
-import main.utils.json.autoplay.AutoPlayUtils;
+import lombok.SneakyThrows;
 import main.commands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
+import main.exceptions.AutoPlayException;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.database.postgresql.tracks.TrackDB;
+import main.utils.json.autoplay.AutoPlayConfig;
+import main.utils.json.autoplay.AutoPlayUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -39,7 +42,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     private final Guild guild;
     private final Link audioPlayer;
-    @Setter
+    @Setter @Getter
     private TextChannel announcementChannel = null;
     @Getter
     private final Stack<AudioTrack> pastQueue;
@@ -117,11 +120,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         }
     }
 
+    @SneakyThrows
     public void nextTrack(AudioTrack lastTrack) {
         nextTrack(lastTrack, false, null);
     }
 
-    public void nextTrack(AudioTrack lastTrack, boolean skipped, Long skippedAt) {
+    public void nextTrack(AudioTrack lastTrack, boolean skipped, Long skippedAt) throws AutoPlayException {
         HashMap<Long, Long> playtime = PlaytimeCommand.playtime;
         if (!skipped) {
             playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + pastQueue.peek().getInfo().getLength() : pastQueue.peek().getInfo().getLength());
@@ -144,19 +148,39 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             else {
                 if (lastTrack != null) {
                     if (new AutoPlayConfig().getStatus(guild.getIdLong())) {
-                        if (lastTrack.getInfo().getSourceName().equals("youtube")) {
-                            GuildConfig guildConfig = new GuildConfig();
-                            AutoPlayUtils.loadRecommendedTracks(
+                        switch (lastTrack.getInfo().getSourceName().toLowerCase()) {
+                            case "youtube" -> AutoPlayUtils.loadRecommendedTracks(
                                     guild,
-                                    guildConfig.announcementChannelIsSet(guild.getIdLong()) ? Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong())) : null,
+                                    announcementChannel,
                                     lastTrack
                             );
+                            case "spotify" -> {
+                                String youTubeID = TrackDB.getInstance().getSpotifyTable()
+                                        .getTrackYouTubeID(lastTrack.getInfo().getIdentifier());
+                                AutoPlayUtils.loadRecommendedTracks(
+                                        guild,
+                                        announcementChannel,
+                                        youTubeID
+                                );
+                            }
+                            case "deezer" -> {
+                                String youTubeID = TrackDB.getInstance().getDeezerTable()
+                                        .getTrackYouTubeID(lastTrack.getInfo().getIdentifier());
+                                AutoPlayUtils.loadRecommendedTracks(
+                                        guild,
+                                        announcementChannel,
+                                        youTubeID
+                                );
+                            }
+                            default -> throw new AutoPlayException("This track can't be auto-played!");
                         }
                     } else scheduleDisconnect(true);
                 } else scheduleDisconnect(true);
             }
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack);
+        } catch (AutoPlayException e) {
+            throw e;
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
@@ -267,7 +291,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             }
         }, delay, timeUnit);
 
-        disconnectExecutors.putIfAbsent(guild.getIdLong(), schedule);
+        if (disconnectExecutors.containsKey(guild.getIdLong()))
+            disconnectExecutors.get(guild.getIdLong()).cancel(false);
+
+        disconnectExecutors.put(guild.getIdLong(), schedule);
     }
 
     public void removeSavedQueue(Guild guild) {

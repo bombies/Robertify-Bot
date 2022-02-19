@@ -22,12 +22,22 @@ public class TrackDB extends AbstractPostgresDB {
     }
 
     public SpotifyTracksTable getSpotifyTable() {
-        return getTable(SpotifyTracksTable.TABLE_NAME, SpotifyTracksTable.class);
+        SpotifyTracksTable table = getTable(SpotifyTracksTable.TABLE_NAME, SpotifyTracksTable.class);
+        initTable(table);
+        return table;
+    }
+
+    public DeezerTracksTable getDeezerTable() {
+        DeezerTracksTable table = getTable(DeezerTracksTable.TABLE_NAME, DeezerTracksTable.class);
+        initTable(table);
+        return table;
     }
 
     @Override
     public void initTables() {
-
+        for (var table : getTables().values())
+            if (!table.tableExists())
+                table.init();
     }
 
     @Override
@@ -39,6 +49,7 @@ public class TrackDB extends AbstractPostgresDB {
     public HashMap<String, AbstractPostgresTable> getTables() {
         HashMap<String, AbstractPostgresTable> tables = new HashMap<>();
         tables.put(SpotifyTracksTable.TABLE_NAME, new SpotifyTracksTable(getInstance()));
+        tables.put(DeezerTracksTable.TABLE_NAME, new DeezerTracksTable(getInstance()));
         return tables;
     }
 

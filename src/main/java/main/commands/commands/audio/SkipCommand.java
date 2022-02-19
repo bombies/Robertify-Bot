@@ -1,5 +1,6 @@
 package main.commands.commands.audio;
 
+import lavalink.client.player.track.AudioTrack;
 import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
@@ -7,6 +8,7 @@ import main.commands.ICommand;
 import main.constants.BotConstants;
 import main.constants.Permission;
 import main.constants.Toggles;
+import main.exceptions.AutoPlayException;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -118,12 +120,21 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
 
-        musicManager.getScheduler().getPastQueue().push(audioPlayer.getPlayingTrack());
+        AudioTrack playingTrack = audioPlayer.getPlayingTrack();
+        musicManager.getScheduler().getPastQueue().push(playingTrack);
 
         if (scheduler.repeating)
             scheduler.repeating = false;
 
-        musicManager.getScheduler().nextTrack(audioPlayer.getPlayingTrack(), true, audioPlayer.getTrackPosition());
+
+        try {
+            musicManager.getScheduler().nextTrack(playingTrack, true, audioPlayer.getTrackPosition());
+        } catch (AutoPlayException e) {
+            scheduler.getAnnouncementChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                    "AutoPlay","Could not auto-play because tracks from `"+ playingTrack.getInfo().getSourceName()+"` aren't supported!").build())
+                    .queue();
+            scheduler.scheduleDisconnect(true);
+        }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

@@ -14,16 +14,18 @@ public abstract class AbstractPostgresDB {
     private final Connection connection;
 
     @SneakyThrows
-    protected AbstractPostgresDB(String user, String password, String host, @Nullable String port, @Nullable String db) {
-        String url = "jdbc:postgresql://" + host + (port == null ? "/" : ":" + port + "/") + (db == null ? "" : db);
-        Properties properties = new Properties();
-        properties.setProperty("user", user);
-        properties.setProperty("password", password);
-        properties.setProperty("ssl", "true");
-        this.connection = DriverManager.getConnection(url, properties);
+    protected AbstractPostgresDB(String user, String password, String host, @Nullable String port, String databaseName) {
+        String url = "jdbc:postgresql://" + host + (port == null ? "" : ":" + port) + "/" + databaseName;
+        this.connection = DriverManager.getConnection(url, user, password);
     }
 
     public abstract void initTables();
+
+    public void initTable(AbstractPostgresTable table){
+        if (!table.tableExists())
+            table.init();
+    }
+
     public abstract void updateTables();
     public abstract HashMap<String, AbstractPostgresTable> getTables();
 
