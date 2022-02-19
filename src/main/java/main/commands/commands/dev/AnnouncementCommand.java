@@ -69,17 +69,13 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
 
                                     GuildConfig guildConfig = new GuildConfig();
 
-                                    final long channelID;
+                                    if (!guildConfig.announcementChannelIsSet(guild.getIdLong()))
+                                        continue;
 
-                                    if (guild.getCommunityUpdatesChannel() == null) {
-                                        if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
-                                            continue;
-                                        } else {
-                                            channelID = guildConfig.getAnnouncementChannelID(guild.getIdLong());
-                                        }
-                                    } else {
-                                        channelID = guild.getCommunityUpdatesChannel().getIdLong();
-                                    }
+                                    final long channelID = guildConfig.getAnnouncementChannelID(guild.getIdLong());
+
+                                    if (channelID == -1)
+                                        continue;
 
                                     try {
                                         guild.getTextChannelById(channelID)
