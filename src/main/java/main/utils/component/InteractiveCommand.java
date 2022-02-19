@@ -1,6 +1,5 @@
 package main.utils.component;
 
-import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lombok.Getter;
 import lombok.Setter;
 import main.commands.CommandManager;
@@ -8,7 +7,9 @@ import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -63,6 +64,9 @@ public abstract class InteractiveCommand extends ListenerAdapter {
 
     public abstract void initCommand();
     public abstract void initCommand(Guild g);
+    public boolean isPremiumCommand() {
+        return false;
+    }
 
     protected void initCommandWithoutUpsertion(InteractionCommand command) {
         if (command == null)

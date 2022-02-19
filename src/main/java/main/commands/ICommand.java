@@ -27,4 +27,8 @@ public interface ICommand {
     default boolean requiresPermission() {
         return getPermissionsRequired() != null;
     }
+
+    default boolean isPremiumCommand() {
+        return false;
+    }
 }

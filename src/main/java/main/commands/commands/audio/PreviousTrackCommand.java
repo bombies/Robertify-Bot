@@ -79,4 +79,9 @@ public class PreviousTrackCommand implements ICommand {
     public List<String> getAliases() {
         return List.of("prev");
     }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
+    }
 }

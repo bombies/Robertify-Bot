@@ -20,16 +20,20 @@ import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.constants.Permission;
 import main.constants.Toggles;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -356,6 +360,25 @@ public class CommandManager {
                             )) {
                                 return;
                             }
+                        }
+                    }
+
+                    if (cmd.isPremiumCommand() && Robertify.getTopGGAPI() != null) {
+                        if (!new VoteManager().userVoted(ctx.getAuthor().getId(), VoteManager.Website.TOP_GG)) {
+                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                                    "🔒 Locked Command", """
+                                                    Woah there! You must vote before interacting with this command.
+                                                    Click on each of the buttons below to vote!
+
+                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                                    .setActionRow(
+                                            Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                                            Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                                            Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
+                                            Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
+                                    )
+                                    .queue();
+                            return;
                         }
                     }
 

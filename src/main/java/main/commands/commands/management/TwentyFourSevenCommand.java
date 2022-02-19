@@ -9,9 +9,12 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -19,8 +22,6 @@ import javax.script.ScriptException;
 public class TwentyFourSevenCommand extends InteractiveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        // TODO Add paywall logic
-
         final var guild = ctx.getGuild();
         final var msg = ctx.getMessage();
         final var member = ctx.getMember();
@@ -92,7 +93,25 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!event.getName().equals(getName())) return;
 
-        // TODO Paywall Logic
+        if (isPremiumCommand()) {
+            if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
+                                "🔒 Locked Command", """
+                                                    Woah there! You must vote before interacting with this command.
+                                                    Click on each of the buttons below to vote!
+
+                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                        .addActionRow(
+                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
+                                Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
+                        )
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+        }
 
         if (!getCommand().getCommand().permissionCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(),
@@ -104,5 +123,10 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
 
         event.replyEmbeds(logic(event.getGuild())).setEphemeral(false)
                 .queue();
+    }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
     }
 }

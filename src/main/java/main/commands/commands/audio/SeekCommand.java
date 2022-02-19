@@ -148,4 +148,9 @@ public class SeekCommand implements ICommand {
         return "Jump to a specific position in the current song\n" +
                 "\nUsage: `"+ prefix+"seek <mm:ss>`\n";
     }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
+    }
 }

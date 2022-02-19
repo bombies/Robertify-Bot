@@ -14,8 +14,6 @@ import javax.script.ScriptException;
 public class KaraokeFilter implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        // TODO Paywall
-
         final var guild = ctx.getGuild();
         final var msg = ctx.getMessage();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
@@ -63,5 +61,10 @@ public class KaraokeFilter implements ICommand {
     @Override
     public String getHelp(String prefix) {
         return "Toggle the karaoke filter";
+    }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
     }
 }

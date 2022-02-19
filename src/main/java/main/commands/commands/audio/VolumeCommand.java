@@ -84,4 +84,9 @@ public class VolumeCommand implements ICommand {
     public List<String> getAliases() {
         return List.of("v", "vol");
     }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
+    }
 }

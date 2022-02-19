@@ -11,7 +11,7 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import java.util.Random;
 
 public class VoteManager {
-    final DiscordBotListAPI topGG = Robertify.getTopGGAPI();
+    final static DiscordBotListAPI topGG = Robertify.getTopGGAPI();
 
     /**
      * Check if a specific user has voted on a specific site

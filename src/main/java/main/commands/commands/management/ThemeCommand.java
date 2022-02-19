@@ -10,9 +10,12 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -99,6 +102,26 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().equals(menuName)) return;
 
+        if (isPremiumCommand()) {
+            if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
+                                "🔒 Locked Command", """
+                                                    Woah there! You must vote before interacting with this command.
+                                                    Click on each of the buttons below to vote!
+
+                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                        .addActionRow(
+                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
+                                Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
+                        )
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+        }
+
         final var guild = event.getGuild();
 
         if (!getSelectionDialogue(menuName).checkPermission(event)) {
@@ -149,6 +172,11 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
     public void initCommand(Guild g) {
         setInteractionCommand(getCommand());
         upsertCommand(g);
+    }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
     }
 
     public void initCommandWithoutUpsertion() {

@@ -96,8 +96,8 @@ public class Listener extends ListenerAdapter {
             Robertify.getDiscordBotListAPI().setStats(serverCount);
 
         logger.info("Watching {} guilds", serverCount);
-        BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
 
+        BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
     }
 
