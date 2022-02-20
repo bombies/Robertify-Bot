@@ -69,7 +69,7 @@ public class PlayCommand implements ICommand {
             } else if (
                     ctx.getEvent().getMessage().getContentRaw()
                     .split(" ")[0]
-                    .replaceFirst(new GuildConfig().getPrefix(guild.getIdLong()), "")
+                    .replaceFirst(GeneralUtils.toSafeString(new GuildConfig().getPrefix(guild.getIdLong())), "")
                     .equalsIgnoreCase("p")
             ) {
                 if (player.getPlayingTrack() != null) {

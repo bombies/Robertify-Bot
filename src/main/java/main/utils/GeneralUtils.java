@@ -545,4 +545,8 @@ public class GeneralUtils {
             default -> throw new IllegalArgumentException("Invalid argument \""+num+"\"");
         }
     }
+
+    public static String toSafeString(String str) {
+        return Pattern.quote(str);
+    }
 }
