@@ -224,6 +224,24 @@ public class CommandManager {
                 .anyMatch(it -> it.getName().equalsIgnoreCase(cmd.getName()));
     }
 
+    public boolean isMiscCommand(ICommand cmd) {
+        return getMiscCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(cmd.getName()));
+    }
+
+    public boolean isManagementCommand(ICommand cmd) {
+        return getManagementCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(cmd.getName()));
+    }
+
+    public boolean isUtilityCommand(ICommand cmd) {
+        return getUtilityCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(cmd.getName()));
+    }
+
     private void addCommands(ICommand... cmds) {
         for (ICommand cmd : cmds) {
             boolean nameFound = this.commands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
