@@ -197,7 +197,7 @@ public class Robertify {
             if (!Config.get(ENV.TOP_GG_TOKEN).isEmpty())
                 topGGAPI = new DiscordBotListAPI.Builder()
                         .token(Config.get(ENV.TOP_GG_TOKEN))
-                        .botId("893558050504466482") // TODO REMEMBER TO CHANGE
+                        .botId(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
                         .build();
 
             if (!Config.get(ENV.DBL_TOKEN).isEmpty())
