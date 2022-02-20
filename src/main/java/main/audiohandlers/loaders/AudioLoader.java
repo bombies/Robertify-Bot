@@ -52,7 +52,7 @@ public class AudioLoader implements LoadResultHandler {
         this.botMsg = botMsg;
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
-        this.announcementChannel = botMsg.getTextChannel();
+        this.announcementChannel = botMsg != null ? botMsg.getTextChannel() : null;
     }
 
     @Override

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>3.0.1</version>
+  <version>3.1.0</version>
   <build>
     <plugins>
       <plugin>
@@ -67,6 +67,10 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <source>16</source>
+          <target>16</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -157,6 +161,10 @@
           <exclusion>
             <artifactId>jackson-databind</artifactId>
             <groupId>com.fasterxml.jackson.core</groupId>
+          </exclusion>
+          <exclusion>
+            <artifactId>opus-java</artifactId>
+            <groupId>club.minnced</groupId>
           </exclusion>
         </exclusions>
       </dependency>

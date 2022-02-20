@@ -218,6 +218,12 @@ public class CommandManager {
         );
     }
 
+    public boolean isMusicCommand(ICommand cmd) {
+        return getMusicCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(cmd.getName()));
+    }
+
     private void addCommands(ICommand... cmds) {
         for (ICommand cmd : cmds) {
             boolean nameFound = this.commands.stream().anyMatch((it) -> it.getName().equalsIgnoreCase(cmd.getName()));
