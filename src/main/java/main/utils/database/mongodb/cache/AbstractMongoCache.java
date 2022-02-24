@@ -97,6 +97,10 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
     }
 
+    public void updateGuild(JSONObject obj) {
+        updateCache(obj, GuildsDB.Field.GUILD_ID, obj.getLong(GuildsDB.Field.GUILD_ID.toString()));
+    }
+
     public <T> void updateCache(JSONObject obj, String identifier, T identifierValue) {
         if (!obj.has(identifier))
             throw new IllegalArgumentException("The JSON object must have the identifier passed!");
