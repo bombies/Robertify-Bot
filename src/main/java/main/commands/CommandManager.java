@@ -120,6 +120,7 @@ public class CommandManager {
                 new SearchCommand(),
                 new LogCommand(),
                 new AutoPlayCommand(),
+                new SetLogChannelCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -194,7 +195,8 @@ public class CommandManager {
                 new RestrictedChannelsCommand(),
                 new ThemeCommand(),
                 new TwentyFourSevenCommand(),
-                new LogCommand()
+                new LogCommand(),
+                new SetLogChannelCommand()
         );
 
         addMiscCommands(

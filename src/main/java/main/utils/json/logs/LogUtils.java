@@ -38,7 +38,7 @@ public class LogUtils {
 
     public void createChannel(Guild guild) {
         if (config.channelIsSet(guild.getIdLong()))
-            throw new IllegalArgumentException("This guild already has a log channel setup!");
+            config.removeChannel(guild.getIdLong());
 
         guild.createTextChannel("robertify-logs")
                 .addPermissionOverride(guild.getPublicRole(), Collections.emptyList(), List.of(Permission.VIEW_CHANNEL))
