@@ -69,6 +69,8 @@ public class SetLogChannelCommand implements ICommand {
         }
 
         config.setChannel(guild.getIdLong(), channel.getIdLong());
+        message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The logs channel has been set to: " + channel.getAsMention()).build())
+                .queue();
     }
 
     @Override
