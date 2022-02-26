@@ -90,7 +90,7 @@ public class RemindersConfig extends AbstractGuildConfig {
     }
 
     public void removeAllReminderChannels(long gid, long uid) {
-        if (userExists(gid, uid))
+        if (!userExists(gid, uid))
             throw new NullPointerException("This user doesn't have any reminders!");
 
         final var guildObj = getGuildObject(gid);
@@ -107,28 +107,24 @@ public class RemindersConfig extends AbstractGuildConfig {
     }
 
     public void editReminderChannel(long gid, long uid, int id, long channelID) {
-        if (userExists(gid, uid))
+        if (!userExists(gid, uid))
             throw new NullPointerException("This user doesn't have any reminders to edit!");
 
         final var guildObj = getGuildObject(gid);
 
         JSONObject reminder = getSpecificReminder(guildObj, gid, uid, id);
-        removeReminder(gid, uid, id);
-
         reminder.put(Fields.REMINDER_CHANNEL.toString(), channelID);
 
         getCache().updateGuild(guildObj);
     }
 
     public void editReminderTime(long gid, long uid, int id, long time) {
-        if (userExists(gid, uid))
+        if (!userExists(gid, uid))
             throw new NullPointerException("This user doesn't have any reminders to edit!");
 
         final var guildObj = getGuildObject(gid);
 
         JSONObject reminder = getSpecificReminder(guildObj, gid, uid, id);
-        removeReminder(gid, uid, id);
-
         reminder.put(Fields.REMINDER_TIME.toString(), time);
 
         getCache().updateGuild(guildObj);

@@ -557,4 +557,31 @@ public class GeneralUtils {
     public static String toSafeString(String str) {
         return Pattern.quote(str);
     }
+
+    public static String toMention(long id, Mentioner mentioner) {
+        return listOfIDsToMentions(List.of(id), mentioner);
+    }
+
+    public static String listOfIDsToMentions(List<Long> mentions, Mentioner mentioner) {
+        String mentionTag = null;
+        switch (mentioner) {
+            case USER -> mentionTag = "@";
+            case ROLE -> mentionTag = "@&";
+            case CHANNEL -> mentionTag = "#";
+        }
+
+        final var sb = new StringBuilder();
+        for (int i = 0; i < mentions.size(); i++) {
+            var elem = mentions.get(i);
+            sb.append("<"+mentionTag+"").append(elem.toString()).append(">")
+                    .append(i != mentions.size() - 1 ? ", " : "");
+        }
+        return sb.toString();
+    }
+
+    public enum Mentioner {
+        USER,
+        ROLE,
+        CHANNEL
+    }
 }
