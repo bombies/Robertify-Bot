@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-public class ReminderUser {
+class ReminderUser {
     @Getter
     private final long id;
     @Getter

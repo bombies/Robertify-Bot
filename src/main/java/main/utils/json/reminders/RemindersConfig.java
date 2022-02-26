@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RemindersConfig extends AbstractGuildConfig {
@@ -24,6 +25,8 @@ public class RemindersConfig extends AbstractGuildConfig {
         userObj.put(Fields.USER_ID.toString(), uid);
         userObj.put(Fields.USER_REMINDERS.toString(), new JSONArray());
         userObj.put(Fields.IS_BANNED.toString(), false);
+
+        userArr.put(userObj);
 
         getCache().updateGuild(guildObject);
     }
@@ -171,7 +174,7 @@ public class RemindersConfig extends AbstractGuildConfig {
     }
 
     public List<Reminder> getReminders(long gid, long uid) {
-        return getUser(gid, uid).getReminders();
+        return Collections.unmodifiableList(getUser(gid, uid).getReminders());
     }
 
     public ReminderUser getUser(long gid, long uid) {
@@ -292,8 +295,12 @@ public class RemindersConfig extends AbstractGuildConfig {
         JSONObject guildObject = getGuildObject(gid);
 
         if (!guildObject.has(Fields.REMINDERS.toString())) {
-            guildObject.put(Fields.USERS.toString(), new JSONArray());
-            guildObject.put(Fields.BANNED_CHANNELS.toString(), new JSONArray());
+            JSONObject reminderObj = new JSONObject();
+
+            reminderObj.put(Fields.USERS.toString(), new JSONArray());
+            reminderObj.put(Fields.BANNED_CHANNELS.toString(), new JSONArray());
+
+            guildObject.put(Fields.REMINDERS.toString(), reminderObj);
         }
 
         getCache().updateCache(Document.parse(guildObject.toString()));

@@ -16,6 +16,7 @@ import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.poll.PollCommand;
+import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.constants.Permission;
@@ -121,6 +122,7 @@ public class CommandManager {
                 new LogCommand(),
                 new AutoPlayCommand(),
                 new SetLogChannelCommand(),
+                new RemindersCommand(),
 
                 //Dev Commands
                 new UpdateCommand(),
@@ -203,7 +205,8 @@ public class CommandManager {
                 new PingCommand(),
                 new EightBallCommand(),
                 new PollCommand(),
-                new PlaytimeCommand()
+                new PlaytimeCommand(),
+                new RemindersCommand()
         );
 
         addUtilityCommands(

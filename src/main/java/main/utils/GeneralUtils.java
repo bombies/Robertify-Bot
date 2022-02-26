@@ -106,6 +106,10 @@ public class GeneralUtils {
         return s.replaceAll("\\D", "");
     }
 
+    public static String removeAllDigits(String s) {
+        return s.replaceAll("\\d", "");
+    }
+
     public static void updateENVField(ENV field, String str) throws IOException {
         switch (field) {
             case BOT_TOKEN -> throw new IllegalAccessError("This env value can't be changed from the bot!");
@@ -290,6 +294,10 @@ public class GeneralUtils {
 
     public static String formatTime(long duration) {
         return DurationFormatUtils.formatDuration(duration, "HH:mm:ss");
+    }
+
+    public static String formatTime(long duration, String format) {
+        return DurationFormatUtils.formatDuration(duration, format);
     }
 
     public static boolean isValidDuration(String timeUnparsed) {

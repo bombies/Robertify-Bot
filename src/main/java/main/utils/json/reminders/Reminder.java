@@ -10,11 +10,16 @@ public class Reminder {
     @Getter
     private final long  userId, channelID, reminderTime;
 
-    public Reminder(int id, String reminder, long userId, long channelID, long reminderTime) {
+    Reminder(int id, String reminder, long userId, long channelID, long reminderTime) {
         this.id = id;
         this.reminder = reminder;
         this.userId = userId;
         this.channelID = channelID;
         this.reminderTime = reminderTime;
+    }
+
+    @Override
+    public String toString() {
+        return reminder;
     }
 }
