@@ -2,6 +2,8 @@ package main.commands.commands.misc.reminders;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
+import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -26,9 +28,7 @@ public class RemindersCommand implements ICommand {
         final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!"
-                            + getUsages(prefix)).build())
-                    .queue();
+            list(msg);
         } else {
             switch (args.get(0).toLowerCase()) {
                 case "add" -> add(msg, args);
@@ -36,10 +36,10 @@ public class RemindersCommand implements ICommand {
                 case "clear" -> clear(msg);
                 case "list" -> list(msg);
                 case "edit" -> edit(msg, args);
-                case "banuser" -> banUser();
-                case "unbanuser" -> unbanUser();
-                case "banchannel" -> banChannel();
-                case "unbanchannel" -> unbanChannel();
+                case "banuser" -> banUser(msg, args);
+                case "unbanuser" -> unbanUser(msg, args);
+                case "banchannel" -> banChannel(msg, args);
+                case "unbanchannel" -> unbanChannel(msg, args);
                 default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arguments!"
                         + getUsages(prefix)).build())
                         .queue();
@@ -398,20 +398,180 @@ public class RemindersCommand implements ICommand {
         return timeInMillis;
     }
 
-    private void banUser() {
+    private void banUser(Message msg, List<String> args) {
+        Guild guild = msg.getGuild();
+        if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .queue();
+            return;
+        }
 
+        if (args.size() < 2) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a user to ban!").build())
+                    .queue();
+            return;
+        }
+
+        final var userID = args.get(1);
+
+        if (!GeneralUtils.stringIsID(userID)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user ID!").build())
+                    .queue();
+            return;
+        }
+
+        Member member = guild.retrieveMemberById(GeneralUtils.getDigitsOnly(userID)).complete();
+
+        if (member == null) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to a user in this server!").build())
+                    .queue();
+            return;
+        }
+
+        msg.replyEmbeds(handleUserBan(guild, member.getIdLong())).queue();
     }
 
-    private void unbanUser() {
+    private MessageEmbed handleUserBan(Guild guild, long idToBan) {
+        final var config = new RemindersConfig();
 
+        if (config.userIsBanned(guild.getIdLong(), idToBan))
+            return RobertifyEmbedUtils.embedMessage(guild, "This user is already banned!").build();
+
+        config.banUser(guild.getIdLong(), idToBan);
+        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully banned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.USER))
+                .build();
     }
 
-    private void banChannel() {
+    private void unbanUser(Message msg, List<String> args) {
+        Guild guild = msg.getGuild();
+        if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .queue();
+            return;
+        }
 
+        if (args.size() < 2) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a user to unban!").build())
+                    .queue();
+            return;
+        }
+
+        final var userID = args.get(1);
+
+        if (!GeneralUtils.stringIsID(userID)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user ID!").build())
+                    .queue();
+            return;
+        }
+
+        Member member = guild.retrieveMemberById(GeneralUtils.getDigitsOnly(userID)).complete();
+
+        if (member == null) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to a user in this server!").build())
+                    .queue();
+            return;
+        }
+
+        msg.replyEmbeds(handleUserUnBan(guild, member.getIdLong())).queue();
     }
 
-    private void unbanChannel() {
+    private MessageEmbed handleUserUnBan(Guild guild, long idToBan) {
+        final var config = new RemindersConfig();
 
+        if (!config.userIsBanned(guild.getIdLong(), idToBan))
+            return RobertifyEmbedUtils.embedMessage(guild, "This user is not banned!").build();
+
+        config.unbanUser(guild.getIdLong(), idToBan);
+        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully unbanned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.USER))
+                .build();
+    }
+
+    private void banChannel(Message msg, List<String> args) {
+        Guild guild = msg.getGuild();
+        if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .queue();
+            return;
+        }
+
+        if (args.size() < 2) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a channel to ban!").build())
+                    .queue();
+            return;
+        }
+
+        final var channelID = args.get(1);
+
+        if (!GeneralUtils.stringIsID(channelID)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid channel ID!").build())
+                    .queue();
+            return;
+        }
+
+        TextChannel channel = guild.getTextChannelById(GeneralUtils.getDigitsOnly(channelID));
+
+        if (channel == null) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to a channel in this server!").build())
+                    .queue();
+            return;
+        }
+
+        msg.replyEmbeds(handleChannelBan(guild, channel.getIdLong())).queue();
+    }
+
+    private MessageEmbed handleChannelBan(Guild guild, long idToBan) {
+        final var config = new RemindersConfig();
+
+        if (config.channelIsBanned(guild.getIdLong(), idToBan))
+            return RobertifyEmbedUtils.embedMessage(guild, "This channel is already banned!").build();
+
+        config.banChannel(guild.getIdLong(), idToBan);
+        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully banned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.CHANNEL))
+                .build();
+    }
+
+    private void unbanChannel(Message msg, List<String> args) {
+        Guild guild = msg.getGuild();
+        if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .queue();
+            return;
+        }
+
+        if (args.size() < 2) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a channel to unban!").build())
+                    .queue();
+            return;
+        }
+
+        final var channelID = args.get(1);
+
+        if (!GeneralUtils.stringIsID(channelID)) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid channel ID!").build())
+                    .queue();
+            return;
+        }
+
+        TextChannel channel = guild.getTextChannelById(GeneralUtils.getDigitsOnly(channelID));
+
+        if (channel == null) {
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to a channel in this server!").build())
+                    .queue();
+            return;
+        }
+
+        msg.replyEmbeds(handleChannelUnBan(guild, channel.getIdLong())).queue();
+    }
+
+    private MessageEmbed handleChannelUnBan(Guild guild, long idToBan) {
+        final var config = new RemindersConfig();
+
+        if (!config.channelIsBanned(guild.getIdLong(), idToBan))
+            return RobertifyEmbedUtils.embedMessage(guild, "This channel is not banned!").build();
+
+        config.unbanChannel(guild.getIdLong(), idToBan);
+        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully unbanned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.CHANNEL))
+                .build();
     }
 
     @Override
@@ -446,6 +606,8 @@ public class RemindersCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
+                "\n\n[insert description]"
+                + getUsages(prefix);
     }
 }
