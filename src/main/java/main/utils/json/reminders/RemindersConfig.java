@@ -211,6 +211,51 @@ public class RemindersConfig extends AbstractGuildConfig {
         }
     }
 
+    public List<ReminderUser> getAllGuildUsers(long gid) {
+        JSONObject guildObject = getGuildObject(gid);
+
+        JSONObject reminderObj;
+
+        try {
+            reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
+        } catch (JSONException e) {
+            update(gid);
+            reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
+        }
+
+        final var users = reminderObj.getJSONArray(Fields.USERS.toString());
+
+        try {
+            final List<ReminderUser> reminderUsers = new ArrayList<>();
+
+            for (var userObj : users) {
+                final var actualUser = (JSONObject) userObj;
+
+                final var uid = actualUser.getLong(Fields.USER_ID.toString());
+                final var reminders = actualUser.getJSONArray(Fields.USER_REMINDERS.toString());
+                final var isBanned = actualUser.getBoolean(Fields.IS_BANNED.toString());
+
+                final List<Reminder> reminderList = new ArrayList<>();
+
+                int i = 0;
+                for (var reminder : reminders) {
+                    final var actualObj = (JSONObject) reminder;
+                    reminderList.add(new Reminder(
+                            i++,
+                            actualObj.getString(Fields.REMINDER.toString()),
+                            uid,
+                            actualObj.getLong(Fields.REMINDER_CHANNEL.toString()),
+                            actualObj.getLong(Fields.REMINDER_TIME.toString())
+                    ));
+                }
+                reminderUsers.add(new ReminderUser(uid, gid, reminderList, isBanned));
+            }
+            return reminderUsers;
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
     public void banChannel(long gid, long cid) {
         if (channelIsBanned(gid, cid))
             throw new IllegalStateException("This channel is already banned!");

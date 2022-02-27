@@ -13,6 +13,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PlaytimeCommand;
+import main.commands.commands.misc.reminders.ReminderScheduler;
 import main.commands.commands.util.*;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
@@ -94,6 +95,9 @@ public class Listener extends ListenerAdapter {
 
         if (Robertify.getDiscordBotListAPI() != null)
             Robertify.getDiscordBotListAPI().setStats(serverCount);
+
+        ReminderScheduler.getInstance().scheduleAllReminders();
+        logger.info("Scheduled all reminders");
 
         logger.info("Watching {} guilds", serverCount);
 

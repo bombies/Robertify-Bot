@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.List;
 
-class ReminderUser {
+public class ReminderUser {
     @Getter
     private final long id;
     @Getter
@@ -14,7 +14,7 @@ class ReminderUser {
     @Getter
     private final boolean isBanned;
 
-    public ReminderUser(long id, long guildID, List<Reminder> reminders, boolean isBanned) {
+    ReminderUser(long id, long guildID, List<Reminder> reminders, boolean isBanned) {
         this.id = id;
         this.guildID = guildID;
         this.reminders = reminders;

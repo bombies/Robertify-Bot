@@ -111,6 +111,16 @@ public class RemindersCommand implements ICommand {
                 timeInMillis
         );
 
+        ReminderScheduler.getInstance()
+                .scheduleReminder(
+                        user.getIdLong(),
+                        guild.getIdLong(),
+                        channelID == null ? -1 : channelID,
+                        timeInMillis,
+                        reminder,
+                        remindersConfig.getReminders(guild.getIdLong(), user.getIdLong()).size()-1
+                );
+
         return RobertifyEmbedUtils.embedMessage(guild, "Successfully added your reminder!").build();
     }
 
@@ -152,7 +162,10 @@ public class RemindersCommand implements ICommand {
 
         config.removeReminder(guild.getIdLong(), user.getIdLong(), id);
 
-        return RobertifyEmbedUtils.embedMessage(guild, "You have removed:\n\n```" + reminders.get(id).getReminder() + "```")
+        ReminderScheduler.getInstance()
+                .removeReminder(user.getIdLong(), id);
+
+        return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You have removed:\n```" + reminders.get(id).getReminder() + "```")
                 .build();
     }
 
@@ -294,6 +307,12 @@ public class RemindersCommand implements ICommand {
                 return RobertifyEmbedUtils.embedMessage(guild, "There exists no such reminder with that ID!").build();
 
             config.editReminderChannel(guild.getIdLong(), user.getIdLong(), id, channelID);
+
+            Reminder reminder = reminders.get(id);
+
+            ReminderScheduler.getInstance()
+                    .editReminder(guild.getIdLong(), channelID, reminder.getUserId(), reminder.getId(), reminder.getReminderTime(), reminder.getReminder());
+
             return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the reminder channel for reminder " +
                     "`"+(id+1)+"` to: "
                     + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL)).build();
@@ -341,6 +360,11 @@ public class RemindersCommand implements ICommand {
 
         try {
             config.editReminderTime(guild.getIdLong(), user.getIdLong(), id, timeInMillis);
+
+            Reminder reminder = reminders.get(id);
+
+            ReminderScheduler.getInstance()
+                    .editReminder(guild.getIdLong(), reminder.getChannelID(), reminder.getUserId(), reminder.getId(), timeInMillis, reminder.getReminder());
             return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the time of reminder with ID `"+(id+1)+"` to: `"+timeUnparsed+"`")
                     .build();
         } catch (NullPointerException e) {
