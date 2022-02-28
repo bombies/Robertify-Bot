@@ -7,7 +7,7 @@ import main.commands.commands.audio.filters.*;
 import main.commands.commands.dev.*;
 import main.commands.commands.dev.test.*;
 import main.commands.commands.management.*;
-import main.commands.commands.management.dedicatechannel.DedicatedChannelCommand;
+import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;

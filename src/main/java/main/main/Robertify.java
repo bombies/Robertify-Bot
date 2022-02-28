@@ -14,7 +14,7 @@ import main.commands.commands.audio.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.*;
-import main.commands.commands.management.dedicatechannel.DedicatedChannelEvents;
+import main.commands.commands.management.dedicatedchannel.DedicatedChannelEvents;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;

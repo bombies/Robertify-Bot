@@ -1,4 +1,4 @@
-package main.commands.commands.management.dedicatechannel;
+package main.commands.commands.management.dedicatedchannel;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
