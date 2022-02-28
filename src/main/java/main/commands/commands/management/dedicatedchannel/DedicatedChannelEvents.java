@@ -12,6 +12,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -19,6 +20,8 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
@@ -292,6 +295,22 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
+            if (!new VoteManager().userVoted(member.getId(), VoteManager.Website.TOP_GG)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                                "🔒 Locked Command", """
+                                                    Woah there! You must vote before interacting with this command.
+                                                    Click on each of the buttons below to vote!
+
+                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                        .addActionRow(
+                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
+                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com")
+                        )
+                        .queue();
+                return;
+            }
+
             if (!djCheck(new PreviousTrackCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
