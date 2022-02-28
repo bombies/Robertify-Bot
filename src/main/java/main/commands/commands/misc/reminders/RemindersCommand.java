@@ -7,10 +7,17 @@ import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
 import main.utils.json.reminders.RemindersConfig;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
@@ -18,7 +25,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class RemindersCommand implements ICommand {
+public class RemindersCommand extends InteractiveCommand implements ICommand {
+    private final static Logger logger = LoggerFactory.getLogger(RemindersCommand.class);
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
@@ -83,6 +92,12 @@ public class RemindersCommand implements ICommand {
     }
 
     private MessageEmbed handleAdd(Guild guild, User user, String reminder, String time, @Nullable Long channelID) {
+        RemindersConfig remindersConfig = new RemindersConfig();
+
+        if (remindersConfig.channelIsBanned(guild.getIdLong(), channelID))
+            return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You cannot set the reminder channel to " + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL) + " as it is banned!")
+                    .build();
+
         long timeInMillis = 0;
 
         try {
@@ -100,8 +115,6 @@ public class RemindersCommand implements ICommand {
                     """).build();
             }
         }
-
-        RemindersConfig remindersConfig = new RemindersConfig();
 
         remindersConfig.addReminder(
                 guild.getIdLong(),
@@ -206,6 +219,13 @@ public class RemindersCommand implements ICommand {
             ).build();
 
         final var reminders = config.getReminders(guild.getIdLong(), user.getIdLong());
+
+        if (reminders.isEmpty())
+            return RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                    "Reminders",
+                    "You have no reminders!"
+            ).build();
+
         final var sb = new StringBuilder();
 
         for (int i = 0; i < reminders.size(); i++) {
@@ -313,9 +333,12 @@ public class RemindersCommand implements ICommand {
             ReminderScheduler.getInstance()
                     .editReminder(guild.getIdLong(), channelID, reminder.getUserId(), reminder.getId(), reminder.getReminderTime(), reminder.getReminder());
 
-            return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the reminder channel for reminder " +
-                    "`"+(id+1)+"` to: "
-                    + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL)).build();
+            if (channelID == -1L)
+                return RobertifyEmbedUtils.embedMessage(guild, "You have successfully removed the reminder channel for reminder `"+(id+1)+"`").build();
+            else
+                return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the reminder channel for reminder " +
+                        "`"+(id+1)+"` to: "
+                        + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL)).build();
         } catch (NullPointerException e) {
             return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!").build();
         } catch (Exception e) {
@@ -605,7 +628,7 @@ public class RemindersCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("reminder", "reminders");
+        return List.of("reminder", "remind");
     }
 
     @Override
@@ -633,5 +656,306 @@ public class RemindersCommand implements ICommand {
         return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
                 "\n\n[insert description]"
                 + getUsages(prefix);
+    }
+
+    @Override
+    public void initCommand() {
+        setInteractionCommand(getCommand());
+        upsertCommand();
+    }
+
+    @Override
+    public void initCommand(Guild g) {
+        setInteractionCommand(getCommand());
+        upsertCommand(g);
+    }
+
+    private InteractionCommand getCommand() {
+        return InteractionCommand.create()
+                .setCommand(Command.ofWithSub(
+                        getName(),
+                        "Set your reminders!",
+                        List.of(
+                                SubCommand.of(
+                                    "add",
+                                    "Add a reminder!",
+                                    List.of(
+                                            CommandOption.of(
+                                                    OptionType.STRING,
+                                                "time",
+                                                "The time to remind you at daily!",
+                                                true
+                                            ),
+                                            CommandOption.of(
+                                                    OptionType.STRING,
+                                                    "reminder",
+                                                    "What you want to be reminded of",
+                                                    true
+                                            ),
+                                            CommandOption.of(
+                                                    OptionType.CHANNEL,
+                                                    "channel",
+                                                    "The channel to send the reminder in",
+                                                    false
+                                            )
+                                    )
+                                ),
+                                SubCommand.of(
+                                        "list",
+                                        "List all your reminders"
+                                ),
+                                SubCommand.of(
+                                        "remove",
+                                        "Remove a specific reminder",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.INTEGER,
+                                                        "id",
+                                                        "The ID of the reminder to remove",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "clear",
+                                        "Clear all reminders"
+                                )
+                        ),
+                        List.of(
+                                SubCommandGroup.of(
+                                        "edit",
+                                        "Edit your reminders!",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "channel",
+                                                        "Edit the channel a specific reminder gets sent in!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.INTEGER,
+                                                                        "id",
+                                                                        "The ID of the reminder to edit",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.CHANNEL,
+                                                                        "channel",
+                                                                        "The new channel to send the reminder in",
+                                                                        false
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "time",
+                                                        "Edit the time a specific reminder gets sent at!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.INTEGER,
+                                                                        "id",
+                                                                        "The ID of the reminder to edit",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.STRING,
+                                                                        "time",
+                                                                        "The new time to send the reminder at",
+                                                                        true
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                                SubCommandGroup.of(
+                                        "ban",
+                                        "Ban either users or channels",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "channel",
+                                                        "Ban a specific channel from being used!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.CHANNEL,
+                                                                        "channel",
+                                                                        "The channel to ban",
+                                                                        true
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "user",
+                                                        "Ban a specific user from receiving reminders in this server!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.USER,
+                                                                        "user",
+                                                                        "The user to ban",
+                                                                        true
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                                ,
+                                SubCommandGroup.of(
+                                        "unban",
+                                        "Unban either users or channels",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "channel",
+                                                        "Unban a specific channel from being used!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.CHANNEL,
+                                                                        "channel",
+                                                                        "The channel to unban",
+                                                                        true
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "user",
+                                                        "Unban a specific user!",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.USER,
+                                                                        "user",
+                                                                        "The user to unban",
+                                                                        true
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                )).build();
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!event.getName().equals(getName())) return;
+
+        String[] split = event.getCommandPath().split("/");
+        List<OptionMapping> options = event.getOptions();
+
+        final Guild guild = event.getGuild();
+        final Member member = event.getMember();
+        final User eventUser = event.getUser();
+        switch (split[1]) {
+            case "add" -> {
+                String time = options.get(0).getAsString();
+                String reminder = options.get(1).getAsString();
+
+                MessageChannel channel = null;
+                if (options.size() == 3)
+                    channel = options.get(2).getAsMessageChannel();
+
+                event.replyEmbeds(handleAdd(guild, eventUser, reminder, time, channel != null ? channel.getIdLong() : -1L))
+                        .setEphemeral(true)
+                        .queue();
+            }
+            case "remove" -> {
+                int id = (int)options.get(0).getAsLong();
+
+                event.replyEmbeds(handleRemove(guild, eventUser, id-1))
+                        .setEphemeral(true)
+                        .queue();
+            }
+            case "edit" -> {
+                switch (split[2]) {
+                    case "channel" -> {
+                        int id = (int)options.get(0).getAsLong();
+
+                        MessageChannel channel = null;
+                        if (options.size() == 2)
+                           channel = options.get(1).getAsMessageChannel();
+
+                        event.replyEmbeds(handleChannelEdit(guild, eventUser, id-1, channel != null ? channel.getIdLong() : -1L))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                    case "time" -> {
+                        int id = (int)options.get(0).getAsLong();
+                        String time = options.get(1).getAsString();
+
+                        event.replyEmbeds(handleTimeEdit(guild, eventUser, id-1, time))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                }
+            }
+            case "clear" -> {
+                event.replyEmbeds(handleClear(guild, eventUser))
+                        .setEphemeral(true)
+                        .queue();
+            }
+            case "list" -> {
+                event.replyEmbeds(handleList(guild, eventUser))
+                        .setEphemeral(true)
+                        .queue();
+            }
+            case "ban" -> {
+                if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                switch (split[2]) {
+                    case "channel" -> {
+                        final var channel = options.get(0).getAsMessageChannel();
+
+                        if (channel == null) {
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You must provide a valid channel!").build())
+                                    .setEphemeral(true)
+                                    .queue();
+                            return;
+                        }
+
+                        event.replyEmbeds(handleChannelBan(guild, channel.getIdLong()))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                    case "user" -> {
+                        final var user = options.get(0).getAsUser();
+
+                        event.replyEmbeds(handleUserBan(guild, user.getIdLong()))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                }
+            }
+            case "unban" -> {
+                if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                switch (split[2]) {
+                    case "channel" -> {
+                        final var channel = options.get(0).getAsMessageChannel();
+
+                        if (channel == null) {
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You must provide a valid channel!").build())
+                                    .setEphemeral(true)
+                                    .queue();
+                            return;
+                        }
+
+                        event.replyEmbeds(handleChannelUnBan(guild, channel.getIdLong()))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                    case "user" -> {
+                        final var user = options.get(0).getAsUser();
+
+                        event.replyEmbeds(handleUserUnBan(guild, user.getIdLong()))
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                }
+            }
+        }
     }
 }

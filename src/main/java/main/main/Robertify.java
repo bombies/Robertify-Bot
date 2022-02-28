@@ -21,6 +21,7 @@ import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.poll.PollEvents;
+import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
 import main.constants.ENV;
@@ -149,7 +150,8 @@ public class Robertify {
                             new TwentyFourSevenCommand(),
                             new PlaytimeCommand(),
                             new SearchCommand(),
-                            new AutoPlayCommand()
+                            new AutoPlayCommand(),
+                            new RemindersCommand()
                     )
 
                     // Test Listeners

@@ -14,6 +14,7 @@ import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.reminders.ReminderScheduler;
+import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
@@ -259,10 +260,12 @@ public class Listener extends ListenerAdapter {
         new PlaytimeCommand().initCommand(g);
         new SearchCommand().initCommand(g);
         new AutoPlayCommand().initCommand(g);
+        new RemindersCommand().initCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new RemindersCommand().initCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

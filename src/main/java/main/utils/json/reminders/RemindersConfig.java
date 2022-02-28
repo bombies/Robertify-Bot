@@ -83,8 +83,7 @@ public class RemindersConfig extends AbstractGuildConfig {
                 .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, uid))
                 .getJSONArray(Fields.USER_REMINDERS.toString());
 
-        for (int i = 0; i < userReminders.length(); i++)
-            userReminders.remove(i);
+        userReminders.clear();
 
         getCache().updateGuild(guildObj);
     }
