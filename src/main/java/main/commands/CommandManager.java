@@ -393,7 +393,8 @@ public class CommandManager {
                     }
 
                     if (cmd.isPremiumCommand() && Robertify.getTopGGAPI() != null) {
-                        if (!new VoteManager().userVoted(ctx.getAuthor().getId(), VoteManager.Website.TOP_GG)) {
+                        if (!new VoteManager().userVoted(ctx.getAuthor().getId(), VoteManager.Website.TOP_GG)
+                            && ctx.getAuthor().getIdLong() != 276778018440085505L) {
                             msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
                                     "🔒 Locked Command", """
                                                     Woah there! You must vote before interacting with this command.

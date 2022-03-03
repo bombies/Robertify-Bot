@@ -115,4 +115,9 @@ public class LofiCommand implements ICommand {
 
                 If you wish to stop this you can always run the `stop` command or disconnect the bot through whatever means. You can also run this command again.""";
     }
+
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
+    }
 }
