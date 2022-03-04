@@ -110,33 +110,31 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
             final var reproduction = fields.get(2).getValue();
             final var comments = fields.get(3).getValue();
 
-            final var user = GeneralUtils.retrieveUser(GeneralUtils.getDigitsOnly(reporter));
-
-            user.openPrivateChannel().queue(channel -> {
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
-                        guild,
-                        "Bug Reports",
-                        "Your bug report has been handled."
-                        )
-                                .addField("Developer Comments", developerMsg, false)
-                                .addBlankField(false)
-                                .appendDescription("\n\n**Your Bug Report**\n```\n" +
-                                        "Command/Feature Origin\n" + origin + "\n\n" +
-                                        "Reproduction of Bug\n" + reproduction + "\n\n" +
-                                        "Additional Comments\n" + comments + "```")
-                                .build())
-                        .queue(success -> {
-                            reportMsg.delete().queue();
-                            msg.addReaction("✅").queue();
-                        }, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
-            });
+            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(reporter))
+                            .queue(user -> user.openPrivateChannel().queue(channel -> {
+                                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
+                                                        guild,
+                                                        "Bug Reports",
+                                                        "Your bug report has been handled."
+                                                )
+                                                .addField("Developer Comments", developerMsg, false)
+                                                .addBlankField(false)
+                                                .appendDescription("\n\n**Your Bug Report**\n```\n" +
+                                                        "Command/Feature Origin\n" + origin + "\n\n" +
+                                                        "Reproduction of Bug\n" + reproduction + "\n\n" +
+                                                        "Additional Comments\n" + comments + "```")
+                                                .build())
+                                        .queue(success -> {
+                                            reportMsg.delete().queue();
+                                            msg.addReaction("✅").queue();
+                                        }, new ErrorHandler()
+                                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
+                            }));
         }, new ErrorHandler()
                 .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any opened report!").build())
                             .queue();
                 }));
-
     }
 
     private void sendReport(User user, Message msg) {

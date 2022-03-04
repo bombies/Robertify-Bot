@@ -2,12 +2,14 @@ package main.utils.database.postgresql;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.constants.ENV;
+import main.main.Config;
 
 import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Properties;
 
 public abstract class AbstractPostgresDB {
     @Getter
@@ -19,9 +21,20 @@ public abstract class AbstractPostgresDB {
         this.connection = DriverManager.getConnection(url, user, password);
     }
 
-    public abstract void initTables();
+    @SneakyThrows
+    protected AbstractPostgresDB(String databaseName) {
+        String url = "jdbc:postgresql://" + Config.get(ENV.POSTGRES_HOST) +
+                (Config.get(ENV.POSTGRES_PORT) == null ? "" : ":"+ Config.get(ENV.POSTGRES_PORT)) +
+                "/" + databaseName;
+        this.connection = DriverManager.getConnection(url, Config.get(ENV.POSTGRES_USERNAME), Config.get(ENV.POSTGRES_PASSWORD));
+    }
 
-    public void initTable(AbstractPostgresTable table){
+    public void initTables() throws SQLException {
+        for (var table : getTables().values())
+            initTable(table);
+    }
+
+    public void initTable(AbstractPostgresTable table) throws SQLException {
         if (!table.tableExists())
             table.init();
     }

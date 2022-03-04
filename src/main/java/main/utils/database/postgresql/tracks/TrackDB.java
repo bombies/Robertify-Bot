@@ -1,5 +1,6 @@
 package main.utils.database.postgresql.tracks;
 
+import lombok.SneakyThrows;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.database.postgresql.AbstractPostgresDB;
@@ -21,23 +22,18 @@ public class TrackDB extends AbstractPostgresDB {
         );
     }
 
+    @SneakyThrows
     public SpotifyTracksTable getSpotifyTable() {
         SpotifyTracksTable table = getTable(SpotifyTracksTable.TABLE_NAME, SpotifyTracksTable.class);
         initTable(table);
         return table;
     }
 
+    @SneakyThrows
     public DeezerTracksTable getDeezerTable() {
         DeezerTracksTable table = getTable(DeezerTracksTable.TABLE_NAME, DeezerTracksTable.class);
         initTable(table);
         return table;
-    }
-
-    @Override
-    public void initTables() {
-        for (var table : getTables().values())
-            if (!table.tableExists())
-                table.init();
     }
 
     @Override

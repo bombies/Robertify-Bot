@@ -3,6 +3,7 @@ package main.constants;
 public enum ENV {
     BOT_TOKEN("bot_token"),
     OWNER_ID("owner_id"),
+    VOTE_WEBHOOK_URL("vote_webhook_url"),
     DATABASE_DIR("database_dir"),
     JSON_DIR("json_dir"),
     BOT_NAME("bot_name"),

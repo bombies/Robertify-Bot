@@ -53,7 +53,6 @@ public class VoteManager {
 
     public enum Website {
         TOP_GG,
-        DBL,
-        DISCORDS
+        DBL
     }
 }

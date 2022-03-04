@@ -37,11 +37,12 @@ public class TrackTable extends AbstractPostgresTable {
 
         final String sql = "SELECT * FROM " + getTableName() + " WHERE " + (table.equals(Table.SPOTIFY) ?
                 SpotifyTracksTable.Fields.SPOTIFY_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='"+sourceID+"';";
-        ResultSet resultSet = con.createStatement().executeQuery(sql);
 
-        while (resultSet.next())
-            return resultSet.getString(SpotifyTracksTable.Fields.YOUTUBE_ID.toString());
-        throw new NullPointerException("There was no matching YouTube track ID found for Spotify track with ID: " + sourceID);
+        String ret = getString(sql);
+
+        if (ret == null)
+            throw new NullPointerException("There was no matching YouTube track ID found for Spotify track with ID: " + sourceID);
+        return ret;
     }
 
     @SneakyThrows
