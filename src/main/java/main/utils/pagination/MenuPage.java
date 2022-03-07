@@ -1,7 +1,7 @@
 package main.utils.pagination;
 
 import lombok.Getter;
-import main.utils.component.builders.selectionmenu.SelectionMenuOption;
+import main.utils.component.legacy.builders.selectionmenu.SelectionMenuOption;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,8 +2,7 @@ package main.commands.commands.audio.slashcommands;
 
 import main.commands.commands.audio.NowPlayingCommand;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.InteractiveCommand;
-import me.duncte123.botcommons.messaging.EmbedUtils;
+import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;

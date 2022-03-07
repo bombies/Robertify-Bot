@@ -76,7 +76,7 @@ public class ReminderScheduler {
                     if (currentTimeInMillis > timeOfDay)
                         return;
 
-                    if (destination == 1L) {
+                    if (destination == -1L) {
                         dmReminder(guild, user, reminder);
                         return;
                     }
@@ -137,5 +137,4 @@ public class ReminderScheduler {
             INSTANCE = new ReminderScheduler();
         return INSTANCE;
     }
-
 }

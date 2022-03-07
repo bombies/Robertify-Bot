@@ -3,7 +3,7 @@ package main.commands.commands.audio.autoplay;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.InteractiveCommand;
+import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;

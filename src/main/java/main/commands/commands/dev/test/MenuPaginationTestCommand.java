@@ -2,7 +2,7 @@ package main.commands.commands.dev.test;
 
 import main.commands.CommandContext;
 import main.commands.ITestCommand;
-import main.utils.component.builders.selectionmenu.SelectionMenuOption;
+import main.utils.component.legacy.builders.selectionmenu.SelectionMenuOption;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;

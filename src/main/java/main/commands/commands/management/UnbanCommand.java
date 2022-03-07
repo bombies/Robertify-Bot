@@ -6,7 +6,7 @@ import main.constants.Permission;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.InteractiveCommand;
+import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

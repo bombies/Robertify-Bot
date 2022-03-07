@@ -1,4 +1,4 @@
-package main.utils.component.builders.selectionmenu;
+package main.utils.component.legacy.builders.selectionmenu;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -19,6 +19,7 @@ import main.commands.commands.util.*;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.tests.SlashCommandTest;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.changelog.ChangeLogConfig;
@@ -177,6 +178,14 @@ public class Listener extends ListenerAdapter {
         initSlashCommands(guild);
         GeneralUtils.setDefaultEmbed(guild);
         logger.info("Joined {}", guild.getName());
+
+        final int serverCount = Robertify.api.getGuilds().size();
+
+        if (Robertify.getTopGGAPI() != null)
+            Robertify.getTopGGAPI().setStats(serverCount);
+
+        if (Robertify.getDiscordBotListAPI() != null)
+            Robertify.getDiscordBotListAPI().setStats(serverCount);
     }
 
     @Override
@@ -187,6 +196,14 @@ public class Listener extends ListenerAdapter {
                         .destroy();
         RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
         logger.info("Left {}", guild.getName());
+
+        final int serverCount = Robertify.api.getGuilds().size();
+
+        if (Robertify.getTopGGAPI() != null)
+            Robertify.getTopGGAPI().setStats(serverCount);
+
+        if (Robertify.getDiscordBotListAPI() != null)
+            Robertify.getDiscordBotListAPI().setStats(serverCount);
     }
 
     public static void checkIfAnnouncementChannelIsSet(Guild guild, TextChannel channel) {
@@ -261,11 +278,15 @@ public class Listener extends ListenerAdapter {
         new SearchCommand().initCommand(g);
         new AutoPlayCommand().initCommand(g);
         new RemindersCommand().initCommand(g);
+
+        // NEW SLASH COMMANDS
+        new SlashCommandTest().loadCommand(g);
     }
 
     public void initNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
         new RemindersCommand().initCommand(g);
+        new SlashCommandTest().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

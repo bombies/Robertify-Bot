@@ -8,7 +8,7 @@ import lavalink.client.player.track.AudioTrackInfo;
 import lombok.SneakyThrows;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.builders.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.legacy.builders.selectionmenu.SelectionMenuBuilder;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;

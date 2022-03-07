@@ -7,7 +7,7 @@ import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.InteractiveCommand;
+import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
 import main.utils.json.reminders.RemindersConfig;

@@ -1,4 +1,4 @@
-package main.utils.component;
+package main.utils.component.legacy;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,6 +7,8 @@ import main.commands.CommandManager;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
+import main.utils.component.InteractionBuilderException;
+import main.utils.component.InvalidBuilderException;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;

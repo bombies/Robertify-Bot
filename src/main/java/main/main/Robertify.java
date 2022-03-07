@@ -29,6 +29,7 @@ import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
+import main.utils.component.interactions.tests.SlashCommandTest;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
@@ -151,7 +152,10 @@ public class Robertify {
                             new PlaytimeCommand(),
                             new SearchCommand(),
                             new AutoPlayCommand(),
-                            new RemindersCommand()
+                            new RemindersCommand(),
+
+                            // NEW SLASH COMMAND
+                            new SlashCommandTest()
                     )
 
                     // Test Listeners
