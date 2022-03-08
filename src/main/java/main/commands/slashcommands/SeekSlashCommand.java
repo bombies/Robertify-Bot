@@ -1,7 +1,8 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.SeekCommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -11,27 +12,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class SeekSlashCommand extends InteractiveCommand {
-    private final String commandName = new SeekCommand().getName();
+public class SeekSlashCommand extends AbstractSlashCommand {
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Jump to a specific position in the current song",
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("seek")
+                        .setDescription("Jump to a specific position in the current song")
+                        .addOptions(
                                 CommandOption.of(
                                         OptionType.INTEGER,
                                         "minutes",
@@ -44,18 +33,24 @@ public class SeekSlashCommand extends InteractiveCommand {
                                         "The seconds to seek",
                                         true
                                 )
-                        ),
-                        djPredicate
-                )).build();
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

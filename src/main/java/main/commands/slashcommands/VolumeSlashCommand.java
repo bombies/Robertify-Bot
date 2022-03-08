@@ -1,54 +1,49 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.VolumeCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class VolumeSlashCommand extends InteractiveCommand {
-    private final String commandName = new VolumeCommand().getName();
+public class VolumeSlashCommand extends AbstractSlashCommand {
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("volume")
+                        .setDescription("Adjust the volume of the bot")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.INTEGER,
+                                        "volume",
+                                        "The volume to set the bot to",
+                                        true
+                                )
+                        )
+                        .setPossibleDJCommand()
+                        .setPremium()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Adjust the bot's volume",
-                        List.of(CommandOption.of(
-                                OptionType.INTEGER,
-                                "volume",
-                                "The volume to set the bot to",
-                                true
-                        )),
-                        djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
+        if (!premiumCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

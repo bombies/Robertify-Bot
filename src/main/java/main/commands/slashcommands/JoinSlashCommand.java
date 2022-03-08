@@ -1,4 +1,4 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.JoinCommand;
 import main.utils.component.legacy.InteractiveCommand;

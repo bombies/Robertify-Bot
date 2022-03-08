@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class ListDJCommand extends InteractiveCommand implements ICommand {
+public class ListDJCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_DJ)) return;
@@ -38,33 +39,28 @@ public class ListDJCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("listdj")
+                        .setDescription("View all the DJs in this server")
+                        .setDJOnly()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "View all the DJs in this server",
-                        djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         final var guild = event.getGuild();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!djCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
                     .queue();
             return;

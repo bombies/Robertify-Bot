@@ -1,7 +1,8 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.RewindCommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -10,43 +11,40 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class RewindSlashCommand extends InteractiveCommand {
+public class RewindSlashCommand extends AbstractSlashCommand {
     private final String commandName = new RewindCommand().getName();
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Rewind the song by the seconds provided or all the way to the beginning")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.INTEGER,
+                                        "seconds",
+                                        "Seconds to rewind the song by",
+                                        false
+                                )
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                    commandName,
-                    "Rewind the song by the seconds provided or all the way to the beginning",
-                    List.of(CommandOption.of(
-                            OptionType.INTEGER,
-                            "seconds",
-                            "Seconds to rewind the song by",
-                            false
-                    )),
-                    djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

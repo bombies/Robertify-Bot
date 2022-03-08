@@ -8,6 +8,9 @@ import main.commands.IDevCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractionBuilderException;
+import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.guildconfig.GuildConfig;
@@ -21,6 +24,7 @@ import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -30,50 +34,49 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class HelpCommand extends InteractiveCommand implements ICommand {
+public class HelpCommand extends AbstractSlashCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(HelpCommand.class);
     private final String menuName = "menu:help";
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("help")
+                        .setDescription("See all the commands the bot has to offer to you!")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.STRING,
+                                        "command",
+                                        "View help for a specific command",
+                                        false
+                                )
+                        )
+                        .build()
+        );
+    }
+
+    private SelectionMenu getSelectionMenu(long userId) {
+        return getSelectionMenuBuilder(userId).build();
+    }
+
+    private SelectionMenuBuilder getSelectionMenuBuilder(long userId) {
+        return new SelectionMenuBuilder()
+                .setName(menuName)
+                .setPlaceHolder("Select an option!")
+                .setRange(1, 1)
+                .addOptions(
+                        SelectionMenuOption.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
+                        SelectionMenuOption.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
+                        SelectionMenuOption.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
+                        SelectionMenuOption.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
+                )
+                .limitToUser(userId);
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public void initCommandWithoutUpsertion() {
-        super.initCommandWithoutUpsertion(getCommand());
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "See all the commands the bot has to offer to you!",
-                        List.of(CommandOption.of(
-                                OptionType.STRING,
-                                "command",
-                                "View help for a specific command",
-                                false
-                        ))
-                ))
-                .addSelectionDialogue(SelectionDialogue.of(
-                        menuName,
-                        "Select an option",
-                        Pair.of(1,1),
-                        List.of(
-                                Triple.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
-                                Triple.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
-                                Triple.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
-                                Triple.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
-                        ),
-                        menuPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
 
@@ -104,17 +107,10 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                     .addField("❓ Utility Commands", "*Curious about the bot? These are the commands for you to explore!*", true)
                     .addBlankField(true);
             msg.replyEmbeds(eb.build()).queue(repliedMsg ->
-                    {
-                        try {
-                            repliedMsg.editMessageComponents(
-                                        ActionRow.of(getInteractionCommand().getSelectionMenu(menuName))
-                                    ).queue();
-                        } catch (InteractionBuilderException e) {
-                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-                        }
-                    }
+                    repliedMsg.editMessageComponents(
+                            ActionRow.of(getSelectionMenu(ctx.getAuthor().getIdLong()))
+                    ).queue()
             );
-
             GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
@@ -189,7 +185,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
                     .addField("❓ Utility Commands", "*Curious about the bot? These are the commands for you to explore!*", true)
                     .addBlankField(true);
             event.replyEmbeds(eb.build())
-                    .addActionRow(getInteractionCommand().getSelectionMenu(menuName))
+                    .addActionRow(getSelectionMenu(event.getUser().getIdLong()))
                     .setEphemeral(true).queue();
         } else {
             final CommandManager manager = new CommandManager();
@@ -207,7 +203,7 @@ public class HelpCommand extends InteractiveCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!getSelectionDialogue(menuName).checkPermission(event)) {
+        if (!getSelectionMenuBuilder(event.getUser().getIdLong()).checkPermission(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
                     .setEphemeral(true).queue();
             return;

@@ -1,4 +1,4 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
@@ -6,56 +6,51 @@ import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.SkipToCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SkipSlashCommand extends InteractiveCommand {
+public class SkipSlashCommand extends AbstractSlashCommand {
     private final String commandName = "skip";
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Skip the song currently being played")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.INTEGER,
+                                        "trackstoskip",
+                                        "Number of tacks to skip",
+                                        false
+                                )
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Skip the song currently being played",
-                        List.of(CommandOption.of(
-                                OptionType.INTEGER,
-                                "trackstoskip",
-                                "Number of tracks to skip",
-                                false
-                        )),
-                        djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final var memberVoiceState = event.getMember().getVoiceState();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             if (selfVoiceState.getChannel().getMembers().size() != 1) {
                 MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getTextChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {

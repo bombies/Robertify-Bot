@@ -1,40 +1,27 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.MoveCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class MoveSlashCommand extends InteractiveCommand {
+public class MoveSlashCommand extends AbstractSlashCommand {
     private final String commandName = new MoveCommand().getName();
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Rearrange the position of tracks in the queue",
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Rearrange the position of tracks in the queue")
+                        .addOptions(
                                 CommandOption.of(
                                         OptionType.INTEGER,
                                         "id",
@@ -47,20 +34,24 @@ public class MoveSlashCommand extends InteractiveCommand {
                                         "The position to move the track to",
                                         true
                                 )
-                        ),
-                        List.of(),
-                        djPredicate
-                )).build();
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
+    }
 
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

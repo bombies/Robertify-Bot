@@ -2,10 +2,12 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
 import main.constants.Permission;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class UnbanCommand extends InteractiveCommand implements ICommand {
+public class UnbanCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
@@ -100,40 +102,35 @@ public class UnbanCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("unban")
+                        .setDescription("Unban a user from the bot")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.USER,
+                                        "user",
+                                        "The user to unban",
+                                        true
+                                )
+                        )
+                        .checkForPermissions(Permission.ROBERTIFY_BAN)
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Unban a user from the bot",
-                        List.of(CommandOption.of(
-                                OptionType.USER,
-                                "user",
-                                "The user to unban",
-                                true
-                        )),
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_BAN),
-                        true
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to run this command!\n\n" +
-                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
+        if (!predicateCheck(event)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_BAN))
                     .build())
                     .setEphemeral(true)
                     .queue();

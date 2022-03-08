@@ -2,10 +2,12 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -20,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class SetChannelCommand extends InteractiveCommand implements ICommand {
+public class SetChannelCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_ADMIN))
@@ -102,34 +104,39 @@ public class SetChannelCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("setchannel")
+                        .setDescription("Set the channel where all the now playing messages will be announced")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.CHANNEL,
+                                        "channel",
+                                        "The channel to be set",
+                                        true
+                                )
+                        )
+                        .setAdminOnly()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Set the channel where all the now playing messages will be announced",
-                        List.of(CommandOption.of(
-                                OptionType.CHANNEL,
-                                "channel",
-                                "The channel to be set",
-                                true
-                        ))
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
+
+        if (!adminCheck(event)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
 
         final var channel = event.getOption("channel").getAsGuildChannel();
         final var guildConfig = new GuildConfig();

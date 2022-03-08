@@ -225,6 +225,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private Predicate<SlashCommandEvent> checkPermission = null;
         private Boolean djOnly = null;
         private Boolean adminOnly = null;
+        private boolean isPremium = false;
         private final InteractionBuilder builder;
 
         public CommandBuilder(InteractionBuilder builder) {
@@ -281,6 +282,11 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             return this;
         }
 
+        public CommandBuilder setPremium() {
+            isPremium = true;
+            return this;
+        }
+
         public InteractionBuilder build() throws InvalidBuilderException {
             if (name == null)
                 throw new InvalidBuilderException("You must provide a name for the command!");
@@ -312,6 +318,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
         private final Boolean djOnly;
         @Nullable @Getter
         private final Boolean adminOnly;
+        private final boolean isPremium;
 
         private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options,
                         @NotNull List<SubCommandGroup> subCommandGroups, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandEvent> checkPermission,
@@ -324,6 +331,7 @@ public abstract class InteractiveCommand extends ListenerAdapter {
             this.checkPermission = checkPermission;
             this.djOnly = djOnly;
             this.adminOnly = adminOnly;
+            this.isPremium = false;
         }
 
         public boolean permissionCheck(SlashCommandEvent e) {

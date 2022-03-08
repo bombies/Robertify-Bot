@@ -9,7 +9,7 @@ import main.constants.TrackSource;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.legacy.InteractiveCommand;
-import main.utils.component.legacy.builders.selectionmenu.SelectionMenuOption;
+import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.themes.ThemesConfig;

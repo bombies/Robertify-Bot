@@ -6,7 +6,7 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
-import main.commands.commands.audio.slashcommands.*;
+import main.commands.slashcommands.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
@@ -35,11 +35,13 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +70,8 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-            initNeededSlashCommands(g);
+            removeAllSlashCommands(g);
+            loadNeededSlashCommands(g);
             rescheduleUnbans(g);
             GeneralUtils.setDefaultEmbed(g);
 
@@ -161,6 +164,10 @@ public class Listener extends ListenerAdapter {
         }
     }
 
+    private void removeAllSlashCommands(Guild g) {
+        g.retrieveCommands().queue(commands -> commands.forEach(command -> g.deleteCommandById(command.getIdLong()).queue()));
+    }
+
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         final var guild = event.getGuild();
@@ -175,7 +182,7 @@ public class Listener extends ListenerAdapter {
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
         new GuildConfig().addGuild(guild.getIdLong());
-        initSlashCommands(guild);
+        loadSlashCommands(guild);
         GeneralUtils.setDefaultEmbed(guild);
         logger.info("Joined {}", guild.getName());
 
@@ -227,39 +234,28 @@ public class Listener extends ListenerAdapter {
         }
     }
 
-    public void initSlashCommands() {
-        new PlaySlashCommand().initCommand();
-        new QueueSlashCommand().initCommand();
-        new LeaveSlashCommand().initCommand();
-        new ClearQueueSlashCommand().initCommand();
-        new JumpSlashCommand().initCommand();
-        new NowPlayingSlashCommand().initCommand();
-        new PauseSlashCommand().initCommand();
-        new HelpCommand().initCommand();
-    }
-
-    public void initSlashCommands(Guild g) {
-        new PlaySlashCommand().initCommand(g);
-        new QueueSlashCommand().initCommand(g);
-        new LeaveSlashCommand().initCommand(g);
-        new ClearQueueSlashCommand().initCommand(g);
-        new JumpSlashCommand().initCommand(g);
-        new NowPlayingSlashCommand().initCommand(g);
-        new PauseSlashCommand().initCommand(g);
-        new HelpCommand().initCommand(g);
-        new SkipSlashCommand().initCommand(g);
-        new RemoveSlashCommand().initCommand(g);
-        new LoopSlashCommand().initCommand(g);
-        new MoveSlashCommand().initCommand(g);
-        new RewindSlashCommand().initCommand(g);
-        new SetChannelCommand().initCommand(g);
-        new VolumeSlashCommand().initCommand(g);
-        new SetDJCommand().initCommand(g);
-        new RemoveDJCommand().initCommand(g);
-        new ListDJCommand().initCommand(g);
-        new SeekSlashCommand().initCommand(g);
-        new BanCommand().initCommand(g);
-        new UnbanCommand().initCommand(g);
+    public void loadSlashCommands(Guild g) {
+        new PlaySlashCommand().loadCommand(g);
+        new QueueSlashCommand().loadCommand(g);
+        new DisconnectSlashCommand().loadCommand(g);
+        new ClearQueueSlashCommand().loadCommand(g);
+        new JumpSlashCommand().loadCommand(g);
+        new NowPlayingSlashCommand().loadCommand(g);
+        new PauseSlashCommand().loadCommand(g);
+        new HelpCommand().loadCommand(g);
+        new SkipSlashCommand().loadCommand(g);
+        new RemoveSlashCommand().loadCommand(g);
+        new LoopSlashCommand().loadCommand(g);
+        new MoveSlashCommand().loadCommand(g);
+        new RewindSlashCommand().loadCommand(g);
+        new SetChannelCommand().loadCommand(g);
+        new VolumeSlashCommand().loadCommand(g);
+        new SetDJCommand().loadCommand(g);
+        new RemoveDJCommand().loadCommand(g);
+        new ListDJCommand().loadCommand(g);
+        new SeekSlashCommand().loadCommand(g);
+        new BanCommand().loadCommand(g);
+        new UnbanCommand().loadCommand(g);
         new ShuffleSlashCommand().initCommand(g);
         new EightBallCommand().initCommand(g);
         new JoinSlashCommand().initCommand(g);
@@ -283,10 +279,29 @@ public class Listener extends ListenerAdapter {
         new SlashCommandTest().loadCommand(g);
     }
 
-    public void initNeededSlashCommands(Guild g) {
+    public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new RemindersCommand().initCommand(g);
-        new SlashCommandTest().loadCommand(g);
+        new PlaySlashCommand().loadCommand(g);
+        new ClearQueueSlashCommand().loadCommand(g);
+        new QueueSlashCommand().loadCommand(g);
+        new DisconnectSlashCommand().loadCommand(g);
+        new JumpSlashCommand().loadCommand(g);
+        new NowPlayingSlashCommand().loadCommand(g);
+        new PauseSlashCommand().loadCommand(g);
+        new HelpCommand().loadCommand(g);
+        new SkipSlashCommand().loadCommand(g);
+        new RemoveSlashCommand().loadCommand(g);
+        new LoopSlashCommand().loadCommand(g);
+        new MoveSlashCommand().loadCommand(g);
+        new RewindSlashCommand().loadCommand(g);
+        new SetChannelCommand().loadCommand(g);
+        new VolumeSlashCommand().loadCommand(g);
+        new SetDJCommand().loadCommand(g);
+        new RemoveDJCommand().loadCommand(g);
+        new ListDJCommand().loadCommand(g);
+        new SeekSlashCommand().loadCommand(g);
+        new UnbanCommand().loadCommand(g);
+
     }
 
     private static void rescheduleUnbans(Guild g) {
@@ -340,7 +355,6 @@ public class Listener extends ListenerAdapter {
     }
 
     private static void initSelectionMenus() {
-        new HelpCommand().initCommandWithoutUpsertion();
         new ThemeCommand().initCommandWithoutUpsertion();
     }
 }

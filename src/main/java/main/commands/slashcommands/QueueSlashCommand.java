@@ -1,50 +1,43 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.QueueCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class QueueSlashCommand extends InteractiveCommand {
+public class QueueSlashCommand extends AbstractSlashCommand {
     private final String commandName = new QueueCommand().getName().toLowerCase();
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("See all queued songs!")
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "See all queued songs!",
-                        djPredicate
-                ))
-                .build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         final var guild = event.getGuild();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
                     .queue();
             return;

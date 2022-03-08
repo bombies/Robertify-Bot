@@ -1,44 +1,38 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.PauseCommand;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class PauseSlashCommand extends InteractiveCommand {
+public class PauseSlashCommand extends AbstractSlashCommand {
     private final String commandName = "pause";
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Pause the song being currently played!")
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Pause the song being currently played!",
-                        djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

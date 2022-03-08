@@ -1,52 +1,41 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class LeaveSlashCommand extends InteractiveCommand {
+public class DisconnectSlashCommand extends AbstractSlashCommand {
     private final String commandName = "disconnect";
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Disconnect the bot from the voice channel it's currently in")
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Disconnect the bot from the voice channel it's currently in",
-                        List.of(),
-                        List.of(),
-                        djPredicate
-                ))
-                .build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
         EmbedBuilder eb;
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (musicCommandDJCheck(event)) {
             eb  = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;

@@ -1,47 +1,39 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ClearQueueCommand;
-import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ClearQueueSlashCommand extends InteractiveCommand {
+public class ClearQueueSlashCommand extends AbstractSlashCommand {
     private final String commandName = new ClearQueueCommand().getName();
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Clear the queue of all its contents")
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Clear the queue of all its contents",
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ)
-                ))
-                .build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
@@ -61,7 +53,7 @@ public class ClearQueueSlashCommand extends InteractiveCommand {
 
         if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
-                if (!getInteractionCommand().getCommand().permissionCheck(event)) {
+                if (!musicCommandDJCheck(event)) {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to use this command when there's other users in the channel!");
                     event.getHook().sendMessageEmbeds(eb.build()).queue();
                     return;

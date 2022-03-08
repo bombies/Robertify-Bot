@@ -1,10 +1,11 @@
-package main.utils.component.legacy.builders.selectionmenu;
+package main.utils.component.interactions.selectionmenu;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InvalidBuilderException;
 import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -70,8 +72,18 @@ public class SelectionMenuBuilder {
         return this;
     }
 
+    public SelectionMenuBuilder addOptions(SelectionMenuOption... options) {
+        this.options.addAll(Arrays.asList(options));
+        return this;
+    }
+
     public SelectionMenuBuilder setPermissionCheck(Predicate<SelectionMenuEvent> predicate) {
         this.permissionCheck = predicate;
+        return this;
+    }
+
+    public SelectionMenuBuilder limitToUser(long userID) {
+        this.permissionCheck = e -> e.getUser().getIdLong() == userID;
         return this;
     }
 
@@ -115,7 +127,8 @@ public class SelectionMenuBuilder {
         return new SelectionMenuBuilder(name, placeholder, range, options, permissionCheck);
     }
 
-    public SelectionMenu build() throws InteractionBuilderException {
+    @SneakyThrows
+    public SelectionMenu build() {
         if (name == null)
             throw new InteractionBuilderException("The name of the menu can't be null!");
         if (placeholder == null)

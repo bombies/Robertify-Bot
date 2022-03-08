@@ -1,12 +1,11 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
-import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.PlayCommand;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,27 +19,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class PlaySlashCommand extends InteractiveCommand {
-    @Override @SneakyThrows
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
+public class PlaySlashCommand extends AbstractSlashCommand {
 
-    @Override @SneakyThrows
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    @SneakyThrows
-    private InteractionCommand getCommand() {
-        return InteractiveCommand.InteractionCommand.create()
-                .setCommand(Command.of(
-                        new PlayCommand().getName(),
-                        "Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
-                        List.of(),
-                        List.of(
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(new PlayCommand().getName())
+                        .setDescription("Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...")
+                        .addSubCommands(
                                 SubCommand.of(
                                         "tracks",
                                         "Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
@@ -65,21 +52,26 @@ public class PlaySlashCommand extends InteractiveCommand {
                                                 )
                                         )
                                 )
-                        ),
-                        djPredicate
-                ))
-                .build();
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(new PlayCommand().getName())) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
         final var guild = event.getGuild();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
                     .queue();
             return;

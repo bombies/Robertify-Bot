@@ -10,7 +10,7 @@ import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
-import main.commands.commands.audio.slashcommands.*;
+import main.commands.slashcommands.*;
 import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.*;
@@ -116,7 +116,7 @@ public class Robertify {
                     .addEventListeners(
                             new PlaySlashCommand(),
                             new QueueSlashCommand(),
-                            new LeaveSlashCommand(),
+                            new DisconnectSlashCommand(),
                             new ClearQueueSlashCommand(),
                             new JumpSlashCommand(),
                             new NowPlayingSlashCommand(),

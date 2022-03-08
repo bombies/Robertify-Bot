@@ -1,4 +1,4 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.commands.commands.audio.ShuffleCommand;
 import main.utils.RobertifyEmbedUtils;

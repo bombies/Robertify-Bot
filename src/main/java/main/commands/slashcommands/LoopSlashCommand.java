@@ -1,57 +1,48 @@
-package main.commands.commands.audio.slashcommands;
+package main.commands.slashcommands;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.LoopCommand;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class LoopSlashCommand extends InteractiveCommand {
+public class LoopSlashCommand extends AbstractSlashCommand {
     private final String commandName = "loop";
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Replay the current song being played",
-                        List.of(),
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName(commandName)
+                        .setDescription("Replay the current song being played")
+                        .addSubCommands(
                                 SubCommand.of(
-                                    "track",
-                                    "Toggle looping the currently playing track"
+                                        "track",
+                                        "Toggle looping the currently playing track"
                                 ),
                                 SubCommand.of(
                                         "queue",
                                         "Toggle looping the current queue"
                                 )
-                        ),
-                        djPredicate
-                )).build();
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
                     .queue();
             return;

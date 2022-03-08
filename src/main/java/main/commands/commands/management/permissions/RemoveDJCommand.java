@@ -5,6 +5,7 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.permissions.PermissionsConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class RemoveDJCommand extends InteractiveCommand implements ICommand {
+public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(RemoveDJCommand.class);
 
     @Override
@@ -118,24 +119,12 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Remove a role/user as a DJ",
-                        List.of(),
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("removedj")
+                        .setDescription("Remove a role/user as a DJ")
+                        .addSubCommands(
                                 SubCommand.of(
                                         "role",
                                         "Remove a role as a DJ",
@@ -156,16 +145,22 @@ public class RemoveDJCommand extends InteractiveCommand implements ICommand {
                                                 true
                                         ))
                                 )
-                        ),
-                        (e) -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_ADMIN)
-                )).build();
+                        )
+                        .setAdminOnly()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!adminCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!").build())
                     .setEphemeral(true)
                     .queue();
