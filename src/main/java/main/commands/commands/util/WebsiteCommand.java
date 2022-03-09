@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.RobertifyTheme;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class WebsiteCommand extends InteractiveCommand implements ICommand {
+public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         ctx.getMessage().replyEmbeds(getEmbed(ctx.getGuild()))
@@ -37,29 +38,23 @@ public class WebsiteCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("website")
+                        .setDescription("Visit our website using this command")
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Visit our website using this command"
-                ))
-                .build();
+    public String getHelp() {
+        return "Visit our website using this command";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         event.replyEmbeds(getEmbed(event.getGuild()))
                 .addActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))

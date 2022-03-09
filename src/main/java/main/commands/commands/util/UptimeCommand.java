@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import net.dv8tion.jda.api.entities.Guild;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class UptimeCommand extends InteractiveCommand implements ICommand {
+public class UptimeCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         ctx.getMessage().replyEmbeds(
@@ -34,29 +35,23 @@ public class UptimeCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("uptime")
+                        .setDescription("Get how long the bot has been online")
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Get how long the bot has been online"
-                ))
-                .build();
+    public String getHelp() {
+        return "See how long the bot has been online";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         event.replyEmbeds(
                 RobertifyEmbedUtils.embedMessage(

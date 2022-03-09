@@ -10,8 +10,8 @@ import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
+import main.commands.commands.dev.*;
 import main.commands.slashcommands.*;
-import main.commands.commands.dev.AnnouncementCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatedchannel.DedicatedChannelEvents;
@@ -154,8 +154,11 @@ public class Robertify {
                             new AutoPlayCommand(),
                             new RemindersCommand(),
 
-                            // NEW SLASH COMMAND
-                            new SlashCommandTest()
+                            // DEV COMMANDS
+                            new GuildCommand(),
+                            new VoiceChannelCountCommand(),
+                            new UpdateCommand(),
+                            new EvalCommand()
                     )
 
                     // Test Listeners

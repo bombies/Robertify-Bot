@@ -7,6 +7,7 @@ import main.constants.BotConstants;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.votes.VoteManager;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class TwentyFourSevenCommand extends InteractiveCommand implements ICommand {
+public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
@@ -68,52 +69,28 @@ public class TwentyFourSevenCommand extends InteractiveCommand implements IComma
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("247")
+                        .setDescription("Toggle whether the bot is supposed to stay in a voice channel 24/7 or not")
+                        .setAdminOnly()
+                        .setPremium()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                "Toggle whether the bot is supposed to stay in a voice channel 24/7 or not",
-                    e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_ADMIN)
-                ))
-                .build();
+    public String getHelp() {
+        return "Toggle whether or not the bot stays in a voice channel 24/7";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
+        if (!premiumCheck(event)) return;
 
-        if (isPremiumCommand()) {
-            if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                                "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!
-
-                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
-                        .addActionRow(
-                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
-                                Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
-                        )
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
-        }
-
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!adminCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(),
                     BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
                     .setEphemeral(true)

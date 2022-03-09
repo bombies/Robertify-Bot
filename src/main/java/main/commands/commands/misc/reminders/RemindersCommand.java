@@ -7,6 +7,7 @@ import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class RemindersCommand extends InteractiveCommand implements ICommand {
+public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     private final static Logger logger = LoggerFactory.getLogger(RemindersCommand.class);
 
     @Override
@@ -659,46 +660,35 @@ public class RemindersCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.ofWithSub(
-                        getName(),
-                        "Set your reminders!",
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("reminders")
+                        .setDescription("Set your reminders!")
+                        .addSubCommands(
                                 SubCommand.of(
-                                    "add",
-                                    "Add a reminder!",
-                                    List.of(
-                                            CommandOption.of(
-                                                    OptionType.STRING,
-                                                "time",
-                                                "The time to remind you at daily!",
-                                                true
-                                            ),
-                                            CommandOption.of(
-                                                    OptionType.STRING,
-                                                    "reminder",
-                                                    "What you want to be reminded of",
-                                                    true
-                                            ),
-                                            CommandOption.of(
-                                                    OptionType.CHANNEL,
-                                                    "channel",
-                                                    "The channel to send the reminder in",
-                                                    false
-                                            )
-                                    )
+                                        "add",
+                                        "Add a reminder!",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.STRING,
+                                                        "time",
+                                                        "The time to remind you at daily!",
+                                                        true
+                                                ),
+                                                CommandOption.of(
+                                                        OptionType.STRING,
+                                                        "reminder",
+                                                        "What you want to be reminded of",
+                                                        true
+                                                ),
+                                                CommandOption.of(
+                                                        OptionType.CHANNEL,
+                                                        "channel",
+                                                        "The channel to send the reminder in",
+                                                        false
+                                                )
+                                        )
                                 ),
                                 SubCommand.of(
                                         "list",
@@ -720,8 +710,8 @@ public class RemindersCommand extends InteractiveCommand implements ICommand {
                                         "clear",
                                         "Clear all reminders"
                                 )
-                        ),
-                        List.of(
+                        )
+                        .addSubCommandGroups(
                                 SubCommandGroup.of(
                                         "edit",
                                         "Edit your reminders!",
@@ -826,12 +816,45 @@ public class RemindersCommand extends InteractiveCommand implements ICommand {
                                         )
                                 )
                         )
-                )).build();
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return "[insert description]"
+                + getUsages();
+    }
+
+    @Override
+    public String getUsages() {
+        return """
+
+
+                **__Usages__**
+
+                __General Commands__
+                `/reminders add <(00:00AM/PM)|00:00> [#channel] <reminder>`
+                `/reminders remove <id>`
+                `/reminders clear`
+                `/reminders list`
+                `/reminders edit channel <ID> <#channel>`
+                `/reminders edit time  <ID> <(00:00AM/PM)|00:00>`
+
+                __Admin Commands__
+                `/reminders banchannel <channel>`
+                `/reminders unbanchannel <channel>`
+                `/reminders banuser <user>`
+                `/reminders unbanuser <user>`
+
+                **NOTE**
+                *<> - Required*
+                *[] - Optional*""";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         String[] split = event.getCommandPath().split("/");
         List<OptionMapping> options = event.getOptions();

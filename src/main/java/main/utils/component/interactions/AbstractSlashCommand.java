@@ -9,6 +9,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
+import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
+import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -80,7 +82,15 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-        commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+        if (command.isPrivate)
+            commandCreateAction = commandCreateAction.setDefaultEnabled(false);
+
+        commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
+            if (!command.isPrivate) return;
+
+            List<Long> developers = BotInfoCache.getInstance().getDevelopers();
+            developers.forEach(developer -> createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(developer)).queue());
+        }, new ErrorHandler()
                 .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
     }
 
@@ -169,6 +179,10 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected abstract void buildCommand();
     public abstract String getHelp();
 
+    public String getUsages() {
+        return null;
+    }
+
     protected Builder getBuilder() {
         return new Builder();
     }
@@ -192,10 +206,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         @NotNull @Getter
         private final Boolean adminOnly;
         private final boolean isPremium;
+        @Getter
+        private final boolean isPrivate;
 
         private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options,
                         @NotNull List<SubCommandGroup> subCommandGroups, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandEvent> checkPermission,
-                        @Nullable Boolean djOnly, @Nullable Boolean adminOnly, boolean isPremium) {
+                        @Nullable Boolean djOnly, @Nullable Boolean adminOnly, boolean isPremium, boolean isPrivate) {
             this.name = name.toLowerCase();
             this.description = description;
             this.options = options;
@@ -205,6 +221,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             this.djOnly = djOnly;
             this.adminOnly = adminOnly;
             this.isPremium = isPremium;
+            this.isPrivate = isPrivate;
         }
 
         public boolean permissionCheck(SlashCommandEvent e) {
@@ -215,120 +232,120 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommandGroup> subCommandGroups, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, subCommandGroups, subCommands, checkPermission, null, null, false);
+            return new Command(name, description, options, subCommandGroups, subCommands, checkPermission, null, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, null, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, djOnly, null, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, adminOnly, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, adminOnly, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands) {
-            return new Command(name, description, options, List.of(), subCommands, null, null, null, false);
+            return new Command(name, description, options, List.of(), subCommands, null, null, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, boolean djOnly) {
-            return new Command(name, description, options, List.of(), subCommands, null, djOnly, null, false);
+            return new Command(name, description, options, List.of(), subCommands, null, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), subCommands, null, null, adminOnly, false);
+            return new Command(name, description, options, List.of(), subCommands, null, null, adminOnly, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, null, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, djOnly, null, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, adminOnly, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, adminOnly, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options) {
-            return new Command(name, description, options, List.of(), List.of(), null, null, null, false);
+            return new Command(name, description, options, List.of(), List.of(), null, null, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options, boolean djOnly) {
-            return new Command(name, description, options, List.of(), List.of(), null, djOnly, null, false);
+            return new Command(name, description, options, List.of(), List.of(), null, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), List.of(), null, null, adminOnly, false);
+            return new Command(name, description, options, List.of(), List.of(), null, null, adminOnly, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, null, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, null, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, djOnly, null, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, djOnly, null, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, adminOnly, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, adminOnly, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, null, null, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, null, null, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, List<SubCommandGroup> subCommandGroups) {
-            return new Command(name, description, List.of(), subCommandGroups, subCommands, null, null, null, false);
+            return new Command(name, description, List.of(), subCommandGroups, subCommands, null, null, null, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, djOnly, null, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, djOnly, null, false, false);
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, null, adminOnly, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, null, adminOnly, false, false);
         }
 
         public static Command of(String name, String description, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, null, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, null, false, false);
         }
 
         public static Command of(String name, String description,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, djOnly, null, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, adminOnly, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, adminOnly, false, false);
         }
 
         public static Command of(String name, String description) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, null, null, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, null, null, false, false);
         }
 
         public static Command of(String name, String description, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, djOnly, null, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, djOnly, null, false, false);
         }
 
         public static Command of(String name, String description, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, null, adminOnly, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, null, adminOnly, false, false);
         }
     }
 
@@ -430,7 +447,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final List<SubCommandGroup> subCommandGroups;
         private final List<Permission> requiredPermissions;
         private Predicate<SlashCommandEvent> permissionCheck;
-        private boolean djOnly, adminOnly, isPremium;
+        private boolean djOnly, adminOnly, isPremium, isPrivate;
 
         private Builder() {
             this.options = new ArrayList<>();
@@ -440,6 +457,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             this.djOnly = false;
             this.adminOnly = false;
             this.isPremium = false;
+            this.isPrivate = false;
         }
 
         public Builder setName(@NotNull String name) {
@@ -520,6 +538,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return this;
         }
 
+        public Builder setDevCommand() {
+            this.isPrivate = true;
+            this.permissionCheck = e -> BotInfoCache.getInstance().isDeveloper(e.getUser().getIdLong());
+            return this;
+        }
+
         @SneakyThrows
         public Command build() {
            if (name == null)
@@ -540,7 +564,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                     permissionCheck,
                     djOnly,
                     adminOnly,
-                    isPremium
+                    isPremium,
+                    isPrivate
             );
         }
     }

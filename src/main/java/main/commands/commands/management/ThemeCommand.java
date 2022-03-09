@@ -7,6 +7,9 @@ import main.constants.Permission;
 import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -16,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -23,36 +27,49 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class ThemeCommand extends InteractiveCommand implements ICommand {
+public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     private final String menuName = "menu:themes";
 
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Set the colour of the bot!",
-                        e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_THEME)
-                ))
-                .addSelectionDialogue(SelectionDialogue.of(
-                        menuName,
-                        "Select a theme",
-                        Pair.of(1,1),
-                        List.of(
-                                Triple.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
-                                Triple.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
-                                Triple.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
-                                Triple.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
-                                Triple.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
-                                Triple.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
-                                Triple.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
-                                Triple.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
-                                Triple.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
-                                Triple.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
-                                Triple.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
-                        ),
-                        menuPredicate
-                ))
-                .build();
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("themes")
+                        .setDescription("Set the colour of the bot!")
+                        .setPermissionCheck(e -> GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_THEME))
+                        .setPremium()
+                        .build()
+        );
+    }
+
+    private SelectionMenuBuilder getSelectionMenuBuilder(long userID) {
+        return new SelectionMenuBuilder()
+                .setName(menuName)
+                .setPlaceHolder("Select a theme...")
+                .setRange(1, 1)
+                .addOptions(
+                        SelectionMenuOption.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
+                        SelectionMenuOption.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
+                        SelectionMenuOption.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
+                        SelectionMenuOption.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
+                        SelectionMenuOption.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
+                        SelectionMenuOption.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
+                        SelectionMenuOption.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
+                        SelectionMenuOption.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
+                        SelectionMenuOption.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                        SelectionMenuOption.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
+                        SelectionMenuOption.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
+                )
+                .limitToUser(userID);
+    }
+
+    private SelectionMenu getSelectionMenu(long userID) {
+        return getSelectionMenuBuilder(userID).build();
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override @SneakyThrows
@@ -71,17 +88,18 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
                 "Themes",
                 "Select an option below to set the current theme!"
         ).build())
-                .setActionRow(getInteractionCommand().getSelectionMenu(menuName))
+                .setActionRow(getSelectionMenu(ctx.getAuthor().getIdLong()))
                 .queue();
     }
 
     @Override @SneakyThrows
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
+        if (!premiumCheck(event)) return;
 
         final var guild = event.getGuild();
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!predicateCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
                     "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
                     .setEphemeral(true).queue();
@@ -93,7 +111,7 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
                 "Themes",
                 "Select an option below to set the current theme!"
         ).build())
-                .addActionRow(getInteractionCommand().getSelectionMenu(menuName))
+                .addActionRow(getSelectionMenu(event.getUser().getIdLong()))
                 .setEphemeral(false)
                 .queue();
     }
@@ -124,7 +142,7 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!getSelectionDialogue(menuName).checkPermission(event)) {
+        if (!getSelectionMenuBuilder(event.getUser().getIdLong()).checkPermission(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
                     .setEphemeral(true).queue();
             return;
@@ -160,26 +178,5 @@ public class ThemeCommand extends InteractiveCommand implements ICommand {
         return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
                 "Tired of seeing our boring old green theme? Well, using this command you can have " +
                 "**8** other colours to choose from! It's as easy as selecting the colour you want from the selection menu provided.";
-    }
-
-    @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    @Override
-    public boolean isPremiumCommand() {
-        return true;
-    }
-
-    public void initCommandWithoutUpsertion() {
-        super.initCommandWithoutUpsertion(getCommand());
     }
 }

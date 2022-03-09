@@ -6,6 +6,7 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,7 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class SuggestionCommand extends InteractiveCommand implements ICommand {
+public class SuggestionCommand extends AbstractSlashCommand implements ICommand {
     private final static Logger logger = LoggerFactory.getLogger(SuggestionCommand.class);
 
     @Override
@@ -407,33 +408,31 @@ public class SuggestionCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("suggest")
+                        .setDescription("Suggest a feature you'd like to see in the bot!")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.STRING,
+                                        "suggestion",
+                                        "The suggestion to send to us",
+                                        true
+                                )
+                        )
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    public InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Suggest a feature you'd like to see in the bot!",
-                        List.of(CommandOption.of(
-                                OptionType.STRING,
-                                "suggestion",
-                                "The suggestion to send to us",
-                                true
-                        ))
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         event.replyEmbeds(handleSuggestion(event.getGuild(), event.getUser(), event.getOption("suggestion").getAsString()))
                 .setEphemeral(true)

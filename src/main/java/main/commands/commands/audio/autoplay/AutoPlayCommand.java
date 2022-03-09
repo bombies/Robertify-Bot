@@ -3,6 +3,7 @@ package main.commands.commands.audio.autoplay;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.votes.VoteManager;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class AutoPlayCommand extends InteractiveCommand implements ICommand {
+public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var msg = ctx.getMessage();
@@ -47,54 +48,32 @@ public class AutoPlayCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("autoplay")
+                        .setDescription("Play recommended tracks at the end of your queue!")
+                        .setDJOnly()
+                        .setPremium()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Play recommended tracks at the end of your queue!",
-                        djPredicate
-                ))
-                .build();
+    public String getHelp() {
+        return "Autoplay allows Robertify to keep playing music just like the last one at the end of the queue." +
+                " Running this command will toggle autoplay either on or off.";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
-
-        if (isPremiumCommand()) {
-            if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                                "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!
-
-                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
-                        .addActionRow(
-                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
-                                Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
-                        )
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
-        }
+        if (!nameCheck(event)) return;
+        if (!premiumCheck(event)) return;
 
         Guild guild = event.getGuild();
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ to run this command!").build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }

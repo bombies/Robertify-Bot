@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class SearchCommand extends InteractiveCommand implements ICommand {
+public class SearchCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
@@ -83,40 +84,40 @@ public class SearchCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Search and browse for a specific track!",
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("search")
+                        .setDescription("Search and browse for a specific track!")
+                        .addOptions(
                                 CommandOption.of(
                                         OptionType.STRING,
                                         "query",
                                         "What would you like to search for?",
                                         true
                                 )
-                        ),
-                        djPredicate
-                ))
-                .build();
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         final var guild = event.getGuild();
+
+        if (!musicCommandDJCheck(event)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ to run this command!").build())
+                    .queue();
+            return;
+        }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == event.getTextChannel().getIdLong()) {

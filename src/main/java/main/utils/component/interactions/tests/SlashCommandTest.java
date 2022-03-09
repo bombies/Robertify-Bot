@@ -33,6 +33,11 @@ public class SlashCommandTest extends AbstractSlashCommand {
     }
 
     @Override
+    public String getHelp() {
+        return null;
+    }
+
+    @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event))
             return;

@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.BotConstants;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class SupportServerCommand extends InteractiveCommand implements ICommand {
+public class SupportServerCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Click on the button below to join our support server").build())
@@ -33,28 +34,23 @@ public class SupportServerCommand extends InteractiveCommand implements ICommand
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("support")
+                        .setDescription("Need help? Use this command to join our support server!")
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Need help? Use this command to join our support server!"
-                )).build();
+    public String getHelp() {
+        return "Need additional help? Use this command to join our support server!";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Click on the button below to join our support server").build())
                 .setEphemeral(true)

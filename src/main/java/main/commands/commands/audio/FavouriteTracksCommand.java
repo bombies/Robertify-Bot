@@ -8,6 +8,7 @@ import main.constants.Toggles;
 import main.constants.TrackSource;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
@@ -26,7 +27,7 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavouriteTracksCommand extends InteractiveCommand implements ICommand {
+public class FavouriteTracksCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var args = ctx.getArgs();
@@ -237,58 +238,61 @@ public class FavouriteTracksCommand extends InteractiveCommand implements IComma
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("favouritetracks")
+                        .setDescription("Interact with your favourite tracks using this command!")
+                        .addSubCommands(
+                                SubCommand.of(
+                                        "view",
+                                        "View all of your favourite tracks!"
+                                ),
+                                SubCommand.of(
+                                        "add",
+                                        "Add the current playing song as one of your favourites!"
+                                ),
+                                SubCommand.of(
+                                        "remove",
+                                        "Remove a specific track as a favourite track",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.INTEGER,
+                                                        "id",
+                                                        "The ID of the song to remove",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "clear",
+                                        "Clear all of your favourite tracks!"
+                                )
+                        )
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
+    public String getHelp() {
+        return "This command allows you to interact with tracks you may really like when" +
+                " using the bot! Want to save some really good songs for later? No problem! " +
+                "We'll store it for you.\n\n" + getUsages();
     }
 
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(
-                        Command.of(
-                                getName(),
-                                "Interact with your favourite tracks using this command!",
-                                List.of(),
-                                List.of(
-                                        SubCommand.of(
-                                                "view",
-                                                "View all of your favourite tracks!"
-                                        ),
-                                        SubCommand.of(
-                                                "add",
-                                                "Add the current playing song as one of your favourites!"
-                                        ),
-                                        SubCommand.of(
-                                                "remove",
-                                                "Remove a specific track as a favourite track",
-                                                List.of(
-                                                        CommandOption.of(
-                                                                OptionType.INTEGER,
-                                                                "id",
-                                                                "The ID of the song to remove",
-                                                                true
-                                                        )
-                                                )
-                                        ),
-                                        SubCommand.of(
-                                                "clear",
-                                                "Clear all of your favourite tracks!"
-                                        )
-                                )
-                        )
-                )
-                .build();
+    @Override
+    public String getUsages() {
+        return """
+                **__Usages__**
+                `/favouritetracks add` *(Add the current song as a favourite track)*
+                `/favouritetracks remove <id>` *(Remove a specified song as a favourite track)*
+                `/favouritetracks` *(View all your favourite tracks)*
+                """;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         switch (event.getSubcommandName()) {
             case "view" -> handeSlashList(event);

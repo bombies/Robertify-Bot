@@ -4,6 +4,7 @@ import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.eightball.EightBallConfig;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
@@ -22,7 +23,7 @@ import javax.script.ScriptException;
 import java.util.List;
 import java.util.Random;
 
-public class EightBallCommand extends InteractiveCommand implements ICommand {
+public class EightBallCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
@@ -216,24 +217,12 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Curious of your fate?",
-                        List.of(),
-                        List.of(
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("8ball")
+                        .setDescription("Curious of your fate?")
+                        .addSubCommands(
                                 SubCommand.of(
                                         "add",
                                         "Add a custom response to 8ball!",
@@ -273,12 +262,18 @@ public class EightBallCommand extends InteractiveCommand implements ICommand {
                                         "List all custom 8ball responses!"
                                 )
                         )
-                )).build();
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         final var guild = event.getGuild();
         final var user = event.getMember();

@@ -218,6 +218,13 @@ public class BotInfoCache extends AbstractMongoCache {
         return arrayHasObject(getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString()), developer);
     }
 
+    public List<Long> getDevelopers() {
+        final List<Long> ret = new ArrayList<>();
+        JSONArray array = getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+        array.forEach(val -> ret.add((long) val));
+        return ret;
+    }
+
     public void addRandomMessage(String s) {
         final var obj = getDocument();
 

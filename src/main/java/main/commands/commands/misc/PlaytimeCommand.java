@@ -6,6 +6,7 @@ import main.commands.ICommand;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,7 +18,7 @@ import javax.script.ScriptException;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlaytimeCommand extends InteractiveCommand implements ICommand {
+public class PlaytimeCommand extends AbstractSlashCommand implements ICommand {
     public static HashMap<Long, Long> playtime = new HashMap<>();
 
     @Override
@@ -55,29 +56,23 @@ public class PlaytimeCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("playtime")
+                        .setDescription("See how long the bot has played music in this guild since its last startup!")
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "See how long the bot has played music in this guild since its last startup!"
-                ))
-                .build();
+    public String getHelp() {
+        return "See how long the bot has played music in this guild since its last startup!";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName()))
+        if (!nameCheck(event))
             return;
 
         event.replyEmbeds(handlePlaytime(event.getGuild())).queue();

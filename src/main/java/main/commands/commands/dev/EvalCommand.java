@@ -6,8 +6,12 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +21,7 @@ import javax.script.ScriptException;
 import java.awt.*;
 import java.util.List;
 
-public class EvalCommand implements IDevCommand {
+public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
     private final Logger logger = LoggerFactory.getLogger(EvalCommand.class);
     private final ScriptEngine engine;
 
@@ -98,5 +102,64 @@ public class EvalCommand implements IDevCommand {
     @Override
     public String getHelp(String prefix) {
         return null;
+    }
+
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("eval")
+                        .setDescription("Spooky scary evals...")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.STRING,
+                                        "src",
+                                        "The source code to evaluate",
+                                        true
+                                )
+                        )
+                        .setDevCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!nameCheck(event)) return;
+
+        final var guild = event.getGuild();
+        EmbedBuilder eb;
+        final String src = event.getOption("src").getAsString();
+
+        try {
+            engine.put("event", event);
+            engine.put("channel", event.getTextChannel());
+            engine.put("api", event.getJDA());
+            engine.put("guild", event.getGuild());
+            engine.put("member", event.getMember());
+
+            Object out = engine.eval(
+                    "(function() {\n" +
+                            " with (imports) { \n" +
+                            src +
+                            " \n}" +
+                            "\n})();");
+
+            if (out != null) {
+                eb = RobertifyEmbedUtils.embedMessage(guild, "```java\n" + src + "```");
+                eb.addField("Result", out.toString(), false);
+            } else
+                eb = RobertifyEmbedUtils.embedMessage(guild, "```java\nExecuted without error.```");
+
+        } catch (Exception e) {
+            eb = RobertifyEmbedUtils.embedMessage(guild, "```java\n" + e.getMessage() +"```");
+        }
+
+        event.replyEmbeds(eb.build()).queue();
     }
 }

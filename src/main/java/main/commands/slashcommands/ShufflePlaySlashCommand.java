@@ -4,6 +4,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.commands.audio.ShufflePlayCommand;
 import main.main.Listener;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -18,43 +19,39 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ShufflePlaySlashCommand extends InteractiveCommand {
-    private final String commandName = new ShufflePlayCommand().getName();
+public class ShufflePlaySlashCommand extends AbstractSlashCommand {
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("shuffleplay")
+                        .setDescription("Play a playlist/album shuffled right off the bat!")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.STRING,
+                                        "playlist",
+                                        "The playlist/album to play",
+                                        true
+                                )
+                        )
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Play a playlist/album shuffled right off the bat!",
-                        List.of(CommandOption.of(
-                                OptionType.STRING,
-                                "playlist",
-                                "The playlist/album to play",
-                                true
-                        )),
-                        djPredicate
-                ))
-                .build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
-        if (!getCommand().getCommand().permissionCheck(event)) {
+        if (!musicCommandDJCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }

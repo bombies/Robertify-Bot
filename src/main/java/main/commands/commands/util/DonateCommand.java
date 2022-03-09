@@ -3,6 +3,7 @@ package main.commands.commands.util;
 import main.commands.CommandContext;
 import main.commands.ICommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -12,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
-public class DonateCommand extends InteractiveCommand implements ICommand {
+public class DonateCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
 
@@ -42,29 +43,24 @@ public class DonateCommand extends InteractiveCommand implements ICommand {
     }
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("donate")
+                        .setDescription("Help keep Robertify online!")
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        getName(),
-                        "Help keep Robertify online!"
-                ))
-                .build();
+    public String getHelp() {
+        return "Want to help keep Robertify online? Donate using these links!\n" +
+                "1 $10 donation is equivalent to 1 more month Robertify gets to stay online!";
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
                         event.getGuild(),

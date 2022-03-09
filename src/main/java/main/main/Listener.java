@@ -6,6 +6,10 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
+import main.commands.commands.dev.EvalCommand;
+import main.commands.commands.dev.GuildCommand;
+import main.commands.commands.dev.UpdateCommand;
+import main.commands.commands.dev.VoiceChannelCountCommand;
 import main.commands.slashcommands.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -70,7 +74,6 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
-            removeAllSlashCommands(g);
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
             GeneralUtils.setDefaultEmbed(g);
@@ -90,21 +93,14 @@ public class Listener extends ListenerAdapter {
             new GuildConfig().unloadGuild(g.getIdLong());
         }
 
-        initSelectionMenus();
 //        StatisticsDB.startDailyUpdateCheck();
 
-        final int serverCount = Robertify.api.getGuilds().size();
-
-        if (Robertify.getTopGGAPI() != null)
-            Robertify.getTopGGAPI().setStats(serverCount);
-
-        if (Robertify.getDiscordBotListAPI() != null)
-            Robertify.getDiscordBotListAPI().setStats(serverCount);
+        updateServerCount();
 
         ReminderScheduler.getInstance().scheduleAllReminders();
         logger.info("Scheduled all reminders");
 
-        logger.info("Watching {} guilds", serverCount);
+        logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
 
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
         Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
@@ -186,13 +182,7 @@ public class Listener extends ListenerAdapter {
         GeneralUtils.setDefaultEmbed(guild);
         logger.info("Joined {}", guild.getName());
 
-        final int serverCount = Robertify.api.getGuilds().size();
-
-        if (Robertify.getTopGGAPI() != null)
-            Robertify.getTopGGAPI().setStats(serverCount);
-
-        if (Robertify.getDiscordBotListAPI() != null)
-            Robertify.getDiscordBotListAPI().setStats(serverCount);
+        updateServerCount();
     }
 
     @Override
@@ -204,6 +194,10 @@ public class Listener extends ListenerAdapter {
         RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
         logger.info("Left {}", guild.getName());
 
+        updateServerCount();
+    }
+
+    private void updateServerCount() {
         final int serverCount = Robertify.api.getGuilds().size();
 
         if (Robertify.getTopGGAPI() != null)
@@ -256,52 +250,77 @@ public class Listener extends ListenerAdapter {
         new SeekSlashCommand().loadCommand(g);
         new BanCommand().loadCommand(g);
         new UnbanCommand().loadCommand(g);
-        new ShuffleSlashCommand().initCommand(g);
-        new EightBallCommand().initCommand(g);
-        new JoinSlashCommand().initCommand(g);
-        new SuggestionCommand().initCommand(g);
-        new VoteCommand().initCommand(g);
-        new ShufflePlaySlashCommand().initCommand(g);
-        new UptimeCommand().initCommand(g);
-        new LofiSlashCommand().initCommand(g);
-        new SupportServerCommand().initCommand(g);
-        new DonateCommand().initCommand(g);
-        new ThemeCommand().initCommand(g);
-        new WebsiteCommand().initCommand(g);
-        new FavouriteTracksCommand().initCommand(g);
-        new TwentyFourSevenCommand().initCommand(g);
-        new PlaytimeCommand().initCommand(g);
-        new SearchCommand().initCommand(g);
-        new AutoPlayCommand().initCommand(g);
-        new RemindersCommand().initCommand(g);
+        new ShuffleSlashCommand().loadCommand(g);
+        new EightBallCommand().loadCommand(g);
+        new JoinSlashCommand().loadCommand(g);
+        new SuggestionCommand().loadCommand(g);
+        new VoteCommand().loadCommand(g);
+        new ShufflePlaySlashCommand().loadCommand(g);
+        new UptimeCommand().loadCommand(g);
+        new LofiSlashCommand().loadCommand(g);
+        new SupportServerCommand().loadCommand(g);
+        new DonateCommand().loadCommand(g);
+        new ThemeCommand().loadCommand(g);
+        new WebsiteCommand().loadCommand(g);
+        new FavouriteTracksCommand().loadCommand(g);
+        new TwentyFourSevenCommand().loadCommand(g);
+        new PlaytimeCommand().loadCommand(g);
+        new SearchCommand().loadCommand(g);
+        new AutoPlayCommand().loadCommand(g);
+        new RemindersCommand().loadCommand(g);
 
-        // NEW SLASH COMMANDS
-        new SlashCommandTest().loadCommand(g);
+        // DEV COMMANDS
+        new GuildCommand().loadCommand(g);
+        new VoiceChannelCountCommand().loadCommand(g);
+        new UpdateCommand().loadCommand(g);
+        new EvalCommand().loadCommand(g);
     }
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new PlaySlashCommand().loadCommand(g);
-        new ClearQueueSlashCommand().loadCommand(g);
-        new QueueSlashCommand().loadCommand(g);
-        new DisconnectSlashCommand().loadCommand(g);
-        new JumpSlashCommand().loadCommand(g);
-        new NowPlayingSlashCommand().loadCommand(g);
-        new PauseSlashCommand().loadCommand(g);
-        new HelpCommand().loadCommand(g);
-        new SkipSlashCommand().loadCommand(g);
-        new RemoveSlashCommand().loadCommand(g);
-        new LoopSlashCommand().loadCommand(g);
-        new MoveSlashCommand().loadCommand(g);
-        new RewindSlashCommand().loadCommand(g);
-        new SetChannelCommand().loadCommand(g);
-        new VolumeSlashCommand().loadCommand(g);
-        new SetDJCommand().loadCommand(g);
-        new RemoveDJCommand().loadCommand(g);
-        new ListDJCommand().loadCommand(g);
-        new SeekSlashCommand().loadCommand(g);
-        new UnbanCommand().loadCommand(g);
+//        new PlaySlashCommand().loadCommand(g);
+//        new ClearQueueSlashCommand().loadCommand(g);
+//        new QueueSlashCommand().loadCommand(g);
+//        new DisconnectSlashCommand().loadCommand(g);
+//        new JumpSlashCommand().loadCommand(g);
+//        new NowPlayingSlashCommand().loadCommand(g);
+//        new PauseSlashCommand().loadCommand(g);
+//        new HelpCommand().loadCommand(g);
+//        new SkipSlashCommand().loadCommand(g);
+//        new RemoveSlashCommand().loadCommand(g);
+//        new LoopSlashCommand().loadCommand(g);
+//        new MoveSlashCommand().loadCommand(g);
+//        new RewindSlashCommand().loadCommand(g);
+//        new SetChannelCommand().loadCommand(g);
+//        new VolumeSlashCommand().loadCommand(g);
+//        new SetDJCommand().loadCommand(g);
+//        new RemoveDJCommand().loadCommand(g);
+//        new ListDJCommand().loadCommand(g);
+//        new SeekSlashCommand().loadCommand(g);
+//        new UnbanCommand().loadCommand(g);
+//        new ShuffleSlashCommand().loadCommand(g);
+//        new EightBallCommand().loadCommand(g);
+//        new JoinSlashCommand().loadCommand(g);
+//        new SuggestionCommand().loadCommand(g);
+//        new VoteCommand().loadCommand(g);
+//        new ShufflePlaySlashCommand().loadCommand(g);
+//        new UptimeCommand().loadCommand(g);
+//        new LofiSlashCommand().loadCommand(g);
+//        new SupportServerCommand().loadCommand(g);
+//        new DonateCommand().loadCommand(g);
+//        new ThemeCommand().loadCommand(g);
+//        new WebsiteCommand().loadCommand(g);
+//        new FavouriteTracksCommand().loadCommand(g);
+//        new TwentyFourSevenCommand().loadCommand(g);
+//        new PlaytimeCommand().loadCommand(g);
+//        new SearchCommand().loadCommand(g);
+//        new AutoPlayCommand().loadCommand(g);
+//        new RemindersCommand().loadCommand(g);
 
+        new GuildCommand().loadCommand(g);
+        new VoiceChannelCountCommand().loadCommand(g);
+        new UpdateCommand().loadCommand(g);
+        new EvalCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
@@ -352,9 +371,5 @@ public class Listener extends ListenerAdapter {
                         .build()
         ).queue(success -> {}, new ErrorHandler()
                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")")))));
-    }
-
-    private static void initSelectionMenus() {
-        new ThemeCommand().initCommandWithoutUpsertion();
     }
 }

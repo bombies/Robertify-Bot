@@ -1,43 +1,44 @@
 package main.commands.slashcommands;
 
 import main.commands.commands.audio.JoinCommand;
-import main.utils.component.legacy.InteractiveCommand;
-import net.dv8tion.jda.api.entities.Guild;
+import main.constants.BotConstants;
+import main.constants.Permission;
+import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class JoinSlashCommand extends InteractiveCommand {
-    private final String commandName = new JoinCommand().getName();
+public class JoinSlashCommand extends AbstractSlashCommand {
 
     @Override
-    public void initCommand() {
-        setInteractionCommand(getCommand());
-        upsertCommand();
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("join")
+                        .setDescription("Force the bot to join the voice channel you're currently in")
+                        .setPossibleDJCommand()
+                        .build()
+        );
     }
 
     @Override
-    public void initCommand(Guild g) {
-        setInteractionCommand(getCommand());
-        upsertCommand(g);
-    }
-
-    private InteractionCommand getCommand() {
-        return InteractionCommand.create()
-                .setCommand(Command.of(
-                        commandName,
-                        "Force the bot to join the voice channel you're currently in",
-                        List.of(),
-                        djPredicate
-                )).build();
+    public String getHelp() {
+        return null;
     }
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
 
         event.deferReply().queue();
+
+        if (!musicCommandDJCheck(event)) {
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ))
+                    .build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
 
         event.getHook().sendMessageEmbeds(new JoinCommand().handleJoin(
                 event.getGuild(),
