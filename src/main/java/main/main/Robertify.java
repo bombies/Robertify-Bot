@@ -158,7 +158,9 @@ public class Robertify {
                             new GuildCommand(),
                             new VoiceChannelCountCommand(),
                             new UpdateCommand(),
-                            new EvalCommand()
+                            new EvalCommand(),
+                            new RandomMessageCommand(),
+                            new ReloadConfigCommand()
                     )
 
                     // Test Listeners

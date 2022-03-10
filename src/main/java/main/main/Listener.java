@@ -6,10 +6,7 @@ import main.commands.CommandManager;
 import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
-import main.commands.commands.dev.EvalCommand;
-import main.commands.commands.dev.GuildCommand;
-import main.commands.commands.dev.UpdateCommand;
-import main.commands.commands.dev.VoiceChannelCountCommand;
+import main.commands.commands.dev.*;
 import main.commands.slashcommands.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -274,6 +271,7 @@ public class Listener extends ListenerAdapter {
         new VoiceChannelCountCommand().loadCommand(g);
         new UpdateCommand().loadCommand(g);
         new EvalCommand().loadCommand(g);
+        new RandomMessageCommand().loadCommand(g);
     }
 
     public void loadNeededSlashCommands(Guild g) {
@@ -321,6 +319,8 @@ public class Listener extends ListenerAdapter {
         new VoiceChannelCountCommand().loadCommand(g);
         new UpdateCommand().loadCommand(g);
         new EvalCommand().loadCommand(g);
+        new RandomMessageCommand().loadCommand(g);
+        new ReloadConfigCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

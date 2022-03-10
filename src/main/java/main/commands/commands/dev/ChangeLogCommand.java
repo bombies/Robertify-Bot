@@ -7,6 +7,7 @@ import main.constants.TimeFormat;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -28,7 +29,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class ChangeLogCommand implements IDevCommand {
+public class ChangeLogCommand extends AbstractSlashCommand implements IDevCommand {
     private static final Logger logger = LoggerFactory.getLogger(ChangeLogCommand.class);
 
     @Override
@@ -181,5 +182,30 @@ public class ChangeLogCommand implements IDevCommand {
     @Override
     public String getHelp(String prefix) {
         return "Send out changelogs for the bot!";
+    }
+
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("changelogs")
+                        .setDescription("Configure changelogs")
+                        .addSubCommands(
+                                SubCommand.of(
+                                        "send",
+                                        "Send the changelog to all servers!"
+                                )
+                        )
+                        .addSubCommandGroups(
+
+                        )
+                        .setDevCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
     }
 }
