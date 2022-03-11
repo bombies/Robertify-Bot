@@ -6,6 +6,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
 import me.duncte123.botcommons.messaging.EmbedUtils;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.entities.Message;
 import javax.script.ScriptException;
 import java.util.List;
 
+@Deprecated @ForRemoval
 public class SetPrefixCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
