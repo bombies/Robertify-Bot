@@ -579,14 +579,16 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         @SneakyThrows
         public Command build() {
-           if (name == null)
-               throw new InvalidBuilderException("The name of the command can't be null!");
-           if (name.isBlank())
-               throw new InvalidBuilderException("The name of the command can't be empty!");
+            if (name == null)
+                throw new InvalidBuilderException("The name of the command can't be null!");
+            if (name.isBlank())
+                throw new InvalidBuilderException("The name of the command can't be empty!");
             if (description == null)
                 throw new InvalidBuilderException("The description of the command can't be null!");
             if (description.isBlank())
                 throw new InvalidBuilderException("The description of the command can't be empty!");
+            if (!options.isEmpty() && (!subCommands.isEmpty() || subCommandGroups.isEmpty()))
+                throw new InvalidBuilderException("You can't provide command options with subcommands and/or subcommand groups!");
 
             return new Command(
                     name,
