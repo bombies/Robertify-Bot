@@ -272,6 +272,8 @@ public class Listener extends ListenerAdapter {
         new UpdateCommand().loadCommand(g);
         new EvalCommand().loadCommand(g);
         new RandomMessageCommand().loadCommand(g);
+        new ChangeLogCommand().loadCommand(g);
+        new AnnouncementCommand().loadCommand(g);
     }
 
     public void loadNeededSlashCommands(Guild g) {
@@ -321,6 +323,8 @@ public class Listener extends ListenerAdapter {
         new EvalCommand().loadCommand(g);
         new RandomMessageCommand().loadCommand(g);
         new ReloadConfigCommand().loadCommand(g);
+        new ChangeLogCommand().loadCommand(g);
+        new AnnouncementCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

@@ -273,7 +273,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         final var guild = event.getGuild();
         final var user = event.getMember();

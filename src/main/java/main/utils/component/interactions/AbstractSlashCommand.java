@@ -10,6 +10,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -108,6 +109,31 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             buildCommand();
         return command.getName().equals(event.getName());
+    }
+
+    protected boolean banCheck(SlashCommandEvent event) {
+        final Guild guild = event.getGuild();
+        if (!new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
+            return true;
+
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned from using commands!").build())
+                .setEphemeral(true)
+                .queue();
+        return false;
+    }
+
+    protected boolean checks(SlashCommandEvent event) {
+        if (!nameCheck(event))
+            return false;
+        return banCheck(event);
+    }
+
+    protected boolean checksWithPremium(SlashCommandEvent event) {
+        if (!nameCheck(event))
+            return false;
+        if (!banCheck(event))
+            return false;
+        return premiumCheck(event);
     }
 
     /**

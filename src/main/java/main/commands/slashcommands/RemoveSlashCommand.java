@@ -10,13 +10,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
 public class RemoveSlashCommand extends AbstractSlashCommand {
-    private final String commandName = new RemoveCommand().getName();
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("remove")
                         .setDescription("Remove a song from the queue")
                         .addOptions(
                                 CommandOption.of(
@@ -39,6 +38,7 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

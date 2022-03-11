@@ -160,7 +160,9 @@ public class Robertify {
                             new UpdateCommand(),
                             new EvalCommand(),
                             new RandomMessageCommand(),
-                            new ReloadConfigCommand()
+                            new ReloadConfigCommand(),
+                            new ChangeLogCommand(),
+                            new AnnouncementCommand()
                     )
 
                     // Test Listeners
@@ -170,8 +172,7 @@ public class Robertify {
 
                     // Button Listeners
                     .addEventListeners(
-                            new PaginationEvents(),
-                            new AnnouncementCommand()
+                            new PaginationEvents()
                     )
 
                     .enableCache(

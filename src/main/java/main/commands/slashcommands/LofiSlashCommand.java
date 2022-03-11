@@ -30,7 +30,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         Guild guild = event.getGuild();
 

@@ -161,7 +161,8 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     @Override @SneakyThrows
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(getName())) return;
+        if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         if (event.getOptions().isEmpty()) {
             final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());

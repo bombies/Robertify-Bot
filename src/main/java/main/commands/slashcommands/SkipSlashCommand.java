@@ -15,13 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SkipSlashCommand extends AbstractSlashCommand {
-    private final String commandName = "skip";
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("skip")
                         .setDescription("Skip the song currently being played")
                         .addOptions(
                                 CommandOption.of(
@@ -44,6 +43,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

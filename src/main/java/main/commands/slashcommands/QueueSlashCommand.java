@@ -34,6 +34,7 @@ public class QueueSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         final var guild = event.getGuild();
 

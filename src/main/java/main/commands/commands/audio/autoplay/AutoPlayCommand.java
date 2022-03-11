@@ -67,8 +67,7 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!premiumCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         Guild guild = event.getGuild();
         if (!musicCommandDJCheck(event)) {

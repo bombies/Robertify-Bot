@@ -173,7 +173,7 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         if (!predicateCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_BAN))

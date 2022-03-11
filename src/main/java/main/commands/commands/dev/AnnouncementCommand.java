@@ -5,12 +5,15 @@ import main.commands.IDevCommand;
 import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
@@ -23,7 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AnnouncementCommand extends ListenerAdapter implements IDevCommand {
+public class AnnouncementCommand extends AbstractSlashCommand implements IDevCommand {
     private final Logger logger = LoggerFactory.getLogger(AnnouncementCommand.class);
 
     @Override
@@ -116,5 +119,42 @@ public class AnnouncementCommand extends ListenerAdapter implements IDevCommand 
     @Override
     public String getHelp(String prefix) {
         return null;
+    }
+
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("announce")
+                        .setDescription("Send an announcement to all servers!")
+                        .addOptions(
+                                CommandOption.of(
+                                        OptionType.STRING,
+                                        "announcement",
+                                        "The announcement to be sent",
+                                        true
+                                )
+                        )
+                        .setDevCommand()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!nameCheck(event)) return;
+
+        final var announcement = event.getOption("announcement").getAsString().replaceAll("\\\\n", "\n");
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "**Are you sure you want to send this announcement?**\n\n" + announcement).build())
+                .addActionRow(
+                        Button.of(ButtonStyle.SUCCESS, "devannouncement:yes", "Yes"),
+                        Button.of(ButtonStyle.DANGER, "devannouncement:no", "No")
+                )
+                .queue();
     }
 }

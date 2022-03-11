@@ -158,7 +158,7 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         if (!adminCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!").build())

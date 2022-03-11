@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class LoopSlashCommand extends AbstractSlashCommand {
-    private final String commandName = "loop";
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("loop")
                         .setDescription("Replay the current song being played")
                         .addSubCommands(
                                 SubCommand.of(
@@ -39,6 +38,7 @@ public class LoopSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

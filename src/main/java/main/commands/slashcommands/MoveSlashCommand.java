@@ -13,13 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MoveSlashCommand extends AbstractSlashCommand {
-    private final String commandName = new MoveCommand().getName();
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("move")
                         .setDescription("Rearrange the position of tracks in the queue")
                         .addOptions(
                                 CommandOption.of(
@@ -48,6 +47,7 @@ public class MoveSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

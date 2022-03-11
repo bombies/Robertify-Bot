@@ -94,8 +94,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
     @Override @SneakyThrows
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!premiumCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         final var guild = event.getGuild();
 

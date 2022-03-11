@@ -38,8 +38,7 @@ public class VolumeSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!premiumCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         event.deferReply().queue();
 

@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
-    private final String commandName = "nowplaying";
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("nowplaying")
                         .setDescription("See the song that is currently being played")
                         .setPossibleDJCommand()
                         .build()
@@ -28,7 +27,8 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!event.getName().equals(commandName)) return;
+        if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

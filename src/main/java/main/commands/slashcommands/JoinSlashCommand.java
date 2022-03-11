@@ -28,7 +28,7 @@ public class JoinSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         event.deferReply().queue();
 

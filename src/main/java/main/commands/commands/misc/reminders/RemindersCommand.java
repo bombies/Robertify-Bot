@@ -854,7 +854,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         String[] split = event.getCommandPath().split("/");
         List<OptionMapping> options = event.getOptions();

@@ -87,8 +87,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!premiumCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         if (!adminCheck(event)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(),

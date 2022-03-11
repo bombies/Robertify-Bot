@@ -8,13 +8,12 @@ import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class PauseSlashCommand extends AbstractSlashCommand {
-    private final String commandName = "pause";
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("pause")
                         .setDescription("Pause the song being currently played!")
                         .setPossibleDJCommand()
                         .build()
@@ -29,6 +28,7 @@ public class PauseSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
+        if (!banCheck(event)) return;
 
         event.deferReply().queue();
 

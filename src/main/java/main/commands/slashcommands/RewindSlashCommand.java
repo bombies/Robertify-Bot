@@ -12,13 +12,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class RewindSlashCommand extends AbstractSlashCommand {
-    private final String commandName = new RewindCommand().getName();
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("rewind")
                         .setDescription("Rewind the song by the seconds provided or all the way to the beginning")
                         .addOptions(
                                 CommandOption.of(
@@ -40,7 +39,7 @@ public class RewindSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         event.deferReply().queue();
 
