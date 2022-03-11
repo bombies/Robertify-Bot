@@ -517,10 +517,166 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
+        final var config = new PermissionsConfig();
         final var path = event.getCommandPath().split("/");
 
         switch (path[1]) {
+            case "list" -> {
+                switch (path[2]) {
+                    case "permissions" -> {
+                        List<String> perms = Permission.getPermissions();
+                        EmbedBuilder eb;
+                        if (perms.isEmpty())
+                            eb = RobertifyEmbedUtils.embedMessage(guild, "There are no permissions yet!");
+                        else
+                            eb = RobertifyEmbedUtils.embedMessage(guild, "**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
+                        event.replyEmbeds(eb.build())
+                                .setEphemeral(true)
+                                .queue();
+                    }
+                    case "role" -> {
+                        final var role = event.getOption("role").getAsRole();
+                        List<Integer> permCodes = config.getPermissionsForRoles(guild.getIdLong(), role.getIdLong());
+                        sendPermMessage(event, permCodes, role);
+                    }
+                    case "user" -> {
+                        final var user = event.getOption("user").getAsUser();
+                        List<Integer> permCodes = config.getPermissionsForUser(guild.getIdLong(), user.getIdLong());
+                        sendPermMessage(event, permCodes, user);
+                    }
+                }
+            }
+            case "add" -> {
+                switch (path[2]) {
+                    case "role" -> {
+                        final var role = event.getOption("role").getAsRole();
+                        final var perm = event.getOption("permission").getAsString();
 
+                        try {
+                            new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ role.getAsMention());
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (IllegalAccessException e) {
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " already has permission to `"+perm+"`!");
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (Exception e) {
+                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                                    An unexpected error has occurred!
+
+                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                                    .build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        }
+                    }
+                    case "user" -> {
+                        final var user = event.getOption("user").getAsUser();
+                        final var perm = event.getOption("permission").getAsString();
+
+                        try {
+                            new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ user.getAsMention());
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (IllegalArgumentException e) {
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " already has permission to `"+perm+"`!");
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (Exception e) {
+                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                                    An unexpected error has occurred!
+
+                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                                            .build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        }
+                    }
+                }
+            }
+            case "remove" -> {
+                switch (path[2]) {
+                    case "role" -> {
+                        final var role = event.getOption("role").getAsRole();
+                        final var perm = event.getOption("permission").getAsString();
+
+                        try {
+                            new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ role.getAsMention());
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (IllegalAccessException e) {
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " never had access to `"+perm+"`!");
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (Exception e) {
+                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                                    An unexpected error has occurred!
+
+                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                                            .build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        }
+                    }
+                    case "user" -> {
+                        final var user = event.getOption("user").getAsUser();
+                        final var perm = event.getOption("permission").getAsString();
+
+                        try {
+                            new PermissionsConfig().removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ user.getAsMention());
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (IllegalArgumentException e) {
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " never had access to `"+perm+"`!");
+                            event.replyEmbeds(eb.build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        } catch (Exception e) {
+                            logger.error("[FATAL ERROR] An unexpected error occurred!", e);
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                                    An unexpected error has occurred!
+
+                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                                            .build())
+                                    .setEphemeral(true)
+                                    .queue();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void sendPermMessage(SlashCommandEvent event, List<Integer> permCodes, IMentionable mentionable) {
+        final var guild = event.getGuild();
+
+        if (permCodes.isEmpty()) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "This user/role has no permissions!");
+            event.replyEmbeds(eb.build())
+                    .setEphemeral(true)
+                    .queue();
+        } else {
+            List<String> permString = new ArrayList<>();
+            for (int i : permCodes)
+                permString.add(Permission.getPermissions().get(i));
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**Permissions for** " + mentionable.getAsMention() + "\n\n`" + permString + "`");
+            event.replyEmbeds(eb.build())
+                    .setEphemeral(true)
+                    .queue();
         }
     }
 }

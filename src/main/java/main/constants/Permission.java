@@ -9,7 +9,7 @@ public enum Permission {
     ROBERTIFY_POLLS(2),
     ROBERTIFY_BAN(3),
     ROBERTIFY_THEME(4),
-    ROBERTIFY_8BALL(8);
+    ROBERTIFY_8BALL(5);
 
     private final int code;
 

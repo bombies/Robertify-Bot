@@ -166,10 +166,21 @@ public class PermissionsConfig extends AbstractGuildConfig {
     public List<Integer> getPermissionsForRoles(long gid, long rid) {
         List<Integer> codes = new ArrayList<>();
         JSONObject obj = getGuildObject(gid);
+        final var permObj = obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString());
 
-        for (int i = 0; i < obj.length()-1; i++) {
-            JSONArray arr = obj.getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
-                    .getJSONArray(String.valueOf(i));
+        for (int i = 0; i < permObj.length()-1; i++) {
+            JSONArray arr;
+            try {
+                arr = permObj.getJSONArray(String.valueOf(i));
+            } catch (JSONException e) {
+                update(gid);
+                try {
+                    arr = permObj.getJSONArray(String.valueOf(i));
+                } catch (JSONException e2) {
+                    continue;
+                }
+            }
+
             for (int j = 0; j < arr.length(); j++)
                 if (arr.getLong(j) == rid) {
                     codes.add(i); break;
@@ -184,7 +195,13 @@ public class PermissionsConfig extends AbstractGuildConfig {
         JSONObject obj = getGuildObject(gid)
                 .getJSONObject(GuildsDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
-        JSONArray arr = obj.getJSONArray(String.valueOf(uid));
+
+        JSONArray arr;
+        try {
+            arr = obj.getJSONArray(String.valueOf(uid));
+        } catch (JSONException e) {
+            return new ArrayList<>();
+        }
 
         for (int i = 0; i < arr.length(); i++)
             codes.add(arr.getInt(i));
