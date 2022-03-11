@@ -5,9 +5,13 @@ import main.commands.ICommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.permissions.PermissionsConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PermissionsCommand implements ICommand {
+public class PermissionsCommand extends AbstractSlashCommand implements ICommand {
     
     private final Logger logger = LoggerFactory.getLogger(PermissionsCommand.class);
     
@@ -367,5 +371,156 @@ public class PermissionsCommand implements ICommand {
     @Override
     public List<String> getAliases() {
         return List.of("perms", "perm", "permission");
+    }
+
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("permissions")
+                        .setDescription("Manage the permissions for roles and users")
+                        .addSubCommandGroups(
+                                SubCommandGroup.of(
+                                        "list",
+                                        "List permissions!",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "permissions",
+                                                        "List all the valid permissions"
+                                                ),
+                                                SubCommand.of(
+                                                        "role",
+                                                        "All the permissions a specific role has",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.ROLE,
+                                                                        "role",
+                                                                        "The role to check",
+                                                                        true
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "user",
+                                                        "All the permissions a specific user has",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.USER,
+                                                                        "user",
+                                                                        "The user to check",
+                                                                        true
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                                SubCommandGroup.of(
+                                        "add",
+                                        "Add permissions to a user or role!",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "role",
+                                                        "Add a specific permission to a specific role",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.ROLE,
+                                                                        "role",
+                                                                        "The role to add the permission to",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.STRING,
+                                                                        "permission",
+                                                                        "The permission to add to the role",
+                                                                        true,
+                                                                        Permission.getPermissions()
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "user",
+                                                        "Add a specific permission to a specific user",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.USER,
+                                                                        "user",
+                                                                        "The user to add the permission to",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.STRING,
+                                                                        "permission",
+                                                                        "The permission to add to the user",
+                                                                        true,
+                                                                        Permission.getPermissions()
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                ),
+                                SubCommandGroup.of(
+                                        "remove",
+                                        "Remove permissions from a user or role!",
+                                        List.of(
+                                                SubCommand.of(
+                                                        "role",
+                                                        "Remove a specific permission from a specific role",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.ROLE,
+                                                                        "role",
+                                                                        "The role to add the permission to",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.STRING,
+                                                                        "permission",
+                                                                        "The permission to add to the role",
+                                                                        true,
+                                                                        Permission.getPermissions()
+                                                                )
+                                                        )
+                                                ),
+                                                SubCommand.of(
+                                                        "user",
+                                                        "Remove a specific permission from a specific user",
+                                                        List.of(
+                                                                CommandOption.of(
+                                                                        OptionType.USER,
+                                                                        "user",
+                                                                        "The user to add the permission to",
+                                                                        true
+                                                                ),
+                                                                CommandOption.of(
+                                                                        OptionType.STRING,
+                                                                        "permission",
+                                                                        "The permission to add to the user",
+                                                                        true,
+                                                                        Permission.getPermissions()
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return null;
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!checks(event)) return;
+
+        final var guild = event.getGuild();
+        final var path = event.getCommandPath().split("/");
+
+        switch (path[1]) {
+
+        }
     }
 }

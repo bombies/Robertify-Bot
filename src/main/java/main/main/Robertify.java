@@ -11,6 +11,7 @@ import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.SkipCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
+import main.commands.commands.misc.PingCommand;
 import main.commands.slashcommands.*;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.*;
@@ -153,6 +154,7 @@ public class Robertify {
                             new SearchCommand(),
                             new AutoPlayCommand(),
                             new RemindersCommand(),
+                            new PingCommand(),
 
                             // DEV COMMANDS
                             new GuildCommand(),

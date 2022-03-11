@@ -7,6 +7,8 @@ import main.commands.commands.audio.FavouriteTracksCommand;
 import main.commands.commands.audio.SearchCommand;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
+import main.commands.commands.management.permissions.PermissionsCommand;
+import main.commands.commands.misc.PingCommand;
 import main.commands.slashcommands.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -265,6 +267,8 @@ public class Listener extends ListenerAdapter {
         new SearchCommand().loadCommand(g);
         new AutoPlayCommand().loadCommand(g);
         new RemindersCommand().loadCommand(g);
+        new PingCommand().loadCommand(g);
+        new PermissionsCommand().loadCommand(g);
 
         // DEV COMMANDS
         new GuildCommand().loadCommand(g);
@@ -316,15 +320,17 @@ public class Listener extends ListenerAdapter {
 //        new SearchCommand().loadCommand(g);
 //        new AutoPlayCommand().loadCommand(g);
 //        new RemindersCommand().loadCommand(g);
+        new PingCommand().loadCommand(g);
+        new PermissionsCommand().loadCommand(g);
 
-        new GuildCommand().loadCommand(g);
-        new VoiceChannelCountCommand().loadCommand(g);
-        new UpdateCommand().loadCommand(g);
-        new EvalCommand().loadCommand(g);
-        new RandomMessageCommand().loadCommand(g);
-        new ReloadConfigCommand().loadCommand(g);
-        new ChangeLogCommand().loadCommand(g);
-        new AnnouncementCommand().loadCommand(g);
+//        new GuildCommand().loadCommand(g);
+//        new VoiceChannelCountCommand().loadCommand(g);
+//        new UpdateCommand().loadCommand(g);
+//        new EvalCommand().loadCommand(g);
+//        new RandomMessageCommand().loadCommand(g);
+//        new ReloadConfigCommand().loadCommand(g);
+//        new ChangeLogCommand().loadCommand(g);
+//        new AnnouncementCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

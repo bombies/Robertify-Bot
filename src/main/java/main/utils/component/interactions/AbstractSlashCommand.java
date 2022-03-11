@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
@@ -380,7 +381,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final String name;
         @Nullable @Getter
         private final String description;
-        @NotNull @Getter
+        @Getter
         private final List<CommandOption> options;
 
 
@@ -422,13 +423,19 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             for (var command : subCommands) {
                 SubcommandData subcommandData = new SubcommandData(command.name, command.description);
 
-                for (var option : command.getOptions())
-                    subcommandData.addOptions(new OptionData(
+                for (var option : command.getOptions()) {
+                    OptionData optionData = new OptionData(
                             option.getType(),
                             option.getName(),
                             option.getDescription(),
                             option.isRequired()
-                    ));
+                    );
+
+                    if (option.getChoices() != null)
+                        for (final var choice : option.getChoices())
+                            optionData.addChoice(choice, choice);
+                    subcommandData.addOptions(optionData);
+                };
 
                 data.addSubcommands(subcommandData);
             }
