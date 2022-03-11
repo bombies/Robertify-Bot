@@ -1,4 +1,4 @@
-package main.commands.slashcommands;
+package main.commands.slashcommands.commands;
 
 import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;

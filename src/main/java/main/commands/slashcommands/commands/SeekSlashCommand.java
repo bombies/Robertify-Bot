@@ -1,4 +1,4 @@
-package main.commands.slashcommands;
+package main.commands.slashcommands.commands;
 
 import main.commands.commands.audio.SeekCommand;
 import main.utils.RobertifyEmbedUtils;

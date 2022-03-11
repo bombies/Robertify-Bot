@@ -1,31 +1,32 @@
-package main.commands.slashcommands;
+package main.commands.slashcommands.commands;
 
-import main.audiohandlers.RobertifyAudioManager;
-import main.commands.commands.audio.RemoveCommand;
+import main.commands.commands.audio.VolumeCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
-public class RemoveSlashCommand extends AbstractSlashCommand {
+public class VolumeSlashCommand extends AbstractSlashCommand {
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName("remove")
-                        .setDescription("Remove a song from the queue")
+                        .setName("volume")
+                        .setDescription("Adjust the volume of the bot")
                         .addOptions(
                                 CommandOption.of(
                                         OptionType.INTEGER,
-                                        "trackid",
-                                        "The id of the track you would like to remove",
+                                        "volume",
+                                        "The volume to set the bot to",
                                         true
                                 )
                         )
                         .setPossibleDJCommand()
+                        .setPremium()
                         .build()
         );
     }
@@ -37,8 +38,7 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checksWithPremium(event)) return;
 
         event.deferReply().queue();
 
@@ -48,12 +48,14 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
             return;
         }
 
-        final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
+        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(event.getGuild(), event.getUser(), queue, trackSelected).build())
-                .setEphemeral(true)
+        event.getHook().sendMessageEmbeds(new VolumeCommand().handleVolumeChange(
+                selfVoiceState ,memberVoiceState,
+                        GeneralUtils.longToInt(event.getOption("volume").getAsLong())
+                ).build())
+                .setEphemeral(false)
                 .queue();
     }
 }

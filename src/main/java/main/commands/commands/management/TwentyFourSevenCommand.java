@@ -89,14 +89,6 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
 
-        if (!adminCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(),
-                    BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
-
         event.replyEmbeds(logic(event.getGuild())).setEphemeral(false)
                 .queue();
     }

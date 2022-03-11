@@ -2,7 +2,9 @@ package main.utils.json.toggles;
 
 import main.commands.CommandManager;
 import main.commands.ICommand;
+import main.commands.slashcommands.SlashCommandManager;
 import main.constants.Toggles;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
@@ -56,6 +58,22 @@ public class TogglesConfig extends AbstractGuildConfig {
         return ret;
     }
 
+    public boolean getDJToggle(Guild g, AbstractSlashCommand cmd) {
+        final var djToggles = getDJToggles(g);
+
+        if (!djToggles.containsKey(cmd.getName())) {
+            if (new SlashCommandManager().isMusicCommand(cmd)) {
+                setDJToggle(g, cmd, false);
+                return false;
+            } else {
+                throw new NullPointerException("Invalid command passed! [Command: "+cmd.getName()+"]");
+            }
+        }
+
+        return djToggles.get(cmd.getName().toLowerCase());
+    }
+
+    @Deprecated
     public boolean getDJToggle(Guild g, ICommand cmd) {
         final var djToggles = getDJToggles(g);
 
@@ -77,6 +95,15 @@ public class TogglesConfig extends AbstractGuildConfig {
         getCache().updateGuild(obj, guild.getIdLong());
     }
 
+    public void setDJToggle(Guild guild, AbstractSlashCommand command, boolean val) {
+        final var obj = getGuildObject(guild.getIdLong());
+        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString())
+                .put(command.getName(), val);
+        getCache().updateGuild(obj, guild.getIdLong());
+    }
+
+    @Deprecated
     public void setDJToggle(Guild guild, ICommand command, boolean val) {
         final var obj = getGuildObject(guild.getIdLong());
         obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
@@ -106,6 +133,11 @@ public class TogglesConfig extends AbstractGuildConfig {
                 .getBoolean(type.name().toLowerCase());
     }
 
+    public boolean isDJToggleSet(Guild guild, AbstractSlashCommand cmd) {
+        return getDJToggles(guild).containsKey(cmd.getName().toLowerCase());
+    }
+
+    @Deprecated
     public boolean isDJToggleSet(Guild guild, ICommand cmd) {
         return getDJToggles(guild).containsKey(cmd.getName().toLowerCase());
     }
@@ -178,7 +210,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
             var djTogglesObj = new JSONObject();
 
-            for (ICommand musicCommand : new CommandManager().getMusicCommands())
+            for (AbstractSlashCommand musicCommand : new SlashCommandManager().getMusicCommands())
                 djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
 
             toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);
@@ -208,8 +240,6 @@ public class TogglesConfig extends AbstractGuildConfig {
 
             toggleObj.put(Toggles.TogglesConfigField.LOG_TOGGLES.toString(), logObj);
         }
-
-
     }
 
 }

@@ -13,7 +13,6 @@ import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.PingCommand;
-import main.commands.slashcommands.*;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatedchannel.DedicatedChannelEvents;
@@ -26,12 +25,12 @@ import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
+import main.commands.slashcommands.commands.*;
 import main.constants.ENV;
 import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
-import main.utils.component.interactions.tests.SlashCommandTest;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
@@ -157,6 +156,7 @@ public class Robertify {
                             new RemindersCommand(),
                             new PingCommand(),
                             new PermissionsCommand(),
+                            new TogglesCommand(),
 
                             // DEV COMMANDS
                             new GuildCommand(),

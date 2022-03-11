@@ -131,13 +131,6 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
-        if (!adminCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
-
         final var channel = event.getOption("channel").getAsGuildChannel();
         final var guildConfig = new GuildConfig();
         final var guild = event.getGuild();

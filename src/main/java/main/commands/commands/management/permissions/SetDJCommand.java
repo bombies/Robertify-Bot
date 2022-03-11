@@ -166,13 +166,6 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
-        if (!adminCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!").build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
-
         GeneralUtils.setCustomEmbed(event.getGuild(), "Set DJ");
         switch  (event.getSubcommandName()) {
             case "role" -> {

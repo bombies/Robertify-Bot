@@ -60,12 +60,6 @@ public class ListDJCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!djCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
-
         List<String> roles = new PermissionsCommand().getRolePerms(event.getGuild(), Permission.ROBERTIFY_DJ.name());
         List<String> users = new PermissionsCommand().getUserPerms(event.getGuild(), Permission.ROBERTIFY_DJ.name());
 

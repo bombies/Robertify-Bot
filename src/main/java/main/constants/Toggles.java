@@ -2,6 +2,9 @@ package main.constants;
 
 import main.utils.json.GenericJSONField;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum Toggles implements GenericJSONField {
     RESTRICTED_VOICE_CHANNELS("restricted_voice_channels"),
     RESTRICTED_TEXT_CHANNELS("restricted_text_channels"),
@@ -59,6 +62,13 @@ public enum Toggles implements GenericJSONField {
             }
         }
         throw new NullPointerException("No such toggle!");
+    }
+
+    public static List<String> toList() {
+        final List<String> ret = new ArrayList<>();
+        for (final var toggle : Toggles.values())
+            ret.add(toggle.toString());
+        return ret;
     }
 
     public enum TogglesConfigField implements GenericJSONField {

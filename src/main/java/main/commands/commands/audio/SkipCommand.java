@@ -15,6 +15,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.json.toggles.TogglesConfig;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+@Deprecated @ForRemoval
 public class SkipCommand extends ListenerAdapter implements ICommand {
     private final static HashMap<Long, Integer> voteSkips = new HashMap<>();
     private final static HashMap<Long, ArrayList<Long>> voters = new HashMap<>();

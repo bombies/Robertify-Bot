@@ -1,20 +1,21 @@
-package main.commands.slashcommands;
+package main.commands.slashcommands.commands;
 
-import main.commands.commands.audio.PauseCommand;
+import main.commands.commands.audio.ShuffleCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
+import main.utils.component.legacy.InteractiveCommand;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class PauseSlashCommand extends AbstractSlashCommand {
+public class ShuffleSlashCommand extends AbstractSlashCommand {
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName("pause")
-                        .setDescription("Pause the song being currently played!")
+                        .setName("shuffle")
+                        .setDescription("Shuffle the queue")
                         .setPossibleDJCommand()
                         .build()
         );
@@ -27,21 +28,18 @@ public class PauseSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
 
         event.deferReply().queue();
 
         if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }
 
-        final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-        final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
-
-        event.getHook().sendMessageEmbeds(new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState).build())
+        event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild(), event.getUser()).build())
                 .setEphemeral(false).queue();
-     }
+    }
 }

@@ -9,6 +9,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -17,6 +18,7 @@ import net.dv8tion.jda.api.entities.Message;
 import javax.script.ScriptException;
 import java.util.List;
 
+@Deprecated @ForRemoval
 public class ClearQueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {

@@ -5,6 +5,8 @@ import main.constants.RobertifyEmoji;
 import net.dv8tion.jda.api.entities.Emoji;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum LogType {
     QUEUE_ADD("Queue Addition", Emoji.fromUnicode("➕"), Color.decode("#35fc03"), "Queue Additions"),
@@ -41,5 +43,12 @@ public enum LogType {
         this.emoji = emoji;
         this.color = color;
         this.name = name;
+    }
+
+    public static List<String> toList() {
+        final List<String> ret = new ArrayList<>();
+        for (final var logType : LogType.values())
+            ret.add(logType.name());
+        return ret;
     }
 }

@@ -13,6 +13,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.json.toggles.TogglesConfig;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -30,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Deprecated @ForRemoval
 public class PlayCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(PlayCommand.class);
 

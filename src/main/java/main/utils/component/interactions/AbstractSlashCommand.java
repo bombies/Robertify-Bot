@@ -3,6 +3,7 @@ package main.utils.component.interactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.constants.BotConstants;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -39,6 +40,30 @@ import java.util.function.Predicate;
 
 public abstract class AbstractSlashCommand extends AbstractInteraction {
     private Command command = null;
+
+    public String getName() {
+        if (command == null)
+            buildCommand();
+        return command.name;
+    }
+
+    public String getDescription() {
+        if (command == null)
+            buildCommand();
+        return command.description;
+    }
+
+    public boolean isPremium(){
+        if (command == null)
+            buildCommand();
+        return command.isPremium;
+    }
+
+    public boolean isDevCommand() {
+        if (command == null)
+            buildCommand();
+        return command.isPrivate;
+    }
 
     @SneakyThrows
     public void loadCommand(Guild g) {
@@ -126,7 +151,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected boolean checks(SlashCommandEvent event) {
         if (!nameCheck(event))
             return false;
-        return banCheck(event);
+        if (!banCheck(event))
+            return false;
+        if (!adminCheck(event))
+            return false;
+        return djCheck(event);
     }
 
     protected boolean checksWithPremium(SlashCommandEvent event) {
@@ -186,13 +215,31 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected boolean djCheck(SlashCommandEvent event) {
-        return command.getDjOnly() && GeneralUtils.hasPerms(event.getGuild(), event.getMember(), Permission.ROBERTIFY_DJ);
+        if (command == null)
+            buildCommand();
+
+        final Guild guild = event.getGuild();
+        if (command.getDjOnly() && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return false;
+        }
+        return true;
     }
 
     protected boolean adminCheck(SlashCommandEvent event) {
         if (command == null)
             buildCommand();
-        return command.adminOnly && GeneralUtils.hasPerms(event.getGuild(), event.getMember(), Permission.ROBERTIFY_ADMIN);
+
+        final Guild guild = event.getGuild();
+        if (command.adminOnly && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return false;
+        }
+        return true;
     }
 
     protected boolean predicateCheck(SlashCommandEvent event) {

@@ -13,6 +13,7 @@ import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.spotify.SpotifyUtils;
+import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.util.List;
 
+@Deprecated @ForRemoval
 public class NowPlayingCommand implements ICommand {
     private final Logger logger = LoggerFactory.getLogger(NowPlayingCommand.class);
 
