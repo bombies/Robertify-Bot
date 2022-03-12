@@ -5,6 +5,7 @@ import main.commands.CommandContext;
 import main.commands.CommandManager;
 import main.commands.ICommand;
 import main.commands.IDevCommand;
+import main.commands.slashcommands.SlashCommandManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.InteractionBuilderException;
@@ -175,10 +176,10 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
             final var guild = event.getGuild();
 
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
-                            Join our [support server](https://discord.gg/VbjmtfJDvU)!
-
-                            *Select an option to view the commands I have to offer!*""")
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Join our [support server](https://robertify.me/support)!\n\n" +
+                            "" +
+                            "*Select an option to view the commands I have to offer!*\n" +
+                            "*There are* `"+new SlashCommandManager().getCommands().size()+"` *commands!*")
                     .addField("💼 Management Commands", "*Configure and control how Robertify operates in this guild!*", true)
                     .addField("🎶 Music Commands", "*Play music and control songs. You can do so much with these commands to make your experience immersive.*", true)
                     .addBlankField(true)
@@ -189,7 +190,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                     .addActionRow(getSelectionMenu(event.getUser().getIdLong()))
                     .setEphemeral(true).queue();
         } else {
-            final CommandManager manager = new CommandManager();
+            final var manager = new SlashCommandManager();
             final String command = event.getOption("command").getAsString();
             event.replyEmbeds(searchCommand(manager, command, event.getGuild(), event.getUser()).build())
                     .setEphemeral(true).queue();
@@ -200,11 +201,11 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     @Override @SneakyThrows
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
-        if (!event.getComponentId().equals(menuName)) return;
+        if (!event.getComponentId().startsWith(menuName)) return;
 
         final var guild = event.getGuild();
 
-        if (!getSelectionMenuBuilder(event.getUser().getIdLong()).checkPermission(event)) {
+        if (!event.getComponentId().split(":")[2].equals(event.getUser().getId())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
                     .setEphemeral(true).queue();
             return;
@@ -230,22 +231,16 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @SneakyThrows
-    private EmbedBuilder searchCommand(CommandManager manager, String search, Guild guild, User user) {
-        final ICommand command = manager.getCommand(search);
+    private EmbedBuilder searchCommand(SlashCommandManager manager, String search, Guild guild, User user) {
+        final var command = manager.getCommand(search);
 
         if (command == null) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
             GeneralUtils.setDefaultEmbed(guild);
             return eb;
-        } else if (command instanceof IDevCommand) {
-            if (!BotInfoCache.getInstance().isDeveloper(user.getIdLong())) {
-                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
-                GeneralUtils.setDefaultEmbed(guild);
-                return eb;
-            }
         }
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp(guild.getId()));
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp());
         final var theme = new ThemesConfig().getTheme(guild.getIdLong());
         eb.setAuthor("Help Command ["+command.getName()+"]", null, theme.getTransparent());
         return eb;
@@ -254,13 +249,13 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     private EmbedBuilder getHelpEmbed(Guild guild, HelpType type, String prefix) {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Here are your commands!\n\n" +
                 "**Prefix**: `"+prefix+"`");
-        CommandManager manager = new CommandManager();
+        final var manager = new SlashCommandManager();
         StringBuilder sb = new StringBuilder();
 
         switch (type) {
             case MANAGEMENT -> {
-                List<ICommand> managementCommands = manager.getManagementCommands();
-                for (ICommand cmd : managementCommands)
+                List<AbstractSlashCommand> managementCommands = manager.getManagementCommands();
+                for (var cmd : managementCommands)
                     sb.append("`").append(cmd.getName()).append(
                             managementCommands.get(managementCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
@@ -268,8 +263,8 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                 eb.addField("Management Commands", sb.toString(), false);
             }
             case MISCELLANEOUS -> {
-                List<ICommand> miscCommands = manager.getMiscCommands();
-                for (ICommand cmd : manager.getMiscCommands())
+                List<AbstractSlashCommand> miscCommands = manager.getMiscCommands();
+                for (var cmd : manager.getMiscCommands())
                     sb.append("`").append(cmd.getName()).append(
                             miscCommands.get(miscCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
@@ -277,8 +272,8 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                 eb.addField("Miscellaneous Commands", sb.toString(), false);
             }
             case MUSIC -> {
-                List<ICommand> musicCommands = manager.getMusicCommands();
-                for (ICommand cmd : musicCommands)
+                List<AbstractSlashCommand> musicCommands = manager.getMusicCommands();
+                for (var cmd : musicCommands)
                     sb.append("`").append(cmd.getName()).append(
                             musicCommands.get(musicCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
@@ -286,8 +281,8 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                 eb.addField("Music Commands", sb.toString(), false);
             }
             case UTILITY -> {
-                List<ICommand> utilityCommands = manager.getUtilityCommands();
-                for (ICommand cmd : utilityCommands)
+                List<AbstractSlashCommand> utilityCommands = manager.getUtilityCommands();
+                for (var cmd : utilityCommands)
                     sb.append("`").append(cmd.getName()).append(
                             utilityCommands.get(utilityCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
@@ -306,7 +301,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return null;
+        return "Get help for all the command Robertify has to offer!";
     }
 
     enum HelpType {

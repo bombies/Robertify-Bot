@@ -104,7 +104,8 @@ public class SlashCommandManager {
                 new DonateCommand(),
                 new SuggestionCommand(),
                 new BotInfoCommand(),
-                new PlaytimeCommand()
+                new PlaytimeCommand(),
+                new HelpCommand()
         );
 
         addDevCommands(
