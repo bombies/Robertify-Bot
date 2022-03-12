@@ -297,6 +297,7 @@ public class RobertifyAudioManager {
     public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
         try {
             musicManager.getLink().connect(vc);
+            musicManager.getScheduler().scheduleDisconnect(true);
         } catch (InsufficientPermissionException e) {
             if (channel != null)
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I do not have enough permissions to join " + vc.getAsMention()).build())

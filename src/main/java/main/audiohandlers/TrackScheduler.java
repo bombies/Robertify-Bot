@@ -258,10 +258,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (disconnectExecutors.containsKey(guild.getIdLong())) {
             disconnectExecutors.get(guild.getIdLong()).cancel(false);
             disconnectExecutors.remove(guild.getIdLong());
+            logger.debug("Removed scheduled player disconnect");
         }
     }
 
     public void scheduleDisconnect(boolean announceMsg) {
+        logger.debug("Scheduling player disconnect in 5 minutes");
         scheduleDisconnect(announceMsg, 5, TimeUnit.MINUTES);
     }
 
@@ -280,6 +282,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     RobertifyAudioManager.getInstance().getMusicManager(guild)
                                     .leave();
                     disconnectExecutors.remove(guild.getIdLong());
+                    logger.debug("Removed scheduled disconnect from mapping");
 
                     final var guildConfig = new GuildConfig();
 
@@ -291,8 +294,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             }
         }, delay, timeUnit);
 
-        if (disconnectExecutors.containsKey(guild.getIdLong()))
+        if (disconnectExecutors.containsKey(guild.getIdLong())) {
+            logger.debug("Scheduled disconnect already existed... Cancelling.");
             disconnectExecutors.get(guild.getIdLong()).cancel(false);
+        }
 
         disconnectExecutors.put(guild.getIdLong(), schedule);
     }
