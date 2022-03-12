@@ -29,15 +29,9 @@ public class ShuffleSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
-
-        if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
 
         event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild(), event.getUser()).build())
                 .setEphemeral(false).queue();

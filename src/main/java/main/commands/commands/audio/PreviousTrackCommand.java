@@ -111,6 +111,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
+        sendRandomMessage(event);
 
         event.replyEmbeds(handlePrevious(event.getGuild(), event.getMember().getVoiceState()).build())
                 .queue();

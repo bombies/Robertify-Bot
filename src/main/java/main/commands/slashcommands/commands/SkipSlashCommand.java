@@ -44,6 +44,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
         if (!banCheck(event)) return;
+        if (!restrictedChannelCheck(event)) return;
 
         event.deferReply().queue();
 
@@ -51,7 +52,14 @@ public class SkipSlashCommand extends AbstractSlashCommand {
         final var memberVoiceState = event.getMember().getVoiceState();
 
         if (!musicCommandDJCheck(event)) {
-            if (selfVoiceState.getChannel().getMembers().size() != 1) {
+            if (!selfVoiceState.inVoiceChannel()) {
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "I must be in a voice channel before this command can be executed!").build())
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
+
+            if (selfVoiceState.getChannel().getMembers().size() != 2) {
                 MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getTextChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {
                     event.getHook().sendMessageEmbeds(embed)
@@ -62,6 +70,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                             .setEphemeral(true)
                             .queue();
                 }
+                sendRandomMessage(event);
                 return;
             }
         }
@@ -78,5 +87,6 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                     .setEphemeral(false)
                     .queue();
         }
+        sendRandomMessage(event);
     }
 }

@@ -61,7 +61,7 @@ public abstract class AbstractPostgresTable {
 
     private <T> T getObject(String sql, Class<T> clazz, int column) throws SQLException {
         ResultSet resultSet = connection.createStatement().executeQuery(sql);
-        if (resultSet.first())
+        while (resultSet.next())
             return resultSet.getObject(column, clazz);
         return null;
     }

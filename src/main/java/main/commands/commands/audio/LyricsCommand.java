@@ -179,7 +179,6 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                                 )
                         )
                         .setPossibleDJCommand()
-                        .setPremium()
                         .build()
         );
     }
@@ -191,7 +190,8 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checksWithPremium(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();

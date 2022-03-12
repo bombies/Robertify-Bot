@@ -3,23 +3,8 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
-import main.commands.commands.audio.*;
-import main.commands.commands.audio.autoplay.AutoPlayCommand;
-import main.commands.commands.dev.*;
-import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
-import main.commands.commands.management.permissions.PermissionsCommand;
-import main.commands.commands.misc.PingCommand;
-import main.commands.commands.management.*;
-import main.commands.commands.management.permissions.ListDJCommand;
-import main.commands.commands.management.permissions.RemoveDJCommand;
-import main.commands.commands.management.permissions.SetDJCommand;
-import main.commands.commands.misc.EightBallCommand;
-import main.commands.commands.misc.PlaytimeCommand;
-import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.reminders.ReminderScheduler;
-import main.commands.commands.misc.reminders.RemindersCommand;
-import main.commands.commands.util.*;
-import main.commands.slashcommands.commands.*;
+import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -165,9 +150,7 @@ public class Listener extends ListenerAdapter {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         final var guild = event.getGuild();
 
-        if (new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.BANNED_MESSAGE.toString()).build())
-                    .queue();
+
     }
 
     @SneakyThrows
@@ -226,124 +209,17 @@ public class Listener extends ListenerAdapter {
     }
 
     public void loadSlashCommands(Guild g) {
-        new PlaySlashCommand().loadCommand(g);
-        new QueueSlashCommand().loadCommand(g);
-        new DisconnectSlashCommand().loadCommand(g);
-        new ClearQueueSlashCommand().loadCommand(g);
-        new JumpSlashCommand().loadCommand(g);
-        new NowPlayingSlashCommand().loadCommand(g);
-        new PauseSlashCommand().loadCommand(g);
-        new HelpCommand().loadCommand(g);
-        new SkipSlashCommand().loadCommand(g);
-        new RemoveSlashCommand().loadCommand(g);
-        new LoopSlashCommand().loadCommand(g);
-        new MoveSlashCommand().loadCommand(g);
-        new RewindSlashCommand().loadCommand(g);
-        new SetChannelCommand().loadCommand(g);
-        new VolumeSlashCommand().loadCommand(g);
-        new SetDJCommand().loadCommand(g);
-        new RemoveDJCommand().loadCommand(g);
-        new ListDJCommand().loadCommand(g);
-        new SeekSlashCommand().loadCommand(g);
-        new BanCommand().loadCommand(g);
-        new UnbanCommand().loadCommand(g);
-        new ShuffleSlashCommand().loadCommand(g);
-        new EightBallCommand().loadCommand(g);
-        new JoinSlashCommand().loadCommand(g);
-        new SuggestionCommand().loadCommand(g);
-        new VoteCommand().loadCommand(g);
-        new ShufflePlaySlashCommand().loadCommand(g);
-        new UptimeCommand().loadCommand(g);
-        new LofiSlashCommand().loadCommand(g);
-        new SupportServerCommand().loadCommand(g);
-        new DonateCommand().loadCommand(g);
-        new ThemeCommand().loadCommand(g);
-        new WebsiteCommand().loadCommand(g);
-        new FavouriteTracksCommand().loadCommand(g);
-        new TwentyFourSevenCommand().loadCommand(g);
-        new PlaytimeCommand().loadCommand(g);
-        new SearchCommand().loadCommand(g);
-        new AutoPlayCommand().loadCommand(g);
-        new RemindersCommand().loadCommand(g);
-        new PingCommand().loadCommand(g);
-        new PermissionsCommand().loadCommand(g);
-        new ResumeCommand().loadCommand(g);
-        new DedicatedChannelCommand().loadCommand(g);
-        new PreviousTrackCommand().loadCommand(g);
-        new PollCommand().loadCommand(g);
-        new RestrictedChannelsCommand().loadCommand(g);
-        new BotInfoCommand().loadCommand(g);
-        new LyricsCommand().loadCommand(g);
+        final SlashCommandManager slashCommandManager = new SlashCommandManager();
 
-        // DEV COMMANDS
-        new GuildCommand().loadCommand(g);
-        new VoiceChannelCountCommand().loadCommand(g);
-        new UpdateCommand().loadCommand(g);
-        new EvalCommand().loadCommand(g);
-        new RandomMessageCommand().loadCommand(g);
-        new ChangeLogCommand().loadCommand(g);
-        new AnnouncementCommand().loadCommand(g);
+        for (var command : slashCommandManager.getCommands())
+            command.loadCommand(g);
+        for (var command : slashCommandManager.getDevCommands())
+            command.loadCommand(g);
     }
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-//        new PlaySlashCommand().loadCommand(g);
-//        new ClearQueueSlashCommand().loadCommand(g);
-//        new QueueSlashCommand().loadCommand(g);
-//        new DisconnectSlashCommand().loadCommand(g);
-//        new JumpSlashCommand().loadCommand(g);
-//        new NowPlayingSlashCommand().loadCommand(g);
-//        new PauseSlashCommand().loadCommand(g);
-//        new HelpCommand().loadCommand(g);
-//        new SkipSlashCommand().loadCommand(g);
-//        new RemoveSlashCommand().loadCommand(g);
-//        new LoopSlashCommand().loadCommand(g);
-//        new MoveSlashCommand().loadCommand(g);
-//        new RewindSlashCommand().loadCommand(g);
-//        new SetChannelCommand().loadCommand(g);
-//        new VolumeSlashCommand().loadCommand(g);
-//        new SetDJCommand().loadCommand(g);
-//        new RemoveDJCommand().loadCommand(g);
-//        new ListDJCommand().loadCommand(g);
-//        new SeekSlashCommand().loadCommand(g);
-//        new UnbanCommand().loadCommand(g);
-//        new ShuffleSlashCommand().loadCommand(g);
-//        new EightBallCommand().loadCommand(g);
-//        new JoinSlashCommand().loadCommand(g);
-//        new SuggestionCommand().loadCommand(g);
-//        new VoteCommand().loadCommand(g);
-//        new ShufflePlaySlashCommand().loadCommand(g);
-//        new UptimeCommand().loadCommand(g);
-//        new LofiSlashCommand().loadCommand(g);
-//        new SupportServerCommand().loadCommand(g);
-//        new DonateCommand().loadCommand(g);
-//        new ThemeCommand().loadCommand(g);
-//        new WebsiteCommand().loadCommand(g);
-//        new FavouriteTracksCommand().loadCommand(g);
-//        new TwentyFourSevenCommand().loadCommand(g);
-//        new PlaytimeCommand().loadCommand(g);
-//        new SearchCommand().loadCommand(g);
-//        new AutoPlayCommand().loadCommand(g);
-//        new RemindersCommand().loadCommand(g);
-//        new PingCommand().loadCommand(g);
-//        new PermissionsCommand().loadCommand(g);
-        new TogglesCommand().loadCommand(g);
-        new ResumeCommand().loadCommand(g);
-        new DedicatedChannelCommand().loadCommand(g);
-        new PreviousTrackCommand().loadCommand(g);
-        new PollCommand().loadCommand(g);
-        new RestrictedChannelsCommand().loadCommand(g);
-        new BotInfoCommand().loadCommand(g);
-        new LyricsCommand().loadCommand(g);
-
-//        new GuildCommand().loadCommand(g);
-//        new VoiceChannelCountCommand().loadCommand(g);
-//        new UpdateCommand().loadCommand(g);
-//        new EvalCommand().loadCommand(g);
-//        new RandomMessageCommand().loadCommand(g);
-//        new ReloadConfigCommand().loadCommand(g);
-//        new ChangeLogCommand().loadCommand(g);
-//        new AnnouncementCommand().loadCommand(g);
+        loadSlashCommands(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

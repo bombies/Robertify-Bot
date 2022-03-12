@@ -13,13 +13,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class QueueSlashCommand extends AbstractSlashCommand {
-    private final String commandName = new QueueCommand().getName().toLowerCase();
 
     @Override
     protected void buildCommand() {
         setCommand(
                 getBuilder()
-                        .setName(commandName)
+                        .setName("queue")
                         .setDescription("See all queued songs!")
                         .setPossibleDJCommand()
                         .build()
@@ -33,17 +32,10 @@ public class QueueSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         final var guild = event.getGuild();
-
-        if (!musicCommandDJCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
-
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
@@ -51,7 +43,7 @@ public class QueueSlashCommand extends AbstractSlashCommand {
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
-            event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+            event.replyEmbeds(eb.build()).queue();
             return;
         }
 

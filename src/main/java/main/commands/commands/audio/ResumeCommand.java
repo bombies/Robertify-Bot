@@ -109,6 +109,7 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
+        sendRandomMessage(event);
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();

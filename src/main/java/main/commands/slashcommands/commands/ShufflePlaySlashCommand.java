@@ -48,13 +48,7 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
-
-        if (!musicCommandDJCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
+        sendRandomMessage(event);
 
         EmbedBuilder eb;
         final Guild guild = event.getGuild();

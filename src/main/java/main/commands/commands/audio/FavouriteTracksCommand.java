@@ -293,6 +293,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
+        sendRandomMessage(event);
 
         switch (event.getSubcommandName()) {
             case "view" -> handeSlashList(event);

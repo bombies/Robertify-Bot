@@ -77,8 +77,6 @@ public class RobertifyAudioManager {
                             User user, Message botMsg, boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
 
         try {
             joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
@@ -128,9 +126,6 @@ public class RobertifyAudioManager {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
-
         try {
             joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
@@ -154,9 +149,6 @@ public class RobertifyAudioManager {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
-
         try {
             joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
@@ -177,9 +169,6 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
 
         try {
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
@@ -202,9 +191,6 @@ public class RobertifyAudioManager {
                                     boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
-
         try {
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
@@ -225,9 +211,6 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                                 boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
 
         try {
             joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);

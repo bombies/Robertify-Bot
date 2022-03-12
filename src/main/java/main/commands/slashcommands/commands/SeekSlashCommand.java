@@ -47,14 +47,9 @@ public class SeekSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
-
-        if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
 
         final var minutes = Integer.parseInt(String.valueOf(event.getOption("minutes").getAsLong()));
         final var seconds = Integer.parseInt(String.valueOf(event.getOption("seconds").getAsLong()));

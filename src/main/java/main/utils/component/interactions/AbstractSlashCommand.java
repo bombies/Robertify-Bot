@@ -3,6 +3,7 @@ package main.utils.component.interactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.commands.RandomMessageManager;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
@@ -148,6 +149,28 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command;
     }
 
+    protected void sendRandomMessage(SlashCommandEvent event) {
+        if (command == null)
+            buildCommand();
+        if (new SlashCommandManager().isMusicCommand(this))
+            new RandomMessageManager().randomlySendMessage(event.getTextChannel());
+    }
+
+    protected boolean checks(SlashCommandEvent event) {
+        if (!nameCheck(event)) return false;
+        if (!botEmbedCheck(event)) return false;
+        if (!banCheck(event)) return false;
+        if (!restrictedChannelCheck(event)) return false;
+        if (!botPermsCheck(event)) return false;
+        if (!adminCheck(event)) return false;
+        return djCheck(event);
+    }
+
+    protected boolean checksWithPremium(SlashCommandEvent event) {
+        if (!checks(event)) return false;
+        return premiumCheck(event);
+    }
+
     protected boolean nameCheck(SlashCommandEvent event) {
         if (command == null)
             buildCommand();
@@ -163,20 +186,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 .setEphemeral(true)
                 .queue();
         return false;
-    }
-
-    protected boolean checks(SlashCommandEvent event) {
-        if (!nameCheck(event)) return false;
-        if (!banCheck(event)) return false;
-        if (!restrictedChannelCheck(event)) return false;
-        if (!botPermsCheck(event)) return false;
-        if (!adminCheck(event)) return false;
-        return djCheck(event);
-    }
-
-    protected boolean checksWithPremium(SlashCommandEvent event) {
-        if (!checks(event)) return false;
-        return premiumCheck(event);
     }
 
     /**
@@ -277,6 +286,18 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                             "`"+GeneralUtils.listToString(command.botRequiredPermissions)+"`\n\n" +
                             "*For the recommended permissions please invite the bot using [this link](https://bit.ly/3DfaNNl)*").build())
                     .setEphemeral(false)
+                    .queue();
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean botEmbedCheck(SlashCommandEvent event) {
+        if (!event.getGuild().getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+            event.reply("""
+                                    ⚠️ I do not have permissions to send embeds!
+
+                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
                     .queue();
             return false;
         }

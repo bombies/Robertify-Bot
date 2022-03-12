@@ -53,7 +53,13 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         if (new TogglesConfig().getDJToggle(guild, this)) {
             if (new TogglesConfig().getToggle(guild, Toggles.VOTE_SKIPS)) {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
-                    if (selfVoiceState.getChannel().getMembers().size() != 1) {
+                    if (selfVoiceState.inVoiceChannel()) {
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel before this command can be executed!").build())
+                                .queue();
+                        return;
+                    }
+
+                    if (selfVoiceState.getChannel().getMembers().size() != 2) {
                         MessageEmbed embed = handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState);
                         if (embed != null)
                             msg.replyEmbeds(handleVoteSkip(ctx.getChannel(), selfVoiceState, memberVoiceState)).queue();
@@ -198,16 +204,16 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
 
         voteSkipMessages.remove(guild.getIdLong());
 
-        skip(guild);
-        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track has been vote skipped!").build())
-                .setActionRows()
-                .queue();
-
         AudioTrackInfo info = RobertifyAudioManager.getInstance()
                 .getMusicManager(guild)
                 .getPlayer()
                 .getPlayingTrack()
                 .getInfo();
+
+        skip(guild);
+        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track has been vote skipped!").build())
+                .setActionRows()
+                .queue();
 
         new LogUtils().sendLog(guild, LogType.TRACK_SKIP, "`"+info.getTitle()+" by "+info.getAuthor()+"` was vote skipped.");
     }

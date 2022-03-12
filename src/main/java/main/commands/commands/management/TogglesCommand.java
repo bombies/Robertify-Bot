@@ -330,9 +330,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                                                         OptionType.STRING,
                                                                         "toggle",
                                                                         "The DJ toggle to switch",
-                                                                        true,
-                                                                        new SlashCommandManager()
-                                                                                .getCommandNames(new SlashCommandManager().getMusicCommands())
+                                                                        true
                                                                 )
                                                         )
                                                 )
@@ -362,6 +360,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                         )
                                 )
                         )
+                        .setAdminOnly()
                         .build()
         );
     }

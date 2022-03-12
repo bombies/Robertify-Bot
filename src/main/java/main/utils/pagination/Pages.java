@@ -46,7 +46,7 @@ public abstract class Pages {
     public static Message paginateMessage(SlashCommandEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        ReplyAction replyAction = event.replyEmbeds(messagePages.get(0).getEmbed()).setEphemeral(true);
+        ReplyAction replyAction = event.replyEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
 
         if (messagePages.size() > 1) {
             replyAction = replyAction.addActionRows(

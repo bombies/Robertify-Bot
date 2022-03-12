@@ -68,14 +68,9 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
+        sendRandomMessage(event);
 
         Guild guild = event.getGuild();
-        if (!musicCommandDJCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ to run this command!").build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
-        }
 
         event.replyEmbeds(handleAutoPlay(guild)).queue();
     }

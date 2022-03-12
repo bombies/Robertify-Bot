@@ -37,16 +37,10 @@ public class LoopSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
-
-        if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var audioPlayer = musicManager.getPlayer();

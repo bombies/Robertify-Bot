@@ -69,7 +69,7 @@ public class RemoveCommand implements ICommand {
 
         AudioTrack removedTrack = trackList.get(id - 1);
         AudioTrackInfo info = removedTrack.getInfo();
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removing `"+ info.getTitle()
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed `"+ info.getTitle()
                 +"` from the queue");
 
         if (!queue.remove(removedTrack))

@@ -7,25 +7,11 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.commands.commands.audio.*;
-import main.commands.commands.audio.autoplay.AutoPlayCommand;
-import main.commands.commands.dev.*;
-import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
-import main.commands.commands.management.permissions.PermissionsCommand;
-import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
-import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatedchannel.DedicatedChannelEvents;
-import main.commands.commands.management.permissions.ListDJCommand;
-import main.commands.commands.management.permissions.RemoveDJCommand;
-import main.commands.commands.management.permissions.SetDJCommand;
-import main.commands.commands.misc.EightBallCommand;
-import main.commands.commands.misc.PlaytimeCommand;
-import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.poll.PollEvents;
-import main.commands.commands.misc.reminders.RemindersCommand;
-import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsEvents;
-import main.commands.slashcommands.commands.*;
+import main.commands.slashcommands.SlashCommandManager;
 import main.constants.ENV;
 import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
@@ -87,7 +73,7 @@ public class Robertify {
             for (var node : Config.getLavaNodes())
                 lavalink.addNode(node.getURI(), node.getPassword());
 
-            api = JDABuilder.createDefault(
+            JDABuilder jdaBuilder = JDABuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MESSAGES,
@@ -112,69 +98,6 @@ public class Robertify {
                             new SkipCommand()
                     )
                     .setVoiceDispatchInterceptor(lavalink.getVoiceInterceptor())
-
-                    // Slash Commands
-                    .addEventListeners(
-                            new PlaySlashCommand(),
-                            new QueueSlashCommand(),
-                            new DisconnectSlashCommand(),
-                            new ClearQueueSlashCommand(),
-                            new JumpSlashCommand(),
-                            new NowPlayingSlashCommand(),
-                            new PauseSlashCommand(),
-                            new HelpCommand(),
-                            new SkipSlashCommand(),
-                            new RemoveSlashCommand(),
-                            new LoopSlashCommand(),
-                            new MoveSlashCommand(),
-                            new RewindSlashCommand(),
-                            new SetChannelCommand(),
-                            new VolumeSlashCommand(),
-                            new SetDJCommand(),
-                            new RemoveDJCommand(),
-                            new SeekSlashCommand(),
-                            new JoinSlashCommand(),
-                            new BanCommand(),
-                            new UnbanCommand(),
-                            new ShuffleSlashCommand(),
-                            new EightBallCommand(),
-                            new SuggestionCommand(),
-                            new ListDJCommand(),
-                            new LofiSlashCommand(),
-                            new UptimeCommand(),
-                            new SupportServerCommand(),
-                            new ShufflePlaySlashCommand(),
-                            new VoteCommand(),
-                            new DonateCommand(),
-                            new ThemeCommand(),
-                            new WebsiteCommand(),
-                            new FavouriteTracksCommand(),
-                            new TwentyFourSevenCommand(),
-                            new PlaytimeCommand(),
-                            new SearchCommand(),
-                            new AutoPlayCommand(),
-                            new RemindersCommand(),
-                            new PingCommand(),
-                            new PermissionsCommand(),
-                            new TogglesCommand(),
-                            new ResumeCommand(),
-                            new DedicatedChannelCommand(),
-                            new PreviousTrackCommand(),
-                            new PollCommand(),
-                            new RestrictedChannelsCommand(),
-                            new BotInfoCommand(),
-                            new LyricsCommand(),
-
-                            // DEV COMMANDS
-                            new GuildCommand(),
-                            new VoiceChannelCountCommand(),
-                            new UpdateCommand(),
-                            new EvalCommand(),
-                            new RandomMessageCommand(),
-                            new ReloadConfigCommand(),
-                            new ChangeLogCommand(),
-                            new AnnouncementCommand()
-                    )
 
                     // Test Listeners
                     .addEventListeners(
@@ -206,8 +129,16 @@ public class Robertify {
                             GatewayIntent.DIRECT_MESSAGE_REACTIONS
                     )
                     .setGatewayEncoding(GatewayEncoding.ETF)
-                    .setActivity(Activity.listening("Starting up..."))
-                    .build();
+                    .setActivity(Activity.listening("Starting up..."));
+
+            // Register all slash commands
+            SlashCommandManager slashCommandManager = new SlashCommandManager();
+            for (var cmd : slashCommandManager.getCommands())
+                jdaBuilder.addEventListeners(cmd);
+            for (var cmd : slashCommandManager.getDevCommands())
+                jdaBuilder.addEventListeners(cmd);
+
+            api = jdaBuilder.build();
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))

@@ -74,7 +74,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
                 getBuilder()
                         .setName("247")
                         .setDescription("Toggle whether the bot is supposed to stay in a voice channel 24/7 or not")
-                        .setAdminOnly()
+                        .setPossibleDJCommand()
                         .setPremium()
                         .build()
         );
@@ -88,6 +88,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
+        sendRandomMessage(event);
 
         event.replyEmbeds(logic(event.getGuild())).setEphemeral(false)
                 .queue();

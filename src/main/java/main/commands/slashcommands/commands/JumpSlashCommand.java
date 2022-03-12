@@ -37,8 +37,8 @@ public class JumpSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
 

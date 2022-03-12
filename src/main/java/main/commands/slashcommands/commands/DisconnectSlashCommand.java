@@ -29,18 +29,12 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
 
         EmbedBuilder eb;
-
-        if (musicCommandDJCheck(event)) {
-            eb  = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to use this command!");
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
-            return;
-        }
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

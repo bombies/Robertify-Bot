@@ -31,6 +31,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
+        sendRandomMessage(event);
 
         Guild guild = event.getGuild();
 

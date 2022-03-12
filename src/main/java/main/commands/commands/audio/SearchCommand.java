@@ -110,14 +110,9 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
+        sendRandomMessage(event);
 
         final var guild = event.getGuild();
-
-        if (!musicCommandDJCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == event.getTextChannel().getIdLong()) {

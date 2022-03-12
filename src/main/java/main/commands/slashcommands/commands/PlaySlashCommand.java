@@ -65,18 +65,12 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
+        sendRandomMessage(event);
 
         event.deferReply().queue();
 
         final var guild = event.getGuild();
-
-        if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to run this command!").build())
-                    .queue();
-            return;
-        }
 
         EmbedBuilder eb;
         final TextChannel channel = event.getTextChannel();

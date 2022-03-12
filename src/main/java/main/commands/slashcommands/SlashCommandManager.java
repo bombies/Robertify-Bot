@@ -4,6 +4,7 @@ import lombok.Getter;
 import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
+import main.commands.commands.dev.*;
 import main.commands.commands.management.*;
 import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
@@ -12,11 +13,13 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
+import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
 import main.commands.commands.util.reports.ReportsCommand;
 import main.commands.slashcommands.commands.*;
+import main.commands.slashcommands.commands.filters.*;
 import main.utils.component.interactions.AbstractSlashCommand;
 
 import java.util.ArrayList;
@@ -34,6 +37,8 @@ public class SlashCommandManager {
     private final List<AbstractSlashCommand> miscCommands = new ArrayList<>();
     @Getter
     private final List<AbstractSlashCommand> utilityCommands = new ArrayList<>();
+    @Getter
+    private final List<AbstractSlashCommand> devCommands = new ArrayList<>();
 
     public SlashCommandManager() {
         addMusicCommands(
@@ -47,7 +52,6 @@ public class SlashCommandManager {
                 new MoveSlashCommand(),
                 new NowPlayingSlashCommand(),
                 new PauseSlashCommand(),
-                new PlaySlashCommand(),
                 new QueueSlashCommand(),
                 new RemoveSlashCommand(),
                 new RewindSlashCommand(),
@@ -62,7 +66,12 @@ public class SlashCommandManager {
                 new SearchCommand(),
                 new ResumeCommand(),
                 new PreviousTrackCommand(),
-                new LyricsCommand()
+                new LyricsCommand(),
+                new KaraokeFilter(),
+                new NightcoreFilter(),
+                new EightDFilter(),
+                new TremoloFilter(),
+                new VibratoFilter()
         );
 
         addManagementCommands(
@@ -75,7 +84,9 @@ public class SlashCommandManager {
                 new TogglesCommand(),
                 new DedicatedChannelCommand(),
                 new ThemeCommand(),
-                new RestrictedChannelsCommand()
+                new RestrictedChannelsCommand(),
+                new LogCommand(),
+                new SetLogChannelCommand()
         );
 
         addMiscCommands(
@@ -92,7 +103,19 @@ public class SlashCommandManager {
                 new WebsiteCommand(),
                 new DonateCommand(),
                 new SuggestionCommand(),
-                new BotInfoCommand()
+                new BotInfoCommand(),
+                new PlaytimeCommand()
+        );
+
+        addDevCommands(
+                new GuildCommand(),
+                new VoiceChannelCountCommand(),
+                new UpdateCommand(),
+                new EvalCommand(),
+                new RandomMessageCommand(),
+                new ReloadConfigCommand(),
+                new ChangeLogCommand(),
+                new AnnouncementCommand()
         );
     }
 
@@ -110,6 +133,10 @@ public class SlashCommandManager {
 
     private void addUtilityCommands(AbstractSlashCommand... commands) {
         utilityCommands.addAll(Arrays.asList(commands));
+    }
+
+    private void addDevCommands(AbstractSlashCommand... commands) {
+        devCommands.addAll(Arrays.asList(commands));
     }
 
     public List<String> getCommandNames(List<AbstractSlashCommand> commands) {
@@ -143,6 +170,13 @@ public class SlashCommandManager {
                 .anyMatch(it -> it.getName().equalsIgnoreCase(command.getName()));
     }
 
+    public boolean isDevCommand(AbstractSlashCommand command) {
+        return getDevCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(command.getName()));
+    }
+
+
     public List<AbstractSlashCommand> getCommands() {
         final List<AbstractSlashCommand> abstractSlashCommands = new ArrayList<>();
         abstractSlashCommands.addAll(musicCommands);
@@ -154,6 +188,13 @@ public class SlashCommandManager {
 
     public AbstractSlashCommand getCommand(String name) {
         return getCommands().stream()
+                .filter(cmd -> cmd.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public AbstractSlashCommand getDevCommand(String name) {
+        return getDevCommands().stream()
                 .filter(cmd -> cmd.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);

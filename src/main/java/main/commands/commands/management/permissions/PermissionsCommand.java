@@ -503,6 +503,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                                         )
                                 )
                         )
+                        .setAdminOnly()
                         .build()
         );
     }
