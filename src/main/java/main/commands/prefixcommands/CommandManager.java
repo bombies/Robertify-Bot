@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class CommandManager {
     private final static Logger logger = LoggerFactory.getLogger(CommandManager.class);
 

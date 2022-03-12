@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.Permission;
 import javax.script.ScriptException;
 import java.util.List;
 
+@Deprecated
 public interface ICommand {
     void handle(CommandContext ctx) throws ScriptException;
 
