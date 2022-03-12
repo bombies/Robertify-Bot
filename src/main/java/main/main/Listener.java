@@ -5,7 +5,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
 import main.commands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.SlashCommandManager;
-import main.constants.BotConstants;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.AbstractMongoDatabase;

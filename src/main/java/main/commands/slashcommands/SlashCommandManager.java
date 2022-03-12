@@ -1,7 +1,6 @@
 package main.commands.slashcommands;
 
 import lombok.Getter;
-import main.commands.ICommand;
 import main.commands.commands.audio.*;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
@@ -17,14 +16,12 @@ import main.commands.commands.misc.PlaytimeCommand;
 import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
-import main.commands.commands.util.reports.ReportsCommand;
 import main.commands.slashcommands.commands.*;
 import main.commands.slashcommands.commands.filters.*;
 import main.utils.component.interactions.AbstractSlashCommand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class SlashCommandManager {
