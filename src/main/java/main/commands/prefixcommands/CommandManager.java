@@ -379,7 +379,7 @@ public class CommandManager {
                     final Message msg = e.getMessage();
                     final var toggles = new TogglesConfig();
 
-                    if (!guild.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+                    if (!guild.getSelfMember().hasPermission(ctx.getChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
                         e.getChannel().sendMessage("""
                                     ⚠️ I do not have permissions to send embeds!
 
