@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Message;
 import javax.script.ScriptException;
 import java.util.List;
 
+@Deprecated
 public class VolumeCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {

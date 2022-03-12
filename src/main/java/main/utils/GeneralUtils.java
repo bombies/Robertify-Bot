@@ -576,7 +576,7 @@ public class GeneralUtils {
             sb.append("<"+mentionTag+"").append(elem.toString()).append(">")
                     .append(i != mentions.size() - 1 ? ", " : "");
         }
-        return sb.toString();
+        return sb.isEmpty() ? "Nothing is here" :  sb.toString();
     }
 
     public enum Mentioner {

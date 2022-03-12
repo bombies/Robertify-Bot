@@ -2,18 +2,20 @@ package main.commands.slashcommands;
 
 import lombok.Getter;
 import main.commands.ICommand;
-import main.commands.commands.audio.FavouriteTracksCommand;
-import main.commands.commands.audio.SearchCommand;
+import main.commands.commands.audio.*;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.management.*;
+import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.ListDJCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PingCommand;
+import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
+import main.commands.commands.util.reports.ReportsCommand;
 import main.commands.slashcommands.commands.*;
 import main.utils.component.interactions.AbstractSlashCommand;
 
@@ -57,7 +59,10 @@ public class SlashCommandManager {
                 new FavouriteTracksCommand(),
                 new TwentyFourSevenCommand(),
                 new AutoPlayCommand(),
-                new SearchCommand()
+                new SearchCommand(),
+                new ResumeCommand(),
+                new PreviousTrackCommand(),
+                new LyricsCommand()
         );
 
         addManagementCommands(
@@ -67,13 +72,16 @@ public class SlashCommandManager {
                 new BanCommand(),
                 new UnbanCommand(),
                 new PermissionsCommand(),
-                new TogglesCommand()
+                new TogglesCommand(),
+                new DedicatedChannelCommand(),
+                new RestrictedChannelsCommand()
         );
 
         addMiscCommands(
                 new EightBallCommand(),
                 new RemindersCommand(),
-                new ThemeCommand()
+                new ThemeCommand(),
+                new PollCommand()
         );
 
         addUtilityCommands(
@@ -82,7 +90,9 @@ public class SlashCommandManager {
                 new UptimeCommand(),
                 new SupportServerCommand(),
                 new WebsiteCommand(),
-                new DonateCommand()
+                new DonateCommand(),
+                new SuggestionCommand(),
+                new BotInfoCommand()
         );
     }
 

@@ -6,14 +6,17 @@ import main.commands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.legacy.InteractiveCommand;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +24,8 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReportsCommand extends InteractiveCommand implements ICommand {
+@Deprecated
+public class ReportsCommand implements ICommand {
     private static final Logger logger = LoggerFactory.getLogger(ReportsCommand.class);
 
     static final List<Long> activeReports = new ArrayList<>();
@@ -284,15 +288,5 @@ public class ReportsCommand extends InteractiveCommand implements ICommand {
     public String getUsages(String prefix) {
         return "**__Usages__**\n" +
                 "`"+prefix+"report`";
-    }
-
-    @Override
-    public void initCommand() {
-
-    }
-
-    @Override
-    public void initCommand(Guild g) {
-
     }
 }

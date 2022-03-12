@@ -2,6 +2,9 @@ package main.constants;
 
 import main.main.Config;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 public enum BotConstants {
     SPOTIFY_EMOJI("<:spotify:893153435438940181>"),
@@ -30,5 +33,13 @@ public enum BotConstants {
     public static String getInsufficientPermsMessage(Permission... permsNeeded) {
         return "You do not have enough permissions to execute this!\n\n" +
                 "You need: `"+ GeneralUtils.arrayToString(permsNeeded) +"`";
+    }
+
+    public static MessageEmbed getUnexpectedErrorEmbed(Guild guild) {
+        return RobertifyEmbedUtils.embedMessage(guild, """
+                                            An unexpected error has occurred!
+
+                                            *Report this bug to the developers in the [support server](https://robertify.me/support)*""")
+                .build();
     }
 }

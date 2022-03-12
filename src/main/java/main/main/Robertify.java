@@ -6,11 +6,10 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
-import main.commands.commands.audio.FavouriteTracksCommand;
-import main.commands.commands.audio.SearchCommand;
-import main.commands.commands.audio.SkipCommand;
+import main.commands.commands.audio.*;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
+import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.dev.test.MenuPaginationTestCommand;
@@ -21,6 +20,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PlaytimeCommand;
+import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.poll.PollEvents;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
@@ -157,6 +157,13 @@ public class Robertify {
                             new PingCommand(),
                             new PermissionsCommand(),
                             new TogglesCommand(),
+                            new ResumeCommand(),
+                            new DedicatedChannelCommand(),
+                            new PreviousTrackCommand(),
+                            new PollCommand(),
+                            new RestrictedChannelsCommand(),
+                            new BotInfoCommand(),
+                            new LyricsCommand(),
 
                             // DEV COMMANDS
                             new GuildCommand(),

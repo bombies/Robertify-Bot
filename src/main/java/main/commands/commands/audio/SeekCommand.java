@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+@Deprecated
 public class SeekCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {

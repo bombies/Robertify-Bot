@@ -399,8 +399,6 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 eb.addField("Toggle ID", toggleIDs.toString(), true);
                 eb.addField("Feature", toggleNames.toString(), true);
                 eb.addField("Status", toggleStatuses.toString(), true);
-
-                event.replyEmbeds(eb.build()).queue();
             }
             case "switch" -> {
                 final var toggle = event.getOption("toggle").getAsString();

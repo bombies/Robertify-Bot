@@ -3,8 +3,10 @@ package main.utils.component.interactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.CommandManager;
+import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
+import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -12,6 +14,7 @@ import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -32,6 +35,7 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,6 +68,19 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             buildCommand();
         return command.isPrivate;
     }
+
+    public List<Permission> getUserRequiredPermissions() {
+        if (command == null)
+            buildCommand();
+        return command.requiredPermissions;
+    }
+
+    public List<net.dv8tion.jda.api.Permission> getBotRequiredPermissions() {
+        if (command == null)
+            buildCommand();
+        return command.botRequiredPermissions;
+    }
+
 
     @SneakyThrows
     public void loadCommand(Guild g) {
@@ -149,20 +166,16 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected boolean checks(SlashCommandEvent event) {
-        if (!nameCheck(event))
-            return false;
-        if (!banCheck(event))
-            return false;
-        if (!adminCheck(event))
-            return false;
+        if (!nameCheck(event)) return false;
+        if (!banCheck(event)) return false;
+        if (!restrictedChannelCheck(event)) return false;
+        if (!botPermsCheck(event)) return false;
+        if (!adminCheck(event)) return false;
         return djCheck(event);
     }
 
     protected boolean checksWithPremium(SlashCommandEvent event) {
-        if (!nameCheck(event))
-            return false;
-        if (!banCheck(event))
-            return false;
+        if (!checks(event)) return false;
         return premiumCheck(event);
     }
 
@@ -250,6 +263,50 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command.getCheckPermission().test(event);
     }
 
+    protected boolean botPermsCheck(SlashCommandEvent event) {
+        if (command == null)
+            buildCommand();
+        if (command.botRequiredPermissions.isEmpty())
+            return true;
+
+        final Guild guild = event.getGuild();
+        final var self = guild.getSelfMember();
+        if (!self.hasPermission(command.botRequiredPermissions)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have enough permissions to do this\n" +
+                            "Please give my role the following permission(s):\n\n" +
+                            "`"+GeneralUtils.listToString(command.botRequiredPermissions)+"`\n\n" +
+                            "*For the recommended permissions please invite the bot using [this link](https://bit.ly/3DfaNNl)*").build())
+                    .setEphemeral(false)
+                    .queue();
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean restrictedChannelCheck(SlashCommandEvent event) {
+        final Guild guild = event.getGuild();
+        final TogglesConfig togglesConfig = new TogglesConfig();
+        final RestrictedChannelsConfig config = new RestrictedChannelsConfig();
+
+        if (!togglesConfig.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS))
+            return true;
+
+        if (!config.isRestrictedChannel(guild.getIdLong(), event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
+            && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
+
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!\n\n" +
+                    "Commands may only be used in:\n"
+                    + GeneralUtils.listOfIDsToMentions(
+                            config.getRestrictedChannels(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
+                            GeneralUtils.Mentioner.CHANNEL
+                    )).build())
+                    .setEphemeral(true)
+                    .queue();
+            return false;
+        }
+        return true;
+    }
+
     protected abstract void buildCommand();
     public abstract String getHelp();
 
@@ -273,6 +330,10 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final List<SubCommandGroup> subCommandGroups;
         @Getter @NotNull
         private final List<SubCommand> subCommands;
+        @Getter
+        private final List<Permission> requiredPermissions;
+        @Getter
+        private final List<net.dv8tion.jda.api.Permission> botRequiredPermissions;
         @Nullable @Getter
         private final Predicate<SlashCommandEvent> checkPermission;
         @NotNull @Getter
@@ -285,7 +346,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options,
                         @NotNull List<SubCommandGroup> subCommandGroups, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandEvent> checkPermission,
-                        @Nullable Boolean djOnly, @Nullable Boolean adminOnly, boolean isPremium, boolean isPrivate) {
+                        @Nullable Boolean djOnly, @Nullable Boolean adminOnly, boolean isPremium, boolean isPrivate, List<Permission> requiredPermissions, List<net.dv8tion.jda.api.Permission> botRequiredPermissions) {
             this.name = name.toLowerCase();
             this.description = description;
             this.options = options;
@@ -296,6 +357,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             this.adminOnly = adminOnly;
             this.isPremium = isPremium;
             this.isPrivate = isPrivate;
+            this.requiredPermissions = requiredPermissions;
+            this.botRequiredPermissions = botRequiredPermissions;
         }
 
         public boolean permissionCheck(SlashCommandEvent e) {
@@ -306,120 +369,120 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommandGroup> subCommandGroups, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, subCommandGroups, subCommands, checkPermission, null, null, false, false);
+            return new Command(name, description, options, subCommandGroups, subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, null, false, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, djOnly, null, false, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, adminOnly, false, false);
+            return new Command(name, description, options, List.of(), subCommands, checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands) {
-            return new Command(name, description, options, List.of(), subCommands, null, null, null, false, false);
+            return new Command(name, description, options, List.of(), subCommands, null, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, boolean djOnly) {
-            return new Command(name, description, options, List.of(), subCommands, null, djOnly, null, false, false);
+            return new Command(name, description, options, List.of(), subCommands, null, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     List<SubCommand> subCommands, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), subCommands, null, null, adminOnly, false, false);
+            return new Command(name, description, options, List.of(), subCommands, null, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, null, false, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, djOnly, null, false, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, adminOnly, false, false);
+            return new Command(name, description, options, List.of(), List.of(), checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options) {
-            return new Command(name, description, options, List.of(), List.of(), null, null, null, false, false);
+            return new Command(name, description, options, List.of(), List.of(), null, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options, boolean djOnly) {
-            return new Command(name, description, options, List.of(), List.of(), null, djOnly, null, false, false);
+            return new Command(name, description, options, List.of(), List.of(), null, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
                                                     boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, options, List.of(), List.of(), null, null, adminOnly, false, false);
+            return new Command(name, description, options, List.of(), List.of(), null, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, null, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, djOnly, null, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, adminOnly, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, null, null, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, null, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, List<SubCommandGroup> subCommandGroups) {
-            return new Command(name, description, List.of(), subCommandGroups, subCommands, null, null, null, false, false);
+            return new Command(name, description, List.of(), subCommandGroups, subCommands, null, null, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, djOnly, null, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
                                                            boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), subCommands, null, null, adminOnly, false, false);
+            return new Command(name, description, List.of(), List.of(), subCommands, null, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, Predicate<SlashCommandEvent> checkPermission) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, null, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, djOnly, null, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description,
                                                     Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, adminOnly, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, null, null, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, boolean djOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, djOnly, null, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, boolean djOnly, boolean adminOnly) {
-            return new Command(name, description, List.of(), List.of(), List.of(), null, null, adminOnly, false, false);
+            return new Command(name, description, List.of(), List.of(), List.of(), null, null, adminOnly, false, false, List.of(), List.of());
         }
     }
 
@@ -526,6 +589,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final List<SubCommand> subCommands;
         private final List<SubCommandGroup> subCommandGroups;
         private final List<Permission> requiredPermissions;
+        private final List<net.dv8tion.jda.api.Permission> botRequiredPermissions;
         private Predicate<SlashCommandEvent> permissionCheck;
         private boolean djOnly, adminOnly, isPremium, isPrivate;
 
@@ -534,6 +598,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             this.subCommands = new ArrayList<>();
             this.subCommandGroups = new ArrayList<>();
             this.requiredPermissions = new ArrayList<>();
+            this.botRequiredPermissions = new ArrayList<>();
             this.djOnly = false;
             this.adminOnly = false;
             this.isPremium = false;
@@ -576,6 +641,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return this;
         }
 
+        public Builder setBotRequiredPermissions(net.dv8tion.jda.api.Permission... permissions) {
+            botRequiredPermissions.addAll(Arrays.asList(permissions));
+            return this;
+        }
+
         @SneakyThrows
         public Builder setPossibleDJCommand() {
             this.permissionCheck = e -> {
@@ -584,7 +654,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 if (!config.isDJToggleSet(e.getGuild(), e.getName()))
                     return true;
 
-                if (config.getDJToggle(e.getGuild(), new CommandManager().getCommand(e.getName())))
+                if (config.getDJToggle(e.getGuild(), new SlashCommandManager().getCommand(e.getName())))
                     return GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ);
 
                 return true;
@@ -647,7 +717,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                     djOnly,
                     adminOnly,
                     isPremium,
-                    isPrivate
+                    isPrivate,
+                    requiredPermissions,
+                    botRequiredPermissions
             );
         }
     }

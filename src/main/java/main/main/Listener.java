@@ -3,10 +3,10 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.CommandManager;
-import main.commands.commands.audio.FavouriteTracksCommand;
-import main.commands.commands.audio.SearchCommand;
+import main.commands.commands.audio.*;
 import main.commands.commands.audio.autoplay.AutoPlayCommand;
 import main.commands.commands.dev.*;
+import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.commands.management.permissions.PermissionsCommand;
 import main.commands.commands.misc.PingCommand;
 import main.commands.commands.management.*;
@@ -15,6 +15,7 @@ import main.commands.commands.management.permissions.RemoveDJCommand;
 import main.commands.commands.management.permissions.SetDJCommand;
 import main.commands.commands.misc.EightBallCommand;
 import main.commands.commands.misc.PlaytimeCommand;
+import main.commands.commands.misc.poll.PollCommand;
 import main.commands.commands.misc.reminders.ReminderScheduler;
 import main.commands.commands.misc.reminders.RemindersCommand;
 import main.commands.commands.util.*;
@@ -266,6 +267,13 @@ public class Listener extends ListenerAdapter {
         new RemindersCommand().loadCommand(g);
         new PingCommand().loadCommand(g);
         new PermissionsCommand().loadCommand(g);
+        new ResumeCommand().loadCommand(g);
+        new DedicatedChannelCommand().loadCommand(g);
+        new PreviousTrackCommand().loadCommand(g);
+        new PollCommand().loadCommand(g);
+        new RestrictedChannelsCommand().loadCommand(g);
+        new BotInfoCommand().loadCommand(g);
+        new LyricsCommand().loadCommand(g);
 
         // DEV COMMANDS
         new GuildCommand().loadCommand(g);
@@ -320,6 +328,13 @@ public class Listener extends ListenerAdapter {
 //        new PingCommand().loadCommand(g);
 //        new PermissionsCommand().loadCommand(g);
         new TogglesCommand().loadCommand(g);
+        new ResumeCommand().loadCommand(g);
+        new DedicatedChannelCommand().loadCommand(g);
+        new PreviousTrackCommand().loadCommand(g);
+        new PollCommand().loadCommand(g);
+        new RestrictedChannelsCommand().loadCommand(g);
+        new BotInfoCommand().loadCommand(g);
+        new LyricsCommand().loadCommand(g);
 
 //        new GuildCommand().loadCommand(g);
 //        new VoiceChannelCountCommand().loadCommand(g);

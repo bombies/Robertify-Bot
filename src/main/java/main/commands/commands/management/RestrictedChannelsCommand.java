@@ -2,8 +2,10 @@ package main.commands.commands.management;
 
 import main.commands.CommandContext;
 import main.commands.ICommand;
+import main.constants.BotConstants;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.constants.Toggles;
@@ -14,13 +16,16 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.util.List;
 
-public class RestrictedChannelsCommand implements ICommand {
+public class RestrictedChannelsCommand extends AbstractSlashCommand implements ICommand {
     private final static Logger logger = LoggerFactory.getLogger(RestrictedChannelsCommand.class);
 
     @Override
@@ -242,5 +247,191 @@ public class RestrictedChannelsCommand implements ICommand {
     @Override
     public List<String> getAliases() {
         return List.of("rc", "rchannels");
+    }
+
+    @Override
+    protected void buildCommand() {
+        setCommand(
+                getBuilder()
+                        .setName("restrictedchannels")
+                        .setDescription("Configure which channels Robertify can interact with!")
+                        .addSubCommands(
+                                SubCommand.of(
+                                        "add",
+                                        "Add restricted text or voice channels",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.CHANNEL,
+                                                        "channel",
+                                                        "The channel to add a restricted channel",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "remove",
+                                        "Remove restricted text or voice channels",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.CHANNEL,
+                                                        "channel",
+                                                        "The channel to add a restricted channel",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "list",
+                                        "List all restricted voice channels"
+                                )
+                        )
+                        .setAdminOnly()
+                        .build()
+        );
+    }
+
+    @Override
+    public String getHelp() {
+        return "Restrict the bot to join voice/text channels that you set.";
+    }
+
+    @Override
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+        if (!checks(event)) return;
+
+        final var config = new RestrictedChannelsConfig();
+        switch (event.getSubcommandName()) {
+            case "add" -> {
+                final var channel = event.getOption("channel").getAsGuildChannel();
+                final var guild = event.getGuild();
+                final long channelId;
+                final RestrictedChannelsConfig.ChannelType field;
+
+                if (channel.getType().isAudio()) {
+                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                    This feature is toggled **OFF**.
+
+                                    *Looking to toggle this feature on? Do* `toggle restrictedvoice`""")
+                                        .build())
+                                .queue();
+                        return;
+                    }
+
+                    channelId = channel.getIdLong();
+                    field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
+                } else if (channel.getType().isMessage()) {
+                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                    This feature is toggled **OFF**.
+
+                                    *Looking to toggle this feature on? Do* `toggle restrictedtext`""")
+                                        .build())
+                                .queue();
+                        return;
+                    }
+
+                    channelId = channel.getIdLong();
+                    field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
+                } else {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The ID provided was not of a valid voice or text channel" +
+                                    " in this server.").build())
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                try {
+                    config.addChannel(guild.getIdLong(), channelId, field);
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully added <#"
+                                    + channelId + "> as a restricted "+ field +" channel!").build())
+                            .queue();
+                } catch (IllegalStateException e) {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
+                            .setEphemeral(true)
+                            .queue();
+                } catch (Exception e) {
+                    logger.error("Unexpected error!", e);
+                    event.replyEmbeds(BotConstants.getUnexpectedErrorEmbed(guild))
+                            .setEphemeral(true)
+                            .queue();
+                }
+            }
+            case "remove" -> {
+                final var channel = event.getOption("channel").getAsGuildChannel();
+                final var guild = event.getGuild();
+                final long channelId;
+                final RestrictedChannelsConfig.ChannelType field;
+
+                if (channel.getType().isAudio()) {
+                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                    This feature is toggled **OFF**.
+
+                                    *Looking to toggle this feature on? Do* `toggle restrictedvoice`""")
+                                        .build())
+                                .queue();
+                        return;
+                    }
+
+                    channelId = channel.getIdLong();
+                    field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
+                } else if (channel.getType().isMessage()) {
+                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
+                                    This feature is toggled **OFF**.
+
+                                    *Looking to toggle this feature on? Do* `toggle restrictedtext`""")
+                                        .build())
+                                .queue();
+                        return;
+                    }
+
+                    channelId = channel.getIdLong();
+                    field = RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL;
+                } else {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The ID provided was not of a valid voice or text channel" +
+                                    " in this server.").build())
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                try {
+                    config.removeChannel(guild.getIdLong(), channelId, field);
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully removed <#"
+                                    + channelId + "> as a restricted "+ field +" channel!").build())
+                            .queue();
+                } catch (IllegalStateException | NullPointerException e) {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
+                            .setEphemeral(true)
+                            .queue();
+                } catch (Exception e) {
+                    logger.error("Unexpected error!", e);
+                    event.replyEmbeds(BotConstants.getUnexpectedErrorEmbed(guild))
+                            .setEphemeral(true)
+                            .queue();
+                }
+            }
+            case "list" -> {
+                final var guild = event.getGuild();
+
+                try {
+                    final var tcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
+                    final var vcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
+
+                    EmbedBuilder embedBuilder = RobertifyEmbedUtils.embedMessage(guild, "Listing all restricted channels");
+                    embedBuilder.addField("Text Channels", tcs == null ? "No channels" : tcs.isEmpty() ? "No channels" : tcs, false);
+                    embedBuilder.addField("Voice Channels", vcs == null ? "No channels" : vcs.isEmpty() ? "No channels" : vcs, false);
+
+                    event.replyEmbeds(embedBuilder.build()).queue();
+                } catch (Exception e) {
+                    logger.error("Unexpected error", e);
+                    event.replyEmbeds(BotConstants.getUnexpectedErrorEmbed(guild))
+                            .setEphemeral(true)
+                            .queue();
+                }
+            }
+        }
     }
 }
