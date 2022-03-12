@@ -290,7 +290,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected boolean botEmbedCheck(SlashCommandEvent event) {
-        if (!event.getGuild().getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+        if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
             event.reply("""
                                     ⚠️ I do not have permissions to send embeds!
 
