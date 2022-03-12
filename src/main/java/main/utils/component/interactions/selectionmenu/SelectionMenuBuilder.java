@@ -20,18 +20,16 @@ import java.util.function.Predicate;
 
 public class SelectionMenuBuilder {
 
-    @Getter
     private String name;
-    @Getter
     private String placeholder;
-    @Getter
     private Pair<Integer, Integer> range;
-    @Getter
     private final List<SelectionMenuOption> options;
     @Nullable
     private Predicate<SelectionMenuEvent> permissionCheck;
+    @Getter
+    private boolean limited;
 
-    private SelectionMenuBuilder(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck) {
+    private SelectionMenuBuilder(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck, boolean limited) {
         this.name = name.toLowerCase();
         this.placeholder = placeholder;
         this.range = range;
@@ -42,6 +40,7 @@ public class SelectionMenuBuilder {
             l.add(SelectionMenuOption.of(option.getLeft(), option.getMiddle(), option.getRight()));
 
         this.options =  l;
+        this.limited = limited;
     }
 
     public SelectionMenuBuilder() {
@@ -82,8 +81,13 @@ public class SelectionMenuBuilder {
         return this;
     }
 
+    @SneakyThrows
     public SelectionMenuBuilder limitToUser(long userID) {
-        this.permissionCheck = e -> e.getUser().getIdLong() == userID;
+        if (name == null)
+            throw new InvalidBuilderException("This menu can't be limited since a name for the menu wasn't provided!");
+
+        this.limited = true;
+        this.name += ":" + userID;
         return this;
     }
 
@@ -111,7 +115,7 @@ public class SelectionMenuBuilder {
         for (var option : options)
             ret.add(Triple.of(option.getLabel(), option.getValue(), option.getEmoji()));
 
-        return new SelectionMenuBuilder(name, placeholder, range, ret, null);
+        return new SelectionMenuBuilder(name, placeholder, range, ret, null, false);
     }
 
     /**
@@ -124,7 +128,7 @@ public class SelectionMenuBuilder {
      * @return A new fancy selection menu
      */
     public static SelectionMenuBuilder of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, Emoji>> options, Predicate<SelectionMenuEvent> permissionCheck) {
-        return new SelectionMenuBuilder(name, placeholder, range, options, permissionCheck);
+        return new SelectionMenuBuilder(name, placeholder, range, options, permissionCheck, false);
     }
 
     @SneakyThrows

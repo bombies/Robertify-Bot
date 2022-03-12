@@ -28,7 +28,7 @@ import javax.script.ScriptException;
 import java.util.List;
 
 public class ThemeCommand extends AbstractSlashCommand implements ICommand {
-    private final String menuName = "menu:themes";
+    final String menuName = "menu:themes";
 
     @Override
     protected void buildCommand() {
@@ -69,7 +69,8 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Tired of seeing our boring old green theme? Well, using this command you can have " +
+                "**10** other colours to choose from! It's as easy as selecting the colour you want from the selection menu provided.";
     }
 
     @Override @SneakyThrows
@@ -117,7 +118,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
-        if (!event.getComponentId().equals(menuName)) return;
+        if (!event.getComponentId().startsWith(menuName)) return;
 
         if (isPremiumCommand()) {
             if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
@@ -141,7 +142,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!getSelectionMenuBuilder(event.getUser().getIdLong()).checkPermission(event)) {
+        if (!event.getComponentId().split(":")[2].equals(event.getUser().getId())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
                     .setEphemeral(true).queue();
             return;
@@ -176,6 +177,6 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     public String getHelp(String prefix) {
         return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
                 "Tired of seeing our boring old green theme? Well, using this command you can have " +
-                "**8** other colours to choose from! It's as easy as selecting the colour you want from the selection menu provided.";
+                "**10** other colours to choose from! It's as easy as selecting the colour you want from the selection menu provided.";
     }
 }

@@ -74,13 +74,13 @@ public class SlashCommandManager {
                 new PermissionsCommand(),
                 new TogglesCommand(),
                 new DedicatedChannelCommand(),
+                new ThemeCommand(),
                 new RestrictedChannelsCommand()
         );
 
         addMiscCommands(
                 new EightBallCommand(),
                 new RemindersCommand(),
-                new ThemeCommand(),
                 new PollCommand()
         );
 
