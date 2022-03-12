@@ -6,6 +6,7 @@ import main.commands.RandomMessageManager;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
+import main.constants.RobertifyTheme;
 import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -281,7 +282,10 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have enough permissions to do this\n" +
                             "Please give my role the following permission(s):\n\n" +
                             "`"+GeneralUtils.listToString(command.botRequiredPermissions)+"`\n\n" +
-                            "*For the recommended permissions please invite the bot using [this link](https://bit.ly/3DfaNNl)*").build())
+                            "*For the recommended permissions please invite the bot by clicking the button below*").build())
+                    .addActionRow(
+                            Button.of(ButtonStyle.LINK, "https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Give Permissions! (Requires Manage Server)", RobertifyTheme.LIGHT.getEmoji())
+                    )
                     .setEphemeral(false)
                     .queue();
             return false;

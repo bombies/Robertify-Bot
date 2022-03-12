@@ -24,6 +24,7 @@ import main.commands.prefixcommands.util.reports.ReportsCommand;
 import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.util.*;
 import main.constants.Permission;
+import main.constants.RobertifyTheme;
 import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
@@ -363,8 +364,11 @@ public class CommandManager {
                             e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(), "I do not have enough permissions to do this\n" +
                                                     "Please give my role the following permission(s):\n\n" +
                                                     "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
-                                                    "*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*")
+                                                    "*For the recommended permissions please invite the bot by clicking the button below*")
                                             .build())
+                                    .setActionRow(
+                                            Button.of(ButtonStyle.LINK, "https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Give Permissions! (Requires Manage Server)", RobertifyTheme.LIGHT.getEmoji())
+                                    )
                                     .queue();
                             return;
                         }
