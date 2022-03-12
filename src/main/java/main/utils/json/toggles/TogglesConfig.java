@@ -1,7 +1,7 @@
 package main.utils.json.toggles;
 
-import main.commands.CommandManager;
-import main.commands.ICommand;
+import main.commands.prefixcommands.CommandManager;
+import main.commands.prefixcommands.ICommand;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.Toggles;
 import main.utils.component.interactions.AbstractSlashCommand;

@@ -3,7 +3,7 @@ package main.utils.component.legacy;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import main.commands.CommandManager;
+import main.commands.prefixcommands.CommandManager;
 import main.constants.Permission;
 import main.main.Robertify;
 import main.utils.GeneralUtils;

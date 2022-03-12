@@ -2,8 +2,8 @@ package main.events;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.commands.audio.LofiCommand;
-import main.commands.commands.audio.SkipCommand;
+import main.commands.slashcommands.commands.audio.LofiCommand;
+import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;

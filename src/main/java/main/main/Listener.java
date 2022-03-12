@@ -2,8 +2,8 @@ package main.main;
 
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.CommandManager;
-import main.commands.commands.misc.reminders.ReminderScheduler;
+import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.SlashCommandManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;

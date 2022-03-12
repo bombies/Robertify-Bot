@@ -8,7 +8,7 @@ import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import main.commands.commands.misc.PlaytimeCommand;
+import main.commands.slashcommands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
 import main.main.Robertify;

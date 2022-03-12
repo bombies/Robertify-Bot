@@ -1,6 +1,6 @@
 package main.utils.pagination;
 
-import main.commands.commands.audio.FavouriteTracksCommand;
+import main.commands.slashcommands.commands.audio.FavouriteTracksCommand;
 import main.constants.MessageButton;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;

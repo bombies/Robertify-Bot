@@ -2,8 +2,8 @@ package main.utils.json.dedicatedchannel;
 
 import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.commands.audio.LofiCommand;
-import main.commands.commands.management.dedicatedchannel.DedicatedChannelCommand;
+import main.commands.slashcommands.commands.audio.LofiCommand;
+import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.constants.RobertifyEmoji;
 import main.main.Robertify;
 import main.utils.GeneralUtils;

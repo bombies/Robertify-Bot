@@ -6,7 +6,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
-import main.commands.CommandContext;
+import main.commands.prefixcommands.CommandContext;
 import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
