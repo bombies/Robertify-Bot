@@ -5,9 +5,12 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.reminders.ReminderUser;
 import main.utils.json.reminders.RemindersConfig;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +96,11 @@ public class ReminderScheduler {
                         return;
                     }
 
+                    if (!guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE)) {
+                        dmReminder(guild, user, reminder);
+                        return;
+                    }
+
                     channel.sendMessage(GeneralUtils.toMention(user, GeneralUtils.Mentioner.USER) + ", here is your reminder:")
                             .setEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminder", reminder)
                                     .setTimestamp(Instant.now())
@@ -128,7 +136,8 @@ public class ReminderScheduler {
                         .setFooter("Reminder from: " + guild.getName())
                         .setTimestamp(Instant.now())
                         .build())
-                .queue()
+                .queue(null, new ErrorHandler()
+                        .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}))
         );
     }
 

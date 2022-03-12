@@ -98,6 +98,14 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You cannot set the reminder channel to " + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL) + " as it is banned!")
                     .build();
 
+        TextChannel channel = guild.getTextChannelById(channelID);
+        Member selfMember = guild.getSelfMember();
+
+        if (channel != null)
+            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_WRITE))
+                return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                        .build();
+
         long timeInMillis = 0;
 
         try {
@@ -120,7 +128,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 guild.getIdLong(),
                 user.getIdLong(),
                 reminder,
-                channelID == null ? -1 : channelID,
+                channelID,
                 timeInMillis
         );
 
@@ -128,7 +136,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 .scheduleReminder(
                         user.getIdLong(),
                         guild.getIdLong(),
-                        channelID == null ? -1 : channelID,
+                        channelID,
                         timeInMillis,
                         reminder,
                         remindersConfig.getReminders(guild.getIdLong(), user.getIdLong()).size()-1
