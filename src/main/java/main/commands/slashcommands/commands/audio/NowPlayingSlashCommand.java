@@ -34,7 +34,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), selfVoiceState, memberVoiceState).build())
+        event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getTextChannel(), selfVoiceState, memberVoiceState).build())
                 .setEphemeral(false)
                 .queue();
     }

@@ -180,7 +180,8 @@ public class GeneralUtils {
         return retrieveUser(Long.parseLong(id));
     }
 
-    public static String progressBar(double percent, ProgressBar barType) {
+    public static String progressBar(Guild guild, TextChannel channel, double percent, ProgressBar barType) {
+        final var self = guild.getSelfMember();
         switch (barType) {
             case DURATION -> {
                 StringBuilder str = new StringBuilder();
@@ -197,28 +198,28 @@ public class GeneralUtils {
                 if (percent * 12 == 0L) {
                     for (int i = 0; i < 12; i++) {
                         if (i == 0)
-                            str.append(RobertifyEmoji.BAR_START_EMPTY);
+                            str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_START_EMPTY : "⬜");
                         else if (i == 11)
-                            str.append(RobertifyEmoji.BAR_END_EMPTY);
+                            str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_END_EMPTY : "⬜");
                         else
-                            str.append(RobertifyEmoji.BAR_MIDDLE_EMPTY);
+                            str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_MIDDLE_EMPTY : "⬜");
                     }
                 } else {
                     for (int i = 0; i < 12; i++)
                         if (i <= (int) (percent * 12)) {
                             if (i == 0)
-                                str.append(RobertifyEmoji.BAR_START_FULL);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_START_FULL : "⬛");
                             else if (i == 11)
-                                str.append(RobertifyEmoji.BAR_END_FULL);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_END_FULL : "⬛");
                             else
-                                str.append(RobertifyEmoji.BAR_MIDDLE_FULL);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_MIDDLE_FULL : "⬛");
                         } else {
                             if (i == 0)
-                                str.append(RobertifyEmoji.BAR_START_EMPTY);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_START_EMPTY : "⬜");
                             else if (i == 11)
-                                str.append(RobertifyEmoji.BAR_END_EMPTY);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_END_EMPTY : "⬜");
                             else
-                                str.append(RobertifyEmoji.BAR_MIDDLE_EMPTY);
+                                str.append(self.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_EXT_EMOJI) ? RobertifyEmoji.BAR_MIDDLE_EMPTY : "⬜");
                         }
                 }
                 return str.toString();

@@ -38,10 +38,10 @@ public class NowPlayingCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        msg.replyEmbeds(getNowPlayingEmbed(ctx.getGuild(), selfVoiceState, memberVoiceState).build()).queue();
+        msg.replyEmbeds(getNowPlayingEmbed(ctx.getGuild(), ctx.getChannel(), selfVoiceState, memberVoiceState).build()).queue();
     }
 
-    public EmbedBuilder getNowPlayingEmbed(Guild guild, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+    public EmbedBuilder getNowPlayingEmbed(Guild guild, TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
@@ -84,13 +84,13 @@ public class NowPlayingCommand implements ICommand {
                         "") +
                 "\n\n "+ (info.isStream() ? "" : "`[0:00]`") +
                         (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "" : (
-                GeneralUtils.progressBar(progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream() ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().getLength()) +"]`") + "\n\n" +
+                GeneralUtils.progressBar(guild, channel, progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream() ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().getLength()) +"]`") + "\n\n" +
                 (info.isStream() ?
                         "📺 **[Livestream]**\n"
                                 :
                         "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getInfo().getLength()-audioPlayer.getTrackPosition()) + "`\n") +
 
-                "\n🔇 " + GeneralUtils.progressBar(filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
+                "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
         switch (track.getInfo().getSourceName()) {
             case "spotify" -> eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().getIdentifier()));
