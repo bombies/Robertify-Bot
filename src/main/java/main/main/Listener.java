@@ -8,6 +8,7 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.json.changelog.ChangeLogConfig;
@@ -211,17 +212,12 @@ public class Listener extends ListenerAdapter {
     }
 
     public void loadSlashCommands(Guild g) {
-        final SlashCommandManager slashCommandManager = new SlashCommandManager();
-
-        for (var command : slashCommandManager.getCommands())
-            command.loadCommand(g);
-        for (var command : slashCommandManager.getDevCommands())
-            command.loadCommand(g);
+        AbstractSlashCommand.loadAllCommands(g);
     }
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        loadSlashCommands(g);
+        AbstractSlashCommand.loadAllCommands(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

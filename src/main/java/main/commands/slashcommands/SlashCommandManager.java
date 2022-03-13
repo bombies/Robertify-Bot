@@ -172,6 +172,12 @@ public class SlashCommandManager {
                 .anyMatch(it -> it.getName().equalsIgnoreCase(command.getName()));
     }
 
+    public boolean isDevCommand(String name) {
+        return getDevCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(name));
+    }
+
 
     public List<AbstractSlashCommand> getCommands() {
         final List<AbstractSlashCommand> abstractSlashCommands = new ArrayList<>();

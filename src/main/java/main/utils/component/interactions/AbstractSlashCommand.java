@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
@@ -31,6 +32,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,6 +70,24 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command.isPrivate;
     }
 
+    public List<SubCommand> getSubCommands() {
+        if (command == null)
+            buildCommand();
+        return command.subCommands;
+    }
+
+    public List<SubCommandGroup> getSubCommandGroups() {
+        if (command == null)
+            buildCommand();
+        return command.subCommandGroups;
+    }
+
+    public List<CommandOption> getOptions() {
+        if (command == null)
+            buildCommand();
+        return command.getOptions();
+    }
+
     public List<Permission> getUserRequiredPermissions() {
         if (command == null)
             buildCommand();
@@ -78,6 +98,53 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             buildCommand();
         return command.botRequiredPermissions;
+    }
+
+    private CommandData getCommandData() {
+        if (command == null)
+            buildCommand();
+
+        CommandData commandData = new CommandData(
+                command.name, command.description
+        );
+
+        // Adding subcommands
+        if (!command.getSubCommands().isEmpty() || !command.getSubCommandGroups().isEmpty()) {
+            if (!command.getSubCommands().isEmpty()) {
+                for (SubCommand subCommand : command.getSubCommands()) {
+                    var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
+
+                    // Adding options for subcommands
+                    for (CommandOption options : subCommand.getOptions()) {
+                        OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                        if (options.getChoices() != null)
+                            for (String choices : options.getChoices())
+                                optionData.addChoice(choices, choices);
+
+                        subCommandData.addOptions(optionData);
+                    }
+                    commandData.addSubcommands(subCommandData);
+                }
+            }
+
+            if (!command.getSubCommandGroups().isEmpty())
+                for (var subCommandGroup : command.getSubCommandGroups())
+                    commandData.addSubcommandGroups(subCommandGroup.build());
+        } else {
+            // Adding options for the main command
+            for (CommandOption options : command.getOptions()) {
+                OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+
+                if (options.getChoices() != null)
+                    for (String choices : options.getChoices())
+                        optionData.addChoice(choices, choices);
+                commandData.addOptions(optionData);
+            }
+        }
+
+        if (command.isPrivate)
+            commandData.setDefaultEnabled(false);
+        return commandData;
     }
 
 
@@ -135,6 +202,84 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             developers.forEach(developer -> createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(developer)).queue());
         }, new ErrorHandler()
                 .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
+    }
+
+    public static void loadAllCommands(Guild g) {
+        SlashCommandManager slashCommandManager = new SlashCommandManager();
+        List<AbstractSlashCommand> commands = slashCommandManager.getCommands();
+        List<AbstractSlashCommand> devCommands = slashCommandManager.getDevCommands();
+        CommandListUpdateAction commandListUpdateAction = g.updateCommands();
+
+        for (var cmd : commands)
+            commandListUpdateAction = commandListUpdateAction.addCommands(
+                    cmd.getCommandData()
+            );
+        for (var cmd : devCommands)
+            commandListUpdateAction = commandListUpdateAction.addCommands(
+                    cmd.getCommandData()
+            );
+
+        commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, e -> {
+            for (var createdCommand : e) {
+                if (!slashCommandManager.isDevCommand(createdCommand.getName())) continue;
+
+                List<Long> developers = BotInfoCache.getInstance().getDevelopers();
+                developers.forEach(developer -> createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(developer)).queue());
+            }
+        }, new ErrorHandler().handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
+                owner -> owner.getUser()
+                        .openPrivateChannel().queue(channel -> {
+                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, I could not create slash commands in **"+g.getName()+"**" +
+                                            " due to being re-invited too many times. Try inviting me again tomorrow to fix this issue.").build())
+                                    .queue(null, new ErrorHandler()
+                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ex2 -> {}));
+                        })
+                ))
+        );
+    }
+
+    @SneakyThrows
+    private static CommandCreateAction getCommandCreateAction(Guild g, AbstractSlashCommand command) {
+        // Initial request builder
+        CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
+
+        // Adding subcommands
+        if (!command.getSubCommands().isEmpty() || !command.getSubCommandGroups().isEmpty()) {
+            if (!command.getSubCommands().isEmpty()) {
+                for (SubCommand subCommand : command.getSubCommands()) {
+                    var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
+
+                    // Adding options for subcommands
+                    for (CommandOption options : subCommand.getOptions()) {
+                        OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                        if (options.getChoices() != null)
+                            for (String choices : options.getChoices())
+                                optionData.addChoice(choices, choices);
+
+                        subCommandData.addOptions(optionData);
+                    }
+                    commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
+                }
+            }
+
+            if (!command.getSubCommandGroups().isEmpty())
+                for (var subCommandGroup : command.getSubCommandGroups())
+                    commandCreateAction = commandCreateAction.addSubcommandGroups(subCommandGroup.build());
+        } else {
+            // Adding options for the main command
+            for (CommandOption options : command.getOptions()) {
+                OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+
+                if (options.getChoices() != null)
+                    for (String choices : options.getChoices())
+                        optionData.addChoice(choices, choices);
+                commandCreateAction = commandCreateAction.addOptions(optionData);
+            }
+        }
+
+        if (command.isDevCommand())
+            commandCreateAction = commandCreateAction.setDefaultEnabled(false);
+        return commandCreateAction;
     }
 
     protected void setCommand(Command command) {
@@ -341,10 +486,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected static class Command {
-        @Getter
-        @NotNull
+        @Getter @NotNull
         private final String name;
-        @Getter @Nullable
+        @Getter @NotNull
         private final String description;
         @Getter @NotNull
         private final List<CommandOption> options;
@@ -548,7 +692,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return new SubCommandGroup(name, description, subCommands);
         }
 
-        public SubcommandGroupData build() throws InvalidBuilderException {
+        @SneakyThrows
+        public SubcommandGroupData build() {
 
             SubcommandGroupData data = new SubcommandGroupData(name, description);
 
