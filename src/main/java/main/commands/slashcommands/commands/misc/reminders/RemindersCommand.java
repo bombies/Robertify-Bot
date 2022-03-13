@@ -94,6 +94,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     private MessageEmbed handleAdd(Guild guild, User user, String reminder, String time, @Nullable Long channelID) {
         RemindersConfig remindersConfig = new RemindersConfig();
 
+        channelID = channelID == null ? -1L : channelID;
+
         if (remindersConfig.channelIsBanned(guild.getIdLong(), channelID))
             return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You cannot set the reminder channel to " + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL) + " as it is banned!")
                     .build();

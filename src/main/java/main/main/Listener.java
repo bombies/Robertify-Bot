@@ -66,9 +66,9 @@ public class Listener extends ListenerAdapter {
         new ChangeLogConfig().initConfig();
 
         for (Guild g : Robertify.api.getGuilds()) {
+            GeneralUtils.setDefaultEmbed(g);
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
-            GeneralUtils.setDefaultEmbed(g);
 
             DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
             try {
@@ -142,13 +142,21 @@ public class Listener extends ListenerAdapter {
             if (!message.getContentRaw().startsWith("<@!"+guild.getSelfMember().getId()+">"))
                 return;
 
-            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Hey "+event.getAuthor().getAsMention()+"! Thank you for using Robertify. :)\n" +
-                            "My prefix in this server is: `" + prefix + "`\n\n" +
-                                    "Type `"+prefix+"help` to see all the commands I offer!\n" +
-                                    "[Invite](https://robertify.me/invite) | [Commands](https://robertify.me/commands) | [Support](https://robertify.me/support)")
-                            .setFooter("Developed by bombies#4445")
-                            .build())
-                    .queue();
+            try {
+                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Hey " + event.getAuthor().getAsMention() + "! Thank you for using Robertify. :)\n" +
+                                        "My prefix in this server is: `" + prefix + "`\n\n" +
+                                        "Type `" + prefix + "help` to see all the commands I offer!\n" +
+                                        "[Invite](https://robertify.me/invite) | [Commands](https://robertify.me/commands) | [Support](https://robertify.me/support)")
+                                .setFooter("Developed by bombies#4445")
+                                .build())
+                        .queue();
+            } catch (InsufficientPermissionException e) {
+                if (!e.getMessage().contains("EMBED")) return;
+
+                message.reply("Hey " + event.getAuthor().getAsMention() + "! Thank you for using Robertify. :)\n" +
+                        "My prefix in this server is: `" + prefix + "`\n\n" +
+                        "Type `" + prefix + "help` to see all the commands I offer!\n").queue();
+            }
         }
     }
 

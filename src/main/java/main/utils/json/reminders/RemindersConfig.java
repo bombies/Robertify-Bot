@@ -255,6 +255,10 @@ public class RemindersConfig extends AbstractGuildConfig {
         }
     }
 
+    public boolean guildHasReminders(long gid) {
+        return getAllGuildUsers(gid).isEmpty();
+    }
+
     public void banChannel(long gid, long cid) {
         if (channelIsBanned(gid, cid))
             throw new IllegalStateException("This channel is already banned!");
@@ -343,7 +347,7 @@ public class RemindersConfig extends AbstractGuildConfig {
             guildObject.put(Fields.REMINDERS.toString(), reminderObj);
         }
 
-        getCache().updateCache(Document.parse(guildObject.toString()));
+        getCache().updateGuild(guildObject);
     }
 
     public enum Fields implements GenericJSONField {

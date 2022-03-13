@@ -90,7 +90,7 @@
         <dependency>
             <groupId>com.github.KittyBot-Org</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>5.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>

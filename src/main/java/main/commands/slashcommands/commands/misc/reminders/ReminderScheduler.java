@@ -43,6 +43,9 @@ public class ReminderScheduler {
     public void scheduleGuildReminders(Guild guild) {
         RemindersConfig config = new RemindersConfig();
 
+        if (!config.guildHasReminders(guild.getIdLong()))
+            return;
+
         List<ReminderUser> allGuildUsers = config.getAllGuildUsers(guild.getIdLong());
 
         for (var user : allGuildUsers) {
