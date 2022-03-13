@@ -1,5 +1,7 @@
 package main.utils.database.mongodb.databases;
 
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import main.constants.Database;
 import main.constants.ENV;
 import main.constants.RobertifyTheme;
@@ -10,11 +12,14 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.DocumentBuilder;
 import main.utils.json.GenericJSONField;
 import main.utils.json.toggles.TogglesConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class GuildsDB extends AbstractMongoDatabase {
     private final static Logger logger = LoggerFactory.getLogger(GuildsDB.class);
@@ -26,11 +31,29 @@ public class GuildsDB extends AbstractMongoDatabase {
 
     @Override
     public synchronized void init() {
-        for (var guild : Robertify.api.getGuilds()) {
+        final List<Guild> guilds = Robertify.api.getGuilds();
+        for (var guild : guilds) {
             if (specificDocumentExists(Field.GUILD_ID, guild.getIdLong()))
                 continue;
 
             addDocument(getGuildDocument(guild.getIdLong()));
+        }
+
+        MongoCollection<Document> collection = getCollection();
+        MongoCursor<Document> cursor = collection.find().cursor();
+
+        while (cursor.hasNext()) {
+            Document guildDoc = cursor.next();
+            JSONObject jsonObject = new JSONObject(guildDoc.toJson());
+            long guildID = jsonObject.getLong(Field.GUILD_ID.toString());
+
+            Guild filteredResult = guilds.stream()
+                    .filter(guild -> guild.getIdLong() == guildID)
+                    .findFirst()
+                    .orElse(null);
+
+            if (filteredResult == null)
+                removeDocument(guildDoc);
         }
     }
 
