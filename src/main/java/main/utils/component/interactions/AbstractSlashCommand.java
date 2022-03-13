@@ -238,50 +238,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         );
     }
 
-    @SneakyThrows
-    private static CommandCreateAction getCommandCreateAction(Guild g, AbstractSlashCommand command) {
-        // Initial request builder
-        CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
-
-        // Adding subcommands
-        if (!command.getSubCommands().isEmpty() || !command.getSubCommandGroups().isEmpty()) {
-            if (!command.getSubCommands().isEmpty()) {
-                for (SubCommand subCommand : command.getSubCommands()) {
-                    var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
-
-                    // Adding options for subcommands
-                    for (CommandOption options : subCommand.getOptions()) {
-                        OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
-                        if (options.getChoices() != null)
-                            for (String choices : options.getChoices())
-                                optionData.addChoice(choices, choices);
-
-                        subCommandData.addOptions(optionData);
-                    }
-                    commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
-                }
-            }
-
-            if (!command.getSubCommandGroups().isEmpty())
-                for (var subCommandGroup : command.getSubCommandGroups())
-                    commandCreateAction = commandCreateAction.addSubcommandGroups(subCommandGroup.build());
-        } else {
-            // Adding options for the main command
-            for (CommandOption options : command.getOptions()) {
-                OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
-
-                if (options.getChoices() != null)
-                    for (String choices : options.getChoices())
-                        optionData.addChoice(choices, choices);
-                commandCreateAction = commandCreateAction.addOptions(optionData);
-            }
-        }
-
-        if (command.isDevCommand())
-            commandCreateAction = commandCreateAction.setDefaultEnabled(false);
-        return commandCreateAction;
-    }
-
     protected void setCommand(Command command) {
         this.command = command;
     }
