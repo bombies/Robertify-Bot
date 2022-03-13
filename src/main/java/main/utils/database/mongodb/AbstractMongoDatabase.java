@@ -141,6 +141,12 @@ public abstract class AbstractMongoDatabase {
         collection.deleteMany(bsonQuery);
     }
 
+    protected void removeManyDocuments(List<Document> docs) {
+        List<WriteModel<? extends Document>> bulkWriteModels = new ArrayList<>();
+        docs.forEach(doc -> bulkWriteModels.add(new DeleteOneModel<>(doc)));
+        collection.bulkWrite(bulkWriteModels);
+    }
+
     /**
      * Remove all documents with the specified key and value
      * @param key The key

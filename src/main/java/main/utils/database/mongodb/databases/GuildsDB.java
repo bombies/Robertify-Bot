@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GuildsDB extends AbstractMongoDatabase {
@@ -39,8 +40,9 @@ public class GuildsDB extends AbstractMongoDatabase {
             addDocument(getGuildDocument(guild.getIdLong()));
         }
 
-        MongoCollection<Document> collection = getCollection();
-        MongoCursor<Document> cursor = collection.find().cursor();
+        final MongoCollection<Document> collection = getCollection();
+        final MongoCursor<Document> cursor = collection.find().cursor();
+        final List<Document> documentsToRemove = new ArrayList<>();
 
         while (cursor.hasNext()) {
             Document guildDoc = cursor.next();
@@ -53,8 +55,12 @@ public class GuildsDB extends AbstractMongoDatabase {
                     .orElse(null);
 
             if (filteredResult == null)
-                removeDocument(guildDoc);
+                documentsToRemove.add(guildDoc);
+
         }
+
+        if (!documentsToRemove.isEmpty())
+            removeManyDocuments(documentsToRemove);
     }
 
     public synchronized void addGuild(long gid) {

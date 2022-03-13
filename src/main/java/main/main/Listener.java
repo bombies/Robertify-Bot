@@ -221,7 +221,7 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-//        loadSlashCommands(g);
+        loadSlashCommands(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
