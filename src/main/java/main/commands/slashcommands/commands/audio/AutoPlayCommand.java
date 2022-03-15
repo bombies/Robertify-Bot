@@ -21,15 +21,17 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
     }
 
     public MessageEmbed handleAutoPlay(Guild guild) {
-        AutoPlayConfig autoPlayConfig = new AutoPlayConfig();
+        return RobertifyEmbedUtils.embedMessage(guild, "Autoplay is not accessible at the moment!").build();
 
-        if (autoPlayConfig.getStatus(guild.getIdLong())) {
-            autoPlayConfig.setStatus(guild.getIdLong(), false);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **OFF**!").build();
-        } else {
-            autoPlayConfig.setStatus(guild.getIdLong(), true);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **ON**!").build();
-        }
+//        AutoPlayConfig autoPlayConfig = new AutoPlayConfig();
+//
+//        if (autoPlayConfig.getStatus(guild.getIdLong())) {
+//            autoPlayConfig.setStatus(guild.getIdLong(), false);
+//            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **OFF**!").build();
+//        } else {
+//            autoPlayConfig.setStatus(guild.getIdLong(), true);
+//            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **ON**!").build();
+//        }
     }
 
     @Override
