@@ -214,10 +214,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             commandListUpdateAction = commandListUpdateAction.addCommands(
                     cmd.getCommandData()
             );
-        for (var cmd : devCommands)
-            commandListUpdateAction = commandListUpdateAction.addCommands(
-                    cmd.getCommandData()
-            );
 
         commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, e -> {
             for (var createdCommand : e) {
