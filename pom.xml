@@ -23,7 +23,7 @@
         <dependency>
             <groupId>me.duncte123</groupId>
             <artifactId>botCommons</artifactId>
-            <version>2.3.10</version>
+            <version>2.3.11</version>
         </dependency>
         <dependency>
             <groupId>com.jagrosh</groupId>
