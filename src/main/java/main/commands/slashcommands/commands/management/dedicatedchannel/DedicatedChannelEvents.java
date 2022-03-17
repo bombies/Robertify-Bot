@@ -5,6 +5,7 @@ import main.commands.prefixcommands.ICommand;
 import main.commands.prefixcommands.audio.*;
 import main.commands.slashcommands.commands.audio.FavouriteTracksCommand;
 import main.commands.slashcommands.commands.audio.PreviousTrackCommand;
+import main.commands.slashcommands.commands.audio.StopCommand;
 import main.constants.Permission;
 import main.constants.SourcePlaylistPatterns;
 import main.constants.Toggles;
@@ -292,7 +293,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            EmbedBuilder stopEmbed = new StopCommand().handleStop(event.getUser(), musicManager);
+            EmbedBuilder stopEmbed = new StopCommand().handleStop(event.getMember());
             event.reply(member.getAsMention()).addEmbeds(stopEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));

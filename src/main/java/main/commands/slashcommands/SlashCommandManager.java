@@ -66,7 +66,8 @@ public class SlashCommandManager {
                 new NightcoreFilter(),
                 new EightDFilter(),
                 new TremoloFilter(),
-                new VibratoFilter()
+                new VibratoFilter(),
+                new StopCommand()
         );
 
         addManagementCommands(

@@ -3,6 +3,7 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.audio.StopCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.RobertifyTheme;
@@ -225,7 +226,7 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-//        AbstractSlashCommand.loadAllCommands(g);
+        new StopCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {
