@@ -4,6 +4,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.IDevCommand;
 import main.constants.ENV;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -71,6 +72,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("api", ctx.getJDA());
             engine.put("guild", ctx.getGuild());
             engine.put("member", ctx.getMember());
+            engine.put("link", Robertify.getLavalink());
 
             Object out = engine.eval(
                     "(function() {\n" +
