@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.misc;
 
+import com.google.api.client.util.Strings;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.constants.Permission;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +67,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
                     .queue();
             case "list" -> msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getMember()).build())
                     .queue();
-            default -> msg.replyEmbeds(handle8Ball(ctx.getGuild()).build())
+            default -> msg.replyEmbeds(handle8Ball(ctx.getGuild(), ctx.getAuthor(), String.join(" ", args)).build())
                     .queue();
         }
 
@@ -143,7 +145,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         return RobertifyEmbedUtils.embedMessage(guild, "**List of Responses**\n\n" + sb);
     }
 
-    private EmbedBuilder handle8Ball(Guild guild) {
+    private EmbedBuilder handle8Ball(Guild guild, User asker, String question) {
         final var affirmativeAnswers = List.of(
                 "It is certain.",
                 "It is decidedly so.",
@@ -178,21 +180,28 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
         if (!customAnswers.isEmpty()) {
             if (random < 0.11) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
             } else if (random > 0.11 && random < 0.22) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             } else if (random > 0.22 && random < 0.33) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  negativeAnswers.get(new Random().nextInt(negativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  negativeAnswers.get(new Random().nextInt(negativeAnswers.size())));
             } else if (random > 0.33) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  customAnswers.get(new Random().nextInt(customAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  customAnswers.get(new Random().nextInt(customAnswers.size())));
             }
         } else {
             if (random < 0.5) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())));
             } else if (random > 0.5 && random < 0.75) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             } else if (random > 0.75) {
-                return RobertifyEmbedUtils.embedMessage(guild, "🎱| " +  negativeAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
+                return RobertifyEmbedUtils.embedMessage(guild, asker.getAsMention() + "asked:\n```" + question + "```\n**My Response**\n" +
+                        "🎱| " +  negativeAnswers.get(new Random().nextInt(nonCommittalAnswers.size())));
             }
         }
 
@@ -278,9 +287,13 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         final var user = event.getMember();
 
         switch(event.getSubcommandName()) {
-            case "ask" -> event.replyEmbeds(handle8Ball(guild).build())
-                    .setEphemeral(false)
-                    .queue();
+            case "ask" -> {
+                GeneralUtils.setCustomEmbed(event.getGuild(), "");
+                event.replyEmbeds(handle8Ball(guild, event.getUser(), event.getOption("question").getAsString()).build())
+                        .setEphemeral(false)
+                        .queue();
+                GeneralUtils.setDefaultEmbed(event.getGuild());
+            }
             case "add" -> {
                 final var response = event.getOption("response").getAsString();
                 event.replyEmbeds(handleAdd(guild, user, response).build())
