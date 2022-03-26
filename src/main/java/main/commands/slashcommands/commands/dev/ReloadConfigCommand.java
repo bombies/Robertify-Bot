@@ -5,6 +5,7 @@ import main.commands.prefixcommands.IDevCommand;
 import main.commands.RandomMessageManager;
 import main.constants.ENV;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +23,7 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
 
         try {
             Config.reload();
+            Robertify.initVoteSiteAPIs();
             RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
 
             ctx.getMessage().addReaction("✅").queue();

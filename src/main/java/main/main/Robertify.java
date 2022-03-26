@@ -148,17 +148,7 @@ public class Robertify {
 
             deezerApi = new DeezerApi();
 
-            if (!Config.get(ENV.TOP_GG_TOKEN).isEmpty())
-                topGGAPI = new DiscordBotListAPI.Builder()
-                        .token(Config.get(ENV.TOP_GG_TOKEN))
-                        .botId(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
-                        .build();
-
-            if (!Config.get(ENV.DBL_TOKEN).isEmpty())
-                discordBotListAPI = new DBLApi.Builder()
-                    .setToken(Config.get(ENV.DBL_TOKEN))
-                        .setBotID(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
-                        .build();
+            initVoteSiteAPIs();
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
@@ -173,6 +163,20 @@ public class Robertify {
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
+    }
+
+    public static void initVoteSiteAPIs() {
+        if (!Config.get(ENV.TOP_GG_TOKEN).isEmpty())
+            topGGAPI = new DiscordBotListAPI.Builder()
+                    .token(Config.get(ENV.TOP_GG_TOKEN))
+                    .botId(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
+                    .build();
+
+        if (!Config.get(ENV.DBL_TOKEN).isEmpty())
+            discordBotListAPI = new DBLApi.Builder()
+                    .setToken(Config.get(ENV.DBL_TOKEN))
+                    .setBotID(getIdFromToken(Config.get(ENV.BOT_TOKEN)))
+                    .build();
     }
 
     private static String getIdFromToken(String token) {
