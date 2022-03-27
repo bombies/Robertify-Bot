@@ -88,6 +88,11 @@
             <version>1.0.3</version>
         </dependency>
         <dependency>
+            <groupId>com.github.walkyst</groupId>
+            <artifactId>lavaplayer-fork</artifactId>
+            <version>1.3.97</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
             <version>2b1b439</version>

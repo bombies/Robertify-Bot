@@ -261,6 +261,7 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
+
         musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
     }
 
