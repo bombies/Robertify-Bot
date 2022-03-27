@@ -1,6 +1,6 @@
 package main.audiohandlers;
 
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
@@ -253,7 +253,7 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(user, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
@@ -261,30 +261,29 @@ public class RobertifyAudioManager {
                            boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
-
-        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
     public void loadSearchResults(GuildMusicManager musicManager, User searcher, Message botMsg, String query) {
         final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
-        musicManager.getLink().getRestClient().loadItem(query, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
     }
 
     public void loadSearchResults(GuildMusicManager musicManager, User searcher, InteractionHook botMsg, String query) {
         final SearchResultLoader loader = new SearchResultLoader(musicManager.getGuild(), searcher, query, botMsg);
-        musicManager.getLink().getRestClient().loadItem(query, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
     }
 
     public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, String query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
-        musicManager.getLink().getRestClient().loadItem(query, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(requester, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
     private void loadPlaylistShuffled(String trackUrl, GuildMusicManager musicManager,
@@ -292,7 +291,7 @@ public class RobertifyAudioManager {
                                       boolean addToBeginning) {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, true, addToBeginning);
-        musicManager.getLink().getRestClient().loadItem(trackUrl, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
     public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
@@ -311,14 +310,14 @@ public class RobertifyAudioManager {
         return "<@" +
                 tracksRequestedByUsers.get(guild.getIdLong())
                         .stream()
-                        .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getTrack()))
+                        .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getIdentifier()))
                         .findFirst().get()
                         .split(":")[0]
                 + ">";
     }
 
     public static void removeRequester(Guild guild, AudioTrack track, User requester) {
-        tracksRequestedByUsers.get(guild.getIdLong()).remove(requester.getId() + ":" + track.getTrack());
+        tracksRequestedByUsers.get(guild.getIdLong()).remove(requester.getId() + ":" + track.getIdentifier());
     }
 
     public static void clearRequesters(Guild guild) {

@@ -1,8 +1,8 @@
 package main.commands.prefixcommands.audio;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lavalink.client.io.filters.Filters;
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -70,34 +70,34 @@ public class NowPlayingCommand implements ICommand {
 
         AudioTrackInfo info = track.getInfo();
 
-        double progress = (double)audioPlayer.getTrackPosition() / track.getInfo().getLength();
+        double progress = (double)audioPlayer.getTrackPosition() / track.getInfo().length;
         Filters filters = audioPlayer.getFilters();
         final String requester = RobertifyAudioManager.getRequester(guild, track);
         eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
                 ? "Lo-Fi Music"
                         :
-                info.getTitle() + " by "  + info.getAuthor()),
+                info.title + " by "  + info.author),
 
                 (((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n~ Requested by " + requester
                         :
                         "") +
-                "\n\n "+ (info.isStream() ? "" : "`[0:00]`") +
+                "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
                         (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "" : (
-                GeneralUtils.progressBar(guild, channel, progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream() ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().getLength()) +"]`") + "\n\n" +
-                (info.isStream() ?
+                GeneralUtils.progressBar(guild, channel, progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().length) +"]`") + "\n\n" +
+                (info.isStream ?
                         "📺 **[Livestream]**\n"
                                 :
-                        "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getInfo().getLength()-audioPlayer.getTrackPosition()) + "`\n") +
+                        "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()) + "`\n") +
 
                 "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
-        switch (track.getInfo().getSourceName()) {
-            case "spotify" -> eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().getIdentifier()));
-            case "deezer" -> eb.setThumbnail(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().getIdentifier())));
+        switch (track.getSourceManager().getSourceName().toLowerCase()) {
+            case "spotify" -> eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().identifier));
+            case "deezer" -> eb.setThumbnail(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier)));
         }
 
-        eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.getUri()) ? info.getUri() : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
+        eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
 
         return eb;
     }

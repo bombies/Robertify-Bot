@@ -1,6 +1,6 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;

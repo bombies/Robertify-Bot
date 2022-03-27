@@ -1,6 +1,6 @@
 package main.utils.json.dedicatedchannel;
 
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
@@ -146,15 +146,15 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setTitle(
                     LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "Lo-Fi Music"
                             :
-                    trackInfo.getTitle() + " by " + trackInfo.getAuthor() + " ["+ GeneralUtils.formatTime(playingTrack.getInfo().getLength()) +"]"
+                    trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getInfo().length) +"]"
             );
 
             var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
             eb.setDescription("Requested by " + requester);
 
-            switch (trackInfo.getSourceName()) {
-                case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.getIdentifier()));
-                case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.getIdentifier())));
+            switch (playingTrack.getSourceManager().getSourceName()) {
+                case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.identifier));
+                case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier)));
                 default -> eb.setImage(theme.getNowPlayingBanner());
             }
 
@@ -165,9 +165,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             if (queueAsList.size() > 10) {
                 int index = 1;
                 for (AudioTrack track : queueAsList.subList(0, 10))
-                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().getTitle())
-                            .append(" - ").append(track.getInfo().getAuthor())
-                            .append(" [").append(GeneralUtils.formatTime(track.getInfo().getLength()))
+                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().title)
+                            .append(" - ").append(track.getInfo().author)
+                            .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
                             .append("]\n");
             } else {
                 if (queue.size() == 0)
@@ -175,8 +175,8 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 else {
                     int index = 1;
                     for (AudioTrack track : queueAsList)
-                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().getTitle()).append(" - ").append(track.getInfo().getAuthor())
-                                .append(" [").append(GeneralUtils.formatTime(track.getInfo().getLength()))
+                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
+                                .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
                                 .append("]\n");
                 }
             }

@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -29,6 +29,7 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 
 @Deprecated @ForRemoval
 public class SkipCommand extends ListenerAdapter implements ICommand {
@@ -130,7 +131,10 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var scheduler = musicManager.getScheduler();
 
         AudioTrack playingTrack = audioPlayer.getPlayingTrack();
-        musicManager.getScheduler().getPastQueue().push(playingTrack);
+        HashMap<Long, Stack<AudioTrack>> pastQueue = musicManager.getScheduler().getPastQueue();
+        if (!pastQueue.containsKey(guild.getIdLong()))
+            pastQueue.put(guild.getIdLong(), new Stack<>());
+        pastQueue.get(guild.getIdLong()).push(audioPlayer.getPlayingTrack());
 
         if (scheduler.repeating)
             scheduler.repeating = false;
@@ -140,7 +144,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             musicManager.getScheduler().nextTrack(playingTrack, true, audioPlayer.getTrackPosition());
         } catch (AutoPlayException e) {
             scheduler.getAnnouncementChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                    "AutoPlay","Could not auto-play because tracks from `"+ playingTrack.getInfo().getSourceName()+"` aren't supported!").build())
+                    "AutoPlay","Could not auto-play because tracks from `"+ playingTrack.getSourceManager().getSourceName()+"` aren't supported!").build())
                     .queue();
             scheduler.scheduleDisconnect(true);
         }
@@ -216,7 +220,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                 .setActionRows()
                 .queue();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, "`"+info.getTitle()+" by "+info.getAuthor()+"` was vote skipped.");
+        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, "`"+info.title+" by "+info.author+"` was vote skipped.");
     }
 
     private void decrementVoteSkip(Guild guild) {

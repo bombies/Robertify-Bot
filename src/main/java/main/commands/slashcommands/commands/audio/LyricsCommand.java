@@ -1,7 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
@@ -72,14 +72,14 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                 return;
             }
 
-            if (!playingTrack.getInfo().getSourceName().equals("spotify") && !playingTrack.getInfo().getSourceName().equals("deezer")) {
+            if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify tracks!").build())
                         .queue();
                 return;
             }
 
             AudioTrackInfo trackInfo = playingTrack.getInfo();
-            query = trackInfo.getTitle() + " by " + trackInfo.getAuthor();
+            query = trackInfo.title + " by " + trackInfo.author;
         } else {
             query = String.join(" ", args);
         }
@@ -235,7 +235,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                 return;
             }
 
-            if (!playingTrack.getInfo().getSourceName().equals("spotify") && !playingTrack.getInfo().getSourceName().equals("deezer")) {
+            if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify/Deezer tracks!").build())
                         .setEphemeral(true)
                         .queue();
@@ -243,7 +243,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             }
 
             AudioTrackInfo trackInfo = playingTrack.getInfo();
-            query = trackInfo.getTitle() + " by " + trackInfo.getAuthor();
+            query = trackInfo.title + " by " + trackInfo.author;
         } else {
             query = event.getOption("song").getAsString();
         }

@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>4.0.0-BETA-5</version>
+    <version>4.0.0-BETA-6</version>
 
     <dependencies>
         <dependency>
@@ -122,16 +122,6 @@
                     <exclusion>
                         <groupId>org.json</groupId>
                         <artifactId>json</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>me.duncte123</groupId>
-                <artifactId>botCommons</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-databind</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

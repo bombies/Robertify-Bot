@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -69,13 +69,13 @@ public class RemoveCommand implements ICommand {
 
         AudioTrack removedTrack = trackList.get(id - 1);
         AudioTrackInfo info = removedTrack.getInfo();
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed `"+ info.getTitle()
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed `"+ info.title
                 +"` from the queue");
 
         if (!queue.remove(removedTrack))
             eb =  RobertifyEmbedUtils.embedMessage(guild, "Could not remove track with id "+id+" from the queue");
         else
-            new LogUtils().sendLog(guild, LogType.QUEUE_REMOVE, remover.getAsMention() + " has removed `"+ info.getTitle() +" by "+ info.getAuthor() +"` from the queue.");
+            new LogUtils().sendLog(guild, LogType.QUEUE_REMOVE, remover.getAsMention() + " has removed `"+ info.title +" by "+ info.author +"` from the queue.");
 
         if (id <= 10)
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))

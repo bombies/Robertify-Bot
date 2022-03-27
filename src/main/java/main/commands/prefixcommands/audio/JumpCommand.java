@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lavalink.client.player.IPlayer;
-import lavalink.client.player.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -68,7 +68,7 @@ public class JumpCommand implements ICommand {
         else {
             if (input == null)
                 throw new NullPointerException("Input string cannot be null");
-            return doActualJump(ctx.getGuild(), memberVoiceState.getMember().getUser(), input, audioPlayer, track);
+            return doActualJump(guild, memberVoiceState.getMember().getUser(), input, audioPlayer, track);
         }
     }
 
@@ -89,7 +89,7 @@ public class JumpCommand implements ICommand {
 
         time = TimeUnit.SECONDS.toMillis(time);
 
-        if (time > track.getInfo().getLength() - player.getTrackPosition()) {
+        if (time > track.getInfo().length - player.getTrackPosition()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "This duration cannot be more than the time left!");
             return eb;
         }

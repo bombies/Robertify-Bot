@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -77,13 +77,13 @@ public class RewindCommand implements ICommand {
         }
 
         AudioTrackInfo info = track.getInfo();
-        if (info.isStream())
+        if (info.isStream)
             return RobertifyEmbedUtils.embedMessage(guild, "You can't rewind a stream!");
 
         if (rewindToBeginning) {
             audioPlayer.seekTo(0L);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song to the beginning!");
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.getTitle()+" by "+info.getAuthor()+"` to the beginning");
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.title+" by "+info.author+"` to the beginning");
         } else {
             if (time <= 0) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, "The duration cannot be negative or zero!");
@@ -99,7 +99,7 @@ public class RewindCommand implements ICommand {
 
             audioPlayer.seekTo(audioPlayer.getTrackPosition() - time);
             eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.getTitle()+" by "+info.getAuthor()+"` by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds");
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.title+" by "+info.author+"` by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds");
         }
 
         return eb;

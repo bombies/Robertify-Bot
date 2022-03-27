@@ -1,11 +1,13 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.commands.slashcommands.commands.audio.LofiCommand;
+import main.exceptions.AutoPlayException;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -18,7 +20,9 @@ import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Deprecated @ForRemoval
@@ -63,8 +67,16 @@ public class SkipToCommand implements ICommand {
 
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
-        scheduler.getPastQueue().push(audioPlayer.getPlayingTrack());
-        scheduler.nextTrack(null);
+        HashMap<Long, Stack<AudioTrack>> pastQueue = scheduler.getPastQueue();
+        if (!pastQueue.containsKey(guild.getIdLong()))
+            pastQueue.put(guild.getIdLong(), new Stack<>());
+
+        AudioTrack playingTrack = audioPlayer.getPlayingTrack();
+        pastQueue.get(guild.getIdLong()).push(playingTrack);
+
+        try {
+            scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());
+        } catch (AutoPlayException ignored) {}
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);

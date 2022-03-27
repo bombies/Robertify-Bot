@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>4.0.0-BETA-5</version>
+  <version>4.0.0-BETA-6</version>
   <build>
     <plugins>
       <plugin>
@@ -141,16 +141,6 @@
           <exclusion>
             <artifactId>json</artifactId>
             <groupId>org.json</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>me.duncte123</groupId>
-        <artifactId>botCommons</artifactId>
-        <exclusions>
-          <exclusion>
-            <artifactId>jackson-databind</artifactId>
-            <groupId>com.fasterxml.jackson.core</groupId>
           </exclusion>
         </exclusions>
       </dependency>

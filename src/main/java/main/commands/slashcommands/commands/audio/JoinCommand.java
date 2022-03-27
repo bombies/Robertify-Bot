@@ -54,6 +54,9 @@ public class JoinCommand implements ICommand {
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
+        if (memberVoiceState.getChannel() == selfVoiceState.getChannel())
+            return RobertifyEmbedUtils.embedMessage(guild, "I am already in " + channel.getAsMention() + " !").build();
+
         RobertifyAudioManager.getInstance()
                 .joinVoiceChannel(textChannel, memberVoiceState.getChannel(), musicManager);
         return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();

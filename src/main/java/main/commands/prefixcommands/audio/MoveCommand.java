@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -91,8 +91,8 @@ public class MoveCommand implements ICommand {
 
         AudioTrackInfo info = trackList.get(id - 1).getInfo();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_MOVE, mover.getAsMention() + " has moved `"+info.getTitle()+" by "+info.getAuthor()+"` to position `"+position+"`");
-        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+ info.getTitle()
+        new LogUtils().sendLog(guild, LogType.TRACK_MOVE, mover.getAsMention() + " has moved `"+info.title+" by "+info.author+"` to position `"+position+"`");
+        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+ info.title
                 +"` to position `"+position+"`.");
     }
 

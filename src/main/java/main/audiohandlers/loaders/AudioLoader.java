@@ -1,10 +1,10 @@
 package main.audiohandlers.loaders;
 
-import lavalink.client.io.FriendlyException;
-import lavalink.client.io.LoadResultHandler;
-import lavalink.client.player.track.AudioPlaylist;
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.slashcommands.commands.audio.LofiCommand;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AudioLoader implements LoadResultHandler {
+public class AudioLoader implements AudioLoadResultHandler {
     private final Logger logger = LoggerFactory.getLogger(AudioLoader.class);
 
     private final Guild guild;
@@ -60,11 +60,11 @@ public class AudioLoader implements LoadResultHandler {
         sendTrackLoadedMessage(audioTrack);
 
         if (!announceMsg)
-            RobertifyAudioManager.getUnannouncedTracks().add(audioTrack.getTrack());
+            RobertifyAudioManager.getUnannouncedTracks().add(audioTrack.getIdentifier());
 
 
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getTrack());
+        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getIdentifier());
 
         final var scheduler = musicManager.getScheduler();
         scheduler.setAnnouncementChannel(announcementChannel);
@@ -75,7 +75,7 @@ public class AudioLoader implements LoadResultHandler {
             scheduler.queue(audioTrack);
 
         AudioTrackInfo info = audioTrack.getInfo();
-        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.getTitle() +" by "+ info.getAuthor() +"` to the queue.");
+        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
 
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
@@ -86,8 +86,8 @@ public class AudioLoader implements LoadResultHandler {
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().getTitle()
-                + "` by `" + audioTrack.getInfo().getAuthor() + "`");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().title
+                + "` by `" + audioTrack.getInfo().author + "`");
 
         if (botMsg != null) {
             if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
@@ -109,71 +109,72 @@ public class AudioLoader implements LoadResultHandler {
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
-                + "` tracks from `" + audioPlaylist.getName() + "`");
+        if (audioPlaylist.isSearchResult()) {
+            sendTrackLoadedMessage(tracks.get(0));
 
-        if (botMsg != null)
-          botMsg.editMessageEmbeds(eb.build()).queue();
-        else {
-            new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
-                    .sendMessageEmbeds(eb.build()).queue();
+            if (!announceMsg)
+                RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0).getIdentifier());
+
+            trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+            trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
+
+            final var scheduler = musicManager.getScheduler();
+            scheduler.setAnnouncementChannel(announcementChannel);
+
+            if (addToBeginning)
+                scheduler.addToBeginningOfQueue(tracks.get(0));
+            else
+                scheduler.queue(tracks.get(0));
+
+            AudioTrackInfo info = tracks.get(0).getInfo();
+            new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
+
+            if (scheduler.playlistRepeating)
+                scheduler.setSavedQueue(guild, scheduler.queue);
+
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(guild);
+        } else {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
+                    + "` tracks from `" + audioPlaylist.getName() + "`");
+
+            if (botMsg != null)
+                botMsg.editMessageEmbeds(eb.build()).queue();
+            else {
+                new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
+                        .sendMessageEmbeds(eb.build()).queue();
+            }
+
+            if (!announceMsg)
+                for (final AudioTrack track : tracks)
+                    RobertifyAudioManager.getUnannouncedTracks().add(track.getIdentifier());
+
+            if (loadPlaylistShuffled)
+                Collections.shuffle(tracks);
+
+            final var scheduler = musicManager.getScheduler();
+            scheduler.setAnnouncementChannel(announcementChannel);
+
+            if (addToBeginning)
+                scheduler.addToBeginningOfQueue(tracks);
+
+            trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+            new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+audioPlaylist.getTracks().size()+"` songs from playlist `"+ audioPlaylist.getName() +"` to the queue.");
+            for (final AudioTrack track : tracks) {
+                trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getIdentifier());
+
+                if (!addToBeginning)
+                    scheduler.queue(track);
+            }
+
+            if (scheduler.playlistRepeating)
+                scheduler.setSavedQueue(guild, scheduler.queue);
+
+            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
+                new DedicatedChannelConfig().updateMessage(guild);
         }
 
-        if (!announceMsg)
-            for (final AudioTrack track : tracks)
-                RobertifyAudioManager.getUnannouncedTracks().add(track.getTrack());
 
-        if (loadPlaylistShuffled)
-            Collections.shuffle(tracks);
-
-        final var scheduler = musicManager.getScheduler();
-        scheduler.setAnnouncementChannel(announcementChannel);
-
-        if (addToBeginning)
-            scheduler.addToBeginningOfQueue(tracks);
-
-        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+audioPlaylist.getTracks().size()+"` songs from playlist `"+ audioPlaylist.getName() +"` to the queue.");
-        for (final AudioTrack track : tracks) {
-            trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getTrack());
-
-            if (!addToBeginning)
-                scheduler.queue(track);
-        }
-
-        if (scheduler.playlistRepeating)
-            scheduler.setSavedQueue(guild, scheduler.queue);
-
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
-    }
-
-    @Override
-    public void searchResultLoaded(List<AudioTrack> list) {
-        sendTrackLoadedMessage(list.get(0));
-
-        if (!announceMsg)
-            RobertifyAudioManager.getUnannouncedTracks().add(list.get(0).getTrack());
-
-        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + list.get(0).getTrack());
-
-        final var scheduler = musicManager.getScheduler();
-        scheduler.setAnnouncementChannel(announcementChannel);
-
-        if (addToBeginning)
-            scheduler.addToBeginningOfQueue(list.get(0));
-        else
-            scheduler.queue(list.get(0));
-
-        AudioTrackInfo info = list.get(0).getInfo();
-        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.getTitle() +" by "+ info.getAuthor() +"` to the queue.");
-
-        if (scheduler.playlistRepeating)
-            scheduler.setSavedQueue(guild, scheduler.queue);
-
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
     }
 
     @Override

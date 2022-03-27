@@ -1,9 +1,9 @@
 package main.audiohandlers.loaders;
 
-import lavalink.client.io.FriendlyException;
-import lavalink.client.io.LoadResultHandler;
-import lavalink.client.player.track.AudioPlaylist;
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AutoPlayLoader implements LoadResultHandler {
+public class AutoPlayLoader implements AudioLoadResultHandler {
     private final GuildMusicManager musicManager;
     private final Guild guild;
     private final TextChannel channel;
@@ -34,6 +34,9 @@ public class AutoPlayLoader implements LoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
+        if (playlist.isSearchResult())
+            throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
+
         final var scheduler = musicManager.getScheduler();
 
         HashMap<Long, List<String>> tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
@@ -41,7 +44,7 @@ public class AutoPlayLoader implements LoadResultHandler {
 
         List<AudioTrack> tracks = playlist.getTracks();
         for (final AudioTrack track : tracks.subList(1, tracks.size())) {
-            tracksRequestedByUsers.get(guild.getIdLong()).add(guild.getSelfMember().getId() + ":" + track.getTrack());
+            tracksRequestedByUsers.get(guild.getIdLong()).add(guild.getSelfMember().getId() + ":" + track.getIdentifier());
             scheduler.queue(track);
         }
 
@@ -60,11 +63,6 @@ public class AutoPlayLoader implements LoadResultHandler {
                     .setFooter("You can toggle autoplay off by running the \"autoplay\" command")
                     .build()
             ).queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
-    }
-
-    @Override
-    public void searchResultLoaded(List<AudioTrack> tracks) {
-        throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
     }
 
     @Override

@@ -1,11 +1,10 @@
 package main.audiohandlers.loaders;
 
-import lavalink.client.io.FriendlyException;
-import lavalink.client.io.LoadResultHandler;
-import lavalink.client.player.track.AudioPlaylist;
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
-import lombok.SneakyThrows;
+import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
@@ -21,7 +20,7 @@ import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 import java.util.List;
 
-public class SearchResultLoader implements LoadResultHandler {
+public class SearchResultLoader implements AudioLoadResultHandler {
     private final Guild guild;
     private final User searcher;
     private final String query;
@@ -51,11 +50,10 @@ public class SearchResultLoader implements LoadResultHandler {
 
     @Override
     public void playlistLoaded(AudioPlaylist playlist) {
-        throw new UnsupportedOperationException("This operation is not supported in the search result loader");
-    }
+        if (!playlist.isSearchResult())
+            throw new UnsupportedOperationException("This operation is not supported in the search result loader");
 
-    @Override @SneakyThrows
-    public void searchResultLoaded(List<AudioTrack> tracks) {
+        final var tracks = playlist.getTracks();
         SelectionMenuBuilder selectionMenuBuilder = new SelectionMenuBuilder()
                 .setName("searchresult:" + searcher.getId() + ":" + query.toLowerCase()
                         .replaceAll(" ", "%SPACE%"))
@@ -66,9 +64,9 @@ public class SearchResultLoader implements LoadResultHandler {
 
         for (int i = 0; i < Math.min(10, tracks.size()); i++) {
             AudioTrackInfo info = tracks.get(i).getInfo();
-            selectionMenuBuilder.addOption(info.getTitle(), info.getIdentifier(), null);
-            embedDescription.append("**").append(i+1).append(".** - ").append(info.getTitle()).append(" by ")
-                    .append(info.getAuthor()).append(" [").append(GeneralUtils.formatTime(info.getLength()))
+            selectionMenuBuilder.addOption(info.title, info.identifier, null);
+            embedDescription.append("**").append(i+1).append(".** - ").append(info.title).append(" by ")
+                    .append(info.author).append(" [").append(GeneralUtils.formatTime(info.length))
                     .append("]").append("\n");
         }
 

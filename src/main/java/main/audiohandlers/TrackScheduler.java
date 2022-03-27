@@ -1,10 +1,10 @@
 package main.audiohandlers;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lavalink.client.io.Link;
 import lavalink.client.player.IPlayer;
 import lavalink.client.player.event.PlayerEventListenerAdapter;
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackEndReason;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -44,8 +44,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     private final Link audioPlayer;
     @Setter @Getter
     private TextChannel announcementChannel = null;
+    private AudioTrack lastPlayedTrackBuffer;
     @Getter
-    private final Stack<AudioTrack> pastQueue;
+    private final static HashMap<Long, Stack<AudioTrack>> pastQueue = new HashMap<>();
     public ConcurrentLinkedQueue<AudioTrack> queue;
     public boolean repeating = false;
     public boolean playlistRepeating = false;
@@ -55,7 +56,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
         this.queue = new ConcurrentLinkedQueue<>();
-        this.pastQueue = new Stack<>();
     }
 
     public void queue(AudioTrack track) {
@@ -80,19 +80,21 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             disconnectExecutors.remove(guild.getIdLong());
         }
 
+        lastPlayedTrackBuffer = track;
+
         if (repeating) return;
 
         if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
 
-        if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getTrack())) {
-            RobertifyAudioManager.getUnannouncedTracks().remove(track.getTrack());
+        if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getIdentifier())) {
+            RobertifyAudioManager.getUnannouncedTracks().remove(track.getIdentifier());
             return;
         }
 
         final var requester = RobertifyAudioManager.getRequester(guild, track);
 
         if (announcementChannel != null) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().getTitle() + "` by `"+track.getInfo().getAuthor() +"`"
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author +"`"
                     + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
                     "\n\n~ Requested by " + requester
                     :
@@ -127,10 +129,13 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     public void nextTrack(AudioTrack lastTrack, boolean skipped, Long skippedAt) throws AutoPlayException {
         HashMap<Long, Long> playtime = PlaytimeCommand.playtime;
-        if (!skipped) {
-            playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + pastQueue.peek().getInfo().getLength() : pastQueue.peek().getInfo().getLength());
-        } else {
-            playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + skippedAt : skippedAt);
+
+        if (lastTrack != null) {
+            if (!skipped) {
+                playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + lastTrack.getInfo().length : lastTrack.getInfo().length);
+            } else {
+                playtime.put(guild.getIdLong(), playtime.containsKey(guild.getIdLong()) ? playtime.get(guild.getIdLong()) + skippedAt : skippedAt);
+            }
         }
 
         if (queue.isEmpty())
@@ -148,7 +153,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             else {
                 if (lastTrack != null) {
                     if (new AutoPlayConfig().getStatus(guild.getIdLong())) {
-                        switch (lastTrack.getInfo().getSourceName().toLowerCase()) {
+                        switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
                             case "youtube" -> AutoPlayUtils.loadRecommendedTracks(
                                     guild,
                                     announcementChannel,
@@ -156,7 +161,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                             );
                             case "spotify" -> {
                                 String youTubeID = TrackDB.getInstance().getSpotifyTable()
-                                        .getTrackYouTubeID(lastTrack.getInfo().getIdentifier());
+                                        .getTrackYouTubeID(lastTrack.getInfo().identifier);
                                 AutoPlayUtils.loadRecommendedTracks(
                                         guild,
                                         announcementChannel,
@@ -165,7 +170,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                             }
                             case "deezer" -> {
                                 String youTubeID = TrackDB.getInstance().getDeezerTable()
-                                        .getTrackYouTubeID(lastTrack.getInfo().getIdentifier());
+                                        .getTrackYouTubeID(lastTrack.getInfo().identifier);
                                 AutoPlayUtils.loadRecommendedTracks(
                                         guild,
                                         announcementChannel,
@@ -189,17 +194,23 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
+        final var trackToUse = lastPlayedTrackBuffer;
+
         if (repeating) {
-            if (track != null) {
+            if (trackToUse != null) {
                 try {
-                    player.playTrack(track);
+                    AudioTrack clonedTrack = trackToUse.makeClone();
+                    lastPlayedTrackBuffer = clonedTrack;
+                    player.playTrack(clonedTrack);
                 } catch (UnsupportedOperationException e) {
                     player.seekTo(0);
                 }
             } else nextTrack(null);
         } else if (endReason.mayStartNext) {
-            pastQueue.push(track);
-            nextTrack(track);
+            if (!pastQueue.containsKey(guild.getIdLong()))
+                pastQueue.put(guild.getIdLong(), new Stack<>());
+            pastQueue.get(guild.getIdLong()).push(trackToUse);
+            nextTrack(trackToUse);
         }
     }
 
@@ -214,7 +225,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             announcementChannel.sendMessageEmbeds(
                             RobertifyEmbedUtils.embedMessage(
                                             guild,
-                                            "`" + track.getInfo().getTitle() + "` by `" + track.getInfo().getAuthor() + "` could not be played!\nSkipped to the next song. (If available)")
+                                            "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
                                     .build()
                     )
                     .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));

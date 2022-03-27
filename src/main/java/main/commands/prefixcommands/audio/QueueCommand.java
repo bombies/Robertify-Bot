@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -52,7 +52,7 @@ public class QueueCommand implements ICommand {
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.getTitle()+" - "+info.getAuthor()+" `["+ GeneralUtils.formatTime(track.getInfo().getLength())+"]`");
+            content.add("**#"+(i+1)+".** "+info.title+" - "+info.author+" `["+ GeneralUtils.formatTime(track.getInfo().length)+"]`");
         }
         return content;
     }

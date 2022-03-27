@@ -1,8 +1,8 @@
 package main.commands.prefixcommands.audio;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lavalink.client.player.IPlayer;
-import lavalink.client.player.track.AudioTrack;
-import lavalink.client.player.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.prefixcommands.CommandContext;
@@ -98,13 +98,13 @@ public class LoopCommand implements ICommand {
         AudioTrackInfo info = player.getPlayingTrack().getInfo();
         if (scheduler.repeating) {
             scheduler.repeating = false;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.getTitle() + "` will no longer be looped!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.title + "` will no longer be looped!");
         } else {
             scheduler.repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.getTitle() + "` will now be looped");
+            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.title + "` will now be looped");
         }
 
-        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.repeating ? "looped" : "unlooped")+" `"+info.getTitle()+" by "+info.getAuthor()+"`");
+        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.repeating ? "looped" : "unlooped")+" `"+info.title+" by "+info.author+"`");
 
         return eb;
     }

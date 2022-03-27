@@ -1,6 +1,6 @@
 package main.utils.json.autoplay;
 
-import lavalink.client.player.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import main.audiohandlers.RobertifyAudioManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -29,7 +29,7 @@ public class AutoPlayUtils {
     }
 
     public static void loadRecommendedTracks(Guild guild, TextChannel channel, AudioTrack track) {
-        loadRecommendedTracks(guild, channel, track.getInfo().getIdentifier());
+        loadRecommendedTracks(guild, channel, track.getInfo().identifier);
     }
 
     public static void loadRecommendedTracks(Guild guild, TextChannel channel, String identifier) {

@@ -1,6 +1,6 @@
 package main.commands.prefixcommands.audio;
 
-import lavalink.client.player.track.AudioTrackInfo;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -89,12 +89,12 @@ public class SeekCommand implements ICommand {
         long totalDurationInMillis = TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
         AudioTrackInfo info = audioPlayer.getPlayingTrack().getInfo();
-        if (totalDurationInMillis > info.getLength())
+        if (totalDurationInMillis > info.length)
             return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
 
         audioPlayer.seekTo(totalDurationInMillis);
         new LogUtils().sendLog(guild, LogType.TRACK_SEEK, memberVoiceState.getMember().getAsMention() + " has seeked `"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.getTitle()+" by "+info.getAuthor()+"`");
+                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.title+" by "+info.author+"`");
         return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
                 ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
 
@@ -129,12 +129,12 @@ public class SeekCommand implements ICommand {
         long totalDurationInMillis = TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
         AudioTrackInfo info = audioPlayer.getPlayingTrack().getInfo();
-        if (totalDurationInMillis > info.getLength())
+        if (totalDurationInMillis > info.length)
             return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
 
         audioPlayer.seekTo(totalDurationInMillis);
         new LogUtils().sendLog(guild, LogType.TRACK_SEEK, memberVoiceState.getMember().getAsMention() + " has seeked `" + (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.getTitle()+" by "+info.getAuthor()+"`");
+                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.title+" by "+info.author+"`");
         return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `" + (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) +
                 ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
     }

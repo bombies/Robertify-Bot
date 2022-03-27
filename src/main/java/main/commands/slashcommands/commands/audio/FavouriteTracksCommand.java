@@ -87,10 +87,10 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
         final var trackInfo = playingTrack.getInfo();
 
-        String id = trackInfo.getIdentifier();
+        String id = trackInfo.identifier;
         TrackSource source;
 
-        switch (playingTrack.getInfo().getSourceName()) {
+        switch (playingTrack.getSourceManager().getSourceName()) {
             case "spotify" -> source = TrackSource.SPOTIFY;
             case "deezer" -> source = TrackSource.DEEZER;
             case "youtube" -> source = TrackSource.YOUTUBE;
@@ -100,8 +100,8 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         }
 
         try {
-            config.addTrack(member.getIdLong(), id, trackInfo.getTitle(), trackInfo.getAuthor(), source);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have added `"+playingTrack.getInfo().getTitle()+" - "+ playingTrack.getInfo().getAuthor() +"` as a favourite track!").build();
+            config.addTrack(member.getIdLong(), id, trackInfo.title, trackInfo.author, source);
+            return RobertifyEmbedUtils.embedMessage(guild, "You have added `"+playingTrack.getInfo().title+" - "+ playingTrack.getInfo().author +"` as a favourite track!").build();
         } catch (IllegalArgumentException e) {
             return RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build();
         } catch (Exception e) {
