@@ -243,7 +243,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             sb.append("**").append(i + 1).append(".** - ")
                     .append(reminder.getReminder()).append(" `@ ")
                     .append(GeneralUtils.formatTime(reminder.getReminderTime(), "HH:mm"))
-                    .append("`")
+                    .append(" EDT`")
                     .append("\n");
         }
 
