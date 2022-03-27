@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.constants.Toggles;
+import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;

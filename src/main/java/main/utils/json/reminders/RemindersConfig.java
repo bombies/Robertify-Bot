@@ -256,7 +256,7 @@ public class RemindersConfig extends AbstractGuildConfig {
     }
 
     public boolean guildHasReminders(long gid) {
-        return getAllGuildUsers(gid).isEmpty();
+        return !getAllGuildUsers(gid).isEmpty();
     }
 
     public void banChannel(long gid, long cid) {
