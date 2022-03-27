@@ -65,8 +65,8 @@ public class Robertify {
 
         try {
             lavalink = new JdaLavalink(
-                    getIdFromToken(Config.get(ENV.BOT_TOKEN)),
-                    1,
+                    getIdFromToken(Config.getBotToken()),
+                    Config.getShardCount(),
                     shardId -> Robertify.getShardManager().getShardById(shardId)
             );
 
@@ -74,11 +74,13 @@ public class Robertify {
                 lavalink.addNode(node.getURI(), node.getPassword());
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
-                            Config.get(ENV.BOT_TOKEN),
+                            Config.getBotToken(),
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
+                    .setShards(Config.getShardCount())
+                    .setBulkDeleteSplittingEnabled(false)
                     .setChunkingFilter(ChunkingFilter.NONE)
                     .setMemberCachePolicy(MemberCachePolicy.VOICE)
 

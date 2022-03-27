@@ -46,6 +46,26 @@ public class Config {
         dotenv = Dotenv.load();
     }
 
+    public static int getShardCount() {
+        return getInt(ENV.SHARD_COUNT);
+    }
+
+    public static String getBotToken() {
+        return get(ENV.BOT_TOKEN);
+    }
+
+    public static long getOwnerID() {
+        return getLong(ENV.OWNER_ID);
+    }
+
+    private static int getInt(ENV key) {
+        return Integer.parseInt(get(key));
+    }
+
+    private static long getLong(ENV key) {
+        return Long.parseLong(get(key));
+    }
+
     @SneakyThrows
     public static List<LavaNode> getLavaNodes() {
         try {
