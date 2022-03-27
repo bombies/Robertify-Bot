@@ -90,8 +90,8 @@ public class Listener extends ListenerAdapter {
 
         updateServerCount();
 
-        ReminderScheduler.getInstance().scheduleAllReminders();
-        logger.info("Scheduled all reminders");
+//        ReminderScheduler.getInstance().scheduleAllReminders();
+//        logger.info("Scheduled all reminders");
 
         logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
 

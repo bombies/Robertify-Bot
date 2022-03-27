@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>4.0.0-BETA-4</version>
+    <version>4.0.0-BETA-5</version>
 
     <dependencies>
         <dependency>
@@ -88,14 +88,14 @@
             <version>1.0.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.KittyBot-Org</groupId>
+            <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>1.0.1</version>
+            <version>2b1b439</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
             <artifactId>DBL-Java-Library</artifactId>
-            <version>2.0.1</version>
+            <version>19abf19</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
