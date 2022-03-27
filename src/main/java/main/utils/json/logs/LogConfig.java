@@ -16,7 +16,7 @@ public class LogConfig extends AbstractGuildConfig {
     }
 
     public TextChannel getChannel(long gid) {
-        return Robertify.api.getTextChannelById(getChannelID(gid));
+        return Robertify.shardManager.getTextChannelById(getChannelID(gid));
     }
 
     public boolean channelIsSet(long gid) {

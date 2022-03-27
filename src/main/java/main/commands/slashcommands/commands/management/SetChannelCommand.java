@@ -62,7 +62,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
                 return;
             }
 
-            TextChannel channel = Robertify.api.getGuildById(guild.getIdLong()).getTextChannelById(id);
+            TextChannel channel = Robertify.shardManager.getGuildById(guild.getIdLong()).getTextChannelById(id);
 
             if (channel == null) {
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That ID doesn't belong to any channel in this guild!");

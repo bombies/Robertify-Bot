@@ -67,12 +67,12 @@ public class ChangeLogCommand extends AbstractSlashCommand implements IDevComman
 
     private void send(Message msg) {
         final var config = new ChangeLogConfig();
-        final var guilds = Robertify.api.getGuilds();
+        final var guilds = Robertify.shardManager.getGuilds();
 
         final ExecutorService executorService = Executors.newCachedThreadPool();
 
         for (Guild g : guilds) {
-            TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
+            TextChannel announcementChannel = Robertify.shardManager.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
 
             if (announcementChannel == null) continue;
 
@@ -284,12 +284,12 @@ public class ChangeLogCommand extends AbstractSlashCommand implements IDevComman
 
         switch (path[1]) {
             case "send" -> {
-                final var guilds = Robertify.api.getGuilds();
+                final var guilds = Robertify.shardManager.getGuilds();
 
                 final ExecutorService executorService = Executors.newCachedThreadPool();
 
                 for (Guild g : guilds) {
-                    TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
+                    TextChannel announcementChannel = Robertify.shardManager.getTextChannelById(new GuildConfig().getAnnouncementChannelID(g.getIdLong()));
 
                     if (announcementChannel == null) continue;
 

@@ -26,7 +26,7 @@ public class VoteEvent {
     }
 
     public void sendVoteMessage(long userID, VoteManager.Website website) {
-        final User user = Robertify.api.retrieveUserById(userID).complete();
+        final User user = Robertify.shardManager.retrieveUserById(userID).complete();
 
         WebhookMessage message = new WebhookMessageBuilder()
                 .setContent(user.getAsMention() + " has voted on:  **" + (website.equals(VoteManager.Website.TOP_GG) ? "TOP.GG" : "Discord Bot List") + "**")

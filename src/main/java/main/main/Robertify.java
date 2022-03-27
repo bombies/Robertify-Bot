@@ -22,10 +22,10 @@ import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
+import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -45,7 +45,7 @@ public class Robertify {
     private static final Logger logger = LoggerFactory.getLogger(Robertify.class);
 
     @Getter
-    public static JDA api;
+    public static ShardManager shardManager;
     @Getter
     private static JdaLavalink lavalink;
     @Getter
@@ -67,13 +67,13 @@ public class Robertify {
             lavalink = new JdaLavalink(
                     getIdFromToken(Config.get(ENV.BOT_TOKEN)),
                     1,
-                    shardId -> getApi()
+                    shardId -> Robertify.getShardManager().getShardById(shardId)
             );
 
             for (var node : Config.getLavaNodes())
                 lavalink.addNode(node.getURI(), node.getPassword());
 
-            JDABuilder jdaBuilder = JDABuilder.createDefault(
+            DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
                             Config.get(ENV.BOT_TOKEN),
                             GatewayIntent.GUILD_VOICE_STATES,
                             GatewayIntent.GUILD_MESSAGES,
@@ -138,7 +138,7 @@ public class Robertify {
             for (var cmd : slashCommandManager.getDevCommands())
                 jdaBuilder.addEventListeners(cmd);
 
-            api = jdaBuilder.build();
+            shardManager = jdaBuilder.build();
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))

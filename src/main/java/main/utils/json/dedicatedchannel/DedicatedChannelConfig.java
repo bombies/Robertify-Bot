@@ -68,7 +68,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
     public synchronized void removeChannel(long gid) {
         if (!isChannelSet(gid))
-            throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
 
         var obj = getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
         obj.put(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString(), -1);
@@ -84,20 +84,20 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
     public synchronized long getChannelID(long gid) {
         if (!isChannelSet(gid))
-            throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
         return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
                 .getLong(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString());
     }
 
     public synchronized long getMessageID(long gid) {
         if (!isChannelSet(gid))
-            throw new IllegalArgumentException(Robertify.api.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
         return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
                 .getLong(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString());
     }
 
     public synchronized TextChannel getTextChannel(long gid) {
-        return Robertify.api.getTextChannelById(getChannelID(gid));
+        return Robertify.shardManager.getTextChannelById(getChannelID(gid));
     }
 
     public synchronized RestAction<Message> getMessageRequest(long gid) {
@@ -105,7 +105,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             return getTextChannel(gid).retrieveMessageById(getMessageID(gid));
         } catch (MissingAccessException e) {
             if (new GuildConfig().announcementChannelIsSet(gid)) {
-                TextChannel channel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(gid));
+                TextChannel channel = Robertify.shardManager.getTextChannelById(new GuildConfig().getAnnouncementChannelID(gid));
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
                         .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}));
             }
@@ -189,7 +189,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public void updateButtons() {
-        for (Guild g : Robertify.api.getGuilds()) {
+        for (Guild g : Robertify.shardManager.getGuilds()) {
             if (!isChannelSet(g.getIdLong())) continue;
 
             final var msgRequest = getMessageRequest(g.getIdLong());
@@ -233,7 +233,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public void updateTopic() {
-        for (Guild g : Robertify.api.getGuilds()) {
+        for (Guild g : Robertify.shardManager.getGuilds()) {
             if (!isChannelSet(g.getIdLong())) continue;
 
             final var channel = getTextChannel(g.getIdLong());

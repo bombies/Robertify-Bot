@@ -57,7 +57,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
         try {
             switch (args.get(1).toLowerCase()) {
                 case "all" -> {
-                    for (Guild g : Robertify.api.getGuilds()) {
+                    for (Guild g : Robertify.shardManager.getGuilds()) {
                         conf.updateButtons(g);
                         conf.updateTopic(g);
                         conf.updateMessage(g);
@@ -66,7 +66,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                 case "topic" -> conf.updateTopic();
                 case "buttons" -> conf.updateButtons();
                 case "message" -> {
-                    for (Guild g : Robertify.api.getGuilds())
+                    for (Guild g : Robertify.shardManager.getGuilds())
                         conf.updateMessage(g);
                 }
                 default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arg").build()).queue();
@@ -131,7 +131,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
 
         switch (event.getSubcommandName()) {
             case "all" -> {
-                for (Guild g : Robertify.api.getGuilds()) {
+                for (Guild g : Robertify.shardManager.getGuilds()) {
                     conf.updateButtons(g);
                     conf.updateTopic(g);
                     conf.updateMessage(g);
@@ -154,7 +154,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                         .queue();
             }
             case "message" -> {
-                for (Guild g : Robertify.api.getGuilds())
+                for (Guild g : Robertify.shardManager.getGuilds())
                     conf.updateMessage(g);
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all messages").build())
                         .setEphemeral(true)

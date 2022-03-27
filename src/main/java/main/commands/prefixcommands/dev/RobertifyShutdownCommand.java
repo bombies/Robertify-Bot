@@ -27,7 +27,7 @@ public class RobertifyShutdownCommand implements IDevCommand {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Now shutting down...");
         ctx.getMessage().replyEmbeds(eb.build()).queue();
 
-        for (Guild g : Robertify.api.getGuilds()) {
+        for (Guild g : Robertify.shardManager.getGuilds()) {
             var selfMember = g.getSelfMember();
             var musicManager = RobertifyAudioManager.getInstance().getMusicManager(g);
 
@@ -39,10 +39,8 @@ public class RobertifyShutdownCommand implements IDevCommand {
             FileUtils.cleanDirectory(new File(Config.get(ENV.AUDIO_DIR) + "/"));
         } catch (IllegalArgumentException ignored) {}
 
-        JDA jda = Robertify.api;
-        jda.shutdown();
-        jda.getHttpClient().connectionPool().evictAll();
-        jda.getHttpClient().dispatcher().executorService().shutdown();
+        final var shardManager = Robertify.shardManager;
+        shardManager.shutdown();
         WebUtils.ins.shutdown();
 
         System.exit(1000);

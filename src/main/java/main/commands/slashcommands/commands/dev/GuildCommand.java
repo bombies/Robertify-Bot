@@ -19,7 +19,7 @@ public class GuildCommand extends AbstractSlashCommand implements IDevCommand {
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
 
-        final var guilds = Robertify.api.getGuilds();
+        final var guilds = Robertify.shardManager.getGuilds();
         final List<String> guildNames = new ArrayList<>();
 
         guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");
@@ -68,7 +68,7 @@ public class GuildCommand extends AbstractSlashCommand implements IDevCommand {
             return;
         }
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "I am in `"+Robertify.api.getGuilds().size()+"` guilds!").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "I am in `"+Robertify.shardManager.getGuilds().size()+"` guilds!").build())
                 .setEphemeral(true)
                 .queue();
     }

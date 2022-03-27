@@ -36,7 +36,7 @@ public class ReminderScheduler {
     }
 
     public void scheduleAllReminders() {
-        for (var guild : Robertify.api.getGuilds())
+        for (var guild : Robertify.shardManager.getGuilds())
             scheduleGuildReminders(guild);
     }
 
@@ -64,7 +64,7 @@ public class ReminderScheduler {
     }
 
     public void scheduleReminder(long user, long guildID, long destination, long timeOfDay, String reminder, int reminderID) {
-        final Guild guild = Robertify.api.getGuildById(guildID);
+        final Guild guild = Robertify.shardManager.getGuildById(guildID);
         final LocalDateTime now = LocalDateTime.now();
         final int currentHour = now.getHour();
         final int currentMinute = now.getMinute();
@@ -132,7 +132,7 @@ public class ReminderScheduler {
     }
 
     private void dmReminder(Guild guild, long user, String reminder) {
-        User u = Robertify.api.retrieveUserById(user).complete();
+        User u = Robertify.shardManager.retrieveUserById(user).complete();
 
         u.openPrivateChannel().queue(channel ->
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminder", reminder)

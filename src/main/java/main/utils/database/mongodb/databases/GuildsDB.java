@@ -32,7 +32,7 @@ public class GuildsDB extends AbstractMongoDatabase {
 
     @Override
     public synchronized void init() {
-        final List<Guild> guilds = Robertify.api.getGuilds();
+        final List<Guild> guilds = Robertify.shardManager.getGuilds();
         for (var guild : guilds) {
             if (specificDocumentExists(Field.GUILD_ID, guild.getIdLong()))
                 continue;

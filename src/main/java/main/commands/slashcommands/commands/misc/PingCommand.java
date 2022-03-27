@@ -18,11 +18,11 @@ public class PingCommand extends AbstractSlashCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final var guild = ctx.getGuild();
 
-        Robertify.api.getRestPing().queue(
+        Robertify.shardManager.getShards().get(0).getRestPing().queue(
                 (ping) -> {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "🏓 Pong!\n\n" +
                             "REST Ping: **"+ping+"ms**\n" +
-                            "Websocket Ping: **"+Robertify.api.getGatewayPing()+"ms**");
+                            "Websocket Ping: **"+Robertify.shardManager.getAverageGatewayPing()+"ms**");
                     msg.replyEmbeds(eb.build()).queue();
                 }
         );
@@ -57,11 +57,11 @@ public class PingCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
-        Robertify.api.getRestPing().queue(
+        Robertify.shardManager.getShards().get(0).getRestPing().queue(
                 (ping) -> {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "🏓 Pong!\n\n" +
                             "REST Ping: **"+ping+"ms**\n" +
-                            "Websocket Ping: **"+Robertify.api.getGatewayPing()+"ms**");
+                            "Websocket Ping: **"+Robertify.shardManager.getAverageGatewayPing()+"ms**");
                     event.replyEmbeds(eb.build()).queue();
                 }
         );

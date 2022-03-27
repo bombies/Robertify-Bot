@@ -220,7 +220,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
 
-        TextChannel announcementChannel = Robertify.api.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
+        TextChannel announcementChannel = Robertify.shardManager.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
         try {
             announcementChannel.sendMessageEmbeds(
                             RobertifyEmbedUtils.embedMessage(
@@ -298,7 +298,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     final var guildConfig = new GuildConfig();
 
                     if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
-                        Robertify.api.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
+                        Robertify.shardManager.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
                                 .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
                                 .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
                 }

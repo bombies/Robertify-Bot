@@ -100,7 +100,7 @@ public class ReportsCommand implements ICommand {
             return;
         }
 
-        final var openedRequests = Robertify.api.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
+        final var openedRequests = Robertify.shardManager.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
 
         openedRequests.retrieveMessageById(id).queue(reportMsg -> {
             final var fields = reportMsg.getEmbeds().get(0).getFields();
@@ -109,7 +109,7 @@ public class ReportsCommand implements ICommand {
             final var reproduction = fields.get(2).getValue();
             final var comments = fields.get(3).getValue();
 
-            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(reporter))
+            Robertify.shardManager.retrieveUserById(GeneralUtils.getDigitsOnly(reporter))
                             .queue(user -> user.openPrivateChannel().queue(channel -> {
                                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
                                                         guild,

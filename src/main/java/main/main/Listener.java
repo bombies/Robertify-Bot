@@ -5,8 +5,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.StopCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
-import main.commands.slashcommands.SlashCommandManager;
-import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -16,29 +14,20 @@ import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.legacy.AbstractJSONFile;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.application.ApplicationCommandUpdateEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.role.update.RoleUpdatePermissionsEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +55,7 @@ public class Listener extends ListenerAdapter {
 
         new ChangeLogConfig().initConfig();
 
-        for (Guild g : Robertify.api.getGuilds()) {
+        for (Guild g : Robertify.shardManager.getGuilds()) {
             GeneralUtils.setDefaultEmbed(g);
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
@@ -93,10 +82,10 @@ public class Listener extends ListenerAdapter {
         ReminderScheduler.getInstance().scheduleAllReminders();
         logger.info("Scheduled all reminders");
 
-        logger.info("Watching {} guilds", Robertify.api.getGuilds().size());
+        logger.info("Watching {} guilds", Robertify.shardManager.getGuilds().size());
 
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
-        Robertify.api.getPresence().setPresence(Activity.listening("+help"), true);
+        Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("+help"));
     }
 
     @SneakyThrows
@@ -190,7 +179,7 @@ public class Listener extends ListenerAdapter {
     }
 
     private void updateServerCount() {
-        final int serverCount = Robertify.api.getGuilds().size();
+        final int serverCount = Robertify.shardManager.getGuilds().size();
 
         if (Robertify.getTopGGAPI() != null)
             Robertify.getTopGGAPI().setStats(serverCount);
@@ -272,7 +261,7 @@ public class Listener extends ListenerAdapter {
     }
 
     private static void sendUnbanMessage(long user, Guild g) {
-        Robertify.api.retrieveUserById(user).queue(user1 -> user1.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(
+        Robertify.shardManager.retrieveUserById(user).queue(user1 -> user1.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(
                 RobertifyEmbedUtils.embedMessage(g, "You have been unbanned from Robertify in **"+g.getName()+"**")
                         .build()
         ).queue(success -> {}, new ErrorHandler()

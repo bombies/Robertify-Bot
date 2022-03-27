@@ -115,7 +115,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
         final var config = BotInfoCache.getInstance();
 
-        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
+        TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
@@ -124,7 +124,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         }
 
         pendingChannel.retrieveMessageById(id).queue(suggestion -> {
-            TextChannel acceptedChannel = Robertify.api.getTextChannelById(config.getSuggestionsAcceptedChannelID());
+            TextChannel acceptedChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsAcceptedChannelID());
 
             if (acceptedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
@@ -146,7 +146,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
             suggestion.delete().queue();
 
-            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
+            Robertify.shardManager.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
                     .queue(user -> {
                         user.openPrivateChannel().queue(channel -> {
                             final EmbedBuilder acceptedEmbed = new EmbedBuilder();
@@ -196,7 +196,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
         final var config = BotInfoCache.getInstance();
 
-        TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
+        TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The pending suggestions channel isn't setup!");
@@ -205,7 +205,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         }
 
         pendingChannel.retrieveMessageById(id).queue(suggestion -> {
-            TextChannel deniedChannel = Robertify.api.getTextChannelById(config.getSuggestionsDeniedChannelID());
+            TextChannel deniedChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsDeniedChannelID());
 
             if (deniedChannel == null) {
                 logger.warn("The pending suggestions channel isn't setup!");
@@ -226,7 +226,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
             suggestion.delete().queue();
 
-            Robertify.api.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
+            Robertify.shardManager.retrieveUserById(GeneralUtils.getDigitsOnly(suggester))
                     .queue(user -> {
                         user.openPrivateChannel().queue(channel -> {
                             final EmbedBuilder deniedEmbed = new EmbedBuilder();
@@ -275,7 +275,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
             return RobertifyEmbedUtils.embedMessage(guild, "Your suggestion must be no more than 1024 characters!").build();
 
         final var config = BotInfoCache.getInstance();
-        final TextChannel pendingChannel = Robertify.api.getTextChannelById(config.getSuggestionsPendingChannelID());
+        final TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
             logger.warn("The suggestion channels aren't setup!");

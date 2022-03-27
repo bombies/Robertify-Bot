@@ -38,7 +38,7 @@ public class ReportsEvents extends ListenerAdapter {
         final var openedReportsChannelID = config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL);
         config.resetReportsConfig();
 
-        TextChannel channel = Robertify.api.getTextChannelById(openedReportsChannelID);
+        TextChannel channel = Robertify.shardManager.getTextChannelById(openedReportsChannelID);
         if (channel != null)
             channel.delete().queueAfter(1, TimeUnit.SECONDS);
     }
@@ -73,7 +73,7 @@ public class ReportsEvents extends ListenerAdapter {
             responses.remove(user.getIdLong());
 
             final var config = BotInfoCache.getInstance();
-            final var openedReportsChannel = Robertify.api.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
+            final var openedReportsChannel = Robertify.shardManager.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
 
             if (openedReportsChannel == null) {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("Could not send your report!\n" +

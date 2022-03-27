@@ -288,7 +288,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                     return;
                 }
 
-                TextChannel channel = Robertify.api.getTextChannelById(GeneralUtils.getDigitsOnly(channelIDStr));
+                TextChannel channel = Robertify.shardManager.getTextChannelById(GeneralUtils.getDigitsOnly(channelIDStr));
 
                 if (channel == null) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid channel!").build())

@@ -20,7 +20,7 @@ public class VoiceChannelCountCommand extends AbstractSlashCommand implements ID
         int vcCount = 0;
         int currentlyPlayingCount = 0;
         int peopleListening = 0;
-        for (var guild : Robertify.api.getGuilds()) {
+        for (var guild : Robertify.shardManager.getGuilds()) {
             vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
 
@@ -72,7 +72,7 @@ public class VoiceChannelCountCommand extends AbstractSlashCommand implements ID
         int vcCount = 0;
         int currentlyPlayingCount = 0;
         int peopleListening = 0;
-        for (var guild : Robertify.api.getGuilds()) {
+        for (var guild : Robertify.shardManager.getGuilds()) {
             vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
 

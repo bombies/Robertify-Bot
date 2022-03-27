@@ -170,7 +170,7 @@ public class GeneralUtils {
 
     public static User retrieveUser(long id) {
         try {
-            return Robertify.api.retrieveUserById(id).complete();
+            return Robertify.shardManager.retrieveUserById(id).complete();
         } catch (ErrorResponseException e) {
             return null;
         }
