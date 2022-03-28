@@ -79,7 +79,7 @@ public class Robertify {
                             GatewayIntent.GUILD_MESSAGES,
                             GatewayIntent.DIRECT_MESSAGES
                     )
-                    .setShards(Config.getShardCount())
+                    .setShardsTotal(Config.getShardCount())
                     .setBulkDeleteSplittingEnabled(false)
                     .setChunkingFilter(ChunkingFilter.NONE)
                     .setMemberCachePolicy(MemberCachePolicy.VOICE)

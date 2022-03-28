@@ -85,7 +85,7 @@ public class Listener extends ListenerAdapter {
         logger.info("Watching {} guilds", Robertify.shardManager.getGuilds().size());
 
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
-        Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("+help"));
+        Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"));
     }
 
     @SneakyThrows
