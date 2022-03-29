@@ -55,7 +55,7 @@ public class Listener extends ListenerAdapter {
 
         new ChangeLogConfig().initConfig();
 
-        for (Guild g : Robertify.shardManager.getGuilds()) {
+        for (Guild g : Robertify.shardManager.getGuildCache()) {
             GeneralUtils.setDefaultEmbed(g);
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
@@ -71,8 +71,6 @@ public class Listener extends ListenerAdapter {
             } catch (NullPointerException e) {
                 dedicatedChannelConfig.removeChannel(g.getIdLong());
             }
-
-            new GuildConfig().unloadGuild(g.getIdLong());
         }
 
 //        StatisticsDB.startDailyUpdateCheck();

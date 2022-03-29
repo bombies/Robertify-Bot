@@ -163,6 +163,6 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             eb = RobertifyEmbedUtils.embedMessage(guild, "```java\n" + e.getMessage() +"```");
         }
 
-        event.replyEmbeds(eb.build()).queue();
+        event.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 }

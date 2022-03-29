@@ -19,7 +19,7 @@ public class GuildCommand extends AbstractSlashCommand implements IDevCommand {
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
 
-        final var guilds = Robertify.shardManager.getGuilds();
+        final var guilds = Robertify.shardManager.getGuildCache();
         final List<String> guildNames = new ArrayList<>();
 
         guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");

@@ -11,6 +11,7 @@ import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
+import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
@@ -69,8 +70,8 @@ public abstract class AbstractMongoDatabase {
         return database.getCollection(name);
     }
 
-    protected void addDocument(Document doc) {
-        collection.insertOne(doc);
+    protected BsonObjectId addDocument(Document doc) {
+        return collection.insertOne(doc).getInsertedId().asObjectId();
     }
 
     protected void addManyDocuments(List<Document> docs) {

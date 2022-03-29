@@ -1,6 +1,7 @@
 package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
+import main.main.Robertify;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractGuildConfig;
 import org.json.JSONException;
@@ -13,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import static main.utils.database.mongodb.databases.GuildsDB.getGuildDocument;
 
 public class GuildsDBCache extends AbstractMongoCache {
     private final static Logger logger = LoggerFactory.getLogger(GuildsDBCache.class);
@@ -86,22 +89,40 @@ public class GuildsDBCache extends AbstractMongoCache {
     }
 
     public synchronized void loadGuild(long gid) {
+        loadGuild(gid, 0);
+    }
+
+    /**
+     * Recursively attempt to load the guild into cache
+     * @param gid The ID of the guild
+     * @param attempt The recursive attempt
+     */
+    private synchronized void loadGuild(long gid, int attempt) {
         logger.debug("Attempting to load guild with ID: {}", gid);
-        String guildJSON = getDocument(GuildsDB.Field.GUILD_ID.toString(), gid);
+        try {
+            String guildJSON = getDocument(GuildsDB.Field.GUILD_ID.toString(), gid);
 
-        if (guildJSON != null) {
-            getCache().put(new JSONObject(guildJSON));
-            logger.debug("Loaded guild with ID: {}", gid);
+            if (guildJSON != null) {
+                getCache().put(new JSONObject(guildJSON));
+                logger.debug("Loaded guild with ID: {}", gid);
 
-            if (!scheduledUnloads.containsKey(gid)) {
-                logger.debug("Scheduling unload for guild with ID: {}", gid);
-                ScheduledFuture<?> scheduledUnload = executorService.schedule(() -> {
-                    unloadGuild(gid);
-                    scheduledUnloads.remove(gid);
-                }, 1, TimeUnit.HOURS);
+                if (!scheduledUnloads.containsKey(gid)) {
+                    logger.debug("Scheduling unload for guild with ID: {}", gid);
+                    ScheduledFuture<?> scheduledUnload = executorService.schedule(() -> {
+                        unloadGuild(gid);
+                        scheduledUnloads.remove(gid);
+                    }, 1, TimeUnit.HOURS);
 
-                scheduledUnloads.put(gid, scheduledUnload);
-            } else delayUnload(gid);
+                    scheduledUnloads.put(gid, scheduledUnload);
+                } else delayUnload(gid);
+            }
+        } catch (NullPointerException e) {
+            if (attempt == 2)
+                return;
+
+            logger.debug("Guild with ID {} didn't exist in the database. Attempting to add and reload.", gid);
+            addDocument(getGuildDocument(gid));
+            loadGuild(gid, ++attempt);
         }
     }
 

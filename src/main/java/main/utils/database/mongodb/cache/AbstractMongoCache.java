@@ -7,6 +7,8 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.databases.GuildsDB;
 import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
+import org.bson.BsonDocument;
+import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
@@ -64,7 +66,12 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         final ObjectId id = document.getObjectId("_id");
         final JSONArray collectionArr = this.cache.getJSONArray(CacheField.DOCUMENTS.toString());
 
-        collectionArr.remove(getIndexOfObjectInArray(collectionArr, id));
+        try {
+            collectionArr.remove(getIndexOfObjectInArray(collectionArr, id));
+        } catch (NullPointerException e) {
+            BsonObjectId bsonDocument = addDocument(document);
+            System.out.println(bsonDocument.toString());
+        }
         collectionArr.put(new JSONObject(document.toJson()));
 
         upsertDocument(document);
