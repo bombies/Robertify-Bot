@@ -113,7 +113,8 @@ public class SlashCommandManager {
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
                 new ChangeLogCommand(),
-                new AnnouncementCommand()
+                new AnnouncementCommand(),
+                new ShardInfoCommand()
         );
     }
 

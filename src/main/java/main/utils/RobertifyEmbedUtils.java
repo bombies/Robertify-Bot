@@ -13,6 +13,10 @@ public class RobertifyEmbedUtils {
         guildEmbedSuppliers.put(guild.getIdLong(), supplier);
     }
 
+    public static EmbedBuilder getEmbedBuilder(Guild guild) {
+        return guildEmbedSuppliers.get(guild.getIdLong()).get();
+    }
+
     public static EmbedBuilder embedMessage(Guild guild, String message) {
         return getDefaultEmbed(guild.getIdLong()).setDescription(message);
     }
