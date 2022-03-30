@@ -5,6 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.StopCommand;
 import main.commands.slashcommands.commands.dev.ShardInfoCommand;
+import main.commands.slashcommands.commands.management.SetChannelCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -214,6 +215,7 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new SetChannelCommand().loadCommand(g);
         if (g.getOwnerIdLong() == Config.getOwnerID())
             new ShardInfoCommand().loadCommand(g);
     }

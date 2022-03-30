@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -112,7 +113,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
                                         OptionType.CHANNEL,
                                         "channel",
                                         "The channel to be set",
-                                        true
+                                        false
                                 )
                         )
                         .setAdminOnly()
@@ -129,7 +130,8 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
-        final var channel = event.getOption("channel").getAsGuildChannel();
+        OptionMapping eventOption = event.getOption("channel");
+        final var channel = eventOption != null ? eventOption.getAsGuildChannel() : event.getGuildChannel();
         final var guildConfig = new GuildConfig();
         final var guild = event.getGuild();
 
