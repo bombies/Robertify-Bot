@@ -52,7 +52,7 @@ public class MoveSlashCommand extends AbstractSlashCommand {
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
-        final int id = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
+        final int id = GeneralUtils.longToInt(event.getOption("id").getAsLong());
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());
 
         event.getHook().sendMessageEmbeds(new MoveCommand().handleMove(event.getGuild(), event.getUser(), queue, id, pos).build())
