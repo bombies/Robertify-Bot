@@ -126,6 +126,27 @@ public class GuildsDBCache extends AbstractMongoCache {
         }
     }
 
+    public void loadAllGuilds() {
+        logger.debug("Attempting to load all guilds");
+        getCollection().find().forEach(document -> {
+            JSONObject jsonObject = new JSONObject(document.toJson());
+            getCache().put(jsonObject);
+
+            final long gid = jsonObject.getLong(GuildsDB.Field.GUILD_ID.toString());
+            logger.debug("Loaded guild with id {}", gid);
+
+            if (!scheduledUnloads.containsKey(gid)) {
+                logger.debug("Scheduling unload for guild with ID: {}", gid);
+                ScheduledFuture<?> scheduledUnload = executorService.schedule(() -> {
+                    unloadGuild(gid);
+                    scheduledUnloads.remove(gid);
+                }, 1, TimeUnit.HOURS);
+
+                scheduledUnloads.put(gid, scheduledUnload);
+            } else delayUnload(gid);
+        });
+    }
+
     public void delayUnload(long gid) {
         if (!scheduledUnloads.containsKey(gid))
             throw new IllegalArgumentException("There was no scheduled unload to delay for guild with ID: " + gid);

@@ -12,6 +12,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -45,6 +46,8 @@ public class Listener extends ListenerAdapter {
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        final var jda = event.getJDA();
+
         // Initialize the JSON directory
         // This is a deprecated feature and is marked for removal
         // Until everything is fully removed, this method needs to be enabled
@@ -52,15 +55,17 @@ public class Listener extends ListenerAdapter {
         AbstractJSONFile.initDirectory();
 
         AbstractMongoDatabase.initAllCaches();
-        AbstractMongoDatabase.updateAllCaches();
-        logger.info("Initialized and updated all caches");
+        logger.info("Initialized and updated all caches on shard #{}", jda.getShardInfo().getShardId());
 
         new ChangeLogConfig().initConfig();
 
-        for (Guild g : Robertify.shardManager.getGuildCache()) {
-            GeneralUtils.setDefaultEmbed(g);
+        GuildsDBCache.getInstance().loadAllGuilds();
+
+        for (Guild g : jda.getGuildCache()) {
+            logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
+            ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
             DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
             try {
@@ -78,11 +83,7 @@ public class Listener extends ListenerAdapter {
 //        StatisticsDB.startDailyUpdateCheck();
 
         updateServerCount();
-
-        ReminderScheduler.getInstance().scheduleAllReminders();
-        logger.info("Scheduled all reminders");
-
-        logger.info("Watching {} guilds", Robertify.shardManager.getGuilds().size());
+        logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
 
         BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
         Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"));
@@ -215,9 +216,6 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new SetChannelCommand().loadCommand(g);
-        if (g.getOwnerIdLong() == Config.getOwnerID())
-            new ShardInfoCommand().loadCommand(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

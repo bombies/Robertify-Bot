@@ -32,29 +32,29 @@ public class GuildsDB extends AbstractMongoDatabase {
 
     @Override
     public synchronized void init() {
-        final List<Guild> guilds = Robertify.shardManager.getGuildCache().asList();
-
-        final MongoCollection<Document> collection = getCollection();
-        final MongoCursor<Document> cursor = collection.find().cursor();
-        final List<Document> documentsToRemove = new ArrayList<>();
-
-        while (cursor.hasNext()) {
-            Document guildDoc = cursor.next();
-            JSONObject jsonObject = new JSONObject(guildDoc.toJson());
-            long guildID = jsonObject.getLong(Field.GUILD_ID.toString());
-
-            Guild filteredResult = guilds.stream()
-                    .filter(guild -> guild.getIdLong() == guildID)
-                    .findFirst()
-                    .orElse(null);
-
-            if (filteredResult == null)
-                documentsToRemove.add(guildDoc);
-
-        }
-
-        if (!documentsToRemove.isEmpty())
-            removeManyDocuments(documentsToRemove);
+//        final List<Guild> guilds = Robertify.shardManager.getGuildCache().asList();
+//
+//        final MongoCollection<Document> collection = getCollection();
+//        final MongoCursor<Document> cursor = collection.find().cursor();
+//        final List<Document> documentsToRemove = new ArrayList<>();
+//
+//        while (cursor.hasNext()) {
+//            Document guildDoc = cursor.next();
+//            JSONObject jsonObject = new JSONObject(guildDoc.toJson());
+//            long guildID = jsonObject.getLong(Field.GUILD_ID.toString());
+//
+//            Guild filteredResult = guilds.stream()
+//                    .filter(guild -> guild.getIdLong() == guildID)
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            if (filteredResult == null)
+//                documentsToRemove.add(guildDoc);
+//
+//        }
+//
+//        if (!documentsToRemove.isEmpty())
+//            removeManyDocuments(documentsToRemove);
     }
 
     public synchronized void addGuild(long gid) {

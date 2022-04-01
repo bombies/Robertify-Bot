@@ -1,5 +1,6 @@
 package main.utils;
 
+import main.main.Robertify;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 
@@ -14,7 +15,12 @@ public class RobertifyEmbedUtils {
     }
 
     public static EmbedBuilder getEmbedBuilder(Guild guild) {
-        return guildEmbedSuppliers.get(guild.getIdLong()).get();
+        try {
+            return guildEmbedSuppliers.get(guild.getIdLong()).get();
+        } catch (NullPointerException e) {
+            GeneralUtils.setDefaultEmbed(guild);
+            return guildEmbedSuppliers.get(guild.getIdLong()).get();
+        }
     }
 
     public static EmbedBuilder embedMessage(Guild guild, String message) {
@@ -26,7 +32,12 @@ public class RobertifyEmbedUtils {
     }
 
     private static EmbedBuilder getDefaultEmbed(long gid) {
-        return guildEmbedSuppliers.get(gid).get();
+        try {
+            return guildEmbedSuppliers.get(gid).get();
+        } catch (NullPointerException e) {
+            GeneralUtils.setDefaultEmbed(Robertify.getShardManager().getGuildById(gid));
+            return guildEmbedSuppliers.get(gid).get();
+        }
     }
 
 }
