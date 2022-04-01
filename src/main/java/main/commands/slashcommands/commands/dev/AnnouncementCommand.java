@@ -65,7 +65,7 @@ public class AnnouncementCommand extends AbstractSlashCommand implements IDevCom
                                             Button.of(ButtonStyle.DANGER, "devannouncement:no", "No").asDisabled()
                                     )
                             ).queue(buttonsChanged -> {
-                                for (var guild : Robertify.shardManager.getGuilds()) {
+                                for (var guild : Robertify.shardManager.getGuildCache()) {
                                     if (!new TogglesConfig().getToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS))
                                         continue;
 
