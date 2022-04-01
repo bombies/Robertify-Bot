@@ -16,7 +16,6 @@ A Discord music bot with an easily understood interface and is easy to use!
 - Fun commands such as 8ball and polls!
 
 ## Supported sources and formats
-Robertify supports all sources and formats supported by [lavaplayer](https://github.com/sedmelluq/lavaplayer#supported-formats)
 ### Available Sources
 - YouTube
 - Spotify
