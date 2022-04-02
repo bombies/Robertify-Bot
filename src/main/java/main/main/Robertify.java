@@ -17,6 +17,10 @@ import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.legacy.AbstractJSONFile;
 import main.utils.pagination.PaginationEvents;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
@@ -139,6 +143,19 @@ public class Robertify {
                 jdaBuilder.addEventListeners(cmd);
             for (var cmd : slashCommandManager.getDevCommands())
                 jdaBuilder.addEventListeners(cmd);
+
+            // Initialize the JSON directory
+            // This is a deprecated feature and is marked for removal
+            // Until everything is fully removed, this method needs to be enabled
+            // For a proper first-boot.
+            AbstractJSONFile.initDirectory();
+
+            AbstractMongoDatabase.initAllCaches();
+            logger.info("Initialized all caches");
+
+            new ChangeLogConfig().initConfig();
+            GuildsDBCache.getInstance().loadAllGuilds();
+            logger.info("All guilds have been loaded into cache");
 
             shardManager = jdaBuilder.build();
 

@@ -48,19 +48,6 @@ public class Listener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
 
-        // Initialize the JSON directory
-        // This is a deprecated feature and is marked for removal
-        // Until everything is fully removed, this method needs to be enabled
-        // For a proper first-boot.
-        AbstractJSONFile.initDirectory();
-
-        AbstractMongoDatabase.initAllCaches();
-        logger.info("Initialized and updated all caches on shard #{}", jda.getShardInfo().getShardId());
-
-        new ChangeLogConfig().initConfig();
-
-        GuildsDBCache.getInstance().loadAllGuilds();
-
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
