@@ -162,7 +162,7 @@ public class GuildsDBCache extends AbstractMongoCache {
             getCache().remove(getIndexOfObjectInArray(getCache(), GuildsDB.Field.GUILD_ID, gid));
             logger.debug("Unloaded guild with ID: {}", gid);
         } catch (NullPointerException e) {
-            logger.debug("Guild with ID {} could not be loaded since it wasn't found in the cache!", gid);
+            logger.debug("Guild with ID {} could not be unloaded since it wasn't found in the cache!", gid);
         }
     }
 }
