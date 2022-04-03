@@ -30,6 +30,7 @@ import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -86,9 +87,10 @@ public class Robertify {
             var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
             Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
                 logger.info("Destroying all players (If any left)");
-                for (var players : RobertifyAudioManager.getInstance().getMusicManagers().entrySet())
-                    players.getValue().getLink().destroy();
-
+                shardManager.getGuildCache().stream()
+                        .filter(guild -> guild.getSelfMember().getVoiceState().inVoiceChannel())
+                        .forEach(guild -> RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler().scheduleDisconnect(false, 0, TimeUnit.SECONDS));
+                shardManager.shutdown();
             }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
