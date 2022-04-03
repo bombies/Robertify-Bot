@@ -79,7 +79,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                             .build())
                     .setActionRows(
                             ActionRow.of(selectionMenu),
-                            ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end", "End Interaction"))
+                            ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), "End Interaction"))
                     )
                     .queue();
         else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
@@ -88,7 +88,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                         .build())
                 .addActionRows(
                         ActionRow.of(selectionMenu),
-                        ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end", "End Interaction"))
+                        ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), "End Interaction"))
                 )
                 .setEphemeral(false)
                 .queue();

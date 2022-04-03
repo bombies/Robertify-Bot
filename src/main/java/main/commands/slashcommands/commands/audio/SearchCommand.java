@@ -173,9 +173,17 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith("searchresult:")) return;
 
-        String id = event.getButton().getId().split(":")[1];
+        String[] split = event.getButton().getId().split(":");
+        String id = split[1], searcherID = split[2];
         switch (id.toLowerCase()) {
-            case "end" -> event.getMessage().delete().queue();
+            case "end" -> {
+                if (!event.getUser().getId().equals(searcherID))
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to end this interaction!").build())
+                            .setEphemeral(true)
+                            .queue();
+                else
+                    event.getMessage().delete().queue();
+            }
             default -> throw new IllegalArgumentException("How did this even happen? (ID="+id+")");
         }
     }
