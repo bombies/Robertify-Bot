@@ -3,9 +3,12 @@ package main.main;
 import api.deezer.DeezerApi;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.*;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEvents;
@@ -76,6 +79,17 @@ public class Robertify {
 
             for (var node : Config.getLavaNodes())
                 lavalink.addNode(node.getURI(), node.getPassword());
+
+            lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getPlayerPenalty);
+            lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getCpuPenalty);
+
+            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
+            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
+                logger.info("Destroying all players (If any left)");
+                for (var players : RobertifyAudioManager.getInstance().getMusicManagers().entrySet())
+                    players.getValue().getLink().destroy();
+
+            }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
                             Config.getBotToken(),

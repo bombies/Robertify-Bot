@@ -26,6 +26,7 @@ public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
 
     private static RobertifyAudioManager INSTANCE;
+    @Getter
     private final Map<Long, GuildMusicManager> musicManagers;
     @Getter
     /*
