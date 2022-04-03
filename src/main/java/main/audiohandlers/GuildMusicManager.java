@@ -39,19 +39,7 @@ public class GuildMusicManager {
         this.link = Robertify.getLavalink().getLink(guild);
         this.scheduler = new TrackScheduler(guild, link);
         link.getPlayer().addListener(this.scheduler);
-        this.playerManager = new DefaultAudioPlayerManager();
-
-        this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
-        this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
-        this.playerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        this.playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        this.playerManager.registerSourceManager(new HttpAudioSourceManager());
-        this.playerManager.registerSourceManager(new BeamAudioSourceManager());
-        this.playerManager.registerSourceManager(new LocalAudioSourceManager());
-        this.playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        this.playerManager.registerSourceManager(new BandcampAudioSourceManager());
-        this.playerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        this.playerManager.registerSourceManager(new VimeoAudioSourceManager());
+        this.playerManager = RobertifyAudioManager.getInstance().getPlayerManager();
     }
 
     public void leave() {

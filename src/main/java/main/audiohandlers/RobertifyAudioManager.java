@@ -1,11 +1,29 @@
 package main.audiohandlers;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
+import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
+import main.audiohandlers.sources.deezer.DeezerSourceManager;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
@@ -17,10 +35,8 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.InetAddress;
+import java.util.*;
 
 public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
@@ -35,9 +51,51 @@ public class RobertifyAudioManager {
     private static final HashMap<Long, List<String>> tracksRequestedByUsers = new HashMap<>();
     @Getter
     private static final List<String> unannouncedTracks = new ArrayList<>();
+    @Getter
+    private final AudioPlayerManager playerManager;
 
     private RobertifyAudioManager() {
         this.musicManagers = new HashMap<>();
+        this.playerManager = new DefaultAudioPlayerManager();
+
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true);
+
+        // TODO IPv6 rotation stuff
+//        if (true) {
+//            AbstractRoutePlanner planner;
+//            String block = "";
+//            List<IpBlock> blocks = Collections.singletonList(new Ipv6Block(block));
+//
+//            if (true) {
+//                planner = new RotatingNanoIpRoutePlanner(blocks);
+//            } else {
+//                try {
+//                    var blacklistedGW = InetAddress.getByName("host");
+//                    planner = new RotatingNanoIpRoutePlanner(blocks, inetAddress ->
+//                       !inetAddress.equals(blacklistedGW)
+//                    );
+//                } catch (Exception e) {
+//                    planner = new RotatingNanoIpRoutePlanner(blocks);
+//                    logger.error("An unexpected error occurred!", e);
+//                }
+//            }
+//
+//            new YoutubeIpRotatorSetup(planner)
+//                    .forSource(youtubeAudioSourceManager)
+//                    .setup();
+//        }
+
+        this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
+        this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
+        this.playerManager.registerSourceManager(youtubeAudioSourceManager);
+        this.playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        this.playerManager.registerSourceManager(new HttpAudioSourceManager());
+        this.playerManager.registerSourceManager(new BeamAudioSourceManager());
+        this.playerManager.registerSourceManager(new LocalAudioSourceManager());
+        this.playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        this.playerManager.registerSourceManager(new BandcampAudioSourceManager());
+        this.playerManager.registerSourceManager(new GetyarnAudioSourceManager());
+        this.playerManager.registerSourceManager(new VimeoAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
