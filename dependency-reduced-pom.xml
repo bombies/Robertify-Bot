@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>4.0.0-BETA-8</version>
+  <version>4.0.0-BETA-9</version>
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.4</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -155,6 +155,16 @@
           <exclusion>
             <artifactId>opus-java</artifactId>
             <groupId>club.minnced</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.github.freyacodes</groupId>
+        <artifactId>Lavalink-Client</artifactId>
+        <exclusions>
+          <exclusion>
+            <artifactId>lavaplayer</artifactId>
+            <groupId>com.sedmelluq</groupId>
           </exclusion>
         </exclusions>
       </dependency>

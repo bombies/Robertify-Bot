@@ -11,6 +11,7 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceM
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
 import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner;
@@ -25,7 +26,9 @@ import main.audiohandlers.loaders.SearchResultLoader;
 import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
+import main.constants.ENV;
 import main.constants.Toggles;
+import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.*;
@@ -59,6 +62,9 @@ public class RobertifyAudioManager {
         this.playerManager = new DefaultAudioPlayerManager();
 
         YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true);
+
+        YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.PAPISID));
+        YoutubeHttpContextFilter.setPSID(Config.get(ENV.PSID));
 
         // TODO IPv6 rotation stuff
 //        if (true) {

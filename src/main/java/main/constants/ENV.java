@@ -30,7 +30,9 @@ public enum ENV {
     POSTGRES_PORT("postgres_port"),
     TOP_GG_TOKEN("top_gg_token"),
     DBL_TOKEN("dbl_token"),
-    VOTE_REMINDER_CHANCE("vote_reminder_chance");
+    VOTE_REMINDER_CHANCE("vote_reminder_chance"),
+    PAPISID("youtub_papisid"),
+    PSID("youtube_psid");
 
     private final String str;
 
