@@ -231,12 +231,19 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                     cmd.getCommandData()
             );
 
+        if (g.getOwnerIdLong() == Config.getOwnerID()) {
+            for (var cmd : devCommands)
+                commandListUpdateAction = commandListUpdateAction.addCommands(
+                        cmd.getCommandData().setDefaultEnabled(false)
+                );
+        }
+
         commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, e -> {
             for (var createdCommand : e) {
                 if (!slashCommandManager.isDevCommand(createdCommand.getName())) continue;
 
-                List<Long> developers = BotInfoCache.getInstance().getDevelopers();
-                developers.forEach(developer -> createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(developer)).queue());
+                createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(Config.getOwnerID()))
+                        .queue();
             }
         }, new ErrorHandler().handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
                 owner -> owner.getUser()
