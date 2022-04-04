@@ -8,6 +8,7 @@ import main.constants.BotConstants;
 import main.constants.Permission;
 import main.constants.RobertifyTheme;
 import main.constants.Toggles;
+import main.main.Config;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -192,16 +194,30 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-        if (command.isPrivate)
+        if (command.isPrivate && g.getOwnerIdLong() != Config.getOwnerID())
+            return;
+        else
             commandCreateAction = commandCreateAction.setDefaultEnabled(false);
 
         commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
             if (!command.isPrivate) return;
-
-            List<Long> developers = BotInfoCache.getInstance().getDevelopers();
-            developers.forEach(developer -> createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(developer)).queue());
+            createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(Config.getOwnerID()))
+                    .queue();
         }, new ErrorHandler()
                 .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
+    }
+
+    public void unload(Guild g) {
+        g.retrieveCommands().queue(commands -> {
+            final net.dv8tion.jda.api.interactions.commands.Command matchedCommand = commands.stream()
+                    .filter(command -> command.getName().equals(this.getName()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (matchedCommand == null) return;
+
+            g.deleteCommandById(matchedCommand.getIdLong()).queue();
+        });
     }
 
     public static void loadAllCommands(Guild g) {

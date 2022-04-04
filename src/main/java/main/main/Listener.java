@@ -4,6 +4,8 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.StopCommand;
+import main.commands.slashcommands.commands.dev.AnnouncementCommand;
+import main.commands.slashcommands.commands.dev.ChangeLogCommand;
 import main.commands.slashcommands.commands.dev.ShardInfoCommand;
 import main.commands.slashcommands.commands.management.SetChannelCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
@@ -203,6 +205,11 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+
+    }
+
+    public void unloadCommands(Guild g) {
+
     }
 
     private static void rescheduleUnbans(Guild g) {
