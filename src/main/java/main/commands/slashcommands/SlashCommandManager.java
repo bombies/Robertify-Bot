@@ -112,8 +112,6 @@ public class SlashCommandManager {
                 new EvalCommand(),
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
-                new ChangeLogCommand(),
-                new AnnouncementCommand(),
                 new ShardInfoCommand()
         );
     }
