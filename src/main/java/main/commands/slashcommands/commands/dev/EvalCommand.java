@@ -70,6 +70,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("channel", ctx.getChannel());
             engine.put("args", args);
             engine.put("api", ctx.getJDA());
+            engine.put("shards",  Robertify.getShardManager());
             engine.put("guild", ctx.getGuild());
             engine.put("member", ctx.getMember());
             engine.put("link", Robertify.getLavalink());
