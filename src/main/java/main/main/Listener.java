@@ -205,7 +205,6 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        AbstractSlashCommand.loadAllCommands(g);
     }
 
     public void unloadCommands(Guild g) {

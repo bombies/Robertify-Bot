@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>4.0.0-BETA-10</version>
+  <version>4.0.0-BETA-11</version>
   <build>
     <plugins>
       <plugin>
