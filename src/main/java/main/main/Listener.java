@@ -3,22 +3,14 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
-import main.commands.slashcommands.commands.audio.StopCommand;
-import main.commands.slashcommands.commands.dev.AnnouncementCommand;
-import main.commands.slashcommands.commands.dev.ChangeLogCommand;
-import main.commands.slashcommands.commands.dev.ShardInfoCommand;
-import main.commands.slashcommands.commands.management.SetChannelCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import main.utils.json.legacy.AbstractJSONFile;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -67,6 +59,8 @@ public class Listener extends ListenerAdapter {
             } catch (NullPointerException e) {
                 dedicatedChannelConfig.removeChannel(g.getIdLong());
             }
+
+            ResumeUtils.getInstance().loadInfo(g);
         }
 
 //        StatisticsDB.startDailyUpdateCheck();

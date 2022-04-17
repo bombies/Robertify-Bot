@@ -1,4 +1,4 @@
-package main.utils.json.legacy;
+package main.utils.json;
 
 import lombok.Getter;
 import lombok.SneakyThrows;

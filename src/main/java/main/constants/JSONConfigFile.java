@@ -1,14 +1,8 @@
 package main.constants;
 
 public enum JSONConfigFile {
-    PERMISSIONS("permissions.json"),
     CHANGELOG("changelog.json"),
-    TOGGLES("toggles.json"),
-    DEDICATED_CHANNELS("dedicatedchannels.json"),
-    EIGHT_BALL("8ball.json"),
-    RESTRICTED_CHANNELS("restrictedchannels.json"),
-    SUGGESTIONS("suggestions.json"),
-    REPORTS("reports.json");
+    RESUME_DATA("resume_data.json");
 
     private final String str;
 

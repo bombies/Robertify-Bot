@@ -8,7 +8,9 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
+import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.TrackScheduler;
 import main.commands.prefixcommands.audio.*;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEvents;
@@ -23,14 +25,14 @@ import main.events.VoiceChannelEvents;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.GuildsDBCache;
 import main.utils.json.changelog.ChangeLogConfig;
-import main.utils.json.legacy.AbstractJSONFile;
+import main.utils.json.AbstractJSONFile;
 import main.utils.pagination.PaginationEvents;
+import main.utils.resume.ResumeUtils;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -89,7 +91,11 @@ public class Robertify {
                 logger.info("Destroying all players (If any left)");
                 shardManager.getGuildCache().stream()
                         .filter(guild -> guild.getSelfMember().getVoiceState().inVoiceChannel())
-                        .forEach(guild -> RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler().scheduleDisconnect(false, 0, TimeUnit.SECONDS));
+                        .forEach(guild -> {
+                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+                            ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
+                            musicManager.getScheduler().scheduleDisconnect(false, 0, TimeUnit.SECONDS);
+                        });
                 shardManager.shutdown();
             }));
 

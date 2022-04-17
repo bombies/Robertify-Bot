@@ -185,7 +185,7 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
             Future<Track> trackFuture = api.getTrack(res.group(res.groupCount())).build().executeAsync();
             Track track = trackFuture.get();
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(), track.getId(), false, "https://open.spotify.com/track/" + track.getId());
-            return (AudioItem)new SpotifyTrack(info, (String)track.getExternalIds().getExternalIds().getOrDefault("isrc", null), track.getAlbum().getImages()[0].getUrl(), this);
+            return new SpotifyTrack(info, track.getExternalIds().getExternalIds().getOrDefault("isrc", null), track.getAlbum().getImages()[0].getUrl(), this);
         } catch (Exception e) {
             throw new FriendlyException(e.getMessage(), FriendlyException.Severity.FAULT, e);
         }

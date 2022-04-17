@@ -29,6 +29,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
 import main.constants.Toggles;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.*;
@@ -111,6 +112,20 @@ public class RobertifyAudioManager {
     public void removeMusicManager(Guild guild) {
         this.musicManagers.get(guild.getIdLong()).destroy();
         this.musicManagers.remove(guild.getIdLong());
+    }
+
+    @SneakyThrows
+    public void loadAndPlay(long gid, long channelID, AudioTrack track) {
+        final var guild = Robertify.getShardManager().getGuildById(gid);
+        final var musicManager = getMusicManager(guild);
+
+        try {
+            joinVoiceChannel(null, guild.getVoiceChannelById(channelID), musicManager);
+        } catch (Exception e) {
+            return;
+        }
+
+        loadTrack(track, musicManager);
     }
 
     @SneakyThrows
@@ -311,6 +326,12 @@ public class RobertifyAudioManager {
                 botMsg,
                 addToBeginning
         );
+    }
+
+    private void loadTrack(AudioTrack track, GuildMusicManager musicManager) {
+        final String trackUrl = "ytsearch:" + track.getInfo().identifier;
+        final AudioLoader loader = new AudioLoader(null, musicManager, tracksRequestedByUsers, trackUrl, false, null, false, false);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,

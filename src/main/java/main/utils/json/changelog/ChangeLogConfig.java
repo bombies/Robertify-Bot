@@ -3,7 +3,7 @@ package main.utils.json.changelog;
 import main.constants.JSONConfigFile;
 import main.constants.TimeFormat;
 import main.utils.GeneralUtils;
-import main.utils.json.legacy.AbstractJSONFile;
+import main.utils.json.AbstractJSONFile;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
