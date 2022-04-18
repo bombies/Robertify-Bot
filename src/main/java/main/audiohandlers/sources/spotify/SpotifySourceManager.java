@@ -55,6 +55,7 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
         return "spotify";
     }
 
+    @Override
     public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
         for (Function<AudioReference, AudioItem> loader : this.loaders) {
             AudioItem item;
@@ -64,20 +65,24 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
         return null;
     }
 
+    @Override
     public boolean isTrackEncodable(AudioTrack track) {
         return true;
     }
 
+    @Override
     public void encodeTrack(AudioTrack track, DataOutput output) throws IOException {
         SpotifyTrack spotifyTrack = (SpotifyTrack)track;
         DataFormatTools.writeNullableText(output, spotifyTrack.getISRC());
         DataFormatTools.writeNullableText(output, spotifyTrack.getArtworkURL());
     }
 
+    @Override
     public AudioTrack decodeTrack(AudioTrackInfo trackInfo, DataInput input) throws IOException {
         return new SpotifyTrack(trackInfo, DataFormatTools.readNullableText(input), DataFormatTools.readNullableText(input), this);
     }
 
+    @Override
     public void shutdown() {}
 
     public AudioItem getSearch(String query) throws IOException, ParseException, SpotifyWebApiException {

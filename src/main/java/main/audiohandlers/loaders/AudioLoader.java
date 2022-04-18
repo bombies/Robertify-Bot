@@ -115,8 +115,10 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (!announceMsg)
                 RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0).getIdentifier());
 
-            trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-            trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
+            if (sender != null) {
+                trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+                trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
+            }
 
             final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
@@ -127,7 +129,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                 scheduler.queue(tracks.get(0));
 
             AudioTrackInfo info = tracks.get(0).getInfo();
-            new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
+            if (sender != null)
+                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
 
             if (scheduler.playlistRepeating)
                 scheduler.setSavedQueue(guild, scheduler.queue);
@@ -158,10 +161,14 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (addToBeginning)
                 scheduler.addToBeginningOfQueue(tracks);
 
-            trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-            new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+audioPlaylist.getTracks().size()+"` songs from playlist `"+ audioPlaylist.getName() +"` to the queue.");
+            if (sender != null) {
+                trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `" + audioPlaylist.getTracks().size() + "` songs from playlist `" + audioPlaylist.getName() + "` to the queue.");
+            }
+
             for (final AudioTrack track : tracks) {
-                trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getIdentifier());
+                if (sender != null)
+                    trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getIdentifier());
 
                 if (!addToBeginning)
                     scheduler.queue(track);
@@ -179,8 +186,9 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `" + trackUrl.replace("ytsearch:", "")
-                + "`. Try being more specific. *(Adding name of the artiste)*");
+        EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `" + trackUrl.replace("ytsearch:", "")
+                + "`. Try being more specific. *(Adding name of the artiste)*")
+                : RobertifyEmbedUtils.embedMessage(guild, "There was nothing found for that track...");
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {

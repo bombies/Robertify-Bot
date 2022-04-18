@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -238,7 +239,14 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackException(IPlayer player, AudioTrack track, Exception exception) {
-        logger.error("There was an exception with playing the track.", exception);
+        if (exception.getMessage().contains("matching track")) {
+            if (announcementChannel != null)
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't find a source for a track`\n" +
+                                "Skipping to the next track (If available...)").build())
+                        .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+        } else {
+            logger.error("There was an exception with playing the track.", exception);
+        }
     }
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {

@@ -19,6 +19,9 @@ import main.utils.json.AbstractJSONFile;
 import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.AbstractQueue;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResumeData extends AbstractJSONFile {
+    private final static Logger logger = LoggerFactory.getLogger(ResumeData.class);
 
     public ResumeData() {
         super(JSONConfigFile.RESUME_DATA);
@@ -116,6 +120,92 @@ public class ResumeData extends AbstractJSONFile {
         return ret;
     }
 
+    @SneakyThrows
+    public List<AudioTrack> assembleSpotifyTracks(JSONArray trackArr) {
+        final List<AudioTrack> spotifyTracks = new ArrayList<>();
+        final List<StringBuilder>  ids = new ArrayList<>();
+        final List<AudioTrackInfo> trackInfos = new ArrayList<>();
+
+        int i = 0;
+        for (var obj : trackArr) {
+            if (ids.size() < i + 1)
+                ids.add(i, new StringBuilder());
+
+            final var trackObj = (JSONObject) obj;
+
+            logger.debug("Source: {}", trackObj.getString("source"));
+            if (!trackObj.getString("source").equals("spotify"))
+                continue;
+
+            ids.get(i).append(trackObj.getString("info_identifier")).append(",");
+            logger.debug("Added Spotify track with ID {} to id builder {}", trackObj.getString("info_identifier"), i);
+
+            trackInfos.add(getTrackInfo(trackObj));
+            i += (ids.get(i).toString().split(",").length == 49) ? 1 : 0;
+        }
+
+        SpotifyApi spotifyApi = Robertify.getSpotifyApi();
+        for (var idBuilder : ids) {
+            Track[] tracks = spotifyApi.getSeveralTracks(idBuilder.toString().split(",")).build().execute();
+
+            for (int j = 0; j < tracks.length; j++)
+                spotifyTracks.add(new SpotifyTrack(
+                        trackInfos.get(j),
+                        tracks[j].getExternalIds().getExternalIds().getOrDefault("isrc", null),
+                        tracks[j].getAlbum().getImages()[0].getUrl(),
+                        new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                ));
+        }
+
+        return spotifyTracks;
+    }
+
+    @SneakyThrows
+    public AudioTrack assembleTrack(JSONObject trackObj, boolean assembleSpotify) {
+        final AudioTrack track;
+        final var trackInfo = getTrackInfo(trackObj);
+
+        String source = trackObj.getString("source");
+        switch (source) {
+            case "spotify" -> {
+                if (assembleSpotify) {
+                    Track spotifyTrack = Robertify.getSpotifyApi().getTrack(trackInfo.identifier).build().execute();
+                    track = new SpotifyTrack(
+                            trackInfo,
+                            spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
+                            spotifyTrack.getAlbum().getImages()[0].getUrl(),
+                            new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                    );
+                } else return null;
+            }
+            case "deezer" -> {
+                api.deezer.objects.Track deezerTrack = Robertify.getDeezerApi().track().getById(Integer.parseInt(trackInfo.identifier)).execute();
+                track = new DeezerTrack(
+                        trackInfo,
+                        deezerTrack.getIsrc(),
+                        (deezerTrack.getAlbum().getCoverXl() == null) ? "https://i.imgur.com/VNQvjve.png" : deezerTrack.getAlbum().getCoverXl(),
+                        new DeezerSourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                );
+            }
+            case "soundcloud" -> track = new SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault());
+            case "youtube" -> track = new YoutubeAudioTrack(trackInfo, new YoutubeAudioSourceManager(true));
+            default -> track = null;
+        }
+
+        return track;
+    }
+
+    private AudioTrackInfo getTrackInfo(JSONObject trackObj) {
+        return new AudioTrackInfo(
+                trackObj.getString("info_title"),
+                trackObj.getString("info_author"),
+                trackObj.getLong("info_length"),
+                trackObj.getString("info_identifier"),
+                trackObj.getBoolean("info_isstream"),
+                trackObj.getString("info_uri")
+        );
+    }
+
     public enum Fields implements GenericJSONField {
         GUILDS("guilds"),
         GUILD_ID("guild_id"),
@@ -135,7 +225,7 @@ public class ResumeData extends AbstractJSONFile {
         }
     }
 
-    protected static class GuildResumeData {
+    public static class GuildResumeData {
         @Getter
         private final long guildId;
         @Getter
@@ -144,68 +234,35 @@ public class ResumeData extends AbstractJSONFile {
         private final AudioTrack playingTrack;
         @Getter
         private final List<AudioTrack> queue;
+        @Getter
+        private final JSONObject guildObject;
 
-        public GuildResumeData(long guildId, long channelId, JSONObject playingTrackObj, JSONArray queueObj) {
+        protected GuildResumeData(long guildId, long channelId, JSONObject playingTrackObj, JSONArray queueObj) {
             this.guildId = guildId;
             this.channelId = channelId;
 
-            playingTrack = assembleTrack(playingTrackObj);
+            ResumeData resumeData = new ResumeData();
+            playingTrack = resumeData.assembleTrack(playingTrackObj, true);
 
             this.queue = new ArrayList<>();
+
+            queue.addAll(resumeData.assembleSpotifyTracks(queueObj));
+
             for (var obj : queueObj) {
                 final var trackObj = (JSONObject) obj;
 
-                AudioTrack track = assembleTrack(trackObj);
+                AudioTrack track = resumeData.assembleTrack(trackObj, false);
 
                 if (track == null)
                     continue;
                 queue.add(track);
             }
+
+            guildObject = new JSONObject();
+            guildObject.put(Fields.GUILD_ID.toString(), guildId);
+            guildObject.put(Fields.CHANNEL_ID.toString(), channelId);
+            guildObject.put(Fields.PLAYING_TRACK.toString(), playingTrackObj);
+            guildObject.put(Fields.QUEUE.toString(), queueObj);
         }
-
-        @SneakyThrows
-        private AudioTrack assembleTrack(JSONObject trackObj) {
-            final AudioTrack track;
-            final var trackInfo = getTrackInfo(trackObj);
-
-            String source = trackObj.getString("source");
-            switch (source) {
-                case "spotify" -> {
-                    Track spotifyTrack = Robertify.getSpotifyApi().getTrack(trackInfo.identifier).build().execute();
-                    track = new SpotifyTrack(
-                            trackInfo,
-                            spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
-                            spotifyTrack.getAlbum().getImages()[0].getUrl(),
-                            new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
-                    );
-                }
-                case "deezer" -> {
-                    api.deezer.objects.Track deezerTrack = Robertify.getDeezerApi().track().getById(Integer.parseInt(trackInfo.identifier)).execute();
-                    track = new DeezerTrack(
-                            trackInfo,
-                            deezerTrack.getIsrc(),
-                            (deezerTrack.getAlbum().getCoverXl() == null) ? "https://i.imgur.com/VNQvjve.png" : deezerTrack.getAlbum().getCoverXl(),
-                            new DeezerSourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
-                    );
-                }
-                case "soundcloud" -> track = new SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault());
-                case "youtube" -> track = new YoutubeAudioTrack(trackInfo, new YoutubeAudioSourceManager(true));
-                default -> track = null;
-            }
-
-            return track;
-        }
-
-        private AudioTrackInfo getTrackInfo(JSONObject trackObj) {
-            return new AudioTrackInfo(
-                    trackObj.getString("info_title"),
-                    trackObj.getString("info_author"),
-                    trackObj.getLong("info_length"),
-                    trackObj.getString("info_identifier"),
-                    trackObj.getBoolean("info_isstream"),
-                    trackObj.getString("info_uri")
-            );
-        }
-
     }
 }

@@ -24,6 +24,7 @@ import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
 import main.audiohandlers.sources.deezer.DeezerSourceManager;
+import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
@@ -32,6 +33,8 @@ import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.resume.ResumeData;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -94,6 +97,7 @@ public class RobertifyAudioManager {
 
         this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
         this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
+        this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
         this.playerManager.registerSourceManager(youtubeAudioSourceManager);
         this.playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
         this.playerManager.registerSourceManager(new HttpAudioSourceManager());
@@ -115,7 +119,7 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlay(long gid, long channelID, AudioTrack track) {
+    public void loadAndPlay(long gid, long channelID, ResumeData.GuildResumeData track) {
         final var guild = Robertify.getShardManager().getGuildById(gid);
         final var musicManager = getMusicManager(guild);
 
@@ -328,10 +332,9 @@ public class RobertifyAudioManager {
         );
     }
 
-    private void loadTrack(AudioTrack track, GuildMusicManager musicManager) {
-        final String trackUrl = "ytsearch:" + track.getInfo().identifier;
-        final AudioLoader loader = new AudioLoader(null, musicManager, tracksRequestedByUsers, trackUrl, false, null, false, false);
-        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
+    private void loadTrack(ResumeData.GuildResumeData track, GuildMusicManager musicManager) {
+        final AudioLoader loader = new AudioLoader(musicManager.getGuild().getSelfMember().getUser(), musicManager, tracksRequestedByUsers, track.getGuildObject().toString(), false, null, false, false);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, ResumeSourceManager.SEARCH_PREFIX + track.getGuildObject().toString(), loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
