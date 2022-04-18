@@ -47,19 +47,6 @@ public class Listener extends ListenerAdapter {
             loadNeededSlashCommands(g);
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
-
-            DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
-            try {
-                if (dedicatedChannelConfig.isChannelSet(g.getIdLong())) {
-                    dedicatedChannelConfig.updateMessage(g);
-                    dedicatedChannelConfig.updateButtons(g);
-                }
-            } catch (InsufficientPermissionException ignored) {
-
-            } catch (NullPointerException e) {
-                dedicatedChannelConfig.removeChannel(g.getIdLong());
-            }
-
             ResumeUtils.getInstance().loadInfo(g);
         }
 
