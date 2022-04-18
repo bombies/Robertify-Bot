@@ -7,16 +7,19 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.deezer.DeezerTrack;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.constants.JSONConfigFile;
+import main.main.Robertify;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.AbstractQueue;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class ResumeData extends AbstractJSONFile {
 
     public ResumeData() {
         super(JSONConfigFile.RESUME_DATA);
+        initConfig();
     }
 
     @Override
@@ -96,8 +100,7 @@ public class ResumeData extends AbstractJSONFile {
 
     private boolean guildHasInfo(long gid) {
         JSONObject jsonObject = getJSONObject();
-
-        return arrayHasObject(jsonObject.getJSONArray(Fields.GUILDS.toString()), Fields.GUILDS, gid);
+        return arrayHasObject(jsonObject.getJSONArray(Fields.GUILDS.toString()), Fields.GUILD_ID, gid);
     }
 
     private JSONObject createAudioTrackObject(AudioTrack track) {
@@ -160,14 +163,31 @@ public class ResumeData extends AbstractJSONFile {
             }
         }
 
+        @SneakyThrows
         private AudioTrack assembleTrack(JSONObject trackObj) {
             final AudioTrack track;
             final var trackInfo = getTrackInfo(trackObj);
 
             String source = trackObj.getString("source");
             switch (source) {
-                case "spotify" -> track = new SpotifyTrack(trackInfo, null, null, new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager()));
-                case "deezer" -> track = new DeezerTrack(trackInfo, null, null, new DeezerSourceManager(RobertifyAudioManager.getInstance().getPlayerManager()));
+                case "spotify" -> {
+                    Track spotifyTrack = Robertify.getSpotifyApi().getTrack(trackInfo.identifier).build().execute();
+                    track = new SpotifyTrack(
+                            trackInfo,
+                            spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
+                            spotifyTrack.getAlbum().getImages()[0].getUrl(),
+                            new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                    );
+                }
+                case "deezer" -> {
+                    api.deezer.objects.Track deezerTrack = Robertify.getDeezerApi().track().getById(Integer.parseInt(trackInfo.identifier)).execute();
+                    track = new DeezerTrack(
+                            trackInfo,
+                            deezerTrack.getIsrc(),
+                            (deezerTrack.getAlbum().getCoverXl() == null) ? "https://i.imgur.com/VNQvjve.png" : deezerTrack.getAlbum().getCoverXl(),
+                            new DeezerSourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                    );
+                }
                 case "soundcloud" -> track = new SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault());
                 case "youtube" -> track = new YoutubeAudioTrack(trackInfo, new YoutubeAudioSourceManager(true));
                 default -> track = null;
@@ -181,7 +201,7 @@ public class ResumeData extends AbstractJSONFile {
                     trackObj.getString("info_title"),
                     trackObj.getString("info_author"),
                     trackObj.getLong("info_length"),
-                    trackObj.getString("info_indentifier"),
+                    trackObj.getString("info_identifier"),
                     trackObj.getBoolean("info_isstream"),
                     trackObj.getString("info_uri")
             );

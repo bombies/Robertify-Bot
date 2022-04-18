@@ -25,9 +25,10 @@ public class ResumeUtils {
     }
 
     public void loadInfo(Guild guild) {
-        GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-
         ResumeData.GuildResumeData info = data.getInfo(guild.getIdLong());
+        if (info == null)
+            return;
+
         RobertifyAudioManager.getInstance().loadAndPlay(guild.getIdLong(), info.getChannelId(), info.getPlayingTrack());
 
         info.getQueue().forEach(track -> RobertifyAudioManager.getInstance().loadAndPlay(guild.getIdLong(), info.getChannelId(), track));
