@@ -384,6 +384,9 @@ public class RobertifyAudioManager {
     }
 
     public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
+        if (vc.getMembers().size() == 0)
+            throw new IllegalStateException("I can't join a voice channel with no one in it!");
+
         try {
             musicManager.getLink().connect(vc);
             musicManager.getScheduler().scheduleDisconnect(true);

@@ -57,8 +57,13 @@ public class JoinCommand implements ICommand {
         if (memberVoiceState.getChannel() == selfVoiceState.getChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I am already in " + channel.getAsMention() + " !").build();
 
-        RobertifyAudioManager.getInstance()
-                .joinVoiceChannel(textChannel, memberVoiceState.getChannel(), musicManager);
+        try {
+            RobertifyAudioManager.getInstance()
+                    .joinVoiceChannel(textChannel, memberVoiceState.getChannel(), musicManager);
+        } catch (IllegalStateException e) {
+            return RobertifyEmbedUtils.embedMessage(guild, "I can't join " + channel.getAsMention() + " since there's no one in the channel!")
+                    .build();
+        }
         return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
     }
 
