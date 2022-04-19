@@ -29,17 +29,6 @@ public class ShufflePlayCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
-                                    "without first having an announcement channel set!").build())
-                            .queue();
-                    return;
-                }
-            }
-        }
-
         if (args.isEmpty()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the link of a playlist to play!");
             msg.replyEmbeds(eb.build()).queue();

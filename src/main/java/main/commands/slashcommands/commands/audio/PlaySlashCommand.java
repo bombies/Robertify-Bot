@@ -75,18 +75,6 @@ public class PlaySlashCommand extends AbstractSlashCommand {
         EmbedBuilder eb;
         final TextChannel channel = event.getTextChannel();
 
-        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
-                                    "without first having an announcement channel set!").build())
-                            .setEphemeral(false)
-                            .queue();
-                    return;
-                }
-            }
-        }
-
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

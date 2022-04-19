@@ -47,17 +47,6 @@ public class PlayCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) {
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
-                                    "without first having an announcement channel set!").build())
-                            .queue();
-                    return;
-                }
-            }
-        }
-
         if (args.isEmpty()) {
             final var player = RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer();
 

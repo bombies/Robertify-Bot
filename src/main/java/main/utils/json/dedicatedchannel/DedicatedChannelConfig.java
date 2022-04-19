@@ -104,12 +104,12 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         try {
             return getTextChannel(gid).retrieveMessageById(getMessageID(gid));
         } catch (MissingAccessException e) {
-            if (new GuildConfig().announcementChannelIsSet(gid)) {
                 TextChannel channel = RobertifyAudioManager.getInstance().getMusicManager(Robertify.getShardManager().getGuildById(gid))
                         .getScheduler().getAnnouncementChannel();
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
-                        .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}));
-            }
+
+                if (channel != null)
+                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
+                            .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}));
             return null;
         }
     }
