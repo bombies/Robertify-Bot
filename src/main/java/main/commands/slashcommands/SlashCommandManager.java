@@ -82,8 +82,7 @@ public class SlashCommandManager {
                 new ThemeCommand(),
                 new RestrictedChannelsCommand(),
                 new LogCommand(),
-                new SetLogChannelCommand(),
-                new SetChannelCommand()
+                new SetLogChannelCommand()
         );
 
         addMiscCommands(

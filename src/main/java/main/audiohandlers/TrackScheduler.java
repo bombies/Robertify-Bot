@@ -103,22 +103,21 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             ));
 
             try {
-                announcementChannel.sendMessageEmbeds(eb.build())
-                        .queue(msg -> {
-                            if (lastSentMsg != null)
-                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                            lastSentMsg = msg;
-                        }, new ErrorHandler()
-                                .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
-                                        .queue(nonEmbedMsg -> {
-                                            if (lastSentMsg != null)
-                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                        })
-                                ));
-            } catch (NullPointerException e) {
-                new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
+                if (announcementChannel != null)
+                    announcementChannel.sendMessageEmbeds(eb.build())
+                            .queue(msg -> {
+                                if (lastSentMsg != null)
+                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                lastSentMsg = msg;
+                            }, new ErrorHandler()
+                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
+                                            .queue(nonEmbedMsg -> {
+                                                if (lastSentMsg != null)
+                                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                            })
+                                    ));
             } catch (InsufficientPermissionException ignored) {}
         }
     }
@@ -219,19 +218,15 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
         if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
 
-        if (!new GuildConfig().announcementChannelIsSet(guild.getIdLong())) return;
-
-        TextChannel announcementChannel = Robertify.shardManager.getTextChannelById(new GuildConfig().getAnnouncementChannelID(this.guild.getIdLong()));
         try {
-            announcementChannel.sendMessageEmbeds(
-                            RobertifyEmbedUtils.embedMessage(
-                                            guild,
-                                            "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
-                                    .build()
-                    )
-                    .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
-        } catch (NullPointerException e) {
-            new GuildConfig().setAnnouncementChannelID(guild.getIdLong(), -1L);
+            if (announcementChannel != null)
+                announcementChannel.sendMessageEmbeds(
+                                RobertifyEmbedUtils.embedMessage(
+                                                guild,
+                                                "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
+                                        .build()
+                        )
+                        .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
         } catch (InsufficientPermissionException ignored) {}
 
         nextTrack(track);
@@ -315,9 +310,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
                     final var guildConfig = new GuildConfig();
 
-                    if (guildConfig.announcementChannelIsSet(guild.getIdLong()) && announceMsg)
-                        Robertify.shardManager.getTextChannelById(guildConfig.getAnnouncementChannelID(guild.getIdLong()))
-                                .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
+                    if (announceMsg && announcementChannel != null)
+                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
                                 .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
                 }
             }

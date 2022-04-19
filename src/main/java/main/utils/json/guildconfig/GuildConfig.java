@@ -46,6 +46,7 @@ public class GuildConfig extends AbstractGuildConfig {
         getCache().setField(gid, GuildsDB.Field.GUILD_PREFIX, prefix);
     }
 
+    @Deprecated
     public long getAnnouncementChannelID(long gid) {
         if (!guildHasInfo(gid))
             loadGuild(gid);
@@ -57,6 +58,7 @@ public class GuildConfig extends AbstractGuildConfig {
         }
     }
 
+    @Deprecated
     public void setAnnouncementChannelID(long gid, long id) {
         if (!guildHasInfo(gid))
             loadGuild(gid);
@@ -64,6 +66,7 @@ public class GuildConfig extends AbstractGuildConfig {
         getCache().setField(gid, GuildsDB.Field.ANNOUNCEMENT_CHANNEL, id);
     }
 
+    @Deprecated
     public boolean announcementChannelIsSet(long gid) {
         if (!guildHasInfo(gid))
             loadGuild(gid);

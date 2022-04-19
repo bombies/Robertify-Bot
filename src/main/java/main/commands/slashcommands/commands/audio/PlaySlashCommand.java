@@ -87,8 +87,6 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             }
         }
 
-        Listener.checkIfAnnouncementChannelIsSet(guild, channel);
-
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();

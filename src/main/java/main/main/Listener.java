@@ -3,6 +3,7 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.management.SetChannelCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -45,6 +46,7 @@ public class Listener extends ListenerAdapter {
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
+            unloadCommands(g);
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
             ResumeUtils.getInstance().loadInfo(g);
@@ -159,27 +161,6 @@ public class Listener extends ListenerAdapter {
             Robertify.getDiscordBotListAPI().setStats(serverCount);
     }
 
-    public static void checkIfAnnouncementChannelIsSet(Guild guild, TextChannel channel) {
-        var guildConfig = new GuildConfig();
-        if (!guildConfig.announcementChannelIsSet(guild.getIdLong())) {
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-                    if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
-                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You cannot run this command in this channel " +
-                                        "without first having an announcement channel set!").build())
-                                .queue();
-                        return;
-                    }
-            }
-
-            guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
-
-            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                    There was no announcement channel set! Setting it to this channel.
-
-                    _You can change the announcement channel by using the "setchannel" command._""").build()).queue();
-        }
-    }
-
     public void loadSlashCommands(Guild g) {
         AbstractSlashCommand.loadAllCommands(g);
     }
@@ -189,7 +170,7 @@ public class Listener extends ListenerAdapter {
     }
 
     public void unloadCommands(Guild g) {
-
+        new SetChannelCommand().unload(g);
     }
 
     private static void rescheduleUnbans(Guild g) {

@@ -58,8 +58,6 @@ public class PlayCommand implements ICommand {
             }
         }
 
-        Listener.checkIfAnnouncementChannelIsSet(guild, channel);
-
         if (args.isEmpty()) {
             final var player = RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer();
 

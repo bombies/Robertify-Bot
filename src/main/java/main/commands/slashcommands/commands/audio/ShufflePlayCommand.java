@@ -40,8 +40,6 @@ public class ShufflePlayCommand implements ICommand {
             }
         }
 
-        Listener.checkIfAnnouncementChannelIsSet(ctx.getGuild(), ctx.getChannel());
-
         if (args.isEmpty()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the link of a playlist to play!");
             msg.replyEmbeds(eb.build()).queue();
