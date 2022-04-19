@@ -170,7 +170,7 @@ public class Listener extends ListenerAdapter {
     }
 
     public void unloadCommands(Guild g) {
-        new SetChannelCommand().unload(g);
+
     }
 
     private static void rescheduleUnbans(Guild g) {
