@@ -71,6 +71,7 @@ public class RobertifyAudioManager {
         YoutubeHttpContextFilter.setPSID(Config.get(ENV.PSID));
 
         // TODO IPv6 rotation stuff
+        // Snippet acquired from Mantaro Bot
 //        if (true) {
 //            AbstractRoutePlanner planner;
 //            String block = "";
