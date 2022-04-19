@@ -187,7 +187,7 @@ public class GuildConfig extends AbstractGuildConfig {
         // Nothing
     }
 
-    public static record BannedUser(long user, long bannedBy, long bannedAt, long bannedUntil) {
+    public record BannedUser(long user, long bannedBy, long bannedAt, long bannedUntil) {
         @Override
         public String toString() {
             return String.valueOf(user);
