@@ -79,7 +79,6 @@ public class CommandManager {
                 new QueueCommand(),
                 new PauseCommand(),
                 new RobertifyShutdownCommand(),
-                new SetChannelCommand(),
                 new RemoveCommand(),
                 new MoveCommand(),
                 new ShuffleCommand(),
@@ -191,7 +190,6 @@ public class CommandManager {
 
         addManagementCommands(
                 new PermissionsCommand(),
-                new SetChannelCommand(),
                 new SetPrefixCommand(),
                 new SetDJCommand(),
                 new RemoveDJCommand(),
