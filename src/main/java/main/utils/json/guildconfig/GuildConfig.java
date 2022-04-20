@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GuildConfig extends AbstractGuildConfig {
-    private final static Logger logger = LoggerFactory.getLogger(GuildDB.class);
+    private final static Logger logger = LoggerFactory.getLogger(GuildConfig.class);
 
     public void addGuild(long gid) {
         if (guildHasInfo(gid))
