@@ -8,7 +8,7 @@ import main.constants.RobertifyEmoji;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -36,33 +36,33 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     public synchronized void setMessage(long gid, long mid) {
         var obj = getGuildObject(gid);
 
-        var dediChannelObj = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
-        dediChannelObj.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
+        var dediChannelObj = obj.getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        dediChannelObj.put(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
 
-        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObj);
+        getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObj);
     }
 
     public synchronized void setChannelAndMessage(long gid, long cid, long mid) {
         var obj = getGuildObject(gid);
 
-        var dediChannelObject = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
-        dediChannelObject.put(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString(), cid);
-        dediChannelObject.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
+        var dediChannelObject = obj.getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        dediChannelObject.put(GuildDB.Field.DEDICATED_CHANNEL_ID.toString(), cid);
+        dediChannelObject.put(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), mid);
 
-        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObject);
+        getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, dediChannelObject);
     }
 
     public synchronized void setOriginalAnnouncementToggle(long gid, boolean toggle) {
         var obj = getGuildObject(gid);
 
-        var dedicatedChannelObj = obj.getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        var dedicatedChannelObj = obj.getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
         dedicatedChannelObj.put(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), toggle);
 
-        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, dedicatedChannelObj);
+        getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, dedicatedChannelObj);
     }
 
     public synchronized boolean getOriginalAnnouncementToggle(long gid) {
-        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
                 .getBoolean(DedicatedChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString());
     }
 
@@ -70,30 +70,30 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
 
-        var obj = getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
-        obj.put(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString(), -1);
-        obj.put(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1);
+        var obj = getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
+        obj.put(GuildDB.Field.DEDICATED_CHANNEL_ID.toString(), -1);
+        obj.put(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1);
 
-        getCache().setField(gid, GuildsDB.Field.DEDICATED_CHANNEL_OBJECT, obj);
+        getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, obj);
     }
 
     public synchronized boolean isChannelSet(long gid) {
-        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
-                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString()) != -1;
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildDB.Field.DEDICATED_CHANNEL_ID.toString()) != -1;
     }
 
     public synchronized long getChannelID(long gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
-        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
-                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_ID.toString());
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildDB.Field.DEDICATED_CHANNEL_ID.toString());
     }
 
     public synchronized long getMessageID(long gid) {
         if (!isChannelSet(gid))
             throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
-        return getGuildObject(gid).getJSONObject(GuildsDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
-                .getLong(GuildsDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString());
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                .getLong(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString());
     }
 
     public synchronized TextChannel getTextChannel(long gid) {

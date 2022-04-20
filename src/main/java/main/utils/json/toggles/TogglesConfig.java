@@ -5,8 +5,8 @@ import main.commands.prefixcommands.ICommand;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.Toggles;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.logs.LogType;
 import net.dv8tion.jda.api.entities.Guild;
@@ -27,7 +27,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         } catch (JSONException e) {
             JSONObject togglesObject = getTogglesObject(guild.getIdLong());
             togglesObject.put(toggle.toString(), true);
-            getCache().setField(guild.getIdLong(), GuildsDB.Field.TOGGLES_OBJECT, togglesObject);
+            getCache().setField(guild.getIdLong(), GuildDB.Field.TOGGLES_OBJECT, togglesObject);
             return true;
         }
     }
@@ -35,7 +35,7 @@ public class TogglesConfig extends AbstractGuildConfig {
     public HashMap<String, Boolean> getDJToggles(Guild g) {
         final HashMap<String, Boolean> ret = new HashMap<>();
         final var obj = getTogglesObject(g.getIdLong())
-                .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString());
+                .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString());
 
         for (String key : obj.keySet())
             ret.put(key, false);
@@ -91,14 +91,14 @@ public class TogglesConfig extends AbstractGuildConfig {
 
     public void setToggle(Guild guild, Toggles toggle, boolean val) {
         final var obj = getGuildObject(guild.getIdLong());
-        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString()).put(toggle.toString(), val);
+        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString()).put(toggle.toString(), val);
         getCache().updateGuild(obj, guild.getIdLong());
     }
 
     public void setDJToggle(Guild guild, AbstractSlashCommand command, boolean val) {
         final var obj = getGuildObject(guild.getIdLong());
-        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString())
+        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
         getCache().updateGuild(obj, guild.getIdLong());
     }
@@ -106,8 +106,8 @@ public class TogglesConfig extends AbstractGuildConfig {
     @Deprecated
     public void setDJToggle(Guild guild, ICommand command, boolean val) {
         final var obj = getGuildObject(guild.getIdLong());
-        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                .getJSONObject(GuildsDB.Field.TOGGLES_DJ.toString())
+        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
         getCache().updateGuild(obj, guild.getIdLong());
     }
@@ -117,8 +117,8 @@ public class TogglesConfig extends AbstractGuildConfig {
             update(guild.getIdLong());
 
         final var obj = getGuildObject(guild.getIdLong());
-        obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                .getJSONObject(GuildsDB.Field.TOGGLES_LOGS.toString())
+        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_LOGS.toString())
                 .put(type.name().toLowerCase(), state);
         getCache().updateGuild(obj, guild.getIdLong());
     }
@@ -128,8 +128,8 @@ public class TogglesConfig extends AbstractGuildConfig {
             update(guild.getIdLong());
 
         final var obj = getGuildObject(guild.getIdLong());
-        return obj.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
-                .getJSONObject(GuildsDB.Field.TOGGLES_LOGS.toString())
+        return obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_LOGS.toString())
                 .getBoolean(type.name().toLowerCase());
     }
 
@@ -155,7 +155,7 @@ public class TogglesConfig extends AbstractGuildConfig {
     }
 
     private JSONObject getTogglesObject(long gid) {
-        return getGuildObject(gid).getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString());
     }
 
     @Override
@@ -163,19 +163,19 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!guildHasInfo(gid))
             loadGuild(gid);
 
-        final JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
-        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildsDB.Field.GUILD_ID, gid));
+        final JSONArray cacheArr = GuildDBCache.getInstance().getCache();
+        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, gid));
 
         for (Toggles toggle : Toggles.values()) {
             try {
-                JSONObject toggleObj = object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString());
+                JSONObject toggleObj = object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString());
                 getTogglesObject(toggleObj, toggle);
             } catch (JSONException e) {
                 for (Toggles errToggles : Toggles.values())
                     switch (errToggles) {
-                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
                                 .put(errToggles.toString(), false);
-                        default -> object.getJSONObject(GuildsDB.Field.TOGGLES_OBJECT.toString())
+                        default -> object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
                                 .put(errToggles.toString(), true);
                     }
             }

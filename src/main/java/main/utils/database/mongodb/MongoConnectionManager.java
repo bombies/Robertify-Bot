@@ -16,7 +16,7 @@ public class MongoConnectionManager {
     private MongoDatabase database;
 
     private MongoConnectionManager() {
-        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.MONGO.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
+        final ConnectionString CONNECTION_STRING = new ConnectionString(Database.Mongo.getConnectionString(Config.get(ENV.MONGO_DATABASE_NAME)));
         final MongoClientSettings CLIENT_SETTINGS = MongoClientSettings.builder()
                 .applyConnectionString(CONNECTION_STRING)
                 .build();
@@ -24,7 +24,7 @@ public class MongoConnectionManager {
         this.client = MongoClients.create(CLIENT_SETTINGS);
     }
 
-    public MongoConnectionManager connect(Database.MONGO database) {
+    public MongoConnectionManager connect(Database.Mongo database) {
         try {
             this.database = client.getDatabase(database.toString());
         } catch (IllegalArgumentException e) {

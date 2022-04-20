@@ -16,7 +16,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
     private final static BotInfoDB INSTANCE = new BotInfoDB();
 
     private BotInfoDB() {
-        super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_BOT_INFO);
+        super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_BOT_INFO);
     }
 
     @Override

@@ -7,7 +7,7 @@ import main.constants.ENV;
 import main.constants.JSONConfigFile;
 import main.main.Config;
 import main.utils.GeneralUtils;
-import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.cache.GuildDBCache;
 import net.dv8tion.jda.api.entities.Message;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class ViewConfigCommand implements IDevCommand {
             String fileName = args.get(0);
 
             if (GeneralUtils.stringIsID(fileName)) {
-                JSONObject guildInfo = GuildsDBCache.getInstance().getGuildInfo(Long.parseLong(fileName));
+                JSONObject guildInfo = GuildDBCache.getInstance().getGuildInfo(Long.parseLong(fileName));
 
                 if (guildInfo == null) {
                     msg.reply("Invalid guild ID").queue();

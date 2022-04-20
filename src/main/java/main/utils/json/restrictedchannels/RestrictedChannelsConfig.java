@@ -1,6 +1,6 @@
 package main.utils.json.restrictedchannels;
 
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
 
 import java.util.ArrayList;
@@ -9,10 +9,10 @@ import java.util.List;
 public class RestrictedChannelsConfig extends AbstractGuildConfig {
 
     public void addChannel(long gid, long channelID, ChannelType type) {
-        final GuildsDB.Field configField;
+        final GuildDB.Field configField;
         switch (type) {
-            case TEXT_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_TEXT;
-            case VOICE_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_VOICE;
+            case TEXT_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_TEXT;
+            case VOICE_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_VOICE;
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
@@ -21,19 +21,19 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
 
         final var obj = getGuildObject(gid);
 
-        obj.getJSONObject(GuildsDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
+        obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
                 .getJSONArray(configField.toString()).put(channelID);
 
-        getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+        getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
     public void removeChannel(long gid, long channelID, ChannelType type) {
         final var obj = getGuildObject(gid);
 
-        final GuildsDB.Field configField;
+        final GuildDB.Field configField;
         switch (type) {
-            case TEXT_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_TEXT;
-            case VOICE_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_VOICE;
+            case TEXT_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_TEXT;
+            case VOICE_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_VOICE;
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
@@ -41,10 +41,10 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
             throw new IllegalStateException("This isn't a restricted channel!");
 
         try {
-            final var arr = obj.getJSONObject(GuildsDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
+            final var arr = obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
                     .getJSONArray(configField.toString());
             arr.remove(getIndexOfObjectInArray(arr, channelID));
-            getCache().updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+            getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
         } catch (NullPointerException e) {
             throw new NullPointerException("This channel ID already isn't a restricted channel");
         }
@@ -53,15 +53,15 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
     public List<Long> getRestrictedChannels(long gid, ChannelType type) {
         final var obj = getGuildObject(gid);
 
-        final GuildsDB.Field configField;
+        final GuildDB.Field configField;
         switch (type) {
-            case TEXT_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_TEXT;
-            case VOICE_CHANNEL -> configField = GuildsDB.Field.RESTRICTED_CHANNELS_VOICE;
+            case TEXT_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_TEXT;
+            case VOICE_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_VOICE;
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
         final List<Long> ret = new ArrayList<>();
-        final var arr = obj.getJSONObject(GuildsDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
+        final var arr = obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
                 .getJSONArray(configField.toString());
 
         for (int i = 0; i < arr.length(); i++)

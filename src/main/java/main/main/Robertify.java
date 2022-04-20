@@ -22,7 +22,7 @@ import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.cache.GuildsDBCache;
+import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.pagination.PaginationEvents;
@@ -175,7 +175,7 @@ public class Robertify {
             logger.info("Initialized all caches");
 
             new ChangeLogConfig().initConfig();
-            GuildsDBCache.getInstance().loadAllGuilds();
+            GuildDBCache.getInstance().loadAllGuilds();
             logger.info("All guilds have been loaded into cache");
 
             shardManager = jdaBuilder.build();

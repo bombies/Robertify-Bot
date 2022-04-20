@@ -8,7 +8,7 @@ public class FavouriteTracksDB extends AbstractMongoDatabase {
     private static FavouriteTracksDB INSTANCE;
 
     private FavouriteTracksDB() {
-        super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_FAVOURITE_TRACKS);
+        super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_FAVOURITE_TRACKS);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class MongoTestDB extends AbstractMongoDatabase {
     private final static MongoTestDB INSTANCE = new MongoTestDB();
 
     private MongoTestDB() {
-        super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_TEST);
+        super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_TEST);
     }
 
 

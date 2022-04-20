@@ -18,7 +18,7 @@ public enum Database {
         return str;
     }
 
-    public enum MONGO {
+    public enum Mongo {
         MAIN("Learning0"),
 
         ROBERTIFY_DATABASE(Config.get(ENV.MONGO_DATABASE_NAME)),
@@ -33,7 +33,7 @@ public enum Database {
 
         private final String str;
 
-        MONGO(String str) {
+        Mongo(String str) {
             this.str =str;
         }
 

@@ -1,60 +1,31 @@
 package main.utils.database.mongodb.databases;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import main.constants.Database;
 import main.constants.ENV;
 import main.constants.RobertifyTheme;
 import main.constants.Toggles;
 import main.main.Config;
-import main.main.Robertify;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.DocumentBuilder;
 import main.utils.json.GenericJSONField;
 import main.utils.json.toggles.TogglesConfig;
-import net.dv8tion.jda.api.entities.Guild;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+public class GuildDB extends AbstractMongoDatabase {
+    private final static Logger logger = LoggerFactory.getLogger(GuildDB.class);
+    private static GuildDB INSTANCE;
 
-public class GuildsDB extends AbstractMongoDatabase {
-    private final static Logger logger = LoggerFactory.getLogger(GuildsDB.class);
-    private static GuildsDB INSTANCE;
-
-    private GuildsDB() {
-        super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_GUILDS);
+    private GuildDB() {
+        super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_GUILDS);
     }
 
     @Override
     public synchronized void init() {
-//        final List<Guild> guilds = Robertify.shardManager.getGuildCache().asList();
-//
-//        final MongoCollection<Document> collection = getCollection();
-//        final MongoCursor<Document> cursor = collection.find().cursor();
-//        final List<Document> documentsToRemove = new ArrayList<>();
-//
-//        while (cursor.hasNext()) {
-//            Document guildDoc = cursor.next();
-//            JSONObject jsonObject = new JSONObject(guildDoc.toJson());
-//            long guildID = jsonObject.getLong(Field.GUILD_ID.toString());
-//
-//            Guild filteredResult = guilds.stream()
-//                    .filter(guild -> guild.getIdLong() == guildID)
-//                    .findFirst()
-//                    .orElse(null);
-//
-//            if (filteredResult == null)
-//                documentsToRemove.add(guildDoc);
-//
-//        }
-//
-//        if (!documentsToRemove.isEmpty())
-//            removeManyDocuments(documentsToRemove);
+
     }
 
     public synchronized void addGuild(long gid) {
@@ -65,9 +36,9 @@ public class GuildsDB extends AbstractMongoDatabase {
         removeDocument(findSpecificDocument(Field.GUILD_ID, gid));
     }
 
-    public static synchronized GuildsDB ins() {
+    public static synchronized GuildDB ins() {
         if (INSTANCE == null)
-            INSTANCE = new GuildsDB();
+            INSTANCE = new GuildDB();
         return INSTANCE;
     }
 
@@ -98,9 +69,6 @@ public class GuildsDB extends AbstractMongoDatabase {
 
     public static synchronized void update() {
         logger.debug("Updating Guild cache");
-//        new TogglesConfig().update();
-//        new PermissionsConfig().update();
-//        new ThemesConfig().update();
     }
 
     public enum Field implements GenericJSONField {

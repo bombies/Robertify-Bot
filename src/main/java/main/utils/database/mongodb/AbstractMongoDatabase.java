@@ -7,8 +7,8 @@ import lombok.Getter;
 import main.constants.Database;
 import main.utils.database.mongodb.cache.BotInfoCache;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
-import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
 import org.bson.BsonObjectId;
@@ -38,7 +38,7 @@ public abstract class AbstractMongoDatabase {
         this.collection = db.collection;
     }
 
-    public AbstractMongoDatabase(Database.MONGO db, Database.MONGO collection) {
+    public AbstractMongoDatabase(Database.Mongo db, Database.Mongo collection) {
         final var database = MongoConnectionManager.ins()
                 .connect(db).database();
         this.database = database;
@@ -56,14 +56,14 @@ public abstract class AbstractMongoDatabase {
 
     public static void initAllCaches() {
         BotInfoCache.initCache();
-        GuildsDBCache.initCache();
+        GuildDBCache.initCache();
         FavouriteTracksCache.initCache();
 //        StatisticsDB.INSTANCE.init();
     }
 
     public static void updateAllCaches() {
 //        BotInfoDB.update();
-        GuildsDB.update();
+        GuildDB.update();
     }
 
     MongoCollection<Document> getCollection(String name) {

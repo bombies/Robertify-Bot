@@ -1,8 +1,8 @@
 package main.utils.json.themes;
 
 import main.constants.RobertifyTheme;
-import main.utils.database.mongodb.cache.GuildsDBCache;
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -41,8 +41,8 @@ public class ThemesConfig extends AbstractGuildConfig {
         if (!guildHasInfo(gid))
             loadGuild(gid);
 
-        final JSONArray cacheArr = GuildsDBCache.getInstance().getCache();
-        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildsDB.Field.GUILD_ID, gid));
+        final JSONArray cacheArr = GuildDBCache.getInstance().getCache();
+        JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, gid));
 
         if (!object.has(ThemesConfigField.THEME.toString())) {
             object.put(ThemesConfigField.THEME.toString(), RobertifyTheme.GREEN.name().toLowerCase());

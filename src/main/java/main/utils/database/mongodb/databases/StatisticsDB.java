@@ -37,7 +37,7 @@ public class StatisticsDB extends AbstractMongoDatabase implements AbstractJSON 
     private static List<String> songsPlayed = new ArrayList<>();
 
     private StatisticsDB() {
-        super(Database.MONGO.ROBERTIFY_DATABASE, Database.MONGO.ROBERTIFY_STATS);
+        super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_STATS);
     }
 
     public void incrementStatistic(long increment, Statistic statistic) {

@@ -4,10 +4,9 @@ import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.databases.GuildsDB;
+import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractJSON;
 import main.utils.json.GenericJSONField;
-import org.bson.BsonDocument;
 import org.bson.BsonObjectId;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -101,11 +100,11 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
     }
 
     public void updateGuild(JSONObject obj, long gid) {
-        updateCache(obj, GuildsDB.Field.GUILD_ID, gid);
+        updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
     public void updateGuild(JSONObject obj) {
-        updateCache(obj, GuildsDB.Field.GUILD_ID, obj.getLong(GuildsDB.Field.GUILD_ID.toString()));
+        updateCache(obj, GuildDB.Field.GUILD_ID, obj.getLong(GuildDB.Field.GUILD_ID.toString()));
     }
 
     public <T> void updateCache(JSONObject obj, String identifier, T identifierValue) {
