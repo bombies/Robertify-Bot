@@ -244,7 +244,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play `"+track.getInfo().title+" by "+track.getInfo().author+"` as it has blocked copyright content`\n" +
                                 "Skipping to the next track (If available...)").build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
-        } else if (exception.getMessage().contains("copyright")) {
+        } else if (exception.getMessage().contains("unavailable")) {
             if (announcementChannel != null)
                 announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play `"+track.getInfo().title+" by "+track.getInfo().author+"` because it is unavailable`\n" +
                                 "Skipping to the next track (If available...)").build())
