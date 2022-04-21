@@ -5,7 +5,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
 import lombok.Getter;
 import main.constants.Database;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.database.mongodb.databases.GuildDB;
@@ -55,7 +55,7 @@ public abstract class AbstractMongoDatabase {
     public abstract void init();
 
     public static void initAllCaches() {
-        BotInfoCache.initCache();
+        BotBDCache.initCache();
         GuildDBCache.initCache();
         FavouriteTracksCache.initCache();
 //        StatisticsDB.INSTANCE.init();

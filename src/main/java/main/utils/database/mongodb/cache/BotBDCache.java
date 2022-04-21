@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache;
 
 import lombok.Getter;
-import main.utils.database.mongodb.databases.BotInfoDB;
+import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BotInfoCache extends AbstractMongoCache {
-    private final static Logger logger = LoggerFactory.getLogger(BotInfoCache.class);
+public class BotBDCache extends AbstractMongoCache {
+    private final static Logger logger = LoggerFactory.getLogger(BotBDCache.class);
     @Getter
-    private static BotInfoCache instance;
+    private static BotBDCache instance;
 
-    private BotInfoCache() {
-        super(BotInfoDB.ins());
+    private BotBDCache() {
+        super(BotDB.ins());
         this.init();
         updateCache();
         logger.debug("Done instantiating Bot Info cache");
@@ -25,12 +25,12 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public void setLastStartup(long time) {
         JSONObject jsonObject = getDocument();
-        jsonObject.put(BotInfoDB.Fields.LAST_BOOTED.toString(), time);
+        jsonObject.put(BotDB.Fields.LAST_BOOTED.toString(), time);
         update(jsonObject);
     }
 
     public long getLastStartup() {
-        return getDocument().getLong(BotInfoDB.Fields.LAST_BOOTED.toString());
+        return getDocument().getLong(BotDB.Fields.LAST_BOOTED.toString());
     }
 
     public void initSuggestionChannels(long categoryID, long pendingChannel, long acceptedChanel, long deniedChannel) {
@@ -38,7 +38,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new IllegalStateException("The channels have already been setup!");
 
         final var obj = getDocument();
-        final var suggestionObj = obj.getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString());
+        final var suggestionObj = obj.getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString());
 
         suggestionObj.put(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString(), categoryID);
         suggestionObj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), pendingChannel);
@@ -50,7 +50,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public void resetSuggestionsConfig() {
         final var obj = getDocument();
-        final var suggestionObj = obj.getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString());
+        final var suggestionObj = obj.getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString());
 
         suggestionObj.put(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString(), -1L);
         suggestionObj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), -1L);
@@ -61,22 +61,22 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public long getSuggestionsCategoryID() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString());
     }
 
     public long getSuggestionsPendingChannelID() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getLong(SuggestionsConfigField.PENDING_CHANNEL.toString());
     }
 
     public long getSuggestionsAcceptedChannelID() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getLong(SuggestionsConfigField.ACCEPTED_CHANNEL.toString());
     }
 
     public long getSuggestionsDeniedChannelID() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getLong(SuggestionsConfigField.DENIED_CHANNEL.toString());
     }
 
@@ -85,7 +85,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new IllegalStateException("This user is already banned!");
 
         final var obj = getDocument();
-        obj.getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString()).put(id);
 
         update(obj);
@@ -96,7 +96,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new IllegalStateException("This user is not banned!");
 
         final var obj = getDocument();
-        JSONArray jsonArray = obj.getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        JSONArray jsonArray = obj.getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString());
         jsonArray.remove(getIndexOfObjectInArray(jsonArray, id));
 
@@ -105,7 +105,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public List<Long> getBannedSuggestionUsers() {
         final List<Long> ret = new ArrayList<>();
-        final var arr = getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        final var arr = getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString());
 
         for (int i = 0; i < arr.length(); i++)
@@ -115,13 +115,13 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public boolean userIsSuggestionBanned(long id) {
-        JSONArray array = getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        JSONArray array = getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString());
         return arrayHasObject(array, id);
     }
 
     public boolean isSuggestionsSetup() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.SUGGESTIONS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
                 .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString()) != -1L;
     }
 
@@ -131,9 +131,9 @@ public class BotInfoCache extends AbstractMongoCache {
 
         final var obj = getDocument();
 
-        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .put(ReportsConfigField.CATEGORY.toString(), categoryID);
-        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .put(ReportsConfigField.CHANNEL.toString(), channelID);
 
         update(obj);
@@ -142,26 +142,26 @@ public class BotInfoCache extends AbstractMongoCache {
     public void resetReportsConfig() {
         final var obj = getDocument();
 
-        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .put(ReportsConfigField.CATEGORY.toString(), -1L);
-        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .put(ReportsConfigField.CHANNEL.toString(), -1L);
 
         update(obj);
     }
 
     public boolean isReportsSetup() {
-        return getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .getLong(ReportsConfigField.CATEGORY.toString()) != -1L;
     }
 
     public long getReportsID(ReportsConfigField field) {
-        return getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        return getDocument().getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .getLong(field.toString());
     }
 
     public boolean isUserReportsBanned(long id) {
-        return arrayHasObject(getDocument().getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        return arrayHasObject(getDocument().getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .getJSONArray(ReportsConfigField.BANNED_USERS.toString()), id);
     }
 
@@ -171,7 +171,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
         final var obj = getDocument();
 
-        obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .getJSONArray(ReportsConfigField.BANNED_USERS.toString()).put(id);
 
         update(obj);
@@ -182,7 +182,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new IllegalStateException("This user isn't banned!");
 
         final var obj = getDocument();
-        final var arr = obj.getJSONObject(BotInfoDB.Fields.REPORTS_OBJECT.toString())
+        final var arr = obj.getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
                 .getJSONArray(ReportsConfigField.BANNED_USERS.toString());
 
         arr.remove(getIndexOfObjectInArray(arr, id));
@@ -195,7 +195,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new NullPointerException("This user is already a developer!");
 
         final var obj = getDocument();
-        final var devArr = obj.getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+        final var devArr = obj.getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString());
 
         devArr.put(developer);
 
@@ -207,7 +207,7 @@ public class BotInfoCache extends AbstractMongoCache {
             throw new NullPointerException("This user isn't a developer!");
 
         final var obj = getDocument();
-        final var devArr = obj.getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+        final var devArr = obj.getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString());
 
         devArr.remove(getIndexOfObjectInArray(devArr, developer));
 
@@ -215,12 +215,12 @@ public class BotInfoCache extends AbstractMongoCache {
     }
 
     public boolean isDeveloper(long developer) {
-        return arrayHasObject(getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString()), developer);
+        return arrayHasObject(getDocument().getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString()), developer);
     }
 
     public List<Long> getDevelopers() {
         final List<Long> ret = new ArrayList<>();
-        JSONArray array = getDocument().getJSONArray(BotInfoDB.Fields.DEVELOPERS_ARRAY.toString());
+        JSONArray array = getDocument().getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString());
         array.forEach(val -> ret.add((long) val));
         return ret;
     }
@@ -228,17 +228,17 @@ public class BotInfoCache extends AbstractMongoCache {
     public void addRandomMessage(String s) {
         final var obj = getDocument();
 
-        if (!obj.has(BotInfoDB.Fields.RANDOM_MESSAGES.toString()))
-            obj.put(BotInfoDB.Fields.RANDOM_MESSAGES.toString(), new JSONArray());
+        if (!obj.has(BotDB.Fields.RANDOM_MESSAGES.toString()))
+            obj.put(BotDB.Fields.RANDOM_MESSAGES.toString(), new JSONArray());
 
-        obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString()).put(s);
+        obj.getJSONArray(BotDB.Fields.RANDOM_MESSAGES.toString()).put(s);
 
         update(obj);
     }
 
     public List<String> getRandomMessages() {
         final List<String> ret = new ArrayList<>();
-        final var arr = getDocument().getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+        final var arr = getDocument().getJSONArray(BotDB.Fields.RANDOM_MESSAGES.toString());
 
         for (int i = 0; i < arr.length(); i++)
             ret.add(arr.getString(i));
@@ -248,7 +248,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public void removeMessage(int id) {
         final var obj = getDocument();
-        final var arr = obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+        final var arr = obj.getJSONArray(BotDB.Fields.RANDOM_MESSAGES.toString());
 
         if (id < 0 || id > arr.length()-1)
             throw new IndexOutOfBoundsException("The ID passed exceeds the bounds of the array!");
@@ -260,7 +260,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public void clearMessages() {
         final var obj = getDocument();
-        final var arr = obj.getJSONArray(BotInfoDB.Fields.RANDOM_MESSAGES.toString());
+        final var arr = obj.getJSONArray(BotDB.Fields.RANDOM_MESSAGES.toString());
 
         arr.clear();
 
@@ -277,7 +277,7 @@ public class BotInfoCache extends AbstractMongoCache {
 
     public static void initCache() {
         logger.debug("Instantiating new Bot Info cache");
-        instance = new BotInfoCache();
+        instance = new BotBDCache();
         logger.debug("BOT INFO CACHE = {}", instance.getCache());
     }
 

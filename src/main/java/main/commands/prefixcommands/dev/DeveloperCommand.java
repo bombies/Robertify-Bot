@@ -5,7 +5,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.IDevCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -21,7 +21,7 @@ public class DeveloperCommand implements IDevCommand {
 
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        final var botUtils = BotInfoCache.getInstance();
+        final var botUtils = BotBDCache.getInstance();
         final var guild = ctx.getGuild();
 
         GeneralUtils.setCustomEmbed(guild, "Developer Tools", new Color(118, 0, 236));
@@ -51,7 +51,7 @@ public class DeveloperCommand implements IDevCommand {
     }
 
     @SneakyThrows
-    private void add(BotInfoCache botUtils, Message msg, List<String> args) {
+    private void add(BotBDCache botUtils, Message msg, List<String> args) {
         final var guild = msg.getGuild();
 
         if (args.size() <= 1) {
@@ -96,7 +96,7 @@ public class DeveloperCommand implements IDevCommand {
     }
 
     @SneakyThrows
-    private void remove(BotInfoCache botUtils, Message msg, List<String> args) {
+    private void remove(BotBDCache botUtils, Message msg, List<String> args) {
         final var guild = msg.getGuild();
 
         if (args.size() <= 1) {

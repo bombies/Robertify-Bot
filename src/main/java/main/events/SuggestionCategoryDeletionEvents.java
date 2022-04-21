@@ -1,6 +1,6 @@
 package main.events;
 
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ public class SuggestionCategoryDeletionEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         if (event.getCategory().getIdLong() != config.getSuggestionsCategoryID()) return;
 

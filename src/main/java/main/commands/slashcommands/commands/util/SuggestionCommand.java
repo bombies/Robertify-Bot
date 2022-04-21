@@ -7,7 +7,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
@@ -51,7 +51,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
     private void setup(Message msg) {
         if (!isDeveloper(msg.getAuthor())) return;
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         if (config.isSuggestionsSetup()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), "The suggestions channels have already been setup!").build())
@@ -113,7 +113,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
             return;
         }
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
@@ -194,7 +194,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
             return;
         }
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
@@ -274,7 +274,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         if (suggestion.chars().count() > 1024)
             return RobertifyEmbedUtils.embedMessage(guild, "Your suggestion must be no more than 1024 characters!").build();
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
         final TextChannel pendingChannel = Robertify.shardManager.getTextChannelById(config.getSuggestionsPendingChannelID());
 
         if (pendingChannel == null) {
@@ -332,7 +332,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         }
 
         try {
-            BotInfoCache.getInstance().banSuggestionsUser(user.getIdLong());
+            BotBDCache.getInstance().banSuggestionsUser(user.getIdLong());
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                     + user.getAsMention() + "from suggestions").build())
                     .queue();
@@ -372,7 +372,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         }
 
         try {
-            BotInfoCache.getInstance().unbanSuggestionUser(user.getIdLong());
+            BotBDCache.getInstance().unbanSuggestionUser(user.getIdLong());
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                             + user.getAsMention() + "from suggestions").build())
                     .queue();
@@ -386,7 +386,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
     @SneakyThrows
     private boolean isDeveloper(User user) {
-        return BotInfoCache.getInstance().isDeveloper(user.getIdLong());
+        return BotBDCache.getInstance().isDeveloper(user.getIdLong());
     }
 
     @Override

@@ -9,7 +9,7 @@ import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -98,7 +98,7 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
         if (GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_ADMIN))
             return RobertifyEmbedUtils.embedMessage(guild, "You cannot ban an admin!");
 
-        if (BotInfoCache.getInstance().isDeveloper(user.getIdLong()))
+        if (BotBDCache.getInstance().isDeveloper(user.getIdLong()))
             return RobertifyEmbedUtils.embedMessage(guild, "You cannot ban a developer of Robertify!");
 
         if (new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))

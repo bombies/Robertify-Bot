@@ -6,7 +6,7 @@ import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -27,7 +27,7 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
                         "in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (main Developer) " +
                         "named Robert wanted a music bot, so he made one for him. Eventually, Robertify became his own project to him and he's been putting in most of " +
                         "his efforts into it ever since.", false)
-                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup()), false)
+                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
                         .setTimestamp(Instant.now())
                 .build())
                 .setActionRow(
@@ -73,7 +73,7 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
                                 "in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (main Developer) " +
                                 "named Robert wanted a music bot, so he made one for him. Eventually, Robertify became his own project to him and he's been putting in most of " +
                                 "his efforts into it ever since.", false)
-                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup()), false)
+                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
                         .setTimestamp(Instant.now())
                         .build())
                 .addActionRow(

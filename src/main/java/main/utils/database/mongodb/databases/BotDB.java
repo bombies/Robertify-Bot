@@ -3,7 +3,7 @@ package main.utils.database.mongodb.databases;
 import main.constants.Database;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.DocumentBuilder;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONArray;
@@ -11,11 +11,11 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BotInfoDB extends AbstractMongoDatabase {
-    private final static Logger logger = LoggerFactory.getLogger(BotInfoDB.class);
-    private final static BotInfoDB INSTANCE = new BotInfoDB();
+public class BotDB extends AbstractMongoDatabase {
+    private final static Logger logger = LoggerFactory.getLogger(BotDB.class);
+    private final static BotDB INSTANCE = new BotDB();
 
-    private BotInfoDB() {
+    private BotDB() {
         super(Database.Mongo.ROBERTIFY_DATABASE, Database.Mongo.ROBERTIFY_BOT_INFO);
     }
 
@@ -46,7 +46,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
 
     public static void update() {
         logger.debug("Updating Bot Info cache");
-        var cache = BotInfoCache.getInstance();
+        var cache = BotBDCache.getInstance();
 
         for (var obj : cache.getCache()) {
             final JSONObject jsonObject = (JSONObject) obj;
@@ -81,7 +81,7 @@ public class BotInfoDB extends AbstractMongoDatabase {
         }
     }
 
-    public static BotInfoDB ins() {
+    public static BotDB ins() {
         return INSTANCE;
     }
 

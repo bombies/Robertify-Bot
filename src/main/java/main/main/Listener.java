@@ -3,13 +3,11 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
-import main.commands.slashcommands.commands.management.SetChannelCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.BotInfoCache;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -57,7 +55,7 @@ public class Listener extends ListenerAdapter {
         updateServerCount();
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
 
-        BotInfoCache.getInstance().setLastStartup(System.currentTimeMillis());
+        BotBDCache.getInstance().setLastStartup(System.currentTimeMillis());
         Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"));
     }
 

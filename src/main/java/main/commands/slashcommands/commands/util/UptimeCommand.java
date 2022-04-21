@@ -5,7 +5,7 @@ import main.commands.prefixcommands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +17,7 @@ public class UptimeCommand extends AbstractSlashCommand implements ICommand {
         ctx.getMessage().replyEmbeds(
                 RobertifyEmbedUtils.embedMessage(
                         ctx.getGuild(),
-                        GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup())
+                        GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup())
                 ).build()
         ).queue();
     }
@@ -54,7 +54,7 @@ public class UptimeCommand extends AbstractSlashCommand implements ICommand {
         event.replyEmbeds(
                 RobertifyEmbedUtils.embedMessage(
                         event.getGuild(),
-                        GeneralUtils.getDurationString(System.currentTimeMillis() - BotInfoCache.getInstance().getLastStartup())
+                        GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup())
                 ).build()
         ).setEphemeral(false).queue();
     }

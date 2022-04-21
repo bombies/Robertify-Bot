@@ -6,7 +6,7 @@ import main.commands.prefixcommands.ICommand;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -46,9 +46,9 @@ public class ReportsCommand implements ICommand {
 
     @SneakyThrows
     private void setup(Message msg) {
-        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
+        if (!BotBDCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         if (config.isReportsSetup()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(msg.getGuild(), "The reports category has already been setup!").build())
@@ -74,9 +74,9 @@ public class ReportsCommand implements ICommand {
     public void address(Message msg, List<String> args) {
         final var guild = msg.getGuild();
 
-        if (!BotInfoCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
+        if (!BotBDCache.getInstance().isDeveloper(msg.getAuthor().getIdLong())) return;
 
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         if (!config.isReportsSetup()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The reports category has not been setup!").build())
@@ -100,7 +100,7 @@ public class ReportsCommand implements ICommand {
             return;
         }
 
-        final var openedRequests = Robertify.shardManager.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
+        final var openedRequests = Robertify.shardManager.getTextChannelById(config.getReportsID(BotBDCache.ReportsConfigField.CHANNEL));
 
         openedRequests.retrieveMessageById(id).queue(reportMsg -> {
             final var fields = reportMsg.getEmbeds().get(0).getFields();
@@ -137,7 +137,7 @@ public class ReportsCommand implements ICommand {
     }
 
     private void sendReport(User user, Message msg) {
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
         final var guild = msg.getGuild();
 
         if (config.isUserReportsBanned(user.getIdLong())) {
@@ -210,7 +210,7 @@ public class ReportsCommand implements ICommand {
         }
 
         try {
-            BotInfoCache.getInstance().banReportsUser(user.getIdLong());
+            BotBDCache.getInstance().banReportsUser(user.getIdLong());
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have banned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
@@ -250,7 +250,7 @@ public class ReportsCommand implements ICommand {
         }
 
         try {
-            BotInfoCache.getInstance().unbanReportsUser(user.getIdLong());
+            BotBDCache.getInstance().unbanReportsUser(user.getIdLong());
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have unbanned "
                             + user.getAsMention() + "from reports").build())
                     .queue();
@@ -264,7 +264,7 @@ public class ReportsCommand implements ICommand {
 
     @SneakyThrows
     private boolean isDeveloper(User user) {
-        return BotInfoCache.getInstance().isDeveloper(user.getIdLong());
+        return BotBDCache.getInstance().isDeveloper(user.getIdLong());
     }
 
     @Override

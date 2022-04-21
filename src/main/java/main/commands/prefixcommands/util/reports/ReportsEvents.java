@@ -2,7 +2,7 @@ package main.commands.prefixcommands.util.reports;
 
 import main.constants.BotConstants;
 import main.main.Robertify;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.pagination.MessagePage;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -29,13 +29,13 @@ public class ReportsEvents extends ListenerAdapter {
 
     @Override
     public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
-        final var config = BotInfoCache.getInstance();
+        final var config = BotBDCache.getInstance();
 
         if (!config.isReportsSetup()) return;
 
-        if (event.getCategory().getIdLong() != config.getReportsID(BotInfoCache.ReportsConfigField.CATEGORY)) return;
+        if (event.getCategory().getIdLong() != config.getReportsID(BotBDCache.ReportsConfigField.CATEGORY)) return;
 
-        final var openedReportsChannelID = config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL);
+        final var openedReportsChannelID = config.getReportsID(BotBDCache.ReportsConfigField.CHANNEL);
         config.resetReportsConfig();
 
         TextChannel channel = Robertify.shardManager.getTextChannelById(openedReportsChannelID);
@@ -72,8 +72,8 @@ public class ReportsEvents extends ListenerAdapter {
             final var collectedResponses = responses.get(user.getIdLong());
             responses.remove(user.getIdLong());
 
-            final var config = BotInfoCache.getInstance();
-            final var openedReportsChannel = Robertify.shardManager.getTextChannelById(config.getReportsID(BotInfoCache.ReportsConfigField.CHANNEL));
+            final var config = BotBDCache.getInstance();
+            final var openedReportsChannel = Robertify.shardManager.getTextChannelById(config.getReportsID(BotBDCache.ReportsConfigField.CHANNEL));
 
             if (openedReportsChannel == null) {
                 channel.sendMessageEmbeds(EmbedUtils.embedMessage("Could not send your report!\n" +

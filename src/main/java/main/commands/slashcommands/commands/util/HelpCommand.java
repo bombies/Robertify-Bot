@@ -11,7 +11,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -111,7 +111,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
             GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
-            if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
+            if (!BotBDCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+args.get(0)+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed(ctx.getGuild());
@@ -140,7 +140,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
             GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (command instanceof IDevCommand) {
-            if (!BotInfoCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
+            if (!BotBDCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed(ctx.getGuild());

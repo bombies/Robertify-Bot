@@ -5,7 +5,7 @@ import main.constants.ENV;
 import main.constants.Toggles;
 import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.database.mongodb.cache.BotInfoCache;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -20,7 +20,7 @@ public class RandomMessageManager {
     private static double chance = Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE));
 
     public MessageEmbed getMessage(Guild guild) {
-        List<String> messages = BotInfoCache.getInstance().getRandomMessages();
+        List<String> messages = BotBDCache.getInstance().getRandomMessages();
 
         if (messages.isEmpty())
             throw new NullPointerException("There are no random messages!");
@@ -37,19 +37,19 @@ public class RandomMessageManager {
     }
 
     public void addMessage(String s) {
-        BotInfoCache.getInstance().addRandomMessage(s);
+        BotBDCache.getInstance().addRandomMessage(s);
     }
 
     public List<String> getMessages() {
-        return BotInfoCache.getInstance().getRandomMessages();
+        return BotBDCache.getInstance().getRandomMessages();
     }
 
     public void removeMessage(int id) {
-        BotInfoCache.getInstance().removeMessage(id);
+        BotBDCache.getInstance().removeMessage(id);
     }
 
     public void clearMessages() {
-        BotInfoCache.getInstance().clearMessages();
+        BotBDCache.getInstance().clearMessages();
     }
 
     public void randomlySendMessage(TextChannel channel) {
