@@ -37,7 +37,7 @@ public class ResumeSourceManager extends RobertifyAudioSourceManager {
                 logger.debug("Using ResumeSourceManager as the source");
                 logger.debug("IDENTIFIER: {}", reference.identifier);
 
-                JSONObject object = new JSONObject(reference.identifier.replaceAll("rsearch:", ""));
+                JSONObject object = new JSONObject(reference.identifier.replaceFirst(SEARCH_PREFIX, ""));
                 logger.debug("JSON OBJECT: {}", object);
 
                 ResumeData resumeData = new ResumeData();
