@@ -249,6 +249,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play `"+track.getInfo().title+" by "+track.getInfo().author+"` because it is unavailable`\n" +
                                 "Skipping to the next track (If available...)").build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+        } else if (exception.getMessage().contains("playlist type is unviewable")) {
+            if (announcementChannel != null)
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play a playlist because it is un-viewable...").build())
+                        .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else {
             logger.error("There was an exception with playing the track.", exception);
         }
