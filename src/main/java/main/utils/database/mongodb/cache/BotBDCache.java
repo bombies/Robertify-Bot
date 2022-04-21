@@ -291,6 +291,9 @@ public class BotBDCache extends AbstractMongoCache {
     }
 
     public boolean userHasViewedAlert(long id) {
+        if (getLatestAlert().isBlank() || getLatestAlert().isEmpty())
+            return true;
+
         final var obj = getDocument();
         final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
         return arrayHasObject(viewerArr, id);
