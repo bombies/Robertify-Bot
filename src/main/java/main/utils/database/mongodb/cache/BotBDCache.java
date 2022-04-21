@@ -267,6 +267,42 @@ public class BotBDCache extends AbstractMongoCache {
         update(obj);
     }
 
+    public void setLatestAlert(String alert) {
+        final var obj = getDocument();
+        obj.put(BotDB.Fields.LATEST_ALERT.toString(), alert.replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t"));
+        update(obj);
+        clearAlertViewers();
+    }
+
+    public String getLatestAlert() {
+        final var obj = getDocument();
+        return obj.getString(BotDB.Fields.LATEST_ALERT.toString());
+    }
+
+    public void addAlertViewer(long id) {
+        if (userHasViewedAlert(id))
+            return;
+
+        final var obj = getDocument();
+        final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
+        viewerArr.put(id);
+
+        update(obj);
+    }
+
+    public boolean userHasViewedAlert(long id) {
+        final var obj = getDocument();
+        final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
+        return arrayHasObject(viewerArr, id);
+    }
+
+    public void clearAlertViewers() {
+        final var obj = getDocument();
+        final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
+        viewerArr.clear();
+        update(obj);
+    }
+
     private JSONObject getDocument() {
         return getCache().getJSONObject(0);
     }

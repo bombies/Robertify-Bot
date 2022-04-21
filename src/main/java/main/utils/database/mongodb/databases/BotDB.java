@@ -39,6 +39,8 @@ public class BotDB extends AbstractMongoDatabase {
                                     .put(Fields.SubFields.REPORTS_BANNED_USERS.toString(), new JSONArray())
                             )
                             .addField(Fields.DEVELOPERS_ARRAY, new JSONArray())
+                            .addField(Fields.LATEST_ALERT, "")
+                            .addField(Fields.ALERT_VIEWERS, new JSONArray())
                             .build()
             );
         }
@@ -74,6 +76,8 @@ public class BotDB extends AbstractMongoDatabase {
                     );
                     case DEVELOPERS_ARRAY -> jsonObject.put(Fields.DEVELOPERS_ARRAY.toString(), new JSONArray());
                     case RANDOM_MESSAGES -> jsonObject.put(Fields.RANDOM_MESSAGES.toString(), new JSONArray());
+                    case LATEST_ALERT -> jsonObject.put(Fields.LATEST_ALERT.toString(), "");
+                    case ALERT_VIEWERS -> jsonObject.put(Fields.ALERT_VIEWERS.toString(), new JSONArray());
                 }
             }
 
@@ -90,7 +94,9 @@ public class BotDB extends AbstractMongoDatabase {
         SUGGESTIONS_OBJECT("suggestions"),
         REPORTS_OBJECT("reports"),
         DEVELOPERS_ARRAY("developers"),
-        RANDOM_MESSAGES("random_messages");
+        RANDOM_MESSAGES("random_messages"),
+        LATEST_ALERT("latest_alert"),
+        ALERT_VIEWERS("alert_viewers");
 
         public enum SubFields {
             SUGGESTIONS_ACCEPTED_CHANNEL("accepted_channel"),

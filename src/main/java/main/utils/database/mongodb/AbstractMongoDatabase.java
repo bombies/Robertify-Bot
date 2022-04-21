@@ -8,6 +8,7 @@ import main.constants.Database;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.databases.BotDB;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
@@ -59,11 +60,13 @@ public abstract class AbstractMongoDatabase {
         GuildDBCache.initCache();
         FavouriteTracksCache.initCache();
 //        StatisticsDB.INSTANCE.init();
+
+        updateAllCaches();
     }
 
     public static void updateAllCaches() {
-//        BotInfoDB.update();
-        GuildDB.update();
+        BotDB.update();
+//        GuildDB.update();
     }
 
     MongoCollection<Document> getCollection(String name) {
