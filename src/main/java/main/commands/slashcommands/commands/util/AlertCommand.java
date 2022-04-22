@@ -32,12 +32,13 @@ public class AlertCommand extends AbstractSlashCommand {
         final var user = event.getUser();
         final var latestAlert = botDB.getLatestAlert();
 
-        botDB.addAlertViewer(user.getIdLong());
+        if (!latestAlert.getLeft().isEmpty() && !latestAlert.getLeft().isBlank())
+            botDB.addAlertViewer(user.getIdLong());
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
                 "Alert From The Developer",
-                latestAlert.getLeft()
-
+                (latestAlert.getLeft().isEmpty() || latestAlert.getLeft().isBlank()) ?
+                        "There is no alert..." : latestAlert.getLeft()
         )
                         .setFooter("You are #" + botDB.getPosOfAlertViewer(user.getIdLong()) + " to view this alert! • " + GeneralUtils.formatDate(latestAlert.getRight(), TimeFormat.DD_MMMM_YYYY))
                 .build()).queue();

@@ -419,7 +419,9 @@ public class CommandManager {
                         }
                     }
 
-                    if (!BotBDCache.getInstance().userHasViewedAlert(ctx.getAuthor().getIdLong()))
+                    BotBDCache botDB = BotBDCache.getInstance();
+                    String latestAlert = botDB.getLatestAlert().getLeft();
+                    if (!botDB.userHasViewedAlert(ctx.getAuthor().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank()))
                         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "⚠️ You have an unread alert!\n" +
                                 "Run the `/alert` command to view this alert.").build()).queue();
 

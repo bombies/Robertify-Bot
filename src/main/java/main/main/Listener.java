@@ -49,7 +49,10 @@ public class Listener extends ListenerAdapter {
             unloadCommands(g);
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
-            ResumeUtils.getInstance().loadInfo(g);
+
+            try {
+                ResumeUtils.getInstance().loadInfo(g);
+            } catch (Exception ignored) {}
         }
 
 //        StatisticsDB.startDailyUpdateCheck();

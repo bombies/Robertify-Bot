@@ -193,10 +193,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-        if (command.isPrivate && g.getOwnerIdLong() != Config.getOwnerID())
-            return;
-        else
-            commandCreateAction = commandCreateAction.setDefaultEnabled(false);
+        if (command.isPrivate) {
+            if (g.getOwnerIdLong() != Config.getOwnerID())
+                return;
+            else commandCreateAction = commandCreateAction.setDefaultEnabled(false);
+        }
 
         commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
             if (!command.isPrivate) return;
@@ -278,9 +279,13 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!botEmbedCheck(event)) return false;
         if (!banCheck(event)) return false;
 
-        if (!BotBDCache.getInstance().userHasViewedAlert(event.getUser().getIdLong()))
-            event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ "+event.getUser().getAsMention()+", you have an unread alert!\n" +
-                    "Run the `/alert` command to view this alert.").build()).queue();
+        if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
+            BotBDCache botDB = BotBDCache.getInstance();
+            String latestAlert = botDB.getLatestAlert().getLeft();
+            if (!botDB.userHasViewedAlert(event.getUser().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank()))
+                event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ " + event.getUser().getAsMention() + ", you have an unread alert!\n" +
+                        "Run the `/alert` command to view this alert.").build()).queue();
+        }
 
         if (!restrictedChannelCheck(event)) return false;
         if (!botPermsCheck(event)) return false;

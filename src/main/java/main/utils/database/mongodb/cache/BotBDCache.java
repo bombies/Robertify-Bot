@@ -5,6 +5,7 @@ import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.GenericJSONField;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,9 +281,14 @@ public class BotBDCache extends AbstractMongoCache {
     public Pair<String, Long> getLatestAlert() {
         final var obj = getDocument();
         final var alertObj = obj.getJSONObject(BotDB.Fields.LATEST_ALERT.toString());
-        final var alert = alertObj.getString(BotDB.Fields.SubFields.ALERT.toString());
-        final var alertTime = alertObj.getLong(BotDB.Fields.SubFields.ALERT_TIME.toString());
-        return Pair.of(alert, alertTime);
+
+        try {
+            final var alert = alertObj.getString(BotDB.Fields.SubFields.ALERT.toString());
+            final var alertTime = alertObj.getLong(BotDB.Fields.SubFields.ALERT_TIME.toString());
+            return Pair.of(alert, alertTime);
+        } catch (JSONException e) {
+            return Pair.of("", 0L);
+        }
     }
 
     public void addAlertViewer(long id) {
@@ -297,9 +303,6 @@ public class BotBDCache extends AbstractMongoCache {
     }
 
     public boolean userHasViewedAlert(long id) {
-        if (getLatestAlert().getLeft().isBlank() || getLatestAlert().getLeft().isEmpty())
-            return true;
-
         final var obj = getDocument();
         final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
         return arrayHasObject(viewerArr, id);
