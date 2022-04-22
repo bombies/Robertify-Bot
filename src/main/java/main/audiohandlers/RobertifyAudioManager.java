@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
+import main.audiohandlers.sources.applemusic.AppleMusicSourceManager;
 import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
@@ -97,6 +98,7 @@ public class RobertifyAudioManager {
 //        }
 
         this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
+        this.playerManager.registerSourceManager(new AppleMusicSourceManager(playerManager));
         this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
         this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
         this.playerManager.registerSourceManager(youtubeAudioSourceManager);
