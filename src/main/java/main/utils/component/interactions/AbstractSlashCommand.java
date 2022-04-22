@@ -277,6 +277,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!nameCheck(event)) return false;
         if (!botEmbedCheck(event)) return false;
         if (!banCheck(event)) return false;
+
+        if (!BotBDCache.getInstance().userHasViewedAlert(event.getUser().getIdLong()))
+            event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ "+event.getUser().getAsMention()+", you have an unread alert!\n" +
+                    "Run the `/alert` command to view this alert.").build()).queue();
+
         if (!restrictedChannelCheck(event)) return false;
         if (!botPermsCheck(event)) return false;
         if (!adminCheck(event)) return false;

@@ -29,6 +29,7 @@ import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -417,6 +418,10 @@ public class CommandManager {
                             return;
                         }
                     }
+
+                    if (!BotBDCache.getInstance().userHasViewedAlert(ctx.getAuthor().getIdLong()))
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "⚠️ You have an unread alert!\n" +
+                                "Run the `/alert` command to view this alert.").build()).queue();
 
                     if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
                         new RandomMessageManager().randomlySendMessage(ctx.getChannel());
