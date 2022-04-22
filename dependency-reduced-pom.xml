@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>4.0.0-BETA-12</version>
+  <version>4.0.0</version>
   <build>
     <plugins>
       <plugin>
@@ -122,7 +122,7 @@
     <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test-junit</artifactId>
-      <version>1.6.20</version>
+      <version>1.6.21</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -172,7 +172,7 @@
   </dependencyManagement>
   <properties>
     <maven.compiler.target>16</maven.compiler.target>
-    <kotlin.version>1.6.20</kotlin.version>
+    <kotlin.version>1.6.21</kotlin.version>
     <maven.compiler.source>16</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

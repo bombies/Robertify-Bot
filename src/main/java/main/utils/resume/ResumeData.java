@@ -54,6 +54,9 @@ public class ResumeData extends AbstractJSONFile {
     }
 
     public void addGuild(long gid, long cid, AudioTrack playingTrack, AbstractQueue<AudioTrack> queue) {
+        if (playingTrack == null)
+            return;
+
         if (guildHasInfo(gid))
             removeGuild(gid);
 
@@ -64,7 +67,10 @@ public class ResumeData extends AbstractJSONFile {
        guildObj.put(Fields.PLAYING_TRACK.toString(), createAudioTrackObject(playingTrack));
 
        final var queueArr = new JSONArray();
-       queue.forEach(track -> queueArr.put(createAudioTrackObject(track)));
+       for (AudioTrack audioTrack : queue) {
+           if (audioTrack == null) continue;
+           queueArr.put(createAudioTrackObject(audioTrack));
+       }
 
        guildObj.put(Fields.QUEUE.toString(), queueArr);
 

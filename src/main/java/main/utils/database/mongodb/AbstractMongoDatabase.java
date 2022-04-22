@@ -65,7 +65,7 @@ public abstract class AbstractMongoDatabase {
     }
 
     public static void updateAllCaches() {
-        BotDB.update();
+//        BotDB.update();
 //        GuildDB.update();
     }
 
