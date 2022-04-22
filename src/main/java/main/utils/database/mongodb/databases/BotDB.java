@@ -76,7 +76,7 @@ public class BotDB extends AbstractMongoDatabase {
                     );
                     case DEVELOPERS_ARRAY -> jsonObject.put(Fields.DEVELOPERS_ARRAY.toString(), new JSONArray());
                     case RANDOM_MESSAGES -> jsonObject.put(Fields.RANDOM_MESSAGES.toString(), new JSONArray());
-                    case LATEST_ALERT -> jsonObject.put(Fields.LATEST_ALERT.toString(), "");
+                    case LATEST_ALERT -> jsonObject.put(Fields.LATEST_ALERT.toString(), new JSONObject());
                     case ALERT_VIEWERS -> jsonObject.put(Fields.ALERT_VIEWERS.toString(), new JSONArray());
                 }
             }
@@ -107,7 +107,11 @@ public class BotDB extends AbstractMongoDatabase {
 
             REPORTS_CHANNEL("reports_channel"),
             REPORTS_CATEGORY("reports_category"),
-            REPORTS_BANNED_USERS("banned_users");
+            REPORTS_BANNED_USERS("banned_users"),
+
+            ALERT("alert"),
+            ALERT_TIME("alert_time");
+
 
             private final String str;
 

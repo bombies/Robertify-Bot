@@ -3,7 +3,9 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.dev.SendAlertCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
+import main.commands.slashcommands.commands.util.AlertCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -165,6 +167,8 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
+        new SendAlertCommand().loadCommand(g);
+        new AlertCommand().loadCommand(g);
     }
 
     public void unloadCommands(Guild g) {

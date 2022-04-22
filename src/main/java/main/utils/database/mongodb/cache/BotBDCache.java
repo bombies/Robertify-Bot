@@ -3,6 +3,7 @@ package main.utils.database.mongodb.cache;
 import lombok.Getter;
 import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.GenericJSONField;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -269,14 +270,19 @@ public class BotBDCache extends AbstractMongoCache {
 
     public void setLatestAlert(String alert) {
         final var obj = getDocument();
-        obj.put(BotDB.Fields.LATEST_ALERT.toString(), alert.replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t"));
+        final var alertObj = obj.getJSONObject(BotDB.Fields.LATEST_ALERT.toString());
+        alertObj.put(BotDB.Fields.SubFields.ALERT.toString(), alert.replaceAll("\\\\n", "\n").replaceAll("\\\\t", "\t"));
+        alertObj.put(BotDB.Fields.SubFields.ALERT_TIME.toString(), System.currentTimeMillis());
         update(obj);
         clearAlertViewers();
     }
 
-    public String getLatestAlert() {
+    public Pair<String, Long> getLatestAlert() {
         final var obj = getDocument();
-        return obj.getString(BotDB.Fields.LATEST_ALERT.toString());
+        final var alertObj = obj.getJSONObject(BotDB.Fields.LATEST_ALERT.toString());
+        final var alert = alertObj.getString(BotDB.Fields.SubFields.ALERT.toString());
+        final var alertTime = alertObj.getLong(BotDB.Fields.SubFields.ALERT_TIME.toString());
+        return Pair.of(alert, alertTime);
     }
 
     public void addAlertViewer(long id) {
@@ -291,12 +297,26 @@ public class BotBDCache extends AbstractMongoCache {
     }
 
     public boolean userHasViewedAlert(long id) {
-        if (getLatestAlert().isBlank() || getLatestAlert().isEmpty())
+        if (getLatestAlert().getLeft().isBlank() || getLatestAlert().getLeft().isEmpty())
             return true;
 
         final var obj = getDocument();
         final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
         return arrayHasObject(viewerArr, id);
+    }
+
+    public int getAlertViewerCount() {
+        final var obj = getDocument();
+        final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
+        return viewerArr.length();
+    }
+
+    public int getPosOfAlertViewer(long id) {
+        if (!userHasViewedAlert(id))
+            return -1;
+        final var obj = getDocument();
+        final var viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString());
+        return getIndexOfObjectInArray(viewerArr, id) + 1;
     }
 
     public void clearAlertViewers() {

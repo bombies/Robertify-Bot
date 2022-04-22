@@ -16,6 +16,7 @@ import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.commands.slashcommands.commands.audio.filters.*;
 import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.util.*;
+import main.commands.slashcommands.commands.util.AlertCommand;
 import main.utils.component.interactions.AbstractSlashCommand;
 
 import java.util.ArrayList;
@@ -101,7 +102,8 @@ public class SlashCommandManager {
                 new SuggestionCommand(),
                 new BotInfoCommand(),
                 new PlaytimeCommand(),
-                new HelpCommand()
+                new HelpCommand(),
+                new AlertCommand()
         );
 
         addDevCommands(
@@ -111,7 +113,8 @@ public class SlashCommandManager {
                 new EvalCommand(),
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
-                new ShardInfoCommand()
+                new ShardInfoCommand(),
+                new SendAlertCommand()
         );
     }
 
