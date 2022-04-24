@@ -155,6 +155,9 @@ public class Listener extends ListenerAdapter {
         updateServerCount();
     }
 
+    /**
+     * Update the server count displayed on the vote websites
+     */
     private void updateServerCount() {
         final int serverCount = Robertify.shardManager.getGuilds().size();
 
@@ -169,15 +172,27 @@ public class Listener extends ListenerAdapter {
         AbstractSlashCommand.loadAllCommands(g);
     }
 
+    /**
+     * Load slash commands that NEED to be updated in a guild
+     * @param g The guild to load the commands in
+     */
     public void loadNeededSlashCommands(Guild g) {
-        // Only slash commands that NEED to be updated in each guild.
         new SeekSlashCommand().loadCommand(g);
     }
 
+    /**
+     * Unload specific slash commands from a guild
+     * @param g The guild to unload the commands in
+     */
     public void unloadCommands(Guild g) {
 
     }
 
+    /**
+     * Load bans for a specific guilds and reschedule the executors for the unbans
+     * of specific users
+     * @param g The guild to reschedule unbans for
+     */
     private static void rescheduleUnbans(Guild g) {
         final var banUtils = new GuildConfig();
         final var map = banUtils.getBannedUsersWithUnbanTimes(g.getIdLong());
@@ -205,6 +220,11 @@ public class Listener extends ListenerAdapter {
         }
     }
 
+    /**
+     * The initial scheduling of an un-ban for a banned user
+     * @param g The guild the banned user is in
+     * @param u The banner user
+     */
     public static void scheduleUnban(Guild g, User u) {
         final GuildConfig banUtils = new GuildConfig();
         final var scheduler = Executors.newScheduledThreadPool(1);
