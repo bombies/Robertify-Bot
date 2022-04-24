@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
@@ -46,20 +47,18 @@ public abstract class Pages {
     public static Message paginateMessage(SlashCommandEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        ReplyAction replyAction = event.replyEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
+        WebhookMessageAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
 
         if (messagePages.size() > 1) {
-            replyAction = replyAction.addActionRows(
+            messageAction = messageAction.addActionRows(
                     Paginator.getButtons(event.getUser(), false, false, true, true)
             );
         }
 
-        replyAction.queue(msg -> {
+        messageAction.queue(msg -> {
            if (messagePages.size() > 1) {
-               msg.retrieveOriginal().queue(msg2 -> {
-                   messages.put(msg2.getIdLong(), messagePages);
-                   ret.set(msg2);
-               });
+               messages.put(msg.getIdLong(), messagePages);
+               ret.set(msg);
            }
         });
 
@@ -76,6 +75,8 @@ public abstract class Pages {
 
     public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandEvent event) {
         List<MessagePage> messagePages = new ArrayList<>();
+
+        event.deferReply().queue();
 
         messageLogic(event.getGuild(), messagePages, content, maxPerPage);
 

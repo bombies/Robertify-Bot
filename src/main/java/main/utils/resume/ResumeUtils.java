@@ -25,6 +25,8 @@ public class ResumeUtils {
     }
 
     public void loadInfo(Guild guild) {
+        if (!hasInfo(guild)) return;
+
         ResumeData.GuildResumeData info = data.getInfo(guild.getIdLong());
         if (info == null)
             return;
@@ -35,6 +37,10 @@ public class ResumeUtils {
                 info
         );
         data.removeGuild(guild.getIdLong());
+    }
+
+    public boolean hasInfo(Guild guild) {
+        return data.guildHasInfo(guild.getIdLong());
     }
 
     public static ResumeUtils getInstance() {

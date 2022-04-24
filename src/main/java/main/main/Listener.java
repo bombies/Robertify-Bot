@@ -52,7 +52,9 @@ public class Listener extends ListenerAdapter {
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                logger.error("There was an error resuming tracks in {}", g.getName(), e);
+            }
         }
 
 //        StatisticsDB.startDailyUpdateCheck();

@@ -13,6 +13,7 @@ import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.deezer.DeezerTrack;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.audiohandlers.sources.spotify.SpotifyTrack;
+import main.constants.BotConstants;
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
 import main.utils.json.AbstractJSONFile;
@@ -22,6 +23,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.model_objects.specification.Image;
 import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.AbstractQueue;
@@ -30,6 +32,7 @@ import java.util.List;
 
 public class ResumeData extends AbstractJSONFile {
     private final static Logger logger = LoggerFactory.getLogger(ResumeData.class);
+    private final static int MAX_TRACKS_TO_SAVE = 1000;
 
     public ResumeData() {
         super(JSONConfigFile.RESUME_DATA);
@@ -67,9 +70,11 @@ public class ResumeData extends AbstractJSONFile {
        guildObj.put(Fields.PLAYING_TRACK.toString(), createAudioTrackObject(playingTrack));
 
        final var queueArr = new JSONArray();
+       int i = 0;
        for (AudioTrack audioTrack : queue) {
            if (audioTrack == null) continue;
            queueArr.put(createAudioTrackObject(audioTrack));
+           if (++i == MAX_TRACKS_TO_SAVE) break;
        }
 
        guildObj.put(Fields.QUEUE.toString(), queueArr);
@@ -108,7 +113,7 @@ public class ResumeData extends AbstractJSONFile {
         );
     }
 
-    private boolean guildHasInfo(long gid) {
+    public boolean guildHasInfo(long gid) {
         JSONObject jsonObject = getJSONObject();
         return arrayHasObject(jsonObject.getJSONArray(Fields.GUILDS.toString()), Fields.GUILD_ID, gid);
     }
@@ -154,13 +159,15 @@ public class ResumeData extends AbstractJSONFile {
         for (var idBuilder : ids) {
             Track[] tracks = spotifyApi.getSeveralTracks(idBuilder.toString().split(",")).build().execute();
 
-            for (int j = 0; j < tracks.length; j++)
+            for (int j = 0; j < tracks.length; j++) {
+                Image[] images = tracks[j].getAlbum().getImages();
                 spotifyTracks.add(new SpotifyTrack(
                         trackInfos.get(j),
                         tracks[j].getExternalIds().getExternalIds().getOrDefault("isrc", null),
-                        tracks[j].getAlbum().getImages()[0].getUrl(),
+                        images.length > 0 ? images[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(),
                         new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
                 ));
+            }
         }
 
         return spotifyTracks;
