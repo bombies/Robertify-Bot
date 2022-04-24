@@ -21,7 +21,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Displays the song that is currently playing";
     }
 
     @Override

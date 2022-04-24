@@ -21,7 +21,7 @@ public class PauseSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Pauses the song currently playing";
     }
 
     @Override

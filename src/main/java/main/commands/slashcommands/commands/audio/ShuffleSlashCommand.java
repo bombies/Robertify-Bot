@@ -20,7 +20,7 @@ public class ShuffleSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Shuffle the current queue";
     }
 
     @Override

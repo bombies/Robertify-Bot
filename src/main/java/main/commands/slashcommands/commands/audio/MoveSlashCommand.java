@@ -40,7 +40,10 @@ public class MoveSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Move a specific track to a specific position in the queue
+
+                Usage: `/move <id> <position>`""";
     }
 
     @Override

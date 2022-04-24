@@ -31,7 +31,7 @@ public class LoopSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Set the song being currently played or the queue to constantly loop";
     }
 
     @Override

@@ -32,7 +32,11 @@ public class JumpSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Skips the song by the given number of seconds
+
+                Usage: `/jump <seconds_to_jump>` *(Skips the song to a specific duration)*
+                """;
     }
 
     @Override

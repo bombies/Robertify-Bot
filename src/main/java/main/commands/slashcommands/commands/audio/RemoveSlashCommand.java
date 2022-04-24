@@ -31,7 +31,10 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Remove a specific song from the queue
+
+                Usage: `/remove <id>`""";
     }
 
     @Override

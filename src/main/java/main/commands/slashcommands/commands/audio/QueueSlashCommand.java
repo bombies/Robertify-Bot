@@ -27,7 +27,7 @@ public class QueueSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Shows all the queued songs";
     }
 
     @Override

@@ -60,7 +60,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Plays a song";
     }
 
     @Override

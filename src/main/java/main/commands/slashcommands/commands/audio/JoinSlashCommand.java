@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.audio;
 
+import main.commands.prefixcommands.audio.JoinCommand;
 import main.constants.BotConstants;
 import main.constants.Permission;
 import main.utils.RobertifyEmbedUtils;
@@ -22,7 +23,10 @@ public class JoinSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Use this command to forcefully move the bot into your voice channel.
+
+                *NOTE: This command can be made DJ only by using* `toggles dj join`""";
     }
 
     @Override

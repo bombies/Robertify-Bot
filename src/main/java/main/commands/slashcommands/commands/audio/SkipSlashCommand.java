@@ -37,7 +37,8 @@ public class SkipSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Skips a track or skip to a specific song in the queue" +
+                "\nUsage: `/skip [id]`";
     }
 
     @Override

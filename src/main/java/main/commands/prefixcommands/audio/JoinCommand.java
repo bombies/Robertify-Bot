@@ -1,4 +1,4 @@
-package main.commands.slashcommands.commands.audio;
+package main.commands.prefixcommands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;

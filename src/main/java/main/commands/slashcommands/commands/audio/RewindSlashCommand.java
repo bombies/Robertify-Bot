@@ -29,7 +29,13 @@ public class RewindSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Rewind the song
+
+                Usage: `/rewind` *(Rewinds the song to the beginning)*
+
+                Usage: `/rewind <seconds_to_rewind>` *(Rewinds the song by a specific duration)*
+                """;
     }
 
     @Override

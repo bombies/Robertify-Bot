@@ -38,7 +38,7 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Looking to play a playlist but shuffled right off the bat? This command does that for you.";
     }
 
     @Override

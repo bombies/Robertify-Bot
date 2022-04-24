@@ -32,7 +32,11 @@ public class VolumeSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Control the volume of the bot
+
+                **__Usages__**
+                `/volume <0-100>`""";
     }
 
     @Override

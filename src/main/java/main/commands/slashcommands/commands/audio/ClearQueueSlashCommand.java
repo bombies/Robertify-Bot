@@ -28,7 +28,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Clear all the queued songs";
     }
 
     @Override

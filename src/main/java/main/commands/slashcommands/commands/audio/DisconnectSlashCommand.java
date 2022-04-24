@@ -27,7 +27,8 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return "Forces the bot to stop playing music and leave the voice channel" +
+                " if already in one.";
     }
 
     @Override

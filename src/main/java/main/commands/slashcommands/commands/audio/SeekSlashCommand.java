@@ -42,7 +42,11 @@ public class SeekSlashCommand extends AbstractSlashCommand {
 
     @Override
     public String getHelp() {
-        return null;
+        return """
+                Jump to a specific position in the current song
+
+                Usage: `/seek <hours> <minutes> <seconds>`
+                """;
     }
 
     @Override
