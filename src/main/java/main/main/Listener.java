@@ -59,8 +59,6 @@ public class Listener extends ListenerAdapter {
         }
 
 //        StatisticsDB.startDailyUpdateCheck();
-
-        updateServerCount();
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
 
         BotBDCache.getInstance().setLastStartup(System.currentTimeMillis());
