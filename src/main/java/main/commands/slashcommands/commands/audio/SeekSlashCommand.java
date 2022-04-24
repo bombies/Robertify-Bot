@@ -18,6 +18,12 @@ public class SeekSlashCommand extends AbstractSlashCommand {
                         .addOptions(
                                 CommandOption.of(
                                         OptionType.INTEGER,
+                                        "hours",
+                                        "The hours to seek",
+                                        true
+                                ),
+                                CommandOption.of(
+                                        OptionType.INTEGER,
                                         "minutes",
                                         "The minutes to seek",
                                         true
@@ -46,12 +52,13 @@ public class SeekSlashCommand extends AbstractSlashCommand {
 
         event.deferReply().queue();
 
+        final var hours = Integer.parseInt(String.valueOf(event.getOption("hours").getAsLong()));
         final var minutes = Integer.parseInt(String.valueOf(event.getOption("minutes").getAsLong()));
         final var seconds = Integer.parseInt(String.valueOf(event.getOption("seconds").getAsLong()));
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
-        event.getHook().sendMessageEmbeds(new SeekCommand().handleSeek(selfVoiceState, memberVoiceState, minutes, seconds).build())
+        event.getHook().sendMessageEmbeds(new SeekCommand().handleSeek(selfVoiceState, memberVoiceState, hours, minutes, seconds).build())
                 .setEphemeral(false).queue();
     }
 }

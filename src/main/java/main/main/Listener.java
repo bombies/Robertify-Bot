@@ -3,6 +3,7 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.audio.SeekSlashCommand;
 import main.commands.slashcommands.commands.dev.SendAlertCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.commands.util.AlertCommand;
@@ -172,8 +173,7 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededSlashCommands(Guild g) {
         // Only slash commands that NEED to be updated in each guild.
-        new SendAlertCommand().loadCommand(g);
-        new AlertCommand().loadCommand(g);
+        new SeekSlashCommand().loadCommand(g);
     }
 
     public void unloadCommands(Guild g) {
