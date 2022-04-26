@@ -21,10 +21,12 @@ import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.pagination.PaginationEvents;
 import main.utils.resume.ResumeUtils;
 import main.utils.spotify.SpotifyAuthorizationUtils;
@@ -32,6 +34,7 @@ import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -94,6 +97,12 @@ public class Robertify {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
                             ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
                             musicManager.getScheduler().scheduleDisconnect(false, 0, TimeUnit.SECONDS);
+
+                            TextChannel announcementChannel = musicManager.getScheduler().getAnnouncementChannel();
+                            if (announcementChannel != null)
+                                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have disconnected due to being restarted!\n" +
+                                                "I will rejoin the voice channel shortly with your tracks loaded...").build())
+                                        .queue();
                         });
                 shardManager.shutdown();
             }));
