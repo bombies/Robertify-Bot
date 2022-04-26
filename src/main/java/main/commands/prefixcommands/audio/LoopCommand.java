@@ -45,7 +45,7 @@ public class LoopCommand implements ICommand {
         }
 
         if (ctx.getArgs().get(0).equalsIgnoreCase("queue") || ctx.getArgs().get(0).equalsIgnoreCase("q")) {
-            eb = handleQueueRepeat(musicManager, ctx.getAuthor(), audioPlayer, ctx.getGuild());
+            eb = handleQueueRepeat(musicManager, ctx.getAuthor());
         } else {
             eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Invalid arguments!");
         }
@@ -109,9 +109,11 @@ public class LoopCommand implements ICommand {
         return eb;
     }
 
-    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, User looper,  IPlayer audioPlayer, Guild guild) {
+    public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, User looper) {
         EmbedBuilder eb;
         final var scheduler = musicManager.getScheduler();
+        final var guild = musicManager.getGuild();
+        final var audioPlayer = musicManager.getPlayer();
 
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;

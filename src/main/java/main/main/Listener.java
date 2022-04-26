@@ -11,6 +11,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -50,6 +51,7 @@ public class Listener extends ListenerAdapter {
             unloadCommands(g);
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
+            new DedicatedChannelConfig().updateButtons(g);
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);

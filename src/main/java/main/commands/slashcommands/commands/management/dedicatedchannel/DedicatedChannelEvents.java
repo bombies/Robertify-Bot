@@ -261,6 +261,18 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             event.reply(member.getAsMention()).addEmbeds(loopEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
+        } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP + "queue")) {
+            if (!djCheck(new LoopCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
+                                " to use this button!").build())
+                        .queue();
+                return;
+            }
+
+            EmbedBuilder loopEmbed = new LoopCommand().handleQueueRepeat(musicManager, member.getUser());
+            event.reply(member.getAsMention()).addEmbeds(loopEmbed.build())
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
             if (!djCheck(new ShuffleCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
