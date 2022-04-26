@@ -39,7 +39,7 @@ public class BotDB extends AbstractMongoDatabase {
                                     .put(Fields.SubFields.REPORTS_BANNED_USERS.toString(), new JSONArray())
                             )
                             .addField(Fields.DEVELOPERS_ARRAY, new JSONArray())
-                            .addField(Fields.LATEST_ALERT, "")
+                            .addField(Fields.LATEST_ALERT, new JSONObject())
                             .addField(Fields.ALERT_VIEWERS, new JSONArray())
                             .build()
             );
