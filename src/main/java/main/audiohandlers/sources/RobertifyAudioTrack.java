@@ -2,6 +2,8 @@ package main.audiohandlers.sources;
 
 import com.sedmelluq.discord.lavaplayer.track.*;
 import com.sedmelluq.discord.lavaplayer.track.playback.LocalAudioTrackExecutor;
+import main.audiohandlers.sources.deezer.DeezerSourceManager;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +29,7 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
     public RobertifyAudioTrack(String title, String identifier, String isrc, String image, String artistName, Integer duration, RobertifyAudioSourceManager audioSourceManager) {
         this(new AudioTrackInfo(title, artistName, duration
 
-                .longValue(), identifier, false, "https://open.spotify.com/track/" + identifier), isrc, image, audioSourceManager);
+                .longValue(), identifier, false, audioSourceManager instanceof SpotifySourceManager ? "https://open.spotify.com/track/" + identifier : audioSourceManager instanceof DeezerSourceManager ? "https://deezer.com/us/track/" + identifier : identifier), isrc, image, audioSourceManager);
     }
 
     public RobertifyAudioTrack(AudioTrackInfo info, String isrc, String artworkURL, RobertifyAudioSourceManager audioSourceManager) {
@@ -39,6 +41,6 @@ public class RobertifyAudioTrack extends DelegatedAudioTrack {
 
     @Override
     public void process(LocalAudioTrackExecutor executor) throws Exception {
-
+        // ;)
     }
 }
