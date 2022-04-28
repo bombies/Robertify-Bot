@@ -282,7 +282,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
             BotBDCache botDB = BotBDCache.getInstance();
             String latestAlert = botDB.getLatestAlert().getLeft();
-            if (!botDB.userHasViewedAlert(event.getUser().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank()))
+            if (!botDB.userHasViewedAlert(event.getUser().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
+            && new SlashCommandManager().isMusicCommand(this))
                 event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ " + event.getUser().getAsMention() + ", you have an unread alert!\n" +
                         "Run the `/alert` command to view this alert.").build()).queue();
         }
