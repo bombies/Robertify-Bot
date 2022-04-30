@@ -8,16 +8,16 @@ import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
-import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.votes.VoteManager;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -44,22 +44,22 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
                 .setPlaceHolder("Select a theme...")
                 .setRange(1, 1)
                 .addOptions(
-                        SelectionMenuOption.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
-                        SelectionMenuOption.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
-                        SelectionMenuOption.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
-                        SelectionMenuOption.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
-                        SelectionMenuOption.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
-                        SelectionMenuOption.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
-                        SelectionMenuOption.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
-                        SelectionMenuOption.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
-                        SelectionMenuOption.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
-                        SelectionMenuOption.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
-                        SelectionMenuOption.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
+                        SelectMenuOption.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
+                        SelectMenuOption.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
+                        SelectMenuOption.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
+                        SelectMenuOption.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
+                        SelectMenuOption.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
+                        SelectMenuOption.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
+                        SelectMenuOption.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
+                        SelectMenuOption.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
+                        SelectMenuOption.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                        SelectMenuOption.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
+                        SelectMenuOption.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
                 )
                 .limitToUser(userID);
     }
 
-    private SelectionMenu getSelectionMenu(long userID) {
+    private SelectMenu getSelectionMenu(long userID) {
         return getSelectionMenuBuilder(userID).build();
     }
 
@@ -90,7 +90,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
 
         final var guild = event.getGuild();
@@ -113,7 +113,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         if (isPremiumCommand()) {

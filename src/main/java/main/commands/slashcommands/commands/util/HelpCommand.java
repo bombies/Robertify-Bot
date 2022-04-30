@@ -9,8 +9,8 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
-import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -19,11 +19,11 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         );
     }
 
-    private SelectionMenu getSelectionMenu(long userId) {
+    private SelectMenu getSelectionMenu(long userId) {
         return getSelectionMenuBuilder(userId).build();
     }
 
@@ -63,10 +63,10 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                 .setPlaceHolder("Select an option!")
                 .setRange(1, 1)
                 .addOptions(
-                        SelectionMenuOption.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
-                        SelectionMenuOption.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
-                        SelectionMenuOption.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
-                        SelectionMenuOption.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
+                        SelectMenuOption.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
+                        SelectMenuOption.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
+                        SelectMenuOption.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
+                        SelectMenuOption.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
                 )
                 .limitToUser(userId);
     }
@@ -157,7 +157,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!nameCheck(event)) return;
         if (!banCheck(event)) return;
 
@@ -196,7 +196,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         final var guild = event.getGuild();

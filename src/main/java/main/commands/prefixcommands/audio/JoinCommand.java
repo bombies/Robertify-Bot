@@ -25,12 +25,12 @@ public class JoinCommand implements ICommand {
     }
 
     public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                     .build();
         }
 
-        VoiceChannel channel = memberVoiceState.getChannel();
+        VoiceChannel channel = (VoiceChannel) memberVoiceState.getChannel();
 
         if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
             final var restrictedChannelsConfig = new RestrictedChannelsConfig();
@@ -59,7 +59,7 @@ public class JoinCommand implements ICommand {
 
         try {
             RobertifyAudioManager.getInstance()
-                    .joinVoiceChannel(textChannel, memberVoiceState.getChannel(), musicManager);
+                    .joinVoiceChannel(textChannel, channel, musicManager);
         } catch (IllegalStateException e) {
             return RobertifyEmbedUtils.embedMessage(guild, "I can't join " + channel.getAsMention() + " since there's no one in the channel!")
                     .build();

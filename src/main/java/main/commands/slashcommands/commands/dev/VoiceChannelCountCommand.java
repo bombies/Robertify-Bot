@@ -6,7 +6,7 @@ import main.commands.prefixcommands.IDevCommand;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -21,10 +21,10 @@ public class VoiceChannelCountCommand extends AbstractSlashCommand implements ID
         int currentlyPlayingCount = 0;
         int peopleListening = 0;
         for (var guild : Robertify.shardManager.getGuilds()) {
-            vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
+            vcCount += guild.getSelfMember().getVoiceState().inAudioChannel() ? 1 : 0;
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
 
-            if (guild.getSelfMember().getVoiceState().inVoiceChannel())
+            if (guild.getSelfMember().getVoiceState().inAudioChannel())
                 peopleListening += guild.getSelfMember().getVoiceState().getChannel().getMembers().size();
         }
 
@@ -66,17 +66,17 @@ public class VoiceChannelCountCommand extends AbstractSlashCommand implements ID
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!nameCheck(event)) return;
 
         int vcCount = 0;
         int currentlyPlayingCount = 0;
         int peopleListening = 0;
         for (var guild : Robertify.shardManager.getGuilds()) {
-            vcCount += guild.getSelfMember().getVoiceState().inVoiceChannel() ? 1 : 0;
+            vcCount += guild.getSelfMember().getVoiceState().inAudioChannel() ? 1 : 0;
             currentlyPlayingCount += (RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null ? 1 : 0;
 
-            if (guild.getSelfMember().getVoiceState().inVoiceChannel())
+            if (guild.getSelfMember().getVoiceState().inAudioChannel())
                 peopleListening += guild.getSelfMember().getVoiceState().getChannel().getMembers().size();
         }
 

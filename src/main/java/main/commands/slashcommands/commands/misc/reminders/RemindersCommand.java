@@ -12,7 +12,7 @@ import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
 import main.utils.json.reminders.RemindersConfig;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -104,7 +104,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         Member selfMember = guild.getSelfMember();
 
         if (channel != null)
-            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_WRITE))
+            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND))
                 return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
                         .build();
 
@@ -862,7 +862,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         String[] split = event.getCommandPath().split("/");

@@ -2,6 +2,7 @@ package main.utils.resume;
 
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
@@ -13,7 +14,7 @@ public class ResumeUtils {
         data = new ResumeData();
     }
 
-    public void saveInfo(Guild guild, VoiceChannel channel) {
+    public void saveInfo(Guild guild, AudioChannel channel) {
         GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         data.addGuild(

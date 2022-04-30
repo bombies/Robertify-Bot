@@ -1,7 +1,9 @@
 package main.events;
 
 import main.utils.database.mongodb.cache.BotBDCache;
-import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,10 +12,13 @@ import java.util.concurrent.TimeUnit;
 public class SuggestionCategoryDeletionEvents extends ListenerAdapter {
 
     @Override
-    public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
+    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+        if (!event.isFromType(ChannelType.CATEGORY)) return;
+
+        final var category = (Category) event.getChannel();
         final var config = BotBDCache.getInstance();
 
-        if (event.getCategory().getIdLong() != config.getSuggestionsCategoryID()) return;
+        if (category.getIdLong() != config.getSuggestionsCategoryID()) return;
 
         final var guild = event.getGuild();
 

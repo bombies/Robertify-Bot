@@ -63,10 +63,10 @@ public class SeekCommand implements ICommand {
     public EmbedBuilder handleSeek(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int mins, int sec) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel for this command to work");
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
@@ -103,10 +103,10 @@ public class SeekCommand implements ICommand {
     public EmbedBuilder handleSeek(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int hours, int mins, int sec) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel for this command to work");
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())

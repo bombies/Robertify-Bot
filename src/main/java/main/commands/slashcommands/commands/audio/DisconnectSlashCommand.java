@@ -8,7 +8,7 @@ import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class DisconnectSlashCommand extends AbstractSlashCommand {
@@ -32,7 +32,7 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -44,13 +44,13 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
         Guild guild = event.getGuild();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "I'm already not in a voice channel!");
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;

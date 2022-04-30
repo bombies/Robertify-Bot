@@ -3,15 +3,15 @@ package main.utils.pagination;
 import lombok.SneakyThrows;
 import main.constants.InteractionLimits;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
-import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageAction;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public abstract class Pages {
         return ret.get();
     }
 
-    public static Message paginateMessage(SlashCommandEvent event, List<MessagePage> messagePages) {
+    public static Message paginateMessage(SlashCommandInteractionEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
         WebhookMessageAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
@@ -73,7 +73,7 @@ public abstract class Pages {
         return paginateMessage(channel, user, messagePages);
     }
 
-    public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandEvent event) {
+    public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandInteractionEvent event) {
         List<MessagePage> messagePages = new ArrayList<>();
 
         event.deferReply().queue();
@@ -111,12 +111,12 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, Message msg, List<SelectionMenuOption> options) {
+    public static void paginateMenu(User user, Message msg, List<SelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic(msg.getId(), options);
 
         final var firstPage = menuPages.get(0);
 
-        SelectionMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = SelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -128,12 +128,12 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, ReplyAction msg, List<SelectionMenuOption> options) {
+    public static void paginateMenu(User user, ReplyCallbackAction msg, List<SelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic("null", options);
 
         final var firstPage = menuPages.get(0);
 
-        SelectionMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = SelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -145,37 +145,37 @@ public abstract class Pages {
                 .queue(success -> success.retrieveOriginal().queue(og -> menuMessages.put(og.getIdLong(), menuPages)));
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<SelectionMenuOption> options, int startingPage) {
+    public static void paginateMenu(TextChannel channel, User user, List<SelectMenuOption> options, int startingPage) {
         paginateMenu(channel, user, options, startingPage, false);
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<SelectionMenuOption> options, int startingPage, boolean numberEachEntry) {
+    public static void paginateMenu(TextChannel channel, User user, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         Message msg = menuLogic(channel, options, startingPage, numberEachEntry);
         paginateMenu(user, msg, options);
     }
 
-    public static void paginateMenu(SlashCommandEvent event, List<SelectionMenuOption> options, int startingPage, boolean numberEachEntry) {
-        ReplyAction msg = menuLogic(event, options, startingPage, numberEachEntry);
+    public static void paginateMenu(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+        ReplyCallbackAction msg = menuLogic(event, options, startingPage, numberEachEntry);
         paginateMenu(event.getUser(), msg, options);
     }
 
-    private static Message menuLogic(TextChannel channel, int startingPage, List<SelectionMenuOption> options) {
+    private static Message menuLogic(TextChannel channel, int startingPage, List<SelectMenuOption> options) {
         return menuLogic(channel, options, startingPage, false);
     }
 
-    private static ReplyAction menuLogic(SlashCommandEvent event, int startingPage, List<SelectionMenuOption> options) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, int startingPage, List<SelectMenuOption> options) {
         return menuLogic(event, options, startingPage, false);
     }
 
-    private static Message menuLogic(TextChannel channel, List<SelectionMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static Message menuLogic(TextChannel channel, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return channel.sendMessageEmbeds(getPaginatedEmbed(channel.getGuild(), options, 25, startingPage, numberEachEntry)).complete();
     }
 
-    private static ReplyAction menuLogic(SlashCommandEvent event, List<SelectionMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return event.replyEmbeds(getPaginatedEmbed(event.getGuild(), options, 25, startingPage, numberEachEntry));
     }
 
-    private static List<MenuPage> menuLogic(String msgID, List<SelectionMenuOption> options) {
+    private static List<MenuPage> menuLogic(String msgID, List<SelectMenuOption> options) {
         final List<MenuPage> menuPages = new ArrayList<>();
 
         if (options.size() <= InteractionLimits.SELECTION_MENU) {
@@ -196,12 +196,12 @@ public abstract class Pages {
                     if (lastIndex == options.size()) break;
 
                     if (j == 0 && i != 0) {
-                        tempPage.addOption(SelectionMenuOption.of("Previous Page", "menuPage:previousPage:" + msgID));
+                        tempPage.addOption(SelectMenuOption.of("Previous Page", "menuPage:previousPage:" + msgID));
                         continue;
                     }
 
                     if (j == InteractionLimits.SELECTION_MENU - 1) {
-                        tempPage.addOption(SelectionMenuOption.of("Next Page", "menuPage:nextPage:" + msgID));
+                        tempPage.addOption(SelectMenuOption.of("Next Page", "menuPage:nextPage:" + msgID));
                         continue;
                     }
 
@@ -220,7 +220,7 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static SelectionMenu getSelectionMenu(User user, List<SelectionMenuOption> options) {
+    public static SelectMenu getSelectionMenu(User user, List<SelectMenuOption> options) {
         return SelectionMenuBuilder.of(
                 "menuPage:" + user.getIdLong(),
                 "Select an option",

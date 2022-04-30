@@ -6,10 +6,7 @@ import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
@@ -51,10 +48,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
             SkipCommand.clearVoteSkipInfo(guild);
         } else {
-             VoiceChannel channelLeft = event.getChannelLeft();
+             AudioChannel channelLeft = event.getChannelLeft();
              GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-             if (!selfVoiceState.inVoiceChannel()) return;
+             if (!selfVoiceState.inAudioChannel()) return;
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
@@ -69,9 +66,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
         Member self = guild.getSelfMember();
         GuildVoiceState voiceState = self.getVoiceState();
 
-        if (!voiceState.inVoiceChannel()) return;
+        if (!voiceState.inAudioChannel()) return;
 
-        VoiceChannel channelLeft = event.getChannelLeft();
+        AudioChannel channelLeft = event.getChannelLeft();
         if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(guild.getIdLong())) {
             doAutoLeave(event, channelLeft);
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
@@ -87,9 +84,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
         if (voiceState == null) return;
 
-        if (!voiceState.inVoiceChannel()) return;
+        if (!voiceState.inAudioChannel()) return;
 
-        VoiceChannel channel = event.getChannelLeft();
+        AudioChannel channel = event.getChannelLeft();
 
         if (!channel.equals(voiceState.getChannel())) return;
 
@@ -106,7 +103,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
             musicManager.getPlayer().setPaused(false);
     }
 
-    void doAutoLeave(GenericGuildVoiceUpdateEvent event, VoiceChannel channelLeft) {
+    void doAutoLeave(GenericGuildVoiceUpdateEvent event, AudioChannel channelLeft) {
         if (channelLeft.getMembers().size() == 1) {
             pauseSong(event);
             waiter.waitForEvent(

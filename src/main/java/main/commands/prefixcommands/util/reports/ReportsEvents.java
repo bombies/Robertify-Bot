@@ -6,9 +6,11 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.pagination.MessagePage;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Category;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -28,12 +30,15 @@ public class ReportsEvents extends ListenerAdapter {
     private static final HashMap<Long, List<String>> responses = new HashMap<>();
 
     @Override
-    public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
+    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+        if (!event.isFromType(ChannelType.CATEGORY)) return;
+
+        final var category = (Category) event.getChannel();
         final var config = BotBDCache.getInstance();
 
         if (!config.isReportsSetup()) return;
 
-        if (event.getCategory().getIdLong() != config.getReportsID(BotBDCache.ReportsConfigField.CATEGORY)) return;
+        if (category.getIdLong() != config.getReportsID(BotBDCache.ReportsConfigField.CATEGORY)) return;
 
         final var openedReportsChannelID = config.getReportsID(BotBDCache.ReportsConfigField.CHANNEL);
         config.resetReportsConfig();
@@ -44,7 +49,9 @@ public class ReportsEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onPrivateMessageReceived(@NotNull PrivateMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (event.isFromGuild()) return;
+
         if (!ReportsCommand.activeReports.contains(event.getAuthor().getIdLong())) return;
 
         final var user = event.getAuthor();

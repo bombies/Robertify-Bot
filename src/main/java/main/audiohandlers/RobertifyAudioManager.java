@@ -37,7 +37,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.resume.ResumeData;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
@@ -143,7 +143,7 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -166,7 +166,7 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -191,7 +191,7 @@ public class RobertifyAudioManager {
             trackUrl += " audio";
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -214,7 +214,7 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -237,7 +237,7 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -254,11 +254,11 @@ public class RobertifyAudioManager {
 
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
-                            SlashCommandEvent event, boolean addToBeginning) {
+                            SlashCommandInteractionEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -274,12 +274,12 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
                                     boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -295,12 +295,12 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
                                                 boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }
@@ -321,7 +321,7 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(channel.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             return;
         }

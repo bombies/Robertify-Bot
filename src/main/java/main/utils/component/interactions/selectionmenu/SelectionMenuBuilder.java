@@ -5,9 +5,8 @@ import lombok.SneakyThrows;
 import main.utils.component.InteractionBuilderException;
 import main.utils.component.InvalidBuilderException;
 import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.NotNull;
@@ -23,21 +22,21 @@ public class SelectionMenuBuilder {
     private String name;
     private String placeholder;
     private Pair<Integer, Integer> range;
-    private final List<SelectionMenuOption> options;
+    private final List<SelectMenuOption> options;
     @Nullable
-    private Predicate<SelectionMenuEvent> permissionCheck;
+    private Predicate<SelectMenuInteractionEvent> permissionCheck;
     @Getter
     private boolean limited;
 
-    private SelectionMenuBuilder(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectionMenuEvent> permissionCheck, boolean limited) {
+    private SelectionMenuBuilder(@NotNull String name, @NotNull String placeholder, @NotNull Pair<Integer, Integer> range, @NotNull List<Triple<String,String, Emoji>> options, @Nullable Predicate<SelectMenuInteractionEvent> permissionCheck, boolean limited) {
         this.name = name.toLowerCase();
         this.placeholder = placeholder;
         this.range = range;
         this.permissionCheck = permissionCheck;
 
-        final List<SelectionMenuOption> l = new ArrayList<>();
+        final List<SelectMenuOption> l = new ArrayList<>();
         for (var option : options)
-            l.add(SelectionMenuOption.of(option.getLeft(), option.getMiddle(), option.getRight()));
+            l.add(SelectMenuOption.of(option.getLeft(), option.getMiddle(), option.getRight()));
 
         this.options =  l;
         this.limited = limited;
@@ -67,16 +66,16 @@ public class SelectionMenuBuilder {
     }
 
     public SelectionMenuBuilder addOption(String label, String value, Emoji emoji) {
-        this.options.add(SelectionMenuOption.of(label, value, emoji));
+        this.options.add(SelectMenuOption.of(label, value, emoji));
         return this;
     }
 
-    public SelectionMenuBuilder addOptions(SelectionMenuOption... options) {
+    public SelectionMenuBuilder addOptions(SelectMenuOption... options) {
         this.options.addAll(Arrays.asList(options));
         return this;
     }
 
-    public SelectionMenuBuilder setPermissionCheck(Predicate<SelectionMenuEvent> predicate) {
+    public SelectionMenuBuilder setPermissionCheck(Predicate<SelectMenuInteractionEvent> predicate) {
         this.permissionCheck = predicate;
         return this;
     }
@@ -91,7 +90,7 @@ public class SelectionMenuBuilder {
         return this;
     }
 
-    public boolean checkPermission(SelectionMenuEvent e) {
+    public boolean checkPermission(SelectMenuInteractionEvent e) {
         if (permissionCheck == null)
             throw new NullPointerException("There is no permission to check!");
         return permissionCheck.test(e);
@@ -106,7 +105,7 @@ public class SelectionMenuBuilder {
      * @return A new fancy selection menu
      */
     @SneakyThrows
-    public static SelectionMenuBuilder of(String name, String placeholder, Pair<Integer, Integer> range, List<SelectionMenuOption> options) {
+    public static SelectionMenuBuilder of(String name, String placeholder, Pair<Integer, Integer> range, List<SelectMenuOption> options) {
         final List<Triple<String, String, Emoji>> ret = new ArrayList<>();
 
         if (options.size() > 25)
@@ -127,12 +126,12 @@ public class SelectionMenuBuilder {
      * @param permissionCheck The check that can be performed when a user interacts with the selection menu
      * @return A new fancy selection menu
      */
-    public static SelectionMenuBuilder of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, Emoji>> options, Predicate<SelectionMenuEvent> permissionCheck) {
+    public static SelectionMenuBuilder of(String name, String placeholder, Pair<Integer, Integer> range, List<Triple<String, String, Emoji>> options, Predicate<SelectMenuInteractionEvent> permissionCheck) {
         return new SelectionMenuBuilder(name, placeholder, range, options, permissionCheck, false);
     }
 
     @SneakyThrows
-    public SelectionMenu build() {
+    public SelectMenu build() {
         if (name == null)
             throw new InteractionBuilderException("The name of the menu can't be null!");
         if (placeholder == null)
@@ -140,11 +139,11 @@ public class SelectionMenuBuilder {
         if (range == null)
             throw new InteractionBuilderException("The range for the menu can't be null!");
 
-        SelectionMenu.Builder builder = SelectionMenu.create(name)
+        SelectMenu.Builder builder = SelectMenu.create(name)
                 .setPlaceholder(placeholder)
                 .setRequiredRange(range.getLeft(), range.getLeft());
 
-        for (SelectionMenuOption val : options)
+        for (SelectMenuOption val : options)
             if (val.getEmoji() == null)
                 builder.addOption(val.getLabel(), val.getValue());
             else

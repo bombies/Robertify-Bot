@@ -18,13 +18,13 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,9 @@ import java.util.concurrent.TimeUnit;
 public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
-    public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
+    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+        if (!event.isFromType(ChannelType.TEXT)) return;
+
         final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
@@ -44,7 +46,9 @@ public class DedicatedChannelEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
+    public void onMessageReceived(@NotNull MessageReceivedEvent event) {
+        if (!event.isFromGuild()) return;
+
         final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
@@ -64,7 +68,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = eventMessage.getContentRaw();
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
-            if (!memberVoiceState.inVoiceChannel()) {
+            if (!memberVoiceState.inAudioChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to do this")
                                 .build())
                         .queue();
@@ -72,7 +76,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            if (selfVoiceState.inVoiceChannel()) {
+            if (selfVoiceState.inAudioChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
                     event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                                     .build())
@@ -107,7 +111,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (!eventMessage.getAttachments().isEmpty()) {
                 var audioFile = eventMessage.getAttachments().get(0);
-                new PlayCommand().playLocalAudio(guild, event.getChannel(), eventMessage, event.getMember(), audioFile);
+                new PlayCommand().playLocalAudio(guild, event.getTextChannel(), eventMessage, event.getMember(), audioFile);
 
                 event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS, null, new ErrorHandler()
                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
@@ -155,13 +159,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (addToBeginning)
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
+                        .loadAndPlayFromDedicatedChannel(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
             else if (shuffled) {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannelShuffled(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannelShuffled(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             } else {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannel(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             }
         }
 
@@ -177,7 +181,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
@@ -193,13 +197,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final var guild = event.getGuild();
         final Member member = event.getMember();
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to do this.").build())
                     .queue();
             return;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                     .build())
                     .queue();

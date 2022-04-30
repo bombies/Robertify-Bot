@@ -9,7 +9,7 @@ import main.constants.TrackSource;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.component.interactions.selectionmenu.SelectionMenuOption;
+import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -17,8 +17,8 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,12 +70,12 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var memberVoiceState = member.getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command!").build();
 
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I must be playing music in order for this command to work!").build();
 
         if (!selfVoiceState.getChannel().equals(memberVoiceState.getChannel()))
@@ -165,11 +165,11 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
             return;
         }
 
-        final List<SelectionMenuOption> list = new ArrayList<>();
+        final List<SelectMenuOption> list = new ArrayList<>();
 
         for (final var track : tracks)
             list.add(
-                    SelectionMenuOption.of(
+                    SelectMenuOption.of(
                             track.title().substring(0, Math.min(75, track.title().length()))
                                     + " by "
                                     + track.author().substring(0, Math.min(20, track.author().length())),
@@ -181,7 +181,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
 
-    private void handeSlashList(SlashCommandEvent event) {
+    private void handeSlashList(SlashCommandInteractionEvent event) {
         final var config = FavouriteTracksCache.getInstance();
         final var member = event.getMember();
         final var guild = member.getGuild();
@@ -194,11 +194,11 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
             return;
         }
 
-        final List<SelectionMenuOption> list = new ArrayList<>();
+        final List<SelectMenuOption> list = new ArrayList<>();
 
         for (final var track : tracks)
             list.add(
-                    SelectionMenuOption.of(
+                    SelectMenuOption.of(
                             track.title().substring(0, Math.min(75, track.title().length()))
                                     + " by "
                                     + track.author().substring(0, Math.min(20, track.author().length())),
@@ -290,7 +290,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -308,7 +308,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1]))
             return;
 
@@ -323,20 +323,20 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var memberVoiceState = event.getMember().getVoiceState();
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .setEphemeral(true)
                     .queue();
             return;
-        } else if (!selfVoiceState.inVoiceChannel()) {
+        } else if (!selfVoiceState.inAudioChannel()) {
             if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                 if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {

@@ -60,7 +60,7 @@ public class ReportsCommand implements ICommand {
 
         guild.createCategory("Bug Reports").queue(category -> {
             category.upsertPermissionOverride(guild.getPublicRole())
-                    .setDeny(Permission.VIEW_CHANNEL)
+                    .deny(Permission.VIEW_CHANNEL)
                     .queue(success -> {
                         guild.createTextChannel("opened-reports", category).queue(openedChannel -> {
                             config.initReportChannels(category.getIdLong(), openedChannel.getIdLong());
