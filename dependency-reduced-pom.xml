@@ -159,7 +159,7 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>com.github.freyacodes</groupId>
+        <groupId>com.github.DuncteBot</groupId>
         <artifactId>Lavalink-Client</artifactId>
         <exclusions>
           <exclusion>
