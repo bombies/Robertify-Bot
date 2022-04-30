@@ -51,7 +51,6 @@ public class Listener extends ListenerAdapter {
             unloadCommands(g);
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
-            new DedicatedChannelConfig().updateButtons(g);
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);
