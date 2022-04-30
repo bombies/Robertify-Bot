@@ -109,7 +109,7 @@ public class Listener extends ListenerAdapter {
                 }
             }
         } else if (!message.getMentionedMembers().isEmpty()) {
-            if (!message.getContentRaw().startsWith("<@!"+guild.getSelfMember().getId()+">"))
+            if (!message.getContentRaw().startsWith("<@"+guild.getSelfMember().getId()+">"))
                 return;
 
             try {
