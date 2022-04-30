@@ -103,13 +103,13 @@ public class RobertifyAudioManager {
         this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
         this.playerManager.registerSourceManager(youtubeAudioSourceManager);
         this.playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        this.playerManager.registerSourceManager(new HttpAudioSourceManager());
         this.playerManager.registerSourceManager(new BeamAudioSourceManager());
-        this.playerManager.registerSourceManager(new LocalAudioSourceManager());
         this.playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
         this.playerManager.registerSourceManager(new BandcampAudioSourceManager());
         this.playerManager.registerSourceManager(new GetyarnAudioSourceManager());
         this.playerManager.registerSourceManager(new VimeoAudioSourceManager());
+        this.playerManager.registerSourceManager(new HttpAudioSourceManager());
+        this.playerManager.registerSourceManager(new LocalAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
