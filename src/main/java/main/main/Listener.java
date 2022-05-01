@@ -49,7 +49,8 @@ public class Listener extends ListenerAdapter {
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
-            unloadCommands(g, "voicechannelcount");
+            unloadCommands(g);
+            unloadDevCommands(g, "voicechannelcount");
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
@@ -189,6 +190,9 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to unload the commands in
      */
     public void unloadCommands(Guild g, String... commandNames) {
+        if (commandNames.length == 0)
+            return;
+
         g.retrieveCommands().queue(commands -> commands.stream()
                 .filter(command -> GeneralUtils.equalsAny(command.getName(), commandNames))
                 .toList()
