@@ -580,6 +580,10 @@ public class GeneralUtils {
         return sb.isEmpty() ? "Nothing is here" :  sb.toString();
     }
 
+    public static <T> boolean equalsAny(T obj, T[] arr) {
+        return Arrays.asList(arr).contains(obj);
+    }
+
     public enum Mentioner {
         USER,
         ROLE,

@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand {
@@ -21,17 +22,20 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
         if (!permissionCheck(ctx)) return;
 
         JdaLavalink lavalink = Robertify.getLavalink();
+        DecimalFormat df = new DecimalFormat("###.##");
         StringBuilder descBuilder = new StringBuilder();
         for (final var node : lavalink.getNodes()) {
             RemoteStats stats = node.getStats();
             descBuilder.append("**__" + node.getName() + "__**\n```" +
                     "CPU Cores:" + stats.getCpuCores() + "\n" +
-                    "Total Lavalink Load: " + stats.getLavalinkLoad() + "%" +
-                    "Total System Load: " + stats.getSystemLoad() + "%" +
-                    "Memory Allocated: " + stats.getMemAllocated() + "MB" +
-                    "Memory Free: " + stats.getMemFree() + "MB" +
-                    "Total Players: " + stats.getPlayers() +
-                    "Playing Players: " + stats.getPlayingPlayers() +
+                    "Total Lavalink Load: " + df.format(stats.getLavalinkLoad()) + "%\n" +
+                    "Total System Load: " + df.format(stats.getSystemLoad()) + "%\n\n" +
+                    "Memory Allocated: " + df.format((stats.getMemAllocated() / 1000000)) + "MB\n" +
+                    "Memory Reservable: " + df.format((stats.getMemReservable() / 1000000)) + "MB\n" +
+                    "Memory Used: " + df.format((stats.getMemUsed() / 1000000)) + "MB\n" +
+                    "Memory Free: " + df.format((stats.getMemFree() / 1000000)) + "MB\n\n" +
+                    "Total Players: " +  stats.getPlayers() + "\n" +
+                    "Playing Players: " + stats.getPlayingPlayers() + "\n" +
                     "Uptime: " + GeneralUtils.getDurationString(stats.getUptime()) +
                     "```\n\n");
         }
@@ -76,18 +80,21 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
         if (!nameCheck(event)) return;
 
         JdaLavalink lavalink = Robertify.getLavalink();
+        DecimalFormat df = new DecimalFormat("###.##");
         StringBuilder descBuilder = new StringBuilder();
         for (final var node : lavalink.getNodes()) {
             RemoteStats stats = node.getStats();
             descBuilder.append("**__" + node.getName() + "__**\n```" +
-                            "CPU Cores:" + stats.getCpuCores() + "\n" +
-                            "Total Lavalink Load: " + stats.getLavalinkLoad() + "%" +
-                            "Total System Load: " + stats.getSystemLoad() + "%" +
-                            "Memory Allocated: " + stats.getMemAllocated() + "MB" +
-                            "Memory Free: " + stats.getMemFree() + "MB" +
-                            "Total Players: " + stats.getPlayers() +
-                            "Playing Players: " + stats.getPlayingPlayers() +
-                            "Uptime: " + GeneralUtils.getDurationString(stats.getUptime()) +
+                    "CPU Cores:" + stats.getCpuCores() + "\n" +
+                    "Total Lavalink Load: " + df.format(stats.getLavalinkLoad()) + "%\n" +
+                    "Total System Load: " + df.format(stats.getSystemLoad()) + "%\n\n" +
+                    "Memory Allocated: " + df.format((stats.getMemAllocated() / 1000000)) + "MB\n" +
+                    "Memory Reservable: " + df.format((stats.getMemReservable() / 1000000)) + "MB\n" +
+                    "Memory Used: " + df.format((stats.getMemUsed() / 1000000)) + "MB\n" +
+                    "Memory Free: " + df.format((stats.getMemFree() / 1000000)) + "MB\n\n" +
+                    "Total Players: " +  stats.getPlayers() + "\n" +
+                    "Playing Players: " + stats.getPlayingPlayers() + "\n" +
+                    "Uptime: " + GeneralUtils.getDurationString(stats.getUptime()) +
                     "```\n\n");
         }
 

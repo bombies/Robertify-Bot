@@ -49,7 +49,7 @@ public class Listener extends ListenerAdapter {
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
-            unloadCommands(g);
+            unloadCommands(g, "voicechannelcount");
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
@@ -188,13 +188,17 @@ public class Listener extends ListenerAdapter {
      * Unload specific slash commands from a guild
      * @param g The guild to unload the commands in
      */
-    public void unloadCommands(Guild g) {
+    public void unloadCommands(Guild g, String... commandNames) {
+        g.retrieveCommands().queue(commands -> commands.stream()
+                .filter(command -> GeneralUtils.equalsAny(command.getName(), commandNames))
+                .toList()
+                .forEach(command -> g.deleteCommandById(command.getIdLong()).queue())
+        );
+    }
+
+    public void unloadDevCommands(Guild g, String... commandNames) {
         if (g.getOwnerIdLong() == Config.getOwnerID())
-            g.retrieveCommands().queue(commands -> commands.stream()
-                    .filter(command -> command.getName().equalsIgnoreCase("voicechannelcount"))
-                    .findFirst()
-                    .ifPresent(cmd -> g.deleteCommandById(cmd.getIdLong()).queue())
-            );
+            unloadCommands(g, commandNames);
     }
 
     /**
