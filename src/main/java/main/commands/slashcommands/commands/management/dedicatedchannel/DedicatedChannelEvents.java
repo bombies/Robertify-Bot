@@ -130,7 +130,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 switch (split[split.length-1].toLowerCase()) {
                     case "-n", "-next" -> {
                         String msgNoFlags = message.replaceAll("\\s-(n|next)$", "");
-                        message = GeneralUtils.isUrl(msgNoFlags) ? "" : "ytsearch:" + msgNoFlags;
+                        message = GeneralUtils.isUrl(msgNoFlags) ? msgNoFlags : "ytsearch:" + msgNoFlags;
                         addToBeginning = true;
                     }
                     case "-s", "-shuffle" -> {
