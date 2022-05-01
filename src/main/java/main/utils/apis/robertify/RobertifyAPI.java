@@ -25,7 +25,7 @@ public class RobertifyAPI {
     public RobertifyAPI(String masterPassword) {
         this.webUtils = WebUtils.ins;
         this.masterPassword = masterPassword;
-        this.uri = new URIBuilder("https://robertify-api.herokuapp.com/api/").build();
+        this.uri = new URIBuilder("https://api.robertify.me/api/").build();
         this.accessToken = getAccessToken();
     }
 
@@ -38,7 +38,10 @@ public class RobertifyAPI {
                 ))
                 .build()).execute();
         final var responseObj = new JSONObject(response.body().string());
-        return responseObj.getString("token");
+        if (responseObj.has("token"))
+            return responseObj.getString("token");
+        else
+            throw new IllegalStateException(responseObj.getString("message"));
     }
 
     @SneakyThrows
