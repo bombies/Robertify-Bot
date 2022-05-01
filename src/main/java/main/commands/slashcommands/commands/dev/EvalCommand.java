@@ -8,10 +8,12 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,8 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("guild", ctx.getGuild());
             engine.put("member", ctx.getMember());
             engine.put("link", Robertify.getLavalink());
+            engine.put("requester", WebUtils.ins);
+            engine.put("http", new OkHttpClient());
 
             Object out = engine.eval(
                     "(function() {\n" +
@@ -147,6 +151,8 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("guild", event.getGuild());
             engine.put("member", event.getMember());
             engine.put("link", Robertify.getLavalink());
+            engine.put("requester", WebUtils.ins);
+            engine.put("http", new OkHttpClient());
 
             Object out = engine.eval(
                     "(function() {\n" +
