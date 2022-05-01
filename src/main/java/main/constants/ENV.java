@@ -32,7 +32,9 @@ public enum ENV {
     DBL_TOKEN("dbl_token"),
     VOTE_REMINDER_CHANCE("vote_reminder_chance"),
     PAPISID("youtube_papisid"),
-    PSID("youtube_psid");
+    PSID("youtube_psid"),
+
+    ROBERTIFY_API_PASSWORD("robertify_api_master_password");
 
     private final String str;
 

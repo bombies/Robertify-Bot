@@ -22,6 +22,8 @@ import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.RobertifyAPI;
+import main.utils.apis.robertify.models.RobertifyGuild;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.json.AbstractJSONFile;
@@ -70,6 +72,8 @@ public class Robertify {
     private static DeezerApi deezerApi;
     @Getter
     private static SpotifyApi spotifyApi;
+    @Getter
+    private static RobertifyAPI robertifyAPI;
     @Getter
     private static final EventWaiter commandWaiter = new EventWaiter();
 
@@ -210,6 +214,10 @@ public class Robertify {
             } catch (BaringoApiException e) {
                 logger.error("[ERROR] There was an issue building the Baringo client!", e);
             }
+
+            String masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
+            if (!masterPassword.isBlank() && !masterPassword.isEmpty())
+                robertifyAPI = new RobertifyAPI(masterPassword);
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
