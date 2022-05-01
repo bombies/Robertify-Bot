@@ -137,7 +137,7 @@ public class CommandManager {
                 new EvalCommand(),
                 new ChangeLogCommand(),
                 new GuildCommand(),
-                new VoiceChannelCountCommand(),
+                new NodeInfoCommand(),
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
                 new AnnouncementCommand(),

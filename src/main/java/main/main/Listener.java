@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.SeekSlashCommand;
+import main.commands.slashcommands.commands.dev.NodeInfoCommand;
 import main.commands.slashcommands.commands.dev.SendAlertCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.commands.util.AlertCommand;
@@ -180,7 +181,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new SeekSlashCommand().loadCommand(g);
+        new NodeInfoCommand().loadCommand(g);
     }
 
     /**
@@ -188,7 +189,12 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to unload the commands in
      */
     public void unloadCommands(Guild g) {
-
+        if (g.getOwnerIdLong() == Config.getOwnerID())
+            g.retrieveCommands().queue(commands -> commands.stream()
+                    .filter(command -> command.getName().equalsIgnoreCase("voicechannelcount"))
+                    .findFirst()
+                    .ifPresent(cmd -> g.deleteCommandById(cmd.getIdLong()).queue())
+            );
     }
 
     /**

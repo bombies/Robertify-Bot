@@ -15,6 +15,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotBDCache;
+import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -190,17 +191,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-        if (command.isPrivate) {
-            if (g.getOwnerIdLong() != Config.getOwnerID())
-                return;
-            else commandCreateAction = commandCreateAction.setDefaultEnabled(false);
-        }
-
-        commandCreateAction.queueAfter(1, TimeUnit.SECONDS, createdCommand -> {
-            if (!command.isPrivate) return;
-            createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(Config.getOwnerID()))
-                    .queue();
-        }, new ErrorHandler()
+        commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
                 .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
     }
 
@@ -275,18 +266,19 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!nameCheck(event)) return false;
         if (!botEmbedCheck(event)) return false;
         if (!banCheck(event)) return false;
+        if (!restrictedChannelCheck(event)) return false;
+        if (!botPermsCheck(event)) return false;
+        if (!devCheck(event)) return false;
 
         if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
             BotBDCache botDB = BotBDCache.getInstance();
             String latestAlert = botDB.getLatestAlert().getLeft();
             if (!botDB.userHasViewedAlert(event.getUser().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
-            && new SlashCommandManager().isMusicCommand(this))
+                    && new SlashCommandManager().isMusicCommand(this))
                 event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ " + event.getUser().getAsMention() + ", you have an unread alert!\n" +
                         "Run the `/alert` command to view this alert.").build()).queue();
         }
 
-        if (!restrictedChannelCheck(event)) return false;
-        if (!botPermsCheck(event)) return false;
         if (!adminCheck(event)) return false;
         return djCheck(event);
     }
@@ -449,6 +441,21 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                             config.getRestrictedChannels(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
                             GeneralUtils.Mentioner.CHANNEL
                     )).build())
+                    .setEphemeral(true)
+                    .queue();
+            return false;
+        }
+        return true;
+    }
+
+    protected boolean devCheck(SlashCommandInteractionEvent event) {
+        if (command == null)
+            buildCommand();
+        if (!command.isPrivate)
+            return true;
+
+        if (!BotBDCache.getInstance().isDeveloper(event.getUser().getIdLong())) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to run this command!").build())
                     .setEphemeral(true)
                     .queue();
             return false;

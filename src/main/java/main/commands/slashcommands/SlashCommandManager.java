@@ -108,7 +108,7 @@ public class SlashCommandManager {
 
         addDevCommands(
                 new GuildCommand(),
-                new VoiceChannelCountCommand(),
+                new NodeInfoCommand(),
                 new UpdateCommand(),
                 new EvalCommand(),
                 new RandomMessageCommand(),
