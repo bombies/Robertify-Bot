@@ -105,7 +105,7 @@
         <dependency>
             <groupId>com.github.DuncteBot</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>c84fe187ebb6275127c4e79a91fa6430f9d68358</version>
+            <version>3.0</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
