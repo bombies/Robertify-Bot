@@ -102,8 +102,8 @@ public class RobertifyGuild {
         );
     }
 
-    public List<Long> getEightBallResponses() {
-        return eight_ball.toList().stream().map(o -> (Long)o).toList();
+    public List<String> getEightBallResponses() {
+        return eight_ball.toList().stream().map(o -> (String)o).toList();
     }
 
     public long getAnnouncementChannel() {
