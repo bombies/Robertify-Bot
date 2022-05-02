@@ -78,6 +78,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("link", Robertify.getLavalink());
             engine.put("requester", WebUtils.ins);
             engine.put("http", new OkHttpClient());
+            engine.put("robapi", Robertify.getRobertifyAPI());
 
             Object out = engine.eval(
                     "(function() {\n" +
@@ -153,6 +154,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
             engine.put("link", Robertify.getLavalink());
             engine.put("requester", WebUtils.ins);
             engine.put("http", new OkHttpClient());
+            engine.put("robapi", Robertify.getRobertifyAPI());
 
             Object out = engine.eval(
                     "(function() {\n" +
