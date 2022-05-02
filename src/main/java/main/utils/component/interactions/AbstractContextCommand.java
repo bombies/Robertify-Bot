@@ -7,6 +7,7 @@ import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,6 +31,11 @@ public abstract class AbstractContextCommand extends AbstractInteraction {
     protected abstract void buildCommand();
     protected Builder getBuilder() {
         return new Builder();
+    }
+
+    public CommandData getCommandData() {
+        buildCommand();
+        return Commands.context(command.type, command.name);
     }
 
     public void loadCommand(Guild g) {

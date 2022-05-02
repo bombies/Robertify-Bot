@@ -3,6 +3,7 @@ package main.utils.component.interactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.RandomMessageManager;
+import main.commands.contextcommands.ContextCommandManager;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
@@ -214,7 +215,15 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         List<AbstractSlashCommand> devCommands = slashCommandManager.getDevCommands();
         CommandListUpdateAction commandListUpdateAction = g.updateCommands();
 
+        ContextCommandManager contextCommandManager = new ContextCommandManager();
+        List<AbstractContextCommand> contextCommands = contextCommandManager.getCommands();
+
         for (var cmd : commands)
+            commandListUpdateAction = commandListUpdateAction.addCommands(
+                    cmd.getCommandData()
+            );
+
+        for (var cmd : contextCommands)
             commandListUpdateAction = commandListUpdateAction.addCommands(
                     cmd.getCommandData()
             );
@@ -226,14 +235,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 );
         }
 
-        commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, e -> {
-            for (var createdCommand : e) {
-                if (!slashCommandManager.isDevCommand(createdCommand.getName())) continue;
-
-                createdCommand.updatePrivileges(g, CommandPrivilege.enableUser(Config.getOwnerID()))
-                        .queue();
-            }
-        }, new ErrorHandler().handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
+        commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler().handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
                 owner -> owner.getUser()
                         .openPrivateChannel().queue(channel -> {
                             channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, I could not create slash commands in **"+g.getName()+"**" +
