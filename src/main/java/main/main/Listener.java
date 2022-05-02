@@ -184,7 +184,6 @@ public class Listener extends ListenerAdapter {
      */
     public void loadNeededSlashCommands(Guild g) {
         new NodeInfoCommand().loadCommand(g);
-        new ContextCommandTest().loadCommand(g);
     }
 
     /**
