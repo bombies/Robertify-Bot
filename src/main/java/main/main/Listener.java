@@ -11,6 +11,7 @@ import main.commands.slashcommands.commands.util.AlertCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.component.interactions.tests.ContextCommandTest;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -183,6 +184,7 @@ public class Listener extends ListenerAdapter {
      */
     public void loadNeededSlashCommands(Guild g) {
         new NodeInfoCommand().loadCommand(g);
+        new ContextCommandTest().loadCommand(g);
     }
 
     /**

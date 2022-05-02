@@ -15,6 +15,18 @@ public abstract class AbstractContextCommand extends AbstractInteraction {
     @Setter @Getter
     private ContextCommand command = null;
 
+    public String getName() {
+        if (command == null)
+            buildCommand();
+        return command.name;
+    }
+
+    public Command.Type getType() {
+        if (command == null)
+            buildCommand();
+        return command.type;
+    }
+
     protected abstract void buildCommand();
     protected Builder getBuilder() {
         return new Builder();
