@@ -25,7 +25,7 @@ public class RobertifyAPI {
     public RobertifyAPI(String masterPassword) {
         this.webUtils = WebUtils.ins;
         this.masterPassword = masterPassword;
-        this.uri = new URIBuilder("https://api.robertify.me/api/").build();
+        this.uri = new URIBuilder("https://api.robertify.me/").build();
         this.accessToken = getAccessToken();
     }
 
