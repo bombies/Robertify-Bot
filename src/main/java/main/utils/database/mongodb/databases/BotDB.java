@@ -41,6 +41,7 @@ public class BotDB extends AbstractMongoDatabase {
                             .addField(Fields.DEVELOPERS_ARRAY, new JSONArray())
                             .addField(Fields.LATEST_ALERT, new JSONObject())
                             .addField(Fields.ALERT_VIEWERS, new JSONArray())
+                            .addField(Fields.GUILD_COUNT, 0)
                             .build()
             );
         }
@@ -96,7 +97,8 @@ public class BotDB extends AbstractMongoDatabase {
         DEVELOPERS_ARRAY("developers"),
         RANDOM_MESSAGES("random_messages"),
         LATEST_ALERT("latest_alert"),
-        ALERT_VIEWERS("alert_viewers");
+        ALERT_VIEWERS("alert_viewers"),
+        GUILD_COUNT("guild_count");
 
         public enum SubFields {
             SUGGESTIONS_ACCEPTED_CHANNEL("accepted_channel"),
