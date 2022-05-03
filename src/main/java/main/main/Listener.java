@@ -167,6 +167,8 @@ public class Listener extends ListenerAdapter {
     private void updateServerCount() {
         final int serverCount = Robertify.shardManager.getGuilds().size();
 
+        BotBDCache.getInstance().setGuildCount(serverCount);
+
         if (Robertify.getTopGGAPI() != null)
             Robertify.getTopGGAPI().setStats(serverCount);
 
