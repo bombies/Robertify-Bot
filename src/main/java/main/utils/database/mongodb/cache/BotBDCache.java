@@ -329,6 +329,12 @@ public class BotBDCache extends AbstractMongoCache {
         update(obj);
     }
 
+    public void setGuildCount(int count) {
+        final var obj = getDocument();
+        obj.put(BotDB.Fields.GUILD_COUNT.toString(), count);
+        update(obj);
+    }
+
     private JSONObject getDocument() {
         return getCache().getJSONObject(0);
     }
