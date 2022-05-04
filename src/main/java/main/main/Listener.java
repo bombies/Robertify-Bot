@@ -185,7 +185,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new NodeInfoCommand().loadCommand(g);
+
     }
 
     /**
