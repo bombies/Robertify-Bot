@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
+import java.text.DecimalFormat;
 
 public class PingCommand extends AbstractSlashCommand implements ICommand {
     @Override
@@ -22,7 +23,7 @@ public class PingCommand extends AbstractSlashCommand implements ICommand {
                 (ping) -> {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "🏓 Pong!\n\n" +
                             "REST Ping: **"+ping+"ms**\n" +
-                            "Websocket Ping: **"+Robertify.shardManager.getAverageGatewayPing()+"ms**");
+                            "Websocket Ping: **"+ new DecimalFormat("##.##").format(Robertify.shardManager.getAverageGatewayPing())+"ms**");
                     msg.replyEmbeds(eb.build()).queue();
                 }
         );
