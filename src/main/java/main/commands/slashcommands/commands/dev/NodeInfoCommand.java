@@ -28,8 +28,8 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
             RemoteStats stats = node.getStats();
             descBuilder.append("**__" + node.getName() + "__**\n```" +
                     "CPU Cores:" + stats.getCpuCores() + "\n" +
-                    "Total Lavalink Load: " + df.format(stats.getLavalinkLoad()) + "%\n" +
-                    "Total System Load: " + df.format(stats.getSystemLoad()) + "%\n\n" +
+                    "Total Lavalink Load: " + df.format(stats.getLavalinkLoad() * 100) + "%\n" +
+                    "Total System Load: " + df.format(stats.getSystemLoad() * 100) + "%\n\n" +
                     "Memory Allocated: " + df.format((stats.getMemAllocated() / 1000000)) + "MB\n" +
                     "Memory Reservable: " + df.format((stats.getMemReservable() / 1000000)) + "MB\n" +
                     "Memory Used: " + df.format((stats.getMemUsed() / 1000000)) + "MB\n" +
@@ -77,7 +77,7 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
 
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         JdaLavalink lavalink = Robertify.getLavalink();
         DecimalFormat df = new DecimalFormat("###.##");
