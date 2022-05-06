@@ -109,6 +109,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
+        final var dedicatedChannelConfig = new DedicatedChannelConfig();
         if (audioPlaylist.isSearchResult()) {
             sendTrackLoadedMessage(tracks.get(0));
 
@@ -135,8 +136,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (scheduler.playlistRepeating)
                 scheduler.setSavedQueue(guild, scheduler.queue);
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
+            if (dedicatedChannelConfig.isChannelSet(guild.getIdLong()))
+                dedicatedChannelConfig.updateMessage(guild);
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
                     + "` tracks from `" + audioPlaylist.getName() + "`");
@@ -144,8 +145,9 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (botMsg != null)
                 botMsg.editMessageEmbeds(eb.build()).queue();
             else {
-                new DedicatedChannelConfig().getTextChannel(guild.getIdLong())
-                        .sendMessageEmbeds(eb.build()).queue();
+                if (dedicatedChannelConfig.isChannelSet(guild.getIdLong()))
+                    dedicatedChannelConfig.getTextChannel(guild.getIdLong())
+                            .sendMessageEmbeds(eb.build()).queue();
             }
 
             if (!announceMsg)
@@ -177,8 +179,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (scheduler.playlistRepeating)
                 scheduler.setSavedQueue(guild, scheduler.queue);
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
+            if (dedicatedChannelConfig.isChannelSet(guild.getIdLong()))
+                dedicatedChannelConfig.updateMessage(guild);
         }
 
 
