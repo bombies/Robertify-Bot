@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -54,13 +54,13 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be in a voice channel for this to work");
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
-        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .queue();

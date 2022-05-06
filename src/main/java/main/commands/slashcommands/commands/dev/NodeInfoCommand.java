@@ -9,7 +9,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -76,7 +76,7 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
         JdaLavalink lavalink = Robertify.getLavalink();

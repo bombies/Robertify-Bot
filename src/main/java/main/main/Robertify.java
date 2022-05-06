@@ -10,7 +10,6 @@ import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.contextcommands.ContextCommandManager;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
@@ -98,7 +97,7 @@ public class Robertify {
             Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
                 logger.info("Destroying all players (If any left)");
                 shardManager.getGuildCache().stream()
-                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
+                        .filter(guild -> guild.getSelfMember().getVoiceState().inVoiceChannel())
                         .forEach(guild -> {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
                             ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
@@ -180,9 +179,9 @@ public class Robertify {
             for (var cmd : slashCommandManager.getDevCommands())
                 jdaBuilder.addEventListeners(cmd);
 
-            ContextCommandManager contextCommandManager = new ContextCommandManager();
-            for (var cmd : contextCommandManager.getCommands())
-                jdaBuilder.addEventListeners(cmd);
+//            ContextCommandManager contextCommandManager = new ContextCommandManager();
+//            for (var cmd : contextCommandManager.getCommands())
+//                jdaBuilder.addEventListeners(cmd);
 
             // Initialize the JSON directory
             // This is a deprecated feature and is marked for removal

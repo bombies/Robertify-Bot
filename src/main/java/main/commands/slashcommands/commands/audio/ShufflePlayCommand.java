@@ -58,18 +58,18 @@ public class ShufflePlayCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .queue();
             return;
-        } else if (!selfVoiceState.inAudioChannel()) {
+        } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(ctx.getGuild(), Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                 if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {

@@ -17,8 +17,8 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,12 +70,12 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var memberVoiceState = member.getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel())
+        if (!memberVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command!").build();
 
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!selfVoiceState.inAudioChannel())
+        if (!selfVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "I must be playing music in order for this command to work!").build();
 
         if (!selfVoiceState.getChannel().equals(memberVoiceState.getChannel()))
@@ -181,7 +181,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
 
-    private void handeSlashList(SlashCommandInteractionEvent event) {
+    private void handeSlashList(SlashCommandEvent event) {
         final var config = FavouriteTracksCache.getInstance();
         final var member = event.getMember();
         final var guild = member.getGuild();
@@ -290,7 +290,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -308,7 +308,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1]))
             return;
 
@@ -323,20 +323,20 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var memberVoiceState = event.getMember().getVoiceState();
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                             .build())
                     .setEphemeral(true)
                     .queue();
             return;
-        } else if (!selfVoiceState.inAudioChannel()) {
+        } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                 if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {

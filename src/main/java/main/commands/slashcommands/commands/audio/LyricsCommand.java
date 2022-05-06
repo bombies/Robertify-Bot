@@ -14,7 +14,7 @@ import main.utils.genius.GeniusSongSearch;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -41,14 +41,14 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
         String query;
 
         if (args.isEmpty()) {
-            if (!memberVoiceState.inAudioChannel()) {
+            if (!memberVoiceState.inVoiceChannel()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                                 .build())
                         .queue();
                 return;
             }
 
-            if (!selfVoiceState.inAudioChannel()) {
+            if (!selfVoiceState.inVoiceChannel()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to use this command")
                                 .build())
                         .queue();
@@ -189,7 +189,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -200,7 +200,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
         final String query;
 
         if (event.getOption("song") == null) {
-            if (!memberVoiceState.inAudioChannel()) {
+            if (!memberVoiceState.inVoiceChannel()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                                 .build())
                         .setEphemeral(true)
@@ -208,7 +208,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                 return;
             }
 
-            if (!selfVoiceState.inAudioChannel()) {
+            if (!selfVoiceState.inVoiceChannel()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to use this command")
                                 .build())
                         .setEphemeral(true)

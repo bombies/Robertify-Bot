@@ -9,7 +9,7 @@ import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ClearQueueSlashCommand extends AbstractSlashCommand {
@@ -32,7 +32,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -52,7 +52,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
 
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (selfVoiceState.inAudioChannel()) {
+        if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!musicCommandDJCheck(event)) {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to use this command when there's other users in the channel!");

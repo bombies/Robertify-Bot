@@ -37,7 +37,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.resume.ResumeData;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import org.slf4j.Logger;
@@ -254,7 +254,7 @@ public class RobertifyAudioManager {
 
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
-                            SlashCommandInteractionEvent event, boolean addToBeginning) {
+                            SlashCommandEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
@@ -274,7 +274,7 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                     boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
@@ -295,7 +295,7 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
                                                 boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 

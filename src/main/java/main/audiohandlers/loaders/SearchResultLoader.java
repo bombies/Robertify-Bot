@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 
 public class SearchResultLoader implements AudioLoadResultHandler {
     private final Guild guild;
@@ -68,7 +68,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                     .append("]").append("\n");
         }
 
-        SelectMenu selectionMenu = selectionMenuBuilder.build();
+        SelectionMenu selectionMenu = selectionMenuBuilder.build();
 
         if (botMsg != null)
             botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())

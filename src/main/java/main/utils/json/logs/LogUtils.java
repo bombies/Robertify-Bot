@@ -42,7 +42,7 @@ public class LogUtils {
 
         guild.createTextChannel("robertify-logs")
                 .addPermissionOverride(guild.getPublicRole(), Collections.emptyList(), List.of(Permission.VIEW_CHANNEL))
-                .addPermissionOverride(guild.getSelfMember(), List.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_SEND), Collections.emptyList())
+                .addPermissionOverride(guild.getSelfMember(), List.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_WRITE), Collections.emptyList())
                 .queue(channel -> config.setChannel(guild.getIdLong(), channel.getIdLong()));
     }
 }

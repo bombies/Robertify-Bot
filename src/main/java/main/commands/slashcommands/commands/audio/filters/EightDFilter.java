@@ -9,7 +9,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -24,14 +24,14 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         final var filters = audioPlayer.getFilters();
         final var selfMember = ctx.getSelfMember();
 
-        if (!selfMember.getVoiceState().inAudioChannel()) {
+        if (!selfMember.getVoiceState().inVoiceChannel()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
                     .queue();
             return;
         }
 
         GuildVoiceState memberVoiceState = ctx.getMember().getVoiceState();
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
                     .queue();
             return;
@@ -90,7 +90,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 
@@ -100,7 +100,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         final var filters = audioPlayer.getFilters();
         final var selfMember = guild.getSelfMember();
 
-        if (!selfMember.getVoiceState().inAudioChannel()) {
+        if (!selfMember.getVoiceState().inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
                     .setEphemeral(true)
                     .queue();
@@ -108,7 +108,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         }
 
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
                     .setEphemeral(true)
                     .queue();

@@ -13,11 +13,11 @@ import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.votes.VoteManager;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -59,7 +59,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
                 .limitToUser(userID);
     }
 
-    private SelectMenu getSelectionMenu(long userID) {
+    private SelectionMenu getSelectionMenu(long userID) {
         return getSelectionMenuBuilder(userID).build();
     }
 
@@ -90,7 +90,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checksWithPremium(event)) return;
 
         final var guild = event.getGuild();
@@ -113,7 +113,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         if (isPremiumCommand()) {

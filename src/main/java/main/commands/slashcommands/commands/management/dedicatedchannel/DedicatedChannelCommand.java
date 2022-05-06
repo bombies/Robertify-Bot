@@ -14,10 +14,9 @@ import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +57,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                     var theme = new ThemesConfig().getTheme(guild.getIdLong());
                     var dediChannelConfig = new DedicatedChannelConfig();
 
-                    TextChannelManager manager = textChannel.getManager();
+                    final var manager = textChannel.getManager();
                     manager.setPosition(0).queue();
                     dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
 
@@ -135,7 +134,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
@@ -151,7 +150,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                     var theme = new ThemesConfig().getTheme(guild.getIdLong());
                     var dediChannelConfig = new DedicatedChannelConfig();
 
-                    TextChannelManager manager = textChannel.getManager();
+                    final var manager = textChannel.getManager();
                     manager.setPosition(0).queue();
                     dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
 

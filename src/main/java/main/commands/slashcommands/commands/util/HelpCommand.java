@@ -19,11 +19,11 @@ import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +53,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         );
     }
 
-    private SelectMenu getSelectionMenu(long userId) {
+    private SelectionMenu getSelectionMenu(long userId) {
         return getSelectionMenuBuilder(userId).build();
     }
 
@@ -157,7 +157,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
         if (!banCheck(event)) return;
 
@@ -196,7 +196,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         final var guild = event.getGuild();

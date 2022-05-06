@@ -2,7 +2,7 @@ package main.utils.component.interactions.tests;
 
 import lombok.SneakyThrows;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,7 +38,7 @@ public class SlashCommandTest extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event))
             return;
 

@@ -48,10 +48,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
             SkipCommand.clearVoteSkipInfo(guild);
         } else {
-             AudioChannel channelLeft = event.getChannelLeft();
+             VoiceChannel channelLeft = event.getChannelLeft();
              GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-             if (!selfVoiceState.inAudioChannel()) return;
+             if (!selfVoiceState.inVoiceChannel()) return;
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
@@ -66,9 +66,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
         Member self = guild.getSelfMember();
         GuildVoiceState voiceState = self.getVoiceState();
 
-        if (!voiceState.inAudioChannel()) return;
+        if (!voiceState.inVoiceChannel()) return;
 
-        AudioChannel channelLeft = event.getChannelLeft();
+        VoiceChannel channelLeft = event.getChannelLeft();
         if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(guild.getIdLong())) {
             doAutoLeave(event, channelLeft);
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
@@ -84,9 +84,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
         if (voiceState == null) return;
 
-        if (!voiceState.inAudioChannel()) return;
+        if (!voiceState.inVoiceChannel()) return;
 
-        AudioChannel channel = event.getChannelLeft();
+        VoiceChannel channel = event.getChannelLeft();
 
         if (!channel.equals(voiceState.getChannel())) return;
 
@@ -103,7 +103,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
             musicManager.getPlayer().setPaused(false);
     }
 
-    void doAutoLeave(GenericGuildVoiceUpdateEvent event, AudioChannel channelLeft) {
+    void doAutoLeave(GenericGuildVoiceUpdateEvent event, VoiceChannel channelLeft) {
         if (channelLeft.getMembers().size() == 1) {
             pauseSong(event);
             waiter.waitForEvent(

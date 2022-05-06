@@ -56,14 +56,14 @@ public class LofiCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel())
+        if (!memberVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build();
 
 
-        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                     .build();
-        } else if (!selfVoiceState.inAudioChannel()) {
+        } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
                 if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {

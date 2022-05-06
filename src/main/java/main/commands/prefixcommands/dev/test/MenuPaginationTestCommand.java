@@ -4,7 +4,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ITestCommand;
 import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.pagination.Pages;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public class MenuPaginationTestCommand extends ListenerAdapter implements ITestC
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         final var selectedOption = event.getSelectedOptions().get(0).getValue();
 
         if (!selectedOption.startsWith("Test")) return;

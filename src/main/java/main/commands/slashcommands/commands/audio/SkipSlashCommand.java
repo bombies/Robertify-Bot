@@ -8,7 +8,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +42,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
         if (!banCheck(event)) return;
         if (!restrictedChannelCheck(event)) return;
@@ -53,7 +53,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
         final var memberVoiceState = event.getMember().getVoiceState();
 
         if (!musicCommandDJCheck(event)) {
-            if (!selfVoiceState.inAudioChannel()) {
+            if (!selfVoiceState.inVoiceChannel()) {
                 event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "I must be in a voice channel before this command can be executed!").build())
                         .setEphemeral(true)
                         .queue();

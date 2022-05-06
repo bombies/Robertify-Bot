@@ -9,7 +9,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.permissions.PermissionsConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -514,7 +514,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
@@ -662,7 +662,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         }
     }
 
-    private void sendPermMessage(SlashCommandInteractionEvent event, List<Integer> permCodes, IMentionable mentionable) {
+    private void sendPermMessage(SlashCommandEvent event, List<Integer> permCodes, IMentionable mentionable) {
         final var guild = event.getGuild();
 
         if (permCodes.isEmpty()) {

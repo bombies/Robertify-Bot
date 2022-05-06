@@ -18,10 +18,10 @@ import main.utils.json.logs.LogUtils;
 import main.utils.json.toggles.TogglesConfig;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +55,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         if (new TogglesConfig().getDJToggle(guild, this)) {
             if (new TogglesConfig().getToggle(guild, Toggles.VOTE_SKIPS)) {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
-                    if (selfVoiceState.inAudioChannel()) {
+                    if (selfVoiceState.inVoiceChannel()) {
                         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel before this command can be executed!").build())
                                 .queue();
                         return;
@@ -176,10 +176,10 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
     private MessageEmbed checks(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inAudioChannel())
+        if (!selfVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!").build();
 
-        if (!memberVoiceState.inAudioChannel())
+        if (!memberVoiceState.inVoiceChannel())
             return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build();
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
@@ -251,7 +251,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith("voteskip:"))
             return;
 
@@ -266,14 +266,14 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         GuildVoiceState voiceState = event.getGuild().getSelfMember().getVoiceState();
         GuildVoiceState memberState = event.getMember().getVoiceState();
 
-        if (!voiceState.inAudioChannel()) {
+        if (!voiceState.inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This button is no longer valid...").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (!memberState.inAudioChannel()) {
+        if (!memberState.inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to interact with this button").build())
                     .setEphemeral(true)
                     .queue();

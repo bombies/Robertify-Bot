@@ -6,10 +6,8 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.pagination.MessagePage;
 import me.duncte123.botcommons.messaging.EmbedUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.category.CategoryDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -30,10 +28,8 @@ public class ReportsEvents extends ListenerAdapter {
     private static final HashMap<Long, List<String>> responses = new HashMap<>();
 
     @Override
-    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
-        if (!event.isFromType(ChannelType.CATEGORY)) return;
-
-        final var category = (Category) event.getChannel();
+    public void onCategoryDelete(@NotNull CategoryDeleteEvent event) {
+        final var category = event.getCategory();
         final var config = BotBDCache.getInstance();
 
         if (!config.isReportsSetup()) return;

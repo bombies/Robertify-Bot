@@ -18,13 +18,13 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,9 +33,7 @@ import java.util.concurrent.TimeUnit;
 public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
-    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
-        if (!event.isFromType(ChannelType.TEXT)) return;
-
+    public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
         final DedicatedChannelConfig config = new DedicatedChannelConfig();
         final Guild guild = event.getGuild();
 
@@ -68,7 +66,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = eventMessage.getContentRaw();
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
-            if (!memberVoiceState.inAudioChannel()) {
+            if (!memberVoiceState.inVoiceChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to do this")
                                 .build())
                         .queue();
@@ -76,7 +74,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            if (selfVoiceState.inAudioChannel()) {
+            if (selfVoiceState.inVoiceChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
                     event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                                     .build())
@@ -181,7 +179,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
@@ -197,13 +195,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final var guild = event.getGuild();
         final Member member = event.getMember();
 
-        if (!selfVoiceState.inAudioChannel()) {
+        if (!selfVoiceState.inVoiceChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to do this.").build())
                     .queue();
             return;
         }
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
                     .build())
                     .queue();

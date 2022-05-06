@@ -22,9 +22,9 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -243,7 +243,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
     }
 
-    public synchronized TextChannelManager channelTopicUpdateRequest(TextChannel channel) {
+    public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
         return channel.getManager().setTopic(
                 RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song. " +
                         RobertifyEmoji.REWIND_EMOJI + " Rewind the song. " +

@@ -6,8 +6,8 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ public class PaginationEvents extends ListenerAdapter {
     private static final HashMap<Long, Integer> currentPage = new HashMap<>();
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith(MessageButton.PAGE_ID.toString()))
             return;
 
@@ -69,7 +69,7 @@ public class PaginationEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith("menupage")) return;
 
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1])) {
@@ -99,7 +99,7 @@ public class PaginationEvents extends ListenerAdapter {
                 .get(currentPage);
 
         int finalCurrentPage = currentPage;
-        event.editSelectMenu(
+        event.editSelectionMenu(
                 Pages.getSelectionMenu(
                         event.getUser(),
                         menuPage.getOptions()

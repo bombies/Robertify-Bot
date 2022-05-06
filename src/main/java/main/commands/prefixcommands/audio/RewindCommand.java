@@ -109,12 +109,12 @@ public class RewindCommand implements ICommand {
         final var guild = selfVoiceState.getGuild();
         EmbedBuilder eb;
 
-        if (!selfVoiceState.inAudioChannel()) {
+        if (!selfVoiceState.inVoiceChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             return eb;
         }
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             return eb;
         }

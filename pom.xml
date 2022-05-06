@@ -39,7 +39,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.11</version>
+            <version>4.4.0_352</version>
         </dependency>
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
@@ -97,16 +97,16 @@
             <artifactId>lavaplayer-ext-youtube-rotator</artifactId>
             <version>0.2.3</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.freyacodes</groupId>-->
-<!--            <artifactId>Lavalink-Client</artifactId>-->
-<!--            <version>2b1b439</version>-->
-<!--        </dependency>-->
         <dependency>
-            <groupId>com.github.DuncteBot</groupId>
+            <groupId>com.github.TopiSenpai</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>c84fe187ebb6275127c4e79a91fa6430f9d68358</version>
+            <version>525f6f094ef47ddc4bc8a381e4bce398ec7e9c37</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.DuncteBot</groupId>-->
+<!--            <artifactId>Lavalink-Client</artifactId>-->
+<!--            <version>c84fe187ebb6275127c4e79a91fa6430f9d68358</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.discordbots</groupId>
             <artifactId>DBL-Java-Library</artifactId>

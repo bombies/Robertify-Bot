@@ -25,7 +25,7 @@ public class JoinCommand implements ICommand {
     }
 
     public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
                     .build();
         }

@@ -11,7 +11,7 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -430,7 +430,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
 
         event.replyEmbeds(handleSuggestion(event.getGuild(), event.getUser(), event.getOption("suggestion").getAsString()))

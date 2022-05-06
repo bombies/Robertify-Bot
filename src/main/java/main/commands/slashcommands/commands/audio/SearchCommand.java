@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -106,7 +106,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+    public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -128,7 +128,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith("searchresult:")) return;
 
         String[] split = event.getComponentId().split(":");
@@ -145,14 +145,14 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         GuildVoiceState voiceState = guild.getSelfMember().getVoiceState();
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
-        if (!memberVoiceState.inAudioChannel()) {
+        if (!memberVoiceState.inVoiceChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this!").build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (voiceState.inAudioChannel() && (!voiceState.getChannel().equals(memberVoiceState.getChannel()))) {
+        if (voiceState.inVoiceChannel() && (!voiceState.getChannel().equals(memberVoiceState.getChannel()))) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this!").build())
                     .setEphemeral(true)
                     .queue();
@@ -170,7 +170,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
         if (!event.getButton().getId().startsWith("searchresult:")) return;
 
         String[] split = event.getButton().getId().split(":");
