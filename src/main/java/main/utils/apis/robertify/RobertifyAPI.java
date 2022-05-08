@@ -25,7 +25,7 @@ public class RobertifyAPI {
     public RobertifyAPI(String masterPassword) {
         this.webUtils = WebUtils.ins;
         this.masterPassword = masterPassword;
-        this.uri = new URIBuilder("https://api.robertify.me/").build();
+        this.uri = new URIBuilder("https://api.robertify.me").build();
         this.accessToken = getAccessToken();
     }
 
@@ -71,5 +71,18 @@ public class RobertifyAPI {
                 guildObj.getJSONObject("server_id"),
                 guildObj.getJSONArray("banned_users")
         );
+    }
+
+    @SneakyThrows
+    public void postCommandInfo(JSONObject commandInfo) {
+        Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
+                .addHeader("auth-token", accessToken)
+                .post(RequestBody.create(
+                        MediaType.get("application/json"),
+                        commandInfo.toString()
+                ))
+                .build()).execute();
+
+        System.out.println(response.body().string());
     }
 }

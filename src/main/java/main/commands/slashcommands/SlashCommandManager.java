@@ -114,7 +114,8 @@ public class SlashCommandManager {
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
                 new ShardInfoCommand(),
-                new SendAlertCommand()
+                new SendAlertCommand(),
+                new PostCommandInfoCommand()
         );
     }
 
@@ -203,5 +204,24 @@ public class SlashCommandManager {
                 .filter(cmd -> cmd.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public CommandType getCommandType(AbstractSlashCommand command) {
+        if (isMusicCommand(command))
+            return CommandType.MUSIC;
+        if (isManagementCommand(command))
+            return CommandType.MANAGEMENT;
+        if (isMiscCommand(command))
+            return CommandType.MISCELLANEOUS;
+        if (isUtilityCommand(command))
+            return CommandType.UTILITY;
+        return null;
+    }
+
+    public enum CommandType {
+        MUSIC,
+        MANAGEMENT,
+        MISCELLANEOUS,
+        UTILITY
     }
 }
