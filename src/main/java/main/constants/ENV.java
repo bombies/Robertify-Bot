@@ -24,16 +24,23 @@ public enum ENV {
     MONGO_HOSTNAME("mongo_hostname"),
     MONGO_CLUSTER_NAME("mongo_cluster_name"),
     MONGO_DATABASE_NAME("mongo_database_name"),
+
     POSTGRES_USERNAME("postgres_username"),
     POSTGRES_PASSWORD("postgres_password"),
     POSTGRES_HOST("postgres_host"),
     POSTGRES_PORT("postgres_port"),
+
+    REDIS_HOSTNAME("redis_hostname"),
+    REDIS_PORT("redis_port"),
+    REDIS_PASSWORD("redis_password"),
+
     TOP_GG_TOKEN("top_gg_token"),
     DBL_TOKEN("dbl_token"),
     VOTE_REMINDER_CHANCE("vote_reminder_chance"),
     PAPISID("youtube_papisid"),
     PSID("youtube_psid"),
 
+    ROBERTIFY_API_HOSTNAME("robertify_api_hostname"),
     ROBERTIFY_API_PASSWORD("robertify_api_master_password");
 
     private final String str;
