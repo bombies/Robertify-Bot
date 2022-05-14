@@ -48,6 +48,6 @@ public class ThemesConfig extends AbstractGuildConfig {
             object.put(ThemesConfigField.THEME.toString(), RobertifyTheme.GREEN.name().toLowerCase());
         }
 
-        getCache().updateCache(Document.parse(object.toString()));
+        getCache().updateCache(String.valueOf(gid), Document.parse(object.toString()));
     }
 }

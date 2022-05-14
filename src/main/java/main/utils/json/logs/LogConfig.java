@@ -49,7 +49,7 @@ public class LogConfig extends AbstractGuildConfig {
         if (!guildObject.has(Field.LOG_CHANNEL.name().toLowerCase()))
             guildObject.put(Field.LOG_CHANNEL.name().toLowerCase(), -1L);
 
-        getCache().updateCache(Document.parse(guildObject.toString()));
+        getCache().updateCache(String.valueOf(gid), Document.parse(guildObject.toString()));
     }
 
     public enum Field {

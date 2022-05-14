@@ -87,6 +87,10 @@ public class GuildRedisCache extends AbstractRedisCache {
         }
     }
 
+    public void unloadGuild(long gid) {
+        del(gid);
+    }
+
     public void loadAllGuilds() {
         logger.debug("Attempting to load all guilds");
         getCollection().find().forEach(document -> {

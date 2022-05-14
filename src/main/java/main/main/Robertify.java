@@ -26,6 +26,7 @@ import main.utils.apis.robertify.RobertifyAPI;
 import main.utils.apis.robertify.models.RobertifyGuild;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -193,7 +194,7 @@ public class Robertify {
             logger.info("Initialized all caches");
 
             new ChangeLogConfig().initConfig();
-            GuildDBCache.getInstance().loadAllGuilds();
+            GuildRedisCache.getInstance().loadAllGuilds();
             logger.info("All guilds have been loaded into cache");
 
             shardManager = jdaBuilder.build();

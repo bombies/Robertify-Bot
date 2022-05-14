@@ -8,6 +8,7 @@ import main.constants.Database;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.database.mongodb.cache.GuildDBCache;
+import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.database.mongodb.databases.BotDB;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.GenericJSONField;
@@ -57,7 +58,7 @@ public abstract class AbstractMongoDatabase {
 
     public static void initAllCaches() {
         BotBDCache.initCache();
-        GuildDBCache.initCache();
+        GuildRedisCache.initCache();
         FavouriteTracksCache.initCache();
 //        StatisticsDB.INSTANCE.init();
 

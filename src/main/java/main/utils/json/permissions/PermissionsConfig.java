@@ -230,6 +230,6 @@ public class PermissionsConfig extends AbstractGuildConfig {
                     .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
         }
 
-        getCache().updateCache(Document.parse(object.toString()));
+        getCache().updateCache(String.valueOf(gid), Document.parse(object.toString()));
     }
 }

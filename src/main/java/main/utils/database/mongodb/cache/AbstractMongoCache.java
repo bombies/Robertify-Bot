@@ -23,7 +23,7 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
     private MongoCollection<Document> collection;
     private JSONObject cache;
 
-    AbstractMongoCache(AbstractMongoDatabase mongoDB) {
+    protected AbstractMongoCache(AbstractMongoDatabase mongoDB) {
         super(mongoDB);
         this.mongoDB = mongoDB;
         this.collection = mongoDB.getCollection();
@@ -147,7 +147,7 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
         return cache.getJSONArray(CacheField.DOCUMENTS.toString());
     }
 
-    enum CacheField implements GenericJSONField {
+    public enum CacheField implements GenericJSONField {
         DOCUMENTS("documents"),
         GUILD_ID("guild_id"),
         ID("_id");

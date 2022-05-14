@@ -181,7 +181,7 @@ public class TogglesConfig extends AbstractGuildConfig {
             }
         }
 
-        getCache().updateCache(Document.parse(object.toString()));
+        getCache().updateCache(String.valueOf(gid), Document.parse(object.toString()));
     }
 
     public JSONObject getDefaultToggleObject() {
@@ -202,10 +202,10 @@ public class TogglesConfig extends AbstractGuildConfig {
 
     private void getTogglesObject(JSONObject toggleObj, Toggles toggle) {
         if (!toggleObj.has(toggle.toString()))
-        switch (toggle) {
-            case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
-            default -> toggleObj.put(toggle.toString(), true);
-        }
+            switch (toggle) {
+                case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(toggle.toString(), false);
+                default -> toggleObj.put(toggle.toString(), true);
+            }
 
         if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
             var djTogglesObj = new JSONObject();
