@@ -223,7 +223,7 @@ public class Robertify {
             String masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
             if (masterPassword != null)
                 if (!masterPassword.isBlank() && !masterPassword.isEmpty())
-                    robertifyAPI = new RobertifyAPI(masterPassword);
+                    robertifyAPI = new RobertifyAPI();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }

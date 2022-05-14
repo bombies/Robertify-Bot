@@ -1,6 +1,8 @@
 package main.utils.apis.robertify;
 
 import lombok.SneakyThrows;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.apis.robertify.models.RobertifyGuild;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.MediaType;
@@ -22,10 +24,10 @@ public class RobertifyAPI {
     private final String accessToken;
 
     @SneakyThrows
-    public RobertifyAPI(String masterPassword) {
+    public RobertifyAPI() {
         this.webUtils = WebUtils.ins;
-        this.masterPassword = masterPassword;
-        this.uri = new URIBuilder("https://api.robertify.me").build();
+        this.masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
+        this.uri = new URIBuilder(Config.get(ENV.ROBERTIFY_API_HOSTNAME)).build();
         this.accessToken = getAccessToken();
     }
 
