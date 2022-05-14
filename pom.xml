@@ -102,11 +102,6 @@
             <artifactId>Lavalink-Client</artifactId>
             <version>525f6f094ef47ddc4bc8a381e4bce398ec7e9c37</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.DuncteBot</groupId>-->
-<!--            <artifactId>Lavalink-Client</artifactId>-->
-<!--            <version>c84fe187ebb6275127c4e79a91fa6430f9d68358</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>org.discordbots</groupId>
             <artifactId>DBL-Java-Library</artifactId>
@@ -149,18 +144,8 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>com.github.freyacodes</groupId>-->
-<!--                <artifactId>Lavalink-Client</artifactId>-->
-<!--                <exclusions>-->
-<!--                    <exclusion>-->
-<!--                        <groupId>com.sedmelluq</groupId>-->
-<!--                        <artifactId>lavaplayer</artifactId>-->
-<!--                    </exclusion>-->
-<!--                </exclusions>-->
-<!--            </dependency>-->
             <dependency>
-                <groupId>com.github.DuncteBot</groupId>
+                <groupId>com.github.freyacodes</groupId>
                 <artifactId>Lavalink-Client</artifactId>
                 <exclusions>
                     <exclusion>
