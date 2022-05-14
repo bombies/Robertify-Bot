@@ -1,20 +1,25 @@
 package main.utils.database.mongodb.cache.redis;
 
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.json.AbstractJSON;
 import org.json.JSONObject;
 import redis.clients.jedis.JedisPooled;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AbstractRedisCache {
+public class AbstractRedisCache extends AbstractMongoDatabase implements AbstractJSON {
 
     private static AbstractRedisCache instance;
     private final String cacheID;
+    private final AbstractMongoDatabase mongoDB;
     private final JedisPooled jedis;
 
-    protected AbstractRedisCache(String cacheID) {
+    protected AbstractRedisCache(String cacheID, AbstractMongoDatabase mongoDB) {
+        super(mongoDB);
         this.cacheID = cacheID + "#";
         this.jedis = RedisDB.getInstance().getJedis();
+        this.mongoDB = mongoDB;
     }
 
     public void hsetJSON(String identifier, HashMap<String, JSONObject> hash) {
@@ -47,7 +52,20 @@ public class AbstractRedisCache {
         setex(identifier, seconds, value.toString());
     }
 
+    public void setex(long identifier, int seconds, JSONObject value) {
+        setex(String.valueOf(identifier), seconds, value.toString());
+    }
+
     public String get(String identifier) {
         return jedis.get(cacheID + identifier);
+    }
+
+    public String get(long identifier) {
+        return get(String.valueOf(identifier));
+    }
+
+    @Override
+    public void init() {
+        mongoDB.init();
     }
 }
