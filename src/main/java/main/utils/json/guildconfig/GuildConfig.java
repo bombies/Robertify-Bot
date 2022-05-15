@@ -114,7 +114,8 @@ public class GuildConfig extends AbstractGuildConfig {
         if (isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user is already banned!");
 
-        final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildDB.Field.BANNED_USERS_ARRAY);
+        final var guildObj = getCache().getGuildInfo(gid);
+        final JSONArray bannedUsers = guildObj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString());
 
         bannedUsers.put(new JSONObject()
                 .put(GuildDB.Field.BANNED_USER.toString(), uid)
@@ -123,7 +124,7 @@ public class GuildConfig extends AbstractGuildConfig {
                 .put(GuildDB.Field.BANNED_UNTIL.toString(), bannedUntil)
         );
 
-        getCache().setField(gid, GuildDB.Field.BANNED_USERS_ARRAY, bannedUsers);
+        getCache().updateGuild(guildObj);
     }
 
     public void unbanUser(long gid, long uid) {
@@ -133,10 +134,11 @@ public class GuildConfig extends AbstractGuildConfig {
         if (!isBannedUser(gid, uid))
             throw new IllegalArgumentException("This user isn't banned!");
 
-        final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildDB.Field.BANNED_USERS_ARRAY);
+        final var guildObj = getCache().getGuildInfo(gid);
+        final JSONArray bannedUsers = guildObj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString());
         bannedUsers.remove(getIndexOfObjectInArray(bannedUsers, GuildDB.Field.BANNED_USER, uid));
 
-        getCache().setField(gid, GuildDB.Field.BANNED_USERS_ARRAY, bannedUsers);
+        getCache().updateGuild(guildObj);
     }
 
     public long getTimeUntilUnban(long gid, long uid) {

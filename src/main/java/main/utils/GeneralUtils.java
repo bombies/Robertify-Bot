@@ -7,12 +7,15 @@ import main.constants.RobertifyEmoji;
 import main.constants.TimeFormat;
 import main.main.Config;
 import main.main.Robertify;
+import main.utils.json.GenericJSONField;
 import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -582,6 +585,18 @@ public class GeneralUtils {
 
     public static <T> boolean equalsAny(T obj, T[] arr) {
         return Arrays.asList(arr).contains(obj);
+    }
+
+    public static long getID(JSONObject obj, GenericJSONField field) {
+        return getID(obj, field.toString());
+    }
+
+    public static long  getID(JSONObject obj, String field) {
+        try {
+            return obj.getLong(field);
+        } catch (JSONException e) {
+            return Long.parseLong(obj.getString(field));
+        }
     }
 
     public enum Mentioner {

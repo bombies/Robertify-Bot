@@ -95,7 +95,8 @@ public class GuildDB extends AbstractMongoDatabase {
             TOGGLES_LOGS(Toggles.TogglesConfigField.LOG_TOGGLES.toString()),
         EIGHT_BALL_ARRAY("eight_ball"),
         THEME("theme"),
-        TWENTY_FOUR_SEVEN("twenty_four_seven_mode");
+        TWENTY_FOUR_SEVEN("twenty_four_seven_mode"),
+        LOG_CHANNEL("log_channel");
 
         private final String str;
 

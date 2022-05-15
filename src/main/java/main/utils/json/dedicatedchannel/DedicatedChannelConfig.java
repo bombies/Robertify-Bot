@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 
@@ -78,8 +79,15 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized boolean isChannelSet(long gid) {
-        return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
-                .getLong(GuildDB.Field.DEDICATED_CHANNEL_ID.toString()) != -1;
+        try {
+            return getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                    .getLong(GuildDB.Field.DEDICATED_CHANNEL_ID.toString()) != -1;
+        } catch (JSONException e) {
+            if (e.getMessage().contains("is not a ")) {
+                return !getGuildObject(gid).getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString())
+                        .getString(GuildDB.Field.DEDICATED_CHANNEL_ID.toString()).equals("-1");
+            } else throw e;
+        }
     }
 
     public synchronized long getChannelID(long gid) {

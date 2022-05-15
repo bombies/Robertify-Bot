@@ -69,7 +69,6 @@ public class AbstractMongoCache extends AbstractMongoDatabase implements Abstrac
             collectionArr.remove(getIndexOfObjectInArray(collectionArr, id));
         } catch (NullPointerException e) {
             BsonObjectId bsonDocument = addDocument(document);
-            System.out.println(bsonDocument.toString());
         }
         collectionArr.put(new JSONObject(document.toJson()));
 

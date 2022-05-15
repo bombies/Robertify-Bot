@@ -21,6 +21,12 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
         return cache.getGuildInfo(gid);
     }
 
+    public JSONObject getGuildObject(String gid) {
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
+        return cache.getGuildInfo(gid);
+    }
+
     public static void initCache() {
         logger.debug("Instantiating Abstract Guild cache");
         cache = GuildRedisCache.getInstance();
@@ -30,7 +36,15 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
         return cache.guildHasInfo(gid);
     }
 
+    public boolean guildHasInfo(String gid) {
+        return cache.guildHasInfo(gid);
+    }
+
     public void loadGuild(long gid) {
+        cache.loadGuild(gid);
+    }
+
+    public void loadGuild(String gid) {
         cache.loadGuild(gid);
     }
 

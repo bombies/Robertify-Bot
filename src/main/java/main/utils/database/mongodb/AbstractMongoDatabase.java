@@ -107,17 +107,25 @@ public abstract class AbstractMongoDatabase {
         upsertManyDocuments(documents);
     }
 
+    protected void upsertDocument(Document oldDoc, Document doc) {
+        if (oldDoc == null)
+            throw new NullPointerException("There is no document to be updated!");
+
+        collection.deleteOne(oldDoc);
+        collection.insertOne(doc);
+    }
+
     protected void upsertDocument(Document doc) {
-        ObjectId id = doc.getObjectId("_id");
+        var id = doc.getObjectId("_id");
+        Document oldDoc = collection.find(eq("_id", id)).first();
+        if (oldDoc == null)
+            throw new NullPointerException("There is no document to be updated!");
 
-        Document oldDoc = null;
-        for (var document : collection.find())
-            if (document.getObjectId("_id").equals(id))
-                oldDoc = document;
-
-        if (oldDoc != null)
-            removeDocument(oldDoc);
-        addDocument(doc);
+        Bson[] updatesArr = doc.keySet().stream().map(key -> Updates.set(key, doc.get(key)))
+                .toList()
+                .toArray(new Bson[doc.keySet().size()]);
+        Bson updates = Updates.combine(updatesArr);
+        collection.updateOne(oldDoc, updates, new UpdateOptions().upsert(true));
     }
 
     protected void upsertDocument(String key, Object value, Document doc) {

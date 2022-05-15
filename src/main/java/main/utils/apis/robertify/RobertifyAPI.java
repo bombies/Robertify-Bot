@@ -84,7 +84,5 @@ public class RobertifyAPI {
                         commandInfo.toString()
                 ))
                 .build()).execute();
-
-        System.out.println(response.body().string());
     }
 }

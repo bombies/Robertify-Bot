@@ -29,7 +29,6 @@ public class AutoPlayConfig extends AbstractGuildConfig {
 
         if (!guildObject.has(Field.AUTOPLAY.name().toLowerCase()))
             guildObject.put(Field.AUTOPLAY.name().toLowerCase(), false);
-
         getCache().updateCache(String.valueOf(gid), Document.parse(guildObject.toString()));
     }
 

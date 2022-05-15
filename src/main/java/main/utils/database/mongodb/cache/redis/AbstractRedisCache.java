@@ -3,6 +3,7 @@ package main.utils.database.mongodb.cache.redis;
 import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.utils.GeneralUtils;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractJSON;
@@ -78,7 +79,7 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
     }
 
     void del(String identifier) {
-        jedis.del(identifier);
+        jedis.del(cacheID + identifier);
     }
 
     void del(long identifier) {
@@ -88,6 +89,13 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
     @Override
     public void init() {
         mongoDB.init();
+    }
+
+    @SneakyThrows
+    public void updateCache(String identifier, Document oldDoc,  Document document) {
+        jedis.del(identifier);
+        jedis.setex(cacheID + identifier, 3600, documentToJSON(document));
+        upsertDocument(oldDoc, document);
     }
 
     @SneakyThrows
@@ -117,14 +125,6 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
         updateCache(obj, identifier.toString(), identifierValue);
     }
 
-    public void updateGuild(JSONObject obj, long gid) {
-        updateCache(obj, GuildDB.Field.GUILD_ID, gid);
-    }
-
-    public void updateGuild(JSONObject obj) {
-        updateCache(obj, GuildDB.Field.GUILD_ID, obj.getLong(GuildDB.Field.GUILD_ID.toString()));
-    }
-
     public <T> void updateCache(JSONObject obj, String identifier, T identifierValue) {
         if (!obj.has(identifier))
             throw new IllegalArgumentException("The JSON object must have the identifier passed!");
@@ -134,7 +134,7 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
         if (document == null)
             throw new NullPointerException("There was no document found with that identifier value!");
 
-        updateCache(identifierValue.toString(), Document.parse(obj.toString()));
+        updateCache(identifierValue.toString(), document, Document.parse(obj.toString()));
     }
 
     public JSONObject getCacheJSON(String identifier) {

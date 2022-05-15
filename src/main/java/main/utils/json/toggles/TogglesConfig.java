@@ -25,10 +25,14 @@ public class TogglesConfig extends AbstractGuildConfig {
         try {
             return getTogglesObject(guild.getIdLong()).getBoolean(toggle.toString());
         } catch (JSONException e) {
-            JSONObject togglesObject = getTogglesObject(guild.getIdLong());
-            togglesObject.put(toggle.toString(), true);
-            getCache().setField(guild.getIdLong(), GuildDB.Field.TOGGLES_OBJECT, togglesObject);
-            return true;
+            if (e.getMessage().contains("is not a")) {
+                return getTogglesObject(guild.getId()).getBoolean(toggle.toString());
+            } else {
+                JSONObject togglesObject = getTogglesObject(guild.getIdLong());
+                togglesObject.put(toggle.toString(), true);
+                getCache().setField(guild.getIdLong(), GuildDB.Field.TOGGLES_OBJECT, togglesObject);
+                return true;
+            }
         }
     }
 
@@ -154,6 +158,9 @@ public class TogglesConfig extends AbstractGuildConfig {
         }
     }
 
+    private JSONObject getTogglesObject(String gid) {
+        return getGuildObject(gid).getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString());
+    }
     private JSONObject getTogglesObject(long gid) {
         return getGuildObject(gid).getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString());
     }
