@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>4.2.2</version>
+  <version>4.3.0-ALPHA.1</version>
   <build>
     <plugins>
       <plugin>
@@ -159,7 +159,7 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>com.github.DuncteBot</groupId>
+        <groupId>com.github.freyacodes</groupId>
         <artifactId>Lavalink-Client</artifactId>
         <exclusions>
           <exclusion>

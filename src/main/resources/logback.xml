@@ -6,10 +6,27 @@
         </encoder>
     </appender>
 
+    <!-- Configure the Console appender -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Configure the Sentry appender, overriding the logging threshold to the WARN level -->
+    <appender name="Sentry" class="io.sentry.logback.SentryAppender">
+        <options>
+            <!-- NOTE: Replace the test DSN below with YOUR OWN DSN to see the events from this app in your Sentry project/dashboard -->
+            <dsn>https://cb26168d57e14b4fa06552350c99ab5c@o1249306.ingest.sentry.io/6409774</dsn>
+        </options>
+    </appender>
+
     <logger name="org.mongodb.driver" level="WARN" additivity="true"/>
 
     <root level="info">
         <appender-ref ref="STDOUT" />
+<!--        <appender-ref ref="Console" />-->
+        <appender-ref ref="Sentry" />
     </root>
 <!--    <root level="debug">-->
 <!--        <appender-ref ref="STDOUT" />-->

@@ -5,6 +5,7 @@ import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import io.sentry.Sentry;
 import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
@@ -224,6 +225,11 @@ public class Robertify {
             if (masterPassword != null)
                 if (!masterPassword.isBlank() && !masterPassword.isEmpty())
                     robertifyAPI = new RobertifyAPI();
+
+            Sentry.init(options -> {
+                options.setDsn(Config.get(ENV.SENTRY_DSN));
+                options.setTracesSampleRate(1.0);
+            });
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
