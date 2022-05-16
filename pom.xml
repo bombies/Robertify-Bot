@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>4.3.0-ALPHA.1</version>
+    <version>4.3.0-ALPHA.2</version>
 
     <dependencies>
         <dependency>
