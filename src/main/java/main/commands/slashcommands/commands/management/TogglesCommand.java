@@ -330,7 +330,8 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                                                         OptionType.STRING,
                                                                         "toggle",
                                                                         "The DJ toggle to switch",
-                                                                        true
+                                                                        true,
+                                                                        Toggles.toList()
                                                                 )
                                                         )
                                                 )

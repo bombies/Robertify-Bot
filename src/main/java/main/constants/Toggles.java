@@ -3,6 +3,7 @@ package main.constants;
 import main.utils.json.GenericJSONField;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public enum Toggles implements GenericJSONField {
@@ -65,10 +66,9 @@ public enum Toggles implements GenericJSONField {
     }
 
     public static List<String> toList() {
-        final List<String> ret = new ArrayList<>();
-        for (final var toggle : Toggles.values())
-            ret.add(toggle.toString());
-        return ret;
+        return Arrays.stream(Toggles.values())
+                .map(Toggles::parseToggle)
+                .toList();
     }
 
     public enum TogglesConfigField implements GenericJSONField {
