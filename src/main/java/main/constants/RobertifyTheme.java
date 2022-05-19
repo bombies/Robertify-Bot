@@ -5,17 +5,17 @@ import net.dv8tion.jda.api.entities.Emoji;
 import java.awt.*;
 
 public enum RobertifyTheme {
-    GREEN("https://i.imgur.com/ZFsTohQ.png", "https://i.imgur.com/oqVpzpV.png", "https://i.imgur.com/7vZpP2B.png", Emoji.fromMarkdown("<:robertifygreen2:933027476555309056>"), Color.decode("#2ce629")),
-    RED("https://i.imgur.com/kPEgTan.png", "https://i.imgur.com/krfEYJP.png", "https://i.imgur.com/XRRcWJr.png", Emoji.fromMarkdown("<:robertifyred2:933027476660170783>"), Color.decode("#e62929")),
-    GOLD("https://i.imgur.com/W6DLRII.png", "https://i.imgur.com/tPfRDTN.png", "https://i.imgur.com/wdOp9qS.png", Emoji.fromMarkdown("<:robertifygold2:933027476739854366>"), Color.decode("#ffac38")),
-    PINK("https://i.imgur.com/sWia6Qj.png", "https://i.imgur.com/jirfaxT.png", "https://i.imgur.com/hkr4gDW.png", Emoji.fromMarkdown("<:robertifypink2:933027476639211570>"), Color.decode("#f159ff")),
-    PURPLE("https://i.imgur.com/lHsH4qL.png", "https://i.imgur.com/XZ0dsEg.png", "https://i.imgur.com/09Vgk7E.png", Emoji.fromMarkdown("<:robertifypurple2:933027476534341722>"), Color.decode("#8900de")),
-    BLUE("https://i.imgur.com/PkFNv8I.png", "https://i.imgur.com/EMPuJOU.png", "https://i.imgur.com/stJW754.png", Emoji.fromMarkdown("<:robertifyblue2:933027476752441374>"), Color.decode("#2b59ff")),
-    LIGHT_BLUE("https://i.imgur.com/aS3RAfF.png", "https://i.imgur.com/IAN6WSf.png", "https://i.imgur.com/gsCGnY4.png", Emoji.fromMarkdown("<:robertifylightblue2:933027476748259328>"), Color.decode("#2bd8ff")),
-    ORANGE("https://i.imgur.com/huYU6mh.png", "https://i.imgur.com/klJLrBn.png", "https://i.imgur.com/rWt38F3.png", Emoji.fromMarkdown("<:robertifyorange2:933027476672765982>"), Color.decode("#f25500")),
-    YELLOW("https://i.imgur.com/VSaar3x.png", "https://i.imgur.com/rGYC1TZ.png", "https://i.imgur.com/ZJVB0XJ.png", Emoji.fromMarkdown("<:robertifyyellow2:933027476723093514>"), Color.decode("#ffea2b")),
-    DARK("https://i.imgur.com/E81mGZT.png", "https://i.imgur.com/IRdVcCV.png", "https://i.imgur.com/Bc113Dl.png", Emoji.fromMarkdown("<:robertifydark:938828978268024873>"), Color.decode("#0f0f0f")),
-    LIGHT("https://i.imgur.com/uahL1T4.png", "https://i.imgur.com/um6vgvQ.png", "https://i.imgur.com/2LjgJ33.png", Emoji.fromMarkdown("<:robertifylight:938828978251239435>"), Color.decode("#f0f0f0"));
+    GREEN("https://i.robertify.me/images/oczhg.png", "https://i.robertify.me/images/n27zq.jpg", "https://i.robertify.me/images/syy1c.jpg", Emoji.fromMarkdown("<:robertify:976955890542465044>"), Color.decode("#2ce629")),
+    RED("https://i.robertify.me/images/unfss.png", "https://i.robertify.me/images/63ee9.jpg", "https://i.robertify.me/images/pexs2.jpg", Emoji.fromMarkdown("<:robertify_red:976955889850388540>"), Color.decode("#e62929")),
+    GOLD("https://i.robertify.me/images/yn5av.png", "https://i.robertify.me/images/x9vcp.jpg", "https://i.robertify.me/images/pl6on.jpg", Emoji.fromMarkdown("<:robertify_gold:976955889481318470>"), Color.decode("#ffac38")),
+    PINK("https://i.robertify.me/images/a35q9.png", "https://i.robertify.me/images/38azv.jpg", "https://i.robertify.me/images/fgq3m.jpg", Emoji.fromMarkdown("<:robertify_pink:976955889707794512>"), Color.decode("#f159ff")),
+    PURPLE("https://i.robertify.me/images/dx0zs.png", "https://i.robertify.me/images/klbwb.jpg", "https://i.robertify.me/images/a2s47.jpg", Emoji.fromMarkdown("<:robertify_purple:976955889682616400>"), Color.decode("#8900de")),
+    BLUE("https://i.robertify.me/images/5w9i8.png", "https://i.robertify.me/images/2tjlh.jpg", "https://i.robertify.me/images/v25jt.jpg", Emoji.fromMarkdown("<:robertify_blue:976955889342898296>"), Color.decode("#2b59ff")),
+    LIGHT_BLUE("https://i.robertify.me/images/bbk4r.png", "https://i.robertify.me/images/98c80.jpg", "https://i.robertify.me/images/6tqvn.jpg", Emoji.fromMarkdown("<:robertify_light_blue:976955890068516924>"), Color.decode("#2bd8ff")),
+    ORANGE("https://i.robertify.me/images/3svnd.png", "https://i.robertify.me/images/3lczl.jpg", "https://i.robertify.me/images/56fg5.jpg", Emoji.fromMarkdown("<:robertify_orange:976955889632305152>"), Color.decode("#f25500")),
+    YELLOW("https://i.robertify.me/images/xmct0.png", "https://i.robertify.me/images/szkz9.jpg", "https://i.robertify.me/images/sly4k.jpg", Emoji.fromMarkdown("<:robertify_yellow:976955889829421126>"), Color.decode("#ffea2b")),
+    DARK("https://i.robertify.me/images/4p6mu.png", "https://i.robertify.me/images/zu0il.jpg", "https://i.robertify.me/images/ql9ef.jpg", Emoji.fromMarkdown("<:robertify_dark:976955890001403954>"), Color.decode("#0f0f0f")),
+    LIGHT("https://i.robertify.me/images/n57oz.png", "https://i.robertify.me/images/wr7td.jpg", "https://i.robertify.me/images/q3rwh.jpg", Emoji.fromMarkdown("<:robertify_light:976955889934290964>"), Color.decode("#f0f0f0"));
 
     private final String transparent;
     private final String idleChannel;

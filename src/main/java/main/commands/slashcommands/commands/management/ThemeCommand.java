@@ -147,7 +147,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
         final var optionSelected = event.getSelectedOptions();
         final RobertifyTheme theme = RobertifyTheme.parse(optionSelected.get(0).getValue().split(":")[1].toLowerCase());
         new ThemesConfig().setTheme(guild.getIdLong(), theme);
-        String msg = "The theme has been set to **" + theme.name().toUpperCase() + "**";
+        String msg = "The theme has been set to **" + theme.name().toUpperCase().replaceAll("_", " ") + "**";
 
         GeneralUtils.setDefaultEmbed(guild);
 

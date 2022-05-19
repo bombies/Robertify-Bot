@@ -145,6 +145,8 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
             return;
         }
 
+        event.deferReply().queue();
+
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
                     var theme = new ThemesConfig().getTheme(guild.getIdLong());
@@ -160,7 +162,6 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                     eb.setImage(theme.getIdleBanner());
                     eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-
                     textChannel.sendMessage("**__Queue:__**\nJoin a voice channel and start playing songs!").setEmbeds(eb.build())
                             .queue(message -> {
                                 dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
@@ -171,13 +172,13 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                                     dediChannelConfig.updateMessage(guild);
 
                                 try {
-                                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully created your " +
+                                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully created your " +
                                             "requests channel in: " + textChannel.getAsMention()).build())
                                             .setEphemeral(false)
                                             .queue();
                                 } catch (InsufficientPermissionException e) {
                                     if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have setup the requests channel!" +
+                                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have setup the requests channel!" +
                                                         "\nCheck the top of your channel list.").build())
                                                 .queue();
                                     else e.printStackTrace();
