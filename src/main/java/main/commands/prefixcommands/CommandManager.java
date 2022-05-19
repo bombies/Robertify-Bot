@@ -135,12 +135,10 @@ public class CommandManager {
                 new DeveloperCommand(),
                 new ViewConfigCommand(),
                 new EvalCommand(),
-                new ChangeLogCommand(),
                 new GuildCommand(),
                 new NodeInfoCommand(),
                 new RandomMessageCommand(),
                 new ReloadConfigCommand(),
-                new AnnouncementCommand(),
                 new HostInfoCommand(),
                 new StatisticsCommand(),
 

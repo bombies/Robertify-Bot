@@ -50,7 +50,7 @@ public class Listener extends ListenerAdapter {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
             unloadCommands(g);
-            unloadDevCommands(g, "voicechannelcount");
+//            unloadDevCommands(g, "");
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 

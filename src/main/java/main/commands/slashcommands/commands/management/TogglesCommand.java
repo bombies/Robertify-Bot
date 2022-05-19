@@ -89,25 +89,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **ON**");
                     }
                 }
-                case "changelog", "4" -> {
-                    if (config.getToggle(guild, Toggles.ANNOUNCE_CHANGELOGS)) {
-                        config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **OFF**");
-                    } else {
-                        config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **ON**");
-                    }
-                }
-                case "globalannouncements", "5" -> {
-                    if (config.getToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS)) {
-                        config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **OFF**");
-                    } else {
-                        config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **ON**");
-                    }
-                }
-                case "requester", "6" -> {
+                case "requester", "4" -> {
                     if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **OFF**");
@@ -116,7 +98,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **ON**");
                     }
                 }
-                case "8ball", "7" -> {
+                case "8ball", "5" -> {
                     if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                         config.setToggle(guild, Toggles.EIGHT_BALL, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **OFF**");
@@ -125,7 +107,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **ON**");
                     }
                 }
-                case "polls", "poll", "8" -> {
+                case "polls", "poll", "6" -> {
                     if (config.getToggle(guild, Toggles.POLLS)) {
                         config.setToggle(guild, Toggles.POLLS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **OFF**");
@@ -134,7 +116,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
                     }
                 }
-                case "tips", "9" -> {
+                case "tips", "7" -> {
                     if (config.getToggle(guild, Toggles.TIPS)) {
                         config.setToggle(guild, Toggles.TIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **OFF**");
@@ -143,7 +125,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
                     }
                 }
-                case "voteskips", "voteskip", "vs", "10" -> {
+                case "voteskips", "voteskip", "vs", "8" -> {
                     if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                         config.setToggle(guild, Toggles.VOTE_SKIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **OFF**");
@@ -431,25 +413,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **ON**");
                         }
                     }
-                    case "changelog", "4" -> {
-                        if (config.getToggle(guild, Toggles.ANNOUNCE_CHANGELOGS)) {
-                            config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **OFF**");
-                        } else {
-                            config.setToggle(guild, Toggles.ANNOUNCE_CHANGELOGS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing changelogs **ON**");
-                        }
-                    }
-                    case "globalannouncements", "5" -> {
-                        if (config.getToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS)) {
-                            config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **OFF**");
-                        } else {
-                            config.setToggle(guild, Toggles.GLOBAL_ANNOUNCEMENTS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled global announcements **ON**");
-                        }
-                    }
-                    case "requester", "6" -> {
+                    case "requester", "4" -> {
                         if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                             config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **OFF**");
@@ -458,7 +422,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **ON**");
                         }
                     }
-                    case "8ball", "7" -> {
+                    case "8ball", "5" -> {
                         if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                             config.setToggle(guild, Toggles.EIGHT_BALL, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **OFF**");
@@ -467,7 +431,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **ON**");
                         }
                     }
-                    case "polls", "poll", "8" -> {
+                    case "polls", "poll", "6" -> {
                         if (config.getToggle(guild, Toggles.POLLS)) {
                             config.setToggle(guild, Toggles.POLLS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **OFF**");
@@ -476,7 +440,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
                         }
                     }
-                    case "tips", "9" -> {
+                    case "tips", "7" -> {
                         if (config.getToggle(guild, Toggles.TIPS)) {
                             config.setToggle(guild, Toggles.TIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **OFF**");
@@ -485,7 +449,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
                         }
                     }
-                    case "voteskips", "voteskip", "vs", "10" -> {
+                    case "voteskips", "voteskip", "vs", "8" -> {
                         if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                             config.setToggle(guild, Toggles.VOTE_SKIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **OFF**");
