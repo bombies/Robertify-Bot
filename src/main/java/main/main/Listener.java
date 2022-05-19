@@ -46,6 +46,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
+        DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
 
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
@@ -55,7 +56,6 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
             if (dedicatedChannelConfig.isChannelSet(g.getIdLong())) {
                 dedicatedChannelConfig.updateMessage(g);
             }
