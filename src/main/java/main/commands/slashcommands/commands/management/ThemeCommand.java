@@ -45,14 +45,19 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
                 .setRange(1, 1)
                 .addOptions(
                         SelectMenuOption.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
+                        SelectMenuOption.of("Mint", "themes:mint", RobertifyTheme.MINT.getEmoji()),
                         SelectMenuOption.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
                         SelectMenuOption.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
+                        SelectMenuOption.of("Pastel Red", "themes:pastel_red", RobertifyTheme.PASTEL_RED.getEmoji()),
                         SelectMenuOption.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
                         SelectMenuOption.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
+                        SelectMenuOption.of("Pastel Purple", "themes:pastel_purple", RobertifyTheme.PASTEL_PURPLE.getEmoji()),
                         SelectMenuOption.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
                         SelectMenuOption.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
+                        SelectMenuOption.of("Baby Blue", "themes:baby_blue", RobertifyTheme.BABY_BLUE.getEmoji()),
                         SelectMenuOption.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
                         SelectMenuOption.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                        SelectMenuOption.of("Pastel Yellow", "themes:pastel_yellow", RobertifyTheme.PASTEL_YELLOW.getEmoji()),
                         SelectMenuOption.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
                         SelectMenuOption.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
                 )
