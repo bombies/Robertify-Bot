@@ -17,7 +17,7 @@ public class LavaNode {
     }
 
     public URI getURI() {
-        return URI.create("ws://" + host + ":" + port);
+        return URI.create("ws://" + host + ((!port.isEmpty() && !port.isBlank()) ? ":" + port : ""));
     }
 
     @Override
