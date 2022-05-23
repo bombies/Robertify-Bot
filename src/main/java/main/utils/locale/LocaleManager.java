@@ -51,7 +51,6 @@ public class LocaleManager {
         File localeFile = new File("./locale/messages." + locale.getCode().toLowerCase() + ".yml");
 
         if (!localeFile.exists()) {
-            localeFile.createNewFile();
             logger.error("There was no information found in the file for locale: " + locale.getCode().toUpperCase());
             createLocaleFile();
             System.exit(-1);
