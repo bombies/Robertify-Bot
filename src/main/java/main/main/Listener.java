@@ -12,6 +12,9 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocale;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
@@ -49,6 +52,12 @@ public class Listener extends ListenerAdapter {
         DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
 
         for (Guild g : jda.getGuildCache()) {
+            LocaleManager localeManager = LocaleManager.getLocaleManager(g.getIdLong());
+            logger.info(localeManager.getMessage(RobertifyLocaleMessage.HELLO));
+            logger.info(localeManager.getMessage(RobertifyLocaleMessage.GOODBYE));
+            localeManager.setLocale(RobertifyLocale.SPANISH);
+            logger.info(localeManager.getMessage(RobertifyLocaleMessage.HELLO));
+
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
             unloadCommands(g);

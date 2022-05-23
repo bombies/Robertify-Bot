@@ -1,5 +1,6 @@
 package main.utils;
 
+import lombok.SneakyThrows;
 import main.constants.Permission;
 import main.constants.BotConstants;
 import main.constants.ENV;
@@ -406,6 +407,33 @@ public class GeneralUtils {
         FileWriter writer = new FileWriter(passedFile.getPath(), false);
         writer.write(content);
         writer.close();
+    }
+
+    @SneakyThrows
+    public static void appendFileContent(File file, String content) {
+        setFileContent(file, getFileContent(file.getPath()) + content);
+    }
+
+    public static boolean fileExists(String path) {
+        return Files.exists(Path.of(path));
+    }
+
+    public static boolean fileExists(File file) {
+        return file.exists();
+    }
+
+    public static boolean directoryExists(String path) {
+        return fileExists(path);
+    }
+
+    @SneakyThrows
+    public static void createDirectory(String path) {
+        Files.createDirectory(Path.of(path));
+    }
+
+    @SneakyThrows
+    public static void createFile(String path) {
+        Files.createFile(Path.of(path));
     }
 
     public static void setDefaultEmbed(Guild guild) {
