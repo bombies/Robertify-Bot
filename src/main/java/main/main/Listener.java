@@ -52,12 +52,6 @@ public class Listener extends ListenerAdapter {
         DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
 
         for (Guild g : jda.getGuildCache()) {
-            LocaleManager localeManager = LocaleManager.getLocaleManager(g.getIdLong());
-            logger.info(localeManager.getMessage(RobertifyLocaleMessage.HELLO));
-            logger.info(localeManager.getMessage(RobertifyLocaleMessage.GOODBYE));
-            localeManager.setLocale(RobertifyLocale.SPANISH);
-            logger.info(localeManager.getMessage(RobertifyLocaleMessage.HELLO));
-
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             loadNeededSlashCommands(g);
             unloadCommands(g);
