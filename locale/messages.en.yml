@@ -16,8 +16,10 @@ cant_join_channel: "I can't join that channel!"
 restricted_to_join: "I am restricted to only join\n{channels}"
 restricted_toggled_no_channels: "Restricted voice channels have been toggled **ON**, but there aren't any set!"
 insufficient_perms: "You do not have enough permissions to execute this!\n\nYou need: `{permissions}`"
+self_insufficient_perms: "I do not have enough permissions to execute this request!"
 dj_only: "You must be a DJ to run this command!"
 nothing_playing: "There is nothing playing!"
+nothing_in_queue: "There is nothing in the queue."
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -29,7 +31,7 @@ filter_toggle_message: "You have turned **{status}** the **{filter}** filter"
 filter_toggle_log_message: "has turned the {filter} filter {status}"
 
 # CLEAR QUEUE MESSAGES
-nothing_in_queue: "There is already nothing in the queue."
+cq_nothing_in_queue: "There is already nothing in the queue."
 dj_perms_needed: "You need to be a DJ to use this command when there's other users in the channel!"
 queue_cleared_user: "has cleared the queue"
 queue_clear: "The queue was cleared!"
@@ -80,3 +82,46 @@ queue_loop_stop: "The current queue will no longer be looped!"
 queue_loop_start: "The current queue will now be looped!"
 queue_loop_nothing: "There is nothing in the queue to repeat"
 queue_loop_log: "{user} has {status} the queue"
+
+# LYRICS MESSAGES
+lyrics_source_not_supported: "This command is only supported by Spotify/Deezer tracks!"
+lyrics_searching: "Now looking for `{query}`"
+lyrics_nothing_found: "Nothing was found for `{query}`"
+lyrics_embed_title: "{title} by {author}"
+lyrics_now_searching: "Now searching..."
+
+# MOVE MESSAGES
+invalid_song_id: "That isn't a valid song id."
+invalid_position_id: "That isn't a valid position id."
+couldnt_move: "Could not move track with id `{id}` in the queue"
+moved_log: "{user} has moved `{title} by {author}` to position `{position}`"
+moved: "Moved `{title} by {author}` to position `{position}`."
+
+# NOW PLAYING MESSAGES
+np_lofi_title: "Lo-Fi Music"
+np_embed_title: "{title} by {author}"
+np_requester: "~ Requested by {requester}"
+np_livestream: "📺 **[Livestream]**"
+np_time_left: "⌚  **Time left**: `{time}`"
+np_author: "Now Playing"
+
+# PAUSE MESSAGES
+paused: "You have paused the music"
+paused_log: "{user} has paused the music"
+resumed: "You have resumed the music"
+resumed_log: "{user} has resumed the music"
+
+# PLAY MESSAGES
+missing_args: "You must provide the name or link of a song to play!"
+missing_file: "You must attach an audio file to play!"
+local_dir_err: "Something went wrong when attempting to create a local audio directory. Contact the developers immediately!"
+file_download_err: "Something went wrong when attempting to download the file. Contact the developers immediately!"
+invalid_file: "Invalid file."
+
+# PREVIOUS TRACKS
+no_prev_tracks: "There are no tracks played previously"
+playing_prev_track: "Now playing the previous tracks!"
+prev_track_log: "{user} has started to play the previous track"
+
+# QUEUE MESSAGES
+queue_entry: "**#{id}.** {title} - {author} `[{duration}]`"

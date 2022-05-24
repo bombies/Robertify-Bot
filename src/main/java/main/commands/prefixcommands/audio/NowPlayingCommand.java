@@ -13,10 +13,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,17 +48,17 @@ public class NowPlayingCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
             return eb;
         }
 
@@ -64,31 +67,32 @@ public class NowPlayingCommand implements ICommand {
         AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         AudioTrackInfo info = track.getInfo();
 
         double progress = (double)audioPlayer.getTrackPosition() / track.getInfo().length;
-        Filters filters = audioPlayer.getFilters();
+        final Filters filters = audioPlayer.getFilters();
         final String requester = RobertifyAudioManager.getRequester(guild, track);
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
-                ? "Lo-Fi Music"
+                ? localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LOFI_TITLE)
                         :
-                info.title + " by "  + info.author),
+                localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_EMBED_TITLE, Pair.of("{title}", info.title), Pair.of("{author}", info.author))),
 
                 (((new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER))) && requester != null ?
-                        "\n\n~ Requested by " + requester
+                        "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_REQUESTER, Pair.of("{requester}", requester))
                         :
                         "") +
                 "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
                         (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "" : (
                 GeneralUtils.progressBar(guild, channel, progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().length) +"]`") + "\n\n" +
                 (info.isStream ?
-                        "📺 **[Livestream]**\n"
+                        localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LIVESTREAM) + "\n"
                                 :
-                        "⌚  **Time left**: `"+ GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()) + "`\n") +
+                        localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_TIME_LEFT, Pair.of("{time}", GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()))) + "`\n") +
 
                 "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
@@ -97,7 +101,7 @@ public class NowPlayingCommand implements ICommand {
             case "deezer" -> eb.setThumbnail(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier)));
         }
 
-        eb.setAuthor("Now Playing", GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
+        eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_AUTHOR), GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent());
 
         return eb;
     }

@@ -6,12 +6,14 @@ import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 
@@ -32,17 +34,17 @@ public class PauseCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
             return eb;
         }
 
@@ -50,20 +52,20 @@ public class PauseCommand implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         if (audioPlayer.isPaused()) {
             audioPlayer.setPaused(false);
             musicManager.setForcePaused(false);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!");
-            new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, memberVoiceState.getMember().getAsMention() + " has resumed the music");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.RESUMED);
+            new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         } else {
             audioPlayer.setPaused(true);
             musicManager.setForcePaused(true);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You have paused the music!");
-            new LogUtils().sendLog(guild, LogType.PLAYER_PAUSE, memberVoiceState.getMember().getAsMention() + " has paused the music");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.PAUSED);
+            new LogUtils().sendLog(guild, LogType.PLAYER_PAUSE, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         }
 
         return eb;

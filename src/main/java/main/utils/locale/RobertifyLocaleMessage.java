@@ -23,8 +23,10 @@ public enum RobertifyLocaleMessage {
         RESTRICTED_TO_JOIN,
         RESTRICTED_TOGGLED_NO_CHANNELS,
         INSUFFICIENT_PERMS,
+        SELF_INSUFFICIENT_PERMS,
         DJ_ONLY,
-        NOTHING_PLAYING
+        NOTHING_PLAYING,
+        NOTHING_IN_QUEUE
     }
 
     public enum RandomMessages implements LocaleMessage {
@@ -39,7 +41,7 @@ public enum RobertifyLocaleMessage {
     }
 
     public enum ClearQueueMessages implements LocaleMessage {
-        NOTHING_IN_QUEUE,
+        CQ_NOTHING_IN_QUEUE,
         DJ_PERMS_NEEDED,
         QUEUE_CLEARED_USER,
         QUEUE_CLEAR
@@ -98,6 +100,56 @@ public enum RobertifyLocaleMessage {
         QUEUE_LOOP_LOG
     }
 
+    public enum LyricsMessages implements LocaleMessage {
+        LYRICS_SOURCE_NOT_SUPPORTED,
+        LYRICS_SEARCHING,
+        LYRICS_NOW_SEARCHING,
+        LYRICS_NOTHING_FOUND,
+        LYRICS_EMBED_TITLE
+    }
+
+    public enum MoveMessages implements LocaleMessage {
+        INVALID_SONG_ID,
+        INVALID_POSITION_ID,
+        COULDNT_MOVE,
+        MOVED_LOG,
+        MOVED
+    }
+
+    public enum NowPlayingMessages implements LocaleMessage {
+        NP_LOFI_TITLE,
+        NP_EMBED_TITLE,
+        NP_REQUESTER,
+        NP_LIVESTREAM,
+        NP_TIME_LEFT,
+        NP_AUTHOR,
+    }
+
+    public enum PauseMessages implements LocaleMessage {
+        PAUSED,
+        PAUSED_LOG,
+        RESUMED,
+        RESUMED_LOG
+    }
+
+    public enum PlayMessages implements LocaleMessage {
+        MISSING_ARGS,
+        MISSING_FILE,
+        LOCAL_DIR_ERR,
+        FILE_DOWNLOAD_ERR,
+        INVALID_FILE
+    }
+
+    public enum PreviousTrackMessages implements LocaleMessage {
+        NO_PREV_TRACKS,
+        PLAYING_PREV_TRACK,
+        PREV_TRACK_LOG
+    }
+
+    public enum QueueMessages implements LocaleMessage {
+        QUEUE_ENTRY
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -110,6 +162,13 @@ public enum RobertifyLocaleMessage {
         ret.put(JumpMessages.class, JumpMessages.values());
         ret.put(LofiMessages.class, LofiMessages.values());
         ret.put(LoopMessages.class, LoopMessages.values());
+        ret.put(LyricsMessages.class, LyricsMessages.values());
+        ret.put(MoveMessages.class, MoveMessages.values());
+        ret.put(NowPlayingMessages.class, NowPlayingMessages.values());
+        ret.put(PauseMessages.class, PauseMessages.values());
+        ret.put(PlayMessages.class, PlayMessages.values());
+        ret.put(PreviousTrackMessages.class, PreviousTrackMessages.values());
+        ret.put(QueueMessages.class, QueueMessages.values());
         return ret;
     }
 }

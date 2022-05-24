@@ -7,12 +7,16 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -35,24 +39,30 @@ public class QueueCommand implements ICommand {
             return;
         }
 
-        sendQueue(queue, ctx.getChannel(), ctx.getAuthor());
+        sendQueue(ctx.getGuild(), queue, ctx.getChannel(), ctx.getAuthor());
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
-    private void sendQueue(ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {
+    private void sendQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
-        List<String> content = getContent(queue, trackList);
+        List<String> content = getContent(guild, queue, trackList);
 
         Pages.paginateMessage(channel, user, content, 10);
     }
 
-    public List<String> getContent(ConcurrentLinkedQueue<AudioTrack> queue, List<AudioTrack> trackList) {
+    public List<String> getContent(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, List<AudioTrack> trackList) {
         List<String> content = new ArrayList<>();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);
             final AudioTrackInfo info = track.getInfo();
-            content.add("**#"+(i+1)+".** "+info.title+" - "+info.author+" `["+ GeneralUtils.formatTime(track.getInfo().length)+"]`");
+            content.add(localeManager.getMessage(RobertifyLocaleMessage.QueueMessages.QUEUE_ENTRY,
+                    Pair.of("{id}", String.valueOf(i+1)),
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author),
+                    Pair.of("{duration}", GeneralUtils.formatTime(track.getInfo().length))
+            ));
         }
         return content;
     }

@@ -11,11 +11,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.genius.GeniusAPI;
 import main.utils.genius.GeniusSongSearch;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,21 +44,21 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
         if (args.isEmpty()) {
             if (!memberVoiceState.inVoiceChannel()) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
                 return;
             }
 
             if (!selfVoiceState.inVoiceChannel()) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to use this command")
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
                 return;
             }
 
             if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as I am to use this command")
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)
                                 .build())
                         .queue();
                 return;
@@ -67,13 +69,13 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
 
             if (playingTrack == null) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!").build())
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING).build())
                         .queue();
                 return;
             }
 
             if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify tracks!").build())
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SOURCE_NOT_SUPPORTED).build())
                         .queue();
                 return;
             }
@@ -85,7 +87,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
         }
 
         AtomicReference<String> finalQuery = new AtomicReference<>(query);
-        ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `"+query+"`").build())
+        ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SEARCHING, Pair.of("{query}", query)).build())
                 .queue(lookingMsg -> {
 
                     GeniusAPI geniusAPI = new GeniusAPI();
@@ -98,13 +100,13 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                     }
 
                     if (songSearch.getStatus() == 403) {
-                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have permission to execute this request!").build())
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS).build())
                                 .queue();
                         return;
                     }
 
                     if (songSearch.getStatus() == 404 || songSearch.getHits().size() == 0) {
-                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `"+ finalQuery +"`").build())
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_NOTHING_FOUND, Pair.of("{query}", finalQuery.get())).build())
                                 .queue();
                         return;
                     }
@@ -114,15 +116,18 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
                     try {
 
-                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(),
-                                                lyrics)
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_EMBED_TITLE,
+                                                lyrics, Pair.of("{title}", hit.getTitle()), Pair.of("{author}", hit.getArtist().getName())
+                                        )
                                         .setThumbnail(hit.getImageUrl())
                                         .build())
                                 .queue();
                     } catch (IllegalArgumentException e) {
                         final int numOfChars = lyrics.length();
 
-                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(), lyrics.substring(0, 4096)).build())
+                        lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_EMBED_TITLE,
+                                            lyrics.substring(0, 4096), Pair.of("{title}", hit.getTitle()), Pair.of("{author}", hit.getArtist().getName())
+                                        ).build())
                                 .queue();
 
                         int i = 4096;
@@ -201,7 +206,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
         if (event.getOption("song") == null) {
             if (!memberVoiceState.inVoiceChannel()) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .setEphemeral(true)
                         .queue();
@@ -209,7 +214,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             }
 
             if (!selfVoiceState.inVoiceChannel()) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to use this command")
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)
                                 .build())
                         .setEphemeral(true)
                         .queue();
@@ -217,7 +222,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             }
 
             if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as I am to use this command")
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)
                                 .build())
                         .setEphemeral(true)
                         .queue();
@@ -229,14 +234,14 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             final AudioTrack playingTrack = audioPlayer.getPlayingTrack();
 
             if (playingTrack == null) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING).build())
                         .setEphemeral(true)
                         .queue();
                 return;
             }
 
             if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command is only supported by Spotify/Deezer tracks!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SOURCE_NOT_SUPPORTED).build())
                         .setEphemeral(true)
                         .queue();
                 return;
@@ -248,10 +253,10 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
             query = event.getOption("song").getAsString();
         }
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now searching...").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_NOW_SEARCHING).build())
                 .queue(x -> {
                     AtomicReference<String> finalQuery = new AtomicReference<>(query);
-                    event.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `"+query+"`").build())
+                    event.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SEARCHING, Pair.of("{query}", query)).build())
                             .queue(lookingMsg -> {
                                 GeniusAPI geniusAPI = new GeniusAPI();
                                 GeniusSongSearch songSearch;
@@ -263,13 +268,13 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                                 }
 
                                 if (songSearch.getStatus() == 403) {
-                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have permission to execute this request!").build())
+                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS).build())
                                             .queue();
                                     return;
                                 }
 
                                 if (songSearch.getStatus() == 404 || songSearch.getHits().size() == 0) {
-                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `"+ finalQuery +"`").build())
+                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_NOTHING_FOUND, Pair.of("{query}", finalQuery.get())).build())
                                             .queue();
                                     return;
                                 }
@@ -279,15 +284,18 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
                                 try {
 
-                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(),
-                                                            lyrics)
+                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_EMBED_TITLE,
+                                                            lyrics, Pair.of("{title}", hit.getTitle()), Pair.of("{author}", hit.getArtist().getName())
+                                                    )
                                                     .setThumbnail(hit.getImageUrl())
                                                     .build())
                                             .queue();
                                 } catch (IllegalArgumentException e) {
                                     final int numOfChars = lyrics.length();
 
-                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, hit.getTitle() + " by " + hit.getArtist().getName(), lyrics.substring(0, 4096)).build())
+                                    lookingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_EMBED_TITLE,
+                                                    lyrics.substring(0, 4096), Pair.of("{title}", hit.getTitle()), Pair.of("{author}", hit.getArtist().getName())
+                                            ).build())
                                             .queue();
 
                                     int i = 4096;

@@ -9,12 +9,14 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -39,16 +41,16 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to execute this command!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (previouslyPlayedTracks.size() == 0)
-            return RobertifyEmbedUtils.embedMessage(guild, "There are no tracks played previously");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.NO_PREV_TRACKS);
 
         if (audioPlayer.getPlayingTrack() != null) {
             final var nowPlayingTrack = audioPlayer.getPlayingTrack();
@@ -61,9 +63,9 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
         if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
 
-        new LogUtils().sendLog(guild, LogType.TRACK_PREVIOUS, memberVoiceState.getMember().getAsMention() + " has started to play the previous track");
+        new LogUtils().sendLog(guild, LogType.TRACK_PREVIOUS, RobertifyLocaleMessage.PreviousTrackMessages.PREV_TRACK_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
 
-        return RobertifyEmbedUtils.embedMessage(guild, "Now playing the previous track!");
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.PLAYING_PREV_TRACK);
     }
 
     @Override

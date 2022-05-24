@@ -9,8 +9,12 @@ import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -18,6 +22,7 @@ import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +55,9 @@ public class PlayCommand implements ICommand {
 
             if (player.isPaused()) {
                 player.setPaused(false);
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have resumed the music!").build())
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.RESUMED).build())
                         .queue();
+                new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
                 return;
             } else if (
                     ctx.getEvent().getMessage().getContentRaw()
@@ -61,13 +67,14 @@ public class PlayCommand implements ICommand {
             ) {
                 if (player.getPlayingTrack() != null) {
                     player.setPaused(true);
-                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have paused the music!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.PAUSED).build())
                             .queue();
+                    new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
                     return;
                 }
             }
 
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the name or link of a song to play!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.MISSING_ARGS);
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -76,32 +83,33 @@ public class PlayCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build())
                     .queue();
             return;
         } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(ctx.getGuild(), Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+                final var localeManager = LocaleManager.getLocaleManager(guild);
                 if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                                     (!restrictedChannelsConfig.getRestrictedChannels(
-                                            ctx.getGuild().getIdLong(),
+                                            guild.getIdLong(),
                                             RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                     ).isEmpty()
                                             ?
-                                            "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
-                                                    ctx.getGuild().getIdLong(),
+                                            localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
+                                                    guild.getIdLong(),
                                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                                            )
+                                            )))
                                             :
-                                            "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                            localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL)
                                     )
                             ).build())
                             .queue();
@@ -114,7 +122,7 @@ public class PlayCommand implements ICommand {
             final List<Message.Attachment> attachments = msg.getAttachments();
 
             if (attachments.isEmpty()) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must attach an audio file to play!").build())
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.MISSING_FILE).build())
                         .queue();
                 return;
             }
@@ -144,7 +152,7 @@ public class PlayCommand implements ICommand {
 
         String finalLink = link;
         boolean finalAddToBeginning = addToBeginning;
-        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
+        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
                     .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, addingMsg, finalAddToBeginning);
         }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
@@ -158,8 +166,7 @@ public class PlayCommand implements ICommand {
                     try {
                         Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
                     } catch (Exception e) {
-                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to create a " +
-                                        "local audio directory. Contact the developers immediately!").build())
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.LOCAL_DIR_ERR).build())
                                 .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                 .queue();
 
@@ -181,22 +188,21 @@ public class PlayCommand implements ICommand {
                                         logger.error("[FATAL ERROR] Error when trying to create a new audio file!", e);
                                     }
 
-                                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
+                                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
                                         RobertifyAudioManager.getInstance()
                                                 .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
                                     });
                                 })
                                 .exceptionally(e -> {
                                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
-                                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
-                                                    "download the file. Contact the developers immediately!").build())
+                                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
                                             .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                             .queue();
                                     return null;
                                 });
                     } else {
                         File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
-                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding to queue...").build()).queue(addingMsg -> {
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
                             RobertifyAudioManager.getInstance()
                                     .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
                         }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
@@ -204,13 +210,12 @@ public class PlayCommand implements ICommand {
                     }
                 } catch (IllegalArgumentException e) {
                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
-                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Something went wrong when attempting to " +
-                                    "download the file. Contact the developers immediately!").build())
+                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
                             .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                             .queue();
                 }
             }
-            default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid file.").build())
+            default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.INVALID_FILE).build())
                     .queue();
         }
     }

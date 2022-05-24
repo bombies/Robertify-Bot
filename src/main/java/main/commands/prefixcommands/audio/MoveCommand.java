@@ -10,11 +10,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -65,15 +67,15 @@ public class MoveCommand implements ICommand {
         GeneralUtils.setCustomEmbed(guild, "Queue");
 
         if (queue.isEmpty())
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (id <= 0 || id > trackList.size()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That isn't a valid song id.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.INVALID_SONG_ID);
             return eb;
         } else if (position <= 0 || position > trackList.size()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "That isn't a valid position id.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.INVALID_POSITION_ID);
             return eb;
         }
 
@@ -83,7 +85,7 @@ public class MoveCommand implements ICommand {
         prevList.add(position-1, trackList.get(id-1));
         if (!queue.addAll(prevList)) {
             queue.addAll(trackList);
-            return RobertifyEmbedUtils.embedMessage(guild, "Could not move track with id "+id+" in the queue");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.COULDNT_MOVE, Pair.of("{id}", String.valueOf(id)));
         }
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
@@ -91,9 +93,18 @@ public class MoveCommand implements ICommand {
 
         AudioTrackInfo info = trackList.get(id - 1).getInfo();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_MOVE, mover.getAsMention() + " has moved `"+info.title+" by "+info.author+"` to position `"+position+"`");
-        return RobertifyEmbedUtils.embedMessage(guild, "Moved `"+ info.title
-                +"` to position `"+position+"`.");
+        new LogUtils().sendLog(guild, LogType.TRACK_MOVE,
+                RobertifyLocaleMessage.MoveMessages.MOVED_LOG,
+                Pair.of("{user}", mover.getAsMention()),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author),
+                Pair.of("{position}", String.valueOf(position))
+        );
+        return RobertifyEmbedUtils.embedMessage(guild,
+                RobertifyLocaleMessage.MoveMessages.MOVED,
+                Pair.of("{title}", info.title),
+                Pair.of("{position}", String.valueOf(position))
+        );
     }
 
     @Override
