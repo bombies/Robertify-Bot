@@ -5,14 +5,18 @@ import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.autoplay.AutoPlayConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 
 public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
+
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var msg = ctx.getMessage();
@@ -21,16 +25,16 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
     }
 
     public MessageEmbed handleAutoPlay(Guild guild) {
-//        return RobertifyEmbedUtils.embedMessage(guild, "Autoplay is not accessible at the moment!").build();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         AutoPlayConfig autoPlayConfig = new AutoPlayConfig();
 
         if (autoPlayConfig.getStatus(guild.getIdLong())) {
             autoPlayConfig.setStatus(guild.getIdLong(), false);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **OFF**!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.GENERAL_TOGGLE_MESSAGE, Pair.of("{toggle}", "autoplay"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase()))).build();
         } else {
             autoPlayConfig.setStatus(guild.getIdLong(), true);
-            return RobertifyEmbedUtils.embedMessage(guild, "You have toggled autoplay **ON**!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.GENERAL_TOGGLE_MESSAGE, Pair.of("{toggle}", "autoplay"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase()))).build();
         }
     }
 

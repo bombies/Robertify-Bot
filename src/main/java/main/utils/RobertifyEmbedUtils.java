@@ -1,8 +1,11 @@
 package main.utils;
 
 import main.main.Robertify;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.LocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
@@ -27,8 +30,28 @@ public class RobertifyEmbedUtils {
         return getDefaultEmbed(guild.getIdLong()).setDescription(message);
     }
 
+    public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message));
+    }
+
+    public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message, Pair<String, String>... placeholders) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message, placeholders));
+    }
+
     public static EmbedBuilder embedMessageWithTitle(Guild guild, String title, String message) {
         return getDefaultEmbed(guild.getIdLong()).setTitle(title).setDescription(message);
+    }
+
+    public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, LocaleMessage message) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message));
+    }
+
+    public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, LocaleMessage message, Pair<String, String>... placeholders) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message, placeholders));
     }
 
     private static EmbedBuilder getDefaultEmbed(long gid) {

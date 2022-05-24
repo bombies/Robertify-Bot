@@ -1,2 +1,50 @@
-hello: "Hello there!"
-goodbye: "Fill me out!"
+# GENERAL MESSAGES
+on_status: "on"
+off_status: "off"
+voice_channel_needed: "I must be in a voice channel in order for this command to work!"
+same_voice_channel: "You must be in the same voice channel as me to use this command"
+same_voice_channel_loc: "You must be in the same voice channel as me to use this command\n\nI am currently in: {channel}"
+general_toggle_message: "You have toggled {toggle} **{status}**"
+no_voice_channel: "The bot isn't in a voice channel."
+must_be_playing: "I must be playing music in order for this command to work!"
+unexpected_error: "An unexpected error occurred!\nPlease run the `support` command to join our support server and query the issue."
+id_gt_zero: "The ID **must** be greater than zero!"
+id_out_of_bounds: "That ID is out of bounds!"
+cant_join_channel: "I can't join that channel!"
+restricted_to_join: "I am restricted to only join\n{channels}"
+restricted_toggled_no_channels: "Restricted voice channels have been toggled **ON**, but there aren't any set!"
+
+# RANDOM MESSAGES
+no_random_messages: "There are no random messages!"
+tip_title: "✨ Robertify Tip"
+tip_footer: "You can toggle tips by running \"toggle tips\""
+
+# FILTER MESSAGES
+filter_toggle_message: "You have turned **{status}** the **{filter}** filter"
+filter_toggle_log_message: "has turned the {filter} filter {status}"
+
+# CLEAR QUEUE MESSAGES
+nothing_in_queue: "There is already nothing in the queue."
+dj_perms_needed: "You need to be a DJ to use this command when there's other users in the channel!"
+queue_cleared_user: "has cleared the queue"
+queue_clear: "The queue was cleared!"
+
+# DISCONNECT MESSAGES
+not_in_channel: "I'm already not in a voice channel!"
+disconnected_user: "has disconnected the bot."
+disconnected: "Disconnected!"
+
+# FAVOURITE TRACK MESSAGES
+ft_missing_id: "You must provide the ID of your favourite track to remove!"
+ft_invalid_id: "You must provide a valid integer as an ID!"
+ft_invalid_source: "The track from this source cannot be added as a favourite track!"
+fav_track_added: "You have added `{title} by {author}` as a favourite track!"
+fav_track_removed: "You have removed `{title} by {author}` as a favourite track!"
+no_fav_tracks: "You do not have any favourite tracks!"
+fav_tracks_cleared: "You have cleared all your favourite tracks"
+ft_select_menu_option: "{title} by {author}"
+ft_adding_to_queue: "Adding that track to queue!"
+ft_adding_to_queue_2: "Adding to queue..."
+ft_embed_title: "⭐ {user}'s Favourite Tracks"
+ft_embed_footer: "Select the song from the options below to add it the to the queue | {tracks} tracks"
+ft_embed_description: "*The tracks on this page are*\n\n"

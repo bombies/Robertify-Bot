@@ -5,10 +5,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public class DisconnectSlashCommand extends AbstractSlashCommand {
@@ -41,23 +44,24 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
         EmbedBuilder eb;
 
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-        Guild guild = event.getGuild();
+        final Guild guild = event.getGuild();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "I'm already not in a voice channel!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.NOT_IN_CHANNEL));
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention())));
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention())));
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
@@ -65,9 +69,9 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         musicManager.leave();
-        new LogUtils().sendLog(guild, LogType.BOT_DISCONNECTED, event.getUser().getAsMention() + " has disconnected the bot.");
+        new LogUtils().sendLog(guild, LogType.BOT_DISCONNECTED, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED_USER));
 
-        eb = RobertifyEmbedUtils.embedMessage(guild, "Disconnected!");
+        eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED));
         event.getHook().sendMessageEmbeds(eb.build()).queue();
     }
 }

@@ -7,6 +7,8 @@ import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -20,14 +22,16 @@ public class RandomMessageManager {
     private static double chance = Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE));
 
     public MessageEmbed getMessage(Guild guild) {
+        LocaleManager localeManager = LocaleManager.getLocaleManager(guild);
+
         List<String> messages = BotBDCache.getInstance().getRandomMessages();
 
         if (messages.isEmpty())
-            throw new NullPointerException("There are no random messages!");
+            throw new NullPointerException(localeManager.getMessage(RobertifyLocaleMessage.RandomMessages.NO_RANDOM_MESSAGES));
 
         return RobertifyEmbedUtils.embedMessage(guild, messages.get(new Random().nextInt(messages.size())))
-                .setTitle("✨ Robertify Tip")
-                .setFooter("You can toggle tips by running \"toggle tips\"")
+                .setTitle(localeManager.getMessage(RobertifyLocaleMessage.RandomMessages.TIP_TITLE))
+                .setFooter(localeManager.getMessage(RobertifyLocaleMessage.RandomMessages.TIP_FOOTER))
                 .setTimestamp(Instant.now())
                 .build();
     }

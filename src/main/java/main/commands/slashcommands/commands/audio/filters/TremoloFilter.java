@@ -8,8 +8,11 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -23,36 +26,43 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
         final var filters = audioPlayer.getFilters();
         final var selfMember = ctx.getSelfMember();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         if (!selfMember.getVoiceState().inVoiceChannel()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
                     .queue();
             return;
         }
 
         GuildVoiceState memberVoiceState = ctx.getMember().getVoiceState();
         if (!memberVoiceState.inVoiceChannel()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfMember.getVoiceState().getChannel())) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .queue();
             return;
         }
 
         if (filters.getTremolo() != null) {
             filters.setTremolo(null).commit();
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **off** the **Tremolo** filter").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Tremolo"))
+                    ).build())
                     .queue();
-            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Tremolo filter off");
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
         } else {
             filters.setTremolo(new Tremolo()).commit();
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **on** the **Tremolo** filter").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Tremolo"))
+                    ).build())
                     .queue();
-            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " has turned the Tremolo filter on");
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
         }
     }
 
@@ -98,9 +108,10 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
         final var filters = audioPlayer.getFilters();
         final var selfMember = guild.getSelfMember();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         if (!selfMember.getVoiceState().inVoiceChannel()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel in order for this command to work!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -108,14 +119,14 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
 
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         if (!memberVoiceState.inVoiceChannel()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfMember.getVoiceState().getChannel())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -123,14 +134,21 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
 
         if (filters.getTremolo() != null) {
             filters.setTremolo(null).commit();
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **off** the **Tremolo** filter").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Tremolo"))
+                    ).build())
                     .queue();
-            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " has turned the Tremolo filter off");
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+
         } else {
             filters.setTremolo(new Tremolo()).commit();
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have turned **on** the **Tremolo** filter").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Tremolo"))
+                    ).build())
                     .queue();
-            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " has turned the Tremolo filter on");
+            new LogUtils().sendLog(guild, LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
         }
     }
 }

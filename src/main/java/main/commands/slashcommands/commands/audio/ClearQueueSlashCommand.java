@@ -7,6 +7,8 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -41,11 +43,12 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
         final var guild = event.getGuild();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         GeneralUtils.setCustomEmbed(event.getGuild(), "Queue");
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is already nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.NOTHING_IN_QUEUE));
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
@@ -55,22 +58,22 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         if (selfVoiceState.inVoiceChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!musicCommandDJCheck(event)) {
-                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be a DJ to use this command when there's other users in the channel!");
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.DJ_PERMS_NEEDED));
                     event.getHook().sendMessageEmbeds(eb.build()).queue();
                     return;
                 }
             }
         } else {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The bot isn't in a voice channel.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL));
             event.getHook().sendMessageEmbeds(eb.build()).queue();
             return;
         }
 
         queue.clear();
-        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " has cleared the queue");
+        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
 
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEAR));
         event.getHook().sendMessageEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed(event.getGuild());
