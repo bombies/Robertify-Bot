@@ -3,6 +3,7 @@ package main.commands.slashcommands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +39,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_ONLY).build())
                     .queue();
             return;
         }
@@ -48,7 +49,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
             event.getHook().sendMessageEmbeds(new LofiCommand().handleLofi(guild, event.getMember(), event.getTextChannel()))
                     .queue();
         } catch (IllegalArgumentException e) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Enabling Lo-Fi mode...").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLING).build())
                     .queue(botMsg -> {
                         LofiCommand.getLofiEnabledGuilds().add(guild.getIdLong());
                         LofiCommand.getAnnounceLofiMode().add(guild.getIdLong());

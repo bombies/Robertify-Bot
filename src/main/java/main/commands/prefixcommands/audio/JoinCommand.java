@@ -7,7 +7,10 @@ import main.constants.Toggles;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 
@@ -26,45 +29,46 @@ public class JoinCommand implements ICommand {
 
     public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
         if (!memberVoiceState.inVoiceChannel()) {
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this command")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                     .build();
         }
 
-        VoiceChannel channel = (VoiceChannel) memberVoiceState.getChannel();
+        VoiceChannel channel = memberVoiceState.getChannel();
 
         if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
             final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            final var localeManager = LocaleManager.getLocaleManager(guild);
             if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), channel.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                return RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
+                return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                         (!restrictedChannelsConfig.getRestrictedChannels(
                                 guild.getIdLong(),
                                 RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                         ).isEmpty()
                                 ?
-                        "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
-                                guild.getIdLong(),
-                                RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                        )
+                                localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
+                                        guild.getIdLong(),
+                                        RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
+                                )))
                                 :
-                                "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL)
                         )
                 ).build();
             }
         }
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var placeholderPair = Pair.of("{channel}", channel.getAsMention());
 
         if (memberVoiceState.getChannel() == selfVoiceState.getChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "I am already in " + channel.getAsMention() + " !").build();
-
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.ALREADY_JOINED, placeholderPair).build();
         try {
             RobertifyAudioManager.getInstance()
                     .joinVoiceChannel(textChannel, channel, musicManager);
         } catch (IllegalStateException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "I can't join " + channel.getAsMention() + " since there's no one in the channel!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.CANT_JOIN, placeholderPair)
                     .build();
         }
-        return RobertifyEmbedUtils.embedMessage(guild, "I have joined " + channel.getAsMention()).build();
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.JOINED, placeholderPair).build();
     }
 
     @Override

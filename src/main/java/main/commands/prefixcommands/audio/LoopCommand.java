@@ -11,9 +11,11 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -47,7 +49,7 @@ public class LoopCommand implements ICommand {
         if (ctx.getArgs().get(0).equalsIgnoreCase("queue") || ctx.getArgs().get(0).equalsIgnoreCase("q")) {
             eb = handleQueueRepeat(musicManager, ctx.getAuthor());
         } else {
-            eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Invalid arguments!");
+            eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), RobertifyLocaleMessage.GeneralMessages.INVALID_ARGS);
         }
         msg.replyEmbeds(eb.build()).queue();
     }
@@ -57,27 +59,27 @@ public class LoopCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
             return eb;
         }
 
         if (audioPlayer.getPlayingTrack() == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is no song playing. I can't repeat nothing.");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_NOTHING_PLAYING);
             return eb;
         }
 
         if (audioPlayer.getPlayingTrack() == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is no song playing. I can't repeat nothing.");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_NOTHING_PLAYING);
             return eb;
         }
 
@@ -91,20 +93,28 @@ public class LoopCommand implements ICommand {
         final var scheduler = musicManager.getScheduler();
 
         if (player.getPlayingTrack() == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
         EmbedBuilder eb;
 
         AudioTrackInfo info = player.getPlayingTrack().getInfo();
         if (scheduler.repeating) {
             scheduler.repeating = false;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.title + "` will no longer be looped!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
         } else {
             scheduler.repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + info.title + "` will now be looped");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
         }
 
-        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.repeating ? "looped" : "unlooped")+" `"+info.title+" by "+info.author+"`");
+        new LogUtils().sendLog(
+                guild,
+                LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
+                Pair.of("{user}", looper.getAsMention()),
+                Pair.of("{status}", (scheduler.repeating ? "looped" : "unlooped")),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+
+        );
 
         return eb;
     }
@@ -118,29 +128,29 @@ public class LoopCommand implements ICommand {
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;
             scheduler.removeSavedQueue(guild);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "The current queue will no longer be repeated!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
         } else {
             scheduler.playlistRepeating = true;
 
             if (audioPlayer.getPlayingTrack() == null) {
-                eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing currently playing!");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
                 return eb;
             }
 
             AudioTrack thisTrack = audioPlayer.getPlayingTrack();
 
             if (scheduler.queue.isEmpty()) {
-                eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue to repeat!\n");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_NOTHING);
                 return eb;
             }
 
             scheduler.addToBeginningOfQueue(thisTrack);
             scheduler.setSavedQueue(guild, scheduler.queue);
             scheduler.queue.remove(thisTrack);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "The current queue will now be looped!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
         }
 
-        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, looper.getAsMention() + " has "+(scheduler.playlistRepeating ? "looped" : "unlooped")+" the queue");
+        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG, Pair.of("{user}", looper.getAsMention()), Pair.of("{status}", (scheduler.playlistRepeating ? "looped" : "unlooped")));
         return eb;
     }
 

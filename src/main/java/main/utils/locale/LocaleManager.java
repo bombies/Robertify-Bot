@@ -24,7 +24,6 @@ public class LocaleManager {
     private Map<String, String> localeFile;
 
     private LocaleManager(RobertifyLocale locale) {
-        logger.info("Constructing new local manager");
         locales.putIfAbsent(locale, retrieveLocaleFile(locale));
 
         this.locale = locale;

@@ -10,7 +10,10 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -31,7 +34,7 @@ public class LofiCommand implements ICommand {
             msg.replyEmbeds(handleLofi(guild, ctx.getMember(), ctx.getChannel()))
                     .queue();
         } catch (IllegalArgumentException e) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Enabling Lo-Fi mode...").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLING).build())
                     .queue(botMsg -> {
                         lofiEnabledGuilds.add(guild.getIdLong());
                         announceLofiMode.add(guild.getIdLong());
@@ -57,28 +60,29 @@ public class LofiCommand implements ICommand {
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build();
 
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build();
         } else if (!selfVoiceState.inVoiceChannel()) {
             if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+                final var localeManager = LocaleManager.getLocaleManager(guild);
                 if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                    return RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
+                    return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                             (!restrictedChannelsConfig.getRestrictedChannels(
                                     guild.getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                             ).isEmpty()
                                     ?
-                                    "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
+                                    localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
                                             guild.getIdLong(),
                                             RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                                    )
+                                    )))
                                     :
-                                    "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                    localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL)
                             )
                     ).build();
                 }
@@ -89,7 +93,7 @@ public class LofiCommand implements ICommand {
             lofiEnabledGuilds.remove(guild.getIdLong());
             musicManager.getScheduler().nextTrack(null);
 
-            return RobertifyEmbedUtils.embedMessage(guild, "You have disabled Lo-Fi mode").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_DISABLED).build();
         } else {
             queue.clear();
             musicManager.getScheduler().getPastQueue().clear();

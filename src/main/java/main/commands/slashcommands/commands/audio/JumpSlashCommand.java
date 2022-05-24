@@ -3,6 +3,7 @@ package main.commands.slashcommands.commands.audio;
 import main.commands.prefixcommands.audio.JumpCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -47,7 +48,7 @@ public class JumpSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You need to be a DJ to run this command!").build())
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.DJ_ONLY).build())
                     .queue();
             return;
         }

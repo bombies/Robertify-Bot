@@ -3,10 +3,16 @@ package main.commands.slashcommands.commands.audio;
 import main.commands.prefixcommands.audio.JoinCommand;
 import main.constants.BotConstants;
 import main.constants.Permission;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class JoinSlashCommand extends AbstractSlashCommand {
 
@@ -37,7 +43,7 @@ public class JoinSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         if (!musicCommandDJCheck(event)) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ))
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_DJ.name().toUpperCase()))
                     .build())
                     .setEphemeral(true)
                     .queue();

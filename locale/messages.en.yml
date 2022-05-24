@@ -1,7 +1,9 @@
 # GENERAL MESSAGES
 on_status: "on"
 off_status: "off"
+invalid_args: "Invalid arguments!"
 voice_channel_needed: "I must be in a voice channel in order for this command to work!"
+user_voice_channel_needed: "You must be in a voice channel to use this command"
 same_voice_channel: "You must be in the same voice channel as me to use this command"
 same_voice_channel_loc: "You must be in the same voice channel as me to use this command\n\nI am currently in: {channel}"
 general_toggle_message: "You have toggled {toggle} **{status}**"
@@ -13,6 +15,9 @@ id_out_of_bounds: "That ID is out of bounds!"
 cant_join_channel: "I can't join that channel!"
 restricted_to_join: "I am restricted to only join\n{channels}"
 restricted_toggled_no_channels: "Restricted voice channels have been toggled **ON**, but there aren't any set!"
+insufficient_perms: "You do not have enough permissions to execute this!\n\nYou need: `{permissions}`"
+dj_only: "You must be a DJ to run this command!"
+nothing_playing: "There is nothing playing!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -48,3 +53,30 @@ ft_adding_to_queue_2: "Adding to queue..."
 ft_embed_title: "⭐ {user}'s Favourite Tracks"
 ft_embed_footer: "Select the song from the options below to add it the to the queue | {tracks} tracks"
 ft_embed_description: "*The tracks on this page are*\n\n"
+
+# JOIN MESSAGES
+already_joined: "I am already in {channel}!"
+cant_join: "I can't join {channel} since there's no one in the channel!"
+joined: "I have joined {channel}"
+
+# JUMP MESSAGES
+jump_missing_amount: "You must provide the amount of seconds to jump in the song!"
+jump_invalid_duration: "You must provide a valid duration to jump"
+jump_duration_neg_zero: "The duration cannot be negative or zero!"
+jump_duration_gt_time_left: "The duration cannot be more than time time left!"
+jumped_log: "{user} has jumped {duration} seconds."
+jumped: "Successfully jumped {duration} seconds ahead!"
+
+# LOFI MESSAGES
+lofi_enabling: "Enabling Lo-Fi mode..."
+lofi_disabling: "You have disabled Lo-Fi mode"
+
+# LOOP MESSAGES
+loop_nothing_playing: "There is no song playing. I can't repeat nothing."
+loop_stop: "`{title}` will no longer be looped!"
+loop_start: "`{title}` will now be looped"
+loop_log: "{user} has {status} `{title} by {author}`"
+queue_loop_stop: "The current queue will no longer be looped!"
+queue_loop_start: "The current queue will now be looped!"
+queue_loop_nothing: "There is nothing in the queue to repeat"
+queue_loop_log: "{user} has {status} the queue"
