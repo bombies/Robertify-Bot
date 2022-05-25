@@ -6,6 +6,7 @@ voice_channel_needed: "I must be in a voice channel in order for this command to
 user_voice_channel_needed: "You must be in a voice channel to use this command"
 same_voice_channel: "You must be in the same voice channel as me to use this command"
 same_voice_channel_loc: "You must be in the same voice channel as me to use this command\n\nI am currently in: {channel}"
+same_voice_channel_button: "You must be in the same voice channel as me to interact with this button"
 general_toggle_message: "You have toggled {toggle} **{status}**"
 no_voice_channel: "The bot isn't in a voice channel."
 must_be_playing: "I must be playing music in order for this command to work!"
@@ -20,6 +21,11 @@ self_insufficient_perms: "I do not have enough permissions to execute this reque
 dj_only: "You must be a DJ to run this command!"
 nothing_playing: "There is nothing playing!"
 nothing_in_queue: "There is nothing in the queue."
+cant_be_used_in_channel: "This command can't be used in this channel!"
+no_menu_perms: "You do not have permissions to interact with this menu!"
+no_perms_end_interaction: "You do not have permission to end this interaction!"
+no_perms_button: "You do not have permission to interact with this button!"
+button_no_longer_valid: "This button is no longer valid..."
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -110,6 +116,7 @@ paused: "You have paused the music"
 paused_log: "{user} has paused the music"
 resumed: "You have resumed the music"
 resumed_log: "{user} has resumed the music"
+player_not_paused: "The player isn't paused"
 
 # PLAY MESSAGES
 missing_args: "You must provide the name or link of a song to play!"
@@ -125,3 +132,52 @@ prev_track_log: "{user} has started to play the previous track"
 
 # QUEUE MESSAGES
 queue_entry: "**#{id}.** {title} - {author} `[{duration}]`"
+
+# REMOVE MESSAGES
+remove_invalid_id: "This is an invalid ID! You must provide an ID between 1 and {max}"
+removed: "Removed `{title} by {author}` from the queue"
+removed_log: "{user} has removed `{title} by {author}` from the queue."
+couldnt_remove: "Could not remove track with id {id} from the queue"
+
+# REWIND MESSAGES
+invalid_duration: "You must provide a valid duration to rewind"
+cant_rewind_stream: "You can't rewind a stream!"
+rewind_to_beginning: "You have rewound the song to the beginning!"
+rewind_to_beginning_log: "{user} has rewound `{title} by {author}` to the beginning"
+duration_gt_current_time: "This duration cannot be more than the current time in the song"
+rewound_by_duration: "You have rewound the song by {duration} seconds!"
+rewound_by_duration_log: "{user} has rewound `{title} by {author}`  by {duration} seconds"
+
+# SEARCH MESSAGES
+must_provide_query: "You must provide a query!"
+looking_for: "Now looking for `{query}`"
+
+# SEEK MESSAGES
+invalid_minutes: "You must provide a valid amount of minutes"
+invalid_seconds: "You must provide a valid amount of seconds"
+pos_gt_duration: "The position provided is greater than the length of the playing track"
+sought_log: "{user} has sought `{time}` on `{title} by {author}`"
+sought: "You have sought `{time}` on the `{title} by {author}`!"
+
+# SHUFFLE PLAY MESSAGES
+missing_link: "You must provide the link of a playlist to play!"
+invalid_link: "That is an invalid URL! Be sure to provide the URL of a **playlist**"
+not_playlist: "This {source} URL doesn't contain a playlist"
+must_provide_valid_playlist: "You must provide the link of a valid album/playlist!"
+
+# SHUFFLE MESSAGES
+shuffled: "Shuffled the queue!"
+shuffled_log: "{user} has shuffled the queue"
+
+# SKIP MESSAGES
+vote_skip_started: "Started a vote skip!"
+vote_skip_started_log: "{user} has started a vote skip."
+vote_skip_started_embed: "{user} has started a vote skip!\n\n**Votes: 1/{neededVotes}**"
+nothing_to_skip: "There is nothing to skip!"
+skipped: "Skipped the song!"
+skipped_log: "{user} has skipped the song!"
+vote_skipped: "`{title} by {author}` has been vote skipped!"
+vote_skipped_log: "`{title} by {author}` was vote skipped."
+skip_vote_added: "You have added your vote!"
+skip_vote_removed: "You have removed your vote!"
+dj_skipped: "Since you were a DJ or above you have forcibly skipped this track!"

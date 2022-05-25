@@ -8,6 +8,8 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -32,13 +35,14 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == channel.getIdLong()) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!").build())
+                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL).build())
                         .queue();
                 return;
             }
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a query!\n\n"
+            final var localeManager = LocaleManager.getLocaleManager(guild);
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.MUST_PROVIDE_QUERY) + "\n\n"
                             + getUsages(new GuildConfig().getPrefix(guild.getIdLong()))).build())
                     .queue();
             return;
@@ -46,7 +50,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final String query = String.join(" ", args);
 
-        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `" + query + "`").build())
+        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SearchMessages.LOOKING_FOR, Pair.of("{query}", query)).build())
                 .queue(searchingMsg -> getSearchResults(guild, user, searchingMsg, "ytsearch:" + query));
     }
 
@@ -114,7 +118,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == event.getTextChannel().getIdLong()) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                         .queue();
                 return;
             }
@@ -122,7 +126,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         final String query = event.getOption("query").getAsString();
 
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now looking for: `" + query + "`").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SearchMessages.LOOKING_FOR, Pair.of("{query}", query)).build())
                 .setEphemeral(false)
                 .queue(addingMsg -> getSearchResults(guild, event.getUser(), addingMsg, "ytsearch:" + query));
     }
@@ -136,7 +140,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         Guild guild = event.getGuild();
         if (!event.getUser().getId().equals(id)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to interact with this menu!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_MENU_PERMS).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -146,14 +150,14 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to use this!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (voiceState.inVoiceChannel() && (!voiceState.getChannel().equals(memberVoiceState.getChannel()))) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -161,7 +165,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final var trackID = event.getSelectedOptions().get(0).getValue();
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Adding that track to the queue!").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE).build())
                 .setEphemeral(true)
                 .queue();
 
@@ -178,7 +182,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         switch (id.toLowerCase()) {
             case "end" -> {
                 if (!event.getUser().getId().equals(searcherID))
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to end this interaction!").build())
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.NO_PERMS_END_INTERACTION).build())
                             .setEphemeral(true)
                             .queue();
                 else

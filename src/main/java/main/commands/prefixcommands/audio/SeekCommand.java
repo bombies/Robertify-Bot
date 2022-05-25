@@ -7,9 +7,11 @@ import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -64,39 +66,47 @@ public class SeekCommand implements ICommand {
         final var guild = selfVoiceState.getGuild();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel for this command to work");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
         if (mins < 0 || mins > 59)
-            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of minutes.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.INVALID_MINUTES);
 
 
         if (sec < 0 || sec > 59)
-            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of seconds.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.INVALID_SECONDS);
 
 
         long totalDurationInMillis = TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
         AudioTrackInfo info = audioPlayer.getPlayingTrack().getInfo();
         if (totalDurationInMillis > info.length)
-            return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.POS_GT_DURATION);
 
         audioPlayer.seekTo(totalDurationInMillis);
-        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, memberVoiceState.getMember().getAsMention() + " has seeked `"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.title+" by "+info.author+"`");
-        return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
+        final var time = (mins > 9 ? mins : "0" + mins) + ":" + (sec > 9 ? sec : "0" + sec);
+        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
+                Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
+                Pair.of("{time}", time),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.SOUGHT,
+                Pair.of("{time}", time),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
 
     }
 
@@ -104,39 +114,47 @@ public class SeekCommand implements ICommand {
         final var guild = selfVoiceState.getGuild();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel for this command to work");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel I am in order to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(selfVoiceState.getGuild());
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
         if (mins < 0 || mins > 59)
-            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of minutes.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.INVALID_MINUTES);
 
 
         if (sec < 0 || sec > 59)
-            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid amount of seconds.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.INVALID_SECONDS);
 
 
         long totalDurationInMillis = TimeUnit.HOURS.toMillis(hours) + TimeUnit.MINUTES.toMillis(mins) + TimeUnit.SECONDS.toMillis(sec);
 
         AudioTrackInfo info = audioPlayer.getPlayingTrack().getInfo();
         if (totalDurationInMillis > info.length)
-            return RobertifyEmbedUtils.embedMessage(guild, "The position provided is greater than the length of the playing track");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.POS_GT_DURATION);
 
         audioPlayer.seekTo(totalDurationInMillis);
-        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, memberVoiceState.getMember().getAsMention() + " has seeked `" + (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"` on `"+info.title+" by "+info.author+"`");
-        return RobertifyEmbedUtils.embedMessage(guild, "You have seeked `" + (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) +
-                ":"+ (sec > 9 ? sec : "0" + sec) +"`!");
+        final var time = (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) + ":"+ (sec > 9 ? sec : "0" + sec);
+        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
+                Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
+                Pair.of("{time}", time),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SeekMessages.SOUGHT,
+                Pair.of("{time}", time),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
     }
 
     @Override

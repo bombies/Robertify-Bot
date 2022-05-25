@@ -10,11 +10,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -60,22 +62,25 @@ public class RemoveCommand implements ICommand {
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (queue.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
             return eb;
         }
 
         if (id <= 0 || id > queue.size())
-            return RobertifyEmbedUtils.embedMessage(guild, "This is an invalid ID! You must provide an ID between 1 and " + queue.size());
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.REMOVE_INVALID_ID, Pair.of("{max}", String.valueOf(queue.size())));
 
         AudioTrack removedTrack = trackList.get(id - 1);
         AudioTrackInfo info = removedTrack.getInfo();
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed `"+ info.title
-                +"` from the queue");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.REMOVED, Pair.of("{title}", info.title), Pair.of("{author}", info.author));
 
         if (!queue.remove(removedTrack))
-            eb =  RobertifyEmbedUtils.embedMessage(guild, "Could not remove track with id "+id+" from the queue");
+            eb =  RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.COULDNT_REMOVE, Pair.of("{id}", String.valueOf(id)));
         else
-            new LogUtils().sendLog(guild, LogType.QUEUE_REMOVE, remover.getAsMention() + " has removed `"+ info.title +" by "+ info.author +"` from the queue.");
+            new LogUtils().sendLog(guild, LogType.QUEUE_REMOVE, RobertifyLocaleMessage.RemoveMessages.REMOVED_LOG,
+                    Pair.of("{user}", remover.getAsMention()),
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author)
+            );
 
         if (id <= 10)
             if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))

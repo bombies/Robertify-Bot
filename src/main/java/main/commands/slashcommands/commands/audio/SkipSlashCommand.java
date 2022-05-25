@@ -7,6 +7,7 @@ import main.commands.prefixcommands.audio.SkipToCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -54,7 +55,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
 
         if (!musicCommandDJCheck(event)) {
             if (!selfVoiceState.inVoiceChannel()) {
-                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "I must be in a voice channel before this command can be executed!").build())
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
                         .setEphemeral(true)
                         .queue();
                 return;
@@ -67,7 +68,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                             .setEphemeral(false)
                             .queue();
                 } else {
-                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Started a vote skip!").build())
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED).build())
                             .setEphemeral(true)
                             .queue();
                 }

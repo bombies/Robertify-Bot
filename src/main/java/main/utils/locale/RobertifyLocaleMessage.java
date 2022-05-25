@@ -13,6 +13,7 @@ public enum RobertifyLocaleMessage {
         USER_VOICE_CHANNEL_NEEDED,
         SAME_VOICE_CHANNEL,
         SAME_VOICE_CHANNEL_LOC,
+        SAME_VOICE_CHANNEL_BUTTON,
         GENERAL_TOGGLE_MESSAGE,
         NO_VOICE_CHANNEL,
         MUST_BE_PLAYING,
@@ -26,7 +27,12 @@ public enum RobertifyLocaleMessage {
         SELF_INSUFFICIENT_PERMS,
         DJ_ONLY,
         NOTHING_PLAYING,
-        NOTHING_IN_QUEUE
+        NOTHING_IN_QUEUE,
+        CANT_BE_USED_IN_CHANNEL,
+        NO_MENU_PERMS,
+        NO_PERMS_END_INTERACTION,
+        NO_PERMS_BUTTON,
+        BUTTON_NO_LONGER_VALID
     }
 
     public enum RandomMessages implements LocaleMessage {
@@ -129,7 +135,8 @@ public enum RobertifyLocaleMessage {
         PAUSED,
         PAUSED_LOG,
         RESUMED,
-        RESUMED_LOG
+        RESUMED_LOG,
+        PLAYER_NOT_PAUSED
     }
 
     public enum PlayMessages implements LocaleMessage {
@@ -148,6 +155,63 @@ public enum RobertifyLocaleMessage {
 
     public enum QueueMessages implements LocaleMessage {
         QUEUE_ENTRY
+    }
+
+    public enum RemoveMessages implements LocaleMessage {
+        REMOVE_INVALID_ID,
+        REMOVED,
+        REMOVED_LOG,
+        COULDNT_REMOVE
+    }
+
+    public enum RewindMessages implements LocaleMessage {
+        INVALID_DURATION,
+        CANT_REWIND_STREAM,
+        REWIND_TO_BEGINNING,
+        REWIND_TO_BEGINNING_LOG,
+        DURATION_GT_CURRENT_TIME,
+        REWOUND_BY_DURATION,
+        REWOUND_BY_DURATION_LOG
+    }
+
+    public enum SearchMessages implements LocaleMessage {
+        MUST_PROVIDE_QUERY,
+        LOOKING_FOR
+    }
+
+    public enum SeekMessages implements LocaleMessage {
+        INVALID_MINUTES,
+        INVALID_SECONDS,
+        POS_GT_DURATION,
+        SOUGHT,
+        SOUGHT_LOG
+    }
+
+    public enum ShufflePlayMessages implements LocaleMessage {
+        MISSING_LINK,
+        INVALID_LINK,
+        NOT_PLAYLIST,
+        MUST_PROVIDE_VALID_PLAYLIST,
+
+    }
+
+    public enum ShuffleMessages implements LocaleMessage {
+        SHUFFLED,
+        SHUFFLED_LOG
+    }
+
+    public enum SkipMessages implements LocaleMessage {
+        VOTE_SKIP_STARTED,
+        VOTE_SKIP_STARTED_LOG,
+        VOTE_SKIP_STARTED_EMBED,
+        NOTHING_TO_SKIP,
+        SKIPPED,
+        SKIPPED_LOG,
+        VOTE_SKIPPED,
+        VOTE_SKIPPED_LOG,
+        SKIP_VOTE_ADDED,
+        SKIP_VOTE_REMOVED,
+        DJ_SKIPPED
     }
 
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
@@ -169,6 +233,13 @@ public enum RobertifyLocaleMessage {
         ret.put(PlayMessages.class, PlayMessages.values());
         ret.put(PreviousTrackMessages.class, PreviousTrackMessages.values());
         ret.put(QueueMessages.class, QueueMessages.values());
+        ret.put(RemoveMessages.class, RemoveMessages.values());
+        ret.put(RewindMessages.class, RewindMessages.values());
+        ret.put(SearchMessages.class, SearchMessages.values());
+        ret.put(SeekMessages.class, SeekMessages.values());
+        ret.put(ShufflePlayMessages.class, ShufflePlayMessages.values());
+        ret.put(ShuffleMessages.class, ShuffleMessages.values());
+        ret.put(SkipMessages.class, SkipMessages.values());
         return ret;
     }
 }

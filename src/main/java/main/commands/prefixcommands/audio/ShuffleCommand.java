@@ -8,11 +8,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class ShuffleCommand implements ICommand {
         final var queue = musicManager.getScheduler().queue;
 
         if (queue.isEmpty())
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
 
         final List<AudioTrack> trackList = new ArrayList<>(queue);
         Collections.shuffle(trackList);
@@ -45,8 +47,8 @@ public class ShuffleCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        new LogUtils().sendLog(guild, LogType.QUEUE_SHUFFLE, shuffler.getAsMention() + " has shuffled the queue");
-        return RobertifyEmbedUtils.embedMessage(guild, "Shuffled the queue!");
+        new LogUtils().sendLog(guild, LogType.QUEUE_SHUFFLE, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED_LOG, Pair.of("{user}", shuffler.getAsMention()));
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED);
     }
 
     @Override

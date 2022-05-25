@@ -16,6 +16,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
@@ -56,7 +57,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             if (new TogglesConfig().getToggle(guild, Toggles.VOTE_SKIPS)) {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
                     if (selfVoiceState.inVoiceChannel()) {
-                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel before this command can be executed!").build())
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
                                 .queue();
                         return;
                     }
@@ -86,12 +87,12 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing to skip!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.NOTHING_TO_SKIP).build();
 
         skip(guild);
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, memberVoiceState.getMember().getAsMention() + " has skipped the song");
-        return RobertifyEmbedUtils.embedMessage(guild, "Skipped the song!").build();
+        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.SKIPPED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIPPED).build();
     }
 
     public MessageEmbed handleVoteSkip(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
@@ -104,15 +105,18 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
 
         if (audioPlayer.getPlayingTrack() == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing to skip!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.NOTHING_TO_SKIP).build();
 
         final int neededVotes = getNeededVotes(guild);
-        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, memberVoiceState.getMember().getAsMention() + " has started a vote skip!\n\n" +
-                        "**Votes: 1/" + neededVotes + "**").build())
+        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+                        RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_EMBED,
+                        Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
+                        Pair.of("{neededVotes}", String.valueOf(neededVotes))).build()
+                )
                 .setActionRow(
                         Button.of(ButtonStyle.SUCCESS, "voteskip:upvote:" + guild.getId(), "Vote")
                 ).queue(success -> {
-                    new LogUtils().sendLog(guild, LogType.TRACK_VOTE_SKIP, memberVoiceState.getMember().getAsMention() + " has started a vote skip.");
+                    new LogUtils().sendLog(guild, LogType.TRACK_VOTE_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
                     voteSkips.put(guild.getIdLong(), 1);
                     voteSkipMessages.put(guild.getIdLong(), Pair.of(channel.getIdLong(), success.getIdLong()) );
 
@@ -165,7 +169,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         if (voteSkipMessages.get(guild.getIdLong()) != null) {
             Pair<Long, Long> pair = voteSkipMessages.get(guild.getIdLong());
             guild.getTextChannelById(pair.getLeft()).retrieveMessageById(pair.getRight()).complete()
-                    .editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track was skipped.")
+                    .editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIPPED)
                             .build())
                     .queue();
         }
@@ -177,13 +181,13 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var guild = selfVoiceState.getGuild();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING).build();
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build();
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention()).build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention())).build();
 
         return null;
     }
@@ -216,11 +220,17 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                 .getInfo();
 
         skip(guild);
-        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The track has been vote skipped!").build())
+        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.VOTE_SKIPPED,
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author)
+                ).build())
                 .setActionRows()
                 .queue();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, "`"+info.title+" by "+info.author+"` was vote skipped.");
+        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIPPED_LOG,
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
     }
 
     private void decrementVoteSkip(Guild guild) {
@@ -241,8 +251,10 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         Message message = guild.getTextChannelById(pair.getLeft()).retrieveMessageById(pair.getRight()).complete();
 
         final int neededVotes = getNeededVotes(guild);
-        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, voteSkipStarters.get(guild.getIdLong()) + " has started a vote skip!\n\n" +
-                "**Votes: "+voteSkips.get(guild.getIdLong())+"/" + neededVotes + "**").build()).queue();
+        message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_EMBED,
+                    Pair.of("{user}", voteSkipStarters.get(guild.getIdLong())),
+                    Pair.of("{neededVotes}", String.valueOf(neededVotes))
+                ).build()).queue();
     }
 
     private int getNeededVotes(Guild guild) {
@@ -267,21 +279,21 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         GuildVoiceState memberState = event.getMember().getVoiceState();
 
         if (!voiceState.inVoiceChannel()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This button is no longer valid...").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BUTTON_NO_LONGER_VALID).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (!memberState.inVoiceChannel()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to interact with this button").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_BUTTON).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (!voiceState.getChannel().equals(memberState.getChannel())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to interact with this button").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_BUTTON).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -295,14 +307,14 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                     list.remove(user.getIdLong());
                     voters.put(guild.getIdLong(), list);
                     decrementVoteSkip(guild);
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have removed your vote!").build())
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIP_VOTE_REMOVED).build())
                             .setEphemeral(true)
                             .queue();
                     updateVoteSkipMessage(guild);
                 } else {
                     if (GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)) {
                         doVoteSkip(guild);
-                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Since you were a DJ or above you have forcibly skipped this track!").build())
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.DJ_SKIPPED).build())
                                 .setEphemeral(true)
                                 .queue();
                         return;
@@ -311,7 +323,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                     list.add(user.getIdLong());
                     voters.put(guild.getIdLong(), list);
                     incrementVoteSkip(guild);
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have added your vote!").build())
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIP_VOTE_ADDED).build())
                             .setEphemeral(true)
                             .queue();
                     updateVoteSkipMessage(guild);

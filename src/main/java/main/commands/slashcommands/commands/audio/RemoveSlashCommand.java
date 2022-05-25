@@ -34,7 +34,7 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
         return """
                 Remove a specific song from the queue
 
-                Usage: `/remove <id>`""";
+                Usage: `remove <id>`""";
     }
 
     @Override

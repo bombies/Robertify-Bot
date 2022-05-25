@@ -9,12 +9,14 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -44,7 +46,7 @@ public class RewindCommand implements ICommand {
         final var guild = ctx.getGuild();
 
         if (track == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -72,34 +74,43 @@ public class RewindCommand implements ICommand {
         EmbedBuilder eb;
 
         if (track == null) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         AudioTrackInfo info = track.getInfo();
         if (info.isStream)
-            return RobertifyEmbedUtils.embedMessage(guild, "You can't rewind a stream!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.CANT_REWIND_STREAM);
 
         if (rewindToBeginning) {
             audioPlayer.seekTo(0L);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song to the beginning!");
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.title+" by "+info.author+"` to the beginning");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING);
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
+                    Pair.of("{user}", user.getAsMention()),
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author)
+            );
         } else {
             if (time <= 0) {
-                eb = RobertifyEmbedUtils.embedMessage(guild, "The duration cannot be negative or zero!");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JumpMessages.JUMP_DURATION_NEG_ZERO);
                 return eb;
             }
 
             time = TimeUnit.SECONDS.toMillis(time);
 
             if (time > audioPlayer.getTrackPosition()) {
-                eb = RobertifyEmbedUtils.embedMessage(guild, "This duration cannot be more than the current time in the song");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.DURATION_GT_CURRENT_TIME);
                 return eb;
             }
 
             audioPlayer.seekTo(audioPlayer.getTrackPosition() - time);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You have rewound the song by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds!");
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, user.getAsMention() + " has rewound `"+info.title+" by "+info.author+"` by "+TimeUnit.MILLISECONDS.toSeconds(time)+" seconds");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.REWOUND_BY_DURATION, Pair.of("{duration}", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(time))));
+            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
+                    Pair.of("{user}", user.getAsMention()),
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author),
+                    Pair.of("{duration}", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(time)))
+            );
         }
 
         return eb;
@@ -110,17 +121,17 @@ public class RewindCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             return eb;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
             return eb;
         }
 
