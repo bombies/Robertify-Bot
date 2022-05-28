@@ -9,6 +9,9 @@ public enum RobertifyLocaleMessage {
         ON_STATUS,
         OFF_STATUS,
         INVALID_ARGS,
+        INVALID_ARGS_USAGES,
+        INSUFFICIENT_ARGS,
+        INSUFFICIENT_ARGS_USAGES,
         VOICE_CHANNEL_NEEDED,
         USER_VOICE_CHANNEL_NEEDED,
         SAME_VOICE_CHANNEL,
@@ -32,7 +35,8 @@ public enum RobertifyLocaleMessage {
         NO_MENU_PERMS,
         NO_PERMS_END_INTERACTION,
         NO_PERMS_BUTTON,
-        BUTTON_NO_LONGER_VALID
+        BUTTON_NO_LONGER_VALID,
+        NO_SUCH_CHANNEL
     }
 
     public enum RandomMessages implements LocaleMessage {
@@ -214,6 +218,109 @@ public enum RobertifyLocaleMessage {
         DJ_SKIPPED
     }
 
+    public enum StopMessages implements LocaleMessage {
+        STOPPED,
+        STOPPED_LOG
+    }
+
+    public enum VolumeMessages implements LocaleMessage {
+        INVALID_VOLUME,
+        VOLUME_CHANGED,
+        VOLUME_CHANGED_LOG
+    }
+
+    public enum BanMessages implements LocaleMessage {
+        BAN_INVALID_USER,
+        BAN_INVALID_USER_DETAILED,
+        INVALID_BAN_DURATION,
+        CANNOT_BAN_ADMIN,
+        CANNOT_BAN_DEVELOPER,
+        USER_ALREADY_BANNED,
+        USER_PERM_BANNED,
+        USER_PERM_BANNED_RESPONSE,
+        USER_TEMP_BANNED,
+        USER_TEMP_BANNED_RESPONSE
+    }
+
+    public enum UnbanMessages implements LocaleMessage {
+        MISSING_UNBAN_USER,
+        INVALID_UNBAN_USER,
+        USER_NOT_BANNED,
+        USER_UNBANNED,
+        USER_UNBANNED_RESPONSE
+    }
+
+    public enum LogChannelMessages implements LocaleMessage {
+        LOG_CHANNEL_ALREADY_SETUP,
+        LOG_CHANNEL_SUCCESSFUL_SETUP,
+        LOG_CHANNEL_MISSING,
+        INVALID_LOG_CHANNEL,
+        CANNOT_SET_LOG_CHANNEL,
+        LOG_CHANNEL_SET,
+        LOG_CHANNEL_INVALID_TYPE
+    }
+
+    public enum RestrictedChannelMessages implements LocaleMessage {
+        MISSING_RESTRICTED_CHANNEL,
+        INVALID_RESTRICTED_CHANNEL_ID,
+        RESTRICTED_CHANNELS_TOGGLED_OFF,
+        RESTRICTED_CHANNEL_ID_INVALID_SERVER,
+        RESTRICTED_CHANNEL_ADDED,
+        LISTING_RESTRICTED_CHANNELS,
+        RESTRICTED_CHANNELS_VC_EMBED_FIELD,
+        RESTRICTED_CHANNELS_TC_EMBED_FIELD,
+        NO_CHANNELS
+    }
+
+    public enum ThemeMessages implements LocaleMessage {
+        THEME_SET,
+        THEME_EMBED_TITLE,
+        THEME_EMBED_DESC,
+        THEME_SELECT_MENU_PLACEHOLDER,
+        THEME_GREEN,
+        THEME_MINT,
+        THEME_GOLD,
+        THEME_RED,
+        THEME_PASTEL_RED,
+        THEME_PINK,
+        THEME_PURPLE,
+        THEME_PASTEL_PURPLE,
+        THEME_BLUE,
+        THEME_LIGHT_BLUE,
+        THEME_BABY_BLUE,
+        THEME_ORANGE,
+        THEME_YELLOW,
+        THEME_PASTEL_YELLOW,
+        THEME_DARK,
+        THEME_LIGHT
+    }
+
+    public enum PremiumMessages implements LocaleMessage {
+        LOCKED_COMMAND_EMBED_TITLE,
+        LOCKED_COMMAND_EMBED_DESC
+    }
+
+    public enum TogglesMessages implements LocaleMessage {
+        TOGGLES_EMBED_TITLE,
+        TOGGLES_EMBED_TOGGLE_ID_FIELD,
+        TOGGLES_MESSAGES_EMBED_FEATURE_FIELD,
+        TOGGLES_EMBED_STATUS_FIELD,
+        DJ_TOGGLES_EMBED_COMMAND_FIELD,
+        DJ_TOGGLES_EMBED_STATUS_FIELD,
+        LOG_TOGGLES_EMBED_TYPE_FIELD,
+        LOG_TOGGLES_EMBED_STATUS_FIELD,
+        TOGGLED,
+        INVALID_TOGGLE,
+        DJ_TOGGLE_INVALID_COMMAND,
+        DJ_TOGGLED,
+        LOG_TOGGLE_INVALID_TYPE,
+        LOG_TOGGLED
+    }
+
+    public enum TwentyFourSevenMessages implements LocaleMessage {
+        TWENTY_FOUR_SEVEN_TOGGLED
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -240,6 +347,16 @@ public enum RobertifyLocaleMessage {
         ret.put(ShufflePlayMessages.class, ShufflePlayMessages.values());
         ret.put(ShuffleMessages.class, ShuffleMessages.values());
         ret.put(SkipMessages.class, SkipMessages.values());
+        ret.put(StopMessages.class, StopMessages.values());
+        ret.put(VolumeMessages.class, VolumeMessages.values());
+        ret.put(BanMessages.class, BanMessages.values());
+        ret.put(UnbanMessages.class, UnbanMessages.values());
+        ret.put(LogChannelMessages.class, LogChannelMessages.values());
+        ret.put(RestrictedChannelMessages.class, RestrictedChannelMessages.values());
+        ret.put(ThemeMessages.class, ThemeMessages.values());
+        ret.put(PremiumMessages.class, PremiumMessages.values());
+        ret.put(TogglesMessages.class, TogglesMessages.values());
+        ret.put(TwentyFourSevenMessages.class, TwentyFourSevenMessages.values());
         return ret;
     }
 }

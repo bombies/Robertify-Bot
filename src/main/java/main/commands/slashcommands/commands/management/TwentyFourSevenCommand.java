@@ -9,9 +9,12 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -36,6 +39,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
 
     private MessageEmbed logic(Guild guild) {
         final var config = new GuildConfig();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         if (config.get247(guild.getIdLong())) {
             config.set247(guild.getIdLong(), false);
@@ -43,14 +47,18 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
             RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().scheduleDisconnect(true);
 
-            return RobertifyEmbedUtils.embedMessage(guild, "You have turned 24/7 mode **off**").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TwentyFourSevenMessages.TWENTY_FOUR_SEVEN_TOGGLED,
+                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+            ).build();
         } else {
             config.set247(guild.getIdLong(), true);
 
             RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().removeScheduledDisconnect(guild);
 
-            return RobertifyEmbedUtils.embedMessage(guild, "You have turned 24/7 mode **on**").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TwentyFourSevenMessages.TWENTY_FOUR_SEVEN_TOGGLED,
+                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+            ).build();
         }
     }
 

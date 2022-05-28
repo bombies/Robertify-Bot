@@ -11,6 +11,8 @@ import main.main.Robertify;
 import main.utils.json.GenericJSONField;
 import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.LocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -472,6 +474,18 @@ public class GeneralUtils {
                 () -> new EmbedBuilder()
                         .setColor(theme.getColor())
                         .setAuthor(author, null, theme.getTransparent())
+        );
+    }
+
+    public static void setCustomEmbed(Guild guild, LocaleMessage author) {
+        final ThemesConfig themesConfig = new ThemesConfig();
+        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        RobertifyEmbedUtils.setEmbedBuilder(
+                guild,
+                () -> new EmbedBuilder()
+                        .setColor(theme.getColor())
+                        .setAuthor(localeManager.getMessage(author), null, theme.getTransparent())
         );
     }
 

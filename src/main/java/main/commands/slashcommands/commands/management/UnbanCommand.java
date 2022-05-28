@@ -9,6 +9,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -30,8 +32,7 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         final var guild = ctx.getGuild();
 
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_BAN)) {
-            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to run this command!\n\n" +
-                                    "You must have `"+Permission.ROBERTIFY_BAN.name()+"`")
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_BAN.name()))
                             .build())
                     .queue();
             return;
@@ -41,7 +42,7 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         final Message msg = ctx.getMessage();
 
         if (args.isEmpty()) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a user to unban!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.MISSING_UNBAN_USER).build())
                     .queue();
             return;
         }
@@ -49,7 +50,7 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         final var id = GeneralUtils.getDigitsOnly(args.get(0));
 
         if (!GeneralUtils.stringIsID(id)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.INVALID_UNBAN_USER).build())
                     .queue();
             return;
         }
@@ -58,13 +59,13 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         try {
             member = ctx.getGuild().retrieveMemberById(id).complete();
         } catch (ErrorResponseException e) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to ban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.INVALID_UNBAN_USER).build())
                     .queue();
             return;
         }
 
         if (member == null) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid user to unban.").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.INVALID_UNBAN_USER).build())
                     .queue();
             return;
         }
@@ -75,18 +76,18 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
 
     private EmbedBuilder handleUnban(Guild guild, User user) {
         if (!new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
-            return RobertifyEmbedUtils.embedMessage(guild, "This user is not banned.");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_NOT_BANNED);
 
         new GuildConfig().unbanUser(guild.getIdLong(), user.getIdLong());
 
-        user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been unbanned from **" + guild.getName() + "**").build())
+        user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED, Pair.of("{server}", guild.getName())).build())
                 .queue(success -> {}, new ErrorHandler()
                         .handle(
                                 ErrorResponse.CANNOT_SEND_TO_USER,
                                 e -> Listener.logger.warn("Was not able to send an unban message to " + user.getAsTag() + "(" + user.getIdLong() + ")")
                         )));
 
-        return RobertifyEmbedUtils.embedMessage(guild, "You have unbanned " + user.getAsMention());
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED_RESPONSE, Pair.of("{user}", user.getAsMention()));
     }
 
     @Override

@@ -11,10 +11,12 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -41,14 +43,14 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         final var memberVoiceState = stopper.getVoiceState();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
         if (!memberVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
 
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention());;
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));;
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
@@ -56,7 +58,7 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         final AudioTrack track = audioPlayer.getPlayingTrack();
 
         if (track == null)
-            return RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
         scheduler.repeating = false;
         scheduler.playlistRepeating = false;
@@ -72,10 +74,10 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
-        new LogUtils().sendLog(guild, LogType.PLAYER_STOP, stopper.getAsMention() + " has stopped the player");
+        new LogUtils().sendLog(guild, LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 
         scheduler.scheduleDisconnect(true);
-        return RobertifyEmbedUtils.embedMessage(guild, "You have stopped the track and cleared the queue.");
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.StopMessages.STOPPED);
     }
 
     @Override

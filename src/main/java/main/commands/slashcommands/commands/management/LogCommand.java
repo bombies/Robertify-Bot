@@ -7,6 +7,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -36,7 +37,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
             new LogUtils().createChannel(guild);
             message.addReaction("✅").queue();
         } catch (IllegalArgumentException e) {
-            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The log channel has already been setup!").build())
+            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP).build())
                     .queue();
         }
     }
@@ -92,10 +93,10 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
 
         try {
             new LogUtils().createChannel(guild);
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully created the log channel!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP).build())
                     .queue();
         } catch (IllegalArgumentException e) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The log channel has already been setup!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP).build())
                     .queue();
         }
     }

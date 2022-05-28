@@ -9,11 +9,13 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -34,7 +36,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         final var args = ctx.getArgs();
 
         if (args.isEmpty()) {
-            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a channel!").build())
+            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_MISSING).build())
                     .queue();
             return;
         }
@@ -42,7 +44,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         final var channelID = args.get(0);
 
         if (!GeneralUtils.stringIsID(channelID)) {
-            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid channel!").build())
+            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.INVALID_LOG_CHANNEL).build())
                     .queue();
             return;
         }
@@ -50,7 +52,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         final var channel = guild.getTextChannelById(channelID);
 
         if (channel == null) {
-            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "There is no such channel with that ID in this server!").build())
+            message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_SUCH_CHANNEL).build())
                     .queue();
             return;
         }
@@ -58,7 +60,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
         if (dedicatedChannelConfig.isChannelSet(guild.getIdLong())) {
             if (dedicatedChannelConfig.getChannelID(guild.getIdLong()) == channel.getIdLong()) {
-                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The log channel cannot be set to this channel!").build())
+                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())
                         .queue();
                 return;
             }
@@ -73,7 +75,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         }
 
         config.setChannel(guild.getIdLong(), channel.getIdLong());
-        message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The logs channel has been set to: " + channel.getAsMention()).build())
+        message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SET, Pair.of("{channel}", channel.getAsMention())).build())
                 .queue();
     }
 
@@ -125,7 +127,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         final var channel = event.getOption("channel").getAsGuildChannel();
 
         if (!channel.getType().isMessage()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The new log channel **MUST** be a text channel!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_INVALID_TYPE).build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -134,7 +136,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
         if (dedicatedChannelConfig.isChannelSet(guild.getIdLong())) {
             if (dedicatedChannelConfig.getChannelID(guild.getIdLong()) == channel.getIdLong()) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The log channel cannot be set to this channel!").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())
                         .setEphemeral(true)
                         .queue();
                 return;
@@ -150,7 +152,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
         }
 
         config.setChannel(guild.getIdLong(), channel.getIdLong());
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The logs channel has been set to: " + channel.getAsMention()).build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SET, Pair.of("{channel}", channel.getAsMention())).build())
                 .queue();
     }
 }

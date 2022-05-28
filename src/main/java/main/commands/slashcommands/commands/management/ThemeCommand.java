@@ -12,12 +12,16 @@ import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -38,34 +42,35 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
         );
     }
 
-    private SelectionMenuBuilder getSelectionMenuBuilder(long userID) {
+    private SelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userID) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         return new SelectionMenuBuilder()
                 .setName(menuName)
-                .setPlaceHolder("Select a theme...")
+                .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_SELECT_MENU_PLACEHOLDER))
                 .setRange(1, 1)
                 .addOptions(
-                        SelectMenuOption.of("Green", "themes:green", RobertifyTheme.GREEN.getEmoji()),
-                        SelectMenuOption.of("Mint", "themes:mint", RobertifyTheme.MINT.getEmoji()),
-                        SelectMenuOption.of("Gold", "themes:gold", RobertifyTheme.GOLD.getEmoji()),
-                        SelectMenuOption.of("Red", "themes:red", RobertifyTheme.RED.getEmoji()),
-                        SelectMenuOption.of("Pastel Red", "themes:pastel_red", RobertifyTheme.PASTEL_RED.getEmoji()),
-                        SelectMenuOption.of("Pink", "themes:pink", RobertifyTheme.PINK.getEmoji()),
-                        SelectMenuOption.of("Purple", "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
-                        SelectMenuOption.of("Pastel Purple", "themes:pastel_purple", RobertifyTheme.PASTEL_PURPLE.getEmoji()),
-                        SelectMenuOption.of("Blue", "themes:blue", RobertifyTheme.BLUE.getEmoji()),
-                        SelectMenuOption.of("Light Blue", "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
-                        SelectMenuOption.of("Baby Blue", "themes:baby_blue", RobertifyTheme.BABY_BLUE.getEmoji()),
-                        SelectMenuOption.of("Orange", "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
-                        SelectMenuOption.of("Yellow", "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
-                        SelectMenuOption.of("Pastel Yellow", "themes:pastel_yellow", RobertifyTheme.PASTEL_YELLOW.getEmoji()),
-                        SelectMenuOption.of("Dark", "themes:dark", RobertifyTheme.DARK.getEmoji()),
-                        SelectMenuOption.of("Light", "themes:light", RobertifyTheme.LIGHT.getEmoji())
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GREEN), "themes:green", RobertifyTheme.GREEN.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_MINT), "themes:mint", RobertifyTheme.MINT.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GOLD), "themes:gold", RobertifyTheme.GOLD.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_RED), "themes:red", RobertifyTheme.RED.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_RED), "themes:pastel_red", RobertifyTheme.PASTEL_RED.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PINK), "themes:pink", RobertifyTheme.PINK.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PURPLE), "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_PURPLE), "themes:pastel_purple", RobertifyTheme.PASTEL_PURPLE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BLUE), "themes:blue", RobertifyTheme.BLUE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT_BLUE), "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BABY_BLUE), "themes:baby_blue", RobertifyTheme.BABY_BLUE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_ORANGE), "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_YELLOW), "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_YELLOW), "themes:pastel_yellow", RobertifyTheme.PASTEL_YELLOW.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_DARK), "themes:dark", RobertifyTheme.DARK.getEmoji()),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT), "themes:light", RobertifyTheme.LIGHT.getEmoji())
                 )
                 .limitToUser(userID);
     }
 
-    private SelectionMenu getSelectionMenu(long userID) {
-        return getSelectionMenuBuilder(userID).build();
+    private SelectionMenu getSelectionMenu(Guild guild, long userID) {
+        return getSelectionMenuBuilder(guild, userID).build();
     }
 
     @Override
@@ -77,20 +82,22 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_THEME)) {
-            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "You do not have enough permissions to execute this command" +
-                            "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(),
+                            RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS,
+                            Pair.of("{permissions}", Permission.ROBERTIFY_THEME.name())
+                    ).build())
                     .queue();
             return;
         }
 
         final var guild = ctx.getGuild();
+        final var localeManager  = LocaleManager.getLocaleManager(guild);
 
-        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
-                guild,
-                "Themes",
-                "Select an option below to set the current theme!"
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_EMBED_TITLE),
+                        localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_EMBED_DESC)
         ).build())
-                .setActionRow(getSelectionMenu(ctx.getAuthor().getIdLong()))
+                .setActionRow(getSelectionMenu(guild, ctx.getAuthor().getIdLong()))
                 .queue();
     }
 
@@ -101,18 +108,21 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
         final var guild = event.getGuild();
 
         if (!predicateCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions to execute this command" +
-                    "\n\nYou must have `"+Permission.ROBERTIFY_THEME.name()+"`!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+                            RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS,
+                            Pair.of("{permissions}", Permission.ROBERTIFY_THEME.name())
+                    ).build())
                     .setEphemeral(true).queue();
             return;
         }
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
-                guild,
-                "Themes",
-                "Select an option below to set the current theme!"
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_EMBED_TITLE),
+                        localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_EMBED_DESC)
         ).build())
-                .addActionRow(getSelectionMenu(event.getUser().getIdLong()))
+                .addActionRow(getSelectionMenu(guild, event.getUser().getIdLong()))
                 .setEphemeral(false)
                 .queue();
     }
@@ -121,19 +131,17 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
+        final Guild guild = event.getGuild();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         if (isPremiumCommand()) {
             if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                                "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!
-
-                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                                localeManager.getMessage(RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE),
+                                localeManager.getMessage(RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC)
+                        ).build())
                         .addActionRow(
                                 Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com"),
-                                Button.of(ButtonStyle.LINK, "https://discord.boats/bot/893558050504466482/vote", "Discord.boats")
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
                         )
                         .setEphemeral(true)
                         .queue();
@@ -141,10 +149,8 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
             }
         }
 
-        final var guild = event.getGuild();
-
         if (!event.getComponentId().split(":")[2].equals(event.getUser().getId())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_MENU_PERMS).build())
                     .setEphemeral(true).queue();
             return;
         }
@@ -152,7 +158,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
         final var optionSelected = event.getSelectedOptions();
         final RobertifyTheme theme = RobertifyTheme.parse(optionSelected.get(0).getValue().split(":")[1].toLowerCase());
         new ThemesConfig().setTheme(guild.getIdLong(), theme);
-        String msg = "The theme has been set to **" + theme.name().toUpperCase().replaceAll("_", " ") + "**";
+        String msg = localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_SET, Pair.of("{theme}", theme.name().replaceAll("_", " ")));
 
         GeneralUtils.setDefaultEmbed(guild);
 

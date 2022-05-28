@@ -2,6 +2,9 @@
 on_status: "on"
 off_status: "off"
 invalid_args: "Invalid arguments!"
+invalid_args_usages: "Invalid arguments!\n\n{usages}"
+insufficient_args: "Insufficient arguments!"
+insufficient_args_usages: "Insufficient arguments!\n\n{usages}"
 voice_channel_needed: "I must be in a voice channel in order for this command to work!"
 user_voice_channel_needed: "You must be in a voice channel to use this command"
 same_voice_channel: "You must be in the same voice channel as me to use this command"
@@ -26,6 +29,7 @@ no_menu_perms: "You do not have permissions to interact with this menu!"
 no_perms_end_interaction: "You do not have permission to end this interaction!"
 no_perms_button: "You do not have permission to interact with this button!"
 button_no_longer_valid: "This button is no longer valid..."
+no_such_channel: "There is no such channel with that ID in this server!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -181,3 +185,96 @@ vote_skipped_log: "`{title} by {author}` was vote skipped."
 skip_vote_added: "You have added your vote!"
 skip_vote_removed: "You have removed your vote!"
 dj_skipped: "Since you were a DJ or above you have forcibly skipped this track!"
+
+# STOP MESSAGES
+stopped_log: "{user} has stopped the player"
+stopped: "You have stopped the track and cleared the queue."
+
+# VOLUME MESSAGES
+invalid_volume: "You can't set the volume to that value!"
+volume_changed: "🔊  You have set the volume of the bot to **{volume}%**"
+volume_changed_log: "{user} has changed the volume to `{volume}%`"
+
+# BAN MESSAGES
+ban_invalid_user: "You must provide a valid user to ban."
+ban_invalid_user_detailed: "You must provide a valid user to ban\nMake sure to either **mention** the user, or provide their **ID**"
+invalid_ban_duration: "Invalid duration format.\n\n*Example formats*: `1d`, `10s`, `5h`, `30m`"
+cannot_ban_admin: "You cannot ban an admin!"
+cannot_ban_developer: "You cannot ban a developer of Robertify!"
+user_already_banned: "This user is already banned."
+user_perm_banned: "You have been permanently banned from using Robertify in **{server}**"
+user_perm_banned_response: "You have banned {user}"
+user_temp_banned: "You have been banned for {duration} in **{server}**!"
+user_temp_banned_response: "You have banned {user} for `{duration}`"
+
+# UNBAN MESSAGES
+missing_unban_user: "You must provide a user to unban!"
+invalid_unban_user: "You must provide a valid user to unban!"
+user_not_banned: "This user is not banned."
+user_banned: "You have been unbanned from **{server}**"
+user_unbanned_response: "You have unbanned {user}"
+
+# LOG CHANNEL MESSAGES
+log_channel_already_setup: "The log channel has already been setup!"
+log_channel_successful_setup: "Successfully created the log channel!"
+log_channel_missing: "You must provide a channel!"
+invalid_log_channel: "You must provide a valid channel!"
+cannot_set_log_channel: "The log channel cannot be set to this channel!"
+log_channel_set: "The log channel has been set to {channel}"
+log_channel_invalid_type: "The new log channel **MUST** be a text channel"
+
+# RESTRICTED CHANNEL MESSAGES
+missing_restricted_channel: "You must provide the voice channel you want to restrict\n**TIP**: You must enable *[developer mode](https://bit.ly/32wGtRz)* to view the ID of the voice or text channel\n\n**__Example__**\n`restrictedchannels add 842795162513965066`\n`restrictedchannels add #bot-commands`"
+invalid_restricted_channel_id: "You must provide a valid voice or text channel ID!\nMake sure to either **mention** the channel, or provide its **ID**"
+restricted_channels_toggled_off: "This feature is toggled **OFF**.\n\n*Looking to toggle this feature on? Do* `toggle restricted{channelType}`"
+restricted_channel_id_invalid_server: "The ID provided was not of a valid voice or text channel in this server."
+restricted_channel_added: "You have successfully added <#{channelId}> as a restricted {channelType} channel!"
+listing_restricted_channels: "Listing all restricted channels"
+restricted_channels_vc_embed_field: "Voice Channels"
+restricted_channels_tc_embed_field: "Text Channels"
+no_channels: "No channels"
+
+# THEME MESSAGES
+theme_set: "The theme has been set to **{theme}**"
+theme_embed_title: "Themes"
+theme_embed_desc: "Select an option below to set the current theme!"
+theme_select_menu_placeholder: "Select a theme..."
+theme_green: "Green"
+theme_mint: "Mint"
+theme_gold: "Gold"
+theme_red: "Red"
+theme_pastel_red: "Pastel Red"
+theme_pink: "Pink"
+theme_purple: "Purple"
+theme_pastel_purple: "Pastel Purple"
+theme_blue: "Blue"
+theme_light_blue: "Light Blue"
+theme_baby_blue: "Baby Blue"
+theme_orange: "Orange"
+theme_yellow: "Yellow"
+theme_pastel_yellow: "Pastel Yellow"
+theme_dark: "Dark"
+theme_light: "Light"
+
+# PREMIUM MESSAGES
+locked_command_embed_title: "🔒 Locked Command"
+locked_command_embed_desc: "Woah there! You must vote before interacting with this command!\nClick on each of the buttons below to vote!"
+
+# TOGGLES MESSAGES
+toggles_embed_title: "Toggles"
+toggles_embed_toggle_id_field: "Toggle ID"
+toggles_messages_embed_feature_field: "Feature"
+toggles_embed_status_field: "Status"
+dj_toggles_embed_command_field: "Command"
+dj_toggles_embed_status_field: "DJ Status"
+log_toggles_embed_type_field: "Log Type"
+log_toggles_embed_status_field: "Log Status"
+toggled: "You have toggled {toggle} {status}"
+invalid_toggle: "Invalid toggle!"
+dj_toggle_invalid_command: "`{command}` is an invalid command!"
+dj_toggled: "You have toggled DJ only mode for the `{command}` command to: **{status}**"
+log_toggle_invalid_type: "`{command}` is an invalid log type!"
+log_toggled: "You have toggled logs for the `{logType}` command to: **{status}**"
+
+# 24/7 MESAGES
+twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"

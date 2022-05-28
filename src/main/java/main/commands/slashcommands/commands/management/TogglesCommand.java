@@ -12,11 +12,14 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +39,9 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN))
             return;
 
-        GeneralUtils.setCustomEmbed(guild, "Toggles");
+        GeneralUtils.setCustomEmbed(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_TITLE);
 
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         var config = new TogglesConfig();
         if (args.isEmpty()) {
             var toggleIDs = new StringBuilder();
@@ -54,9 +58,9 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         .append("\n");
             }
 
-            eb.addField("Toggle ID", toggleIDs.toString(), true);
-            eb.addField("Feature", toggleNames.toString(), true);
-            eb.addField("Status", toggleStatuses.toString(), true);
+            eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_TOGGLE_ID_FIELD), toggleIDs.toString(), true);
+            eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_MESSAGES_EMBED_FEATURE_FIELD), toggleNames.toString(), true);
+            eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_STATUS_FIELD), toggleStatuses.toString(), true);
 
             msg.replyEmbeds(eb.build()).queue();
         } else {
@@ -65,78 +69,126 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 case "restrictedvoice", "1", "rvc", "rvchannels" -> {
                     if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                         config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Restricted Voice Channels`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Restricted Voice Channels`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "restrictedtext", "2", "rtc", "rtchannels" -> {
                     if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                         config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Restricted Text Channels`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Restricted Text Channels`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "announcements", "3" -> {
                     if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Announcing Player Messages`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "`Announcing Player Messages`"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "requester", "4" -> {
                     if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "showing the requester in now playing messages"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "showing the requester in now playing messages"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "8ball", "5" -> {
                     if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                         config.setToggle(guild, Toggles.EIGHT_BALL, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "8ball command"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.EIGHT_BALL, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "8ball command"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "polls", "poll", "6" -> {
                     if (config.getToggle(guild, Toggles.POLLS)) {
                         config.setToggle(guild, Toggles.POLLS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "polls command"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.POLLS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "polls command"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "tips", "7" -> {
                     if (config.getToggle(guild, Toggles.TIPS)) {
                         config.setToggle(guild, Toggles.TIPS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "tips"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.TIPS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "tips"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "voteskips", "voteskip", "vs", "8" -> {
                     if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                         config.setToggle(guild, Toggles.VOTE_SKIPS, false);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **OFF**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "vote skips"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     } else {
                         config.setToggle(guild, Toggles.VOTE_SKIPS, true);
-                        eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **ON**");
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "vote skips"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
                 case "logs", "log", "l" -> eb = handleLogToggles(guild, args);
-                default -> eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid toggle!");
+                default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
             }
             msg.replyEmbeds(eb.build()).queue();
         }
@@ -159,16 +211,24 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 var command = commandManager.getCommand(args.get(1));
 
                 if (command == null)
-                    return RobertifyEmbedUtils.embedMessage(guild, "`"+args.get(1)+"` is an invalid command!");
+                    return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLE_INVALID_COMMAND, Pair.of("{command}", args.get(1)));
+
+                final var localeManager = LocaleManager.getLocaleManager(guild);
 
                 switch (Boolean.toString(config.getDJToggle(guild, command))) {
                     case "true" -> {
                         config.setDJToggle(guild, command, false);
-                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **OFF**");
+                        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                                Pair.of("{command}", command.getName()),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     }
                     case "false" -> {
                         config.setDJToggle(guild, command, true);
-                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **ON**");
+                        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                                Pair.of("{command}", command.getName()),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                     default -> logger.error("Did not receive either true or false. Lol?? How??");
                 }
@@ -193,17 +253,25 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 try {
                     logType = LogType.valueOf(args.get(1).toUpperCase());
                 } catch (IllegalArgumentException e) {
-                    return RobertifyEmbedUtils.embedMessage(guild, "`"+args.get(1)+"` is an invalid log type!");
+                    return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLE_INVALID_TYPE, Pair.of("{command}", args.get(1)));
                 }
+
+                final var localeManager = LocaleManager.getLocaleManager(guild);
 
                 switch (Boolean.toString(config.getLogToggle(guild, logType))) {
                     case "true" -> {
                         config.setLogToggle(guild, logType, false);
-                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **OFF**");
+                        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
+                                Pair.of("{logType}", logType.getName()),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
                     }
                     case "false" -> {
                         config.setLogToggle(guild, logType, true);
-                        return RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **ON**");
+                        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
+                                Pair.of("{logType}", logType.getName()),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
                     }
                     default -> logger.error("Did not receive either true or false. Lol?? How??");
                 }
@@ -225,9 +293,10 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     .append("\n");
         }
 
-        eb.addField("Command", toggleNames.toString(), true);
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLES_EMBED_COMMAND_FIELD), toggleNames.toString(), true);
         eb.addBlankField(true);
-        eb.addField("DJ Status", toggleStatuses.toString(), true);
+        eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLES_EMBED_STATUS_FIELD), toggleStatuses.toString(), true);
 
         return eb;
     }
@@ -245,9 +314,10 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     .append("\n");
         }
 
-        eb.addField("Log type", toggleNames.toString(), true);
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLES_EMBED_TYPE_FIELD), toggleNames.toString(), true);
         eb.addBlankField(true);
-        eb.addField("Log Status", toggleStatuses.toString(), true);
+        eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLES_EMBED_STATUS_FIELD), toggleStatuses.toString(), true);
 
         return eb;
     }
@@ -360,6 +430,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         final var guild = event.getGuild();
         final var config = new TogglesConfig();
         final var path = event.getCommandPath().split("/");
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb = null;
 
         switch (path[1]) {
@@ -378,9 +449,9 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             .append("\n");
                 }
 
-                eb.addField("Toggle ID", toggleIDs.toString(), true);
-                eb.addField("Feature", toggleNames.toString(), true);
-                eb.addField("Status", toggleStatuses.toString(), true);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_TOGGLE_ID_FIELD), toggleIDs.toString(), true);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_MESSAGES_EMBED_FEATURE_FIELD), toggleNames.toString(), true);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_STATUS_FIELD), toggleStatuses.toString(), true);
             }
             case "switch" -> {
                 final var toggle = event.getOption("toggle").getAsString();
@@ -389,76 +460,124 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     case "restrictedvoice", "1", "rvc", "rvchannels" -> {
                         if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                             config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Restricted Voice Channels`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted voice channels **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Restricted Voice Channels`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "restrictedtext", "2", "rtc", "rtchannels" -> {
                         if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
                             config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Restricted Text Channels`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled restricted text channels **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Restricted Text Channels`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "announcements", "3" -> {
                         if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
                             config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Announcing Player Messages`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled announcing player messages **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "`Announcing Player Messages`"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "requester", "4" -> {
                         if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
                             config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "showing the requester in now playing messages"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled showing the requester in now playing messages **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "showing the requester in now playing messages"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "8ball", "5" -> {
                         if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
                             config.setToggle(guild, Toggles.EIGHT_BALL, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "8ball command"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.EIGHT_BALL, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the 8ball command **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "8ball command"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "polls", "poll", "6" -> {
                         if (config.getToggle(guild, Toggles.POLLS)) {
                             config.setToggle(guild, Toggles.POLLS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "polls command"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.POLLS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled the polls command **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "polls command"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "tips", "7" -> {
                         if (config.getToggle(guild, Toggles.TIPS)) {
                             config.setToggle(guild, Toggles.TIPS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "tips"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.TIPS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled tips **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "tips"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                     case "voteskips", "voteskip", "vs", "8" -> {
                         if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                             config.setToggle(guild, Toggles.VOTE_SKIPS, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "vote skips"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setToggle(guild, Toggles.VOTE_SKIPS, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled vote skips **ON**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "vote skips"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
-                    default -> eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid toggle!");
+                    default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
                 }
             }
             case "dj" -> {
@@ -469,16 +588,22 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         AbstractSlashCommand command = new SlashCommandManager().getCommand(toggle);
 
                         if (command == null) {
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "`" + toggle + "` is an invalid command!");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLE_INVALID_COMMAND, Pair.of("{command}", toggle));
                             break;
                         }
 
                         if (config.getDJToggle(guild, command)) {
                             config.setDJToggle(guild, command, false);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **OFF**");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                                    Pair.of("{command}", command.getName()),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
                         } else {
                             config.setDJToggle(guild, command, true);
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled DJ only mode for the `"+command.getName()+"` command to: **ON**");
+                            RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                                    Pair.of("{command}", command.getName()),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
                         }
                     }
                 }
@@ -492,18 +617,24 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         try {
                             logType = LogType.valueOf(logTypeStr.toUpperCase());
                         } catch (IllegalArgumentException e) {
-                            eb =  RobertifyEmbedUtils.embedMessage(guild, "`"+logTypeStr+"` is an invalid log type!");
+                            eb =  RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLE_INVALID_TYPE, Pair.of("{logType}", logTypeStr));
                             break;
                         }
 
                         switch (Boolean.toString(config.getLogToggle(guild, logType))) {
                             case "true" -> {
                                 config.setLogToggle(guild, logType, false);
-                                eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **OFF**");
+                                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
+                                        Pair.of("{logType}", logType.getName()),
+                                        Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                                );
                             }
                             case "false" -> {
                                 config.setLogToggle(guild, logType, true);
-                                eb = RobertifyEmbedUtils.embedMessage(guild, "You have toggled logs for `"+logType.getName()+"` to: **ON**");
+                                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
+                                        Pair.of("{logType}", logType.getName()),
+                                        Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                                );
                             }
                             default -> logger.error("Did not receive either true or false. Lol?? How??");
                         }

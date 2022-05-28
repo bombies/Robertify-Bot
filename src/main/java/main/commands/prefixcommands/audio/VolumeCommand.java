@@ -8,10 +8,12 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -48,13 +50,13 @@ public class VolumeCommand implements ICommand {
         final var guild = selfVoiceState.getGuild();
 
         if (!selfVoiceState.inVoiceChannel())
-            return RobertifyEmbedUtils.embedMessage(guild, "You can't use this command while I'm not in a voice channel");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
         if (memberVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as I am to use this command");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (volume < 0 || volume > 100)
-            return RobertifyEmbedUtils.embedMessage(guild, "You can't set the volume to that value");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.VolumeMessages.INVALID_VOLUME);
 
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(memberVoiceState.getGuild());
         var audioPlayer = musicManager.getPlayer();
@@ -64,8 +66,15 @@ public class VolumeCommand implements ICommand {
         if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
             new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
 
-        new LogUtils().sendLog(guild, LogType.VOLUME_CHANGE, memberVoiceState.getMember().getAsMention() + " has changed the volume to `"+volume+"%`");
-        return RobertifyEmbedUtils.embedMessage(guild, "🔊  You have set the volume of the bot to **"+volume+"%**");
+        new LogUtils().sendLog(guild, LogType.VOLUME_CHANGE,
+                RobertifyLocaleMessage.VolumeMessages.VOLUME_CHANGED_LOG,
+                Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
+                Pair.of("{volume}", String.valueOf(volume))
+        );
+        return RobertifyEmbedUtils.embedMessage(guild,
+                RobertifyLocaleMessage.VolumeMessages.VOLUME_CHANGED,
+                Pair.of("{volume}", String.valueOf(volume))
+        );
     }
 
     @Override
