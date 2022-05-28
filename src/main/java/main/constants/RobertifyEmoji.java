@@ -3,16 +3,17 @@ package main.constants;
 import net.dv8tion.jda.api.entities.Emoji;
 
 public enum RobertifyEmoji {
-    PREVIOUS_EMOJI("<:rewind:913595299203805194>"),
-    REWIND_EMOJI("<:back:913595555811307541>"),
-    PLAY_EMOJI("<:play:913594529603547237>"),
-    END_EMOJI("<:next:913594937298280528>"),
+    PREVIOUS_EMOJI("<:previous:980202130755444766>"),
+    REWIND_EMOJI("<:rewind:980201728815276113>"),
+    PLAY_EMOJI("<:play:980201728622329867>"),
+    END_EMOJI("<:skip:980202130914803772>"),
     PAUSE_EMOJI("<:pause:913595131058356256>"),
-    PLAY_AND_PAUSE_EMOJI("<:playandpause:913594828338659368>"),
-    LOOP_EMOJI("<:loop:913613388003823636>"),
-    SHUFFLE_EMOJI("<:shuffle:913613387974471741>"),
-    STOP_EMOJI("<:stop:913601140879425557>"),
-    QUIT_EMOJI("<:close:913798787691073556>"),
+    PLAY_AND_PAUSE_EMOJI("<:playandpause:980201728458768424>"),
+    LOOP_EMOJI("<:loop:980197155929214986>"),
+    SHUFFLE_EMOJI("<:shuffle:980197231623823482>"),
+    STOP_EMOJI("<:stop:980201728450375681>"),
+    QUIT_EMOJI("<:disconnect:980201728987267072>"),
+    STAR_EMOJI("<:favourite:980201729096286239>"),
     CHECK_EMOJI("<:check:914738311535407136>"),
     BAR_START_FULL("<:VolumeBarEmoteStartFULL:917851063384674394>"),
     BAR_START_EMPTY("<:VolumeBarEmoteStartEMPTY:917851063321776198>"),
@@ -31,7 +32,7 @@ public enum RobertifyEmoji {
 
     @Override
     public String toString() {
-        return str;
+        return str.trim();
     }
 
     public Emoji getEmoji() {

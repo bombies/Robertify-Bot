@@ -59,9 +59,8 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet(g.getIdLong())) {
-                dedicatedChannelConfig.updateMessage(g);
-            }
+            if (dedicatedChannelConfig.isChannelSet(g.getIdLong()))
+                dedicatedChannelConfig.updateAll(g);
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);

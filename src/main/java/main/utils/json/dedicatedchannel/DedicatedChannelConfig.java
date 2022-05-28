@@ -197,6 +197,12 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
     }
 
+    public void updateAll(Guild g) {
+        updateMessage(g);
+        updateButtons(g);
+        updateTopic(g);
+    }
+
     public void updateButtons() {
         for (Guild g : Robertify.shardManager.getGuilds()) {
             if (!isChannelSet(g.getIdLong())) continue;
@@ -227,7 +233,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                         Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString()))
                 ),
                 ActionRow.of(
-                        Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromMarkdown("⭐")),
+                        Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromMarkdown(RobertifyEmoji.STAR_EMOJI.toString())),
                         Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP.toString(), "Track", Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
                         Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP + "queue", "Queue", Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
                         Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
@@ -253,14 +259,14 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
     public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
         return channel.getManager().setTopic(
-                RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song. " +
-                        RobertifyEmoji.REWIND_EMOJI + " Rewind the song. " +
-                        RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song. " +
-                        RobertifyEmoji.STOP_EMOJI + " Stop the song and clear the queue. " +
-                        RobertifyEmoji.END_EMOJI + " Skip the song. " +
-                        RobertifyEmoji.LOOP_EMOJI + " Loop the song. " +
-                        RobertifyEmoji.SHUFFLE_EMOJI + " Shuffle the song. " +
-                        RobertifyEmoji.QUIT_EMOJI + " Disconnect the bot "
+                RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song.\n" +
+                        RobertifyEmoji.REWIND_EMOJI + " Rewind the song.\n" +
+                        RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song.\n" +
+                        RobertifyEmoji.STOP_EMOJI + " Stop the song and clear the queue.\n" +
+                        RobertifyEmoji.END_EMOJI + " Skip the song.\n" +
+                        RobertifyEmoji.LOOP_EMOJI + " Loop the song.\n" +
+                        RobertifyEmoji.SHUFFLE_EMOJI + " Shuffle the song.\n" +
+                        RobertifyEmoji.QUIT_EMOJI + " Disconnect the bot\n"
         );
     }
 
