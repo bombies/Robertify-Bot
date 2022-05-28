@@ -75,7 +75,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
     }
 
     public EmbedBuilder handlePoll(TextChannel channel, User sender, String question) {
-        final Pattern choiceWithDurationRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s[0-9]+[sSmMhHdD]\\s$");
+        final Pattern choiceWithDurationRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s\\d+[sSmMhHdD]\\s$");
         final Pattern choiceRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s$");
         final var guild = channel.getGuild();
 
