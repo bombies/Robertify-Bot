@@ -67,6 +67,11 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         }
     }
 
+    @Override
+    public boolean isPremiumCommand() {
+        return true;
+    }
+
     public MessageEmbed handleAdd(Guild guild, @NotNull Member member) {
         final var config = FavouriteTracksCache.getInstance();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
@@ -275,6 +280,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                                         "Clear all of your favourite tracks!"
                                 )
                         )
+                        .setPremium()
                         .build()
         );
     }
@@ -298,7 +304,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checks(event)) return;
+        if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 
         switch (event.getSubcommandName()) {
