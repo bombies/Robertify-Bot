@@ -61,7 +61,7 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event))
+        if (!devCheck(event))
             return;
 
         try {

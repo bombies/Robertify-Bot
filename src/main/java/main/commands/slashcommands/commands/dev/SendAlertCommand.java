@@ -40,7 +40,7 @@ public class SendAlertCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checks(event)) return;
+        if (!devCheck(event)) return;
 
         final var alert = event.getOption("alert").getAsString();
 

@@ -272,7 +272,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!banCheck(event)) return false;
         if (!restrictedChannelCheck(event)) return false;
         if (!botPermsCheck(event)) return false;
-        if (!devCheck(event)) return false;
 
         if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
             BotBDCache botDB = BotBDCache.getInstance();
@@ -285,17 +284,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         if (!adminCheck(event)) return false;
         return djCheck(event);
-    }
-
-    protected boolean devChecks(SlashCommandEvent event) {
-        if (!nameCheck(event)) return false;
-        if (!BotBDCache.getInstance().isDeveloper(event.getUser().getIdLong())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS).build())
-                    .setEphemeral(true)
-                    .queue();
-            return false;
-        }
-        return true;
     }
 
     protected boolean checksWithPremium(SlashCommandEvent event) {
@@ -466,11 +454,13 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected boolean devCheck(SlashCommandEvent event) {
         if (command == null)
             buildCommand();
+        if (!nameCheck(event))
+            return false;
         if (!command.isPrivate)
             return true;
 
         if (!BotBDCache.getInstance().isDeveloper(event.getUser().getIdLong())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to run this command!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS).build())
                     .setEphemeral(true)
                     .queue();
             return false;

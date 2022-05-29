@@ -77,7 +77,7 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checks(event)) return;
+        if (!devCheck(event)) return;
 
         JdaLavalink lavalink = Robertify.getLavalink();
         DecimalFormat df = new DecimalFormat("###.##");

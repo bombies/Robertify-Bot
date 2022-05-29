@@ -25,7 +25,7 @@ public class RefreshSpotifyTokenCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!devChecks(event)) return;
+        if (!devCheck(event)) return;
 
         SpotifyAuthorizationUtils.setTokens();
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Refreshed Spotify token!").build())

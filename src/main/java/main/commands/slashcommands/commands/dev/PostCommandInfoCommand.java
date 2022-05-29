@@ -27,7 +27,7 @@ public class PostCommandInfoCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checks(event)) return;
+        if (!devCheck(event)) return;
 
         SlashCommandManager slashCommandManager = new SlashCommandManager();
         final var commands = slashCommandManager.getCommands();

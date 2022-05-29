@@ -35,7 +35,7 @@ public class ShardInfoCommand extends AbstractSlashCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!checks(event)) return;
+        if (!devCheck(event)) return;
 
         final EmbedBuilder embedBuilder = RobertifyEmbedUtils.getEmbedBuilder(event.getGuild());
         final int currentShard = event.getJDA().getShardInfo().getShardId();

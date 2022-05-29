@@ -140,7 +140,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!devCheck(event)) return;
 
         final var guild = event.getGuild();
         EmbedBuilder eb;

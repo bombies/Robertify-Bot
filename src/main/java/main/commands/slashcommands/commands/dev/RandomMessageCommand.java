@@ -151,7 +151,7 @@ public class RandomMessageCommand extends AbstractSlashCommand implements IDevCo
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!devCheck(event)) return;
 
         final RandomMessageManager randomMessageManager = new RandomMessageManager();
         switch (event.getSubcommandName()) {
