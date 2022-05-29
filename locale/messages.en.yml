@@ -277,4 +277,5 @@ log_toggle_invalid_type: "`{command}` is an invalid log type!"
 log_toggled: "You have toggled logs for the `{logType}` command to: **{status}**"
 
 # 24/7 MESAGES
-twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"
+twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"lofi_disabled: "Fill me out!"
+user_unbanned: "Fill me out!"
