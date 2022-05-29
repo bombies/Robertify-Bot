@@ -27,6 +27,7 @@ public enum RobertifyLocaleMessage {
         RESTRICTED_TO_JOIN,
         RESTRICTED_TOGGLED_NO_CHANNELS,
         INSUFFICIENT_PERMS,
+        INSUFFICIENT_PERMS_NO_ARGS,
         SELF_INSUFFICIENT_PERMS,
         DJ_ONLY,
         NOTHING_PLAYING,

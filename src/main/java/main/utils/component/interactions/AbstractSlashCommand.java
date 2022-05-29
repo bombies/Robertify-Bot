@@ -19,6 +19,7 @@ import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -153,6 +154,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             throw new IllegalStateException("The command is null! Cannot load into guild.");
 
+        if (command.isPrivate && g.getOwnerIdLong() != Config.getOwnerID())
+            return;
+
         // Initial request builder
         CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
 
@@ -281,6 +285,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         if (!adminCheck(event)) return false;
         return djCheck(event);
+    }
+
+    protected boolean devChecks(SlashCommandEvent event) {
+        if (!nameCheck(event)) return false;
+        if (!BotBDCache.getInstance().isDeveloper(event.getUser().getIdLong())) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS).build())
+                    .setEphemeral(true)
+                    .queue();
+            return false;
+        }
+        return true;
     }
 
     protected boolean checksWithPremium(SlashCommandEvent event) {

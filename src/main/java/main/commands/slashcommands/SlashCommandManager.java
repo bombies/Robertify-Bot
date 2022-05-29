@@ -115,7 +115,8 @@ public class SlashCommandManager {
                 new ReloadConfigCommand(),
                 new ShardInfoCommand(),
                 new SendAlertCommand(),
-                new PostCommandInfoCommand()
+                new PostCommandInfoCommand(),
+                new RefreshSpotifyTokenCommand()
         );
     }
 
