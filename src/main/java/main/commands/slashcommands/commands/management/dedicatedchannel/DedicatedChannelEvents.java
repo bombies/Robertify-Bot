@@ -13,8 +13,11 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.logs.LogType;
+import main.utils.json.logs.LogUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -26,6 +29,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
@@ -252,26 +256,55 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
-            if (!djCheck(new LoopCommand(), guild, member)) {
+            final LoopCommand loopCommand = new LoopCommand();
+            if (!djCheck(loopCommand, guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
                                 " to use this button!").build())
                         .queue();
                 return;
             }
 
-            EmbedBuilder loopEmbed = new LoopCommand().handleRepeat(musicManager, member.getUser());
-            event.reply(member.getAsMention()).addEmbeds(loopEmbed.build())
-                    .queue(null, new ErrorHandler()
-                            .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP + "queue")) {
-            if (!djCheck(new LoopCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
-                        .queue();
-                return;
+            final var scheduler = musicManager.getScheduler();
+            final var info = musicManager.getPlayer().getPlayingTrack().getInfo();
+            final EmbedBuilder loopEmbed;
+            if (scheduler.repeating) {
+                scheduler.repeating = false;
+                scheduler.playlistRepeating = true;
+                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
+
+                new LogUtils().sendLog(
+                        guild,
+                        LogType.QUEUE_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG,
+                        Pair.of("{user}", member.getAsMention()),
+                        Pair.of("{status}", "looped")
+                );
+            } else if (scheduler.playlistRepeating) {
+                scheduler.playlistRepeating = false;
+                scheduler.repeating = false;
+                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
+
+                new LogUtils().sendLog(
+                        guild,
+                        LogType.QUEUE_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG,
+                        Pair.of("{user}", member.getAsMention()),
+                        Pair.of("{status}", "unlooped")
+                );
+            } else {
+                scheduler.repeating = true;
+                scheduler.playlistRepeating = false;
+                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START);
+
+                new LogUtils().sendLog(
+                        guild,
+                        LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
+                        Pair.of("{user}", member.getAsMention()),
+                        Pair.of("{status}", "looped"),
+                        Pair.of("{title}", info.title),
+                        Pair.of("{author}", info.author)
+
+                );
             }
 
-            EmbedBuilder loopEmbed = new LoopCommand().handleQueueRepeat(musicManager, member.getUser());
             event.reply(member.getAsMention()).addEmbeds(loopEmbed.build())
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
