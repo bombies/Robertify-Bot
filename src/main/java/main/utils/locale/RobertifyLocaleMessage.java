@@ -36,7 +36,8 @@ public enum RobertifyLocaleMessage {
         NO_PERMS_END_INTERACTION,
         NO_PERMS_BUTTON,
         BUTTON_NO_LONGER_VALID,
-        NO_SUCH_CHANNEL
+        NO_SUCH_CHANNEL,
+        OK
     }
 
     public enum RandomMessages implements LocaleMessage {
@@ -314,7 +315,8 @@ public enum RobertifyLocaleMessage {
         DJ_TOGGLE_INVALID_COMMAND,
         DJ_TOGGLED,
         LOG_TOGGLE_INVALID_TYPE,
-        LOG_TOGGLED
+        LOG_TOGGLED,
+        SKIP_DJ_TOGGLE_PROMPT
     }
 
     public enum TwentyFourSevenMessages implements LocaleMessage {

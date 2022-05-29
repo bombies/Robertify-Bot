@@ -17,8 +17,12 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -178,12 +182,26 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                 Pair.of("{toggle}", "vote skips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
+
+                        final var skipCommand = new SlashCommandManager().getCommand("skip");
+                        if (config.getDJToggle(guild, skipCommand)) {
+                            ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
+                                    .setActionRow(
+                                            Button.of(ButtonStyle.SUCCESS, "toggledjskip:yes:" + ctx.getAuthor().getId(), "", RobertifyEmoji.CHECK_EMOJI.getEmoji()),
+                                            Button.of(ButtonStyle.SECONDARY, "toggledjskip:no:" + ctx.getAuthor().getId(), "", RobertifyEmoji.QUIT_EMOJI.getEmoji())
+                                    )
+                                    .queue();
+                        }
                     } else {
                         config.setToggle(guild, Toggles.VOTE_SKIPS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "vote skips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                         );
+
+                        final var skipCommand = new SlashCommandManager().getCommand("skip");
+                        if (!config.getDJToggle(guild, skipCommand))
+                            config.setDJToggle(guild, skipCommand, true);
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
@@ -427,6 +445,8 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
+        event.deferReply().queue();
+
         final var guild = event.getGuild();
         final var config = new TogglesConfig();
         final var path = event.getCommandPath().split("/");
@@ -569,12 +589,26 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                     Pair.of("{toggle}", "vote skips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
+
+                            final var skipCommand = new SlashCommandManager().getCommand("skip");
+                            if (config.getDJToggle(guild, skipCommand)) {
+                                event.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
+                                        .setActionRow(
+                                                Button.of(ButtonStyle.SUCCESS, "toggledjskip:yes:" + event.getUser().getId(), "", RobertifyEmoji.CHECK_EMOJI.getEmoji()),
+                                                Button.of(ButtonStyle.SECONDARY, "toggledjskip:no:" + event.getUser().getId(), "", RobertifyEmoji.QUIT_EMOJI.getEmoji())
+                                        )
+                                        .queue();
+                            }
                         } else {
                             config.setToggle(guild, Toggles.VOTE_SKIPS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "vote skips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                             );
+
+                            final var skipCommand = new SlashCommandManager().getCommand("skip");
+                            if (!config.getDJToggle(guild, skipCommand))
+                                config.setDJToggle(guild, skipCommand, true);
                         }
                     }
                     default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
@@ -642,6 +676,47 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 }
             }
         }
-        event.replyEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build()).queue();
+    }
+
+    @Override
+    public void onButtonClick(@NotNull ButtonClickEvent event) {
+        if (!event.getButton().getId().startsWith("toggledjskip:"))
+            return;
+
+        final var guild = event.getGuild();
+        final var split = event.getButton().getId().split(":");
+        if (!event.getUser().getId().equals(split[2])) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_PERMS_BUTTON).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        final var disabledButtons = event.getMessage().getButtons()
+                .stream()
+                .map(Button::asDisabled)
+                .toList();
+
+        switch (split[1].toLowerCase()) {
+            case "yes" -> {
+                final var config = new TogglesConfig();
+                final var skipCommand = new SlashCommandManager().getCommand("skip");
+                final var localeManager = LocaleManager.getLocaleManager(guild);
+
+                config.setDJToggle(guild, skipCommand, false);
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                        Pair.of("{command}", "skip"),
+                        Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))
+                ).build()).setEphemeral(true).queue();
+            }
+            case "no" -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.OK).build())
+                    .setEphemeral(true)
+                    .queue();
+        }
+
+        event.getMessage().editMessageComponents(
+                ActionRow.of(disabledButtons)
+        ).queue();
     }
 }

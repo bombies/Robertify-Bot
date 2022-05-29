@@ -30,6 +30,7 @@ no_perms_end_interaction: "You do not have permission to end this interaction!"
 no_perms_button: "You do not have permission to interact with this button!"
 button_no_longer_valid: "This button is no longer valid..."
 no_such_channel: "There is no such channel with that ID in this server!"
+ok: "Okay!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -81,7 +82,7 @@ jumped: "Successfully jumped {duration} seconds ahead!"
 
 # LOFI MESSAGES
 lofi_enabling: "Enabling Lo-Fi mode..."
-lofi_disabling: "You have disabled Lo-Fi mode"
+lofi_disabled: "You have disabled Lo-Fi mode"
 
 # LOOP MESSAGES
 loop_nothing_playing: "There is no song playing. I can't repeat nothing."
@@ -211,7 +212,7 @@ user_temp_banned_response: "You have banned {user} for `{duration}`"
 missing_unban_user: "You must provide a user to unban!"
 invalid_unban_user: "You must provide a valid user to unban!"
 user_not_banned: "This user is not banned."
-user_banned: "You have been unbanned from **{server}**"
+user_unbanned: "You have been unbanned from **{server}**"
 user_unbanned_response: "You have unbanned {user}"
 
 # LOG CHANNEL MESSAGES
@@ -269,13 +270,13 @@ dj_toggles_embed_command_field: "Command"
 dj_toggles_embed_status_field: "DJ Status"
 log_toggles_embed_type_field: "Log Type"
 log_toggles_embed_status_field: "Log Status"
-toggled: "You have toggled {toggle} {status}"
+toggled: "You have toggled {toggle} **{status}**"
 invalid_toggle: "Invalid toggle!"
 dj_toggle_invalid_command: "`{command}` is an invalid command!"
 dj_toggled: "You have toggled DJ only mode for the `{command}` command to: **{status}**"
 log_toggle_invalid_type: "`{command}` is an invalid log type!"
 log_toggled: "You have toggled logs for the `{logType}` command to: **{status}**"
+skip_dj_toggle_prompt: "Would you like to turn off DJ only mode for the `skip` command?"
 
 # 24/7 MESAGES
-twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"lofi_disabled: "Fill me out!"
-user_unbanned: "Fill me out!"
+twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"
