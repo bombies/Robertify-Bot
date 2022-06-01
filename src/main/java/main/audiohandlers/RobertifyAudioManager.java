@@ -50,15 +50,19 @@ public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
 
     private static RobertifyAudioManager INSTANCE;
+
     @Getter
     private final Map<Long, GuildMusicManager> musicManagers;
-    @Getter
-    /*
-    Each guild will have a list that consists of tracks formatted "userid:trackstring"
+
+    /**
+     * Each guild will have a list that consists of tracks formatted "userid:trackstring"
      */
+    @Getter
     private static final HashMap<Long, List<String>> tracksRequestedByUsers = new HashMap<>();
+
     @Getter
     private static final List<String> unannouncedTracks = new ArrayList<>();
+
     @Getter
     private final AudioPlayerManager playerManager;
 
