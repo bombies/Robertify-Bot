@@ -406,7 +406,8 @@ public class RobertifyAudioManager {
                 tracksRequestedByUsers.get(guild.getIdLong())
                         .stream()
                         .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getIdentifier()))
-                        .findFirst().get()
+                        .findFirst()
+                        .orElse("Unknown Requester")
                         .split(":")[0]
                 + ">";
     }
