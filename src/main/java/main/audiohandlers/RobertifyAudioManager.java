@@ -406,8 +406,8 @@ public class RobertifyAudioManager {
                 .stream()
                 .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getIdentifier()))
                 .findFirst()
-                .orElse(null)
-                .split(":")[0];
+                .orElse(null);
+        requester = requester != null ? requester.split(":")[0] : null;
         return requester != null ? "<@" + requester + ">" : "Unknown requester";
     }
 
