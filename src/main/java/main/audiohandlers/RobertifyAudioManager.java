@@ -402,14 +402,13 @@ public class RobertifyAudioManager {
     }
 
     public static String getRequester(Guild guild, AudioTrack track) {
-        return "<@" +
-                tracksRequestedByUsers.get(guild.getIdLong())
-                        .stream()
-                        .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getIdentifier()))
-                        .findFirst()
-                        .orElse("Unknown Requester")
-                        .split(":")[0]
-                + ">";
+        String requester = tracksRequestedByUsers.get(guild.getIdLong())
+                .stream()
+                .filter(trackInfo -> trackInfo.split(":")[1].equals(track.getIdentifier()))
+                .findFirst()
+                .orElse(null)
+                .split(":")[0];
+        return requester != null ? "<@" + requester + ">" : "Unknown requester";
     }
 
     public static void removeRequester(Guild guild, AudioTrack track, User requester) {
