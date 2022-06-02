@@ -2,6 +2,7 @@ package main.utils.locale;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -53,6 +54,12 @@ public class LocaleManager {
         locales.clear();
         RobertifyLocale.getAvailableLanguages()
                 .forEach(locale -> locales.put(locale, retrieveLocaleFile(locale)));
+        Robertify.getShardManager().getGuildCache().forEach(guild -> {
+            if (localeManagers.containsKey(guild.getIdLong())) {
+                LocaleManager localeManager = localeManagers.get(guild.getIdLong());
+                localeManager.setLocale(localeManager.locale);
+            }
+        });
     }
 
     public String getMessage(LocaleMessage message) {
@@ -85,9 +92,8 @@ public class LocaleManager {
 
         File localeFile = new File("./locale/messages." + locale.getCode().toLowerCase() + ".yml");
 
-        if (!localeFile.exists()) {
+        if (!localeFile.exists())
             createLocaleFile(locale);
-        }
 
         if (localeFile.length() == 0) {
             logger.error("There was no information found in the file for locale: " + locale.getCode().toUpperCase());

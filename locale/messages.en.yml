@@ -467,4 +467,4 @@ inactivity_leave: "I have left {channel} due to inactivity."
 # LANGUAGE COMMAND MESSAGES
 language_embed_desc: "Current Language: **{language}**\n\nSelect an option from the list below to change the bot's language!"
 language_select_menu_place_holder: "Select a language!"
-language_changed: "You have changed the language to: {language}"
+language_changed: "You have changed the language to: **{language}**"

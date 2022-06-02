@@ -68,6 +68,8 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
 
         try {
             Config.reload();
+            LocaleManager.reloadLocales();
+            Robertify.initVoteSiteAPIs();
             RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
             event.reply("Successfully reloaded all configs!").setEphemeral(true).queue();
         } catch (Exception e) {
