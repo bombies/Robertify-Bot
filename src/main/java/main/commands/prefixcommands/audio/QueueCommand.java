@@ -20,6 +20,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -70,7 +71,8 @@ public class QueueCommand implements ICommand {
 
     public List<String> getContent(Guild guild, Stack<AudioTrack> pastTracks) {
         List<String> content = new ArrayList<>();
-        final var trackList = pastTracks.stream().toList();
+        final var trackList = new ArrayList<>(pastTracks.stream().toList());
+        Collections.reverse(trackList);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         for (int i = 0; i < pastTracks.size(); i++) {
             final AudioTrack track = trackList.get(i);
