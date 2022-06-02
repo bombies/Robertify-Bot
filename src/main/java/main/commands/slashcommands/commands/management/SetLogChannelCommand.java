@@ -68,12 +68,6 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
 
         final var config = new LogConfig();
 
-        if (config.channelIsSet(guild.getIdLong())) {
-            TextChannel oldChannel = config.getChannel(guild.getIdLong());
-            config.removeChannel(guild.getIdLong());
-           oldChannel.delete().queue();
-        }
-
         config.setChannel(guild.getIdLong(), channel.getIdLong());
         message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SET, Pair.of("{channel}", channel.getAsMention())).build())
                 .queue();
