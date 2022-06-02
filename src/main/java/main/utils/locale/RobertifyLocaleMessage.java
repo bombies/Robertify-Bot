@@ -527,6 +527,11 @@ public enum RobertifyLocaleMessage {
         LANGUAGE_CHANGED
     }
 
+    public enum HistoryMessages implements LocaleMessage {
+        NO_PAST_TRACKS,
+        HISTORY_EMBED_TITLE
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -577,6 +582,7 @@ public enum RobertifyLocaleMessage {
         ret.put(AutoPlayMessages.class, AutoPlayMessages.values());
         ret.put(TrackSchedulerMessages.class, TrackSchedulerMessages.values());
         ret.put(LanguageCommandMessages.class, LanguageCommandMessages.values());
+        ret.put(HistoryMessages.class, HistoryMessages.values());
         return ret;
     }
 }

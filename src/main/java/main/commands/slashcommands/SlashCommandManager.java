@@ -68,7 +68,8 @@ public class SlashCommandManager {
                 new EightDFilter(),
                 new TremoloFilter(),
                 new VibratoFilter(),
-                new StopCommand()
+                new StopCommand(),
+                new HistoryCommand()
         );
 
         addManagementCommands(

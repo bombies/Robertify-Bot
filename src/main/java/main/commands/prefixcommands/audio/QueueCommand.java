@@ -21,6 +21,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Deprecated @ForRemoval
@@ -67,6 +68,22 @@ public class QueueCommand implements ICommand {
         return content;
     }
 
+    public List<String> getContent(Guild guild, Stack<AudioTrack> pastTracks) {
+        List<String> content = new ArrayList<>();
+        final var trackList = pastTracks.stream().toList();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        for (int i = 0; i < pastTracks.size(); i++) {
+            final AudioTrack track = trackList.get(i);
+            final AudioTrackInfo info = track.getInfo();
+            content.add(localeManager.getMessage(RobertifyLocaleMessage.QueueMessages.QUEUE_ENTRY,
+                    Pair.of("{id}", String.valueOf(i+1)),
+                    Pair.of("{title}", info.title),
+                    Pair.of("{author}", info.author),
+                    Pair.of("{duration}", GeneralUtils.formatTime(track.getInfo().length))
+            ));
+        }
+        return content;
+    }
     @Override
     public String getName() {
         return "queue";

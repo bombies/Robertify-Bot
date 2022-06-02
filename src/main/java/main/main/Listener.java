@@ -3,6 +3,7 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.audio.HistoryCommand;
 import main.commands.slashcommands.commands.dev.PostCommandInfoCommand;
 import main.commands.slashcommands.commands.dev.RefreshSpotifyTokenCommand;
 import main.commands.slashcommands.commands.management.LanguageCommand;
@@ -194,6 +195,7 @@ public class Listener extends ListenerAdapter {
         new TogglesCommand().loadCommand(g);
         new RefreshSpotifyTokenCommand().loadCommand(g);
         new LanguageCommand().loadCommand(g);
+        new HistoryCommand().loadCommand(g);
     }
 
     /**
