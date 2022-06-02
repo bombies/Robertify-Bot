@@ -15,6 +15,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.LocaleConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -57,6 +58,10 @@ public class Listener extends ListenerAdapter {
 
         for (Guild g : jda.getGuildCache()) {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
+            final var locale = new LocaleConfig().getLocale(g.getIdLong());
+            if (locale != null)
+                LocaleManager.getLocaleManager(g.getIdLong()).setLocale(locale);
+
             loadNeededSlashCommands(g);
             unloadCommands(g);
 //            unloadDevCommands(g, "");

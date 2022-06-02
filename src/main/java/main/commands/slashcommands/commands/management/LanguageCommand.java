@@ -80,6 +80,7 @@ public class LanguageCommand extends AbstractSlashCommand {
         if (!selectionMenu.getId().startsWith("languagemenu")) return;
 
         final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);
+        LocaleManager.getLocaleManager(event.getGuild()).setLocale(newLocale);
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                 .build())
                 .setEphemeral(true)
