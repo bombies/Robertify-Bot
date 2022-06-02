@@ -29,7 +29,9 @@ public enum RobertifyLocaleMessage {
         INSUFFICIENT_PERMS,
         INSUFFICIENT_PERMS_NO_ARGS,
         SELF_INSUFFICIENT_PERMS,
+        SELF_INSUFFICIENT_PERMS_ARGS,
         DJ_ONLY,
+        DJ_BUTTON,
         NOTHING_PLAYING,
         NOTHING_IN_QUEUE,
         CANT_BE_USED_IN_CHANNEL,
@@ -38,7 +40,18 @@ public enum RobertifyLocaleMessage {
         NO_PERMS_BUTTON,
         BUTTON_NO_LONGER_VALID,
         NO_SUCH_CHANNEL,
-        OK
+        OK,
+        NOTHING_HERE,
+        INVALID_MINUTE,
+        INVALID_HOUR,
+        MUST_PROVIDE_VALID_CHANNEL,
+        SELECT_MENU_PLACEHOLDER,
+        VOTE_EMBED_DESC,
+        WEBSITE_EMBED_DESC,
+        INSUFFICIENT_PERMS_TO_JOIN,
+        UNKNOWN_REQUESTER,
+        BANNED_FROM_COMMANDS,
+        NO_EMBED_PERMS
     }
 
     public enum RandomMessages implements LocaleMessage {
@@ -98,6 +111,7 @@ public enum RobertifyLocaleMessage {
 
     public enum LofiMessages implements LocaleMessage {
         LOFI_ENABLING,
+        LOFI_ENABLED,
         LOFI_DISABLED
     }
 
@@ -135,6 +149,8 @@ public enum RobertifyLocaleMessage {
         NP_LIVESTREAM,
         NP_TIME_LEFT,
         NP_AUTHOR,
+        NP_ANNOUNCEMENT_DESC,
+        NP_ANNOUNCEMENT_REQUESTER,
     }
 
     public enum PauseMessages implements LocaleMessage {
@@ -182,7 +198,11 @@ public enum RobertifyLocaleMessage {
 
     public enum SearchMessages implements LocaleMessage {
         MUST_PROVIDE_QUERY,
-        LOOKING_FOR
+        LOOKING_FOR,
+        SEARCH_MENU_PLACEHOLDER,
+        SEARCH_EMBED_AUTHOR,
+        SEARCH_EMBED_FOOTER,
+        SEARCH_END_INTERACTION
     }
 
     public enum SeekMessages implements LocaleMessage {
@@ -324,6 +344,184 @@ public enum RobertifyLocaleMessage {
         TWENTY_FOUR_SEVEN_TOGGLED
     }
 
+    public enum DedicatedChannelMessages implements LocaleMessage {
+        DEDICATED_CHANNEL_SETUP,
+        DEDICATED_CHANNEL_SETUP_2,
+        DEDICATED_CHANNEL_ALREADY_SETUP,
+        DEDICATED_CHANNEL_NOTHING_PLAYING,
+        DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING,
+        DEDICATED_CHANNEL_QUEUE_PLAYING,
+        DEDICATED_CHANNEL_NO_ACCESS_ANYMORE,
+        DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
+        DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
+        DEDICATED_CHANNEL_QUEUE_NO_SONGS,
+        DEDICATED_CHANNEL_TOPIC_PREVIOUS,
+        DEDICATED_CHANNEL_TOPIC_REWIND,
+        DEDICATED_CHANNEL_TOPIC_PLAY_AND_PAUSE,
+        DEDICATED_CHANNEL_TOPIC_STOP,
+        DEDICATED_CHANNEL_TOPIC_END,
+        DEDICATED_CHANNEL_TOPIC_STAR,
+        DEDICATED_CHANNEL_TOPIC_LOOP,
+        DEDICATED_CHANNEL_TOPIC_SHUFFLE,
+        DEDICATED_CHANNEL_TOPIC_QUIT,
+    }
+
+    public enum PermissionsMessages implements LocaleMessage {
+        PERMISSIONS_NONE,
+        MENTIONABLE_PERMISSIONS_NONE,
+
+        PERMISSIONS_LIST,
+        PERMISSION_LIST,
+        MENTIONABLE_PERMISSIONS_LIST,
+        PERMISSIONS_ROLES,
+        PERMISSIONS_USERS,
+        PERMISSION_ADDED,
+        MENTIONABLE_ALREADY_HAS_PERMISSION,
+        PERMISSION_REMOVED,
+        MENTIONABLE_NEVER_HAD_PERMISSION,
+        DJ_REMOVED,
+        DJ_SET,
+        NOT_DJ,
+        ALREADY_DJ,
+        INVALID_PERMISSION
+    }
+
+    public enum MentionableTypeMessages implements LocaleMessage {
+        ROLE,
+        USER
+    }
+
+    public enum PollMessages implements LocaleMessage {
+        POLL_ENDS_AT,
+        POLL_BY,
+        POLL_SENT,
+        POLL_WINNER_LABEL,
+        POLL_ENDED
+    }
+
+    public enum ReminderMessages implements LocaleMessage {
+        REMINDERS_EMBED_TITLE,
+        CANNOT_SET_BANNED_REMINDER_CHANNEL,
+        REMINDER_INVALID_TIME_FORMAT,
+        REMINDER_ADDED,
+        NO_REMINDERS,
+        INVALID_REMINDER_ID,
+        MISSING_REMINDER_ID,
+        REMINDER_REMOVED,
+        REMINDERS_CLEARED,
+        NO_REMINDER_WITH_ID,
+        REMINDER_CHANNEL_REMOVED,
+        REMINDER_CHANNEL_CHANGED,
+        REMINDER_TIME_CHANGED,
+        REMINDER_CHANNEL_ALREADY_BANNED,
+        REMINDER_CHANNEL_BANNED,
+        REMINDER_CHANNEL_NOT_BANNED,
+        REMINDER_SEND,
+        REMINDER_FROM
+    }
+
+    public enum EightBallMessages implements LocaleMessage {
+        MUST_PROVIDE_SOMETHING_TO_RESPOND_TO,
+        PROVIDE_INDEX_TO_REMOVE,
+        INVALID_INDEX_INTEGER,
+        MISSING_RESPONSE_TO_ADD,
+        ALREADY_A_RESPONSE,
+        ADDED_RESPONSE,
+        NOT_A_RESPONSE,
+        REMOVED_RESPONSE,
+        CLEARED_RESPONSES,
+        NO_CUSTOM_RESPONSES,
+        LIST_OF_RESPONSES,
+        QUESTION_ASKED,
+        EB_AF_1,
+        EB_AF_2,
+        EB_AF_3,
+        EB_AF_4,
+        EB_AF_5,
+        EB_AF_6,
+        EB_AF_7,
+        EB_AF_8,
+        EB_AF_9,
+        EB_AF_10,
+        EB_NC_1,
+        EB_NC_2,
+        EB_NC_3,
+        EB_NC_4,
+        EB_NC_5,
+        EB_N_1,
+        EB_N_2,
+        EB_N_3,
+        EB_N_4,
+        EB_N_5,
+    }
+
+    public enum PlaytimeMessages implements LocaleMessage {
+        LISTENED_TO,
+        LAST_BOOTED
+    }
+
+    public enum AlertMessages implements LocaleMessage {
+        ALERT_EMBED_TITLE,
+        NO_ALERT,
+        ALERT_EMBED_FOOTER
+    }
+
+    public enum BotInfoMessages implements LocaleMessage {
+        BOT_INFO_DEVELOPERS,
+        BOT_INFO_ABOUT_ME_LABEL,
+        BOT_INFO_ABOUT_ME_VALUE,
+        BOT_INFO_UPTIME,
+        BOT_INFO_TERMS,
+        BOT_INFO_PRIVACY
+    }
+
+    public enum HelpMessages implements LocaleMessage {
+        HELP_MANAGEMENT_OPTION,
+        HELP_MANAGEMENT_OPTION_DESC,
+        HELP_MUSIC_OPTION,
+        HELP_MUSIC_OPTION_DESC,
+        HELP_MISCELLANEOUS_OPTION,
+        HELP_MISCELLANEOUS_OPTION_DESC,
+        HELP_UTILITY_OPTION,
+        HELP_UTILITY_OPTION_DESC,
+        HELP_EMBED_AUTHOR,
+        HELP_EMBED_DESC,
+        HELP_EMBED_FOOTER,
+        HELP_NOTHING_FOUND,
+        HELP_COMMANDS
+    }
+
+    public enum SupportServerMessages implements LocaleMessage {
+        JOIN_SUPPORT_SERVER,
+        SUPPORT_SERVER
+    }
+
+    public enum AudioLoaderMessages implements LocaleMessage {
+        QUEUE_ADD,
+        QUEUE_PLAYLIST_ADD,
+        QUEUE_ADD_LOG,
+        QUEUE_PLAYLIST_ADD_LOG,
+        NO_TRACK_FOUND,
+        NO_TRACK_FOUND_ALT,
+        ERROR_LOADING_TRACK,
+        PLAYING_RECOMMENDED_TRACKS,
+        NO_SIMILAR_TRACKS,
+    }
+
+    public enum AutoPlayMessages implements LocaleMessage {
+        AUTO_PLAY_EMBED_TITLE,
+        AUTO_PLAY_EMBED_FOOTER
+    }
+
+    public enum TrackSchedulerMessages implements LocaleMessage {
+        TRACK_COULD_NOT_BE_PLAYED,
+        COULD_NOT_FIND_SOURCE,
+        COPYRIGHT_TRACK,
+        UNAVAILABLE_TRACK,
+        UNVIEWABLE_PLAYLIST,
+        INACTIVITY_LEAVE
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -360,6 +558,19 @@ public enum RobertifyLocaleMessage {
         ret.put(PremiumMessages.class, PremiumMessages.values());
         ret.put(TogglesMessages.class, TogglesMessages.values());
         ret.put(TwentyFourSevenMessages.class, TwentyFourSevenMessages.values());
+        ret.put(DedicatedChannelMessages.class, DedicatedChannelMessages.values());
+        ret.put(PermissionsMessages.class, PermissionsMessages.values());
+        ret.put(MentionableTypeMessages.class, MentionableTypeMessages.values());
+        ret.put(PollMessages.class, PollMessages.values());
+        ret.put(ReminderMessages.class, ReminderMessages.values());
+        ret.put(EightBallMessages.class, EightBallMessages.values());
+        ret.put(PlaytimeMessages.class, PlaytimeMessages.values());
+        ret.put(AlertMessages.class, AlertMessages.values());
+        ret.put(BotInfoMessages.class, BotInfoMessages.values());
+        ret.put(HelpMessages.class, HelpMessages.values());
+        ret.put(AudioLoaderMessages.class, AudioLoaderMessages.values());
+        ret.put(AutoPlayMessages.class, AutoPlayMessages.values());
+        ret.put(TrackSchedulerMessages.class, TrackSchedulerMessages.values());
         return ret;
     }
 }

@@ -18,19 +18,15 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
 import main.constants.ENV;
-import main.events.AnnouncementChannelEvents;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.RobertifyAPI;
-import main.utils.apis.robertify.models.RobertifyGuild;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
-import main.utils.json.guildconfig.GuildConfig;
 import main.utils.pagination.PaginationEvents;
 import main.utils.resume.ResumeUtils;
 import main.utils.spotify.SpotifyAuthorizationUtils;
@@ -39,7 +35,6 @@ import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -136,7 +131,6 @@ public class Robertify {
                             new PollEvents(),
                             new SuggestionCategoryDeletionEvents(),
                             new ReportsEvents(),
-                            new AnnouncementChannelEvents(),
                             new LogChannelEvents(),
                             new SkipCommand()
                     )

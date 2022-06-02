@@ -9,15 +9,17 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -29,7 +31,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
         final var guild = ctx.getGuild();
 
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to execute this command")
+            ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS)
                     .build()).queue();
             return;
         }
@@ -37,38 +39,33 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
         final Message msg = ctx.getMessage();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The request channel has already been setup!").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
         }
 
         if (!ctx.getSelfMember().hasPermission(net.dv8tion.jda.api.Permission.MANAGE_CHANNEL)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                            I do not have enough permissions to do this!
-                            Please give my role the `Manage Channels` permission in order for me to execute this command.
-
-                            *For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*""").build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS, Pair.of("{permissions}", "`Manage Channels`")).build())
                     .queue();
             return;
         }
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    var theme = new ThemesConfig().getTheme(guild.getIdLong());
-                    var dediChannelConfig = new DedicatedChannelConfig();
-
+                    final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+                    final var dediChannelConfig = new DedicatedChannelConfig();
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
+
                     manager.setPosition(0).queue();
                     dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
 
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setColor(theme.getColor());
-                    eb.setTitle("No song playing...");
+                    eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
                     eb.setImage(theme.getIdleBanner());
-                    eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-
-                    textChannel.sendMessage("**__Queue:__**\nJoin a voice channel and start playing songs!").setEmbeds(eb.build())
+                    textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
                             .queue(message -> {
                                 dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
@@ -78,24 +75,19 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                                     dediChannelConfig.updateMessage(guild);
 
                                 try {
-                                    msg.addReaction("✅").queue();
+                                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
+                                                    .queue();
                                 } catch (InsufficientPermissionException e) {
                                     if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have setup the requests channel!" +
-                                                "\nCheck the top of your channel list.").build())
+                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
                                                 .queue();
                                     else e.printStackTrace();
                                 }
                             });
-
-
                 },
                 new ErrorHandler()
                         .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                                 .queue())
-                        .handle(ErrorResponse.MFA_NOT_ENABLED,
-                                e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I cannot execute this command because 2FA is required in this server!\n\n" +
-                                        "*Tip: Try disabling 2FA temporarily and running the command again. After successful execution, you may turn 2FA on again.*").build()).queue())
         );
     }
 
@@ -140,7 +132,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
         final var guild = event.getGuild();
 
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The request channel has already been setup!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
         }
@@ -149,20 +141,19 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    var theme = new ThemesConfig().getTheme(guild.getIdLong());
-                    var dediChannelConfig = new DedicatedChannelConfig();
-
+                    final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+                    final var dediChannelConfig = new DedicatedChannelConfig();
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
                     manager.setPosition(0).queue();
                     dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
 
                     EmbedBuilder eb = new EmbedBuilder();
                     eb.setColor(theme.getColor());
-                    eb.setTitle("No song playing...");
+                    eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
                     eb.setImage(theme.getIdleBanner());
-                    eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-                    textChannel.sendMessage("**__Queue:__**\nJoin a voice channel and start playing songs!").setEmbeds(eb.build())
+                    textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
                             .queue(message -> {
                                 dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
@@ -172,14 +163,12 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
                                     dediChannelConfig.updateMessage(guild);
 
                                 try {
-                                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully created your " +
-                                            "requests channel in: " + textChannel.getAsMention()).build())
+                                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
                                             .setEphemeral(false)
                                             .queue();
                                 } catch (InsufficientPermissionException e) {
                                     if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have setup the requests channel!" +
-                                                        "\nCheck the top of your channel list.").build())
+                                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
                                                 .queue();
                                     else e.printStackTrace();
                                 }

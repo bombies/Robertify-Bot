@@ -8,9 +8,12 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -35,8 +38,8 @@ public class PlaytimeCommand extends AbstractSlashCommand implements ICommand {
 
         final var time = (playtime.get(guild.getIdLong()) == null ? 0 : playtime.get(guild.getIdLong())) + (audioPlayer.getPlayingTrack() == null ? 0 : audioPlayer.getTrackPosition());
 
-        return RobertifyEmbedUtils.embedMessage(guild, "🎶 I have listened to **"+ GeneralUtils.getDurationString(time)+"** of music in this guild since my last boot.")
-                .setFooter("Last booted: " + GeneralUtils.formatDate(BotBDCache.getInstance().getLastStartup(), TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z)).build();
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlaytimeMessages.LISTENED_TO, Pair.of("{time}", GeneralUtils.getDurationString(time)))
+                .setFooter(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.PlaytimeMessages.LAST_BOOTED, Pair.of("{time}", GeneralUtils.formatDate(BotBDCache.getInstance().getLastStartup(), TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z)))).build();
     }
 
     @Override

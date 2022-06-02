@@ -19,6 +19,8 @@ import main.utils.json.autoplay.AutoPlayUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -26,6 +28,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,9 +98,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         final var requester = RobertifyAudioManager.getRequester(guild, track);
 
         if (announcementChannel != null) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), "Now Playing: `" + track.getInfo().title + "` by `"+track.getInfo().author +"`"
+            final var localeManager =LocaleManager.getLocaleManager(guild);
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", track.getInfo().title), Pair.of("{author}", track.getInfo().author))
                     + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
-                    "\n\n~ Requested by " + requester
+                    "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
                     :
                     ""
             ));
@@ -223,7 +227,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 announcementChannel.sendMessageEmbeds(
                                 RobertifyEmbedUtils.embedMessage(
                                                 guild,
-                                                "`" + track.getInfo().title + "` by `" + track.getInfo().author + "` could not be played!\nSkipped to the next song. (If available)")
+                                                RobertifyLocaleMessage.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
+                                                Pair.of("{title}", track.getInfo().title),
+                                                Pair.of("{author}", track.getInfo().author)
+                                        )
                                         .build()
                         )
                         .queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
@@ -236,22 +243,25 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void onTrackException(IPlayer player, AudioTrack track, Exception exception) {
         if (exception.getMessage().contains("matching track")) {
             if (announcementChannel != null)
-                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't find a source for a track`\n" +
-                                "Skipping to the next track (If available...)").build())
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE).build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else if (exception.getMessage().contains("copyright")) {
             if (announcementChannel != null)
-                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play `"+track.getInfo().title+" by "+track.getInfo().author+"` as it has blocked copyright content`\n" +
-                                "Skipping to the next track (If available...)").build())
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.COPYRIGHT_TRACK,
+                            Pair.of("{title}", track.getInfo().title),
+                            Pair.of("{author}", track.getInfo().author)
+                        ).build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else if (exception.getMessage().contains("unavailable")) {
             if (announcementChannel != null)
-                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play `"+track.getInfo().title+" by "+track.getInfo().author+"` because it is unavailable`\n" +
-                                "Skipping to the next track (If available...)").build())
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.UNAVAILABLE_TRACK,
+                                Pair.of("{title}", track.getInfo().title),
+                                Pair.of("{author}", track.getInfo().author)
+                        ).build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else if (exception.getMessage().contains("playlist type is unviewable")) {
             if (announcementChannel != null)
-                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I couldn't play a playlist because it is un-viewable...").build())
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.UNVIEWABLE_PLAYLIST).build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else {
             logger.error("There was an exception with playing the track.", exception);
@@ -312,10 +322,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     disconnectExecutors.remove(guild.getIdLong());
                     logger.debug("Removed scheduled disconnect from mapping");
 
-                    final var guildConfig = new GuildConfig();
-
                     if (announceMsg && announcementChannel != null)
-                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have left " + channel.getAsMention() + " due to inactivity.").build())
+                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.INACTIVITY_LEAVE, Pair.of("{channel}", channel.getAsMention())).build())
                                 .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
                 }
             }

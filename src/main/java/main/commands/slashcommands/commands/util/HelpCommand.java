@@ -2,9 +2,7 @@ package main.commands.slashcommands.commands.util;
 
 import lombok.SneakyThrows;
 import main.commands.prefixcommands.CommandContext;
-import main.commands.prefixcommands.CommandManager;
 import main.commands.prefixcommands.ICommand;
-import main.commands.prefixcommands.IDevCommand;
 import main.commands.slashcommands.SlashCommandManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -14,16 +12,18 @@ import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,20 +53,21 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         );
     }
 
-    private SelectionMenu getSelectionMenu(long userId) {
-        return getSelectionMenuBuilder(userId).build();
+    private SelectionMenu getSelectionMenu(Guild guild, long userId) {
+        return getSelectionMenuBuilder(guild, userId).build();
     }
 
-    private SelectionMenuBuilder getSelectionMenuBuilder(long userId) {
+    private SelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userId) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         return new SelectionMenuBuilder()
                 .setName(menuName)
-                .setPlaceHolder("Select an option!")
+            .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SELECT_MENU_PLACEHOLDER))
                 .setRange(1, 1)
                 .addOptions(
-                        SelectMenuOption.of("Management Commands", "help:management", Emoji.fromUnicode("💼")),
-                        SelectMenuOption.of("Music Commands", "help:music", Emoji.fromUnicode("🎶")),
-                        SelectMenuOption.of("Miscellaneous Commands", "help:misc", Emoji.fromUnicode("⚒️")),
-                        SelectMenuOption.of("Utility Commands", "help:utility", Emoji.fromUnicode("❓"))
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), "help:management", Emoji.fromUnicode("💼")),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), "help:music", Emoji.fromUnicode("🎶")),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), "help:misc", Emoji.fromUnicode("⚒️")),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), "help:utility", Emoji.fromUnicode("❓"))
                 )
                 .limitToUser(userId);
     }
@@ -79,47 +80,45 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     @Override @SneakyThrows
     public void handle(CommandContext ctx) throws ScriptException {
-        final Message msg = ctx.getMessage();
-        final List<String> args = ctx.getArgs();
+        final var msg = ctx.getMessage();
+        final var args = ctx.getArgs();
         final var guild = ctx.getGuild();
-        final String prefix = new GuildConfig().getPrefix(ctx.getGuild().getIdLong());
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        final var prefix = new GuildConfig().getPrefix(ctx.getGuild().getIdLong());
 
         GeneralUtils.setCustomEmbed(
                 ctx.getGuild(),
-                "Help Command",
-                "Type \"" + prefix + "help <command>\" to get more help on a specific command."
+                localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR),
+                localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_FOOTER)
         );
 
-        CommandManager manager = new CommandManager();
+        final var manager = new SlashCommandManager();
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
-                            Join our [support server](https://discord.gg/VbjmtfJDvU)!
-
-                            *Select an option to view the commands I have to offer!*""")
-                    .addField("💼 Management Commands", "*Configure and control how Robertify operates in this guild!*", true)
-                    .addField("🎶 Music Commands", "*Play music and control songs. You can do so much with these commands to make your experience immersive.*", true)
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_EMBED_DESC)
+                    .addField("💼 " + localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION_DESC), true)
+                    .addField("🎶 "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION_DESC), true)
                     .addBlankField(true)
-                    .addField("⚒️ Miscellaneous Commands", "*Tired of playing music all the time? Well, here are some commands you can play around with!*", true)
-                    .addField("❓ Utility Commands", "*Curious about the bot? These are the commands for you to explore!*", true)
+                    .addField("⚒️ "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION_DESC), true)
+                    .addField("❓ "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION_DESC), true)
                     .addBlankField(true);
             msg.replyEmbeds(eb.build()).queue(repliedMsg ->
                     repliedMsg.editMessageComponents(
-                            ActionRow.of(getSelectionMenu(ctx.getAuthor().getIdLong()))
+                            ActionRow.of(getSelectionMenu(guild, ctx.getAuthor().getIdLong()))
                     ).queue()
             );
             GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
         } else if (args.get(0).equalsIgnoreCase("dev")) {
             if (!BotBDCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
-                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+args.get(0)+"`");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_NOTHING_FOUND, Pair.of("{command}", args.get(0)));
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed(ctx.getGuild());
                 return;
             }
 
             StringBuilder stringBuilder = new StringBuilder();
-            for (ICommand cmd : manager.getDevCommands())
+            for (var cmd : manager.getDevCommands())
                 stringBuilder.append("`").append(cmd.getName()).append("`, ");
 
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**Developer Commands**\n\n" +
@@ -131,26 +130,26 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
             return;
         }
 
-        String search = args.get(0);
-        ICommand command = manager.getCommand(search);
+        final var search = args.get(0);
+        final var command = manager.getCommand(search);
 
         if (command == null) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_NOTHING_FOUND, Pair.of("{command}", search));
             msg.replyEmbeds(eb.build()).queue();
             GeneralUtils.setDefaultEmbed(ctx.getGuild());
             return;
-        } else if (command instanceof IDevCommand) {
+        } else if (command.isDevCommand()) {
             if (!BotBDCache.getInstance().isDeveloper(ctx.getAuthor().getIdLong())) {
-                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_NOTHING_FOUND, Pair.of("{command}", search));
                 msg.replyEmbeds(eb.build()).queue();
                 GeneralUtils.setDefaultEmbed(ctx.getGuild());
                 return;
             }
         }
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp(prefix));
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp());
         final var theme = new ThemesConfig().getTheme(guild.getIdLong());
-        eb.setAuthor("Help Command ["+command.getName()+"]", null, theme.getTransparent());
+        eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR) + " ["+command.getName()+"]", null, theme.getTransparent());
         msg.replyEmbeds(eb.build()).queue();
 
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
@@ -161,38 +160,34 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         if (!nameCheck(event)) return;
         if (!banCheck(event)) return;
 
+        final var guild = event.getGuild();
         if (event.getOptions().isEmpty()) {
-            final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+            final var localeManager = LocaleManager.getLocaleManager(guild);
 
             GeneralUtils.setCustomEmbed(
-                    event.getGuild(),
-                    "Help Command",
-                    "Type \"" + prefix + "help <command>\" to get more help on a specific command."
+                    guild,
+                    localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR),
+                    localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_FOOTER)
             );
 
-            final var guild = event.getGuild();
-
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Join our [support server](https://robertify.me/support)!\n\n" +
-                            "" +
-                            "*Select an option to view the commands I have to offer!*\n" +
-                            "*There are* `"+new SlashCommandManager().getCommands().size()+"` *commands!*")
-                    .addField("💼 Management Commands", "*Configure and control how Robertify operates in this guild!*", true)
-                    .addField("🎶 Music Commands", "*Play music and control songs. You can do so much with these commands to make your experience immersive.*", true)
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_EMBED_DESC)
+                    .addField("💼 " + localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION_DESC), true)
+                    .addField("🎶 "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION_DESC), true)
                     .addBlankField(true)
-                    .addField("⚒️ Miscellaneous Commands", "*Tired of playing music all the time? Well, here are some commands you can play around with!*", true)
-                    .addField("❓ Utility Commands", "*Curious about the bot? These are the commands for you to explore!*", true)
+                    .addField("⚒️ "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION_DESC), true)
+                    .addField("❓ "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION_DESC), true)
                     .addBlankField(true);
             event.replyEmbeds(eb.build())
-                    .addActionRow(getSelectionMenu(event.getUser().getIdLong()))
+                    .addActionRow(getSelectionMenu(guild, event.getUser().getIdLong()))
                     .setEphemeral(true).queue();
         } else {
             final var manager = new SlashCommandManager();
             final String command = event.getOption("command").getAsString();
-            event.replyEmbeds(searchCommand(manager, command, event.getGuild(), event.getUser()).build())
+            event.replyEmbeds(searchCommand(manager, command, guild).build())
                     .setEphemeral(true).queue();
         }
 
-        GeneralUtils.setDefaultEmbed(event.getGuild());
+        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override @SneakyThrows
@@ -202,7 +197,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         final var guild = event.getGuild();
 
         if (!event.getComponentId().split(":")[2].equals(event.getUser().getId())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You can't interact with this menu!").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_MENU_PERMS).build())
                     .setEphemeral(true).queue();
             return;
         }
@@ -227,25 +222,26 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @SneakyThrows
-    private EmbedBuilder searchCommand(SlashCommandManager manager, String search, Guild guild, User user) {
+    private EmbedBuilder searchCommand(SlashCommandManager manager, String search, Guild guild) {
         final var command = manager.getCommand(search);
 
         if (command == null) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Nothing found for: `"+search+"`");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_NOTHING_FOUND, Pair.of("{command}", search));
             GeneralUtils.setDefaultEmbed(guild);
             return eb;
         }
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp());
         final var theme = new ThemesConfig().getTheme(guild.getIdLong());
-        eb.setAuthor("Help Command ["+command.getName()+"]", null, theme.getTransparent());
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR) + " ["+command.getName()+"]", null, theme.getTransparent());
         return eb;
     }
 
     private EmbedBuilder getHelpEmbed(Guild guild, HelpType type, String prefix) {
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Here are your commands!\n\n" +
-                "**Prefix**: `"+prefix+"`");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_COMMANDS, Pair.of("{prefix}", prefix));
         final var manager = new SlashCommandManager();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         StringBuilder sb = new StringBuilder();
 
         switch (type) {
@@ -256,7 +252,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                             managementCommands.get(managementCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
                     );
-                eb.addField("Management Commands", sb.toString(), false);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), sb.toString(), false);
             }
             case MISCELLANEOUS -> {
                 List<AbstractSlashCommand> miscCommands = manager.getMiscCommands();
@@ -265,7 +261,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                             miscCommands.get(miscCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
                     );
-                eb.addField("Miscellaneous Commands", sb.toString(), false);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), sb.toString(), false);
             }
             case MUSIC -> {
                 List<AbstractSlashCommand> musicCommands = manager.getMusicCommands();
@@ -274,7 +270,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                             musicCommands.get(musicCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
                     );
-                eb.addField("Music Commands", sb.toString(), false);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), sb.toString(), false);
             }
             case UTILITY -> {
                 List<AbstractSlashCommand> utilityCommands = manager.getUtilityCommands();
@@ -283,7 +279,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                             utilityCommands.get(utilityCommands.size()-1).equals(cmd) ?
                                     "`" : "`, "
                     );
-                eb.addField("Utility Commands", sb.toString(), false);
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), sb.toString(), false);
             }
         }
 

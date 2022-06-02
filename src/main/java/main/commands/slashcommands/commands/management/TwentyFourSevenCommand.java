@@ -28,7 +28,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
 
         if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild,
-                    BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN))
+                    BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN))
                     .build())
                     .queue();
             return;

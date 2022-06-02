@@ -4,6 +4,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
@@ -14,8 +15,7 @@ import javax.script.ScriptException;
 public class VoteCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "Thank you for taking the interest in supporting us!\n" +
-                        "You may press on each of the buttons below to vote for us.")
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), RobertifyLocaleMessage.GeneralMessages.VOTE_EMBED_DESC)
                         .build())
                 .setActionRow(
                         Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
@@ -55,8 +55,7 @@ public class VoteCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!nameCheck(event)) return;
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "Thank you for taking the interest in supporting us!\n" +
-                        "You may press on each of the buttons below to vote for us.")
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.VOTE_EMBED_DESC)
                 .build())
                 .addActionRow(
                         Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),

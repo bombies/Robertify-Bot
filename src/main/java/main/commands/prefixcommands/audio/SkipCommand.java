@@ -71,7 +71,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             } else  {
                 if (GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
                     msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
-                } else msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ)).build())
+                } else msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_DJ)).build())
                         .queue();
             }
         } else msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();

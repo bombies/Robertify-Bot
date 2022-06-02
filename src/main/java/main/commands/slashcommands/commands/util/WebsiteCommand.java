@@ -5,6 +5,7 @@ import main.commands.prefixcommands.ICommand;
 import main.constants.RobertifyTheme;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -23,7 +24,7 @@ public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
     }
 
     public MessageEmbed getEmbed(Guild guild) {
-        return RobertifyEmbedUtils.embedMessage(guild, "Click on the link below to visit our website!").build();
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.WEBSITE_EMBED_DESC).build();
     }
 
     @Override

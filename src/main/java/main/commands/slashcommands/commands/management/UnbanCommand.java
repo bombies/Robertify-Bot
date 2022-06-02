@@ -130,7 +130,7 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         if (!checks(event)) return;
 
         if (!predicateCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_BAN))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(event.getGuild(), Permission.ROBERTIFY_BAN))
                     .build())
                     .setEphemeral(true)
                     .queue();

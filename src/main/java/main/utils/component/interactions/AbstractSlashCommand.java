@@ -362,7 +362,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         final Guild guild = event.getGuild();
         if (command.getDjOnly() && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_DJ)).build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_DJ)).build())
                     .setEphemeral(true)
                     .queue();
             return false;
@@ -376,7 +376,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
         final Guild guild = event.getGuild();
         if (command.adminOnly && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .setEphemeral(true)
                     .queue();
             return false;
@@ -441,6 +441,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!\n\n" +
                     "Commands may only be used in:\n"
                     + GeneralUtils.listOfIDsToMentions(
+                            guild,
                             config.getRestrictedChannels(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
                             GeneralUtils.Mentioner.CHANNEL
                     )).build())

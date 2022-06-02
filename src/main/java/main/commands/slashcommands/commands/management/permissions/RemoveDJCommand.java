@@ -7,6 +7,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,6 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
-        final User sender = ctx.getAuthor();
         final Guild guild = ctx.getGuild();
 
         GeneralUtils.setCustomEmbed(guild, "Remove DJ");
@@ -36,7 +37,7 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
         EmbedBuilder eb;
 
         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "You don't have permission to run this command!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS);
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -78,12 +79,12 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
-            return RobertifyEmbedUtils.embedMessage(guild, "Removed " + role.getAsMention() + " as a DJ!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_REMOVED, Pair.of("{mentionable}", role.getAsMention()));
         } catch (IllegalAccessException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "This role never was a DJ in the first place");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.NOT_DJ, Pair.of("{djType}", "role"));
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            return RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR);
         }
     }
 
@@ -91,12 +92,12 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
-            return RobertifyEmbedUtils.embedMessage(guild, "Removed " + user.getAsMention() + " as a DJ!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_REMOVED, Pair.of("{mentionable}", user.getAsMention()));
         } catch (IllegalArgumentException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "This user never was a DJ in the first place");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.NOT_DJ, Pair.of("{djType}", "user"));
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            return RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR);
         }
     }
 

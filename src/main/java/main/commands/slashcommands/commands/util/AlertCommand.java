@@ -5,7 +5,10 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public class AlertCommand extends AbstractSlashCommand {
@@ -31,16 +34,20 @@ public class AlertCommand extends AbstractSlashCommand {
         final var botDB = BotBDCache.getInstance();
         final var user = event.getUser();
         final var latestAlert = botDB.getLatestAlert();
+        final var localeManager = LocaleManager.getLocaleManager(event.getGuild());
 
         if (!latestAlert.getLeft().isEmpty() && !latestAlert.getLeft().isBlank())
             botDB.addAlertViewer(user.getIdLong());
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                "Alert From The Developer",
+                        RobertifyLocaleMessage.AlertMessages.ALERT_EMBED_TITLE,
                 (latestAlert.getLeft().isEmpty() || latestAlert.getLeft().isBlank()) ?
-                        "There is no alert..." : latestAlert.getLeft()
+                        localeManager.getMessage(RobertifyLocaleMessage.AlertMessages.NO_ALERT) : latestAlert.getLeft()
         )
-                        .setFooter("You are #" + botDB.getPosOfAlertViewer(user.getIdLong()) + " to view this alert! • " + GeneralUtils.formatDate(latestAlert.getRight(), TimeFormat.DD_MMMM_YYYY))
+                        .setFooter(localeManager.getMessage(RobertifyLocaleMessage.AlertMessages.ALERT_EMBED_FOOTER,
+                                Pair.of("{number}", String.valueOf(botDB.getPosOfAlertViewer(user.getIdLong()))),
+                                Pair.of("{alertDate}", GeneralUtils.formatDate(latestAlert.getRight(), TimeFormat.DD_MMMM_YYYY))
+                        ))
                 .build()).queue();
 
     }

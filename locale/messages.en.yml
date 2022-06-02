@@ -22,7 +22,9 @@ restricted_toggled_no_channels: "Restricted voice channels have been toggled **O
 insufficient_perms: "You do not have enough permissions to execute this!\n\nYou need: `{permissions}`"
 insufficient_perms_no_args: "You do not have permission to execute this!"
 self_insufficient_perms: "I do not have enough permissions to execute this request!"
+self_insufficient_perms_args: "I do not have enough permissions to execute this request!\nPlease give my role the following permissions to execute this:\n{permissions}\n\n*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*"
 dj_only: "You must be a DJ to run this command!"
+dj_button: "You must be a DJ to use this button!"
 nothing_playing: "There is nothing playing!"
 nothing_in_queue: "There is nothing in the queue."
 cant_be_used_in_channel: "This command can't be used in this channel!"
@@ -32,6 +34,17 @@ no_perms_button: "You do not have permission to interact with this button!"
 button_no_longer_valid: "This button is no longer valid..."
 no_such_channel: "There is no such channel with that ID in this server!"
 ok: "Okay!"
+nothing_here: "There is nothing here!"
+invalid_minute: "Invalid minute!"
+invalid_hour: "Invalid hour!"
+must_provide_valid_channel: "You must provide a valid channel!"
+select_menu_placeholder: "Select an option!"
+vote_embed_desc: "Thank you for taking the interest in supporting us!\nYou may press on each of the buttons below to vote for us."
+website_embed_desc: "Click on the link below to visit our website!"
+insufficient_perms_to_join: "I do not have enough permissions to join: {channel}"
+unknown_requester: "Unknown Requester"
+banned_from_commands: "You are banned from using commands in this server!"
+no_embed_perms: "⚠️ I don't have permission to send embeds!\n\nPlease tell an admin to enable the `Embed Links` permission for my role in this channel in order for my commands to work!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"
@@ -83,6 +96,7 @@ jumped: "Successfully jumped {duration} seconds ahead!"
 
 # LOFI MESSAGES
 lofi_enabling: "Enabling Lo-Fi mode..."
+lofi_enabled: "You have enabled Lo-Fi mode!"
 lofi_disabled: "You have disabled Lo-Fi mode"
 
 # LOOP MESSAGES
@@ -116,6 +130,8 @@ np_requester: "~ Requested by {requester}"
 np_livestream: "📺 **[Livestream]**"
 np_time_left: "⌚  **Time left**: `{time}`"
 np_author: "Now Playing"
+np_announcement_desc: "Now Playing: `{title} by {author}`"
+np_announcement_requester: "~ Requested by {requester}"
 
 # PAUSE MESSAGES
 paused: "You have paused the music"
@@ -157,6 +173,10 @@ rewound_by_duration_log: "{user} has rewound `{title} by {author}`  by {duration
 # SEARCH MESSAGES
 must_provide_query: "You must provide a query!"
 looking_for: "Now looking for `{query}`"
+search_menu_placeholder: "Choose a result!"
+search_embed_author: "Search results for for: {query}"
+search_embed_footer: "Select a result from the selection menu below"
+search_end_interaction: "End Interaction"
 
 # SEEK MESSAGES
 invalid_minutes: "You must provide a valid amount of minutes"
@@ -213,7 +233,7 @@ user_temp_banned_response: "You have banned {user} for `{duration}`"
 missing_unban_user: "You must provide a user to unban!"
 invalid_unban_user: "You must provide a valid user to unban!"
 user_not_banned: "This user is not banned."
-user_unbanned: "You have been unbanned from **{server}**"
+user_unbanned: "You have been unbanned from Robertify in **{server}**"
 user_unbanned_response: "You have unbanned {user}"
 
 # LOG CHANNEL MESSAGES
@@ -279,5 +299,167 @@ log_toggle_invalid_type: "`{command}` is an invalid log type!"
 log_toggled: "You have toggled logs for the `{logType}` command to: **{status}**"
 skip_dj_toggle_prompt: "Would you like to turn off DJ only mode for the `skip` command?"
 
-# 24/7 MESAGES
+# 24/7 MESSAGES
 twenty_four_seven_toggled: "You have turned 24/7 mode **{status}**"
+
+# DEDICATED CHANNEL MESSAGES
+dedicated_channel_setup: "Successfully created your requests channel in: {channel}"
+dedicated_channel_setup_2: "I have setup the requests channel!\nCheck the top of your channel list."
+dedicated_channel_already_setup: "The request channel has already been setup!"
+dedicated_channel_nothing_playing: "No song playing..."
+dedicated_channel_queue_nothing_playing: "**__Queue:__**\nJoin a voice channel and start playing songs!"
+dedicated_channel_queue_playing: "**__Queue:__**\n{songs}"
+dedicated_channel_no_access_anymore: "I don't have access to the requests channel anymore! I cannot update."
+dedicated_channel_playing_embed_title: "{title} by {author} [{duration}]"
+dedicated_channel_playing_embed_footer: "{numSongs} songs in queue | Volume: {volume}%"
+dedicated_channel_queue_no_songs: "Songs in queue will appear here."
+dedicated_channel_topic_previous: "Go to the previous song.\n"
+dedicated_channel_topic_rewind: "Rewind the song.\n"
+dedicated_channel_topic_play_and_pause: "Pause/resume the song.\n"
+dedicated_channel_topic_stop: "Stop the song and clear the queue.\n"
+dedicated_channel_topic_end: "Skip the song.\n"
+dedicated_channel_topic_star: "Add this song to your favourites.\n"
+dedicated_channel_topic_loop: "Loop the song.\n"
+dedicated_channel_topic_shuffle: "Shuffle the song.\n"
+dedicated_channel_topic_quit: "Disconnect the bot.\n"
+
+# PERMISSIONS MESSAGES
+permissions_none: "There are no permissions yet!"
+mentionable_permissions_none: "This user/role has no permissions!"
+permissions_list: "**List of Permissions**\n\n`{permissions}`"
+permission_list: "**List of roles/users with permission** `{permission}`"
+mentionable_permissions_list: "**List of permissions for** {mentionable}\n\n`{permissions}`"
+permissions_roles: "Roles"
+permissions_users: "Users"
+permission_added: "Added permission `{permission}` to {mentionable}"
+mentionable_already_has_permission: "{mentionable} already has permission to `{permission}`!"
+permission_removed: "Removed permission `{permission}` from {mentionable}!"
+mentionable_never_had_permission: "{mentionable} never had access to `{permission}`"
+dj_removed: "Removed {mentionable} as a DJ!"
+dj_set: "Set {mentionable} as a DJ!"
+not_dj: "This {djType} was never a DJ in the first place."
+already_dj: "This {djType} has already been set as a DJ!"
+invalid_permission: "Invalid permission!"
+
+# MENTIONABLE TYPE MESSAGES
+role: "role"
+user: "user"
+
+# POLL MESSAGES
+polls_ends_at: " | Ends at {time}"
+poll_by: "Poll by {user}"
+poll_sent: "Sent poll"
+poll_winner_label: "🎊 POLL WINNER 🎊"
+poll_ended: "**{question}** [ENDED]\n\n"
+
+# REMINDER MESSAGES
+reminders_embed_title: "Reminders"
+cannot_set_banned_reminder_channel: "You cannot ser the reminder channel to {channel} as it is banned!"
+reminder_invalid_time_format: "Invalid time format!\n\n**Correct Format**: `00:00AM/PM` **__OR__** `00:00` *(24-hour format)*"
+reminder_added: "Successfully added your reminder!"
+no_reminders: "You do not have any reminders!"
+invalid_reminder_id: "Invalid reminder ID!"
+missing_reminder_id: "You must provide a valid reminder ID!"
+reminder_removed: "You have removed:\n```{reminder}```"
+reminders_cleared: "You have successfully cleared all reminders!"
+no_reminder_with_id: "There is no such reminder with that ID!"
+reminder_channel_removed: "You have successfully removed the reminder channel for reminder `{id}`"
+reminder_channel_changed: "You have successfully changed the reminder channel for reminder `{id}` to {channel}"
+reminder_time_changed: "You have successfully changed the time of the reminder with ID `{id}` to `{time}`"
+reminder_channel_already_banned: "This channel is already banned!"
+reminder_channel_not_banned: "This channel is not banned!"
+reminder_send: "{user}, here is your reminder:"
+reminder_from: "Reminder from: {server}"
+
+# EIGHT BALL MESSAGES
+must_provide_something_to_respond_to: "You must provide something for me to respond to..."
+provide_index_to_remove: "You must provide an index to remove!"
+invalid_index_integer: "You must provide a valid integer as the index!"
+missing_response_to_add: "You need to provide a response to add!"
+already_a_response: "This is already a response!"
+added_response: "Added `{response}` as a response!"
+not_a_response: "This is not a response!"
+removed_response: "Removed `{response}` as a response!"
+cleared_responses: "You have cleared all of your custom responses!"
+no_custom_responses: "There are no custom responses!"
+list_of_responses: "**List of Responses**\n\n{responses}"
+question_asked: "{user} asked:\n```{question}```\n**My Response**\n🎱| {response}"
+eb_af_1: "It is certain."
+eb_af_2: "It is decidedly so."
+eb_af_3: "Without a doubt."
+eb_af_4: "Yes definitely."
+eb_af_5: "You many rely on it."
+eb_af_6: "As I see it, yes."
+eb_af_7: "Most likely."
+eb_af_8: "Outlook good."
+eb_af_9: "Yes."
+eb_af_10: "Signs points to yes."
+eb_bc_1: "Reply hazy, try again."
+eb_bc_2: "Ask again later."
+eb_bc_3: "Better not tell you now."
+eb_bc_4: "Cannot predict now."
+eb_bc_5: "Concentrate and ask again."
+eb_n_1: "Don't count on it."
+eb_n_2: "My reply is no."
+eb_n_3: "My sources say no."
+eb_n_4: "Outlook not so good."
+eb_n_5: "Very doubtful."
+
+# PLAYTIME MESSAGES
+listened_to: "🎶 I have listened to **{time}** of music in this guild since my last boot."
+last_booted: "Last booted: {time}"
+
+# ALERT MESSAGES
+alert_embed_title: "Alert From The Developer"
+no_alert: "There is no alert..."
+alert_embed_footer: "You are #{number} to view this alert! • {alertDate}"
+
+# BOT INFO MESSAGES
+bot_info_developers: "Developers"
+bot_info_about_me_label: "About Me"
+bot_info_about_me_value: "Robertify is a music bot written completely in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (founder) named Robert wanted a music bot, so he made one for him. Eventually, Robertify became his own project to him and he's been putting in most of his efforts into it ever since."
+bot_info_uptime: "Uptime"
+bot_info_terms: "Terms of Service"
+bot_info_privacy: "Privacy Policy"
+
+# HELP MESSAGES
+help_management_option: "Management Commands"
+help_management_option_desc: "*Configure and control how Robertify operates in this guild!*"
+help_music_option: "Music Commands"
+help_music_option_desc: "*Play music and control songs. You can do so much with these commands to make your experience immersive.*"
+help_miscellaneous_option: "Miscellaneous Commands"
+help_miscellaneous_option_desc: "*Tired of playing music all the time? Well, here are some commands you can play around with!*"
+help_utility_option: "Utility Commands"
+help_utility_option_desc: "*Curious about the bot? These are the commands for you to explore!*"
+help_embed_author: "Help Command"
+help_embed_desc: "Join our [support server](https://discord.gg/VbjmtfJDvU)!\n\n*Select an option to view the commands I have to offer!*"
+help_embed_footer: "Type \"/help <command>\" to get more help for a specific command."
+help_nothing_found: "Nothing found for: `{command}`"
+help_commands: "Here are your commands!\n\n**Prefix**: `{prefix}`"
+
+# SUPPORT SERVER MESSAGES
+join_support_server: "Click on the button below to join our support server"
+support_server: "Support Server"
+
+# AUDIO LOADER MESSAGES
+queue_add: "Added to queue: `{title} by {author}`"
+queue_playlist_add: "Added to queue: `{numTracks}` from `{playlist}`"
+queue_add_log: "{user} has added `{title} by {author}` to the queue."
+queue_playlist_add_log: "{user} has added `{numTracks}` from playlist `{playlist}` to the queue."
+no_track_found: "Nothing was found for `{query}`.\nℹ️ Try being more specific. *(Adding the name of the artiste)*"
+no_track_found_alt: "There was nothing found for that track..."
+error_loading_track: "Error loading track"
+playing_recommended_tracks: "Now playing recommended tracks"
+no_similar_tracks: "There were no similar tracks found!"
+
+# AUTOPLAY MESSAGES
+auto_play_embed_title: "Autoplay"
+auto_play_embed_footer: "You can toggle autoplay off by running the "autoplay" command"
+
+# TRACK SCHEDULER MESSAGES
+track_could_not_be_played: "`{title} by {author}` could not be played!\nSkipped to the next song. (If available)"
+could_not_find_source: "I couldn't find a source for a track\nSkipping to the next track (If available)"
+copyright_track: "I couldn't play `{title} by {author}` as it has blocked copyright content\nSkipping to the next track (If available)"
+unavailable_track: "I couldn't play `{title} by {author}` because is it unavailable\nSkipping to the next track (If available)"
+unviewable_playlist: "I couldn't play a playlist because it is un-viewable..."
+inactivity_leave: "I have left {channel} due to inactivity."

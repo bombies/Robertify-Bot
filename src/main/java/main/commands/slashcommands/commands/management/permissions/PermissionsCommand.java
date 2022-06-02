@@ -7,10 +7,13 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,10 +75,16 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
         try {
             new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ role.getAsMention());
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
+                    Pair.of("{permission}", perm),
+                    Pair.of("{mentionable}", role.getAsMention())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalAccessException e) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " already has permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                    Pair.of("{permission}", perm),
+                    Pair.of("{mentionable}", role.getAsMention())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -93,10 +102,16 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
         try {
             new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ user.getAsMention());
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
+                    Pair.of("{permission}", perm),
+                    Pair.of("{mentionable}", user.getAsMention())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " already has permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                    Pair.of("{permission}", perm),
+                    Pair.of("{mentionable}", user.getAsMention())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -180,13 +195,19 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
         try {
             new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ role.getAsMention());
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
+                    Pair.of("{mentionable}", role.getAsMention()),
+                    Pair.of("{permission}", perm.toUpperCase())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (IOException e) {
-            logger.error("[FATAL ERROR] There was an error reading from/writing to the JSON file!", e);
+            logger.error("[FATAL ERROR] There was an IOException", e);
             msg.addReaction("❌").queue();
         } catch (IllegalAccessException e) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " does not have permission to `"+perm+"`!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                    Pair.of("{mentionable}", role.getAsMention()),
+                    Pair.of("{permission}", perm.toUpperCase())
+            );
             msg.replyEmbeds(eb.build()).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
@@ -253,9 +274,9 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
             List<String> perms = Permission.getPermissions();
             EmbedBuilder eb;
             if (perms.isEmpty())
-                eb = RobertifyEmbedUtils.embedMessage(guild, "There are no permissions yet!");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_NONE);
             else
-                eb = RobertifyEmbedUtils.embedMessage(guild, "**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
+                eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_LIST, Pair.of("{permissions}", GeneralUtils.listToString(perms)));
             msg.replyEmbeds(eb.build()).queue();
         } else {
             PermissionsConfig permissionsConfig = new PermissionsConfig();
@@ -280,16 +301,17 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                 }
             } else {
                 if (Permission.getPermissions().contains(args.get(1).toUpperCase())) {
-                    List<String> roles = getRolePerms(msg.getGuild(), args.get(1).toUpperCase());
-                    List<String> users = getUserPerms(msg.getGuild(), args.get(1).toUpperCase());
+                    final var roles = getRolePerms(msg.getGuild(), args.get(1).toUpperCase());
+                    final var users = getUserPerms(msg.getGuild(), args.get(1).toUpperCase());
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
 
-                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**List of roles/users with permission** `" + args.get(1).toUpperCase() + "`")
-                            .addField("Roles", roles.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(roles), false)
-                            .addField("Users", users.isEmpty() ? "There is nothing here!" : GeneralUtils.listToString(users), false);
+                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_LIST, Pair.of("{permission}", args.get(1).toUpperCase()))
+                            .addField(localeManager.getMessage(RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_ROLES), roles.isEmpty() ? localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NOTHING_HERE) : GeneralUtils.listToString(roles), false)
+                            .addField(localeManager.getMessage(RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_USERS), users.isEmpty() ? localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NOTHING_HERE) : GeneralUtils.listToString(users), false);
 
                     msg.replyEmbeds(eb.build()).queue();
                 } else {
-                    EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Invalid permission!");
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.INVALID_PERMISSION);
                     msg.replyEmbeds(eb.build()).queue();
                 }
             }
@@ -528,7 +550,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                         List<String> perms = Permission.getPermissions();
                         EmbedBuilder eb;
                         if (perms.isEmpty())
-                            eb = RobertifyEmbedUtils.embedMessage(guild, "There are no permissions yet!");
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_NONE);
                         else
                             eb = RobertifyEmbedUtils.embedMessage(guild, "**List of Permissions**\n\n`" + GeneralUtils.listToString(perms) + "`");
                         event.replyEmbeds(eb.build())
@@ -555,21 +577,24 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
                         try {
                             new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ role.getAsMention());
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
+                                    Pair.of("{mentionable}", role.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (IllegalAccessException e) {
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " already has permission to `"+perm+"`!");
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                                    Pair.of("{mentionable}", role.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (Exception e) {
                             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                                                    An unexpected error has occurred!
-
-                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR)
                                     .build())
                                     .setEphemeral(true)
                                     .queue();
@@ -581,21 +606,24 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
                         try {
                             new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added permission `"+perm+"` to: "+ user.getAsMention());
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                                    Pair.of("{mentionable}", user.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (IllegalArgumentException e) {
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " already has permission to `"+perm+"`!");
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                                    Pair.of("{mentionable}", user.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (Exception e) {
                             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                                                    An unexpected error has occurred!
-
-                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR)
                                             .build())
                                     .setEphemeral(true)
                                     .queue();
@@ -611,21 +639,24 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
                         try {
                             new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ role.getAsMention());
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
+                                    Pair.of("{mentionable}", role.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (IllegalAccessException e) {
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, role.getAsMention() + " never had access to `"+perm+"`!");
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                                    Pair.of("{mentionable}", role.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (Exception e) {
                             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                                                    An unexpected error has occurred!
-
-                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR)
                                             .build())
                                     .setEphemeral(true)
                                     .queue();
@@ -637,21 +668,24 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
                         try {
                             new PermissionsConfig().removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ user.getAsMention());
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
+                                    Pair.of("{mentionable}", user.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (IllegalArgumentException e) {
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, user.getAsMention() + " never had access to `"+perm+"`!");
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                                    Pair.of("{mentionable}", user.getAsMention()),
+                                    Pair.of("{permission}", perm.toUpperCase())
+                            );
                             event.replyEmbeds(eb.build())
                                     .setEphemeral(true)
                                     .queue();
                         } catch (Exception e) {
                             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
-                                                    An unexpected error has occurred!
-
-                                                    Please join our [support server](https://robertify.me/support) in order to report this error to the developers!""")
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR)
                                             .build())
                                     .setEphemeral(true)
                                     .queue();
@@ -666,15 +700,18 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final var guild = event.getGuild();
 
         if (permCodes.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "This user/role has no permissions!");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_PERMISSIONS_NONE);
             event.replyEmbeds(eb.build())
                     .setEphemeral(true)
                     .queue();
         } else {
-            List<String> permString = new ArrayList<>();
-            for (int i : permCodes)
-                permString.add(Permission.getPermissions().get(i));
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**Permissions for** " + mentionable.getAsMention() + "\n\n`" + permString + "`");
+            List<String> permString = permCodes.stream()
+                    .map(i -> Permission.getPermissions().get(i))
+                    .toList();
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_PERMISSIONS_LIST,
+                    Pair.of("{mentionable}", mentionable.getAsMention()),
+                    Pair.of("{permissions}", GeneralUtils.listToString(permString))
+            );
             event.replyEmbeds(eb.build())
                     .setEphemeral(true)
                     .queue();

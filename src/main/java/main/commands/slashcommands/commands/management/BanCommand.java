@@ -177,8 +177,9 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
+        final var guild = event.getGuild();
         if (!predicateCheck(event)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_BAN))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_BAN))
                             .build())
                     .setEphemeral(true)
                     .queue();
@@ -188,7 +189,7 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
         final var userToBan = event.getOption("user").getAsMember();
         final var duration = event.getOption("duration") == null ? null : event.getOption("duration").getAsString();
 
-        event.replyEmbeds(handleBan(event.getGuild(), userToBan, event.getUser(), duration).build())
+        event.replyEmbeds(handleBan(guild, userToBan, event.getUser(), duration).build())
                 .setEphemeral(false)
                 .queue();
     }

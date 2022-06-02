@@ -11,10 +11,12 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
 import main.utils.json.reminders.RemindersConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 case "unbanuser" -> unbanUser(msg, args);
                 case "banchannel" -> banChannel(msg, args);
                 case "unbanchannel" -> unbanChannel(msg, args);
-                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arguments!"
+                default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_ARGS
                         + getUsages(prefix)).build())
                         .queue();
             }
@@ -97,7 +99,11 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         channelID = channelID == null ? -1L : channelID;
 
         if (remindersConfig.channelIsBanned(guild.getIdLong(), channelID))
-            return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You cannot set the reminder channel to " + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL) + " as it is banned!")
+            return RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                            RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
+                            RobertifyLocaleMessage.ReminderMessages.CANNOT_SET_BANNED_REMINDER_CHANNEL,
+                            Pair.of("{channel}", GeneralUtils.toMention(guild, channelID, GeneralUtils.Mentioner.CHANNEL))
+                    )
                     .build();
 
         TextChannel channel = guild.getTextChannelById(channelID);
@@ -105,7 +111,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
         if (channel != null)
             if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_WRITE))
-                return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                return RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
                         .build();
 
         long timeInMillis = 0;
@@ -114,15 +120,11 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             timeInMillis = timeToMillis(time);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("minute")) {
-                return RobertifyEmbedUtils.embedMessage(guild, "Invalid minute!").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build();
             } else if (e.getMessage().contains("hour")) {
-                return RobertifyEmbedUtils.embedMessage(guild, "Invalid hour!").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_HOUR).build();
             } else if (e.getMessage().contains("time")) {
-                return RobertifyEmbedUtils.embedMessage(guild, """
-                    Invalid time format!
-                    
-                    **Correct Format** : `00:00AM/PM` **__OR__** `00:00` *(24-hour format)*
-                    """).build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_INVALID_TIME_FORMAT).build();
             }
         }
 
@@ -144,7 +146,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                         remindersConfig.getReminders(guild.getIdLong(), user.getIdLong()).size()-1
                 );
 
-        return RobertifyEmbedUtils.embedMessage(guild, "Successfully added your reminder!").build();
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_ADDED).build();
     }
 
     private void remove(Message msg, List<String> args) {
@@ -176,11 +178,11 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         List<Reminder> reminders = config.getReminders(guild.getIdLong(), user.getIdLong());
 
         if (reminders.isEmpty())
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS)
                     .build();
 
         if (id < 0 || id > reminders.size()-1)
-            return RobertifyEmbedUtils.embedMessage(guild, "Invalid reminder ID!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.INVALID_REMINDER_ID)
                     .build();
 
         config.removeReminder(guild.getIdLong(), user.getIdLong(), id);
@@ -188,7 +190,11 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         ReminderScheduler.getInstance()
                 .removeReminder(user.getIdLong(), id);
 
-        return RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You have removed:\n```" + reminders.get(id).getReminder() + "```")
+        return RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                        RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
+                        RobertifyLocaleMessage.ReminderMessages.REMINDER_REMOVED,
+                        Pair.of("{reminder}", reminders.get(id).getReminder())
+                )
                 .build();
     }
 
@@ -202,15 +208,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
         try {
             config.clearReminders(guild.getIdLong(), user.getIdLong());
-            return RobertifyEmbedUtils.embedMessage(guild, "You have successfully cleared all reminders!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_CLEARED)
                     .build();
         } catch (NullPointerException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS).build();
         } catch (Exception e) {
-            return RobertifyEmbedUtils.embedMessage(guild, """
-                    An unexpected error occurred!
-
-                    Please join our [support server](https://robertify.me/support) to report this to the developers!""").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR).build();
         }
     }
 
@@ -224,16 +227,16 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
         if (!config.userHasReminders(guild.getIdLong(), user.getIdLong()))
             return RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                    "Reminders",
-                    "You have no reminders!"
+                    RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
+                    RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS
             ).build();
 
         final var reminders = config.getReminders(guild.getIdLong(), user.getIdLong());
 
         if (reminders.isEmpty())
             return RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                    "Reminders",
-                    "You have no reminders!"
+                    RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
+                    RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS
             ).build();
 
         final var sb = new StringBuilder();
@@ -248,7 +251,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         }
 
         return RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                "Reminders",
+                RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
                 sb.toString()
         ).build();
     }
@@ -328,13 +331,13 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var config = new RemindersConfig();
 
         if (!config.userHasReminders(guild.getIdLong(), user.getIdLong()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS).build();
 
         try {
             List<Reminder> reminders = config.getReminders(guild.getIdLong(), user.getIdLong());
 
             if (id < 0 || id > reminders.size())
-                return RobertifyEmbedUtils.embedMessage(guild, "There exists no such reminder with that ID!").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDER_WITH_ID).build();
 
             config.editReminderChannel(guild.getIdLong(), user.getIdLong(), id, channelID);
 
@@ -344,19 +347,17 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                     .editReminder(guild.getIdLong(), channelID, reminder.getUserId(), reminder.getId(), reminder.getReminderTime(), reminder.getReminder());
 
             if (channelID == -1L)
-                return RobertifyEmbedUtils.embedMessage(guild, "You have successfully removed the reminder channel for reminder `"+(id+1)+"`").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_REMOVED, Pair.of("{id}", String.valueOf(id+1))).build();
             else
-                return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the reminder channel for reminder " +
-                        "`"+(id+1)+"` to: "
-                        + GeneralUtils.toMention(channelID, GeneralUtils.Mentioner.CHANNEL)).build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_CHANNEL_CHANGED,
+                        Pair.of("{id}", String.valueOf(id+1)),
+                        Pair.of("{channel}", GeneralUtils.toMention(guild, channelID, GeneralUtils.Mentioner.CHANNEL))
+                ).build();
         } catch (NullPointerException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return RobertifyEmbedUtils.embedMessage(guild, """
-                    An unexpected error occurred!
-
-                    Please join our [support server](https://robertify.me/support) to report this to the developers!""").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR).build();
         }
     }
 
@@ -367,28 +368,24 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             timeInMillis = timeToMillis(timeUnparsed);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("minute")) {
-                return RobertifyEmbedUtils.embedMessage(guild, "Invalid minute!").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build();
             } else if (e.getMessage().contains("hour")) {
-                return RobertifyEmbedUtils.embedMessage(guild, "Invalid hour!").build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_HOUR).build();
             } else if (e.getMessage().contains("time")) {
-                return RobertifyEmbedUtils.embedMessage(guild, """
-                    Invalid time format!
-                    
-                    **Correct Format** : `00:00AM/PM` **__OR__** `00:00` *(24-hour format)*
-                    """).build();
+                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_INVALID_TIME_FORMAT).build();
             }
         }
 
         final var config = new RemindersConfig();
 
         if (!config.userHasReminders(guild.getIdLong(), user.getIdLong()))
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS)
                     .build();
 
         List<Reminder> reminders = config.getReminders(guild.getIdLong(), user.getIdLong());
 
         if (id < 0 || id >= reminders.size())
-            return RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid reminder ID!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.MISSING_REMINDER_ID)
                     .build();
 
         try {
@@ -398,16 +395,16 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
             ReminderScheduler.getInstance()
                     .editReminder(guild.getIdLong(), reminder.getChannelID(), reminder.getUserId(), reminder.getId(), timeInMillis, reminder.getReminder());
-            return RobertifyEmbedUtils.embedMessage(guild, "You have successfully changed the time of reminder with ID `"+(id+1)+"` to: `"+timeUnparsed+"`")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_TIME_CHANGED,
+                        Pair.of("{time}", timeUnparsed),
+                        Pair.of("{id}", String.valueOf(id+1))
+                    )
                     .build();
         } catch (NullPointerException e) {
-            return RobertifyEmbedUtils.embedMessage(guild, "You do not have any reminders!")
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS)
                     .build();
         } catch (Exception e) {
-            return RobertifyEmbedUtils.embedMessage(guild, """
-                    An unexpected error occurred!
-
-                    Please join our [support server](https://robertify.me/support) to report this to the developers!""").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR).build();
         }
     }
 
@@ -458,7 +455,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     private void banUser(Message msg, List<String> args) {
         Guild guild = msg.getGuild();
         if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .queue();
             return;
         }
@@ -492,17 +489,17 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var config = new RemindersConfig();
 
         if (config.userIsBanned(guild.getIdLong(), idToBan))
-            return RobertifyEmbedUtils.embedMessage(guild, "This user is already banned!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_ALREADY_BANNED).build();
 
         config.banUser(guild.getIdLong(), idToBan);
-        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully banned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.USER))
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_PERM_BANNED_RESPONSE, Pair.of("{user}", GeneralUtils.toMention(guild, idToBan, GeneralUtils.Mentioner.USER)))
                 .build();
     }
 
     private void unbanUser(Message msg, List<String> args) {
         Guild guild = msg.getGuild();
         if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .queue();
             return;
         }
@@ -536,17 +533,17 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var config = new RemindersConfig();
 
         if (!config.userIsBanned(guild.getIdLong(), idToBan))
-            return RobertifyEmbedUtils.embedMessage(guild, "This user is not banned!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_NOT_BANNED).build();
 
         config.unbanUser(guild.getIdLong(), idToBan);
-        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully unbanned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.USER))
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED_RESPONSE, Pair.of("{user}", GeneralUtils.toMention(guild, idToBan, GeneralUtils.Mentioner.USER)))
                 .build();
     }
 
     private void banChannel(Message msg, List<String> args) {
         Guild guild = msg.getGuild();
         if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .queue();
             return;
         }
@@ -580,17 +577,17 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var config = new RemindersConfig();
 
         if (config.channelIsBanned(guild.getIdLong(), idToBan))
-            return RobertifyEmbedUtils.embedMessage(guild, "This channel is already banned!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_CHANNEL_ALREADY_BANNED).build();
 
         config.banChannel(guild.getIdLong(), idToBan);
-        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully banned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.CHANNEL))
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_PERM_BANNED_RESPONSE, Pair.of("{user}", GeneralUtils.toMention(guild, idToBan, GeneralUtils.Mentioner.CHANNEL)))
                 .build();
     }
 
     private void unbanChannel(Message msg, List<String> args) {
         Guild guild = msg.getGuild();
         if (!GeneralUtils.hasPerms(guild, msg.getMember(), Permission.ROBERTIFY_ADMIN)) {
-            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .queue();
             return;
         }
@@ -624,10 +621,10 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var config = new RemindersConfig();
 
         if (!config.channelIsBanned(guild.getIdLong(), idToBan))
-            return RobertifyEmbedUtils.embedMessage(guild, "This channel is not banned!").build();
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_CHANNEL_NOT_BANNED).build();
 
         config.unbanChannel(guild.getIdLong(), idToBan);
-        return RobertifyEmbedUtils.embedMessage(guild, "You have successfully unbanned " + GeneralUtils.toMention(idToBan, GeneralUtils.Mentioner.CHANNEL))
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED_RESPONSE, Pair.of("{user}", GeneralUtils.toMention(guild, idToBan, GeneralUtils.Mentioner.CHANNEL)))
                 .build();
     }
 
@@ -926,7 +923,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             }
             case "ban" -> {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                             .setEphemeral(true)
                             .queue();
                     return;
@@ -937,7 +934,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                         final var channel = options.get(0).getAsMessageChannel();
 
                         if (channel == null) {
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You must provide a valid channel!").build())
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())
                                     .setEphemeral(true)
                                     .queue();
                             return;
@@ -958,7 +955,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             }
             case "unban" -> {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", BotConstants.getInsufficientPermsMessage(Permission.ROBERTIFY_ADMIN)).build())
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                             .setEphemeral(true)
                             .queue();
                     return;
@@ -969,7 +966,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                         final var channel = options.get(0).getAsMessageChannel();
 
                         if (channel == null) {
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminders", "You must provide a valid channel!").build())
+                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())
                                     .setEphemeral(true)
                                     .queue();
                             return;

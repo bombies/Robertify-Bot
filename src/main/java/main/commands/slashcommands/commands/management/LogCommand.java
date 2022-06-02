@@ -27,7 +27,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
             message.replyEmbeds(
                     RobertifyEmbedUtils.embedMessage(
                             guild,
-                            BotConstants.getInsufficientPermsMessage(main.constants.Permission.ROBERTIFY_ADMIN)
+                            BotConstants.getInsufficientPermsMessage(guild, main.constants.Permission.ROBERTIFY_ADMIN)
                     ).build())
                     .queue();
             return;

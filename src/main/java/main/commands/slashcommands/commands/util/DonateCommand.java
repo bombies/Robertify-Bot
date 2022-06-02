@@ -23,8 +23,7 @@ public class DonateCommand extends AbstractSlashCommand implements ICommand {
                         "A $10 donation is equivalent to 1 more month Robertify stays online. 🙂"
         ).build())
                 .setActionRow(
-                        Button.of(ButtonStyle.LINK, "https://www.patreon.com/robertify", "Patreon"),
-                        Button.of(ButtonStyle.LINK, "https://donatebot.io/checkout/922856265821061130", "Donate Bot")
+                        Button.of(ButtonStyle.LINK, "https://www.patreon.com/robertify", "Patreon")
                 )
                 .queue();
     }

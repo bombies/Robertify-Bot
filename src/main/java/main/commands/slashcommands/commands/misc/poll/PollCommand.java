@@ -10,6 +10,8 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,13 +124,13 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         if (choices.size() > 9)
             return RobertifyEmbedUtils.embedMessage(guild, "You must set at most 9 options");
 
-
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**" + question + "**");
 
         eb.appendDescription(
                 (
                         endTime != -1 ?
-                                (" | Ends at " + GeneralUtils.formatDate(endTime, TimeFormat.DD_M_YYYY_HH_MM_SS))
+                                (localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_ENDS_AT, Pair.of("{time}", GeneralUtils.formatDate(endTime, TimeFormat.DD_M_YYYY_HH_MM_SS))))
                                 :
                                 ""
                 ) + "\n\n");
@@ -136,7 +139,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
             eb.appendDescription(GeneralUtils.parseNumEmoji(i) + " - *" + choices.get(i-1) + "*\n\n");
 
         eb.setThumbnail("https://i.imgur.com/owL8bGL.png");
-        eb.setFooter("Poll by " + sender.getAsTag());
+        eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_BY, Pair.of("{user}", sender.getAsTag())));
         eb.setTimestamp(Instant.now());
 
         String finalQuestion = question;
@@ -156,7 +159,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                         doPollEnd(msg, sender, finalQuestion, choices, finalDuration);
                 });
 
-        return RobertifyEmbedUtils.embedMessage(guild, "Sent poll");
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PollMessages.POLL_SENT);
     }
 
     private void doPollEnd(Message msg, User sender, String question, List<String> choices, long timeToEnd) {
@@ -174,11 +177,12 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                         winner = i;
                 }
 
-                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), "**" + question + " [ENDED]**\n\n");
+                final var localeManager = LocaleManager.getLocaleManager(msg.getGuild());
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(msg.getGuild(), RobertifyLocaleMessage.PollMessages.POLL_ENDED, Pair.of("{question}", question));
                 eb.setThumbnail("https://i.imgur.com/owL8bGL.png");
                 eb.appendDescription("\n");
-                eb.addField("🎊 POLL WINNER 🎊", choices.get(winner-1) + "\n\n", false);
-                eb.setFooter("Poll by " + sender.getAsTag());
+                eb.addField(localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_WINNER_LABEL), choices.get(winner-1) + "\n\n", false);
+                eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_BY, Pair.of("{user}", sender.getAsTag())));
                 eb.setTimestamp(Instant.now());
 
                 msg.editMessageEmbeds(eb.build())
@@ -332,12 +336,13 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         }
 
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**" + question + "**");
+        final EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "**" + question + "**");
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         eb.appendDescription(
                 (
                         endTime != -1 ?
-                                (" | Ends at " + GeneralUtils.formatDate(endTime, TimeFormat.DD_M_YYYY_HH_MM_SS))
+                                (localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_ENDS_AT, Pair.of("{time}", GeneralUtils.formatDate(endTime, TimeFormat.DD_M_YYYY_HH_MM_SS))))
                                 :
                                 ""
                 ) + "\n\n");
@@ -346,7 +351,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
             eb.appendDescription(GeneralUtils.parseNumEmoji(i) + " - *" + choices.get(i-1) + "*\n\n");
 
         eb.setThumbnail("https://i.imgur.com/owL8bGL.png");
-        eb.setFooter("Poll by " + event.getUser().getAsTag());
+        eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.PollMessages.POLL_BY, Pair.of("{user}", event.getUser().getAsTag())));
         eb.setTimestamp(Instant.now());
 
         boolean finalEndPoll = endPoll;
@@ -365,7 +370,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                         doPollEnd(msg, event.getUser(), question, choices, finalDuration);
                 });
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Sent poll")
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PollMessages.POLL_SENT)
                 .build())
                 .setEphemeral(true)
                 .queue();

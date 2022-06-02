@@ -12,11 +12,14 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +78,11 @@ public class AudioLoader implements AudioLoadResultHandler {
             scheduler.queue(audioTrack);
 
         AudioTrackInfo info = audioTrack.getInfo();
-        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
+        new LogUtils().sendLog(guild, LogType.QUEUE_ADD, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_ADD_LOG,
+                Pair.of("{user}", sender.getAsMention()),
+                Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author)
+        );
 
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
@@ -86,13 +93,15 @@ public class AudioLoader implements AudioLoadResultHandler {
     }
 
     private void sendTrackLoadedMessage(AudioTrack audioTrack) {
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + audioTrack.getInfo().title
-                + "` by `" + audioTrack.getInfo().author + "`");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_ADD,
+                Pair.of("{title}", audioTrack.getInfo().title),
+                Pair.of("{author}", audioTrack.getInfo().author)
+        );
 
         if (botMsg != null) {
             if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
                 LofiCommand.getAnnounceLofiMode().remove(guild.getIdLong());
-                botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have enabled Lo-Fi mode").build())
+                botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLED).build())
                         .queue();
             } else {
                 botMsg.editMessageEmbeds(eb.build())
@@ -131,7 +140,11 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             AudioTrackInfo info = tracks.get(0).getInfo();
             if (sender != null)
-                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `"+ info.title +" by "+ info.author +"` to the queue.");
+                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_ADD_LOG,
+                        Pair.of("{user}", sender.getAsMention()),
+                        Pair.of("{title}", info.title),
+                        Pair.of("{author}", info.author)
+                );
 
             if (scheduler.playlistRepeating)
                 scheduler.setSavedQueue(guild, scheduler.queue);
@@ -139,8 +152,10 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (dedicatedChannelConfig.isChannelSet(guild.getIdLong()))
                 dedicatedChannelConfig.updateMessage(guild);
         } else {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Added to queue: `" + tracks.size()
-                    + "` tracks from `" + audioPlaylist.getName() + "`");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
+                    Pair.of("{numTracks}", String.valueOf(tracks.size())),
+                    Pair.of("{playlist}", audioPlaylist.getName())
+            );
 
             if (botMsg != null)
                 botMsg.editMessageEmbeds(eb.build()).queue();
@@ -165,7 +180,11 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             if (sender != null) {
                 trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, sender.getAsMention() + " has added `" + audioPlaylist.getTracks().size() + "` songs from playlist `" + audioPlaylist.getName() + "` to the queue.");
+                new LogUtils().sendLog(guild, LogType.QUEUE_ADD, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD_LOG,
+                        Pair.of("{user}", sender.getAsMention()),
+                        Pair.of("{numTracks}", String.valueOf(tracks.size())),
+                        Pair.of("{playlist}", audioPlaylist.getName())
+                );
             }
 
             for (final AudioTrack track : tracks) {
@@ -182,15 +201,12 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (dedicatedChannelConfig.isChannelSet(guild.getIdLong()))
                 dedicatedChannelConfig.updateMessage(guild);
         }
-
-
     }
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, "Nothing was found for `" + trackUrl.replace("ytsearch:", "")
-                + "`. Try being more specific. *(Adding name of the artiste)*")
-                : RobertifyEmbedUtils.embedMessage(guild, "There was nothing found for that track...");
+        EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", trackUrl.replaceFirst("ytsearch:", "")))
+                : RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND_ALT);
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
@@ -213,7 +229,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild,
                 e.getMessage().contains("available") ? e.getMessage()
                         : e.getMessage().contains("format") ? e.getMessage() :
-                        "Error loading track"
+                        LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.AudioLoaderMessages.ERROR_LOADING_TRACK)
         );
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();

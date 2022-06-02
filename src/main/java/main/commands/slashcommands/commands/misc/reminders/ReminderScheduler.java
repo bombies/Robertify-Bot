@@ -5,12 +5,15 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.reminders.ReminderUser;
 import main.utils.json.reminders.RemindersConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,8 +107,9 @@ public class ReminderScheduler {
                         return;
                     }
 
-                    channel.sendMessage(GeneralUtils.toMention(user, GeneralUtils.Mentioner.USER) + ", here is your reminder:")
-                            .setEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminder", reminder)
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
+                    channel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDER_SEND, Pair.of("{user}", GeneralUtils.toMention(guild, user, GeneralUtils.Mentioner.USER))))
+                            .setEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE), reminder)
                                     .setTimestamp(Instant.now())
                                     .build())
                             .queue();
@@ -132,11 +136,12 @@ public class ReminderScheduler {
     }
 
     private void dmReminder(Guild guild, long user, String reminder) {
-        User u = Robertify.shardManager.retrieveUserById(user).complete();
+        final var u = Robertify.shardManager.retrieveUserById(user).complete();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         u.openPrivateChannel().queue(channel ->
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, "Reminder", reminder)
-                        .setFooter("Reminder from: " + guild.getName())
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE), reminder)
+                        .setFooter(localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDER_FROM, Pair.of("{server}", guild.getName())))
                         .setTimestamp(Instant.now())
                         .build())
                 .queue(null, new ErrorHandler()

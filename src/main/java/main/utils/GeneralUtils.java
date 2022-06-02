@@ -13,6 +13,7 @@ import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.LocaleMessage;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -604,25 +605,26 @@ public class GeneralUtils {
         return Pattern.quote(str);
     }
 
-    public static String toMention(long id, Mentioner mentioner) {
-        return listOfIDsToMentions(List.of(id), mentioner);
+    public static String toMention(Guild guild, long id, Mentioner mentioner) {
+        return listOfIDsToMentions(guild, List.of(id), mentioner);
     }
 
-    public static String listOfIDsToMentions(List<Long> mentions, Mentioner mentioner) {
-        String mentionTag = null;
+    public static String listOfIDsToMentions(Guild guild, List<Long> mentions, Mentioner mentioner) {
+        final String mentionTag;
         switch (mentioner) {
             case USER -> mentionTag = "@";
             case ROLE -> mentionTag = "@&";
             case CHANNEL -> mentionTag = "#";
+            default -> mentionTag = null;
         }
 
-        final var sb = new StringBuilder();
-        for (int i = 0; i < mentions.size(); i++) {
-            var elem = mentions.get(i);
-            sb.append("<"+mentionTag+"").append(elem.toString()).append(">")
-                    .append(i != mentions.size() - 1 ? ", " : "");
-        }
-        return sb.isEmpty() ? "Nothing is here" :  sb.toString();
+        if (mentionTag == null)
+            return null;
+
+        final var parsedMentions = mentions.stream()
+                .map(id -> "<" + mentionTag + id + ">")
+                .toList();
+        return parsedMentions.isEmpty() ? LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NOTHING_HERE) : listToString(parsedMentions);
     }
 
     public static <T> boolean equalsAny(T obj, T[] arr) {

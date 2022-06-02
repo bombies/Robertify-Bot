@@ -3,14 +3,13 @@ package main.commands.slashcommands.commands.management.dedicatedchannel;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.ICommand;
 import main.commands.prefixcommands.audio.*;
-import main.commands.slashcommands.commands.audio.FavouriteTracksCommand;
-import main.commands.slashcommands.commands.audio.PreviousTrackCommand;
-import main.commands.slashcommands.commands.audio.StopCommand;
+import main.commands.slashcommands.commands.audio.*;
 import main.constants.Permission;
 import main.constants.SourcePlaylistPatterns;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.logs.LogType;
@@ -200,29 +199,28 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final Member member = event.getMember();
 
         if (!selfVoiceState.inVoiceChannel()) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I must be in a voice channel to do this.").build())
+            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.inVoiceChannel()) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
+            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build())
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
+            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                             .build())
                     .queue();
             return;
         }
 
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
-            if (!djCheck(new RewindCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+            if (!djCheck(new RewindSlashCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -232,9 +230,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
-            if (!djCheck(new PauseCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+            if (!djCheck(new PauseSlashCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -244,9 +241,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
-            if (!djCheck(new SkipCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+            if (!djCheck(new SkipSlashCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -256,10 +252,9 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
-            final LoopCommand loopCommand = new LoopCommand();
+            final LoopSlashCommand loopCommand = new LoopSlashCommand();
             if (!djCheck(loopCommand, guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -309,9 +304,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
-            if (!djCheck(new ShuffleCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+            if (!djCheck(new ShuffleSlashCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -321,9 +315,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
-            if (!djCheck(new DisconnectCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+            if (!djCheck(new DisconnectSlashCommand(), guild, member)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -334,8 +327,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
             if (!djCheck(new StopCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -347,23 +339,17 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
             if (!new VoteManager().userVoted(member.getId(), VoteManager.Website.TOP_GG)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                                "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!
-
-                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                                RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
                         .addActionRow(
                                 Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                                Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com")
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
                         )
                         .queue();
                 return;
             }
 
             if (!djCheck(new PreviousTrackCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -375,8 +361,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
             if (!djCheck(new FavouriteTracksCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                " to use this button!").build())
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
                 return;
             }
@@ -388,14 +373,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         }
     }
 
-    private boolean djCheck(ICommand command, Guild guild, Member user) {
+    private boolean djCheck(AbstractSlashCommand command, Guild guild, Member user) {
         final var toggles = new TogglesConfig();
         if (toggles.isDJToggleSet(guild, command)) {
             if (toggles.getDJToggle(guild, command)) {
                 return GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_DJ);
             }
         }
-
         return true;
     }
 }

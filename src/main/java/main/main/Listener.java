@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,6 @@ public class Listener extends ListenerAdapter {
             }
         }
 
-//        StatisticsDB.startDailyUpdateCheck();
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
 
         BotBDCache.getInstance().setLastStartup(System.currentTimeMillis());
@@ -99,7 +99,7 @@ public class Listener extends ListenerAdapter {
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
             if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), user.getIdLong())) {
-                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You are banned from using commands in this server!").build())
+                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
                         .queue();
             } else {
                 try {
@@ -107,11 +107,7 @@ public class Listener extends ListenerAdapter {
                 } catch (InsufficientPermissionException e) {
                     try {
                         if (e.getMessage().contains("Permission.MESSAGE_EMBED_LINKS")) {
-                            event.getChannel().sendMessage("""
-                                            ⚠️ I don't have permission to send embeds!
-
-                                            Please tell an admin to enable the `Embed Links` permission for my role in this channel in order for my commands to work!"""
-                                    )
+                            event.getChannel().sendMessage(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
                                     .queue();
                         } else {
                             logger.error("Insufficient permissions", e);
@@ -272,7 +268,7 @@ public class Listener extends ListenerAdapter {
 
     private static void sendUnbanMessage(long user, Guild g) {
         Robertify.shardManager.retrieveUserById(user).queue(user1 -> user1.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(
-                RobertifyEmbedUtils.embedMessage(g, "You have been unbanned from Robertify in **"+g.getName()+"**")
+                RobertifyEmbedUtils.embedMessage(g, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED, Pair.of("{server}", g.getName()))
                         .build()
         ).queue(success -> {}, new ErrorHandler()
                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, (e) -> logger.warn("Was not able to send an unban message to " + user1.getAsTag() + "("+ user1.getIdLong()+")")))));

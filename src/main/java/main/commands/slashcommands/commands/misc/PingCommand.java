@@ -62,7 +62,7 @@ public class PingCommand extends AbstractSlashCommand implements ICommand {
                 (ping) -> {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "🏓 Pong!\n\n" +
                             "REST Ping: **"+ping+"ms**\n" +
-                            "Websocket Ping: **"+Robertify.shardManager.getAverageGatewayPing()+"ms**");
+                            "Websocket Ping: **"+ new DecimalFormat("##.##").format(Robertify.shardManager.getAverageGatewayPing()) +"ms**");
                     event.replyEmbeds(eb.build()).queue();
                 }
         );

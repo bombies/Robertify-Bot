@@ -8,6 +8,8 @@ import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -57,16 +59,20 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
             new DedicatedChannelConfig().updateMessage(guild);
 
-        if (channel != null)
-            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Now playing recommended tracks")
-                    .setTitle("Autoplay")
-                    .setFooter("You can toggle autoplay off by running the \"autoplay\" command")
+        if (channel != null) {
+            final var localeManager = LocaleManager.getLocaleManager(guild);
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.PLAYING_RECOMMENDED_TRACKS)
+                    .setTitle(localeManager.getMessage(RobertifyLocaleMessage.AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
+                    .setFooter(localeManager.getMessage(RobertifyLocaleMessage.AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
                     .build()
             ).queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
+        }
     }
 
     @Override
     public void noMatches() {
+        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_SIMILAR_TRACKS).build())
+                .queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
         throw new FriendlyException("There were no similar tracks found!", FriendlyException.Severity.COMMON, new NullPointerException());
     }
 

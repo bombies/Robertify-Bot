@@ -13,6 +13,8 @@ import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
@@ -28,6 +30,7 @@ import net.dv8tion.jda.api.managers.ChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -136,16 +139,16 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         final var queue = musicManager.getScheduler().queue;
         final var queueAsList = new ArrayList<>(queue);
         final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        final var localeManager = LocaleManager.getLocaleManager(guild);
 
         EmbedBuilder eb = new EmbedBuilder();
 
         if (playingTrack == null) {
             eb.setColor(theme.getColor());
-            eb.setTitle("No song playing...");
+            eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
             eb.setImage(theme.getIdleBanner());
-            eb.setFooter("Prefix for this server is: " + new GuildConfig().getPrefix(guild.getIdLong()));
 
-            msgRequest.queue(msg -> msg.editMessage("**__Queue:__**\nJoin a voice channel and start playing songs!")
+            msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
                     .setEmbeds(eb.build()).queue());
         } else {
             final var trackInfo = playingTrack.getInfo();
@@ -153,13 +156,17 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setColor(theme.getColor());
 
             eb.setTitle(
-                    LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "Lo-Fi Music"
+                    LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LOFI_TITLE)
                             :
-                    trackInfo.title + " by " + trackInfo.author + " ["+ GeneralUtils.formatTime(playingTrack.getInfo().length) +"]"
+                    localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
+                            Pair.of("{title}", trackInfo.title),
+                            Pair.of("{author}", trackInfo.author),
+                            Pair.of("{duration}", GeneralUtils.formatTime(playingTrack.getInfo().length))
+                    )
             );
 
             var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
-            eb.setDescription("Requested by " + requester);
+            eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
 
             switch (playingTrack.getSourceManager().getSourceName()) {
                 case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.identifier));
@@ -167,7 +174,10 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 default -> eb.setImage(theme.getNowPlayingBanner());
             }
 
-            eb.setFooter(queueAsList.size() + " songs in queue | Volume: " + (int)(audioPlayer.getFilters().getVolume() * 100) + "%");
+            eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
+                    Pair.of("{numSongs}", String.valueOf(queueAsList.size())),
+                    Pair.of("{volume}", String.valueOf((int)(audioPlayer.getFilters().getVolume() * 100)))
+            ));
 
             final StringBuilder nextTenSongs = new StringBuilder();
             nextTenSongs.append("```");
@@ -180,7 +190,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                             .append("]\n");
             } else {
                 if (queue.size() == 0)
-                    nextTenSongs.append("Songs in the queue will appear here.");
+                    nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS));
                 else {
                     int index = 1;
                     for (AudioTrack track : queueAsList)
@@ -191,7 +201,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             }
             nextTenSongs.append("```");
 
-            msgRequest.queue(msg -> msg.editMessage("**__Queue__**\n" + nextTenSongs)
+            msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING, Pair.of("{songs}", nextTenSongs.toString())))
                     .setEmbeds(eb.build())
                     .queue());
         }
@@ -257,15 +267,17 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
+        final var localeManager = LocaleManager.getLocaleManager(channel.getGuild());
         return channel.getManager().setTopic(
-                RobertifyEmoji.PREVIOUS_EMOJI + " Go to the previous song.\n" +
-                        RobertifyEmoji.REWIND_EMOJI + " Rewind the song.\n" +
-                        RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " Pause/Resume the song.\n" +
-                        RobertifyEmoji.STOP_EMOJI + " Stop the song and clear the queue.\n" +
-                        RobertifyEmoji.END_EMOJI + " Skip the song.\n" +
-                        RobertifyEmoji.LOOP_EMOJI + " Loop the song.\n" +
-                        RobertifyEmoji.SHUFFLE_EMOJI + " Shuffle the song.\n" +
-                        RobertifyEmoji.QUIT_EMOJI + " Disconnect the bot\n"
+                RobertifyEmoji.PREVIOUS_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +
+                        RobertifyEmoji.REWIND_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_REWIND) +
+                        RobertifyEmoji.PLAY_AND_PAUSE_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PLAY_AND_PAUSE) +
+                        RobertifyEmoji.STOP_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STOP) +
+                        RobertifyEmoji.END_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_END) +
+                        RobertifyEmoji.STAR_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STAR) +
+                        RobertifyEmoji.LOOP_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_LOOP) +
+                        RobertifyEmoji.SHUFFLE_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_SHUFFLE) +
+                        RobertifyEmoji.QUIT_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_QUIT)
         );
     }
 

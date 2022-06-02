@@ -3,19 +3,17 @@ package main.constants;
 import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public enum BotConstants {
-    SPOTIFY_EMOJI("<:spotify:893153435438940181>"),
     ICON_URL(Config.get(ENV.ICON_URL)),
     ROBERTIFY_LOGO("https://i.imgur.com/KioK108.png"),
-    ROBERTIFY_LOGO_TRANSPARENT("https://i.imgur.com/ZF3Y4ee.png"),
-    ROBERTIFY_CHRISTMAS_LOGO("https://i.imgur.com/kVyBLi7.png"),
-    ROBERTIFY_CHRISTMAS_LOGO_TRANSPARENT("https://i.imgur.com/eSoNR0X.png"),
     ROBERTIFY_EMBED_TITLE(Config.get(ENV.BOT_NAME)),
     SUPPORT_SERVER(Config.get(ENV.BOT_SUPPORT_SERVER)),
-    BANNED_MESSAGE("You are banned from using commands in this server!"),
     DEFAULT_IMAGE("https://i.imgur.com/VNQvjve.png"),
     USER_AGENT("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
 
@@ -30,16 +28,12 @@ public enum BotConstants {
         return str;
     }
 
-    public static String getInsufficientPermsMessage(Permission... permsNeeded) {
-        return "You do not have enough permissions to execute this!\n\n" +
-                "You need: `"+ GeneralUtils.arrayToString(permsNeeded) +"`";
+    public static String getInsufficientPermsMessage(Guild guild, Permission... permsNeeded) {
+        return LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", GeneralUtils.arrayToString(permsNeeded)));
     }
 
     public static MessageEmbed getUnexpectedErrorEmbed(Guild guild) {
-        return RobertifyEmbedUtils.embedMessage(guild, """
-                                            An unexpected error has occurred!
-
-                                            *Report this bug to the developers in the [support server](https://robertify.me/support)*""")
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR)
                 .build();
     }
 }

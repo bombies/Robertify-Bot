@@ -9,6 +9,8 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -17,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public class SearchResultLoader implements AudioLoadResultHandler {
     private final Guild guild;
@@ -52,10 +55,11 @@ public class SearchResultLoader implements AudioLoadResultHandler {
             throw new UnsupportedOperationException("This operation is not supported in the search result loader");
 
         final var tracks = playlist.getTracks();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         SelectionMenuBuilder selectionMenuBuilder = new SelectionMenuBuilder()
                 .setName("searchresult:" + searcher.getId() + ":" + query.toLowerCase()
                         .replaceAll(" ", "%SPACE%"))
-                .setPlaceHolder("Choose a result!")
+                .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_MENU_PLACEHOLDER))
                 .setRange(1, 1);
 
         final StringBuilder embedDescription = new StringBuilder();
@@ -72,21 +76,21 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
         if (botMsg != null)
             botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                            .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
-                            .setFooter("Select a result from the selection menu below")
+                            .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                            .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                             .build())
                     .setActionRows(
                             ActionRow.of(selectionMenu),
-                            ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), "End Interaction"))
+                            ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_END_INTERACTION)))
                     )
                     .queue();
         else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                        .setAuthor("Search results for: " + query.replaceFirst("ytsearch:", ""), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
-                        .setFooter("Select a result from the selection menu below")
+                        .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                        .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                         .build())
                 .addActionRows(
                         ActionRow.of(selectionMenu),
-                        ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), "End Interaction"))
+                        ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_END_INTERACTION)))
                 )
                 .setEphemeral(false)
                 .queue();
@@ -94,7 +98,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "There was nothing found for: `" + query.replaceFirst("ytsearch:", "") + "`").build())
+        botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))).build())
                 .queue();
     }
 

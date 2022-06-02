@@ -7,6 +7,8 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.permissions.PermissionsConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -14,6 +16,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,35 +77,37 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleSetDJ(Guild guild, Role role) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb;
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "Set " + role.getAsMention() + " as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_SET, Pair.of("{mentionable}", role.getAsMention()));
             return eb;
         } catch (IllegalAccessException e) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "This role has already been set as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.ALREADY_DJ, Pair.of("{djType}", localeManager.getMessage(RobertifyLocaleMessage.MentionableTypeMessages.ROLE)));
             return eb;
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR);
             return eb;
         }
     }
 
     private EmbedBuilder handleSetDJ(Guild guild, User user) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb;
         PermissionsConfig permissionsConfig = new PermissionsConfig();
         try {
             permissionsConfig.addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "Set " + user.getAsMention() + " as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_SET, Pair.of("{mentionable}", user.getAsMention()));
             return eb;
         } catch (IllegalArgumentException e) {
-            eb = RobertifyEmbedUtils.embedMessage(guild, "This user has already been set as a DJ!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.NOT_DJ, Pair.of("{djType}", localeManager.getMessage(RobertifyLocaleMessage.MentionableTypeMessages.USER)));
             return eb;
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            eb = RobertifyEmbedUtils.embedMessage(guild, "An unexpected error occurred!");
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR);
             return eb;
         }
     }

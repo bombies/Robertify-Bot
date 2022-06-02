@@ -8,6 +8,8 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
@@ -19,20 +21,17 @@ import java.time.Instant;
 public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-
+        final var localeManager = LocaleManager.getLocaleManager(ctx.getGuild());
         ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "\t")
                         .setThumbnail(new ThemesConfig().getTheme(ctx.getGuild().getIdLong()).getTransparent())
-                        .addField("Developers", "<@274681651945144321>", false)
-                        .addField("About Me", "Robertify is a music bot programmed completely " +
-                        "in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (main Developer) " +
-                        "named Robert wanted a music bot, so he made one for him. Eventually, Robertify became his own project to him and he's been putting in most of " +
-                        "his efforts into it ever since.", false)
-                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_DEVELOPERS), "<@274681651945144321>", false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_LABEL), localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_VALUE), false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_UPTIME), GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
                         .setTimestamp(Instant.now())
                 .build())
                 .setActionRow(
-                        Button.of(ButtonStyle.LINK, "https://robertify.me/terms", "Terms of Service", RobertifyTheme.ORANGE.getEmoji()),
-                        Button.of(ButtonStyle.LINK, "https://robertify.me/privacypolicy", "Privacy Policy", RobertifyTheme.BLUE.getEmoji())
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/terms", localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_TERMS), RobertifyTheme.ORANGE.getEmoji()),
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/privacypolicy", localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_PRIVACY), RobertifyTheme.BLUE.getEmoji())
                 )
                 .queue();
     }
@@ -66,19 +65,17 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
+        final var localeManager = LocaleManager.getLocaleManager(event.getGuild());
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "\t")
                         .setThumbnail(new ThemesConfig().getTheme(event.getGuild().getIdLong()).getTransparent())
-                        .addField("Developers", "<@274681651945144321>", false)
-                        .addField("About Me", "Robertify is a music bot programmed completely " +
-                                "in Java using JDA. The name \"Robertify\" originated from the simple fact that a friend of bombies (main Developer) " +
-                                "named Robert wanted a music bot, so he made one for him. Eventually, Robertify became his own project to him and he's been putting in most of " +
-                                "his efforts into it ever since.", false)
-                        .addField("Uptime", GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_DEVELOPERS), "<@274681651945144321>", false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_LABEL), localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_VALUE), false)
+                        .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_UPTIME), GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
                         .setTimestamp(Instant.now())
                         .build())
                 .addActionRow(
-                        Button.of(ButtonStyle.LINK, "https://robertify.me/terms", "Terms of Service", RobertifyTheme.ORANGE.getEmoji()),
-                        Button.of(ButtonStyle.LINK, "https://robertify.me/privacypolicy", "Privacy Policy", RobertifyTheme.BLUE.getEmoji())
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/terms", localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_TERMS), RobertifyTheme.ORANGE.getEmoji()),
+                        Button.of(ButtonStyle.LINK, "https://robertify.me/privacypolicy", localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_PRIVACY), RobertifyTheme.BLUE.getEmoji())
                 )
                 .queue();
     }

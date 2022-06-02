@@ -34,12 +34,15 @@ import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeData;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -190,9 +193,6 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, CommandContext ctx,
                                     Message botMsg, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-
-        if (trackUrl.contains("ytsearch:") && !trackUrl.endsWith("audio"))
-            trackUrl += " audio";
 
         try {
             joinVoiceChannel(ctx.getChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
@@ -399,7 +399,7 @@ public class RobertifyAudioManager {
             musicManager.getScheduler().scheduleDisconnect(true);
         } catch (InsufficientPermissionException e) {
             if (channel != null)
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I do not have enough permissions to join " + vc.getAsMention()).build())
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, Pair.of("{channel}", vc.getAsMention())).build())
                         .queue();
             throw e;
         }
@@ -412,7 +412,7 @@ public class RobertifyAudioManager {
                 .findFirst()
                 .orElse(null);
         requester = requester != null ? requester.split(":")[0] : null;
-        return requester != null ? "<@" + requester + ">" : "Unknown requester";
+        return requester != null ? "<@" + requester + ">" : LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.UNKNOWN_REQUESTER);
     }
 
     public static void removeRequester(Guild guild, AudioTrack track, User requester) {
