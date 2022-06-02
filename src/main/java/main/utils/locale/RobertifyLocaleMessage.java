@@ -414,7 +414,6 @@ public enum RobertifyLocaleMessage {
         REMINDER_CHANNEL_CHANGED,
         REMINDER_TIME_CHANGED,
         REMINDER_CHANNEL_ALREADY_BANNED,
-        REMINDER_CHANNEL_BANNED,
         REMINDER_CHANNEL_NOT_BANNED,
         REMINDER_SEND,
         REMINDER_FROM
@@ -522,6 +521,12 @@ public enum RobertifyLocaleMessage {
         INACTIVITY_LEAVE
     }
 
+    public enum LanguageCommandMessages implements LocaleMessage {
+        LANGUAGE_EMBED_DESC,
+        LANGUAGE_SELECT_MENU_PLACE_HOLDER,
+        LANGUAGE_CHANGED
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -571,6 +576,7 @@ public enum RobertifyLocaleMessage {
         ret.put(AudioLoaderMessages.class, AudioLoaderMessages.values());
         ret.put(AutoPlayMessages.class, AutoPlayMessages.values());
         ret.put(TrackSchedulerMessages.class, TrackSchedulerMessages.values());
+        ret.put(LanguageCommandMessages.class, LanguageCommandMessages.values());
         return ret;
     }
 }

@@ -322,6 +322,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
     @Override
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+        if (!event.getSelectionMenu().getId().startsWith("menupage")) return;
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1]))
             return;
 

@@ -346,7 +346,7 @@ role: "role"
 user: "user"
 
 # POLL MESSAGES
-polls_ends_at: " | Ends at {time}"
+poll_ends_at: " | Ends at {time}"
 poll_by: "Poll by {user}"
 poll_sent: "Sent poll"
 poll_winner_label: "🎊 POLL WINNER 🎊"
@@ -454,7 +454,7 @@ no_similar_tracks: "There were no similar tracks found!"
 
 # AUTOPLAY MESSAGES
 auto_play_embed_title: "Autoplay"
-auto_play_embed_footer: "You can toggle autoplay off by running the "autoplay" command"
+auto_play_embed_footer: "You can toggle autoplay off by running the \"autoplay\" command"
 
 # TRACK SCHEDULER MESSAGES
 track_could_not_be_played: "`{title} by {author}` could not be played!\nSkipped to the next song. (If available)"
@@ -463,3 +463,8 @@ copyright_track: "I couldn't play `{title} by {author}` as it has blocked copyri
 unavailable_track: "I couldn't play `{title} by {author}` because is it unavailable\nSkipping to the next track (If available)"
 unviewable_playlist: "I couldn't play a playlist because it is un-viewable..."
 inactivity_leave: "I have left {channel} due to inactivity."
+
+# LANGUAGE COMMAND MESSAGES
+language_embed_desc: "Current Language: **{language}**\n\nSelect an option from the list below to change the bot's language!"
+language_select_menu_place_holder: "Select a language!"
+language_changed: "You have changed the language to: {language}"
