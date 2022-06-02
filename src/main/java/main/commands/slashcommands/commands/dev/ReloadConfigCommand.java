@@ -7,6 +7,7 @@ import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.LocaleManager;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
 
         try {
             Config.reload();
+            LocaleManager.reloadLocales();
             Robertify.initVoteSiteAPIs();
             RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
 

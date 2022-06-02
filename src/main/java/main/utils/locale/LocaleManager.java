@@ -49,6 +49,12 @@ public class LocaleManager {
         this.localeFile = retrieveLocaleFile();
     }
 
+    public static void reloadLocales() {
+        locales.clear();
+        RobertifyLocale.getAvailableLanguages()
+                .forEach(locale -> locales.put(locale, retrieveLocaleFile(locale)));
+    }
+
     public String getMessage(LocaleMessage message) {
         return localeFile.get(message.name().toLowerCase());
     }
@@ -69,7 +75,7 @@ public class LocaleManager {
     }
 
     @SneakyThrows
-    private Map<String, String> retrieveLocaleFile(RobertifyLocale locale) {
+    private static Map<String, String> retrieveLocaleFile(RobertifyLocale locale) {
         if (!GeneralUtils.directoryExists("./locale")) {
             GeneralUtils.createDirectory("./locale");
             logger.error("There was no file found for locale: " + locale.getCode().toUpperCase());
@@ -98,7 +104,7 @@ public class LocaleManager {
     }
 
     @SneakyThrows
-    private void createLocaleFile(RobertifyLocale locale) {
+    private static void createLocaleFile(RobertifyLocale locale) {
         final File file = new File("./locale/messages." + locale.getCode().toLowerCase() + ".yml");
         file.createNewFile();
 
@@ -109,12 +115,12 @@ public class LocaleManager {
         GeneralUtils.setFileContent(file, content.toString());
     }
 
-    private void createAllLocaleFiles() {
+    private static void createAllLocaleFiles() {
         for (final var locale : RobertifyLocale.values())
             createLocaleFile(locale);
     }
 
-    private Map<String, String> checkLocaleFile(File localeFile, Map<String, String> fileMap) {
+    private static Map<String, String> checkLocaleFile(File localeFile, Map<String, String> fileMap) {
         StringBuilder contentToAppend = new StringBuilder();
         for (final var fieldSection : RobertifyLocaleMessage.getMessageTypes().values()) {
             for (final var field : fieldSection)
