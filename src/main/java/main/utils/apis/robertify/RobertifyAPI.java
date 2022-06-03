@@ -77,12 +77,12 @@ public class RobertifyAPI {
 
     @SneakyThrows
     public void postCommandInfo(JSONObject commandInfo) {
-        Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
+        webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
                 .addHeader("auth-token", accessToken)
                 .post(RequestBody.create(
                         MediaType.get("application/json"),
                         commandInfo.toString()
                 ))
-                .build()).execute();
+                .build()).execute().close();
     }
 }
