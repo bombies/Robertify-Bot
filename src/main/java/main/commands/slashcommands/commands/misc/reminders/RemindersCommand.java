@@ -4,6 +4,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.constants.BotConstants;
 import main.constants.Permission;
+import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -11,6 +12,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
 import main.utils.json.reminders.RemindersConfig;
+import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -37,6 +39,9 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var user = ctx.getAuthor();
         final var args = ctx.getArgs();
         final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
+
+        if (!new TogglesConfig().getToggle(guild, Toggles.REMINDERS))
+            return;
 
         if (args.isEmpty()) {
             list(msg);
@@ -862,12 +867,19 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
+        final Guild guild = event.getGuild();
+        if (!new TogglesConfig().getToggle(guild, Toggles.REMINDERS)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
+                    .queue();
+            return;
+        }
+
         String[] split = event.getCommandPath().split("/");
         List<OptionMapping> options = event.getOptions();
 
-        final Guild guild = event.getGuild();
         final Member member = event.getMember();
         final User eventUser = event.getUser();
+
         switch (split[1]) {
             case "add" -> {
                 String time = options.get(0).getAsString();

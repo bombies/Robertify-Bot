@@ -160,7 +160,22 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         );
                     }
                 }
-                case "tips", "7" -> {
+                case "reminders", "7" -> {
+                    if (config.getToggle(guild, Toggles.REMINDERS)) {
+                        config.setToggle(guild, Toggles.REMINDERS, false);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "reminders"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
+                    } else {
+                        config.setToggle(guild, Toggles.REMINDERS, true);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                Pair.of("{toggle}", "reminders"),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
+                    }
+                }
+                case "tips", "8" -> {
                     if (config.getToggle(guild, Toggles.TIPS)) {
                         config.setToggle(guild, Toggles.TIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
@@ -175,7 +190,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         );
                     }
                 }
-                case "voteskips", "voteskip", "vs", "8" -> {
+                case "voteskips", "voteskip", "vs", "9" -> {
                     if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                         config.setToggle(guild, Toggles.VOTE_SKIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
@@ -567,7 +582,22 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             );
                         }
                     }
-                    case "tips", "7" -> {
+                    case "reminders", "7" -> {
+                        if (config.getToggle(guild, Toggles.REMINDERS)) {
+                            config.setToggle(guild, Toggles.REMINDERS, false);
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "reminders"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                            );
+                        } else {
+                            config.setToggle(guild, Toggles.REMINDERS, true);
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
+                                    Pair.of("{toggle}", "reminders"),
+                                    Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                            );
+                        }
+                    }
+                    case "tips", "8" -> {
                         if (config.getToggle(guild, Toggles.TIPS)) {
                             config.setToggle(guild, Toggles.TIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
@@ -582,7 +612,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             );
                         }
                     }
-                    case "voteskips", "voteskip", "vs", "8" -> {
+                    case "voteskips", "voteskip", "vs", "9" -> {
                         if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
                             config.setToggle(guild, Toggles.VOTE_SKIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,

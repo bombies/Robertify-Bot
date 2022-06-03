@@ -181,7 +181,11 @@ public class RemindersConfig extends AbstractGuildConfig {
             reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
         } catch (JSONException e) {
             update(gid);
-            reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
+            try {
+                reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
+            } catch (JSONException e2) {
+                reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
+            }
         }
 
         final var users = reminderObj.getJSONArray(Fields.USERS.toString());

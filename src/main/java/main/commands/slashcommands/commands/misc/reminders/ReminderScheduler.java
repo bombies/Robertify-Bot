@@ -1,10 +1,12 @@
 package main.commands.slashcommands.commands.misc.reminders;
 
+import main.constants.Toggles;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.reminders.ReminderUser;
 import main.utils.json.reminders.RemindersConfig;
+import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.Permission;
@@ -106,6 +108,9 @@ public class ReminderScheduler {
                         dmReminder(guild, user, reminder);
                         return;
                     }
+
+                    if (!new TogglesConfig().getToggle(guild, Toggles.REMINDERS))
+                        return;
 
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     channel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDER_SEND, Pair.of("{user}", GeneralUtils.toMention(guild, user, GeneralUtils.Mentioner.USER))))

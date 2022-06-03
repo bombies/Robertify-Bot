@@ -13,6 +13,7 @@ public enum Toggles implements GenericJSONField {
     SHOW_REQUESTER("show_requester"),
     EIGHT_BALL("8ball"),
     POLLS("polls"),
+    REMINDERS("reminders"),
     TIPS("tips"),
     VOTE_SKIPS("vote_skips");
 
@@ -40,6 +41,9 @@ public enum Toggles implements GenericJSONField {
             }
             case POLLS -> {
                 return "polls";
+            }
+            case REMINDERS -> {
+                return "reminders";
             }
             case RESTRICTED_VOICE_CHANNELS -> {
                 return "restrictedvoice";
