@@ -33,6 +33,8 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
+import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -41,6 +43,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +52,7 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -358,14 +362,11 @@ public class CommandManager {
                     if (cmd.requiresPermission())
                         if (!hasAllPermissions(cmd, e.getGuild().getSelfMember())) {
                             final var permissionsRequired = cmd.getPermissionsRequired();
-                            e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(), "I do not have enough permissions to do this\n" +
-                                                    "Please give my role the following permission(s):\n\n" +
-                                                    "`"+GeneralUtils.listToString(permissionsRequired)+"`\n\n" +
-                                                    "*For the recommended permissions please invite the bot by clicking the button below*")
+                            e.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(e.getGuild(),
+                                                    RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS,
+                                                    Pair.of("{permissions}", GeneralUtils.listToString(permissionsRequired))
+                                            )
                                             .build())
-                                    .setActionRow(
-                                            Button.of(ButtonStyle.LINK, "https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Give Permissions! (Requires Manage Server)", RobertifyTheme.LIGHT.getEmoji())
-                                    )
                                     .queue();
                             return;
                         }
@@ -375,12 +376,10 @@ public class CommandManager {
                     final Guild guild = e.getGuild();
                     final Message msg = e.getMessage();
                     final var toggles = new TogglesConfig();
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
 
                     if (!guild.getSelfMember().hasPermission(ctx.getChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
-                        e.getChannel().sendMessage("""
-                                    ⚠️ I do not have permissions to send embeds!
-
-                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
+                        e.getChannel().sendMessage(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
                                 .queue();
                         return;
                     }
@@ -402,15 +401,10 @@ public class CommandManager {
                         if (!new VoteManager().userVoted(ctx.getAuthor().getId(), VoteManager.Website.TOP_GG)
                             && ctx.getAuthor().getIdLong() != 276778018440085505L) {
                             msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                                    "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!
-
-                                                    *Note: Only the first two votes sites are required, the last two are optional!*""").build())
+                                            RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
                                     .setActionRow(
                                             Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                            Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List"),
-                                            Button.of(ButtonStyle.LINK, "https://discords.com/bots/bot/893558050504466482/vote", "Discords.com")
+                                            Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
                                     )
                                     .queue();
                             return;
@@ -421,8 +415,7 @@ public class CommandManager {
                     String latestAlert = botDB.getLatestAlert().getLeft();
                     if (!botDB.userHasViewedAlert(ctx.getAuthor().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
                      && isMusicCommand(cmd))
-                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "⚠️ You have an unread alert!\n" +
-                                "Run the `/alert` command to view this alert.").build()).queue();
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT).build()).queue();
 
                     if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
                         new RandomMessageManager().randomlySendMessage(ctx.getChannel());
@@ -431,22 +424,15 @@ public class CommandManager {
                         if (toggles.getDJToggle(guild, cmd) && !cmd.getName().equals("skip")) {
                             if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                                 cmd.handle(ctx);
-//                            if (!(cmd instanceof StatisticsCommand))
-//                                StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                             } else {
-                                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be a DJ" +
-                                                " to run this command!").build())
+                                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_ONLY).build())
                                         .queue();
                             }
                         } else {
                             cmd.handle(ctx);
-//                        if (!(cmd instanceof StatisticsCommand))
-//                            StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                         }
                     } else {
                         cmd.handle(ctx);
-//                    if (!(cmd instanceof StatisticsCommand))
-//                        StatisticsManager.ins().incrementStatistic(1, Statistic.COMMANDS_USED);
                     }
                     CooldownManager.INSTANCE.setCooldown(e.getAuthor(), System.currentTimeMillis());
                 } else {

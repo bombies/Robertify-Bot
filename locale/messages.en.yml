@@ -28,6 +28,7 @@ dj_button: "You must be a DJ to use this button!"
 nothing_playing: "There is nothing playing!"
 nothing_in_queue: "There is nothing in the queue."
 cant_be_used_in_channel: "This command can't be used in this channel!"
+cant_be_used_in_channel_args: "This command can't be used in this channel!\n\nCommands may only be used in:\n{channels}"
 no_menu_perms: "You do not have permissions to interact with this menu!"
 no_perms_end_interaction: "You do not have permission to end this interaction!"
 no_perms_button: "You do not have permission to interact with this button!"
@@ -45,6 +46,8 @@ insufficient_perms_to_join: "I do not have enough permissions to join: {channel}
 unknown_requester: "Unknown Requester"
 banned_from_commands: "You are banned from using commands in this server!"
 no_embed_perms: "⚠️ I don't have permission to send embeds!\n\nPlease tell an admin to enable the `Embed Links` permission for my role in this channel in order for my commands to work!"
+unread_alert: "⚠️ You have an unread alert!\nRun the `alert` command to view this alert."
+unread_alert_mention: "⚠️ {user}, you have an unread alert!\nRun the `alert` command to view this alert."
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"

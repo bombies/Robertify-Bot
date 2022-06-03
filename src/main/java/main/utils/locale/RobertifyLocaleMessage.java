@@ -35,6 +35,7 @@ public enum RobertifyLocaleMessage {
         NOTHING_PLAYING,
         NOTHING_IN_QUEUE,
         CANT_BE_USED_IN_CHANNEL,
+        CANT_BE_USED_IN_CHANNEL_ARGS,
         NO_MENU_PERMS,
         NO_PERMS_END_INTERACTION,
         NO_PERMS_BUTTON,
@@ -51,7 +52,9 @@ public enum RobertifyLocaleMessage {
         INSUFFICIENT_PERMS_TO_JOIN,
         UNKNOWN_REQUESTER,
         BANNED_FROM_COMMANDS,
-        NO_EMBED_PERMS
+        NO_EMBED_PERMS,
+        UNREAD_ALERT,
+        UNREAD_ALERT_MENTION
     }
 
     public enum RandomMessages implements LocaleMessage {

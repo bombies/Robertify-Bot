@@ -19,6 +19,7 @@ import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
@@ -32,6 +33,7 @@ import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
 
@@ -274,12 +276,13 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!botPermsCheck(event)) return false;
 
         if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
-            BotBDCache botDB = BotBDCache.getInstance();
-            String latestAlert = botDB.getLatestAlert().getLeft();
-            if (!botDB.userHasViewedAlert(event.getUser().getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
+            final var botDB = BotBDCache.getInstance();
+            final var latestAlert = botDB.getLatestAlert().getLeft();
+            final var user = event.getUser();
+
+            if (!botDB.userHasViewedAlert(user.getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
                     && new SlashCommandManager().isMusicCommand(this))
-                event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "⚠️ " + event.getUser().getAsMention() + ", you have an unread alert!\n" +
-                        "Run the `/alert` command to view this alert.").build()).queue();
+                event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build()).queue();
         }
 
         if (!adminCheck(event)) return false;
@@ -302,7 +305,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
             return true;
 
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have been banned from using commands!").build())
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
                 .setEphemeral(true)
                 .queue();
         return false;
@@ -343,9 +346,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG)
                 && user.getIdLong() != 276778018440085505L) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                            "🔒 Locked Command", """
-                                                    Woah there! You must vote before interacting with this command.
-                                                    Click on each of the buttons below to vote!""").build())
+                            RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
                     .addActionRow(
                             Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
                             Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
@@ -401,13 +402,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         final Guild guild = event.getGuild();
         final var self = guild.getSelfMember();
         if (!self.hasPermission(command.botRequiredPermissions)) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I do not have enough permissions to do this\n" +
-                            "Please give my role the following permission(s):\n\n" +
-                            "`"+GeneralUtils.listToString(command.botRequiredPermissions)+"`\n\n" +
-                            "*For the recommended permissions please invite the bot by clicking the button below*").build())
-                    .addActionRow(
-                            Button.of(ButtonStyle.LINK, "https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Give Permissions! (Requires Manage Server)", RobertifyTheme.LIGHT.getEmoji())
-                    )
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS, Pair.of("{permissions}", GeneralUtils.listToString(command.botRequiredPermissions))).build())
                     .setEphemeral(false)
                     .queue();
             return false;
@@ -416,11 +411,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected boolean botEmbedCheck(SlashCommandEvent event) {
-        if (!event.getGuild().getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
-            event.reply("""
-                                    ⚠️ I do not have permissions to send embeds!
-
-                                    Please enable the `Embed Links` permission for my role in this channel in order for my commands to work!""")
+        final var guild = event.getGuild();
+        if (!guild.getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
+            event.reply(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
                     .queue();
             return false;
         }
@@ -438,13 +431,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!config.isRestrictedChannel(guild.getIdLong(), event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
             && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
 
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "This command cannot be used in this channel!\n\n" +
-                    "Commands may only be used in:\n"
-                    + GeneralUtils.listOfIDsToMentions(
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL_ARGS,
+                    Pair.of("{channels}", GeneralUtils.listOfIDsToMentions(
                             guild,
                             config.getRestrictedChannels(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
                             GeneralUtils.Mentioner.CHANNEL
-                    )).build())
+                    ))).build())
                     .setEphemeral(true)
                     .queue();
             return false;
