@@ -16,6 +16,7 @@ import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
+import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -70,7 +71,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         if (!message.startsWith(new GuildConfig().getPrefix(guild.getIdLong())) && !user.isBot() && !event.isWebhookMessage()) {
             if (!memberVoiceState.inVoiceChannel()) {
-                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in a voice channel to do this")
+                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
                 event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -79,7 +80,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (selfVoiceState.inVoiceChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-                    event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must be in the same voice channel as me to use this command!" + "\n\nI am currently in: " + selfVoiceState.getChannel().getAsMention())
+                    event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                                     .build())
                             .queue();
                     event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
@@ -88,19 +89,20 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             } else {
                 if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
                     final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+                    final var localeManager = LocaleManager.getLocaleManager(guild);
                     if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
-                        event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I can't join this channel!" +
+                        event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                                         (!restrictedChannelsConfig.getRestrictedChannels(
                                                 guild.getIdLong(),
                                                 RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                         ).isEmpty()
                                                 ?
-                                                "\n\nI am restricted to only join\n" + restrictedChannelsConfig.restrictedChannelsToString(
+                                                localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
                                                         guild.getIdLong(),
                                                         RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
-                                                )
+                                                )))
                                                 :
-                                                "\n\nRestricted voice channels have been toggled **ON**, but there aren't any set!"
+                                                localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL)
                                         )
                                 ).build())
                                 .queue();
@@ -138,14 +140,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                         var msgNoFlags = message.replaceAll("\\s-(s|shuffle)$", "");
 
                         if (!GeneralUtils.isUrl(msgNoFlags)) {
-                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide the URL of an album/playlist for me to shuffle!").build())
+                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.MUST_PROVIDE_VALID_PLAYLIST).build())
                                     .queue();
                             event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
                                 return;
                         }
 
                         if (!SourcePlaylistPatterns.isPlaylistLink(msgNoFlags)) {
-                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide a valid Spotify/Deezer/YouTube/SoundCloud playlist or album").build())
+                            event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.MUST_PROVIDE_VALID_PLAYLIST).build())
                                     .queue();
                             event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
                             return;
@@ -360,6 +362,17 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
+            if (!new VoteManager().userVoted(member.getId(), VoteManager.Website.TOP_GG)) {
+                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                                RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
+                        .addActionRow(
+                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
+                        )
+                        .queue();
+                return;
+            }
+
             if (!djCheck(new FavouriteTracksCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
