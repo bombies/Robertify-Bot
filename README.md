@@ -1,4 +1,4 @@
-<img align="right" src="https://i.imgur.com/JGXXPgn.png" height="256" width="256">
+<img align="right" src="https://i.robertify.me/images/gklyg.png" height="256" width="256">
 
 # Robertify
 [![Discord](https://discordapp.com/api/guilds/922856265821061130/widget.png)](https://robertify.me/invite) <br>
