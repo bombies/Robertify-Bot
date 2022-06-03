@@ -28,6 +28,7 @@ public class ResumeUtils {
         if (!hasInfo(guild)) return;
 
         ResumeData.GuildResumeData info = data.getInfo(guild.getIdLong());
+        System.out.println(info);
         if (info == null)
             return;
 
@@ -36,6 +37,11 @@ public class ResumeUtils {
                 info.getChannelId(),
                 info
         );
+        data.removeGuild(guild.getIdLong());
+    }
+
+    public void removeInfo(Guild guild) {
+        if (!hasInfo(guild)) return;
         data.removeGuild(guild.getIdLong());
     }
 

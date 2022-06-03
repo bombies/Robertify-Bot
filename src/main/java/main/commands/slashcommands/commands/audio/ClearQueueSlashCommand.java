@@ -9,6 +9,7 @@ import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -72,10 +73,9 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         queue.clear();
         new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
 
-
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEAR));
         event.getHook().sendMessageEmbeds(eb.build()).queue();
-
+        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }

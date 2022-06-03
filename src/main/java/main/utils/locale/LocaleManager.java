@@ -13,6 +13,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LocaleManager {
@@ -75,7 +76,7 @@ public class LocaleManager {
 
         if (placeholders.length != 0)
             for (final var placeholder : placeholders)
-                msg = msg.replaceAll(Pattern.quote(placeholder.getLeft()), placeholder.getRight());
+                msg = msg.replaceAll(Pattern.quote(placeholder.getLeft()), Matcher.quoteReplacement(placeholder.getRight()));
         return msg;
     }
 

@@ -397,6 +397,8 @@ public class RobertifyAudioManager {
         try {
             musicManager.getLink().connect(vc);
             musicManager.getScheduler().scheduleDisconnect(true);
+            final var guild = channel.getGuild();
+            ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         } catch (InsufficientPermissionException e) {
             if (channel != null)
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, Pair.of("{channel}", vc.getAsMention())).build())

@@ -1,8 +1,7 @@
 package main.constants;
 
 public enum JSONConfigFile {
-    CHANGELOG("changelog.json"),
-    RESUME_DATA("resume_data.json");
+    CHANGELOG("changelog.json");
 
     private final String str;
 

@@ -9,6 +9,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -48,6 +49,7 @@ public class ShuffleCommand implements ICommand {
             new DedicatedChannelConfig().updateMessage(guild);
 
         new LogUtils().sendLog(guild, LogType.QUEUE_SHUFFLE, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED_LOG, Pair.of("{user}", shuffler.getAsMention()));
+        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED);
     }
 

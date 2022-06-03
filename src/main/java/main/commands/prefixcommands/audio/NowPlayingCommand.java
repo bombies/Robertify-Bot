@@ -92,7 +92,7 @@ public class NowPlayingCommand implements ICommand {
                 (info.isStream ?
                         localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LIVESTREAM) + "\n"
                                 :
-                        localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_TIME_LEFT, Pair.of("{time}", GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()))) + "`\n") +
+                        localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_TIME_LEFT, Pair.of("{time}", GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()))) + "\n") +
 
                 "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 

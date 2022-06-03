@@ -12,6 +12,7 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
@@ -31,7 +32,7 @@ public class LofiCommand implements ICommand {
         final Guild guild = ctx.getGuild();
 
         try {
-            msg.replyEmbeds(handleLofi(guild, ctx.getMember(), ctx.getChannel()))
+            msg.replyEmbeds(handleLofi(guild, ctx.getMember()))
                     .queue();
         } catch (IllegalArgumentException e) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLING).build())
@@ -47,11 +48,12 @@ public class LofiCommand implements ICommand {
                                         botMsg,
                                         false
                                 );
+                        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
                     });
         }
     }
 
-    public MessageEmbed handleLofi(Guild guild, Member member, TextChannel channel) {
+    public MessageEmbed handleLofi(Guild guild, Member member) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var audioPlayer = musicManager.getPlayer();
         final var queue = musicManager.getScheduler().queue;

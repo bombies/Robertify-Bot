@@ -1,8 +1,6 @@
 package main.main;
 
 import api.deezer.DeezerApi;
-import com.github.kskelm.baringo.BaringoClient;
-import com.github.kskelm.baringo.util.BaringoApiException;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import io.sentry.Sentry;
@@ -21,20 +19,17 @@ import main.constants.ENV;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
-import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.RobertifyAPI;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.pagination.PaginationEvents;
-import main.utils.resume.ResumeUtils;
 import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -64,7 +59,6 @@ public class Robertify {
     private static DiscordBotListAPI topGGAPI;
     @Getter
     private static DBLApi discordBotListAPI;
-    public static BaringoClient baringo;
     @Getter
     private static DeezerApi deezerApi;
     @Getter
@@ -97,14 +91,7 @@ public class Robertify {
                         .filter(guild -> guild.getSelfMember().getVoiceState().inVoiceChannel())
                         .forEach(guild -> {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                            ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
-                            musicManager.getScheduler().scheduleDisconnect(false, 0, TimeUnit.SECONDS);
-
-                            TextChannel announcementChannel = musicManager.getScheduler().getAnnouncementChannel();
-                            if (announcementChannel != null)
-                                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "I have disconnected due to being restarted!\n" +
-                                                "I will rejoin the voice channel shortly with your tracks loaded...").build())
-                                        .queue();
+                            musicManager.getScheduler().disconnect(false);
                         });
                 shardManager.shutdown();
             }));
@@ -206,14 +193,6 @@ public class Robertify {
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
-
-            try {
-                baringo = new BaringoClient.Builder()
-                        .clientAuth(Config.get(ENV.IMGUR_CLIENT), Config.get(ENV.IMGUR_SECRET))
-                        .build();
-            } catch (BaringoApiException e) {
-                logger.error("[ERROR] There was an issue building the Baringo client!", e);
-            }
 
             String masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
             if (masterPassword != null)

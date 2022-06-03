@@ -9,6 +9,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -58,7 +59,7 @@ public class ClearQueueCommand implements ICommand {
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();
-
+        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         GeneralUtils.setDefaultEmbed(guild);
     }
 

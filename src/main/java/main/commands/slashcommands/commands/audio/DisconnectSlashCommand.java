@@ -7,6 +7,7 @@ import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -73,5 +74,7 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
 
         eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED));
         event.getHook().sendMessageEmbeds(eb.build()).queue();
+
+        ResumeUtils.getInstance().removeInfo(guild);
     }
 }

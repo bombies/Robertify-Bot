@@ -16,6 +16,10 @@ import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.constants.BotConstants;
 import main.constants.JSONConfigFile;
 import main.main.Robertify;
+import main.utils.database.mongodb.AbstractMongoDatabase;
+import main.utils.database.mongodb.cache.redis.AbstractRedisCache;
+import main.utils.database.mongodb.cache.redis.RedisCache;
+import main.utils.json.AbstractJSON;
 import main.utils.json.AbstractJSONFile;
 import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
@@ -30,30 +34,13 @@ import java.util.AbstractQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResumeData extends AbstractJSONFile {
+public class ResumeData extends RedisCache {
     private final static Logger logger = LoggerFactory.getLogger(ResumeData.class);
     private final static int MAX_TRACKS_TO_SAVE = 1000;
+    private final static String CACHE_ID = "guildResumeCache";
 
     public ResumeData() {
-        super(JSONConfigFile.RESUME_DATA);
-        initConfig();
-    }
-
-    @Override
-    public void initConfig() {
-        try {
-            makeConfigFile();
-        } catch (IllegalStateException e) {
-            return;
-        }
-
-        final var obj = new JSONObject();
-        final var guilds = new JSONArray();
-
-        obj.put(Fields.GUILDS.toString(), guilds);
-
-
-        setJSON(obj);
+        super(CACHE_ID);
     }
 
     public void addGuild(long gid, long cid, AudioTrack playingTrack, AbstractQueue<AudioTrack> queue) {
@@ -78,32 +65,20 @@ public class ResumeData extends AbstractJSONFile {
        }
 
        guildObj.put(Fields.QUEUE.toString(), queueArr);
-
-       final var obj = getJSONObject();
-       obj.getJSONArray(Fields.GUILDS.toString())
-                       .put(guildObj);
-
-       setJSON(obj);
+       updateCache(String.valueOf(gid), guildObj);
     }
 
     public void removeGuild(long gid) {
         if (!guildHasInfo(gid))
             return;
-
-        final var obj = getJSONObject();
-        final var arr = obj.getJSONArray(Fields.GUILDS.toString());
-
-        arr.remove(getIndexOfObjectInArray(arr, Fields.GUILD_ID, gid));
-
-        setJSON(obj);
+        removeFromCache(String.valueOf(gid));
     }
 
     public GuildResumeData getInfo(long gid) {
         if (!guildHasInfo(gid))
             return null;
 
-        final var guildArr = getJSONObject().getJSONArray(Fields.GUILDS.toString());
-        final var guildObj = guildArr.getJSONObject(getIndexOfObjectInArray(guildArr, Fields.GUILD_ID, gid));
+        final var guildObj = getJSONByGuild(gid);
 
         return new GuildResumeData(
                 guildObj.getLong(Fields.GUILD_ID.toString()),
@@ -114,8 +89,10 @@ public class ResumeData extends AbstractJSONFile {
     }
 
     public boolean guildHasInfo(long gid) {
-        JSONObject jsonObject = getJSONObject();
-        return arrayHasObject(jsonObject.getJSONArray(Fields.GUILDS.toString()), Fields.GUILD_ID, gid);
+        JSONObject jsonObject = getJSONByGuild(gid);
+        if (jsonObject == null)
+            return false;
+        return !jsonObject.isEmpty();
     }
 
     private JSONObject createAudioTrackObject(AudioTrack track) {
@@ -220,7 +197,6 @@ public class ResumeData extends AbstractJSONFile {
     }
 
     public enum Fields implements GenericJSONField {
-        GUILDS("guilds"),
         GUILD_ID("guild_id"),
         CHANNEL_ID("channel_id"),
         PLAYING_TRACK("playing_track"),
@@ -276,6 +252,11 @@ public class ResumeData extends AbstractJSONFile {
             guildObject.put(Fields.CHANNEL_ID.toString(), channelId);
             guildObject.put(Fields.PLAYING_TRACK.toString(), playingTrackObj);
             guildObject.put(Fields.QUEUE.toString(), queueObj);
+        }
+
+        @Override
+        public String toString() {
+            return "GuildResumeData={guildId={"+ guildId +"},channelId={" + channelId + "},queue={" + queue.toString() + "}}";
         }
     }
 }

@@ -12,6 +12,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -25,14 +26,6 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final Message msg = ctx.getMessage();
-        final Member self = ctx.getSelfMember();
-        final GuildVoiceState selfVoiceState = self.getVoiceState();
-        final Guild guild = ctx.getGuild();
-        final EmbedBuilder eb;
-        final Member member = ctx.getMember();
-        final GuildVoiceState memberVoiceState = member.getVoiceState();
-
-        var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
 
         msg.replyEmbeds(handleStop(ctx.getMember()).build()).queue();
     }
@@ -77,6 +70,7 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         new LogUtils().sendLog(guild, LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 
         scheduler.scheduleDisconnect(true);
+        ResumeUtils.getInstance().removeInfo(guild);
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.StopMessages.STOPPED);
     }
 

@@ -21,6 +21,7 @@ import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -87,6 +88,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         lastPlayedTrackBuffer = track;
 
         if (repeating) return;
+
+        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
 
         if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
 
@@ -309,25 +312,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (new GuildConfig().get247(guild.getIdLong()))
             return;
 
-        ScheduledFuture<?> schedule = executor.schedule(() -> {
-            final var channel = guild.getSelfMember().getVoiceState().getChannel();
-
-            if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
-                return;
-
-            if (!new GuildConfig().get247(guild.getIdLong())) {
-                if (channel != null) {
-                    RobertifyAudioManager.getInstance().getMusicManager(guild)
-                                    .leave();
-                    disconnectExecutors.remove(guild.getIdLong());
-                    logger.debug("Removed scheduled disconnect from mapping");
-
-                    if (announceMsg && announcementChannel != null)
-                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.INACTIVITY_LEAVE, Pair.of("{channel}", channel.getAsMention())).build())
-                                .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
-                }
-            }
-        }, delay, timeUnit);
+        ScheduledFuture<?> schedule = executor.schedule(() -> disconnect(announceMsg), delay, timeUnit);
 
         if (disconnectExecutors.containsKey(guild.getIdLong())) {
             logger.debug("Scheduled disconnect already existed... Cancelling.");
@@ -335,6 +320,26 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         }
 
         disconnectExecutors.put(guild.getIdLong(), schedule);
+    }
+
+    public void disconnect(boolean announceMsg) {
+        final var channel = guild.getSelfMember().getVoiceState().getChannel();
+
+        if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
+            return;
+
+        if (!new GuildConfig().get247(guild.getIdLong())) {
+            if (channel != null) {
+                RobertifyAudioManager.getInstance().getMusicManager(guild)
+                        .leave();
+                disconnectExecutors.remove(guild.getIdLong());
+                logger.debug("Removed scheduled disconnect from mapping");
+
+                if (announceMsg && announcementChannel != null)
+                    announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.INACTIVITY_LEAVE, Pair.of("{channel}", channel.getAsMention())).build())
+                            .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+            }
+        }
     }
 
     public void removeSavedQueue(Guild guild) {

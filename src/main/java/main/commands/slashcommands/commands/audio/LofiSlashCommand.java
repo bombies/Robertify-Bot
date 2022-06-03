@@ -4,6 +4,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
 
 
         try {
-            event.getHook().sendMessageEmbeds(new LofiCommand().handleLofi(guild, event.getMember(), event.getTextChannel()))
+            event.getHook().sendMessageEmbeds(new LofiCommand().handleLofi(guild, event.getMember()))
                     .queue();
         } catch (IllegalArgumentException e) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLING).build())
@@ -62,6 +63,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
                                         event,
                                         false
                                 );
+                        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
                     });
         }
     }

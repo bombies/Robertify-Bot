@@ -10,6 +10,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -64,7 +65,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
             new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
 
         new LogUtils().sendLog(guild, LogType.TRACK_PREVIOUS, RobertifyLocaleMessage.PreviousTrackMessages.PREV_TRACK_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
-
+        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.PLAYING_PREV_TRACK);
     }
 
