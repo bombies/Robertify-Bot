@@ -50,20 +50,19 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
 
         EmbedBuilder eb;
         final Guild guild = event.getGuild();
-        final TextChannel channel = event.getTextChannel();
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         if (!memberVoiceState.inVoiceChannel()) {
-            eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             event.replyEmbeds(eb.build()).setEphemeral(true).queue();
             return;
         }
 
         if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                             .build())
                     .queue();
             return;
@@ -73,20 +72,20 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
 
         if (!url.contains("deezer.page.link")) {
             if (url.contains("soundcloud.com") && !url.contains("sets")) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.ShufflePlayMessages.NOT_PLAYLIST, Pair.of("{source}", "SoundCloud")).build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.NOT_PLAYLIST, Pair.of("{source}", "SoundCloud")).build()).queue();
                 return;
             } else if (url.contains("youtube.com") && !url.contains("playlist") && !url.contains("list")) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.ShufflePlayMessages.NOT_PLAYLIST, Pair.of("{source}", "YouTube")).build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.NOT_PLAYLIST, Pair.of("{source}", "YouTube")).build()).queue();
                 return;
             } else if (!url.contains("playlist") && !url.contains("album") && !url.contains("soundcloud.com") && !url.contains("youtube.com")) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.ShufflePlayMessages.MUST_PROVIDE_VALID_PLAYLIST).build()).queue();
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.MUST_PROVIDE_VALID_PLAYLIST).build()).queue();
                 return;
             }
         }
 
         event.deferReply().queue();
 
-        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build()).queue(addingMsg -> {
+        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
             RobertifyAudioManager.getInstance()
                     .loadAndPlayShuffled(url, selfVoiceState, memberVoiceState, addingMsg, event, false);
         });
