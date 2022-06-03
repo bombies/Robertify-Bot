@@ -42,6 +42,9 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
+        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS))
+            return;
+
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_DJ)
             && !GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_POLLS)) {
             ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have enough permissions " +
@@ -55,9 +58,6 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final TextChannel channel = ctx.getChannel();
         final Message msg = ctx.getMessage();
-
-        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS))
-            return;
 
         GeneralUtils.setCustomEmbed(ctx.getGuild(), "Polls");
 
@@ -302,6 +302,13 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
+        final var guild = event.getGuild();
+        if (!new TogglesConfig().getToggle(guild, Toggles.POLLS)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
+                    .queue();
+            return;
+        }
+
         final List<String> choices = new ArrayList<>();
         final var question = event.getOption("question").getAsString();
 
@@ -312,7 +319,6 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                 choices.add(option.getAsString());
         }
 
-        final var guild = event.getGuild();
         final var durationStr = event.getOption("duration") == null ? null : event.getOption("duration").getAsString();
 
         boolean endPoll = false;

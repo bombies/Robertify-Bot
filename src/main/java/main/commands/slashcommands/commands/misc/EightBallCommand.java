@@ -357,6 +357,13 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
+
+        if (!new TogglesConfig().getToggle(guild, Toggles.EIGHT_BALL)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
+                    .queue();
+            return;
+        }
+
         final var user = event.getMember();
 
         switch(event.getSubcommandName()) {

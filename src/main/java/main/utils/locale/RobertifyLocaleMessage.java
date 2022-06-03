@@ -54,7 +54,8 @@ public enum RobertifyLocaleMessage {
         BANNED_FROM_COMMANDS,
         NO_EMBED_PERMS,
         UNREAD_ALERT,
-        UNREAD_ALERT_MENTION
+        UNREAD_ALERT_MENTION,
+        DISABLED_FEATURE
     }
 
     public enum RandomMessages implements LocaleMessage {
