@@ -7,7 +7,7 @@ import java.util.List;
 public enum RobertifyLocale {
     ENGLISH("en", "English (UK)", "English (UK)", "\uD83C\uDDEC\uD83C\uDDE7"),
     SPANISH("es", "Spanish", "Español", "\uD83C\uDDEA\uD83C\uDDF8"),
-    PORTUGUESE("pt", "Portguese", "Português", "\uD83C\uDDF5\uD83C\uDDF9"),
+    PORTUGUESE("pt", "Portuguese", "Português", "\uD83C\uDDF5\uD83C\uDDF9"),
     RUSSIAN("ru", "Russian", "Русский", "\uD83C\uDDF7\uD83C\uDDFA"),
     DUTCH("nl", "Dutch", "Nederlands", "\uD83C\uDDF3\uD83C\uDDF1"),
     FRENCH("fr", "French", "Français", "\uD83C\uDDEB\uD83C\uDDF7"),
@@ -49,6 +49,12 @@ public enum RobertifyLocale {
             }
             case "DUTCH" -> {
                 return DUTCH;
+            }
+            case "GERMAN" -> {
+                return GERMAN;
+            }
+            case "FRENCH" -> {
+                return FRENCH;
             }
             default -> throw new IllegalArgumentException("There is no such locale with the name: " + locale);
         }
