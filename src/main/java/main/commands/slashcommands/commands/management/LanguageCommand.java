@@ -32,6 +32,7 @@ public class LanguageCommand extends AbstractSlashCommand {
                                         .map(RobertifyLocale::name)
                                         .toList()
                         ))
+                        .setAdminOnly()
                         .build()
         );
     }
