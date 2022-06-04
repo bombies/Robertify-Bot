@@ -83,9 +83,11 @@ public class LanguageCommand extends AbstractSlashCommand {
         final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);
         final var guild = event.getGuild();
 
+        event.deferReply().queue();
+
         LocaleManager.getLocaleManager(guild).setLocale(newLocale);
         new DedicatedChannelConfig().updateAll(guild);
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
+        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                 .build())
                 .setEphemeral(true)
                 .queue();
