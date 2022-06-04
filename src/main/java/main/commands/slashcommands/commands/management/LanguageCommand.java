@@ -9,6 +9,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -80,8 +81,11 @@ public class LanguageCommand extends AbstractSlashCommand {
         if (!selectionMenu.getId().startsWith("languagemenu")) return;
 
         final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);
-        LocaleManager.getLocaleManager(event.getGuild()).setLocale(newLocale);
-        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
+        final var guild = event.getGuild();
+
+        LocaleManager.getLocaleManager(guild).setLocale(newLocale);
+        new DedicatedChannelConfig().updateAll(guild);
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                 .build())
                 .setEphemeral(true)
                 .queue();
