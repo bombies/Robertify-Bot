@@ -28,7 +28,7 @@ public enum RobertifyLocale {
     }
 
     public static List<RobertifyLocale> getAvailableLanguages() {
-        return List.of(ENGLISH, SPANISH, PORTUGUESE);
+        return List.of(ENGLISH, DUTCH, SPANISH, PORTUGUESE);
     }
 
     public static RobertifyLocale parse(String locale) {
