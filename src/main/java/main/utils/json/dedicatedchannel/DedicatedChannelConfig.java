@@ -299,7 +299,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, config);
     }
 
-    private static class ChannelConfig {
+    public static class ChannelConfig {
         private final DedicatedChannelConfig mainConfig;
         private final long gid;
 
@@ -370,7 +370,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             LOOP(DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
             SHUFFLE(DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
             DISCONNECT(DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(RobertifyEmoji.QUIT_EMOJI.toString())),
-            FILTERS("dedicatedfilters", null);
+            FILTERS("dedicatedfilters", Emoji.fromMarkdown(RobertifyEmoji.FILTER_EMOJI.toString()));
 
             @Getter
             private final String id;

@@ -22,7 +22,8 @@ public enum RobertifyEmoji {
     BAR_END_FULL("<:VolumeBarEmoteEndFULL:917851063321788486>"),
     BAR_END_EMPTY("<:VolumeBarEmoteEndEMPTY:917851063376306226>"),
     FEATURE("<:feature:938567758172540928>"),
-    BUG_FIX("<:bugfix:938568095985979412>");
+    BUG_FIX("<:bugfix:938568095985979412>"),
+    FILTER_EMOJI("<:filter:983839047157940234>");
 
     private final String str;
 
