@@ -161,7 +161,7 @@ public class PlayCommand implements ICommand {
 
     public void playLocalAudio(Guild guild, TextChannel channel, Message msg, Member member, Message.Attachment audioFile) {
         switch (audioFile.getFileExtension().toLowerCase()) {
-            case "mp3", "ogg", "m4a", "wav", "flac" -> {
+            case "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
                 if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {
                     try {
                         Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
