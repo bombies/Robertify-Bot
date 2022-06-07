@@ -93,9 +93,9 @@
             <version>0.2.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.TopiSenpai</groupId>
+            <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>525f6f094ef47ddc4bc8a381e4bce398ec7e9c37</version>
+            <version>2b1b439ea65be2ee9a83f2b924566fdefe94d8ed</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
