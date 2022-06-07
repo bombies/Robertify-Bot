@@ -4,6 +4,7 @@ import lombok.Getter;
 import main.commands.slashcommands.commands.audio.*;
 import main.commands.slashcommands.commands.management.*;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
+import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
 import main.commands.slashcommands.commands.management.permissions.ListDJCommand;
 import main.commands.slashcommands.commands.management.permissions.PermissionsCommand;
 import main.commands.slashcommands.commands.management.permissions.RemoveDJCommand;
@@ -81,6 +82,7 @@ public class SlashCommandManager {
                 new PermissionsCommand(),
                 new TogglesCommand(),
                 new DedicatedChannelCommand(),
+                new DedicatedChannelEditCommand(),
                 new ThemeCommand(),
                 new RestrictedChannelsCommand(),
                 new LogCommand(),

@@ -128,59 +128,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
-
-        final var guild = event.getGuild();
-
-        if (new DedicatedChannelConfig(guild).isChannelSet()) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
-                    .queue();
-            return;
-        }
-
-        event.deferReply().queue();
-
-        guild.createTextChannel("robertify-requests").queue(
-                textChannel -> {
-                    final var theme = new ThemesConfig(guild).getTheme();
-                    final var dediChannelConfig = new DedicatedChannelConfig(guild);
-                    final var localeManager = LocaleManager.getLocaleManager(guild);
-                    final var manager = textChannel.getManager();
-                    manager.setPosition(0).queue();
-                    dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
-
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setColor(theme.getColor());
-                    eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
-                    eb.setImage(theme.getIdleBanner());
-
-                    textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
-                            .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(textChannel.getIdLong(), message.getIdLong());
-                                dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
-
-                                if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
-                                    dediChannelConfig.updateMessage();
-
-                                try {
-                                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
-                                            .setEphemeral(false)
-                                            .queue();
-                                } catch (InsufficientPermissionException e) {
-                                    if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
-                                                .queue();
-                                    else e.printStackTrace();
-                                }
-                            });
-
-
-                },
-                new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                                .setEphemeral(true)
-                                .queue())
-        );
+        new DedicatedChannelEditCommand().handleSetup(event);
     }
 
     @Override

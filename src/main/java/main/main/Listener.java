@@ -8,6 +8,7 @@ import main.commands.slashcommands.commands.dev.PostCommandInfoCommand;
 import main.commands.slashcommands.commands.dev.RefreshSpotifyTokenCommand;
 import main.commands.slashcommands.commands.management.LanguageCommand;
 import main.commands.slashcommands.commands.management.TogglesCommand;
+import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -197,11 +198,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new PostCommandInfoCommand().loadCommand(g);
-        new TogglesCommand().loadCommand(g);
-        new RefreshSpotifyTokenCommand().loadCommand(g);
-        new LanguageCommand().loadCommand(g);
-        new HistoryCommand().loadCommand(g);
+        AbstractSlashCommand.loadAllCommands(g);
     }
 
     /**
