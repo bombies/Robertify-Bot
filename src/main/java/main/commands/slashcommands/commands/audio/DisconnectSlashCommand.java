@@ -70,7 +70,7 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         musicManager.leave();
-        new LogUtils().sendLog(guild, LogType.BOT_DISCONNECTED, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED_USER));
+        new LogUtils(guild).sendLog(LogType.BOT_DISCONNECTED, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED_USER));
 
         eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED));
         event.getHook().sendMessageEmbeds(eb.build()).queue();

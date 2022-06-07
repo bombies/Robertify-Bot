@@ -77,15 +77,15 @@ public class RemoveCommand implements ICommand {
         if (!queue.remove(removedTrack))
             eb =  RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.COULDNT_REMOVE, Pair.of("{id}", String.valueOf(id)));
         else
-            new LogUtils().sendLog(guild, LogType.QUEUE_REMOVE, RobertifyLocaleMessage.RemoveMessages.REMOVED_LOG,
+            new LogUtils(guild).sendLog(LogType.QUEUE_REMOVE, RobertifyLocaleMessage.RemoveMessages.REMOVED_LOG,
                     Pair.of("{user}", remover.getAsMention()),
                     Pair.of("{title}", info.title),
                     Pair.of("{author}", info.author)
             );
 
         if (id <= 10)
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
+            if (new DedicatedChannelConfig(guild).isChannelSet())
+                new DedicatedChannelConfig(guild).updateMessage();
         ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return eb;
     }

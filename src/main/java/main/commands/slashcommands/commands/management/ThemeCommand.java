@@ -157,13 +157,13 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
         final var optionSelected = event.getSelectedOptions();
         final RobertifyTheme theme = RobertifyTheme.parse(optionSelected.get(0).getValue().split(":")[1].toLowerCase());
-        new ThemesConfig().setTheme(guild.getIdLong(), theme);
+        new ThemesConfig(guild).setTheme(theme);
         String msg = localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_SET, Pair.of("{theme}", theme.name().replaceAll("_", " ")));
 
         GeneralUtils.setDefaultEmbed(guild);
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, msg)
                         .setImage(theme.getTransparent())

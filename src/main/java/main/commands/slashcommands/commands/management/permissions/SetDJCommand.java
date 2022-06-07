@@ -79,9 +79,9 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
     private EmbedBuilder handleSetDJ(Guild guild, Role role) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb;
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         try {
-            permissionsConfig.addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.addRoleToPermission(role.getIdLong(), Permission.ROBERTIFY_DJ);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_SET, Pair.of("{mentionable}", role.getAsMention()));
             return eb;
         } catch (IllegalAccessException e) {
@@ -97,9 +97,9 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
     private EmbedBuilder handleSetDJ(Guild guild, User user) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb;
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         try {
-            permissionsConfig.addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.addPermissionToUser(user.getIdLong(), Permission.ROBERTIFY_DJ);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_SET, Pair.of("{mentionable}", user.getAsMention()));
             return eb;
         } catch (IllegalArgumentException e) {

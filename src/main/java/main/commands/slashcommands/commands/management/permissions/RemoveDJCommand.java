@@ -76,9 +76,9 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, Role role) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         try {
-            permissionsConfig.removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.removeRoleFromPermission(role.getIdLong(), Permission.ROBERTIFY_DJ);
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_REMOVED, Pair.of("{mentionable}", role.getAsMention()));
         } catch (IllegalAccessException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.NOT_DJ, Pair.of("{djType}", "role"));
@@ -89,9 +89,9 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, User user) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         try {
-            permissionsConfig.removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.ROBERTIFY_DJ);
+            permissionsConfig.removePermissionFromUser(user.getIdLong(), Permission.ROBERTIFY_DJ);
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.DJ_REMOVED, Pair.of("{mentionable}", user.getAsMention()));
         } catch (IllegalArgumentException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.NOT_DJ, Pair.of("{djType}", "user"));

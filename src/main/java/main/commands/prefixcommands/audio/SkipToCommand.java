@@ -78,12 +78,12 @@ public class SkipToCommand implements ICommand {
             scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());
         } catch (AutoPlayException ignored) {}
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
+        new LogUtils(guild).sendLog(LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
         SkipCommand.clearVoteSkipInfo(guild);
         return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "Skipped to **track #"+id+"**!");
     }

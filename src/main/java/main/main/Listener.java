@@ -54,13 +54,13 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
-        DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
 
         for (Guild g : jda.getGuildCache()) {
+            final var dedicatedChannelConfig = new DedicatedChannelConfig(g);
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
-            final var locale = new LocaleConfig().getLocale(g.getIdLong());
+            final var locale = new LocaleConfig(g).getLocale();
             if (locale != null)
-                LocaleManager.getLocaleManager(g.getIdLong()).setLocale(locale);
+                LocaleManager.getLocaleManager(g).setLocale(locale);
 
             loadNeededSlashCommands(g);
             unloadCommands(g);
@@ -68,8 +68,8 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet(g.getIdLong()))
-                dedicatedChannelConfig.updateAll(g);
+            if (dedicatedChannelConfig.isChannelSet())
+                dedicatedChannelConfig.updateAll();
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);
@@ -91,10 +91,11 @@ public class Listener extends ListenerAdapter {
 
         final User user = event.getAuthor();
         final var guild = event.getGuild();
+        final var guildConfig = new GuildConfig(guild);
         final String prefix;
 
         try {
-            prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+            prefix = guildConfig.getPrefix();
         } catch (NullPointerException ignored) {
             return;
         }
@@ -105,7 +106,7 @@ public class Listener extends ListenerAdapter {
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
-            if (new GuildConfig().isBannedUser(event.getGuild().getIdLong(), user.getIdLong())) {
+            if (guildConfig.isBannedUser(user.getIdLong())) {
                 message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
                         .queue();
             } else {
@@ -152,7 +153,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
-        new GuildConfig().addGuild(guild.getIdLong());
+        new GuildConfig(guild).addGuild();
         loadSlashCommands(guild);
         GeneralUtils.setDefaultEmbed(guild);
         logger.info("Joined {}", guild.getName());
@@ -163,7 +164,7 @@ public class Listener extends ListenerAdapter {
     @Override
     public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         Guild guild = event.getGuild();
-        new GuildConfig().removeGuild(guild.getIdLong());
+        new GuildConfig(guild).removeGuild();
         RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .destroy();
         RobertifyAudioManager.getInstance().removeMusicManager(event.getGuild());
@@ -229,15 +230,15 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to reschedule unbans for
      */
     private static void rescheduleUnbans(Guild g) {
-        final var banUtils = new GuildConfig();
-        final var map = banUtils.getBannedUsersWithUnbanTimes(g.getIdLong());
+        final var banUtils = new GuildConfig(g);
+        final var map = banUtils.getBannedUsersWithUnbanTimes();
 
         for (long user : map.keySet()) {
             if (map.get(user) == null) continue;
             if (map.get(user) == -1) continue;
             if (map.get(user) - System.currentTimeMillis() <= 0) {
                 try {
-                    banUtils.unbanUser(g.getIdLong(), user);
+                    banUtils.unbanUser(user);
                     sendUnbanMessage(user, g);
                 } catch (IllegalArgumentException e) {
                     map.remove(user);
@@ -247,11 +248,11 @@ public class Listener extends ListenerAdapter {
 
             final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
             final Runnable task = () -> {
-                banUtils.unbanUser(user, g.getIdLong());
+                banUtils.unbanUser(user);
 
                 sendUnbanMessage(user, g);
             };
-            scheduler.schedule(task, banUtils.getTimeUntilUnban(g.getIdLong(), user), TimeUnit.MILLISECONDS);
+            scheduler.schedule(task, banUtils.getTimeUntilUnban(user), TimeUnit.MILLISECONDS);
         }
     }
 
@@ -261,18 +262,18 @@ public class Listener extends ListenerAdapter {
      * @param u The banner user
      */
     public static void scheduleUnban(Guild g, User u) {
-        final GuildConfig banUtils = new GuildConfig();
+        final GuildConfig banUtils = new GuildConfig(g);
         final var scheduler = Executors.newScheduledThreadPool(1);
 
         final Runnable task = () -> {
-            if (!new GuildConfig().isBannedUser(g.getIdLong(), u.getIdLong()))
+            if (!banUtils.isBannedUser(u.getIdLong()))
                 return;
 
-            banUtils.unbanUser(g.getIdLong(), u.getIdLong());
+            banUtils.unbanUser(u.getIdLong());
 
             sendUnbanMessage(u.getIdLong(), g);
         };
-        scheduler.schedule(task, new GuildConfig().getTimeUntilUnban(g.getIdLong(), u.getIdLong()), TimeUnit.MILLISECONDS);
+        scheduler.schedule(task, banUtils.getTimeUntilUnban(u.getIdLong()), TimeUnit.MILLISECONDS);
     }
 
     private static void sendUnbanMessage(long user, Guild g) {

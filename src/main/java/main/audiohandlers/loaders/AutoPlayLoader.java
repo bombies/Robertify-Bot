@@ -56,8 +56,8 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
             scheduler.clearSavedQueue(guild);
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         if (channel != null) {
             final var localeManager = LocaleManager.getLocaleManager(guild);

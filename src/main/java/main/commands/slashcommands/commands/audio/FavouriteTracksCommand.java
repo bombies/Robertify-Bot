@@ -185,7 +185,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                             "favouriteTrack:" + track.id() + ":" + track.source())
             );
 
-        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        final var theme = new ThemesConfig(guild).getTheme();
         setDefaultEmbed(member, tracks, theme);
         Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
@@ -217,7 +217,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                             "favouriteTrack:" + track.id() + ":" + track.source())
             );
 
-        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        final var theme = new ThemesConfig(guild).getTheme();
         setDefaultEmbed(member, tracks, theme);
         Pages.paginateMenu(event, list, 0,true);
     }
@@ -351,18 +351,16 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                     .queue();
             return;
         } else if (!selfVoiceState.inVoiceChannel()) {
-            if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);
-                if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                if (!restrictedChannelsConfig.isRestrictedChannel(memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                                     (!restrictedChannelsConfig.getRestrictedChannels(
-                                            guild.getIdLong(),
                                             RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                     ).isEmpty()
                                             ?
                                             localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
-                                                    guild.getIdLong(),
                                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                             )))
                                             :

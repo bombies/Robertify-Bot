@@ -75,10 +75,11 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleUnban(Guild guild, User user) {
-        if (!new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
+        final var guildConfig = new GuildConfig(guild);
+        if (!guildConfig.isBannedUser(user.getIdLong()))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_NOT_BANNED);
 
-        new GuildConfig().unbanUser(guild.getIdLong(), user.getIdLong());
+        guildConfig.unbanUser(user.getIdLong());
 
         user.openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.UnbanMessages.USER_UNBANNED, Pair.of("{server}", guild.getName())).build())
                 .queue(success -> {}, new ErrorHandler()

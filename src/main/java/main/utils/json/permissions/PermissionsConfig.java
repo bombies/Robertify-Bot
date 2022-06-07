@@ -4,6 +4,7 @@ import main.constants.Permission;
 import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,21 +15,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PermissionsConfig extends AbstractGuildConfig {
+    private final Guild guild;
+    private final long gid;
+    
+    public PermissionsConfig(Guild guild) {
+        super(guild);
+        this.guild = guild;
+        this.gid = guild.getIdLong();
+    }
 
-    public void addPermissionToUser(long guildID, long userID, Permission p) {
-        var obj = getGuildObject(guildID);
+    public void addPermissionToUser(long userID, Permission p) {
+        var obj = getGuildObject();
         var usersObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
         try {
-            if (userHasPermission(guildID, userID, p))
+            if (userHasPermission(userID, p))
                 throw new IllegalArgumentException("User with id \"" + userID + "\" already has " + p.name() + "");
         } catch (NullPointerException e) {
             usersObj.put(String.valueOf(userID), new JSONArray());
-            getCache().updateCache(obj, GuildDB.Field.GUILD_ID, guildID);
+            getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
         }
 
-        obj = getGuildObject(guildID);
+        obj = getGuildObject();
         usersObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
@@ -45,11 +54,11 @@ public class PermissionsConfig extends AbstractGuildConfig {
 
         usersObj.put(String.valueOf(userID), array);
 
-        getCache().updateCache(obj, GuildDB.Field.GUILD_ID, guildID);
+        getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
-    public boolean userHasPermission(long guildID, long userID, Permission p) {
-        var userObj = getGuildObject(guildID)
+    public boolean userHasPermission(long userID, Permission p) {
+        var userObj = getGuildObject()
                 .getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
@@ -59,11 +68,11 @@ public class PermissionsConfig extends AbstractGuildConfig {
         return userObj.getJSONArray(String.valueOf(userID)).toList().contains(p.getCode());
     }
 
-    public void removePermissionFromUser(long guildID, long userID, Permission p) {
-        if (!userHasPermission(guildID, userID, p))
+    public void removePermissionFromUser(long userID, Permission p) {
+        if (!userHasPermission(userID, p))
             throw new IllegalArgumentException("User with id \""+userID+"\" doesn't have "+p.name()+"");
 
-        var obj = getGuildObject(guildID);
+        var obj = getGuildObject();
         var usersObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
@@ -71,25 +80,25 @@ public class PermissionsConfig extends AbstractGuildConfig {
         array.remove(getIndexOfObjectInArray(array, p.getCode()));
 
         usersObj.put(String.valueOf(userID), array);
-        getCache().updateCache(obj, GuildDB.Field.GUILD_ID, guildID);
+        getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
-    public void removeRoleFromPermission(long gid, long rid, Permission p) throws IllegalAccessException, IOException {
-        if (!getRolesForPermission(gid, p).contains(rid))
+    public void removeRoleFromPermission(long rid, Permission p) throws IllegalAccessException, IOException {
+        if (!getRolesForPermission(p).contains(rid))
             throw new IllegalAccessException("The role "+rid+" doesn't have access to Permission with code "+p.getCode());
 
-        JSONObject obj = getGuildObject(gid);
+        JSONObject obj = getGuildObject();
         JSONArray permArr = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONArray(String.valueOf(p.getCode()));
         permArr.remove(getIndexOfObjectInArray(permArr, rid));
         getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
-    public void addRoleToPermission(long gid, long rid, Permission p) throws IllegalAccessException {
-        if (getRolesForPermission(gid, p).contains(rid))
+    public void addRoleToPermission(long rid, Permission p) throws IllegalAccessException {
+        if (getRolesForPermission(p).contains(rid))
             throw new IllegalAccessException("The role "+rid+" already has access to Permission with code "+ p.getCode());
 
-        JSONObject obj = getGuildObject(gid);
+        JSONObject obj = getGuildObject();
         JSONArray permArr = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONArray(String.valueOf(p.getCode()));
         permArr.put(rid);
@@ -97,9 +106,9 @@ public class PermissionsConfig extends AbstractGuildConfig {
         getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
-    public List<Long> getRolesForPermission(long gid, Permission p) {
+    public List<Long> getRolesForPermission(Permission p) {
         List<Long> ret = new ArrayList<>();
-        JSONObject object = getGuildObject(gid)
+        JSONObject object = getGuildObject()
                 .getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString());
 
         JSONArray arr;
@@ -117,7 +126,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
         return ret;
     }
 
-    public List<Long> getRolesForPermission(long gid, String p) {
+    public List<Long> getRolesForPermission(String p) {
         if (!Permission.getPermissions().contains(p.toUpperCase()))
             throw new NullPointerException("There is no enum with the name \""+p+"\"");
 
@@ -128,10 +137,10 @@ public class PermissionsConfig extends AbstractGuildConfig {
                 code = perm.getCode(); break;
             }
 
-        return getRolesForPermission(gid, Permission.parse(code));
+        return getRolesForPermission(Permission.parse(code));
     }
 
-    public List<Long> getUsersForPermission(long gid, String p) {
+    public List<Long> getUsersForPermission(String p) {
         if (!Permission.getPermissions().contains(p.toUpperCase()))
             throw new NullPointerException("There is no enum with the name \""+p+"\"");
 
@@ -145,7 +154,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
         List<Long> ret = new ArrayList<>();
 
         try {
-            JSONObject object = getGuildObject(gid)
+            JSONObject object = getGuildObject()
                     .getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                     .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
@@ -155,7 +164,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
 
             return ret;
         } catch (JSONException e) {
-            final var obj = getGuildObject(gid);
+            final var obj = getGuildObject();
             obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                     .put(PermissionConfigField.USER_PERMISSIONS.toString(), new JSONObject());
             getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
@@ -163,9 +172,9 @@ public class PermissionsConfig extends AbstractGuildConfig {
         }
     }
 
-    public List<Integer> getPermissionsForRoles(long gid, long rid) {
+    public List<Integer> getPermissionsForRoles(long rid) {
         List<Integer> codes = new ArrayList<>();
-        JSONObject obj = getGuildObject(gid);
+        JSONObject obj = getGuildObject();
         final var permObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString());
 
         for (int i = 0; i < permObj.length()-1; i++) {
@@ -173,7 +182,7 @@ public class PermissionsConfig extends AbstractGuildConfig {
             try {
                 arr = permObj.getJSONArray(String.valueOf(i));
             } catch (JSONException e) {
-                update(gid);
+                update();
                 try {
                     arr = permObj.getJSONArray(String.valueOf(i));
                 } catch (JSONException e2) {
@@ -190,9 +199,9 @@ public class PermissionsConfig extends AbstractGuildConfig {
         return codes;
     }
 
-    public List<Integer> getPermissionsForUser(long gid, long uid) {
+    public List<Integer> getPermissionsForUser(long uid) {
         List<Integer> codes = new ArrayList<>();
-        JSONObject obj = getGuildObject(gid)
+        JSONObject obj = getGuildObject()
                 .getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
                 .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString());
 
@@ -210,9 +219,9 @@ public class PermissionsConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void update() {
+        if (!guildHasInfo())
+            loadGuild();
 
         final JSONArray cacheArr = GuildDBCache.getInstance().getCache();
         JSONObject object = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, gid));

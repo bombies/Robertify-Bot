@@ -45,10 +45,10 @@ public class ShuffleCommand implements ICommand {
         queue.clear();
         queue.addAll(trackList);
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
-        new LogUtils().sendLog(guild, LogType.QUEUE_SHUFFLE, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED_LOG, Pair.of("{user}", shuffler.getAsMention()));
+        new LogUtils(guild).sendLog(LogType.QUEUE_SHUFFLE, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED_LOG, Pair.of("{user}", shuffler.getAsMention()));
         ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED);
     }

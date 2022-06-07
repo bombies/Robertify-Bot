@@ -57,19 +57,19 @@ public class PlayCommand implements ICommand {
                 player.setPaused(false);
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.RESUMED).build())
                         .queue();
-                new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
+                new LogUtils(guild).sendLog(LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
                 return;
             } else if (
                     ctx.getEvent().getMessage().getContentRaw()
                     .split(" ")[0]
-                    .replaceFirst(GeneralUtils.toSafeString(new GuildConfig().getPrefix(guild.getIdLong())), "")
+                    .replaceFirst(GeneralUtils.toSafeString(new GuildConfig(guild).getPrefix()), "")
                     .equalsIgnoreCase("p")
             ) {
                 if (player.getPlayingTrack() != null) {
                     player.setPaused(true);
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.PAUSED).build())
                             .queue();
-                    new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
+                    new LogUtils(guild).sendLog(LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
                     return;
                 }
             }
@@ -94,18 +94,16 @@ public class PlayCommand implements ICommand {
                     .queue();
             return;
         } else if (!selfVoiceState.inVoiceChannel()) {
-            if (new TogglesConfig().getToggle(ctx.getGuild(), Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);
-                if (!restrictedChannelsConfig.isRestrictedChannel(ctx.getGuild().getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                if (!restrictedChannelsConfig.isRestrictedChannel(memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                                     (!restrictedChannelsConfig.getRestrictedChannels(
-                                            guild.getIdLong(),
                                             RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                     ).isEmpty()
                                             ?
                                             localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
-                                                    guild.getIdLong(),
                                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                             )))
                                             :

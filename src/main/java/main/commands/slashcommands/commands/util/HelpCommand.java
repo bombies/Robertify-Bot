@@ -84,7 +84,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         final var args = ctx.getArgs();
         final var guild = ctx.getGuild();
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        final var prefix = new GuildConfig().getPrefix(ctx.getGuild().getIdLong());
+        final var prefix = new GuildConfig(guild).getPrefix();
 
         GeneralUtils.setCustomEmbed(
                 ctx.getGuild(),
@@ -148,7 +148,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         }
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp());
-        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        final var theme = new ThemesConfig(guild).getTheme();
         eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR) + " ["+command.getName()+"]", null, theme.getTransparent());
         msg.replyEmbeds(eb.build()).queue();
 
@@ -203,7 +203,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         }
 
         var optionSelected = event.getSelectedOptions();
-        final String prefix = new GuildConfig().getPrefix(event.getGuild().getIdLong());
+        final String prefix = new GuildConfig(guild).getPrefix();
 
         switch (optionSelected.get(0).getValue()) {
             case "help:management" -> {
@@ -232,7 +232,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         }
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, command.getHelp());
-        final var theme = new ThemesConfig().getTheme(guild.getIdLong());
+        final var theme = new ThemesConfig(guild).getTheme();
         final var localeManager = LocaleManager.getLocaleManager(guild);
         eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR) + " ["+command.getName()+"]", null, theme.getTransparent());
         return eb;

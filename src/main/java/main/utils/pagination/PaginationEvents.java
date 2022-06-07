@@ -6,6 +6,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -72,8 +73,9 @@ public class PaginationEvents extends ListenerAdapter {
     public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
         if (!event.getComponentId().startsWith("menupage")) return;
 
+        final var guild = event.getGuild();
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1])) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to interact with this selection menu").build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You do not have permission to interact with this selection menu").build())
                     .setEphemeral(true)
                     .queue();
             return;
@@ -106,7 +108,7 @@ public class PaginationEvents extends ListenerAdapter {
                 )
         ).queue(s -> {
             final var tracks = FavouriteTracksCache.getInstance().getTracks(event.getMember().getIdLong());
-            final var theme = new ThemesConfig().getTheme(event.getGuild().getIdLong());
+            final var theme = new ThemesConfig(guild).getTheme();
             FavouriteTracksCommand.setDefaultEmbed(event.getMember(), tracks, theme);
             msg.editMessageEmbeds(Pages.getPaginatedEmbed(msg.getGuild(), menuPage.toStringList(), 25, finalCurrentPage, true))
                     .queue();

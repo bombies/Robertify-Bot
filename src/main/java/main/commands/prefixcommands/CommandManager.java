@@ -350,7 +350,7 @@ public class CommandManager {
 
     public void handle(MessageReceivedEvent e) throws ScriptException {
             String[] split = e.getMessage().getContentRaw()
-                    .replaceFirst("(?i)" + Pattern.quote(new GuildConfig().getPrefix(e.getGuild().getIdLong())), "")
+                    .replaceFirst("(?i)" + Pattern.quote(new GuildConfig(e.getGuild()).getPrefix()), "")
                     .split("\\s+");
 
             String invoke = split[0].toLowerCase();
@@ -375,7 +375,7 @@ public class CommandManager {
                     final CommandContext ctx = new CommandContext(e, args);
                     final Guild guild = e.getGuild();
                     final Message msg = e.getMessage();
-                    final var toggles = new TogglesConfig();
+                    final var toggles = new TogglesConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
 
                     if (!guild.getSelfMember().hasPermission(ctx.getChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
@@ -384,11 +384,10 @@ public class CommandManager {
                         return;
                     }
 
-                    if (toggles.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                    if (toggles.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
                         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
-                            final var rcConfig = new RestrictedChannelsConfig();
+                            final var rcConfig = new RestrictedChannelsConfig(guild);
                             if (!rcConfig.isRestrictedChannel(
-                                    guild.getIdLong(),
                                     msg.getTextChannel().getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
                             )) {
@@ -420,8 +419,8 @@ public class CommandManager {
                     if (commandTypeHasCommandWithName(CommandType.MUSIC, cmd.getName()))
                         new RandomMessageManager().randomlySendMessage(ctx.getChannel());
 
-                    if (toggles.isDJToggleSet(guild, cmd)) {
-                        if (toggles.getDJToggle(guild, cmd) && !cmd.getName().equals("skip")) {
+                    if (toggles.isDJToggleSet(cmd)) {
+                        if (toggles.getDJToggle(cmd) && !cmd.getName().equals("skip")) {
                             if (GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_DJ)) {
                                 cmd.handle(ctx);
                             } else {

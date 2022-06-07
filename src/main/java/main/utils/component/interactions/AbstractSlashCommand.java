@@ -302,7 +302,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
     protected boolean banCheck(SlashCommandEvent event) {
         final Guild guild = event.getGuild();
-        if (!new GuildConfig().isBannedUser(guild.getIdLong(), event.getUser().getIdLong()))
+        if (!new GuildConfig(guild).isBannedUser(event.getUser().getIdLong()))
             return true;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
@@ -422,19 +422,19 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
     protected boolean restrictedChannelCheck(SlashCommandEvent event) {
         final Guild guild = event.getGuild();
-        final TogglesConfig togglesConfig = new TogglesConfig();
-        final RestrictedChannelsConfig config = new RestrictedChannelsConfig();
+        final TogglesConfig togglesConfig = new TogglesConfig(guild);
+        final RestrictedChannelsConfig config = new RestrictedChannelsConfig(guild);
 
-        if (!togglesConfig.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS))
+        if (!togglesConfig.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS))
             return true;
 
-        if (!config.isRestrictedChannel(guild.getIdLong(), event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
+        if (!config.isRestrictedChannel(event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
             && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
 
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL_ARGS,
                     Pair.of("{channels}", GeneralUtils.listOfIDsToMentions(
                             guild,
-                            config.getRestrictedChannels(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
+                            config.getRestrictedChannels(RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL),
                             GeneralUtils.Mentioner.CHANNEL
                     ))).build())
                     .setEphemeral(true)
@@ -803,12 +803,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         @SneakyThrows
         public Builder setPossibleDJCommand() {
             this.permissionCheck = e -> {
-                final TogglesConfig config = new TogglesConfig();
+                final TogglesConfig config = new TogglesConfig(e.getGuild());
 
-                if (!config.isDJToggleSet(e.getGuild(), e.getName()))
+                if (!config.isDJToggleSet(e.getName()))
                     return true;
 
-                if (config.getDJToggle(e.getGuild(), new SlashCommandManager().getCommand(e.getName())))
+                if (config.getDJToggle(new SlashCommandManager().getCommand(e.getName())))
                     return GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ);
 
                 return true;

@@ -33,8 +33,9 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         final var msg = ctx.getMessage();
         final var args = ctx.getArgs();
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == channel.getIdLong()) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        if (dedicatedChannelConfig.isChannelSet())
+            if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL).build())
                         .queue();
                 return;
@@ -43,7 +44,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         if (args.isEmpty()) {
             final var localeManager = LocaleManager.getLocaleManager(guild);
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.MUST_PROVIDE_QUERY) + "\n\n"
-                            + getUsages(new GuildConfig().getPrefix(guild.getIdLong()))).build())
+                            + getUsages(new GuildConfig(guild).getPrefix())).build())
                     .queue();
             return;
         }
@@ -116,8 +117,9 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            if (new DedicatedChannelConfig().getChannelID(guild.getIdLong()) == event.getTextChannel().getIdLong()) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        if (dedicatedChannelConfig.isChannelSet())
+            if (dedicatedChannelConfig.getChannelID() == event.getTextChannel().getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                         .queue();
                 return;

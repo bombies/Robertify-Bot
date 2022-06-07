@@ -46,7 +46,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         GeneralUtils.setCustomEmbed(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_TITLE);
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        var config = new TogglesConfig();
+        var config = new TogglesConfig(guild);
         if (args.isEmpty()) {
             var toggleIDs = new StringBuilder();
             var toggleNames = new StringBuilder();
@@ -58,7 +58,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
             for (Toggles toggle : Toggles.values()) {
                 toggleIDs.append(++toggleID).append("\n");
                 toggleNames.append(Toggles.parseToggle(toggle)).append("\n");
-                toggleStatuses.append(config.getToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
+                toggleStatuses.append(config.getToggle(toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                         .append("\n");
             }
 
@@ -71,14 +71,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
             var eb = new EmbedBuilder();
             switch (args.get(0).toLowerCase()) {
                 case "restrictedvoice", "1", "rvc", "rvchannels" -> {
-                    if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                        config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
+                    if (config.getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                        config.setToggle(Toggles.RESTRICTED_VOICE_CHANNELS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Restricted Voice Channels`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
+                        config.setToggle(Toggles.RESTRICTED_VOICE_CHANNELS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Restricted Voice Channels`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -86,14 +86,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "restrictedtext", "2", "rtc", "rtchannels" -> {
-                    if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                        config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
+                    if (config.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                        config.setToggle(Toggles.RESTRICTED_TEXT_CHANNELS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Restricted Text Channels`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
+                        config.setToggle(Toggles.RESTRICTED_TEXT_CHANNELS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Restricted Text Channels`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -101,14 +101,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "announcements", "3" -> {
-                    if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
-                        config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
+                    if (config.getToggle(Toggles.ANNOUNCE_MESSAGES)) {
+                        config.setToggle(Toggles.ANNOUNCE_MESSAGES, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Announcing Player Messages`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
+                        config.setToggle(Toggles.ANNOUNCE_MESSAGES, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "`Announcing Player Messages`"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -116,14 +116,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "requester", "4" -> {
-                    if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
-                        config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
+                    if (config.getToggle(Toggles.SHOW_REQUESTER)) {
+                        config.setToggle(Toggles.SHOW_REQUESTER, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "showing the requester in now playing messages"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
+                        config.setToggle(Toggles.SHOW_REQUESTER, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "showing the requester in now playing messages"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -131,14 +131,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "8ball", "5" -> {
-                    if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
-                        config.setToggle(guild, Toggles.EIGHT_BALL, false);
+                    if (config.getToggle(Toggles.EIGHT_BALL)) {
+                        config.setToggle(Toggles.EIGHT_BALL, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "8ball command"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.EIGHT_BALL, true);
+                        config.setToggle(Toggles.EIGHT_BALL, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "8ball command"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -146,14 +146,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "polls", "poll", "6" -> {
-                    if (config.getToggle(guild, Toggles.POLLS)) {
-                        config.setToggle(guild, Toggles.POLLS, false);
+                    if (config.getToggle(Toggles.POLLS)) {
+                        config.setToggle(Toggles.POLLS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "polls command"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.POLLS, true);
+                        config.setToggle(Toggles.POLLS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "polls command"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -161,14 +161,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "reminders", "7" -> {
-                    if (config.getToggle(guild, Toggles.REMINDERS)) {
-                        config.setToggle(guild, Toggles.REMINDERS, false);
+                    if (config.getToggle(Toggles.REMINDERS)) {
+                        config.setToggle(Toggles.REMINDERS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "reminders"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.REMINDERS, true);
+                        config.setToggle(Toggles.REMINDERS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "reminders"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -176,14 +176,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "tips", "8" -> {
-                    if (config.getToggle(guild, Toggles.TIPS)) {
-                        config.setToggle(guild, Toggles.TIPS, false);
+                    if (config.getToggle(Toggles.TIPS)) {
+                        config.setToggle(Toggles.TIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "tips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     } else {
-                        config.setToggle(guild, Toggles.TIPS, true);
+                        config.setToggle(Toggles.TIPS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "tips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -191,15 +191,15 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
                 case "voteskips", "voteskip", "vs", "9" -> {
-                    if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
-                        config.setToggle(guild, Toggles.VOTE_SKIPS, false);
+                    if (config.getToggle(Toggles.VOTE_SKIPS)) {
+                        config.setToggle(Toggles.VOTE_SKIPS, false);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "vote skips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
 
                         final var skipCommand = new SlashCommandManager().getCommand("skip");
-                        if (config.getDJToggle(guild, skipCommand)) {
+                        if (config.getDJToggle(skipCommand)) {
                             ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
                                     .setActionRow(
                                             Button.of(ButtonStyle.SUCCESS, "toggledjskip:yes:" + ctx.getAuthor().getId(), "", RobertifyEmoji.CHECK_EMOJI.getEmoji()),
@@ -208,15 +208,15 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                     .queue();
                         }
                     } else {
-                        config.setToggle(guild, Toggles.VOTE_SKIPS, true);
+                        config.setToggle(Toggles.VOTE_SKIPS, true);
                         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                 Pair.of("{toggle}", "vote skips"),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                         );
 
                         final var skipCommand = new SlashCommandManager().getCommand("skip");
-                        if (!config.getDJToggle(guild, skipCommand))
-                            config.setDJToggle(guild, skipCommand, true);
+                        if (!config.getDJToggle(skipCommand))
+                            config.setDJToggle(skipCommand, true);
                     }
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
@@ -231,7 +231,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {
         final var commandManager = new SlashCommandManager();
-        final TogglesConfig config = new TogglesConfig();
+        final TogglesConfig config = new TogglesConfig(guild);
 
         if (args.size() < 2)
             return getDJTogglesEmbed(guild, commandManager, config);
@@ -248,16 +248,16 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 
-                switch (Boolean.toString(config.getDJToggle(guild, command))) {
+                switch (Boolean.toString(config.getDJToggle(command))) {
                     case "true" -> {
-                        config.setDJToggle(guild, command, false);
+                        config.setDJToggle(command, false);
                         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                                 Pair.of("{command}", command.getName()),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     }
                     case "false" -> {
-                        config.setDJToggle(guild, command, true);
+                        config.setDJToggle(command, true);
                         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                                 Pair.of("{command}", command.getName()),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -272,7 +272,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
     private EmbedBuilder handleLogToggles(Guild guild, List<String> args) {
         final CommandManager commandManager = new CommandManager();
-        final TogglesConfig config = new TogglesConfig();
+        final TogglesConfig config = new TogglesConfig(guild);
 
         if (args.size() < 2)
             return getLogTogglesEmbed(guild, config);
@@ -291,16 +291,16 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 
-                switch (Boolean.toString(config.getLogToggle(guild, logType))) {
+                switch (Boolean.toString(config.getLogToggle(logType))) {
                     case "true" -> {
-                        config.setLogToggle(guild, logType, false);
+                        config.setLogToggle(logType, false);
                         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
                                 Pair.of("{logType}", logType.getName()),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
                     }
                     case "false" -> {
-                        config.setLogToggle(guild, logType, true);
+                        config.setLogToggle(logType, true);
                         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
                                 Pair.of("{logType}", logType.getName()),
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -322,7 +322,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         for (AbstractSlashCommand toggle : musicCmds) {
             toggleNames.append(toggle.getName()).append("\n");
-            toggleStatuses.append(config.getDJToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
+            toggleStatuses.append(config.getDJToggle(toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                     .append("\n");
         }
 
@@ -343,7 +343,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         for (var toggle : logTypes) {
             toggleNames.append(toggle.name().toLowerCase()).append("\n");
-            toggleStatuses.append(config.getLogToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
+            toggleStatuses.append(config.getLogToggle(toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                     .append("\n");
         }
 
@@ -463,7 +463,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         event.deferReply().queue();
 
         final var guild = event.getGuild();
-        final var config = new TogglesConfig();
+        final var config = new TogglesConfig(guild);
         final var path = event.getCommandPath().split("/");
         final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb = null;
@@ -480,7 +480,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 for (Toggles toggle : Toggles.values()) {
                     toggleIDs.append(++toggleID).append("\n");
                     toggleNames.append(Toggles.parseToggle(toggle)).append("\n");
-                    toggleStatuses.append(config.getToggle(guild, toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
+                    toggleStatuses.append(config.getToggle(toggle) ? RobertifyEmoji.CHECK_EMOJI.toString() : RobertifyEmoji.QUIT_EMOJI.toString())
                             .append("\n");
                 }
 
@@ -493,14 +493,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
                 switch (toggle.toLowerCase()) {
                     case "restrictedvoice", "1", "rvc", "rvchannels" -> {
-                        if (config.getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                            config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, false);
+                        if (config.getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                            config.setToggle(Toggles.RESTRICTED_VOICE_CHANNELS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Restricted Voice Channels`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS, true);
+                            config.setToggle(Toggles.RESTRICTED_VOICE_CHANNELS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Restricted Voice Channels`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -508,14 +508,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "restrictedtext", "2", "rtc", "rtchannels" -> {
-                        if (config.getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
-                            config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, false);
+                        if (config.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                            config.setToggle(Toggles.RESTRICTED_TEXT_CHANNELS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Restricted Text Channels`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS, true);
+                            config.setToggle(Toggles.RESTRICTED_TEXT_CHANNELS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Restricted Text Channels`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -523,14 +523,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "announcements", "3" -> {
-                        if (config.getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) {
-                            config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, false);
+                        if (config.getToggle(Toggles.ANNOUNCE_MESSAGES)) {
+                            config.setToggle(Toggles.ANNOUNCE_MESSAGES, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Announcing Player Messages`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.ANNOUNCE_MESSAGES, true);
+                            config.setToggle(Toggles.ANNOUNCE_MESSAGES, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "`Announcing Player Messages`"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -538,14 +538,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "requester", "4" -> {
-                        if (config.getToggle(guild, Toggles.SHOW_REQUESTER)) {
-                            config.setToggle(guild, Toggles.SHOW_REQUESTER, false);
+                        if (config.getToggle(Toggles.SHOW_REQUESTER)) {
+                            config.setToggle(Toggles.SHOW_REQUESTER, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "showing the requester in now playing messages"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.SHOW_REQUESTER, true);
+                            config.setToggle(Toggles.SHOW_REQUESTER, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "showing the requester in now playing messages"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -553,14 +553,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "8ball", "5" -> {
-                        if (config.getToggle(guild, Toggles.EIGHT_BALL)) {
-                            config.setToggle(guild, Toggles.EIGHT_BALL, false);
+                        if (config.getToggle(Toggles.EIGHT_BALL)) {
+                            config.setToggle(Toggles.EIGHT_BALL, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "8ball command"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.EIGHT_BALL, true);
+                            config.setToggle(Toggles.EIGHT_BALL, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "8ball command"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -568,14 +568,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "polls", "poll", "6" -> {
-                        if (config.getToggle(guild, Toggles.POLLS)) {
-                            config.setToggle(guild, Toggles.POLLS, false);
+                        if (config.getToggle(Toggles.POLLS)) {
+                            config.setToggle(Toggles.POLLS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "polls command"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.POLLS, true);
+                            config.setToggle(Toggles.POLLS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "polls command"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -583,14 +583,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "reminders", "7" -> {
-                        if (config.getToggle(guild, Toggles.REMINDERS)) {
-                            config.setToggle(guild, Toggles.REMINDERS, false);
+                        if (config.getToggle(Toggles.REMINDERS)) {
+                            config.setToggle(Toggles.REMINDERS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "reminders"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.REMINDERS, true);
+                            config.setToggle(Toggles.REMINDERS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "reminders"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -598,14 +598,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "tips", "8" -> {
-                        if (config.getToggle(guild, Toggles.TIPS)) {
-                            config.setToggle(guild, Toggles.TIPS, false);
+                        if (config.getToggle(Toggles.TIPS)) {
+                            config.setToggle(Toggles.TIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "tips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setToggle(guild, Toggles.TIPS, true);
+                            config.setToggle(Toggles.TIPS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "tips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -613,15 +613,15 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         }
                     }
                     case "voteskips", "voteskip", "vs", "9" -> {
-                        if (config.getToggle(guild, Toggles.VOTE_SKIPS)) {
-                            config.setToggle(guild, Toggles.VOTE_SKIPS, false);
+                        if (config.getToggle(Toggles.VOTE_SKIPS)) {
+                            config.setToggle(Toggles.VOTE_SKIPS, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "vote skips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
 
                             final var skipCommand = new SlashCommandManager().getCommand("skip");
-                            if (config.getDJToggle(guild, skipCommand)) {
+                            if (config.getDJToggle(skipCommand)) {
                                 event.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
                                         .setActionRow(
                                                 Button.of(ButtonStyle.SUCCESS, "toggledjskip:yes:" + event.getUser().getId(), "", RobertifyEmoji.CHECK_EMOJI.getEmoji()),
@@ -630,15 +630,15 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                         .queue();
                             }
                         } else {
-                            config.setToggle(guild, Toggles.VOTE_SKIPS, true);
+                            config.setToggle(Toggles.VOTE_SKIPS, true);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLED,
                                     Pair.of("{toggle}", "vote skips"),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                             );
 
                             final var skipCommand = new SlashCommandManager().getCommand("skip");
-                            if (!config.getDJToggle(guild, skipCommand))
-                                config.setDJToggle(guild, skipCommand, true);
+                            if (!config.getDJToggle(skipCommand))
+                                config.setDJToggle(skipCommand, true);
                         }
                     }
                     default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
@@ -656,14 +656,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             break;
                         }
 
-                        if (config.getDJToggle(guild, command)) {
-                            config.setDJToggle(guild, command, false);
+                        if (config.getDJToggle(command)) {
+                            config.setDJToggle(command, false);
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                                     Pair.of("{command}", command.getName()),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
                         } else {
-                            config.setDJToggle(guild, command, true);
+                            config.setDJToggle(command, true);
                             RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                                     Pair.of("{command}", command.getName()),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -685,16 +685,16 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             break;
                         }
 
-                        switch (Boolean.toString(config.getLogToggle(guild, logType))) {
+                        switch (Boolean.toString(config.getLogToggle(logType))) {
                             case "true" -> {
-                                config.setLogToggle(guild, logType, false);
+                                config.setLogToggle(logType, false);
                                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
                                         Pair.of("{logType}", logType.getName()),
                                         Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                                 );
                             }
                             case "false" -> {
-                                config.setLogToggle(guild, logType, true);
+                                config.setLogToggle(logType, true);
                                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLED,
                                         Pair.of("{logType}", logType.getName()),
                                         Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
@@ -730,11 +730,11 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         switch (split[1].toLowerCase()) {
             case "yes" -> {
-                final var config = new TogglesConfig();
+                final var config = new TogglesConfig(guild);
                 final var skipCommand = new SlashCommandManager().getCommand("skip");
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 
-                config.setDJToggle(guild, skipCommand, false);
+                config.setDJToggle(skipCommand, false);
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                         Pair.of("{command}", "skip"),
                         Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))

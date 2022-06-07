@@ -89,12 +89,12 @@ public class MoveCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.COULDNT_MOVE, Pair.of("{id}", String.valueOf(id)));
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         AudioTrackInfo info = trackList.get(id - 1).getInfo();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_MOVE,
+        new LogUtils(guild).sendLog(LogType.TRACK_MOVE,
                 RobertifyLocaleMessage.MoveMessages.MOVED_LOG,
                 Pair.of("{user}", mover.getAsMention()),
                 Pair.of("{title}", info.title),

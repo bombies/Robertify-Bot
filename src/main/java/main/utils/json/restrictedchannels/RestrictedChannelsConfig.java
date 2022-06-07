@@ -2,13 +2,22 @@ package main.utils.json.restrictedchannels;
 
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestrictedChannelsConfig extends AbstractGuildConfig {
+    private final Guild guild;
+    private final long gid;
 
-    public void addChannel(long gid, long channelID, ChannelType type) {
+    public RestrictedChannelsConfig(Guild guild) {
+        super(guild);
+        this.guild = guild;
+        this.gid = guild.getIdLong();
+    }
+
+    public void addChannel(long channelID, ChannelType type) {
         final GuildDB.Field configField;
         switch (type) {
             case TEXT_CHANNEL -> configField = GuildDB.Field.RESTRICTED_CHANNELS_TEXT;
@@ -16,10 +25,10 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
-        if (isRestrictedChannel(gid, channelID, type))
+        if (isRestrictedChannel(channelID, type))
             throw new IllegalStateException("This is already a restricted voice channel!");
 
-        final var obj = getGuildObject(gid);
+        final var obj = getGuildObject();
 
         obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
                 .getJSONArray(configField.toString()).put(channelID);
@@ -27,8 +36,8 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
         getCache().updateCache(obj, GuildDB.Field.GUILD_ID, gid);
     }
 
-    public void removeChannel(long gid, long channelID, ChannelType type) {
-        final var obj = getGuildObject(gid);
+    public void removeChannel(long channelID, ChannelType type) {
+        final var obj = getGuildObject();
 
         final GuildDB.Field configField;
         switch (type) {
@@ -37,7 +46,7 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
             default -> throw new IllegalArgumentException("Invalid type!");
         }
 
-        if (!isRestrictedChannel(gid, channelID, type))
+        if (!isRestrictedChannel(channelID, type))
             throw new IllegalStateException("This isn't a restricted channel!");
 
         try {
@@ -50,8 +59,8 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
         }
     }
 
-    public List<Long> getRestrictedChannels(long gid, ChannelType type) {
-        final var obj = getGuildObject(gid);
+    public List<Long> getRestrictedChannels(ChannelType type) {
+        final var obj = getGuildObject();
 
         final GuildDB.Field configField;
         switch (type) {
@@ -70,12 +79,12 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
         return ret;
     }
 
-    public boolean isRestrictedChannel(long gid, long vcID, ChannelType type) {
-        return getRestrictedChannels(gid, type).contains(vcID);
+    public boolean isRestrictedChannel(long vcID, ChannelType type) {
+        return getRestrictedChannels(type).contains(vcID);
     }
 
-    public String restrictedChannelsToString(long gid, ChannelType type) {
-        final var channels = getRestrictedChannels(gid, type);
+    public String restrictedChannelsToString(ChannelType type) {
+        final var channels = getRestrictedChannels(type);
         final var sb = new StringBuilder();
 
         for (var channelID : channels)
@@ -103,7 +112,7 @@ public class RestrictedChannelsConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update(long gid) {
+    public void update() {
 
     }
 }

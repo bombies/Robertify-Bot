@@ -31,11 +31,12 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
+        final var guild = ctx.getGuild();
 
-        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.EIGHT_BALL))
+        if (!new TogglesConfig(guild).getToggle(Toggles.EIGHT_BALL))
             return;
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "");
+        GeneralUtils.setCustomEmbed(guild, "");
 
         if (args.isEmpty()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), RobertifyLocaleMessage.EightBallMessages.MUST_PROVIDE_SOMETHING_TO_RESPOND_TO)
@@ -70,7 +71,6 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
             case "list" -> msg.replyEmbeds(handleList(ctx.getGuild(), ctx.getMember()).build())
                     .queue();
             default -> {
-                final var guild = ctx.getGuild();
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 
                 final var affirmativeAnswers = List.of(
@@ -102,7 +102,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
                         localeManager.getMessage(RobertifyLocaleMessage.EightBallMessages.EB_N_5)
                 );
 
-                final var customAnswers = new EightBallConfig().getResponses(guild.getIdLong());
+                final var customAnswers = new EightBallConfig(guild).getResponses();
 
                 final var random = new Random().nextDouble();
 
@@ -144,16 +144,16 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
         if (phraseToAdd.isEmpty())
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.MISSING_RESPONSE_TO_ADD);
-        var config = new EightBallConfig();
+        var config = new EightBallConfig(guild);
 
         try {
-            if (config.getResponses(guild.getIdLong()).contains(phraseToAdd))
+            if (config.getResponses().contains(phraseToAdd))
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.ALREADY_A_RESPONSE);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        config.addResponse(guild.getIdLong(), phraseToAdd);
+        config.addResponse(phraseToAdd);
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.ADDED_RESPONSE, Pair.of("{response}", phraseToAdd));
     }
 
@@ -161,17 +161,17 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_8BALL.name()));
 
-        var config = new EightBallConfig();
+        var config = new EightBallConfig(guild);
 
         try {
-            if (index > config.getResponses(guild.getIdLong()).size() || index < 0)
+            if (index > config.getResponses().size() || index < 0)
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.NOT_A_RESPONSE);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        var eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.REMOVED_RESPONSE, Pair.of("{response}", config.getResponses(guild.getIdLong()).get(index)));
-        config.removeResponse(guild.getIdLong(), index);
+        var eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.REMOVED_RESPONSE, Pair.of("{response}", config.getResponses().get(index)));
+        config.removeResponse(index);
         return eb;
     }
 
@@ -179,8 +179,8 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_8BALL.name()));
 
-        var config = new EightBallConfig();
-        config.removeAllResponses(guild.getIdLong());
+        var config = new EightBallConfig(guild);
+        config.removeAllResponses();
 
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.CLEARED_RESPONSES);
     }
@@ -189,8 +189,8 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_8BALL))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_8BALL.name()));
 
-        var config = new EightBallConfig();
-        final var responses = config.getResponses(guild.getIdLong());
+        var config = new EightBallConfig(guild);
+        final var responses = config.getResponses();
 
         if (responses.isEmpty())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.NO_CUSTOM_RESPONSES);
@@ -233,7 +233,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
                 localeManager.getMessage(RobertifyLocaleMessage.EightBallMessages.EB_N_5)
         );
 
-        final var customAnswers = new EightBallConfig().getResponses(guild.getIdLong());
+        final var customAnswers = new EightBallConfig(guild).getResponses();
 
         final var random = new Random().nextDouble();
 
@@ -358,7 +358,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!new TogglesConfig().getToggle(guild, Toggles.EIGHT_BALL)) {
+        if (!new TogglesConfig(guild).getToggle(Toggles.EIGHT_BALL)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
                     .queue();
             return;

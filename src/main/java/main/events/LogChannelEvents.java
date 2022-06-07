@@ -11,12 +11,12 @@ public class LogChannelEvents extends ListenerAdapter {
     @Override
     public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
 
-        LogConfig logConfig = new LogConfig();
+        LogConfig logConfig = new LogConfig(event.getGuild());
 
-        if (!logConfig.channelIsSet(event.getGuild().getIdLong()))
+        if (!logConfig.channelIsSet())
             return;
 
-        if (event.getChannel().getIdLong() == logConfig.getChannelID(event.getGuild().getIdLong()))
-            logConfig.removeChannel(event.getGuild().getIdLong());
+        if (event.getChannel().getIdLong() == logConfig.getChannelID())
+            logConfig.removeChannel();
     }
 }

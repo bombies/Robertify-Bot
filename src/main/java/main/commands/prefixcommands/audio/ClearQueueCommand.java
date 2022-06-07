@@ -52,10 +52,10 @@ public class ClearQueueCommand implements ICommand {
         }
 
         queue.clear();
-        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queue");
+        new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queue");
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();

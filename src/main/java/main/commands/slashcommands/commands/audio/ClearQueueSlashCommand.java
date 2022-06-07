@@ -71,7 +71,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         }
 
         queue.clear();
-        new LogUtils().sendLog(guild, LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
+        new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEAR));
         event.getHook().sendMessageEmbeds(eb.build()).queue();

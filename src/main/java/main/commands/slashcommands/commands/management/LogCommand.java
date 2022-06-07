@@ -34,7 +34,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
         }
 
         try {
-            new LogUtils().createChannel(guild);
+            new LogUtils(guild).createChannel();
             message.addReaction("✅").queue();
         } catch (IllegalArgumentException e) {
             message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP).build())
@@ -92,7 +92,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
         final Guild guild = event.getGuild();
 
         try {
-            new LogUtils().createChannel(guild);
+            new LogUtils(guild).createChannel();
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP).build())
                     .queue();
         } catch (IllegalArgumentException e) {

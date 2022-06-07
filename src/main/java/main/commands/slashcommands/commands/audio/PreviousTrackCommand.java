@@ -61,10 +61,10 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
 
         audioPlayer.playTrack(previouslyPlayedTracks.get(guild.getIdLong()).pop());
 
-        if (new DedicatedChannelConfig().isChannelSet(musicManager.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(musicManager.getGuild());
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_PREVIOUS, RobertifyLocaleMessage.PreviousTrackMessages.PREV_TRACK_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+        new LogUtils(guild).sendLog(LogType.TRACK_PREVIOUS, RobertifyLocaleMessage.PreviousTrackMessages.PREV_TRACK_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.PLAYING_PREV_TRACK);
     }

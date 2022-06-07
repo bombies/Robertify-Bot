@@ -91,7 +91,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
 
-        if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
+        if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
         if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getIdentifier())) {
             RobertifyAudioManager.getUnannouncedTracks().remove(track.getIdentifier());
@@ -103,7 +103,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (announcementChannel != null) {
             final var localeManager =LocaleManager.getLocaleManager(guild);
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", track.getInfo().title), Pair.of("{author}", track.getInfo().author))
-                    + (new TogglesConfig().getToggle(guild, Toggles.SHOW_REQUESTER) ?
+                    + (new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
                     "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
                     :
                     ""
@@ -159,7 +159,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 getMusicPlayer().playTrack(nextTrack);
             else {
                 if (lastTrack != null) {
-                    if (new AutoPlayConfig().getStatus(guild.getIdLong())) {
+                    if (new AutoPlayConfig(guild).getStatus()) {
                         switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
                             case "youtube" -> AutoPlayUtils.loadRecommendedTracks(
                                     guild,
@@ -195,8 +195,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             throw e;
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        if (dedicatedChannelConfig.isChannelSet())
+            dedicatedChannelConfig.updateMessage();
     }
 
     @Override
@@ -223,7 +224,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
-        if (!new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES)) return;
+        if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
         try {
             if (announcementChannel != null)
@@ -309,7 +310,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     }
 
     public void scheduleDisconnect(boolean announceMsg, long delay, TimeUnit timeUnit) {
-        if (new GuildConfig().get247(guild.getIdLong()))
+        if (new GuildConfig(guild).get247())
             return;
 
         ScheduledFuture<?> schedule = executor.schedule(() -> disconnect(announceMsg), delay, timeUnit);
@@ -328,7 +329,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
             return;
 
-        if (!new GuildConfig().get247(guild.getIdLong())) {
+        if (!new GuildConfig(guild).get247()) {
             if (channel != null) {
                 RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .leave();

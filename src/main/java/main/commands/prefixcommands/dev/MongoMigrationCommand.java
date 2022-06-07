@@ -97,7 +97,7 @@
 //            try {
 //                final var legacyDedicatedChannelConfig = new LegacyDedicatedChannelConfig();
 //                if (legacyDedicatedChannelConfig.isChannelSet(g.getId())) {
-//                    final var dedicatedChannelConfig = new DedicatedChannelConfig();
+//                    final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
 //                    if (!dedicatedChannelConfig.isChannelSet(g.getIdLong())) {
 //
 //                        String channelID = legacyDedicatedChannelConfig.getChannelID(g.getId());
@@ -118,7 +118,7 @@
 //                final var legacyConfig = new LegacyRestrictedChannelsConfig();
 //                final var restrictedVoiceChannels = legacyConfig.getRestrictedChannels(g.getId(), LegacyRestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
 //                final var restrictedTextChannels = legacyConfig.getRestrictedChannels(g.getId(), LegacyRestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
-//                final var config = new RestrictedChannelsConfig();
+//                final var config = new RestrictedChannelsConfig(guild);
 //
 //                if (!restrictedVoiceChannels.isEmpty()) {
 //                    for (long vc : restrictedVoiceChannels) {
@@ -150,7 +150,7 @@
 //            // Prefixes
 //            try {
 //                final var legacyDB = new ServerDB();
-//                final var config = new GuildConfig();
+//                final var config = new GuildConfig(guild);
 //                var prefix = legacyDB.getServerPrefix(g.getIdLong());
 //                prefix = prefix == null ? Config.get(ENV.PREFIX) : prefix;
 //
@@ -163,7 +163,7 @@
 //            // Permissions
 //            try {
 //                final var legacyConfig = new LegacyPermissionsConfig();
-//                final var config = new PermissionsConfig();
+//                final var config = new PermissionsConfig(guild);
 //
 //                for (var permission : Permission.values()) {
 //                    final var usersForPermission = legacyConfig.getUsersForPermission(g.getId(), permission.name());
@@ -209,7 +209,7 @@
 //            // Announcement Channel
 //            try {
 //                final var oldDB = new BotDB();
-//                final var config = new GuildConfig();
+//                final var config = new GuildConfig(guild);
 //
 //                if (oldDB.isAnnouncementChannelSet(g.getIdLong())) {
 //                    final var oldChannel = oldDB.getAnnouncementChannel(g.getIdLong());
@@ -223,7 +223,7 @@
 //            // Banned Users
 //            try {
 //                final var oldDB = new BanDB();
-//                final var config = new GuildConfig();
+//                final var config = new GuildConfig(guild);
 //                final var oldBannedUsers = oldDB.getAllBannedUsers(g.getIdLong());
 //
 //                if (!oldBannedUsers.isEmpty()) {
@@ -249,7 +249,7 @@
 //            // Toggles
 //            try {
 //                final var oldConfig = new LegacyTogglesConfig();
-//                final var config = new TogglesConfig();
+//                final var config = new TogglesConfig(guild);
 //
 //                for (var toggle : Toggles.values())
 //                    if (config.getToggle(g, toggle) != oldConfig.getToggle(g, toggle))

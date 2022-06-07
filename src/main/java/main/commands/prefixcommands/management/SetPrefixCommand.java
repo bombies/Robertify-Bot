@@ -35,7 +35,7 @@ public class SetPrefixCommand implements ICommand {
         } else if (args.get(0).contains("/")) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Your prefix can't contain `/`").build()).queue();
         } else {
-            new GuildConfig().setPrefix(guild.getIdLong(), args.get(0));
+            new GuildConfig(guild).setPrefix(args.get(0));
 
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You have set the bot's prefix to `" + args.get(0) + "`");
             msg.replyEmbeds(eb.build()).queue();

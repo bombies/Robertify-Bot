@@ -38,7 +38,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         final Message msg = ctx.getMessage();
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
+        if (new DedicatedChannelConfig(guild).isChannelSet()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
@@ -52,8 +52,8 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    final var theme = new ThemesConfig().getTheme(guild.getIdLong());
-                    final var dediChannelConfig = new DedicatedChannelConfig();
+                    final var theme = new ThemesConfig(guild).getTheme();
+                    final var dediChannelConfig = new DedicatedChannelConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
 
@@ -67,12 +67,12 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
                     textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
                             .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
+                                dediChannelConfig.setChannelAndMessage(textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
+                                dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
 
                                 if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
-                                    dediChannelConfig.updateMessage(guild);
+                                    dediChannelConfig.updateMessage();
 
                                 try {
                                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
@@ -131,7 +131,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         final var guild = event.getGuild();
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong())) {
+        if (new DedicatedChannelConfig(guild).isChannelSet()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
@@ -141,8 +141,8 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
-                    final var theme = new ThemesConfig().getTheme(guild.getIdLong());
-                    final var dediChannelConfig = new DedicatedChannelConfig();
+                    final var theme = new ThemesConfig(guild).getTheme();
+                    final var dediChannelConfig = new DedicatedChannelConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
                     manager.setPosition(0).queue();
@@ -155,12 +155,12 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
                     textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
                             .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(guild.getIdLong(), textChannel.getIdLong(), message.getIdLong());
+                                dediChannelConfig.setChannelAndMessage(textChannel.getIdLong(), message.getIdLong());
                                 dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(guild.getIdLong(), new TogglesConfig().getToggle(guild, Toggles.ANNOUNCE_MESSAGES));
+                                dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
 
                                 if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
-                                    dediChannelConfig.updateMessage(guild);
+                                    dediChannelConfig.updateMessage();
 
                                 try {
                                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())

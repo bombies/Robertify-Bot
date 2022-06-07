@@ -76,7 +76,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
         if (botMsg != null)
             botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                            .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                            .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                             .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                             .build())
                     .setActionRows(
@@ -85,7 +85,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                     )
                     .queue();
         else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                        .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig().getTheme(guild.getIdLong()).getTransparent())
+                        .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                         .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                         .build())
                 .addActionRows(

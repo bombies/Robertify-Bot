@@ -57,18 +57,18 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
             return;
         }
 
-        DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
-        if (dedicatedChannelConfig.isChannelSet(guild.getIdLong())) {
-            if (dedicatedChannelConfig.getChannelID(guild.getIdLong()) == channel.getIdLong()) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        if (dedicatedChannelConfig.isChannelSet()) {
+            if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())
                         .queue();
                 return;
             }
         }
 
-        final var config = new LogConfig();
+        final var config = new LogConfig(guild);
 
-        config.setChannel(guild.getIdLong(), channel.getIdLong());
+        config.setChannel(channel.getIdLong());
         message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SET, Pair.of("{channel}", channel.getAsMention())).build())
                 .queue();
     }
@@ -127,9 +127,9 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
             return;
         }
 
-        DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig();
-        if (dedicatedChannelConfig.isChannelSet(guild.getIdLong())) {
-            if (dedicatedChannelConfig.getChannelID(guild.getIdLong()) == channel.getIdLong()) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        if (dedicatedChannelConfig.isChannelSet()) {
+            if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())
                         .setEphemeral(true)
                         .queue();
@@ -137,15 +137,15 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
             }
         }
 
-        final var config = new LogConfig();
+        final var config = new LogConfig(guild);
 
-        if (config.channelIsSet(guild.getIdLong())) {
-            TextChannel oldChannel = config.getChannel(guild.getIdLong());
-            config.removeChannel(guild.getIdLong());
+        if (config.channelIsSet()) {
+            TextChannel oldChannel = config.getChannel();
+            config.removeChannel();
             oldChannel.delete().queue();
         }
 
-        config.setChannel(guild.getIdLong(), channel.getIdLong());
+        config.setChannel(channel.getIdLong());
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_SET, Pair.of("{channel}", channel.getAsMention())).build())
                 .queue();
     }

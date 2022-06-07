@@ -14,15 +14,15 @@ public class GuildConfigTestCommand implements ITestCommand {
         if (!permissionCheck(ctx)) return;
 
         final var args = ctx.getArgs();
-        final var config = new GuildConfig();
         final var guild = ctx.getGuild();
+        final var config = new GuildConfig(guild);
         final var msg = ctx.getMessage();
 
         if (args.isEmpty()) {
-            final var guildHasInfo = config.guildHasInfo(guild.getIdLong());
-            final var prefix = config.getPrefix(guild.getIdLong());
-            final var announcementChannel = config.getAnnouncementChannelID(guild.getIdLong());
-            final var bannedUsers = config.getBannedUsers(guild.getIdLong());
+            final var guildHasInfo = config.guildHasInfo();
+            final var prefix = config.getPrefix();
+            final var announcementChannel = config.getAnnouncementChannelID();
+            final var bannedUsers = config.getBannedUsers();
 
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "\t")
                     .addField("Has Info", String.valueOf(guildHasInfo), false)
@@ -42,16 +42,16 @@ public class GuildConfigTestCommand implements ITestCommand {
                 try {
                     switch (args.get(1).toLowerCase()) {
                         case "prefix" -> {
-                            config.setPrefix(guild.getIdLong(), args.get(2));
+                            config.setPrefix(args.get(2));
                         }
                         case "ac" -> {
-                            config.setAnnouncementChannelID(guild.getIdLong(), Long.parseLong(args.get(2)));
+                            config.setAnnouncementChannelID(Long.parseLong(args.get(2)));
                         }
                         case "banuser" -> {
-                            config.banUser(guild.getIdLong(), Long.parseLong(args.get(2)), 0, 0, 0);
+                            config.banUser(Long.parseLong(args.get(2)), 0, 0, 0);
                         }
                         case "unbanuser" -> {
-                            config.unbanUser(guild.getIdLong(), Long.parseLong(args.get(2)));
+                            config.unbanUser(Long.parseLong(args.get(2)));
                         }
                         default -> {
                             return;

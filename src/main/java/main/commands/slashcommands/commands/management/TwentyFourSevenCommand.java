@@ -38,11 +38,11 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
     }
 
     private MessageEmbed logic(Guild guild) {
-        final var config = new GuildConfig();
+        final var config = new GuildConfig(guild);
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        if (config.get247(guild.getIdLong())) {
-            config.set247(guild.getIdLong(), false);
+        if (config.get247()) {
+            config.set247(false);
 
             RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().scheduleDisconnect(true);
@@ -51,7 +51,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
             ).build();
         } else {
-            config.set247(guild.getIdLong(), true);
+            config.set247(true);
 
             RobertifyAudioManager.getInstance().getMusicManager(guild)
                     .getScheduler().removeScheduledDisconnect(guild);

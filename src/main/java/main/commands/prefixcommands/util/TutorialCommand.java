@@ -25,7 +25,7 @@ public class TutorialCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final User user = ctx.getAuthor();
         final Message msg = ctx.getMessage();
-        final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
+        final String prefix = new GuildConfig(guild).getPrefix();
 
         GeneralUtils.setCustomEmbed(guild, "Tutorial");
 

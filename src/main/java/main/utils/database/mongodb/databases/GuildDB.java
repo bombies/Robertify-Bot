@@ -61,7 +61,7 @@ public class GuildDB extends AbstractMongoDatabase {
                         .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), new JSONArray())
                         .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), new JSONArray())
                 )
-                .addField(Field.TOGGLES_OBJECT, new TogglesConfig().getDefaultToggleObject())
+                .addField(Field.TOGGLES_OBJECT, TogglesConfig.getDefaultToggleObject())
                 .addField(Field.EIGHT_BALL_ARRAY, new JSONArray())
                 .addField(Field.THEME, RobertifyTheme.GREEN.name().toLowerCase())
                 .build();
@@ -83,6 +83,7 @@ public class GuildDB extends AbstractMongoDatabase {
         DEDICATED_CHANNEL_OBJECT("dedicated_channel"),
             DEDICATED_CHANNEL_ID("channel_id"),
             DEDICATED_CHANNEL_MESSAGE_ID("message_id"),
+            DEDICATED_CHANNEL_CONFIG("config"),
         PERMISSIONS_OBJECT("permissions"),
             PERMISSIONS_DJ("0"),
             PERMISSIONS_ADMIN("1"),

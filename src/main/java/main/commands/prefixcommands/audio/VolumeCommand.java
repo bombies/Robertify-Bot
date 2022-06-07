@@ -63,10 +63,10 @@ public class VolumeCommand implements ICommand {
 
         audioPlayer.getFilters().setVolume((float)volume/100).commit();
 
-        if (new DedicatedChannelConfig().isChannelSet(selfVoiceState.getGuild().getIdLong()))
-            new DedicatedChannelConfig().updateMessage(selfVoiceState.getGuild());
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
-        new LogUtils().sendLog(guild, LogType.VOLUME_CHANGE,
+        new LogUtils(guild).sendLog(LogType.VOLUME_CHANGE,
                 RobertifyLocaleMessage.VolumeMessages.VOLUME_CHANGED_LOG,
                 Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
                 Pair.of("{volume}", String.valueOf(volume))

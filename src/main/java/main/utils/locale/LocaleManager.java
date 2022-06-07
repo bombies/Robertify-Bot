@@ -24,24 +24,20 @@ public class LocaleManager {
     @Getter
     private RobertifyLocale locale;
     private Map<String, String> localeFile;
+    private final Guild guild;
     private final long guildID;
 
-    private LocaleManager(long guildID, RobertifyLocale locale) {
+    private LocaleManager(Guild guild, RobertifyLocale locale) {
         locales.putIfAbsent(locale, retrieveLocaleFile(locale));
-
-        this.guildID = guildID;
+        this.guild = guild;
+        this.guildID = guild.getIdLong();
         this.locale = locale;
         this.localeFile = locales.get(locale);
     }
 
-    public static LocaleManager getLocaleManager(long guildID) {
-        if (!localeManagers.containsKey(guildID))
-            localeManagers.put(guildID, new LocaleManager(guildID, RobertifyLocale.ENGLISH));
-        return localeManagers.get(guildID);
-    }
     public static LocaleManager getLocaleManager(Guild guild) {
         if (!localeManagers.containsKey(guild.getIdLong()))
-            localeManagers.put(guild.getIdLong(), new LocaleManager(guild.getIdLong(), RobertifyLocale.ENGLISH));
+            localeManagers.put(guild.getIdLong(), new LocaleManager(guild, RobertifyLocale.ENGLISH));
         return localeManagers.get(guild.getIdLong());
     }
 
@@ -51,7 +47,7 @@ public class LocaleManager {
 
         this.locale = locale;
         this.localeFile = retrieveLocaleFile();
-        new LocaleConfig().setLocale(guildID, locale);
+        new LocaleConfig(guild).setLocale(locale);
     }
 
     public static void reloadLocales() {

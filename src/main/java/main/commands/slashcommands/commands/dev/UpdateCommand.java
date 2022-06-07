@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.dev;
 
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.IDevCommand;
+import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -52,22 +53,23 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
             return;
         }
 
-        var conf = new DedicatedChannelConfig();
-
         try {
             switch (args.get(1).toLowerCase()) {
                 case "all" -> {
                     for (Guild g : Robertify.shardManager.getGuilds()) {
-                        conf.updateButtons(g);
-                        conf.updateTopic(g);
-                        conf.updateMessage(g);
+                        final var config = new DedicatedChannelConfig(g);
+                        config.updateButtons();
+                        config.updateTopic();
+                        config.updateMessage();
                     }
                 }
-                case "topic" -> conf.updateTopic();
-                case "buttons" -> conf.updateButtons();
+                case "topic" -> DedicatedChannelConfig.updateAllTopics();
+                case "buttons" -> DedicatedChannelConfig.updateAllButtons();
                 case "message" -> {
-                    for (Guild g : Robertify.shardManager.getGuilds())
-                        conf.updateMessage(g);
+                    for (Guild g : Robertify.shardManager.getGuilds()) {
+                        final var config = new DedicatedChannelConfig(g);
+                        config.updateMessage();
+                    }
                 }
                 default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arg").build()).queue();
             }
@@ -126,15 +128,16 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!devCheck(event)) return;
 
-        final var conf = new DedicatedChannelConfig();
+
         final Guild guild = event.getGuild();
 
         switch (event.getSubcommandName()) {
             case "all" -> {
                 for (Guild g : Robertify.shardManager.getGuilds()) {
-                    conf.updateButtons(g);
-                    conf.updateTopic(g);
-                    conf.updateMessage(g);
+                    final var conf = new DedicatedChannelConfig(g);
+                    conf.updateButtons();
+                    conf.updateTopic();
+                    conf.updateMessage();
                 }
 
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated everything").build())
@@ -142,20 +145,20 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                         .queue();
             }
             case "topic" -> {
-                conf.updateTopic();
+                DedicatedChannelConfig.updateAllTopics();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all topics").build())
                         .setEphemeral(true)
                         .queue();
             }
             case "buttons" -> {
-                conf.updateButtons();
+                DedicatedChannelConfig.updateAllButtons();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully all buttons").build())
                         .setEphemeral(true)
                         .queue();
             }
             case "message" -> {
                 for (Guild g : Robertify.shardManager.getGuilds())
-                    conf.updateMessage(g);
+                    new DedicatedChannelConfig(g).updateMessage();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all messages").build())
                         .setEphemeral(true)
                         .queue();

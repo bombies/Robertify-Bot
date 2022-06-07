@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Deprecated
 public class ChangeLogConfig extends AbstractJSONFile {
     public ChangeLogConfig() {
         super(JSONConfigFile.CHANGELOG);

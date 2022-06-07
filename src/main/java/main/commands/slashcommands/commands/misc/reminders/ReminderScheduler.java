@@ -46,12 +46,12 @@ public class ReminderScheduler {
     }
 
     public void scheduleGuildReminders(Guild guild) {
-        RemindersConfig config = new RemindersConfig();
+        RemindersConfig config = new RemindersConfig(guild);
 
-        if (!config.guildHasReminders(guild.getIdLong()))
+        if (!config.guildHasReminders())
             return;
 
-        List<ReminderUser> allGuildUsers = config.getAllGuildUsers(guild.getIdLong());
+        List<ReminderUser> allGuildUsers = config.getAllGuildUsers();
 
         for (var user : allGuildUsers) {
             final var reminders = user.getReminders();
@@ -92,7 +92,7 @@ public class ReminderScheduler {
                         return;
                     }
 
-                    if (new RemindersConfig().userIsBanned(guildID, user)) {
+                    if (new RemindersConfig(guild).userIsBanned(user)) {
                         dmReminder(guild, user, reminder);
                         return;
                     }
@@ -109,7 +109,7 @@ public class ReminderScheduler {
                         return;
                     }
 
-                    if (!new TogglesConfig().getToggle(guild, Toggles.REMINDERS))
+                    if (!new TogglesConfig(guild).getToggle(Toggles.REMINDERS))
                         return;
 
                     final var localeManager = LocaleManager.getLocaleManager(guild);

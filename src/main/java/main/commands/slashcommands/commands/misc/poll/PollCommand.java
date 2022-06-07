@@ -42,7 +42,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
 
-        if (!new TogglesConfig().getToggle(ctx.getGuild(), Toggles.POLLS))
+        if (!new TogglesConfig(guild).getToggle(Toggles.POLLS))
             return;
 
         if (!GeneralUtils.hasPerms(ctx.getGuild(), ctx.getMember(), Permission.ROBERTIFY_DJ)
@@ -303,7 +303,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
-        if (!new TogglesConfig().getToggle(guild, Toggles.POLLS)) {
+        if (!new TogglesConfig(guild).getToggle(Toggles.POLLS)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
                     .queue();
             return;

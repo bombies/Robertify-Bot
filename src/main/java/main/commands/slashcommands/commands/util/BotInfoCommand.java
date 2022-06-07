@@ -23,7 +23,7 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var localeManager = LocaleManager.getLocaleManager(ctx.getGuild());
         ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "\t")
-                        .setThumbnail(new ThemesConfig().getTheme(ctx.getGuild().getIdLong()).getTransparent())
+                        .setThumbnail(new ThemesConfig(ctx.getGuild()).getTheme().getTransparent())
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_DEVELOPERS), "<@274681651945144321>", false)
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_LABEL), localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_VALUE), false)
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_UPTIME), GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)
@@ -67,7 +67,7 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
 
         final var localeManager = LocaleManager.getLocaleManager(event.getGuild());
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), "\t")
-                        .setThumbnail(new ThemesConfig().getTheme(event.getGuild().getIdLong()).getTransparent())
+                        .setThumbnail(new ThemesConfig(event.getGuild()).getTheme().getTransparent())
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_DEVELOPERS), "<@274681651945144321>", false)
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_LABEL), localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_ABOUT_ME_VALUE), false)
                         .addField(localeManager.getMessage(RobertifyLocaleMessage.BotInfoMessages.BOT_INFO_UPTIME), GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup()), false)

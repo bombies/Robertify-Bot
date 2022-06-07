@@ -15,19 +15,21 @@ import java.util.List;
 
 public class LogUtils {
     private final LogConfig config;
+    private final Guild guild;
 
-    public LogUtils() {
-        config = new LogConfig();
+    public LogUtils(Guild guild) {
+        config = new LogConfig(guild);
+        this.guild = guild;
     }
 
-    public void sendLog(Guild guild, LogType type, String message) {
-        if (!config.channelIsSet(guild.getIdLong()))
+    public void sendLog(LogType type, String message) {
+        if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig().getLogToggle(guild, type))
+        if (!new TogglesConfig(guild).getLogToggle(type))
             return;
 
-        TextChannel channel = config.getChannel(guild.getIdLong());
+        TextChannel channel = config.getChannel();
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
@@ -39,15 +41,15 @@ public class LogUtils {
                 ).queue();
     }
 
-    public void sendLog(Guild guild, LogType type, LocaleMessage message) {
-        if (!config.channelIsSet(guild.getIdLong()))
+    public void sendLog(LogType type, LocaleMessage message) {
+        if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig().getLogToggle(guild, type))
+        if (!new TogglesConfig(guild).getLogToggle(type))
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        TextChannel channel = config.getChannel(guild.getIdLong());
+        TextChannel channel = config.getChannel();
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
@@ -60,15 +62,15 @@ public class LogUtils {
     }
 
     @SafeVarargs
-    public final void sendLog(Guild guild, LogType type, LocaleMessage message, Pair<String, String>... placeholders) {
-        if (!config.channelIsSet(guild.getIdLong()))
+    public final void sendLog(LogType type, LocaleMessage message, Pair<String, String>... placeholders) {
+        if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig().getLogToggle(guild, type))
+        if (!new TogglesConfig(guild).getLogToggle(type))
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        TextChannel channel = config.getChannel(guild.getIdLong());
+        TextChannel channel = config.getChannel();
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
@@ -80,13 +82,13 @@ public class LogUtils {
         ).queue();
     }
 
-    public void createChannel(Guild guild) {
-        if (config.channelIsSet(guild.getIdLong()))
-            config.removeChannel(guild.getIdLong());
+    public void createChannel() {
+        if (config.channelIsSet())
+            config.removeChannel();
 
         guild.createTextChannel("robertify-logs")
                 .addPermissionOverride(guild.getPublicRole(), Collections.emptyList(), List.of(Permission.VIEW_CHANNEL))
                 .addPermissionOverride(guild.getSelfMember(), List.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_WRITE), Collections.emptyList())
-                .queue(channel -> config.setChannel(guild.getIdLong(), channel.getIdLong()));
+                .queue(channel -> config.setChannel(channel.getIdLong()));
     }
 }

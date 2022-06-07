@@ -69,18 +69,16 @@ public class LofiCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build();
         } else if (!selfVoiceState.inVoiceChannel()) {
-            if (new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
-                final var restrictedChannelsConfig = new RestrictedChannelsConfig();
+            if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);
-                if (!restrictedChannelsConfig.isRestrictedChannel(guild.getIdLong(), memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
+                if (!restrictedChannelsConfig.isRestrictedChannel(memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
                     return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.CANT_JOIN_CHANNEL) +
                             (!restrictedChannelsConfig.getRestrictedChannels(
-                                    guild.getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                             ).isEmpty()
                                     ?
                                     localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.RESTRICTED_TO_JOIN, Pair.of("{channels}", restrictedChannelsConfig.restrictedChannelsToString(
-                                            guild.getIdLong(),
                                             RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                     )))
                                     :
@@ -101,8 +99,8 @@ public class LofiCommand implements ICommand {
             musicManager.getScheduler().getPastQueue().clear();
             audioPlayer.stopTrack();
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
+            if (new DedicatedChannelConfig(guild).isChannelSet())
+                new DedicatedChannelConfig(guild).updateMessage();
 
             return null;
         }

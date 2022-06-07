@@ -134,41 +134,41 @@ public class GeneralUtils {
 
     public static boolean  hasPerms(Guild guild, Member sender, Permission perm) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
-                || new PermissionsConfig().userHasPermission(guild.getIdLong(), sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
+                || new PermissionsConfig(guild).userHasPermission(sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
                 || sender.isOwner())
             return true;
 
         List<Role> userRoles = sender.getRoles();
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
 
         for (Role r : userRoles)
-            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), perm).contains(r.getIdLong()) ||
-                    permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
+            if (permissionsConfig.getRolesForPermission(perm).contains(r.getIdLong()) ||
+                    permissionsConfig.getRolesForPermission(Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
                 return true;
 
 
-        return permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.name()).contains(sender.getIdLong());
+        return permissionsConfig.getUsersForPermission(perm.name()).contains(sender.getIdLong());
     }
 
     public static boolean hasPerms(Guild guild, Member sender, Permission... perms) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
-        || new PermissionsConfig().userHasPermission(guild.getIdLong(), sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
+        || new PermissionsConfig(guild).userHasPermission(sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
         || sender.isOwner())
             return true;
 
         List<Role> userRoles = sender.getRoles();
         int pass = 0;
 
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
 
         for (Role r : userRoles) {
-            if (permissionsConfig.getRolesForPermission(guild.getIdLong(), Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
+            if (permissionsConfig.getRolesForPermission(Permission.ROBERTIFY_ADMIN).contains(r.getIdLong()))
                 return true;
             for (Permission p : perms) {
-                if (permissionsConfig.getRolesForPermission(guild.getIdLong(), p).contains(r.getIdLong()))
+                if (permissionsConfig.getRolesForPermission(p).contains(r.getIdLong()))
                     pass++;
-                else if (permissionsConfig.getUsersForPermission(guild.getIdLong(), p.name()).contains(sender.getIdLong()))
+                else if (permissionsConfig.getUsersForPermission(p.name()).contains(sender.getIdLong()))
                     pass++;
             }
         }
@@ -440,8 +440,8 @@ public class GeneralUtils {
     }
 
     public static void setDefaultEmbed(Guild guild) {
-        final ThemesConfig themesConfig = new ThemesConfig();
-        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final ThemesConfig themesConfig = new ThemesConfig(guild);
+        final var theme = themesConfig.getTheme();
         RobertifyEmbedUtils.setEmbedBuilder(
                 guild,
                 () -> new EmbedBuilder()
@@ -468,8 +468,8 @@ public class GeneralUtils {
     }
 
     public static void setCustomEmbed(Guild guild, String author) {
-        final ThemesConfig themesConfig = new ThemesConfig();
-        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final ThemesConfig themesConfig = new ThemesConfig(guild);
+        final var theme = themesConfig.getTheme();
         RobertifyEmbedUtils.setEmbedBuilder(
                 guild,
                 () -> new EmbedBuilder()
@@ -479,8 +479,8 @@ public class GeneralUtils {
     }
 
     public static void setCustomEmbed(Guild guild, LocaleMessage author) {
-        final ThemesConfig themesConfig = new ThemesConfig();
-        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final ThemesConfig themesConfig = new ThemesConfig(guild);
+        final var theme = themesConfig.getTheme();
         final var localeManager = LocaleManager.getLocaleManager(guild);
         RobertifyEmbedUtils.setEmbedBuilder(
                 guild,
@@ -491,8 +491,8 @@ public class GeneralUtils {
     }
 
     public static void setCustomEmbed(Guild guild, String author, String footer) {
-        final ThemesConfig themesConfig = new ThemesConfig();
-        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final ThemesConfig themesConfig = new ThemesConfig(guild);
+        final var theme = themesConfig.getTheme();
         RobertifyEmbedUtils.setEmbedBuilder(
                 guild,
                 () -> new EmbedBuilder()
@@ -503,8 +503,8 @@ public class GeneralUtils {
     }
 
     public static void setCustomEmbed(Guild guild, String author, @Nullable String title, String footer) {
-        final ThemesConfig themesConfig = new ThemesConfig();
-        final var theme = themesConfig.getTheme(guild.getIdLong());
+        final ThemesConfig themesConfig = new ThemesConfig(guild);
+        final var theme = themesConfig.getTheme();
         RobertifyEmbedUtils.setEmbedBuilder(
                 guild,
                 () -> new EmbedBuilder()

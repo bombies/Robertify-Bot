@@ -96,7 +96,7 @@ public class SeekCommand implements ICommand {
 
         audioPlayer.seekTo(totalDurationInMillis);
         final var time = (mins > 9 ? mins : "0" + mins) + ":" + (sec > 9 ? sec : "0" + sec);
-        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
+        new LogUtils(guild).sendLog(LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
                 Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
                 Pair.of("{time}", time),
                 Pair.of("{title}", info.title),
@@ -144,7 +144,7 @@ public class SeekCommand implements ICommand {
 
         audioPlayer.seekTo(totalDurationInMillis);
         final var time = (hours > 9 ? hours : "0" + hours) + ":"+ (mins > 9 ? mins : "0" + mins) + ":"+ (sec > 9 ? sec : "0" + sec);
-        new LogUtils().sendLog(guild, LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
+        new LogUtils(guild).sendLog(LogType.TRACK_SEEK, RobertifyLocaleMessage.SeekMessages.SOUGHT_LOG,
                 Pair.of("{user}", memberVoiceState.getMember().getAsMention()),
                 Pair.of("{time}", time),
                 Pair.of("{title}", info.title),

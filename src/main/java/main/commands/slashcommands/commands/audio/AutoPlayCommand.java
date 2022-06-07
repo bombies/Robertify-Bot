@@ -27,13 +27,13 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
     public MessageEmbed handleAutoPlay(Guild guild) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        AutoPlayConfig autoPlayConfig = new AutoPlayConfig();
+        final var autoPlayConfig = new AutoPlayConfig(guild);
 
-        if (autoPlayConfig.getStatus(guild.getIdLong())) {
-            autoPlayConfig.setStatus(guild.getIdLong(), false);
+        if (autoPlayConfig.getStatus()) {
+            autoPlayConfig.setStatus(false);
             return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.GENERAL_TOGGLE_MESSAGE, Pair.of("{toggle}", "autoplay"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase()))).build();
         } else {
-            autoPlayConfig.setStatus(guild.getIdLong(), true);
+            autoPlayConfig.setStatus(true);
             return RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.GENERAL_TOGGLE_MESSAGE, Pair.of("{toggle}", "autoplay"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase()))).build();
         }
     }

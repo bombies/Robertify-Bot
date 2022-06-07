@@ -41,8 +41,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
             musicManager.getScheduler().queue.clear();
             musicManager.getPlayer().getFilters().clear().commit();
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                new DedicatedChannelConfig().updateMessage(guild);
+            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            if (dedicatedChannelConfig.isChannelSet())
+                dedicatedChannelConfig.updateMessage();
 
             LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
@@ -55,7 +56,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
-             if (!new GuildConfig().get247(guild.getIdLong()))
+             if (!new GuildConfig(guild).get247())
                 doAutoLeave(event, channelLeft);
         }
     }
@@ -69,11 +70,12 @@ public class VoiceChannelEvents extends ListenerAdapter {
         if (!voiceState.inVoiceChannel()) return;
 
         VoiceChannel channelLeft = event.getChannelLeft();
-        if (event.getMember().getIdLong() == self.getIdLong() && !new GuildConfig().get247(guild.getIdLong())) {
+        final var guildConfig = new GuildConfig(guild);
+        if (event.getMember().getIdLong() == self.getIdLong() && !guildConfig.get247()) {
             doAutoLeave(event, channelLeft);
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
             resumeSong(event);
-        } else if (voiceState.getChannel().equals(channelLeft) && !new GuildConfig().get247(guild.getIdLong())) {
+        } else if (voiceState.getChannel().equals(channelLeft) && !guildConfig.get247()) {
             doAutoLeave(event, channelLeft);
         }
     }
@@ -132,7 +134,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                     },
                     1L, TimeUnit.MINUTES,
                     () -> {
-                        if (!new GuildConfig().get247(event.getGuild().getIdLong()))
+                        if (!new GuildConfig(event.getGuild()).get247())
                             RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
                     }
             );

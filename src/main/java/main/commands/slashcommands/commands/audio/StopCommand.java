@@ -62,12 +62,12 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         if (audioPlayer.isPaused())
             audioPlayer.setPaused(false);
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
-        new LogUtils().sendLog(guild, LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
+        new LogUtils(guild).sendLog(LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 
         scheduler.scheduleDisconnect(true);
         ResumeUtils.getInstance().removeInfo(guild);

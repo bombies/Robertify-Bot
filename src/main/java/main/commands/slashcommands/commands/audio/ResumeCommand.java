@@ -68,7 +68,7 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
 
         audioPlayer.setPaused(false);
         eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.RESUMED);
-        new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
+        new LogUtils(guild).sendLog(LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", ctx.getMember().getAsMention()));
         msg.replyEmbeds(eb.build()).queue();
     }
 
@@ -155,7 +155,7 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
 
         audioPlayer.setPaused(false);
         eb = RobertifyEmbedUtils.embedMessage(guild, "You have resumed the song!");
-        new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, member.getAsMention() + " has resumed the music");
+        new LogUtils(guild).sendLog(LogType.PLAYER_RESUME, member.getAsMention() + " has resumed the music");
         event.replyEmbeds(eb.build()).queue();
     }
 }

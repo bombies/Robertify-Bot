@@ -98,11 +98,12 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
         if (BotBDCache.getInstance().isDeveloper(user.getIdLong()))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.CANNOT_BAN_DEVELOPER);
 
-        if (new GuildConfig().isBannedUser(guild.getIdLong(), user.getIdLong()))
+        final var guildConfig = new GuildConfig(guild);
+        if (guildConfig.isBannedUser(user.getIdLong()))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_ALREADY_BANNED);
 
         if (bannedUntil == null) { // Perm ban
-            new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
+            guildConfig.banUser(user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), -1);
 
              user.getUser().openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_PERM_BANNED, Pair.of("{server}", guild.getName()))
                     .build())
@@ -111,7 +112,7 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
                                     Listener.logger.warn("Was not able to send an unban message to " + user.getUser().getAsTag() + "("+user.getIdLong()+")"))));
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_PERM_BANNED_RESPONSE, Pair.of("{user}", user.getAsMention()));
         } else {
-            new GuildConfig().banUser(guild.getIdLong(), user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
+            guildConfig.banUser(user.getIdLong(), mod.getIdLong(), System.currentTimeMillis(), bannedUntil);
 
             user.getUser().openPrivateChannel().queue(channel -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.BanMessages.USER_TEMP_BANNED,
                                     Pair.of("{duration}", GeneralUtils.formatDuration(duration)),

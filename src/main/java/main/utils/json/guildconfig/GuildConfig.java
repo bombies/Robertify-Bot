@@ -2,6 +2,7 @@ package main.utils.json.guildconfig;
 
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -13,32 +14,40 @@ import java.util.List;
 
 public class GuildConfig extends AbstractGuildConfig {
     private final static Logger logger = LoggerFactory.getLogger(GuildConfig.class);
+    private final Guild guild;
+    private final long gid;
+    
+    public GuildConfig(Guild guild) {
+        super(guild);
+        this.guild = guild;
+        this.gid = guild.getIdLong();
+    }
 
-    public void addGuild(long gid) {
-        if (guildHasInfo(gid))
+    public void addGuild() {
+        if (guildHasInfo())
             throw new IllegalArgumentException("This guild is already added!");
 
         getDatabase().addGuild(gid);
     }
 
-    public void removeGuild(long gid) {
+    public void removeGuild() {
         getDatabase().removeGuild(gid);
-        if (!guildHasInfo(gid))
+        if (!guildHasInfo())
             logger.warn("There is no information for guild with ID {} in the cache.", gid);
         else
-            unloadGuild(gid);
+            unloadGuild();
     }
 
-    public String getPrefix(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public String getPrefix() {
+        if (!guildHasInfo())
+            loadGuild();
 
         return (String) getCache().getField(gid, GuildDB.Field.GUILD_PREFIX);
     }
 
-    public void setPrefix(long gid, String prefix) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void setPrefix(String prefix) {
+        if (!guildHasInfo())
+            loadGuild();
 
         if (prefix.length() > 4)
             throw new IllegalArgumentException("The prefix must be 4 or less characters!");
@@ -47,9 +56,9 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     @Deprecated
-    public long getAnnouncementChannelID(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public long getAnnouncementChannelID() {
+        if (!guildHasInfo())
+            loadGuild();
 
         try {
             return (long) getCache().getField(gid, GuildDB.Field.ANNOUNCEMENT_CHANNEL);
@@ -59,24 +68,24 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     @Deprecated
-    public void setAnnouncementChannelID(long gid, long id) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void setAnnouncementChannelID(long id) {
+        if (!guildHasInfo())
+            loadGuild();
 
         getCache().setField(gid, GuildDB.Field.ANNOUNCEMENT_CHANNEL, id);
     }
 
     @Deprecated
-    public boolean announcementChannelIsSet(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public boolean announcementChannelIsSet() {
+        if (!guildHasInfo())
+            loadGuild();
 
-        return getAnnouncementChannelID(gid) != -1;
+        return getAnnouncementChannelID() != -1;
     }
 
-    public List<BannedUser> getBannedUsers(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public List<BannedUser> getBannedUsers() {
+        if (!guildHasInfo())
+            loadGuild();
 
         final JSONArray bannedUsers = (JSONArray) getCache().getField(gid, GuildDB.Field.BANNED_USERS_ARRAY);
         final List<BannedUser> ret = new ArrayList<>();
@@ -95,11 +104,11 @@ public class GuildConfig extends AbstractGuildConfig {
         return ret;
     }
 
-    public HashMap<Long, Long> getBannedUsersWithUnbanTimes(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public HashMap<Long, Long> getBannedUsersWithUnbanTimes() {
+        if (!guildHasInfo())
+            loadGuild();
 
-        final var bannedUsers = getBannedUsers(gid);
+        final var bannedUsers = getBannedUsers();
         final HashMap<Long, Long> ret = new HashMap<>();
 
         for (var bannedUser : bannedUsers)
@@ -107,11 +116,11 @@ public class GuildConfig extends AbstractGuildConfig {
         return ret;
     }
 
-    public void banUser(long gid, long uid, long modId, long bannedAt, long bannedUntil) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void banUser(long uid, long modId, long bannedAt, long bannedUntil) {
+        if (!guildHasInfo())
+            loadGuild();
 
-        if (isBannedUser(gid, uid))
+        if (isBannedUser(uid))
             throw new IllegalArgumentException("This user is already banned!");
 
         final var guildObj = getCache().getGuildInfo(gid);
@@ -127,11 +136,11 @@ public class GuildConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void unbanUser(long gid, long uid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void unbanUser(long uid) {
+        if (!guildHasInfo())
+            loadGuild();
 
-        if (!isBannedUser(gid, uid))
+        if (!isBannedUser(uid))
             throw new IllegalArgumentException("This user isn't banned!");
 
         final var guildObj = getCache().getGuildInfo(gid);
@@ -141,11 +150,11 @@ public class GuildConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public long getTimeUntilUnban(long gid, long uid) {
-        if (!isBannedUser(gid, uid))
+    public long getTimeUntilUnban(long uid) {
+        if (!isBannedUser(uid))
             throw new IllegalArgumentException("This user isn't banned!");
 
-        final var bannedUser = getBannedUsers(gid).stream()
+        final var bannedUser = getBannedUsers().stream()
                 .filter(user -> user.user == uid)
                 .findFirst()
                 .orElse(null);
@@ -156,18 +165,18 @@ public class GuildConfig extends AbstractGuildConfig {
         return bannedUser.bannedUntil - bannedUser.bannedAt;
     }
 
-    public boolean isBannedUser(long gid, long uid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public boolean isBannedUser(long uid) {
+        if (!guildHasInfo())
+            loadGuild();
 
-        for (var bannedUser : getBannedUsers(gid))
+        for (var bannedUser : getBannedUsers())
             if (bannedUser.user == uid) return true;
         return false;
     }
 
-    public boolean get247(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public boolean get247() {
+        if (!guildHasInfo())
+            loadGuild();
 
         if (!getCache().hasField(gid, GuildDB.Field.TWENTY_FOUR_SEVEN)) {
             getCache().setField(gid, GuildDB.Field.TWENTY_FOUR_SEVEN, false);
@@ -177,15 +186,15 @@ public class GuildConfig extends AbstractGuildConfig {
         return (boolean) getCache().getField(gid, GuildDB.Field.TWENTY_FOUR_SEVEN);
     }
 
-    public void set247(long gid, boolean status) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public void set247(boolean status) {
+        if (!guildHasInfo())
+            loadGuild();
 
         getCache().setField(gid, GuildDB.Field.TWENTY_FOUR_SEVEN, status);
     }
 
     @Override
-    public void update(long gid) {
+    public void update() {
         // Nothing
     }
 

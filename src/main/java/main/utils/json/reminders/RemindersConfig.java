@@ -2,6 +2,7 @@ package main.utils.json.reminders;
 
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.GenericJSONField;
+import net.dv8tion.jda.api.entities.Guild;
 import org.bson.Document;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,12 +13,20 @@ import java.util.Collections;
 import java.util.List;
 
 public class RemindersConfig extends AbstractGuildConfig {
+    private final Guild guild;
+    private final long gid;
 
-    public void addUser(long gid, long uid) {
-        if (userExists(gid, uid))
+    public RemindersConfig(Guild guild) {
+        super(guild);
+        this.guild = guild;
+        this.gid = guild.getIdLong();
+    }
+
+    public void addUser(long uid) {
+        if (userExists(uid))
             return;
 
-        JSONObject guildObject = getGuildObject(gid);
+        JSONObject guildObject = getGuildObject();
         final var userArr = guildObject.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.USERS.toString());
 
@@ -31,11 +40,11 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObject);
     }
 
-    public void addReminder(long gid, long uid, String reminder, long channelID, long reminderTime) {
-        if (!userExists(gid, uid))
-            addUser(gid, uid);
+    public void addReminder(long uid, String reminder, long channelID, long reminderTime) {
+        if (!userExists(uid))
+            addUser(uid);
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
         final var userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.USERS.toString());
         final var userReminders = userArr
@@ -51,11 +60,11 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void removeReminder(long gid, long uid, int id) {
-        if (!userHasReminders(gid, uid))
+    public void removeReminder(long uid, int id) {
+        if (!userHasReminders(uid))
             throw new NullPointerException("This user doesn't have any reminders in this guild!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
 
         final var userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.USERS.toString());
@@ -71,11 +80,11 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void clearReminders(long gid, long uid) {
-        if (!userHasReminders(gid, uid))
+    public void clearReminders(long uid) {
+        if (!userHasReminders(uid))
             throw new NullPointerException("This user doesn't have any reminders in this guild!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
 
         final var userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.USERS.toString());
@@ -88,12 +97,12 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void removeAllReminderChannels(long gid, long uid) {
-        if (!userExists(gid, uid))
+    public void removeAllReminderChannels(long uid) {
+        if (!userExists(uid))
             throw new NullPointerException("This user doesn't have any reminders!");
 
-        final var guildObj = getGuildObject(gid);
-        final var allReminders = getAllReminders(guildObj, gid, uid);
+        final var guildObj = getGuildObject();
+        final var allReminders = getAllReminders(guildObj, uid);
 
         for (var reminder : allReminders)
             ((JSONObject) reminder).put(Fields.REMINDER_CHANNEL.toString(), -1L);
@@ -101,52 +110,52 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void removeReminderChannel(long gid, long uid, int id) {
-        editReminderChannel(gid, uid, id, -1L);
+    public void removeReminderChannel(long uid, int id) {
+        editReminderChannel(uid, id, -1L);
     }
 
-    public void editReminderChannel(long gid, long uid, int id, long channelID) {
-        if (!userExists(gid, uid))
+    public void editReminderChannel(long uid, int id, long channelID) {
+        if (!userExists(uid))
             throw new NullPointerException("This user doesn't have any reminders to edit!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
 
-        JSONObject reminder = getSpecificReminder(guildObj, gid, uid, id);
+        JSONObject reminder = getSpecificReminder(guildObj, uid, id);
         reminder.put(Fields.REMINDER_CHANNEL.toString(), channelID);
 
         getCache().updateGuild(guildObj);
     }
 
-    public void editReminderTime(long gid, long uid, int id, long time) {
-        if (!userExists(gid, uid))
+    public void editReminderTime(long uid, int id, long time) {
+        if (!userExists(uid))
             throw new NullPointerException("This user doesn't have any reminders to edit!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
 
-        JSONObject reminder = getSpecificReminder(guildObj, gid, uid, id);
+        JSONObject reminder = getSpecificReminder(guildObj, uid, id);
         reminder.put(Fields.REMINDER_TIME.toString(), time);
 
         getCache().updateGuild(guildObj);
     }
 
-    public void banUser(long gid, long uid) {
-        setBanState(gid, uid, true);
+    public void banUser(long uid) {
+        setBanState(uid, true);
     }
 
-    public void unbanUser(long gid, long uid) {
-        setBanState(gid, uid, false);
+    public void unbanUser(long uid) {
+        setBanState(uid, false);
     }
 
-    private void setBanState(long gid, long uid, boolean state) {
+    private void setBanState(long uid, boolean state) {
         if (state) {
-            if (userIsBanned(gid, uid))
+            if (userIsBanned(uid))
                 throw new IllegalStateException("This user is already banned!");
         } else {
-            if (!userIsBanned(gid, uid))
+            if (!userIsBanned(uid))
                 throw new IllegalStateException("This user is not banned!");
         }
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
         final var usersArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.USERS.toString());
         final var userObj = usersArr.getJSONObject(getIndexOfObjectInArray(usersArr, Fields.USER_ID, uid));
@@ -156,31 +165,31 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public boolean userIsBanned(long gid, long uid) {
-        if (!userExists(gid, uid))
-            addUser(gid, uid);
-        return getUser(gid, uid).isBanned();
+    public boolean userIsBanned(long uid) {
+        if (!userExists(uid))
+            addUser(uid);
+        return getUser(uid).isBanned();
     }
 
-    public boolean userHasReminders(long gid, long uid) {
-        if (!userExists(gid, uid))
+    public boolean userHasReminders(long uid) {
+        if (!userExists(uid))
             return false;
-        return getReminders(gid, uid) != null;
+        return getReminders(uid) != null;
     }
 
-    public List<Reminder> getReminders(long gid, long uid) {
-        return Collections.unmodifiableList(getUser(gid, uid).getReminders());
+    public List<Reminder> getReminders(long uid) {
+        return Collections.unmodifiableList(getUser(uid).getReminders());
     }
 
-    public ReminderUser getUser(long gid, long uid) {
-        JSONObject guildObject = getGuildObject(gid);
+    public ReminderUser getUser(long uid) {
+        JSONObject guildObject = getGuildObject();
 
         JSONObject reminderObj;
 
         try {
             reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
         } catch (JSONException e) {
-            update(gid);
+            update();
             try {
                 reminderObj = guildObject.getJSONObject(Fields.REMINDERS.toString());
             } catch (JSONException e2) {
@@ -214,8 +223,8 @@ public class RemindersConfig extends AbstractGuildConfig {
         }
     }
 
-    public List<ReminderUser> getAllGuildUsers(long gid) {
-        JSONObject guildObject = getGuildObject(gid);
+    public List<ReminderUser> getAllGuildUsers() {
+        JSONObject guildObject = getGuildObject();
 
         JSONObject reminderObj;
 
@@ -258,15 +267,15 @@ public class RemindersConfig extends AbstractGuildConfig {
         }
     }
 
-    public boolean guildHasReminders(long gid) {
-        return !getAllGuildUsers(gid).isEmpty();
+    public boolean guildHasReminders() {
+        return !getAllGuildUsers().isEmpty();
     }
 
-    public void banChannel(long gid, long cid) {
-        if (channelIsBanned(gid, cid))
+    public void banChannel(long cid) {
+        if (channelIsBanned(cid))
             throw new IllegalStateException("This channel is already banned!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
         final var channelsArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.BANNED_CHANNELS.toString());
 
@@ -275,11 +284,11 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public void unbanChannel(long gid, long cid) {
-        if (!channelIsBanned(gid, cid))
+    public void unbanChannel(long cid) {
+        if (!channelIsBanned(cid))
             throw new IllegalStateException("This channel is not banned!");
 
-        final var guildObj = getGuildObject(gid);
+        final var guildObj = getGuildObject();
         final var channelsArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
                 .getJSONArray(Fields.BANNED_CHANNELS.toString());
 
@@ -288,8 +297,8 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObj);
     }
 
-    public boolean channelIsBanned(long gid, long cid) {
-        final var guildObj = getGuildObject(gid);
+    public boolean channelIsBanned(long cid) {
+        final var guildObj = getGuildObject();
 
         try {
             JSONArray array = guildObj.getJSONObject(Fields.REMINDERS.toString())
@@ -298,21 +307,21 @@ public class RemindersConfig extends AbstractGuildConfig {
 
             return list.stream().anyMatch(obj -> ((long) obj) == cid);
         } catch (JSONException e) {
-            update(gid);
+            update();
             return false;
         }
     }
 
-    private boolean userExists(long gid, long uid) {
-        return getUser(gid, uid) != null;
+    private boolean userExists(long uid) {
+        return getUser(uid) != null;
     }
 
-    private JSONObject getSpecificReminder(long gid, long uid, int id) {
-        return getSpecificReminder(getGuildObject(gid), gid, uid, id);
+    private JSONObject getSpecificReminder(long uid, int id) {
+        return getSpecificReminder(getGuildObject(), uid, id);
     }
 
-    private JSONObject getSpecificReminder(JSONObject guildObj, long gid, long uid, int id) {
-        if (!userHasReminders(gid, uid))
+    private JSONObject getSpecificReminder(JSONObject guildObj, long uid, int id) {
+        if (!userHasReminders(uid))
             throw new NullPointerException("This user doesn't have any reminders in this guild!");
 
         final var userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
@@ -324,8 +333,8 @@ public class RemindersConfig extends AbstractGuildConfig {
         return userReminders.getJSONObject(id);
     }
 
-    private JSONArray getAllReminders(JSONObject guildObj, long gid, long uid) {
-        if (!userHasReminders(gid, uid))
+    private JSONArray getAllReminders(JSONObject guildObj, long uid) {
+        if (!userHasReminders(uid))
             throw new NullPointerException("This user doesn't have any reminders in this guild!");
 
         final var userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
@@ -338,8 +347,8 @@ public class RemindersConfig extends AbstractGuildConfig {
     }
 
     @Override
-    public void update(long gid) {
-        JSONObject guildObject = getGuildObject(gid);
+    public void update() {
+        JSONObject guildObject = getGuildObject();
 
         if (!guildObject.has(Fields.REMINDERS.toString())) {
             JSONObject reminderObj = new JSONObject();

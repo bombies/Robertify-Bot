@@ -33,23 +33,24 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        var guildConfig = new GuildConfig();
+        var guildConfig = new GuildConfig(guild);
 
         if (args.isEmpty()) {
             TextChannel channel = ctx.getChannel();
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            if (dedicatedChannelConfig.isChannelSet())
+                if (channel.getIdLong() == dedicatedChannelConfig.getChannelID()) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to this channel!")
                             .build()).queue();
                     return;
                 }
 
-            if (guildConfig.getAnnouncementChannelID(guild.getIdLong()) == channel.getIdLong()) {
+            if (guildConfig.getAnnouncementChannelID() == channel.getIdLong()) {
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "This is already the announcement channel.");
                 msg.replyEmbeds(eb.build()).queue();
             } else {
-                guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
+                guildConfig.setAnnouncementChannelID(channel.getIdLong());
 
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Set the announcement channel to: " + channel.getAsMention());
                 msg.replyEmbeds(eb.build()).queue();
@@ -73,14 +74,15 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
                 return;
             }
 
-            if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-                if (channel.getIdLong() == new DedicatedChannelConfig().getChannelID(guild.getIdLong())) {
+            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            if (dedicatedChannelConfig.isChannelSet())
+                if (channel.getIdLong() == dedicatedChannelConfig.getChannelID()) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to that channel!")
                             .build()).queue();
                     return;
                 }
 
-            guildConfig.setAnnouncementChannelID(guild.getIdLong(), channel.getIdLong());
+            guildConfig.setAnnouncementChannelID(channel.getIdLong());
 
             EmbedBuilder eb =  RobertifyEmbedUtils.embedMessage(guild, "You've set the announcement channel to: " +  channel.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
@@ -134,8 +136,8 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
 
         OptionMapping eventOption = event.getOption("channel");
         final var channel = eventOption != null ? eventOption.getAsGuildChannel() : event.getGuildChannel();
-        final var guildConfig = new GuildConfig();
         final var guild = event.getGuild();
+        final var guildConfig = new GuildConfig(guild);
 
         if (!(channel instanceof TextChannel)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The channel must be a **text** channel!").build())
@@ -143,13 +145,13 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
             return;
         }
 
-        if (guildConfig.getAnnouncementChannelID(event.getGuild().getIdLong()) == channel.getIdLong()) {
+        if (guildConfig.getAnnouncementChannelID() == channel.getIdLong()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, channel.getAsMention() + " is already the announcement channel").build())
                     .setEphemeral(true).queue();
             return;
         }
 
-        guildConfig.setAnnouncementChannelID(event.getGuild().getIdLong(), channel.getIdLong());
+        guildConfig.setAnnouncementChannelID(channel.getIdLong());
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have set the announcement channel to: " + channel.getAsMention()).build())
                 .setEphemeral(false)
                 .queue();

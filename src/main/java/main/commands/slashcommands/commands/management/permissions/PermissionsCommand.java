@@ -74,7 +74,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final var guild = msg.getGuild();
 
         try {
-            new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+            new PermissionsConfig(guild).addRoleToPermission(role.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
                     Pair.of("{permission}", perm),
                     Pair.of("{mentionable}", role.getAsMention())
@@ -101,7 +101,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final var guild = msg.getGuild();
 
         try {
-            new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+            new PermissionsConfig(guild).addPermissionToUser(user.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
                     Pair.of("{permission}", perm),
                     Pair.of("{mentionable}", user.getAsMention())
@@ -128,7 +128,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final var guild = msg.getGuild();
 
         try {
-            new PermissionsConfig().removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+            new PermissionsConfig(guild).removePermissionFromUser(user.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "Removed permission `"+perm+"` from: "+ user.getAsMention());
             msg.replyEmbeds(eb.build()).queue();
         } catch (IllegalArgumentException e) {
@@ -194,7 +194,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final var guild = msg.getGuild();
 
         try {
-            new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+            new PermissionsConfig(guild).removeRoleFromPermission(role.getIdLong(), Permission.valueOf(perm));
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
                     Pair.of("{mentionable}", role.getAsMention()),
                     Pair.of("{permission}", perm.toUpperCase())
@@ -279,7 +279,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_LIST, Pair.of("{permissions}", GeneralUtils.listToString(perms)));
             msg.replyEmbeds(eb.build()).queue();
         } else {
-            PermissionsConfig permissionsConfig = new PermissionsConfig();
+            PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
 
             if (GeneralUtils.stringIsID(GeneralUtils.getDigitsOnly(args.get(1)))) {
                 String id = GeneralUtils.getDigitsOnly(args.get(1));
@@ -293,10 +293,10 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                 }
 
                 if (user == null) {
-                    List<Integer> permCodes = permissionsConfig.getPermissionsForRoles(msg.getGuild().getIdLong(), role.getIdLong());
+                    List<Integer> permCodes = permissionsConfig.getPermissionsForRoles(role.getIdLong());
                     sendPermMessage(permCodes, msg, role);
                 } else {
-                    List<Integer> permCodes = permissionsConfig.getPermissionsForUser(msg.getGuild().getIdLong(), user.getIdLong());
+                    List<Integer> permCodes = permissionsConfig.getPermissionsForUser(user.getIdLong());
                     sendPermMessage(permCodes, msg, user);
                 }
             } else {
@@ -319,9 +319,9 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
     }
 
     protected List<String> getRolePerms(Guild guild, String perm) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         List<Role> roles = new ArrayList<>();
-        for (long s : permissionsConfig.getRolesForPermission(guild.getIdLong(), perm.toUpperCase()))
+        for (long s : permissionsConfig.getRolesForPermission(perm.toUpperCase()))
             roles.add(guild.getRoleById(s));
 
         List<String> rolesWithPerms = new ArrayList<>();
@@ -332,9 +332,9 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
     }
 
     protected List<String> getUserPerms(Guild guild, String perm) {
-        PermissionsConfig permissionsConfig = new PermissionsConfig();
+        PermissionsConfig permissionsConfig = new PermissionsConfig(guild);
         List<User> users = new ArrayList<>();
-        for (long s : permissionsConfig.getUsersForPermission(guild.getIdLong(), perm.toUpperCase()))
+        for (long s : permissionsConfig.getUsersForPermission(perm.toUpperCase()))
             users.add(GeneralUtils.retrieveUser(s));
 
         List<String> usersWithPerm = new ArrayList<>();
@@ -540,7 +540,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
-        final var config = new PermissionsConfig();
+        final var config = new PermissionsConfig(guild);
         final var path = event.getCommandPath().split("/");
 
         switch (path[1]) {
@@ -559,12 +559,12 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                     }
                     case "role" -> {
                         final var role = event.getOption("role").getAsRole();
-                        List<Integer> permCodes = config.getPermissionsForRoles(guild.getIdLong(), role.getIdLong());
+                        List<Integer> permCodes = config.getPermissionsForRoles(role.getIdLong());
                         sendPermMessage(event, permCodes, role);
                     }
                     case "user" -> {
                         final var user = event.getOption("user").getAsUser();
-                        List<Integer> permCodes = config.getPermissionsForUser(guild.getIdLong(), user.getIdLong());
+                        List<Integer> permCodes = config.getPermissionsForUser(user.getIdLong());
                         sendPermMessage(event, permCodes, user);
                     }
                 }
@@ -576,7 +576,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                         final var perm = event.getOption("permission").getAsString();
 
                         try {
-                            new PermissionsConfig().addRoleToPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+                            new PermissionsConfig(guild).addRoleToPermission(role.getIdLong(), Permission.valueOf(perm));
                             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
                                     Pair.of("{mentionable}", role.getAsMention()),
                                     Pair.of("{permission}", perm.toUpperCase())
@@ -605,7 +605,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                         final var perm = event.getOption("permission").getAsString();
 
                         try {
-                            new PermissionsConfig().addPermissionToUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+                            new PermissionsConfig(guild).addPermissionToUser(user.getIdLong(), Permission.valueOf(perm));
                             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                                     Pair.of("{mentionable}", user.getAsMention()),
                                     Pair.of("{permission}", perm.toUpperCase())
@@ -638,7 +638,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                         final var perm = event.getOption("permission").getAsString();
 
                         try {
-                            new PermissionsConfig().removeRoleFromPermission(guild.getIdLong(), role.getIdLong(), Permission.valueOf(perm));
+                            new PermissionsConfig(guild).removeRoleFromPermission(role.getIdLong(), Permission.valueOf(perm));
                             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
                                     Pair.of("{mentionable}", role.getAsMention()),
                                     Pair.of("{permission}", perm.toUpperCase())
@@ -667,7 +667,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                         final var perm = event.getOption("permission").getAsString();
 
                         try {
-                            new PermissionsConfig().removePermissionFromUser(guild.getIdLong(), user.getIdLong(), Permission.valueOf(perm));
+                            new PermissionsConfig(guild).removePermissionFromUser(user.getIdLong(), Permission.valueOf(perm));
                             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_REMOVED,
                                     Pair.of("{mentionable}", user.getAsMention()),
                                     Pair.of("{permission}", perm.toUpperCase())

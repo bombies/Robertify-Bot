@@ -2,6 +2,7 @@ package main.utils.json.changelog;
 
 import main.utils.json.GenericJSONField;
 
+@Deprecated
 public enum ChangeLogConfigField implements GenericJSONField {
     CURRENT_LOG("current_log"),
     PAST_LOGS("past_logs"),

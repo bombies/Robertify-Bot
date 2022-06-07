@@ -39,7 +39,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
 
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
-        final String prefix = new GuildConfig().getPrefix(guild.getIdLong());
+        final String prefix = new GuildConfig(guild).getPrefix();
 
         if (args.isEmpty()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_ARGS_USAGES, Pair.of("{usages}", getUsages(prefix))).build())
@@ -79,7 +79,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
         final RestrictedChannelsConfig.ChannelType field;
 
         if (voiceChannel != null) {
-            if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+            if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNELS_TOGGLED_OFF, Pair.of("{channelType}", "voice"))
                                 .build())
                         .queue();
@@ -89,7 +89,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
             channelId = voiceChannel.getIdLong();
             field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
-            if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+            if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNELS_TOGGLED_OFF, Pair.of("{channelType}", "text"))
                                 .build())
                         .queue();
@@ -105,7 +105,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
         }
 
         try {
-            new RestrictedChannelsConfig().addChannel(guild.getIdLong(), channelId, field);
+            new RestrictedChannelsConfig(guild).addChannel(channelId, field);
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild,
                                     RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                                     Pair.of("{channelId}", String.valueOf(channelId)),
@@ -143,7 +143,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
         final RestrictedChannelsConfig.ChannelType field;
 
         if (voiceChannel != null) {
-            if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+            if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNELS_TOGGLED_OFF, Pair.of("{channelType}", "voice"))
                                 .build())
                         .queue();
@@ -153,7 +153,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
             channelId = voiceChannel.getIdLong();
             field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
         } else if (textChannel != null) {
-            if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+            if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNELS_TOGGLED_OFF, Pair.of("{channelType}", "text"))
                                 .build())
                         .queue();
@@ -169,7 +169,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
         }
 
         try {
-            new RestrictedChannelsConfig().removeChannel(guild.getIdLong(), channelId, field);
+            new RestrictedChannelsConfig(guild).removeChannel(channelId, field);
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                             Pair.of("{channelId}", String.valueOf(channelId)),
                             Pair.of("{channelType}", field.toString())
@@ -185,12 +185,12 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
     }
 
     public void list(Message msg) {
-        final var config = new RestrictedChannelsConfig();
         final var guild = msg.getGuild();
+        final var config = new RestrictedChannelsConfig(guild);
 
         try {
-            final var tcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
-            final var vcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
+            final var tcs = config.restrictedChannelsToString(RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
+            final var vcs = config.restrictedChannelsToString(RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
 
             EmbedBuilder embedBuilder = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RestrictedChannelMessages.LISTING_RESTRICTED_CHANNELS);
 
@@ -280,7 +280,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
         if (!checks(event)) return;
 
-        final var config = new RestrictedChannelsConfig();
+        final var config = new RestrictedChannelsConfig(event.getGuild());
         switch (event.getSubcommandName()) {
             case "add" -> {
                 final var channel = event.getOption("channel").getAsGuildChannel();
@@ -289,7 +289,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 final RestrictedChannelsConfig.ChannelType field;
 
                 if (channel.getType().isAudio()) {
-                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                    if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
@@ -302,7 +302,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                     channelId = channel.getIdLong();
                     field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
                 } else if (channel.getType().isMessage()) {
-                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                    if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
                         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
@@ -323,7 +323,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 }
 
                 try {
-                    config.addChannel(guild.getIdLong(), channelId, field);
+                    config.addChannel(channelId, field);
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully added <#"
                                     + channelId + "> as a restricted "+ field +" channel!").build())
                             .queue();
@@ -345,7 +345,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 final RestrictedChannelsConfig.ChannelType field;
 
                 if (channel.getType().isAudio()) {
-                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                    if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
@@ -358,7 +358,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                     channelId = channel.getIdLong();
                     field = RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL;
                 } else if (channel.getType().isMessage()) {
-                    if (!new TogglesConfig().getToggle(guild, Toggles.RESTRICTED_TEXT_CHANNELS)) {
+                    if (!new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_TEXT_CHANNELS)) {
                         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, """
                                     This feature is toggled **OFF**.
 
@@ -379,7 +379,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 }
 
                 try {
-                    config.removeChannel(guild.getIdLong(), channelId, field);
+                    config.removeChannel(channelId, field);
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have successfully removed <#"
                                     + channelId + "> as a restricted "+ field +" channel!").build())
                             .queue();
@@ -398,8 +398,8 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 final var guild = event.getGuild();
 
                 try {
-                    final var tcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
-                    final var vcs = config.restrictedChannelsToString(guild.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
+                    final var tcs = config.restrictedChannelsToString(RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL);
+                    final var vcs = config.restrictedChannelsToString(RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL);
 
                     EmbedBuilder embedBuilder = RobertifyEmbedUtils.embedMessage(guild, "Listing all restricted channels");
                     embedBuilder.addField("Text Channels", tcs == null ? "No channels" : tcs.isEmpty() ? "No channels" : tcs, false);

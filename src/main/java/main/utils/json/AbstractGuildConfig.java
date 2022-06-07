@@ -4,6 +4,7 @@ import lombok.Getter;
 import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.database.mongodb.databases.GuildDB;
+import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,18 +13,18 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
     private final static Logger logger = LoggerFactory.getLogger(AbstractGuildConfig.class);
     @Getter
     private static GuildRedisCache cache;
-
-    public abstract void update(long gid);
-
-    public JSONObject getGuildObject(long gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
-        return cache.getGuildInfo(gid);
+    private final Guild guild;
+    private final long gid;
+    protected AbstractGuildConfig(Guild guild) {
+        this.guild = guild;
+        this.gid = guild.getIdLong();
     }
 
-    public JSONObject getGuildObject(String gid) {
-        if (!guildHasInfo(gid))
-            loadGuild(gid);
+    public abstract void update();
+
+    public JSONObject getGuildObject() {
+        if (!guildHasInfo())
+            loadGuild();
         return cache.getGuildInfo(gid);
     }
 
@@ -32,23 +33,15 @@ public abstract class AbstractGuildConfig implements AbstractJSON {
         cache = GuildRedisCache.getInstance();
     }
 
-    public boolean guildHasInfo(long gid) {
+    public boolean guildHasInfo() {
         return cache.guildHasInfo(gid);
     }
 
-    public boolean guildHasInfo(String gid) {
-        return cache.guildHasInfo(gid);
-    }
-
-    public void loadGuild(long gid) {
+    public void loadGuild() {
         cache.loadGuild(gid);
     }
 
-    public void loadGuild(String gid) {
-        cache.loadGuild(gid);
-    }
-
-    public void unloadGuild(long gid) {
+    public void unloadGuild() {
         cache.unloadGuild(gid);
     }
 

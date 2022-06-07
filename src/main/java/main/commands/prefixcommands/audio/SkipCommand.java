@@ -47,14 +47,15 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final Guild guild = ctx.getGuild();
+        final var togglesConfig = new TogglesConfig(guild);
 
-        if (!new TogglesConfig().isDJToggleSet(guild, this)) {
+        if (!togglesConfig.isDJToggleSet(this)) {
             msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();
             return;
         }
 
-        if (new TogglesConfig().getDJToggle(guild, this)) {
-            if (new TogglesConfig().getToggle(guild, Toggles.VOTE_SKIPS)) {
+        if (togglesConfig.getDJToggle(this)) {
+            if (togglesConfig.getToggle(Toggles.VOTE_SKIPS)) {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_DJ)) {
                     if (selfVoiceState.inVoiceChannel()) {
                         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
@@ -91,7 +92,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
 
         skip(guild);
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.SKIPPED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+        new LogUtils(guild).sendLog(LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.SKIPPED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIPPED).build();
     }
 
@@ -116,7 +117,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                 .setActionRow(
                         Button.of(ButtonStyle.SUCCESS, "voteskip:upvote:" + guild.getId(), "Vote")
                 ).queue(success -> {
-                    new LogUtils().sendLog(guild, LogType.TRACK_VOTE_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+                    new LogUtils(guild).sendLog(LogType.TRACK_VOTE_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
                     voteSkips.put(guild.getIdLong(), 1);
                     voteSkipMessages.put(guild.getIdLong(), Pair.of(channel.getIdLong(), success.getIdLong()) );
 
@@ -153,8 +154,8 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             scheduler.scheduleDisconnect(true);
         }
 
-        if (new DedicatedChannelConfig().isChannelSet(guild.getIdLong()))
-            new DedicatedChannelConfig().updateMessage(guild);
+        if (new DedicatedChannelConfig(guild).isChannelSet())
+            new DedicatedChannelConfig(guild).updateMessage();
 
         LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
@@ -227,7 +228,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                 .setActionRows()
                 .queue();
 
-        new LogUtils().sendLog(guild, LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIPPED_LOG,
+        new LogUtils(guild).sendLog(LogType.TRACK_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIPPED_LOG,
                 Pair.of("{title}", info.title),
                 Pair.of("{author}", info.author)
         );

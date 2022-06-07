@@ -60,12 +60,12 @@ public class PauseCommand implements ICommand {
             audioPlayer.setPaused(false);
             musicManager.setForcePaused(false);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.RESUMED);
-            new LogUtils().sendLog(guild, LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+            new LogUtils(guild).sendLog(LogType.PLAYER_RESUME, RobertifyLocaleMessage.PauseMessages.RESUMED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         } else {
             audioPlayer.setPaused(true);
             musicManager.setForcePaused(true);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PauseMessages.PAUSED);
-            new LogUtils().sendLog(guild, LogType.PLAYER_PAUSE, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
+            new LogUtils(guild).sendLog(LogType.PLAYER_PAUSE, RobertifyLocaleMessage.PauseMessages.PAUSED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         }
 
         return eb;

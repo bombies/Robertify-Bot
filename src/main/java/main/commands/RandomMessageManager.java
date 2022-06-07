@@ -57,7 +57,7 @@ public class RandomMessageManager {
     }
 
     public void randomlySendMessage(TextChannel channel) {
-        if (!new TogglesConfig().getToggle(channel.getGuild(), Toggles.TIPS))
+        if (!new TogglesConfig(channel.getGuild()).getToggle(Toggles.TIPS))
             return;
 
         if (!hasMessages()) return;

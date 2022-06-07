@@ -106,8 +106,7 @@ public class LoopCommand implements ICommand {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
         }
 
-        new LogUtils().sendLog(
-                guild,
+        new LogUtils(guild).sendLog(
                 LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
                 Pair.of("{user}", looper.getAsMention()),
                 Pair.of("{status}", (scheduler.repeating ? "looped" : "unlooped")),
@@ -150,7 +149,7 @@ public class LoopCommand implements ICommand {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
         }
 
-        new LogUtils().sendLog(guild, LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG, Pair.of("{user}", looper.getAsMention()), Pair.of("{status}", (scheduler.playlistRepeating ? "looped" : "unlooped")));
+        new LogUtils(guild).sendLog(LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG, Pair.of("{user}", looper.getAsMention()), Pair.of("{status}", (scheduler.playlistRepeating ? "looped" : "unlooped")));
         return eb;
     }
 

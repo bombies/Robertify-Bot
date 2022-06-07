@@ -85,7 +85,7 @@ public class RewindCommand implements ICommand {
         if (rewindToBeginning) {
             audioPlayer.seekTo(0L);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING);
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
+            new LogUtils(guild).sendLog(LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
                     Pair.of("{user}", user.getAsMention()),
                     Pair.of("{title}", info.title),
                     Pair.of("{author}", info.author)
@@ -105,7 +105,7 @@ public class RewindCommand implements ICommand {
 
             audioPlayer.seekTo(audioPlayer.getTrackPosition() - time);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RewindMessages.REWOUND_BY_DURATION, Pair.of("{duration}", String.valueOf(TimeUnit.MILLISECONDS.toSeconds(time))));
-            new LogUtils().sendLog(guild, LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
+            new LogUtils(guild).sendLog(LogType.TRACK_REWIND, RobertifyLocaleMessage.RewindMessages.REWIND_TO_BEGINNING_LOG,
                     Pair.of("{user}", user.getAsMention()),
                     Pair.of("{title}", info.title),
                     Pair.of("{author}", info.author),

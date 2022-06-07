@@ -55,7 +55,7 @@ public class DisconnectCommand implements ICommand {
         var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
         musicManager.leave();
-        new LogUtils().sendLog(guild, LogType.BOT_DISCONNECTED, disconnecter.getAsMention() + " has disconnected the bot.");
+        new LogUtils(guild).sendLog(LogType.BOT_DISCONNECTED, disconnecter.getAsMention() + " has disconnected the bot.");
         ResumeUtils.getInstance().removeInfo(guild);
         return RobertifyEmbedUtils.embedMessage(guild, "Disconnected!");
     }
