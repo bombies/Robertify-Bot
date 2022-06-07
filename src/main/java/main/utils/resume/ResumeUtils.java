@@ -28,7 +28,6 @@ public class ResumeUtils {
         if (!hasInfo(guild)) return;
 
         ResumeData.GuildResumeData info = data.getInfo(guild.getIdLong());
-        System.out.println(info);
         if (info == null)
             return;
 
