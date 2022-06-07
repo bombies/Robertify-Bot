@@ -6,7 +6,6 @@ import main.commands.RandomMessageManager;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
-import main.constants.RobertifyTheme;
 import main.constants.Toggles;
 import main.main.Config;
 import main.main.Robertify;
@@ -15,7 +14,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotBDCache;
-import main.utils.database.mongodb.databases.BotDB;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -27,7 +25,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.*;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -36,6 +37,8 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -45,6 +48,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 public abstract class AbstractSlashCommand extends AbstractInteraction {
+    private final static Logger logger = LoggerFactory.getLogger(AbstractSlashCommand.class);
+
     private Command command = null;
 
     public String getName() {
@@ -239,15 +244,31 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 );
         }
 
-        commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler().handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
-                owner -> owner.getUser()
-                        .openPrivateChannel().queue(channel -> {
-                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, I could not create slash commands in **"+g.getName()+"**" +
-                                            " due to being re-invited too many times. Try inviting me again tomorrow to fix this issue.").build())
+        commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                .handle(ErrorResponse.fromCode(30034), e -> g.retrieveOwner().queue(
+                    owner -> owner.getUser()
+                            .openPrivateChannel().queue(channel -> {
+                                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, I could not create slash commands in **"+g.getName()+"**" +
+                                                " due to being re-invited too many times. Try inviting me again tomorrow to fix this issue.").build())
+                                        .queue(null, new ErrorHandler()
+                                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, ex2 -> {}));
+                            })
+                    )
+                )
+                .handle(ErrorResponse.MISSING_ACCESS, e -> {
+                    logger.warn("I wasn't able to update commands in {}!", g.getName());
+                    g.retrieveOwner().queue(owner ->
+                        owner.getUser().openPrivateChannel().queue(channel ->
+                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, it seems I don't have permission to make slash commands in **"+ g.getName() +"**. 🙁\n" +
+                                                    "It's essential you enable this permission for me because this is the main entry point for Robertify. All the latest features will only be accessible through slash commands." +
+                                                    "\n\nYou can click on the button below to re-invite me with the correct permissions. 🙂")
+                                    .build())
+                                    .setActionRow(Button.link("https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Invite Me!"))
                                     .queue(null, new ErrorHandler()
-                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ex2 -> {}));
-                        })
-                ))
+                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, e2 -> logger.info("I wasn't able to send a private message to the owner of the guild {}", g.getName())))
+                        )
+                    );
+                })
         );
     }
 
