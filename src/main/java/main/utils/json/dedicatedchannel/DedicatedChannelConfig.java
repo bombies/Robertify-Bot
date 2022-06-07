@@ -1,6 +1,7 @@
 package main.utils.json.dedicatedchannel;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lombok.Getter;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
@@ -34,6 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class DedicatedChannelConfig extends AbstractGuildConfig {
     private final Guild guild;
@@ -247,20 +249,18 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public MessageAction buttonUpdateRequest(Message msg) {
-        return msg.editMessageComponents(
-                ActionRow.of(
-                        Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString())),
-                        Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString())),
-                        Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(RobertifyEmoji.PLAY_AND_PAUSE_EMOJI.toString())),
-                        Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.STOP_EMOJI.toString())),
-                        Button.of(ButtonStyle.PRIMARY, DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString()))
-                ),
-                ActionRow.of(
-                        Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromMarkdown(RobertifyEmoji.STAR_EMOJI.toString())),
-                        Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
-                        Button.of(ButtonStyle.SECONDARY, DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
-                        Button.of(ButtonStyle.DANGER, DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(RobertifyEmoji.QUIT_EMOJI.toString()))
-                ));
+        final var config = getConfig();
+
+        final var firstRow = ActionRow.of(ChannelConfig.Field.getFirstRow().stream()
+                .filter(field -> config.getState(field))
+                .map(field -> Button.of(ButtonStyle.PRIMARY, field.getId(), field.getEmoji()))
+                .toList());
+        final var secondRow = ActionRow.of(ChannelConfig.Field.getSecondRow().stream()
+                .filter(field -> config.getState(field))
+                .map(field -> Button.of(field.equals(ChannelConfig.Field.DISCONNECT) ? ButtonStyle.DANGER : ButtonStyle.SECONDARY, field.getId(), field.getEmoji()))
+                .toList());
+
+        return msg.editMessageComponents(firstRow, secondRow);
     }
 
     public void updateTopic() {
@@ -345,10 +345,12 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
 
         private JSONObject getConfig() {
-            final var dedicatedChannelObj = getFullConfig();
+            var dedicatedChannelObj = getFullConfig();
 
-            if (!dedicatedChannelObj.has(GuildDB.Field.DEDICATED_CHANNEL_CONFIG.toString()))
+            if (!dedicatedChannelObj.has(GuildDB.Field.DEDICATED_CHANNEL_CONFIG.toString())) {
                 initConfig();
+                dedicatedChannelObj = getFullConfig();
+            }
 
             return dedicatedChannelObj.getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_CONFIG.toString());
         }
@@ -359,16 +361,38 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
 
         public enum Field {
-            PREVIOUS,
-            REWIND,
-            PLAY_PAUSE,
-            STOP,
-            SKIP,
-            FAVOURITE,
-            LOOP,
-            SHUFFLE,
-            DISCONNECT,
-            FILTERS
+            PREVIOUS(DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString())),
+            REWIND(DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString())),
+            PLAY_PAUSE(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(RobertifyEmoji.PLAY_AND_PAUSE_EMOJI.toString())),
+            STOP(DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.STOP_EMOJI.toString())),
+            SKIP(DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())),
+            FAVOURITE(DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromMarkdown(RobertifyEmoji.STAR_EMOJI.toString())),
+            LOOP(DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
+            SHUFFLE(DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
+            DISCONNECT(DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(RobertifyEmoji.QUIT_EMOJI.toString())),
+            FILTERS("dedicatedfilters", null);
+
+            @Getter
+            private final String id;
+            @Getter
+            private final Emoji emoji;
+
+            Field(String id, Emoji emoji) {
+                this.id = id;
+                this.emoji = emoji;
+            }
+
+            public static List<Field> getFirstRow() {
+                return List.of(PREVIOUS, REWIND, PLAY_PAUSE, STOP, SKIP);
+            }
+
+            public static List<Field> getSecondRow() {
+                return List.of(FAVOURITE, LOOP, SHUFFLE, DISCONNECT);
+            }
+
+            public static List<Field> getFinalRow() {
+                return List.of(FILTERS);
+            }
         }
     }
 
