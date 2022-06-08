@@ -51,7 +51,7 @@ public class KaraokeFilter extends AbstractSlashCommand implements ICommand {
             filters.setKaraoke(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                             guild,
-                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Karaoke"))
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE)))
                     ).build())
                     .queue();
             new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Karaoke"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
@@ -59,7 +59,7 @@ public class KaraokeFilter extends AbstractSlashCommand implements ICommand {
             filters.setKaraoke(new Karaoke()).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                             guild,
-                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Karaoke"))
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE)))
                     ).build())
                     .queue();
             new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Karaoke"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));

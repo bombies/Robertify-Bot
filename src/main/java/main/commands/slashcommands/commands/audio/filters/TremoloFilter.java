@@ -51,7 +51,7 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
             filters.setTremolo(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                             guild,
-                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Tremolo"))
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.TREMOLO)))
                     ).build())
                     .queue();
             new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
@@ -59,7 +59,7 @@ public class TremoloFilter extends AbstractSlashCommand implements ICommand {
             filters.setTremolo(new Tremolo()).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                             guild,
-                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Tremolo"))
+                            localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.TREMOLO)))
                     ).build())
                     .queue();
             new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, ctx.getAuthor().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));

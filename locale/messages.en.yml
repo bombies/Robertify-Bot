@@ -58,6 +58,12 @@ tip_footer: "You can toggle tips by running \"toggle tips\""
 # FILTER MESSAGES
 filter_toggle_message: "You have turned **{status}** the **{filter}** filter"
 filter_toggle_log_message: "has turned the {filter} filter {status}"
+filter_select_placeholder: "Select a filter"
+eight_d: "8D"
+karaoke: "Karaoke"
+nightcore: "Nightcore"
+tremolo: "Tremolo"
+vibrato: "Vibrato"
 
 # CLEAR QUEUE MESSAGES
 cq_nothing_in_queue: "There is already nothing in the queue."

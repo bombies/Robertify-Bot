@@ -40,13 +40,4 @@ public class MenuPaginationTestCommand extends ListenerAdapter implements ITestC
     public String getHelp(String prefix) {
         return null;
     }
-
-    @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
-        final var selectedOption = event.getSelectedOptions().get(0).getValue();
-
-        if (!selectedOption.startsWith("Test")) return;
-
-        event.reply("You clicked: Test " + selectedOption.split(":")[1]).queue();
-    }
 }

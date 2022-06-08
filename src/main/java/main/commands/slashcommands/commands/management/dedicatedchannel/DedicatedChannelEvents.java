@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.management.dedicatedchannel;
 
+import lavalink.client.io.filters.*;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.ICommand;
 import main.commands.prefixcommands.audio.*;
@@ -23,15 +24,19 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class DedicatedChannelEvents extends ListenerAdapter {
@@ -379,6 +384,156 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         }
+    }
+
+    @Override
+    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+        if (!event.getComponentId().startsWith(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId()))
+            return;
+
+        final var guild = event.getGuild();
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        final var audioPlayer = musicManager.getPlayer();
+        final var filters = audioPlayer.getFilters();
+        final var member = event.getMember();
+        final var selfMember = guild.getSelfMember();
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        final var eventSelectedOptions = event.getSelectedOptions();
+        final var selectedOptions = eventSelectedOptions != null ? eventSelectedOptions.stream().map(SelectOption::getValue).toList() : List.of();
+
+        if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
+            return;
+
+        if (!selfMember.getVoiceState().inVoiceChannel()) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
+        if (!memberVoiceState.inVoiceChannel()) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        if (!memberVoiceState.getChannel().equals(selfMember.getVoiceState().getChannel())) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
+        final List<MessageEmbed> embedsToSend = new ArrayList<>();
+
+        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":8d")) {
+            if (filters.getRotation() == null) {
+                filters.setRotation(new Rotation()
+                        .setFrequency(0.05F)).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "8D"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "8D"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
+            }
+        } else {
+            if (filters.getRotation() != null) {
+                filters.setRotation(null).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D)))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D)), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+            }
+        }
+
+        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":karaoke")) {
+            if (filters.getKaraoke() == null) {
+                filters.setKaraoke(new Karaoke()).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Karaoke"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Karaoke"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
+            }
+        } else {
+            if (filters.getKaraoke() != null) {
+                filters.setKaraoke(null).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Karaoke"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Karaoke"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+            }
+        }
+
+        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":nightcore")) {
+            if (filters.getTimescale() == null) {
+                filters.setTimescale(new Timescale()
+                        .setPitch(1.5F)
+                ).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Nightcore"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Nightcore"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
+
+            }
+        } else {
+            if (filters.getTimescale() != null) {
+                filters.setTimescale(null).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Nightcore"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Nightcore"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+            }
+        }
+
+        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":tremolo")) {
+            if (filters.getTremolo() == null) {
+                filters.setTremolo(new Tremolo()).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Tremolo"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
+            }
+        } else {
+            if (filters.getTremolo() != null) {
+                filters.setTremolo(null).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Tremolo"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+
+            }
+        }
+
+        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":vibrato")) {
+            if (filters.getVibrato() == null) {
+                filters.setVibrato(new Vibrato()).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Vibrato"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS))));
+            }
+        } else {
+            if (filters.getVibrato() != null) {
+                filters.setVibrato(null).commit();
+                embedsToSend.add(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Vibrato"))
+                ).build());
+                new LogUtils(guild).sendLog(LogType.FILTER_TOGGLE, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE, Pair.of("{filter}", "Tremolo"), Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))));
+            }
+        }
+
+        event.replyEmbeds(embedsToSend).queue();
     }
 
     private boolean djCheck(AbstractSlashCommand command, Guild guild, Member user) {

@@ -257,17 +257,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 )
                 .handle(ErrorResponse.MISSING_ACCESS, e -> {
                     logger.warn("I wasn't able to update commands in {}!", g.getName());
-                    g.retrieveOwner().queue(owner ->
-                        owner.getUser().openPrivateChannel().queue(channel ->
-                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, it seems I don't have permission to make slash commands in **"+ g.getName() +"**. 🙁\n" +
-                                                    "It's essential you enable this permission for me because this is the main entry point for Robertify. All the latest features will only be accessible through slash commands." +
-                                                    "\n\nYou can click on the button below to re-invite me with the correct permissions. 🙂")
-                                    .build())
-                                    .setActionRow(Button.link("https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Invite Me!"))
-                                    .queue(null, new ErrorHandler()
-                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, e2 -> logger.info("I wasn't able to send a private message to the owner of the guild {}", g.getName())))
-                        )
-                    );
+//                    g.retrieveOwner().queue(owner ->
+//                        owner.getUser().openPrivateChannel().queue(channel ->
+//                            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(g, "Hey, it seems I don't have permission to make slash commands in **"+ g.getName() +"**. 🙁\n" +
+//                                                    "It's essential you enable this permission for me because this is the main entry point for Robertify. All the latest features will only be accessible through slash commands." +
+//                                                    "\n\nYou can click on the button below to re-invite me with the correct permissions. 🙂")
+//                                    .build())
+//                                    .setActionRow(Button.link("https://discord.com/oauth2/authorize?client_id=893558050504466482&permissions=269479308656&scope=bot%20applications.commands", "Invite Me!"))
+//                                    .queue(null, new ErrorHandler()
+//                                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, e2 -> logger.info("I wasn't able to send a private message to the owner of the guild {}", g.getName())))
+//                        )
+//                    );
                 })
         );
     }

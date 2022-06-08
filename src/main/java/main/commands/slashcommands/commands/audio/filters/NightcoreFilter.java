@@ -51,7 +51,7 @@ public class NightcoreFilter extends AbstractSlashCommand implements ICommand {
             filters.setTimescale(null).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                                     guild,
-                                    localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", "Nightcore"))
+                                    localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.NIGHTCORE)))
                             ).build()
                     )
                     .queue();
@@ -62,7 +62,7 @@ public class NightcoreFilter extends AbstractSlashCommand implements ICommand {
             ).commit();
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(
                                     guild,
-                                    localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", "Nightcore"))
+                                    localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_TOGGLE_MESSAGE, Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS)), Pair.of("{filter}", localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.NIGHTCORE)))
                             ).build()
                     )
                     .queue();

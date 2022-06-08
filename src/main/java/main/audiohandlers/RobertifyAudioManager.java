@@ -136,6 +136,7 @@ public class RobertifyAudioManager {
         try {
             joinVoiceChannel(null, guild.getVoiceChannelById(channelID), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -150,8 +151,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -173,8 +175,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -195,11 +198,11 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(ctx.getChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
-
         loadPlaylistShuffled(
                 memberVoiceState.getMember().getUser(),
                 trackUrl,
@@ -218,8 +221,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -241,8 +245,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -262,8 +267,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -283,8 +289,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -304,8 +311,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
 
@@ -325,8 +333,9 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(channel.getGuild());
 
         try {
-            joinVoiceChannel(channel, (VoiceChannel) memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
             return;
         }
         loadTrack(
@@ -397,8 +406,6 @@ public class RobertifyAudioManager {
         try {
             musicManager.getLink().connect(vc);
             musicManager.getScheduler().scheduleDisconnect(true);
-            final var guild = channel.getGuild();
-            ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         } catch (InsufficientPermissionException e) {
             if (channel != null)
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, Pair.of("{channel}", vc.getAsMention())).build())

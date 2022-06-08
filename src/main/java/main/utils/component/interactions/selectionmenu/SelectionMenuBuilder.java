@@ -141,7 +141,7 @@ public class SelectionMenuBuilder {
 
         SelectionMenu.Builder builder = SelectionMenu.create(name)
                 .setPlaceholder(placeholder)
-                .setRequiredRange(range.getLeft(), range.getLeft());
+                .setRequiredRange(range.getLeft(), range.getRight());
 
         for (SelectMenuOption val : options)
             if (val.getEmoji() == null)

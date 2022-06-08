@@ -66,7 +66,13 @@ public enum RobertifyLocaleMessage {
 
     public enum FilterMessages implements LocaleMessage {
         FILTER_TOGGLE_MESSAGE,
-        FILTER_TOGGLE_LOG_MESSAGE
+        FILTER_TOGGLE_LOG_MESSAGE,
+        FILTER_SELECT_PLACEHOLDER,
+        EIGHT_D,
+        KARAOKE,
+        NIGHTCORE,
+        TREMOLO,
+        VIBRATO
     }
 
     public enum ClearQueueMessages implements LocaleMessage {

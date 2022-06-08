@@ -9,6 +9,8 @@ import main.constants.RobertifyEmoji;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.component.interactions.selectionmenu.SelectMenuOption;
+import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
@@ -250,6 +252,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
     public MessageAction buttonUpdateRequest(Message msg) {
         final var config = getConfig();
+        final var localeManager = LocaleManager.getLocaleManager(msg.getGuild());
 
         final var firstRow = ActionRow.of(ChannelConfig.Field.getFirstRow().stream()
                 .filter(field -> config.getState(field))
@@ -259,8 +262,20 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 .filter(field -> config.getState(field))
                 .map(field -> Button.of(field.equals(ChannelConfig.Field.DISCONNECT) ? ButtonStyle.DANGER : ButtonStyle.SECONDARY, field.getId(), field.getEmoji()))
                 .toList());
+        final var thirdRow = ActionRow.of(SelectionMenuBuilder.of(
+                ChannelConfig.Field.FILTERS.id,
+                LocaleManager.getLocaleManager(msg.getGuild()).getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_SELECT_PLACEHOLDER),
+                Pair.of(0,5),
+                List.of(
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D), ChannelConfig.Field.FILTERS.id + ":8d"),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE), ChannelConfig.Field.FILTERS.id + ":karaoke"),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.NIGHTCORE), ChannelConfig.Field.FILTERS.id + ":nightcore"),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.TREMOLO), ChannelConfig.Field.FILTERS.id + ":tremolo"),
+                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.VIBRATO), ChannelConfig.Field.FILTERS.id + ":vibrato")
+                )
 
-        return msg.editMessageComponents(firstRow, secondRow);
+        ).build());
+        return  config.getState(ChannelConfig.Field.FILTERS) ? msg.editMessageComponents(firstRow, secondRow, thirdRow) : msg.editMessageComponents(firstRow, secondRow);
     }
 
     public void updateTopic() {

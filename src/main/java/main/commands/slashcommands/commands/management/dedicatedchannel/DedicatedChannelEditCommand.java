@@ -138,7 +138,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
                         Button.secondary("togglerqchannel:loop:" + event.getUser().getId(), localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP)).withEmoji(RobertifyEmoji.LOOP_EMOJI.getEmoji()),
                         Button.secondary("togglerqchannel:shuffle:" + event.getUser().getId(), localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE)).withEmoji(RobertifyEmoji.SHUFFLE_EMOJI.getEmoji()),
                         Button.secondary("togglerqchannel:disconnect:" + event.getUser().getId(), localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT)).withEmoji(RobertifyEmoji.QUIT_EMOJI.getEmoji()),
-                        Button.secondary("togglerqchannel:filters:" + event.getUser().getId(), localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)).withEmoji(RobertifyEmoji.FILTER_EMOJI.getEmoji()).asDisabled()
+                        Button.secondary("togglerqchannel:filters:" + event.getUser().getId(), localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)).withEmoji(RobertifyEmoji.FILTER_EMOJI.getEmoji())
                 )
                 .setEphemeral(true)
                 .queue();
