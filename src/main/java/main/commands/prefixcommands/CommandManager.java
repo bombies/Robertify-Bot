@@ -396,19 +396,9 @@ public class CommandManager {
                         }
                     }
 
-                    if (cmd.isPremiumCommand() && Robertify.getTopGGAPI() != null) {
-                        if (!new VoteManager().userVoted(ctx.getAuthor().getId(), VoteManager.Website.TOP_GG)
-                            && ctx.getAuthor().getIdLong() != 276778018440085505L) {
-                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                                            RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                                    .setActionRow(
-                                            Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                            Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                                    )
-                                    .queue();
+                    if (cmd.isPremiumCommand())
+                        if (!GeneralUtils.checkPremium(guild, ctx.getAuthor(), msg) && ctx.getAuthor().getIdLong() != 276778018440085505L)
                             return;
-                        }
-                    }
 
                     BotBDCache botDB = BotBDCache.getInstance();
                     String latestAlert = botDB.getLatestAlert().getLeft();

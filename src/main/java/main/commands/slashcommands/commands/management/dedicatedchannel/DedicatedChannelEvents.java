@@ -339,16 +339,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
-            if (!new VoteManager().userVoted(member.getId(), VoteManager.Website.TOP_GG)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                                RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                        .addActionRow(
-                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                        )
-                        .queue();
+            if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
                 return;
-            }
 
             if (!djCheck(new PreviousTrackCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
@@ -362,16 +354,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
-            if (!new VoteManager().userVoted(member.getId(), VoteManager.Website.TOP_GG)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
-                                RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                        .addActionRow(
-                                Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                                Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                        )
-                        .queue();
+            if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
                 return;
-            }
 
             if (!djCheck(new FavouriteTracksCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())

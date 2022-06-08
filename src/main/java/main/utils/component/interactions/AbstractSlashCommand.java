@@ -364,17 +364,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return true;
 
         User user = event.getUser();
-        if (!new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG)
-                && user.getIdLong() != 276778018440085505L) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(event.getGuild(),
-                            RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                    .addActionRow(
-                            Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                            Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                    )
-                    .queue();
+        if (!GeneralUtils.checkPremium(event.getGuild(), user, event) && user.getIdLong() != 276778018440085505L)
             return false;
-        }
+
         return true;
     }
 

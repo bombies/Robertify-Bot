@@ -18,6 +18,7 @@ import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -649,6 +650,24 @@ public class GeneralUtils {
     }
 
     public static boolean checkPremium(Guild guild, User user, GenericComponentInteractionCreateEvent event) {
+        if (Robertify.getTopGGAPI() == null)
+            return true;
+
+        if (new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG))
+            return true;
+
+        event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
+                        RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
+                .addActionRow(
+                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
+                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
+                )
+                .setEphemeral(true)
+                .queue();
+        return false;
+    }
+
+    public static boolean checkPremium(Guild guild, User user, GenericInteractionCreateEvent event) {
         if (Robertify.getTopGGAPI() == null)
             return true;
 
