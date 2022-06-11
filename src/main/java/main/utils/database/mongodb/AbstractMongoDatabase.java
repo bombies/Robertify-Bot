@@ -7,10 +7,8 @@ import lombok.Getter;
 import main.constants.Database;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
-import main.utils.database.mongodb.cache.GuildDBCache;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
-import main.utils.database.mongodb.databases.BotDB;
-import main.utils.database.mongodb.databases.GuildDB;
+import main.utils.database.mongodb.cache.redis.PremiumRedisCache;
 import main.utils.json.GenericJSONField;
 import org.bson.BsonArray;
 import org.bson.BsonObjectId;
@@ -59,6 +57,7 @@ public abstract class AbstractMongoDatabase {
     public static void initAllCaches() {
         BotBDCache.initCache();
         GuildRedisCache.initCache();
+        PremiumRedisCache.initCache();
         FavouriteTracksCache.initCache();
 //        StatisticsDB.INSTANCE.init();
 
@@ -142,8 +141,8 @@ public abstract class AbstractMongoDatabase {
         upsertDocument(Document.parse(obj.toString()));
     }
 
-    protected void addDocument(JSONObject obj) {
-        collection.insertOne(Document.parse(obj.toString()));
+    protected BsonObjectId addDocument(JSONObject obj) {
+        return collection.insertOne(Document.parse(obj.toString())).getInsertedId().asObjectId();
     }
 
     protected void removeDocument(Document doc) {

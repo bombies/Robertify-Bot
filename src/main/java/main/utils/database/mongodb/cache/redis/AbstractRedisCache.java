@@ -91,6 +91,11 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
         mongoDB.init();
     }
 
+    public void addToCache(String identifier, JSONObject obj) {
+        final var objectID = addDocument(obj);
+        jedis.setex(cacheID + identifier, 3600, obj.put("_id", objectID.getValue().toString()).toString());
+    }
+
     @SneakyThrows
     public void updateCache(String identifier, Document oldDoc,  Document document) {
         jedis.del(identifier);
@@ -103,6 +108,13 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
         jedis.del(identifier);
         jedis.setex(cacheID + identifier, 3600, documentToJSON(document));
         upsertDocument(document);
+    }
+
+    @SneakyThrows
+    public void updateCache(String identifier, JSONObject object) {
+        jedis.del(identifier);
+        jedis.setex(cacheID + identifier, 3600, object.toString());
+        upsertDocument(object);
     }
 
     public void updateCacheObjects(HashMap<String, JSONObject> objects) {

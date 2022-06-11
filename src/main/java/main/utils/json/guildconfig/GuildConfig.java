@@ -193,6 +193,25 @@ public class GuildConfig extends AbstractGuildConfig {
         getCache().setField(gid, GuildDB.Field.TWENTY_FOUR_SEVEN, status);
     }
 
+    public boolean isPremium() {
+        if (!guildHasInfo())
+            loadGuild();
+
+        if (!getCache().hasField(gid, GuildDB.Field.PREMIUM)) {
+            getCache().setField(gid, GuildDB.Field.PREMIUM, false);
+            return false;
+        }
+
+        return (boolean) getCache().getField(gid, GuildDB.Field.PREMIUM);
+    }
+
+    public void setPremium(boolean status) {
+        if (!guildHasInfo())
+            loadGuild();
+
+        getCache().setField(gid, GuildDB.Field.PREMIUM, status);
+    }
+
     @Override
     public void update() {
         // Nothing
