@@ -105,6 +105,7 @@ public class MoveCommand implements ICommand {
         return RobertifyEmbedUtils.embedMessage(guild,
                 RobertifyLocaleMessage.MoveMessages.MOVED,
                 Pair.of("{title}", info.title),
+                Pair.of("{author}", info.author),
                 Pair.of("{position}", String.valueOf(position))
         );
     }
