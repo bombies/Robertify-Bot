@@ -98,14 +98,14 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             case "tracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))
-                    link = "ytsearch:" + link;
+                    link = "ytmsearch:" + link;
 
                 handlePlayTracks(event, guild, member, link, false);
             }
             case "nexttracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))
-                    link = "ytsearch:" + link;
+                    link = "ytmsearch:" + link;
 
                 handlePlayTracks(event, guild, member, link, true);
             }

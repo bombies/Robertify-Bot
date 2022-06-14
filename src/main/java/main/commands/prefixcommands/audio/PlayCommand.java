@@ -146,7 +146,7 @@ public class PlayCommand implements ICommand {
         }
 
         if (!GeneralUtils.isUrl(link))
-            link = "ytsearch:" + link;
+            link = "ytmsearch:" + link;
 
         String finalLink = link;
         boolean finalAddToBeginning = addToBeginning;

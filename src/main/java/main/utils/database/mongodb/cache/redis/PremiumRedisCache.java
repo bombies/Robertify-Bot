@@ -19,7 +19,7 @@ public class PremiumRedisCache extends AbstractRedisCache {
     }
 
     public static void initCache() {
-        logger.debug("Instantiating new Guild cache");
+        logger.debug("Instantiating new premium cache");
         instance = new PremiumRedisCache();
     }
 
@@ -31,7 +31,6 @@ public class PremiumRedisCache extends AbstractRedisCache {
                 .put(PremiumDB.Field.PREMIUM_SERVERS.toString(), new JSONArray())
                 .put(PremiumDB.Field.PREMIUM_STARTED.toString(), premiumStarted)
                 .put(PremiumDB.Field.PREMIUM_EXPIRES.toString(), premiumExpires)
-
         );
     }
 
