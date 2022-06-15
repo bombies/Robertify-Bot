@@ -108,10 +108,11 @@ public class RobertifyAPI {
         String error = null;
         if (premiumInfo.code() != 200)
             error = new JSONObject(premiumInfo.body().string()).getJSONObject("error").getString("message");
-        premiumInfo.close();
 
-        if (error != null)
+        if (error != null) {
+            premiumInfo.close();
             throw new IllegalArgumentException(error);
+        }
 
         final var premiumObj = new JSONObject(premiumInfo.body().string());
         premiumInfo.close();
