@@ -117,9 +117,8 @@ public class RobertifyAPI {
         final var premiumObj = new JSONObject(premiumInfo.body().string());
         premiumInfo.close();
 
-        if (premiumObj.has("error")) {
+        if (premiumObj.has("error"))
             throw new IllegalArgumentException(premiumObj.getJSONObject("error").getString("message"));
-        }
 
         return new RobertifyPremium(
                 premiumObj.getString("user_id"),
@@ -156,7 +155,6 @@ public class RobertifyAPI {
         String error = null;
         if (response.code() != 200) {
             JSONObject jsonObject = new JSONObject(response.body().string());
-            logger.error(jsonObject.toString(4));
             if (jsonObject.get("error") instanceof String)
                 error = jsonObject.getString("error");
             else
@@ -190,7 +188,7 @@ public class RobertifyAPI {
     public void updateUserTier(long userId, int tier) {
         final var premiumInfo = getPremiumInfo(userId);
         if (premiumInfo == null)
-            throw new IllegalArgumentException("There is not information for user with that ID!");
+            throw new IllegalArgumentException("There is no information for user with that ID!");
         Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
                 .addHeader("auth-token", accessToken)
                 .patch(RequestBody.create(
@@ -200,6 +198,7 @@ public class RobertifyAPI {
                                 .put("user_email", premiumInfo.getEmail())
                                 .put("premium_type", premiumInfo.getType())
                                 .put("premium_tier", tier)
+                                .put("premium_servers", new JSONArray())
                                 .put("premium_started", String.valueOf(premiumInfo.getStartedAt()))
                                 .put("premium_expires", String.valueOf(premiumInfo.getEndsAt()))
                                 .toString()

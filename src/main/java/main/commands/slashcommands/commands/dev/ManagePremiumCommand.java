@@ -117,7 +117,7 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
                                 .queue()
                         );
                     } else {
-                        robertifyAPI.addPremiumUser(userID, 0, tier, 32503680001L);
+                        robertifyAPI.addPremiumUser(userID, 0, tier, 32503680000000L);
                         Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
                                         RobertifyEmbedUtils.embedMessage(
                                                 guild,
@@ -152,9 +152,9 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
 
                 try {
                     robertifyAPI.updateUserTier(userID, tier);
-                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
-                                guild,
-                                "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
+                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
                         ).build()).queue()
                     );
 
