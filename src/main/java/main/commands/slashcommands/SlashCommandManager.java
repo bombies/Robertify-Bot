@@ -1,6 +1,7 @@
 package main.commands.slashcommands;
 
 import lombok.Getter;
+import main.commands.slashcommands.commands.dev.ManagePremiumCommand;
 import main.commands.slashcommands.commands.audio.*;
 import main.commands.slashcommands.commands.management.*;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
@@ -120,7 +121,8 @@ public class SlashCommandManager {
                 new ShardInfoCommand(),
                 new SendAlertCommand(),
                 new PostCommandInfoCommand(),
-                new RefreshSpotifyTokenCommand()
+                new RefreshSpotifyTokenCommand(),
+                new ManagePremiumCommand()
         );
     }
 
