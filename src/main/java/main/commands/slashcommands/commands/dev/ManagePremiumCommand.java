@@ -1,6 +1,8 @@
 package main.commands.slashcommands.commands.dev;
 
+import main.constants.TimeFormat;
 import main.main.Robertify;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -106,8 +108,24 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
                 try {
                     if (expiration != -1) {
                         robertifyAPI.addPremiumUser(userID, 0, tier, expiration);
+
+                        final var user = Robertify.getShardManager().getUserById(userID);
+                        event.getHook().sendMessageEmbeds(
+                                RobertifyEmbedUtils.embedMessage(
+                                        guild,
+                                        "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user permanently."
+                                ).build())
+                                .queue();
                     } else {
                         robertifyAPI.addPremiumUser(userID, 0, tier, 32503680001L);
+
+                        final var user = Robertify.getShardManager().getUserById(userID);
+                        event.getHook().sendMessageEmbeds(
+                                        RobertifyEmbedUtils.embedMessage(
+                                                guild,
+                                                "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user until `"+ GeneralUtils.formatDate(expiration, TimeFormat.DD_M_YYYY_HH_MM_SS) +"`."
+                                        ).build())
+                                .queue();
                     }
                 } catch (IllegalArgumentException e) {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
@@ -117,6 +135,13 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
             case "remove" -> {
                 try {
                     robertifyAPI.deletePremiumUser(userID);
+
+                    final var user = Robertify.getShardManager().getUserById(userID);
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            "You have successfully removed " + user.getName() + "#" + user.getDiscriminator() + " as a premium user."
+                    ).build())
+                            .queue();
                 } catch (IllegalArgumentException e) {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                             .queue();
@@ -127,6 +152,12 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
 
                 try {
                     robertifyAPI.updateUserTier(userID, tier);
+
+                    final var user = Robertify.getShardManager().getUserById(userID);
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
+                    ).build());
                 } catch (IllegalArgumentException e) {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                             .queue();
