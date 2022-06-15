@@ -114,7 +114,8 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
                                                 guild,
                                                 "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user until `"+ GeneralUtils.formatDate(expiration, TimeFormat.DD_M_YYYY_HH_MM_SS) +"`."
                                         ).build())
-                                .queue());
+                                .queue()
+                        );
                     } else {
                         robertifyAPI.addPremiumUser(userID, 0, tier, 32503680001L);
                         Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
@@ -122,7 +123,8 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
                                                 guild,
                                                 "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user permanently."
                                         ).build())
-                                .queue());
+                                .queue()
+                        );
 
                     }
                 } catch (IllegalArgumentException e) {
@@ -138,7 +140,8 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
                                     guild,
                                     "You have successfully removed " + user.getName() + "#" + user.getDiscriminator() + " as a premium user."
                             ).build())
-                            .queue());
+                            .queue()
+                    );
                 } catch (IllegalArgumentException e) {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
                             .queue();
@@ -149,10 +152,11 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
 
                 try {
                     robertifyAPI.updateUserTier(userID, tier);
-                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
-                            guild,
-                            "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
-                    ).build()));
+                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                                guild,
+                                "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
+                        ).build()).queue()
+                    );
 
                 } catch (IllegalArgumentException e) {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
