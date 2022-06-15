@@ -116,8 +116,9 @@ public class RobertifyAPI {
         final var premiumObj = new JSONObject(premiumInfo.body().string());
         premiumInfo.close();
 
-        if (premiumObj.has("error"))
+        if (premiumObj.has("error")) {
             throw new IllegalArgumentException(premiumObj.getJSONObject("error").getString("message"));
+        }
 
         return new RobertifyPremium(
                 premiumObj.getString("user_id"),
@@ -142,7 +143,7 @@ public class RobertifyAPI {
                         MediaType.get("application/json"),
                         new JSONObject()
                                 .put("user_id", String.valueOf(userId))
-                                .put("user_email", "")
+                                .put("user_email", "thisdocumentwasforced@email.com")
                                 .put("premium_type", premiumType)
                                 .put("premium_tier", premiumTier)
                                 .put("premium_started", String.valueOf(System.currentTimeMillis()))
@@ -152,8 +153,14 @@ public class RobertifyAPI {
                 .build()).execute();
 
         String error = null;
-        if (response.code() != 200)
-            error = new JSONObject(response.body().string()).getJSONObject("error").getString("message");
+        if (response.code() != 200) {
+            JSONObject jsonObject = new JSONObject(response.body().string());
+            logger.error(jsonObject.toString(4));
+            if (jsonObject.get("error") instanceof String)
+                error = jsonObject.getString("error");
+            else
+                error = jsonObject.getJSONObject("error").getString("message");
+        }
         response.close();
 
         if (error != null)
@@ -181,6 +188,8 @@ public class RobertifyAPI {
     @SneakyThrows
     public void updateUserTier(long userId, int tier) {
         final var premiumInfo = getPremiumInfo(userId);
+        if (premiumInfo == null)
+            throw new IllegalArgumentException("There is not information for user with that ID!");
         Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
                 .addHeader("auth-token", accessToken)
                 .patch(RequestBody.create(
