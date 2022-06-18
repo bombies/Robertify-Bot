@@ -124,6 +124,7 @@ public class Listener extends ListenerAdapter {
                         logger.error("Insufficient permissions", e);
                     }
                 }
+                return;
             }
 
             if (guildConfig.isBannedUser(user.getIdLong())) {
