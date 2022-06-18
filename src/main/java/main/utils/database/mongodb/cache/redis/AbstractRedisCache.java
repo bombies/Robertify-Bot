@@ -3,6 +3,8 @@ package main.utils.database.mongodb.cache.redis;
 import com.mongodb.client.MongoCollection;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.databases.GuildDB;
@@ -31,7 +33,7 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
     protected AbstractRedisCache(String cacheID, AbstractMongoDatabase mongoDB) {
         super(mongoDB);
         this.collection = mongoDB.getCollection();
-        this.cacheID = cacheID + "#";
+        this.cacheID = cacheID + "#" + Config.get(ENV.MONGO_DATABASE_NAME) + "#";
         this.jedis = RedisDB.getInstance().getJedis();
         this.mongoDB = mongoDB;
     }
