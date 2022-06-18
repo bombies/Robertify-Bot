@@ -1,6 +1,8 @@
 package main.utils.database.mongodb.cache.redis;
 
 import com.mongodb.client.MongoCollection;
+import main.constants.ENV;
+import main.main.Config;
 import main.utils.json.AbstractJSON;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -17,7 +19,7 @@ public class RedisCache implements AbstractJSON {
     private final JedisPooled jedis;
 
     protected RedisCache(String cacheID) {
-        this.cacheID = cacheID + "#";
+        this.cacheID = cacheID + "#"+ Config.get(ENV.MONGO_DATABASE_NAME) +"#";
         this.jedis = RedisDB.getInstance().getJedis();
     }
 
