@@ -97,8 +97,7 @@ public class GuildDB extends AbstractMongoDatabase {
         EIGHT_BALL_ARRAY("eight_ball"),
         THEME("theme"),
         TWENTY_FOUR_SEVEN("twenty_four_seven_mode"),
-        LOG_CHANNEL("log_channel"),
-        PREMIUM("premium");
+        LOG_CHANNEL("log_channel");
 
         private final String str;
 

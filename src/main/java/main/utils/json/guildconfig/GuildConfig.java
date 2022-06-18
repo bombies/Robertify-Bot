@@ -1,5 +1,6 @@
 package main.utils.json.guildconfig;
 
+import main.main.Robertify;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
@@ -194,22 +195,7 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     public boolean isPremium() {
-        if (!guildHasInfo())
-            loadGuild();
-
-        if (!getCache().hasField(gid, GuildDB.Field.PREMIUM)) {
-            getCache().setField(gid, GuildDB.Field.PREMIUM, false);
-            return false;
-        }
-
-        return (boolean) getCache().getField(gid, GuildDB.Field.PREMIUM);
-    }
-
-    public void setPremium(boolean status) {
-        if (!guildHasInfo())
-            loadGuild();
-
-        getCache().setField(gid, GuildDB.Field.PREMIUM, status);
+        return Robertify.getRobertifyAPI().guildIsPremium(gid);
     }
 
     @Override

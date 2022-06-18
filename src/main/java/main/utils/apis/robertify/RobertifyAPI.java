@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.List;
 
 public class RobertifyAPI {
     private final Logger logger = LoggerFactory.getLogger(RobertifyAPI.class);
@@ -212,5 +213,28 @@ public class RobertifyAPI {
 
         if (error != null)
             throw new IllegalArgumentException(error);
+    }
+
+    public boolean guildIsPremium(long gid) {
+        return guildIsPremium(String.valueOf(gid));
+    }
+
+    @SneakyThrows
+    public boolean guildIsPremium(String gid) {
+        return getPremiumGuilds().contains(gid);
+    }
+
+    @SneakyThrows
+    private List<String> getPremiumGuilds() {
+        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
+                        .addHeader("auth-token", accessToken)
+                        .build())
+                .execute();
+        final var responseObj = new JSONArray(response.body().string());
+        response.close();
+        return responseObj.toList()
+                .stream()
+                .map(String::valueOf)
+                .toList();
     }
 }
