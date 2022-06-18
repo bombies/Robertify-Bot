@@ -49,6 +49,9 @@ no_embed_perms: "⚠️ I don't have permission to send embeds!\n\nPlease tell a
 unread_alert: "⚠️ You have an unread alert!\nRun the `alert` command to view this alert."
 unread_alert_mention: "⚠️ {user}, you have an unread alert!\nRun the `alert` command to view this alert."
 disabled_feature: "This feature has been disabled in this server!"
+premium_instance_needed: "This server must be upgraded to premium before this instance can be used!"
+premium_embed_title: "Premium Bot"
+premium_upgrade_button: "Upgrade to Premium!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"

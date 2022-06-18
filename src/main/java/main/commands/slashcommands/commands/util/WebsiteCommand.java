@@ -54,7 +54,7 @@ public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         event.replyEmbeds(getEmbed(event.getGuild()))
                 .addActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))

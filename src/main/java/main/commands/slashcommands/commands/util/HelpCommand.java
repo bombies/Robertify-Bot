@@ -157,8 +157,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     @Override @SneakyThrows
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
-        if (!banCheck(event)) return;
+        if (!checks(event)) return;
 
         final var guild = event.getGuild();
         if (event.getOptions().isEmpty()) {

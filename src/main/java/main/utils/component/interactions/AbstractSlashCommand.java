@@ -295,8 +295,10 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!banCheck(event)) return false;
         if (!restrictedChannelCheck(event)) return false;
         if (!botPermsCheck(event)) return false;
+        if (!premiumBotCheck(event)) return false;
 
-        if (!command.name.equalsIgnoreCase("alert") && !command.name.equalsIgnoreCase("sendalert")) {
+        if (command == null) buildCommand();
+        if (new SlashCommandManager().isMusicCommand(this)) {
             final var botDB = BotBDCache.getInstance();
             final var latestAlert = botDB.getLatestAlert().getLeft();
             final var user = event.getUser();
@@ -366,6 +368,23 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         User user = event.getUser();
         if (!GeneralUtils.checkPremium(event.getGuild(), user, event) && user.getIdLong() != 276778018440085505L)
             return false;
+
+        return true;
+    }
+
+    protected boolean premiumBotCheck(SlashCommandEvent event) {
+        if (command == null)
+            buildCommand();
+        if (!Config.isPremiumBot())
+            return true;
+
+        final var guild = event.getGuild();
+        if (!new GuildConfig(guild).isPremium()) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.GeneralMessages.PREMIUM_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.PREMIUM_INSTANCE_NEEDED).build())
+                    .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
+                    .queue();
+            return false;
+        }
 
         return true;
     }

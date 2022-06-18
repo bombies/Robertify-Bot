@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -107,16 +108,43 @@ public class Listener extends ListenerAdapter {
         if (user.isBot() || event.isWebhookMessage()) return;
 
         if (raw.startsWith(prefix) && raw.length() > prefix.length()) {
+            final var localeManager = LocaleManager.getLocaleManager(guild);
+            if (Config.isPremiumBot() && !guildConfig.isPremium()) {
+                try {
+                    event.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.GeneralMessages.PREMIUM_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.PREMIUM_INSTANCE_NEEDED)
+                                    .build())
+                            .setActionRow(Button.link("https://robertify.me/premium", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
+                            .queue();
+                } catch (InsufficientPermissionException e) {
+                    if (e.getMessage().contains("Permission.MESSAGE_EMBED_LINKS")) {
+                        event.getChannel().sendMessage(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_INSTANCE_NEEDED))
+                                .setActionRow(Button.link("https://robertify.me/premium", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
+                                .queue();
+                    } else {
+                        logger.error("Insufficient permissions", e);
+                    }
+                }
+            }
+
             if (guildConfig.isBannedUser(user.getIdLong())) {
-                message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
-                        .queue();
+                try {
+                    message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS).build())
+                            .queue();
+                } catch (InsufficientPermissionException e) {
+                    if (e.getMessage().contains("Permission.MESSAGE_EMBED_LINKS")) {
+                        event.getChannel().sendMessage(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.BANNED_FROM_COMMANDS))
+                                .queue();
+                    } else {
+                        logger.error("Insufficient permissions", e);
+                    }
+                }
             } else {
                 try {
                     manager.handle(event);
                 } catch (InsufficientPermissionException e) {
                     try {
                         if (e.getMessage().contains("Permission.MESSAGE_EMBED_LINKS")) {
-                            event.getChannel().sendMessage(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
+                            event.getChannel().sendMessage(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
                                     .queue();
                         } else {
                             logger.error("Insufficient permissions", e);

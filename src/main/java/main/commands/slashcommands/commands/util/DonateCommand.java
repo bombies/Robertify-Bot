@@ -57,7 +57,7 @@ public class DonateCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(
                         event.getGuild(),

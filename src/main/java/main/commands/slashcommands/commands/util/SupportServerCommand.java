@@ -50,7 +50,7 @@ public class SupportServerCommand extends AbstractSlashCommand implements IComma
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event)) return;
+        if (!checks(event)) return;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.SupportServerMessages.JOIN_SUPPORT_SERVER).build())
                 .setEphemeral(true)

@@ -74,7 +74,7 @@ public class PlaytimeCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public void onSlashCommand(@NotNull SlashCommandEvent event) {
-        if (!nameCheck(event))
+        if (!checks(event))
             return;
 
         event.replyEmbeds(handlePlaytime(event.getGuild())).queue();

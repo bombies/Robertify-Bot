@@ -62,12 +62,20 @@ public class Config {
         return getLong(ENV.OWNER_ID);
     }
 
+    public static boolean isPremiumBot() {
+        return getBoolean(ENV.PREMIUM_BOT);
+    }
+
     public static int getInt(ENV key) {
         return Integer.parseInt(get(key));
     }
 
     public static long getLong(ENV key) {
         return Long.parseLong(get(key));
+    }
+
+    public static boolean getBoolean(ENV key) {
+        return Boolean.parseBoolean(get(key));
     }
 
     @SneakyThrows
