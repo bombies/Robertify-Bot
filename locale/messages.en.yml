@@ -293,7 +293,7 @@ theme_light: "Light"
 
 # PREMIUM MESSAGES
 locked_command_embed_title: "🔒 Locked Command"
-locked_command_embed_desc: "Woah there! You must vote before interacting with this command!\nClick on each of the buttons below to vote!"
+locked_command_embed_desc: "Woah there! You must upgrade your server to **Premium** before interacting with this command!\nClick on the button below to upgrade now!"
 
 # TOGGLES MESSAGES
 toggles_embed_title: "Toggles"

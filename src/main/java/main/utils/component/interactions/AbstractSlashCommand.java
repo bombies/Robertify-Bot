@@ -8,7 +8,6 @@ import main.constants.BotConstants;
 import main.constants.Permission;
 import main.constants.Toggles;
 import main.main.Config;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
@@ -19,7 +18,6 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -30,12 +28,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
 import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -361,12 +357,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!command.isPremium)
             return true;
 
-        DiscordBotListAPI topGGAPI = Robertify.getTopGGAPI();
-        if (topGGAPI == null)
-            return true;
-
         User user = event.getUser();
-        if (!GeneralUtils.checkPremium(event.getGuild(), user, event) && user.getIdLong() != 276778018440085505L)
+        if (!GeneralUtils.checkPremium(event.getGuild(), event) && user.getIdLong() != 276778018440085505L)
             return false;
 
         return true;

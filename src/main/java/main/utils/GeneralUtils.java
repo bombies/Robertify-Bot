@@ -9,6 +9,7 @@ import main.constants.TimeFormat;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.permissions.PermissionsConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
@@ -667,37 +668,25 @@ public class GeneralUtils {
         return false;
     }
 
-    public static boolean checkPremium(Guild guild, User user, GenericInteractionCreateEvent event) {
-        if (Robertify.getTopGGAPI() == null)
-            return true;
-
-        if (new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG))
+    public static boolean checkPremium(Guild guild, GenericInteractionCreateEvent event) {
+        if (new GuildConfig(guild).isPremium())
             return true;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
                         RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                .addActionRow(
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                )
+                .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
                 .setEphemeral(true)
                 .queue();
         return false;
     }
 
     public static boolean checkPremium(Guild guild, User user, Message msg) {
-        if (Robertify.getTopGGAPI() == null)
-            return true;
-
-        if (new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG))
+        if (new GuildConfig(guild).isPremium())
             return true;
 
         msg.reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
                         RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                .setActionRow(
-                        Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                )
+                .setActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
                 .queue();
         return false;
     }
