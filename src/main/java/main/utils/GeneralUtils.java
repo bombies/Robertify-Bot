@@ -650,19 +650,13 @@ public class GeneralUtils {
         }
     }
 
-    public static boolean checkPremium(Guild guild, User user, GenericComponentInteractionCreateEvent event) {
-        if (Robertify.getTopGGAPI() == null)
-            return true;
-
-        if (new VoteManager().userVoted(user.getId(), VoteManager.Website.TOP_GG))
+    public static boolean checkPremium(Guild guild, GenericComponentInteractionCreateEvent event) {
+        if (new GuildConfig(guild).isPremium())
             return true;
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,
                         RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE, RobertifyLocaleMessage.PremiumMessages.LOCKED_COMMAND_EMBED_DESC).build())
-                .addActionRow(
-                        net.dv8tion.jda.api.interactions.components.Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
-                        Button.of(ButtonStyle.LINK, "https://discordbotlist.com/bots/robertify/upvote", "Discord Bot List")
-                )
+                .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
                 .setEphemeral(true)
                 .queue();
         return false;

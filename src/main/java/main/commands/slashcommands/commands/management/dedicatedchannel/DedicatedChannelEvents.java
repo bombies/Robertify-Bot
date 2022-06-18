@@ -339,7 +339,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
-            if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
+            if (!GeneralUtils.checkPremium(guild, event))
                 return;
 
             if (!djCheck(new PreviousTrackCommand(), guild, member)) {
@@ -354,7 +354,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
-            if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
+            if (!GeneralUtils.checkPremium(guild, event))
                 return;
 
             if (!djCheck(new FavouriteTracksCommand(), guild, member)) {
@@ -385,7 +385,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final var eventSelectedOptions = event.getSelectedOptions();
         final var selectedOptions = eventSelectedOptions != null ? eventSelectedOptions.stream().map(SelectOption::getValue).toList() : List.of();
 
-        if (!GeneralUtils.checkPremium(guild, member.getUser(), event))
+        if (!GeneralUtils.checkPremium(guild, event))
             return;
 
         if (!selfMember.getVoiceState().inVoiceChannel()) {
