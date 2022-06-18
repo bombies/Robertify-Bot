@@ -226,7 +226,7 @@ public class RobertifyAPI {
 
     @SneakyThrows
     private List<String> getPremiumGuilds() {
-        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
+        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").toString())
                         .addHeader("auth-token", accessToken)
                         .build())
                 .execute();
