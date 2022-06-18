@@ -50,9 +50,10 @@ public class PremiumCommand extends AbstractSlashCommand {
 
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
                         RobertifyLocaleMessage.PremiumMessages.IS_PREMIUM,
+                        Pair.of("{user}", premiumSetterInfo.getUser().getId()),
                         Pair.of("{tier}", RobertifyPremium.parseTier(premiumSetterInfo.getTier())),
-                        Pair.of("{premium_started}", "<t:"+premiumSetterInfo.getStartedAt()+":F>"),
-                        Pair.of("{premium_ends}", "<t:"+premiumSetterInfo.getEndsAt()+":F>")
+                        Pair.of("{premium_started}", "<t:"+ Math.round(premiumSetterInfo.getStartedAt() / 1000.0) +":F>"),
+                        Pair.of("{premium_ends}", "<t:"+ Math.round(premiumSetterInfo.getEndsAt() / 1000.0) +":F>")
                 ).build())
                 .queue();
     }

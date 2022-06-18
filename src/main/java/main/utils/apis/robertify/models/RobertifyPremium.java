@@ -39,7 +39,7 @@ public class RobertifyPremium {
     }
 
     public User getUser() {
-        return Robertify.getShardManager().getUserById(this.userId);
+        return Robertify.getShardManager().retrieveUserById(this.userId).complete();
     }
 
     public List<Guild> getGuilds() {
