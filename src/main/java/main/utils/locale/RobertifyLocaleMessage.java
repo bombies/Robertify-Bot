@@ -332,7 +332,9 @@ public enum RobertifyLocaleMessage {
 
     public enum PremiumMessages implements LocaleMessage {
         LOCKED_COMMAND_EMBED_TITLE,
-        LOCKED_COMMAND_EMBED_DESC
+        LOCKED_COMMAND_EMBED_DESC,
+        NOT_PREMIUM,
+        IS_PREMIUM
     }
 
     public enum TogglesMessages implements LocaleMessage {

@@ -52,4 +52,25 @@ public class RobertifyPremium {
     public List<String> getGuildIDs() {
         return this.servers;
     }
+
+    public static String parseTier(int tierID) {
+        switch (tierID) {
+            case 0 -> {
+                return "Bronze";
+            }
+            case 1 -> {
+                return "Silver";
+            }
+            case 2 -> {
+                return "Gold";
+            }
+            case 3 -> {
+                return "Diamond";
+            }
+            case 4 -> {
+                return "Emerald";
+            }
+            default -> throw new IllegalArgumentException(tierID + " is an invalid tier code!");
+        }
+    }
 }

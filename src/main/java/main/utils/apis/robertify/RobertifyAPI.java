@@ -237,4 +237,32 @@ public class RobertifyAPI {
                 .map(String::valueOf)
                 .toList();
     }
+
+    public RobertifyPremium getGuildPremiumSetter(long gid) {
+        return getGuildPremiumSetter(String.valueOf(gid));
+    }
+
+    @SneakyThrows
+    public RobertifyPremium getGuildPremiumSetter(String gid) {
+        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").appendPath("user").appendPath(gid).toString())
+                        .addHeader("auth-token", accessToken)
+                        .build())
+                .execute();
+
+        if (response.code() == 404)
+            throw new NullPointerException("Guild with ID " + gid + " isn't premium.");
+        final var responseObj = new JSONObject(response.body().string());
+        response.close();
+        if (responseObj.has("error"))
+            throw new IllegalArgumentException(responseObj.getString("error"));
+        return new RobertifyPremium(
+                responseObj.getString("user_id"),
+                responseObj.getString("user_email"),
+                responseObj.getInt("premium_type"),
+                responseObj.getInt("premium_tier"),
+                responseObj.getJSONArray("premium_servers").toList().stream().map(String::valueOf).toList(),
+                responseObj.getString("premium_started"),
+                responseObj.getString("premium_expires")
+        );
+    }
 }

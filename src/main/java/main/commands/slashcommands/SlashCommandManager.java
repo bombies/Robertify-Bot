@@ -88,7 +88,8 @@ public class SlashCommandManager {
                 new RestrictedChannelsCommand(),
                 new LogCommand(),
                 new SetLogChannelCommand(),
-                new LanguageCommand()
+                new LanguageCommand(),
+                new PremiumCommand()
         );
 
         addMiscCommands(
