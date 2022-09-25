@@ -127,6 +127,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             }
             case "file" -> {
                 final var file = event.getOption("track").getAsAttachment();
+                handleLocalTrack(event, file);
             }
             case "nexttracks" -> {
                 String link = event.getOption("tracks").getAsString();
@@ -152,9 +153,10 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                         ));
     }
 
-    public void handleLocalTrack(SlashCommandInteractionEvent event, Member member, Message.Attachment audioFile) {
+    public void handleLocalTrack(SlashCommandInteractionEvent event, Message.Attachment audioFile) {
         final var guild = event.getGuild();
         final var channel = event.getChannel().asTextChannel();
+        final var member = event.getMember();
 
         switch (audioFile.getFileExtension().toLowerCase()) {
             case "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
