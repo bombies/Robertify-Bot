@@ -9,6 +9,7 @@ import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.commands.contextcommands.ContextCommandManager;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
@@ -160,9 +161,9 @@ public class Robertify {
             for (var cmd : slashCommandManager.getDevCommands())
                 jdaBuilder.addEventListeners(cmd);
 
-//            ContextCommandManager contextCommandManager = new ContextCommandManager();
-//            for (var cmd : contextCommandManager.getCommands())
-//                jdaBuilder.addEventListeners(cmd);
+            ContextCommandManager contextCommandManager = new ContextCommandManager();
+            for (var cmd : contextCommandManager.getCommands())
+                jdaBuilder.addEventListeners(cmd);
 
             // Initialize the JSON directory
             // This is a deprecated feature and is marked for removal
