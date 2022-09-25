@@ -89,7 +89,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (repeating) return;
 
-        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
+        final var selfChannel = guild.getSelfMember().getVoiceState().getChannel();
+        if (selfChannel != null)
+            ResumeUtils.getInstance().saveInfo(guild, selfChannel);
 
         if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
