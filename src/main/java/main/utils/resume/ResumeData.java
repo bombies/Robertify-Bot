@@ -178,7 +178,7 @@ public class ResumeData extends RedisCache {
                 );
             }
             case "soundcloud" -> track = new SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault());
-            case "youtube" -> track = new YoutubeAudioTrack(trackInfo, new YoutubeAudioSourceManager(true));
+            case "youtube" -> track = new YoutubeAudioTrack(trackInfo, new YoutubeAudioSourceManager());
             default -> track = null;
         }
 
