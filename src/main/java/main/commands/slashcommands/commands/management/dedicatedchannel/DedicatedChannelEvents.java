@@ -204,62 +204,72 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final Member member = event.getMember();
 
         if (!selfVoiceState.inAudioChannel()) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (!memberVoiceState.inAudioChannel()) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                             .build())
+                    .setEphemeral(true)
                     .queue();
             return;
         }
 
         if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
             if (!djCheck(new RewindSlashCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             EmbedBuilder rewindEmbed = new RewindCommand().handleRewind(member.getUser(), selfVoiceState, 0, true);
-            event.reply(member.getAsMention()).addEmbeds(rewindEmbed.build())
+            event.replyEmbeds(rewindEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
             if (!djCheck(new PauseSlashCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             EmbedBuilder playPauseEmbed = new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState);
-            event.reply(member.getAsMention()).addEmbeds(playPauseEmbed.build())
+            event.replyEmbeds(playPauseEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
             if (!djCheck(new SkipSlashCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             MessageEmbed skipEmbed = new SkipCommand().handleSkip(selfVoiceState, memberVoiceState);
-            event.reply(member.getAsMention()).addEmbeds(skipEmbed)
+            event.replyEmbeds(skipEmbed)
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
             final LoopSlashCommand loopCommand = new LoopSlashCommand();
             if (!djCheck(loopCommand, guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
@@ -302,29 +312,34 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 );
             }
 
-            event.reply(member.getAsMention()).addEmbeds(loopEmbed.build())
+            event.replyEmbeds(loopEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
             if (!djCheck(new ShuffleSlashCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             EmbedBuilder shuffleEmbed = new ShuffleCommand().handleShuffle(event.getGuild(), member.getUser());
-            event.reply(member.getAsMention()).addEmbeds(shuffleEmbed.build())
+            event.replyEmbeds(shuffleEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
             if (!djCheck(new DisconnectSlashCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             EmbedBuilder disconnectEmbed = new DisconnectCommand().handleDisconnect(event.getGuild(), event.getUser());
-            event.reply(member.getAsMention()).addEmbeds(disconnectEmbed.build())
+            event.replyEmbeds(disconnectEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
@@ -335,7 +350,8 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
 
             EmbedBuilder stopEmbed = new StopCommand().handleStop(event.getMember());
-            event.reply(member.getAsMention()).addEmbeds(stopEmbed.build())
+            event.replyEmbeds(stopEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
@@ -343,14 +359,15 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
 
             if (!djCheck(new PreviousTrackCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
             EmbedBuilder previousEmbed = new PreviousTrackCommand().handlePrevious(event.getGuild(), memberVoiceState);
-            event.reply(member.getAsMention()).addEmbeds(previousEmbed.build())
-                    .setEphemeral(false)
+            event.replyEmbeds(previousEmbed.build())
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
@@ -358,13 +375,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
 
             if (!djCheck(new FavouriteTracksCommand(), guild, member)) {
-                event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
+                        .setEphemeral(true)
                         .queue();
                 return;
             }
 
-            event.reply(member.getAsMention()).addEmbeds(new FavouriteTracksCommand().handleAdd(event.getGuild(), event.getMember()))
-                    .setEphemeral(false)
+            event.replyEmbeds(new FavouriteTracksCommand().handleAdd(event.getGuild(), event.getMember()))
+                    .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
         }
@@ -517,7 +535,9 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        event.replyEmbeds(embedsToSend).queue();
+        event.replyEmbeds(embedsToSend)
+                .setEphemeral(true)
+                .queue();
     }
 
     private boolean djCheck(AbstractSlashCommand command, Guild guild, Member user) {

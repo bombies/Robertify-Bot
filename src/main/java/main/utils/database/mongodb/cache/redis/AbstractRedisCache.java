@@ -27,7 +27,7 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
     @Getter
     private final AbstractMongoDatabase mongoDB;
     @Getter
-    private MongoCollection<Document> collection;
+    private final MongoCollection<Document> collection;
     private final JedisPooled jedis;
 
     protected AbstractRedisCache(String cacheID, AbstractMongoDatabase mongoDB) {
