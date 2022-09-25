@@ -2,6 +2,8 @@ package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.PlayCommand;
+import main.constants.ENV;
+import main.main.Config;
 import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -10,18 +12,27 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class PlaySlashCommand extends AbstractSlashCommand {
+    final Logger logger = LoggerFactory.getLogger(PlaySlashCommand.class);
 
     @Override
     protected void buildCommand() {
@@ -38,6 +49,18 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                                         OptionType.STRING,
                                                         "tracks",
                                                         "The name/url of the track/album/playlist to play",
+                                                        true
+                                                )
+                                        )
+                                ),
+                                SubCommand.of(
+                                        "file",
+                                        "Play a local file!",
+                                        List.of(
+                                                CommandOption.of(
+                                                        OptionType.ATTACHMENT,
+                                                        "track",
+                                                        "The local audio file of the track to be played!",
                                                         true
                                                 )
                                         )
@@ -102,6 +125,9 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
                 handlePlayTracks(event, guild, member, link, false);
             }
+            case "file" -> {
+                final var file = event.getOption("track").getAsAttachment();
+            }
             case "nexttracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))
@@ -124,5 +150,63 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                 event,
                                 addToBeginning
                         ));
+    }
+
+    public void handleLocalTrack(SlashCommandInteractionEvent event, Member member, Message.Attachment audioFile) {
+        final var guild = event.getGuild();
+        final var channel = event.getChannel().asTextChannel();
+
+        switch (audioFile.getFileExtension().toLowerCase()) {
+            case "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
+                if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {
+                    try {
+                        Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
+                    } catch (Exception e) {
+                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.LOCAL_DIR_ERR).build())
+                                .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                .setEphemeral(true)
+                                .queue();
+
+                        logger.error("[FATAL ERROR] Could not create audio directory!", e);
+                        return;
+                    }
+                }
+
+                final var selfVoiceState = guild.getSelfMember().getVoiceState();
+                final var memberVoiceState = member.getVoiceState();
+
+                try {
+                    if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
+                        final var trackFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
+                        audioFile.getProxy().downloadToFile(trackFile)
+                                .thenAccept(file -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+                                    RobertifyAudioManager.getInstance()
+                                            .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
+                                }))
+                                .exceptionally(e -> {
+                                    logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
+                                            .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                            .queue();
+                                    return null;
+                                });
+                    } else {
+                        File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+                            RobertifyAudioManager.getInstance()
+                                    .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
+                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
+                                .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, null, false)));
+                    }
+                } catch (IllegalArgumentException e) {
+                    logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
+                            .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                            .queue();
+                }
+            }
+            default -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.INVALID_FILE).build())
+                    .queue();
+        }
     }
 }
