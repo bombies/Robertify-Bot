@@ -12,7 +12,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -75,12 +75,12 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.6.1</version>
+            <version>4.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.walkyst</groupId>
