@@ -73,10 +73,7 @@ public class RobertifyAudioManager {
         this.musicManagers = new HashMap<>();
         this.playerManager = new DefaultAudioPlayerManager();
 
-        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager(true);
-
-        YoutubeHttpContextFilter.setPAPISID(Config.get(ENV.PAPISID));
-        YoutubeHttpContextFilter.setPSID(Config.get(ENV.PSID));
+        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
 
         // TODO IPv6 rotation stuff
         // Snippet acquired from Mantaro Bot
