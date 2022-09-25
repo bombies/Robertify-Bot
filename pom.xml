@@ -49,7 +49,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220320</version>
+            <version>20220924</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.nashorn</groupId>
@@ -75,12 +75,12 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.6.1</version>
+            <version>4.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.walkyst</groupId>
