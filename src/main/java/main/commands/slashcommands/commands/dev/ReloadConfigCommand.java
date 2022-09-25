@@ -8,7 +8,8 @@ import main.main.Config;
 import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.LocaleManager;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +29,10 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
             Robertify.initVoteSiteAPIs();
             RandomMessageManager.setChance(Double.parseDouble(Config.get(ENV.RANDOM_MESSAGE_CHANCE)));
 
-            ctx.getMessage().addReaction("✅").queue();
+            ctx.getMessage().addReaction(Emoji.fromUnicode("✅")).queue();
         } catch (Exception e) {
             logger.error("There was an unexpected error!", e);
-            ctx.getMessage().addReaction("❌").queue();
+            ctx.getMessage().addReaction(Emoji.fromUnicode("❌")).queue();
         }
     }
 
@@ -62,7 +63,7 @@ public class ReloadConfigCommand extends AbstractSlashCommand implements IDevCom
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event))
             return;
 

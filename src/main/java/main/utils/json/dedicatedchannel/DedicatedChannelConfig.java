@@ -19,19 +19,19 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.managers.ChannelManager;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -250,16 +250,16 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
     }
 
-    public MessageAction buttonUpdateRequest(Message msg) {
+    public MessageEditAction buttonUpdateRequest(Message msg) {
         final var config = getConfig();
         final var localeManager = LocaleManager.getLocaleManager(msg.getGuild());
 
         final var firstRow = ActionRow.of(ChannelConfig.Field.getFirstRow().stream()
-                .filter(field -> config.getState(field))
+                .filter(config::getState)
                 .map(field -> Button.of(ButtonStyle.PRIMARY, field.getId(), field.getEmoji()))
                 .toList());
         final var secondRow = ActionRow.of(ChannelConfig.Field.getSecondRow().stream()
-                .filter(field -> config.getState(field))
+                .filter(config::getState)
                 .map(field -> Button.of(field.equals(ChannelConfig.Field.DISCONNECT) ? ButtonStyle.DANGER : ButtonStyle.SECONDARY, field.getId(), field.getEmoji()))
                 .toList());
         final var thirdRow = ActionRow.of(SelectionMenuBuilder.of(
@@ -295,7 +295,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
     }
 
-    public synchronized ChannelManager channelTopicUpdateRequest(TextChannel channel) {
+    public synchronized TextChannelManager channelTopicUpdateRequest(TextChannel channel) {
         final var localeManager = LocaleManager.getLocaleManager(channel.getGuild());
         return channel.getManager().setTopic(
                 RobertifyEmoji.PREVIOUS_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +
@@ -376,16 +376,16 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         }
 
         public enum Field {
-            PREVIOUS(DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString())),
-            REWIND(DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString())),
-            PLAY_PAUSE(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromMarkdown(RobertifyEmoji.PLAY_AND_PAUSE_EMOJI.toString())),
-            STOP(DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.STOP_EMOJI.toString())),
-            SKIP(DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())),
-            FAVOURITE(DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromMarkdown(RobertifyEmoji.STAR_EMOJI.toString())),
-            LOOP(DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromMarkdown(RobertifyEmoji.LOOP_EMOJI.toString())),
-            SHUFFLE(DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromMarkdown(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
-            DISCONNECT(DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromMarkdown(RobertifyEmoji.QUIT_EMOJI.toString())),
-            FILTERS("dedicatedfilters", Emoji.fromMarkdown(RobertifyEmoji.FILTER_EMOJI.toString()));
+            PREVIOUS(DedicatedChannelCommand.ButtonID.PREVIOUS.toString(), Emoji.fromFormatted(RobertifyEmoji.PREVIOUS_EMOJI.toString())),
+            REWIND(DedicatedChannelCommand.ButtonID.REWIND.toString(), Emoji.fromFormatted(RobertifyEmoji.REWIND_EMOJI.toString())),
+            PLAY_PAUSE(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString(), Emoji.fromFormatted(RobertifyEmoji.PLAY_AND_PAUSE_EMOJI.toString())),
+            STOP(DedicatedChannelCommand.ButtonID.STOP.toString(), Emoji.fromFormatted(RobertifyEmoji.STOP_EMOJI.toString())),
+            SKIP(DedicatedChannelCommand.ButtonID.END.toString(), Emoji.fromFormatted(RobertifyEmoji.END_EMOJI.toString())),
+            FAVOURITE(DedicatedChannelCommand.ButtonID.FAVOURITE.toString(), Emoji.fromFormatted(RobertifyEmoji.STAR_EMOJI.toString())),
+            LOOP(DedicatedChannelCommand.ButtonID.LOOP.toString(), Emoji.fromFormatted(RobertifyEmoji.LOOP_EMOJI.toString())),
+            SHUFFLE(DedicatedChannelCommand.ButtonID.SHUFFLE.toString(), Emoji.fromFormatted(RobertifyEmoji.SHUFFLE_EMOJI.toString())),
+            DISCONNECT(DedicatedChannelCommand.ButtonID.DISCONNECT.toString(), Emoji.fromFormatted(RobertifyEmoji.QUIT_EMOJI.toString())),
+            FILTERS("dedicatedfilters", Emoji.fromFormatted(RobertifyEmoji.FILTER_EMOJI.toString()));
 
             @Getter
             private final String id;

@@ -49,10 +49,10 @@ public class VolumeCommand implements ICommand {
     public EmbedBuilder handleVolumeChange(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int volume) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
-        if (memberVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
+        if (memberVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (volume < 0 || volume > 100)

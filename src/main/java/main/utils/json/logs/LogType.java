@@ -2,7 +2,7 @@ package main.utils.json.logs;
 
 import lombok.Getter;
 import main.constants.RobertifyEmoji;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 import java.awt.*;
 import java.util.ArrayList;

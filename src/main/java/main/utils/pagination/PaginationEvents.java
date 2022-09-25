@@ -7,8 +7,8 @@ import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +19,7 @@ public class PaginationEvents extends ListenerAdapter {
     private static final HashMap<Long, Integer> currentPage = new HashMap<>();
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (!event.getButton().getId().startsWith(MessageButton.PAGE_ID.toString()))
             return;
 
@@ -39,28 +39,28 @@ public class PaginationEvents extends ListenerAdapter {
         if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
             currentPage.put(msg, 0);
             event.editMessageEmbeds(messagePages.get(0).getEmbed())
-                    .setActionRows(((currentPage.get(msg) == 0) ?
+                    .setComponents(((currentPage.get(msg) == 0) ?
                             Paginator.getButtons(event.getUser(), false, false, true, true) :
                             Paginator.getButtons(event.getUser())))
                     .queue();
         } else if (event.getButton().getId().equals(MessageButton.PREVIOUS + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) - 1);
                 event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
-                        .setActionRows(((currentPage.get(msg) == 0) ?
+                        .setComponents(((currentPage.get(msg) == 0) ?
                                 Paginator.getButtons(event.getUser(), false, false, true, true) :
                                 Paginator.getButtons(event.getUser())))
                         .queue();
         } else if (event.getButton().getId().equals(MessageButton.NEXT + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) + 1);
                 event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
-                        .setActionRows(((currentPage.get(msg) == messagePages.size()-1) ?
+                        .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
                                 Paginator.getButtons(event.getUser(), true, true, false, false) :
                                 Paginator.getButtons(event.getUser())))
                         .queue();
         } else if (event.getButton().getId().equals(MessageButton.END + event.getUser().getId())) {
             currentPage.put(msg, messagePages.size()-1);
             event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
-                    .setActionRows(((currentPage.get(msg) == messagePages.size()-1) ?
+                    .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
                             Paginator.getButtons(event.getUser(), true, true, false, false) :
                             Paginator.getButtons(event.getUser()))).queue();
         } else {
@@ -70,7 +70,7 @@ public class PaginationEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith("menupage")) return;
 
         final var guild = event.getGuild();
@@ -101,7 +101,7 @@ public class PaginationEvents extends ListenerAdapter {
                 .get(currentPage);
 
         int finalCurrentPage = currentPage;
-        event.editSelectionMenu(
+        event.editSelectMenu(
                 Pages.getSelectionMenu(
                         event.getUser(),
                         menuPage.getOptions()

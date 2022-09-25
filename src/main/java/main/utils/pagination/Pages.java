@@ -7,11 +7,11 @@ import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageAction;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyAction;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.ArrayList;
@@ -44,13 +44,13 @@ public abstract class Pages {
         return ret.get();
     }
 
-    public static Message paginateMessage(SlashCommandEvent event, List<MessagePage> messagePages) {
+    public static Message paginateMessage(SlashCommandInteractionEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        WebhookMessageAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
+        WebhookMessageCreateAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
 
         if (messagePages.size() > 1) {
-            messageAction = messageAction.addActionRows(
+            messageAction = messageAction.addComponents(
                     Paginator.getButtons(event.getUser(), false, false, true, true)
             );
         }
@@ -73,7 +73,7 @@ public abstract class Pages {
         return paginateMessage(channel, user, messagePages);
     }
 
-    public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandEvent event) {
+    public static Message paginateMessage(List<String> content, int maxPerPage, SlashCommandInteractionEvent event) {
         List<MessagePage> messagePages = new ArrayList<>();
 
         event.deferReply().queue();
@@ -116,7 +116,7 @@ public abstract class Pages {
 
         final var firstPage = menuPages.get(0);
 
-        SelectionMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = SelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -128,12 +128,12 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, ReplyAction msg, List<SelectMenuOption> options) {
+    public static void paginateMenu(User user, ReplyCallbackAction msg, List<SelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic("null", options);
 
         final var firstPage = menuPages.get(0);
 
-        SelectionMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = SelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -154,8 +154,8 @@ public abstract class Pages {
         paginateMenu(user, msg, options);
     }
 
-    public static void paginateMenu(SlashCommandEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
-        ReplyAction msg = menuLogic(event, options, startingPage, numberEachEntry);
+    public static void paginateMenu(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+        final var msg = menuLogic(event, options, startingPage, numberEachEntry);
         paginateMenu(event.getUser(), msg, options);
     }
 
@@ -163,7 +163,7 @@ public abstract class Pages {
         return menuLogic(channel, options, startingPage, false);
     }
 
-    private static ReplyAction menuLogic(SlashCommandEvent event, int startingPage, List<SelectMenuOption> options) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, int startingPage, List<SelectMenuOption> options) {
         return menuLogic(event, options, startingPage, false);
     }
 
@@ -171,7 +171,7 @@ public abstract class Pages {
         return channel.sendMessageEmbeds(getPaginatedEmbed(channel.getGuild(), options, 25, startingPage, numberEachEntry)).complete();
     }
 
-    private static ReplyAction menuLogic(SlashCommandEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return event.replyEmbeds(getPaginatedEmbed(event.getGuild(), options, 25, startingPage, numberEachEntry));
     }
 
@@ -220,7 +220,7 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static SelectionMenu getSelectionMenu(User user, List<SelectMenuOption> options) {
+    public static SelectMenu getSelectionMenu(User user, List<SelectMenuOption> options) {
         return SelectionMenuBuilder.of(
                 "menuPage:" + user.getIdLong(),
                 "Select an option",

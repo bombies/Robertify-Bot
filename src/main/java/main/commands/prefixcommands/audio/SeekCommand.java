@@ -65,10 +65,10 @@ public class SeekCommand implements ICommand {
     public EmbedBuilder handleSeek(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int mins, int sec) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())
@@ -113,10 +113,10 @@ public class SeekCommand implements ICommand {
     public EmbedBuilder handleSeek(GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState, int hours, int mins, int sec) {
         final var guild = selfVoiceState.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (memberVoiceState.getChannel().getIdLong() != selfVoiceState.getChannel().getIdLong())

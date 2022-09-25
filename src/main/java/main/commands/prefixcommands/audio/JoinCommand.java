@@ -28,12 +28,12 @@ public class JoinCommand implements ICommand {
     }
 
     public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                     .build();
         }
 
-        VoiceChannel channel = memberVoiceState.getChannel();
+        final var channel = memberVoiceState.getChannel();
 
         if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
             final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);

@@ -11,7 +11,7 @@ import main.utils.json.logs.LogUtils;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,14 +28,14 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         final var selfMember = ctx.getSelfMember();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        if (!selfMember.getVoiceState().inVoiceChannel()) {
+        if (!selfMember.getVoiceState().inAudioChannel()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
                     .queue();
             return;
         }
 
         GuildVoiceState memberVoiceState = ctx.getMember().getVoiceState();
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .queue();
             return;
@@ -102,7 +102,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 
@@ -113,7 +113,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         final var selfMember = guild.getSelfMember();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        if (!selfMember.getVoiceState().inVoiceChannel()) {
+        if (!selfMember.getVoiceState().inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
                     .setEphemeral(true)
                     .queue();
@@ -121,7 +121,7 @@ public class EightDFilter extends AbstractSlashCommand implements ICommand {
         }
 
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .setEphemeral(true)
                     .queue();

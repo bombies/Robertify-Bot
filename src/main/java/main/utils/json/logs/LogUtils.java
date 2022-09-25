@@ -33,7 +33,7 @@ public class LogUtils {
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
-                        .setTitle(type.getEmoji().getAsMention() + " " + type.getTitle())
+                        .setTitle(type.getEmoji().getFormatted() + " " + type.getTitle())
                         .setColor(type.getColor())
                         .setDescription(message)
                         .setTimestamp(Instant.now())
@@ -53,7 +53,7 @@ public class LogUtils {
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
-                        .setTitle(type.getEmoji().getAsMention() + " " + type.getTitle())
+                        .setTitle(type.getEmoji().getFormatted() + " " + type.getTitle())
                         .setColor(type.getColor())
                         .setDescription(localeManager.getMessage(message))
                         .setTimestamp(Instant.now())
@@ -74,7 +74,7 @@ public class LogUtils {
 
         channel.sendMessageEmbeds(
                 new EmbedBuilder()
-                        .setTitle(type.getEmoji().getAsMention() + " " + type.getTitle())
+                        .setTitle(type.getEmoji().getFormatted() + " " + type.getTitle())
                         .setColor(type.getColor())
                         .setDescription(localeManager.getMessage(message, placeholders))
                         .setTimestamp(Instant.now())
@@ -88,7 +88,7 @@ public class LogUtils {
 
         guild.createTextChannel("robertify-logs")
                 .addPermissionOverride(guild.getPublicRole(), Collections.emptyList(), List.of(Permission.VIEW_CHANNEL))
-                .addPermissionOverride(guild.getSelfMember(), List.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_WRITE), Collections.emptyList())
+                .addPermissionOverride(guild.getSelfMember(), List.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_SEND), Collections.emptyList())
                 .queue(channel -> config.setChannel(channel.getIdLong()));
     }
 }

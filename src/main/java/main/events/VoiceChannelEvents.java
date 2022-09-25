@@ -49,10 +49,10 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
             SkipCommand.clearVoteSkipInfo(guild);
         } else {
-             VoiceChannel channelLeft = event.getChannelLeft();
-             GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
+             final var channelLeft = event.getChannelLeft();
+             final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
-             if (!selfVoiceState.inVoiceChannel()) return;
+             if (!selfVoiceState.inAudioChannel()) return;
 
              if (!selfVoiceState.getChannel().equals(channelLeft)) return;
 
@@ -67,10 +67,11 @@ public class VoiceChannelEvents extends ListenerAdapter {
         Member self = guild.getSelfMember();
         GuildVoiceState voiceState = self.getVoiceState();
 
-        if (!voiceState.inVoiceChannel()) return;
+        if (!voiceState.inAudioChannel()) return;
 
-        VoiceChannel channelLeft = event.getChannelLeft();
+        final var channelLeft = event.getChannelLeft();
         final var guildConfig = new GuildConfig(guild);
+
         if (event.getMember().getIdLong() == self.getIdLong() && !guildConfig.get247()) {
             doAutoLeave(event, channelLeft);
         } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
@@ -86,9 +87,9 @@ public class VoiceChannelEvents extends ListenerAdapter {
 
         if (voiceState == null) return;
 
-        if (!voiceState.inVoiceChannel()) return;
+        if (!voiceState.inAudioChannel()) return;
 
-        VoiceChannel channel = event.getChannelLeft();
+        final var channel = event.getChannelLeft();
 
         if (!channel.equals(voiceState.getChannel())) return;
 
@@ -105,7 +106,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
             musicManager.getPlayer().setPaused(false);
     }
 
-    void doAutoLeave(GenericGuildVoiceUpdateEvent event, VoiceChannel channelLeft) {
+    void doAutoLeave(GenericGuildVoiceUpdateEvent event, AudioChannel channelLeft) {
         if (channelLeft.getMembers().size() == 1) {
             pauseSong(event);
             waiter.waitForEvent(

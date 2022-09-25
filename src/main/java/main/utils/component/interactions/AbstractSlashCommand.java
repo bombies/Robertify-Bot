@@ -20,14 +20,11 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.commands.build.*;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.api.requests.restaction.CommandCreateAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -106,7 +103,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             buildCommand();
 
-        CommandData commandData = new CommandData(
+        SlashCommandData commandData = Commands.slash(
                 command.name, command.description
         );
 
@@ -144,8 +141,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-        if (command.isPrivate)
-            commandData.setDefaultEnabled(false);
+//        if (command.isPrivate)
+//            commandData.setDefaultEnabled(false);
         return commandData;
     }
 
@@ -236,7 +233,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (g.getOwnerIdLong() == Config.getOwnerID()) {
             for (var cmd : devCommands)
                 commandListUpdateAction = commandListUpdateAction.addCommands(
-                        cmd.getCommandData().setDefaultEnabled(false)
+                        cmd.getCommandData()
                 );
         }
 
@@ -278,14 +275,14 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command;
     }
 
-    protected void sendRandomMessage(SlashCommandEvent event) {
+    protected void sendRandomMessage(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         if (new SlashCommandManager().isMusicCommand(this))
-            new RandomMessageManager().randomlySendMessage(event.getTextChannel());
+            new RandomMessageManager().randomlySendMessage(event.getChannel().asTextChannel());
     }
 
-    protected boolean checks(SlashCommandEvent event) {
+    protected boolean checks(SlashCommandInteractionEvent event) {
         if (!nameCheck(event)) return false;
         if (!botEmbedCheck(event)) return false;
         if (!banCheck(event)) return false;
@@ -301,25 +298,25 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
             if (!botDB.userHasViewedAlert(user.getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
                     && new SlashCommandManager().isMusicCommand(this))
-                event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build()).queue();
+                event.getChannel().asTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build()).queue();
         }
 
         if (!adminCheck(event)) return false;
         return djCheck(event);
     }
 
-    protected boolean checksWithPremium(SlashCommandEvent event) {
+    protected boolean checksWithPremium(SlashCommandInteractionEvent event) {
         if (!checks(event)) return false;
         return premiumCheck(event);
     }
 
-    protected boolean nameCheck(SlashCommandEvent event) {
+    protected boolean nameCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         return command.getName().equals(event.getName());
     }
 
-    protected boolean banCheck(SlashCommandEvent event) {
+    protected boolean banCheck(SlashCommandInteractionEvent event) {
         final Guild guild = event.getGuild();
         if (!new GuildConfig(guild).isBannedUser(event.getUser().getIdLong()))
             return true;
@@ -338,7 +335,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
      * @return True - If the command isn't a DJ command or the user is a DJ
      *         False - If the command is a DJ command and the user isn't a DJ.
      */
-    protected boolean musicCommandDJCheck(SlashCommandEvent event) {
+    protected boolean musicCommandDJCheck(SlashCommandInteractionEvent event) {
         return predicateCheck(event);
     }
 
@@ -350,7 +347,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
      * @return True - If the command isn't a premium command or the user is a premium user
      *         False - If the command is a premium command and the user isn't a premium user
      */
-    protected boolean premiumCheck(SlashCommandEvent event) {
+    protected boolean premiumCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
 
@@ -364,7 +361,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean premiumBotCheck(SlashCommandEvent event) {
+    protected boolean premiumBotCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         if (!Config.isPremiumBot())
@@ -381,7 +378,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean djCheck(SlashCommandEvent event) {
+    protected boolean djCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
 
@@ -395,7 +392,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean adminCheck(SlashCommandEvent event) {
+    protected boolean adminCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
 
@@ -409,7 +406,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean predicateCheck(SlashCommandEvent event) {
+    protected boolean predicateCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         if (command.getCheckPermission() == null)
@@ -417,7 +414,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command.getCheckPermission().test(event);
     }
 
-    protected boolean botPermsCheck(SlashCommandEvent event) {
+    protected boolean botPermsCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         if (command.botRequiredPermissions.isEmpty())
@@ -434,7 +431,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean botEmbedCheck(SlashCommandEvent event) {
+    protected boolean botEmbedCheck(SlashCommandInteractionEvent event) {
         final var guild = event.getGuild();
         if (!guild.getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
@@ -444,7 +441,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean restrictedChannelCheck(SlashCommandEvent event) {
+    protected boolean restrictedChannelCheck(SlashCommandInteractionEvent event) {
         final Guild guild = event.getGuild();
         final TogglesConfig togglesConfig = new TogglesConfig(guild);
         final RestrictedChannelsConfig config = new RestrictedChannelsConfig(guild);
@@ -468,7 +465,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
-    protected boolean devCheck(SlashCommandEvent event) {
+    protected boolean devCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         if (!nameCheck(event))
@@ -512,7 +509,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         @Getter
         private final List<net.dv8tion.jda.api.Permission> botRequiredPermissions;
         @Nullable @Getter
-        private final Predicate<SlashCommandEvent> checkPermission;
+        private final Predicate<SlashCommandInteractionEvent> checkPermission;
         @NotNull @Getter
         private final Boolean djOnly;
         @NotNull @Getter
@@ -522,7 +519,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final boolean isPrivate;
 
         private Command(@NotNull String name, @Nullable String description, @NotNull List<CommandOption> options,
-                        @NotNull List<SubCommandGroup> subCommandGroups, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandEvent> checkPermission,
+                        @NotNull List<SubCommandGroup> subCommandGroups, @NotNull List<SubCommand> subCommands, @Nullable Predicate<SlashCommandInteractionEvent> checkPermission,
                         @Nullable Boolean djOnly, @Nullable Boolean adminOnly, boolean isPremium, boolean isPrivate, List<Permission> requiredPermissions, List<net.dv8tion.jda.api.Permission> botRequiredPermissions) {
             this.name = name.toLowerCase();
             this.description = description;
@@ -538,28 +535,28 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             this.botRequiredPermissions = botRequiredPermissions;
         }
 
-        public boolean permissionCheck(SlashCommandEvent e) {
+        public boolean permissionCheck(SlashCommandInteractionEvent e) {
             if (checkPermission == null)
                 throw new NullPointerException("Can't perform permission check since a check predicate was not provided!");
 
             return checkPermission.test(e);
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, List<SubCommandGroup> subCommandGroups, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, List<SubCommandGroup> subCommandGroups, List<SubCommand> subCommands, Predicate<SlashCommandInteractionEvent> checkPermission) {
             return new Command(name, description, options, subCommandGroups, subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, List<SubCommand> subCommands, Predicate<SlashCommandInteractionEvent> checkPermission) {
             return new Command(name, description, options, List.of(), subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
-                                                    List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
+                                                    List<SubCommand> subCommands, Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly) {
             return new Command(name, description, options, List.of(), subCommands, checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
-                                                    List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
+                                                    List<SubCommand> subCommands, Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly, boolean adminOnly) {
             return new Command(name, description, options, List.of(), subCommands, checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
@@ -577,17 +574,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return new Command(name, description, options, List.of(), subCommands, null, null, adminOnly, false, false, List.of(), List.of());
         }
 
-        public static Command of(String name, String description, List<CommandOption> options, Predicate<SlashCommandEvent> checkPermission) {
+        public static Command of(String name, String description, List<CommandOption> options, Predicate<SlashCommandInteractionEvent> checkPermission) {
             return new Command(name, description, options, List.of(), List.of(), checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
-                                                    Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
+                                                    Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly) {
             return new Command(name, description, options, List.of(), List.of(), checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description, List<CommandOption> options,
-                                                    Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
+                                                    Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly, boolean adminOnly) {
             return new Command(name, description, options, List.of(), List.of(), checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
@@ -604,17 +601,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return new Command(name, description, options, List.of(), List.of(), null, null, adminOnly, false, false, List.of(), List.of());
         }
 
-        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<SlashCommandEvent> checkPermission) {
+        public static Command ofWithSub(String name, String description, List<SubCommand> subCommands, Predicate<SlashCommandInteractionEvent> checkPermission) {
             return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
-                                                           Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
+                                                           Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly) {
             return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command ofWithSub(String name, String description, List<SubCommand> subCommands,
-                                                           Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
+                                                           Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly, boolean adminOnly) {
             return new Command(name, description, List.of(), List.of(), subCommands, checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
@@ -636,17 +633,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return new Command(name, description, List.of(), List.of(), subCommands, null, null, adminOnly, false, false, List.of(), List.of());
         }
 
-        public static Command of(String name, String description, Predicate<SlashCommandEvent> checkPermission) {
+        public static Command of(String name, String description, Predicate<SlashCommandInteractionEvent> checkPermission) {
             return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description,
-                                                    Predicate<SlashCommandEvent> checkPermission, boolean djOnly) {
+                                                    Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly) {
             return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, djOnly, null, false, false, List.of(), List.of());
         }
 
         public static Command of(String name, String description,
-                                                    Predicate<SlashCommandEvent> checkPermission, boolean djOnly, boolean adminOnly) {
+                                                    Predicate<SlashCommandInteractionEvent> checkPermission, boolean djOnly, boolean adminOnly) {
             return new Command(name, description, List.of(), List.of(), List.of(), checkPermission, null, adminOnly, false, false, List.of(), List.of());
         }
 
@@ -768,7 +765,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         private final List<SubCommandGroup> subCommandGroups;
         private final List<Permission> requiredPermissions;
         private final List<net.dv8tion.jda.api.Permission> botRequiredPermissions;
-        private Predicate<SlashCommandEvent> permissionCheck;
+        private Predicate<SlashCommandInteractionEvent> permissionCheck;
         private boolean djOnly, adminOnly, isPremium, isPrivate;
 
         private Builder() {
@@ -808,7 +805,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return this;
         }
 
-        public Builder setPermissionCheck(Predicate<SlashCommandEvent> predicate) {
+        public Builder setPermissionCheck(Predicate<SlashCommandInteractionEvent> predicate) {
             this.permissionCheck = predicate;
             return this;
         }

@@ -8,7 +8,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class QueueSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 

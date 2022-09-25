@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import main.utils.component.InvalidBuilderException;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,9 +19,9 @@ public class SelectMenuOption {
     @Getter
     private final Emoji emoji;
     @Getter
-    private final Predicate<SelectionMenuEvent> predicate;
+    private final Predicate<SelectMenuInteractionEvent> predicate;
 
-    private SelectMenuOption(@NotNull String label, @NotNull String value, @Nullable Emoji emoji, @Nullable Predicate<SelectionMenuEvent> predicate) {
+    private SelectMenuOption(@NotNull String label, @NotNull String value, @Nullable Emoji emoji, @Nullable Predicate<SelectMenuInteractionEvent> predicate) {
         this.label = label;
         this.value = value;
         this.emoji = emoji;
@@ -32,7 +32,7 @@ public class SelectMenuOption {
         return new OptionBuilder();
     }
 
-    public static SelectMenuOption of(@NotNull String label, @NotNull String id, @Nullable Emoji emoji, @Nullable Predicate<SelectionMenuEvent> predicate) {
+    public static SelectMenuOption of(@NotNull String label, @NotNull String id, @Nullable Emoji emoji, @Nullable Predicate<SelectMenuInteractionEvent> predicate) {
         return new SelectMenuOption(label, id, emoji, predicate);
     }
 
@@ -52,7 +52,7 @@ public class SelectMenuOption {
         @Setter
         private Emoji emoji;
         @Setter
-        private Predicate<SelectionMenuEvent> predicate;
+        private Predicate<SelectMenuInteractionEvent> predicate;
 
         private OptionBuilder() {}
 

@@ -16,7 +16,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -149,7 +150,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                 .queue(msg -> {
                     HashMap<Integer, Integer> map = new HashMap<>();
                     for (int i = 1; i <= choices.size(); i++) {
-                        msg.addReaction(GeneralUtils.parseNumEmoji(i)).queue();
+                        msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i))).queue();
                         map.put(i, 0);
                     }
 
@@ -299,7 +300,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
@@ -366,7 +367,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
                 .queue(msg -> {
                     HashMap<Integer, Integer> map = new HashMap<>();
                     for (int i = 1; i <= choices.size(); i++) {
-                        msg.addReaction(GeneralUtils.parseNumEmoji(i)).queue();
+                        msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i))).queue();
                         map.put(i, 0);
                     }
 

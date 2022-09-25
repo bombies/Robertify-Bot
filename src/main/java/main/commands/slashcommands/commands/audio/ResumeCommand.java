@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,13 +33,13 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final var guild = ctx.getGuild();
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             msg.replyEmbeds(eb.build()).queue();
             return;
@@ -109,7 +109,7 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -120,13 +120,13 @@ public class ResumeCommand extends AbstractSlashCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing playing!");
             event.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in a voice channel for this to work");
             event.replyEmbeds(eb.build()).queue();
             return;

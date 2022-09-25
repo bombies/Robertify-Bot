@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,10 +41,10 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
         final var audioPlayer = musicManager.getPlayer();
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED);
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
@@ -112,7 +112,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 

@@ -16,7 +16,7 @@ import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,10 +35,10 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
         final var memberVoiceState = stopper.getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
 
 
@@ -103,7 +103,7 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         event.replyEmbeds(handleStop(event.getMember())

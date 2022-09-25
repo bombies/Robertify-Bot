@@ -11,7 +11,8 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
@@ -35,7 +36,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
 
         try {
             new LogUtils(guild).createChannel();
-            message.addReaction("✅").queue();
+            message.addReaction(Emoji.fromFormatted("✅")).queue();
         } catch (IllegalArgumentException e) {
             message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP).build())
                     .queue();
@@ -86,7 +87,7 @@ public class LogCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         final Guild guild = event.getGuild();

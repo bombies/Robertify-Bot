@@ -3,7 +3,7 @@ package main.commands.slashcommands.commands.dev;
 import main.commands.slashcommands.SlashCommandManager;
 import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +26,7 @@ public class PostCommandInfoCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
         SlashCommandManager slashCommandManager = new SlashCommandManager();

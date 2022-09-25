@@ -1,6 +1,6 @@
 package main.constants;
 
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public enum RobertifyEmoji {
     PREVIOUS_EMOJI("<:previous:980202130755444766>"),
@@ -37,6 +37,6 @@ public enum RobertifyEmoji {
     }
 
     public Emoji getEmoji() {
-        return Emoji.fromMarkdown(str);
+        return Emoji.fromFormatted(str);
     }
 }

@@ -16,11 +16,11 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -69,7 +69,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
                 .limitToUser(userID);
     }
 
-    private SelectionMenu getSelectionMenu(Guild guild, long userID) {
+    private SelectMenu getSelectionMenu(Guild guild, long userID) {
         return getSelectionMenuBuilder(guild, userID).build();
     }
 
@@ -102,7 +102,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
 
         final var guild = event.getGuild();
@@ -128,7 +128,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         final Guild guild = event.getGuild();

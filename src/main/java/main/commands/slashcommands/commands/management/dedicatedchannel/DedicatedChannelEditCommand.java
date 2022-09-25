@@ -13,11 +13,11 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
         return null;
     }
 
-    protected void handleSetup(SlashCommandEvent event) {
+    protected void handleSetup(SlashCommandInteractionEvent event) {
         final var guild = event.getGuild();
 
         if (new DedicatedChannelConfig(guild).isChannelSet()) {
@@ -103,7 +103,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
         );
     }
 
-    private void handleEdit(SlashCommandEvent event) {
+    private void handleEdit(SlashCommandInteractionEvent event) {
         final var guild = event.getGuild();
 
         if (!GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
@@ -145,7 +145,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (!event.getButton().getId().startsWith("togglerqchannel:")) return;
 
         final var guild = event.getGuild();
@@ -228,7 +228,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         switch (event.getSubcommandName()) {

@@ -39,7 +39,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeData;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -260,11 +260,11 @@ public class RobertifyAudioManager {
 
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState, Message botMsg,
-                            SlashCommandEvent event, boolean addToBeginning) {
+                            SlashCommandInteractionEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
             return;
@@ -281,12 +281,12 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
                                     boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
             return;
@@ -303,12 +303,12 @@ public class RobertifyAudioManager {
     }
 
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandEvent event,
+                            GuildVoiceState memberVoiceState, Message botMsg, SlashCommandInteractionEvent event,
                                                 boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getTextChannel(), memberVoiceState.getChannel(), musicManager);
+            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
             return;
@@ -396,7 +396,7 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
-    public void joinVoiceChannel(TextChannel channel, VoiceChannel vc, GuildMusicManager musicManager) {
+    public void joinVoiceChannel(TextChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
         if (vc.getMembers().size() == 0)
             throw new IllegalStateException("I can't join a voice channel with no one in it!");
 

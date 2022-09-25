@@ -88,7 +88,7 @@ public class Robertify {
             Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
                 logger.info("Destroying all players (If any left)");
                 shardManager.getGuildCache().stream()
-                        .filter(guild -> guild.getSelfMember().getVoiceState().inVoiceChannel())
+                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
                         .forEach(guild -> {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
                             musicManager.getScheduler().disconnect(false);
@@ -98,9 +98,7 @@ public class Robertify {
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
                             Config.getBotToken(),
-                            GatewayIntent.GUILD_VOICE_STATES,
-                            GatewayIntent.GUILD_MESSAGES,
-                            GatewayIntent.DIRECT_MESSAGES
+                            GatewayIntent.GUILD_VOICE_STATES
                     )
                     .setShardsTotal(Config.getShardCount())
                     .setBulkDeleteSplittingEnabled(false)
@@ -138,7 +136,7 @@ public class Robertify {
                     )
                     .disableCache(
                             CacheFlag.ACTIVITY,
-                            CacheFlag.EMOTE,
+                            CacheFlag.EMOJI,
                             CacheFlag.CLIENT_STATUS,
                             CacheFlag.ROLE_TAGS,
                             CacheFlag.ONLINE_STATUS

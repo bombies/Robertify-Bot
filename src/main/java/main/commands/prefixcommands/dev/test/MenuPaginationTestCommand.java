@@ -4,7 +4,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ITestCommand;
 import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.pagination.Pages;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 

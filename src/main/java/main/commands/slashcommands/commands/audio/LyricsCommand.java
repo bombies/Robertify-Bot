@@ -15,7 +15,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -43,14 +43,14 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
         String query;
 
         if (args.isEmpty()) {
-            if (!memberVoiceState.inVoiceChannel()) {
+            if (!memberVoiceState.inAudioChannel()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
                 return;
             }
 
-            if (!selfVoiceState.inVoiceChannel()) {
+            if (!selfVoiceState.inAudioChannel()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
@@ -194,7 +194,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -205,7 +205,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
         final String query;
 
         if (event.getOption("song") == null) {
-            if (!memberVoiceState.inVoiceChannel()) {
+            if (!memberVoiceState.inAudioChannel()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .setEphemeral(true)
@@ -213,7 +213,7 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                 return;
             }
 
-            if (!selfVoiceState.inVoiceChannel()) {
+            if (!selfVoiceState.inAudioChannel()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)
                                 .build())
                         .setEphemeral(true)

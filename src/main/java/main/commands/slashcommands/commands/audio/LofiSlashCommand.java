@@ -6,7 +6,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class LofiSlashCommand extends AbstractSlashCommand {
@@ -29,7 +29,7 @@ public class LofiSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 

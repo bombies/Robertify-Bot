@@ -14,9 +14,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -111,7 +111,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -119,7 +119,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet())
-            if (dedicatedChannelConfig.getChannelID() == event.getTextChannel().getIdLong()) {
+            if (dedicatedChannelConfig.getChannelID() == event.getChannel().asTextChannel().getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                         .queue();
                 return;
@@ -134,7 +134,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith("searchresult:")) return;
 
         String[] split = event.getComponentId().split(":");
@@ -151,14 +151,14 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         GuildVoiceState voiceState = guild.getSelfMember().getVoiceState();
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (voiceState.inVoiceChannel() && (!voiceState.getChannel().equals(memberVoiceState.getChannel()))) {
+        if (voiceState.inAudioChannel() && (!voiceState.getChannel().equals(memberVoiceState.getChannel()))) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                     .setEphemeral(true)
                     .queue();
@@ -171,12 +171,12 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
                 .setEphemeral(true)
                 .queue();
 
-        RobertifyAudioManager.getInstance().loadAndPlay(event.getTextChannel(), "ytsearch:" + trackID,
+        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), "ytsearch:" + trackID,
                 voiceState, memberVoiceState, event.getMessage(), false);
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (!event.getButton().getId().startsWith("searchresult:")) return;
 
         String[] split = event.getButton().getId().split(":");

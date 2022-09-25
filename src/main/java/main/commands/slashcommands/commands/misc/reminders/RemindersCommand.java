@@ -15,7 +15,7 @@ import main.utils.json.reminders.RemindersConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -115,7 +115,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         Member selfMember = guild.getSelfMember();
 
         if (channel != null)
-            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_WRITE))
+            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND))
                 return RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
                         .build();
 
@@ -863,7 +863,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         final Guild guild = event.getGuild();
@@ -886,7 +886,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
                 MessageChannel channel = null;
                 if (options.size() == 3)
-                    channel = options.get(2).getAsMessageChannel();
+                    channel = options.get(2).getAsChannel().asGuildMessageChannel();
 
                 event.replyEmbeds(handleAdd(guild, eventUser, reminder, time, channel != null ? channel.getIdLong() : -1L))
                         .setEphemeral(true)
@@ -906,7 +906,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
                         MessageChannel channel = null;
                         if (options.size() == 2)
-                           channel = options.get(1).getAsMessageChannel();
+                           channel = options.get(1).getAsChannel().asGuildMessageChannel();
 
                         event.replyEmbeds(handleChannelEdit(guild, eventUser, id-1, channel != null ? channel.getIdLong() : -1L))
                                 .setEphemeral(true)
@@ -942,7 +942,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
                 switch (split[2]) {
                     case "channel" -> {
-                        final var channel = options.get(0).getAsMessageChannel();
+                        final var channel = options.get(0).getAsChannel().asGuildMessageChannel();
 
                         if (channel == null) {
                             event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())
@@ -974,7 +974,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
                 switch (split[2]) {
                     case "channel" -> {
-                        final var channel = options.get(0).getAsMessageChannel();
+                        final var channel = options.get(0).getAsChannel().asGuildMessageChannel();
 
                         if (channel == null) {
                             event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())

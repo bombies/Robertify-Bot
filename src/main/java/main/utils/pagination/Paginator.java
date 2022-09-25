@@ -3,11 +3,11 @@ package main.utils.pagination;
 import lombok.Getter;
 import main.constants.MessageButton;
 import main.constants.RobertifyEmoji;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 
 public class Paginator {
     @Getter
@@ -22,10 +22,10 @@ public class Paginator {
 
     public static Paginator getDefaultPaginator() {
         return new Paginator(
-                Emoji.fromMarkdown(RobertifyEmoji.PREVIOUS_EMOJI.toString()),
-                Emoji.fromMarkdown(RobertifyEmoji.REWIND_EMOJI.toString()),
-                Emoji.fromMarkdown(RobertifyEmoji.PLAY_EMOJI.toString()),
-                Emoji.fromMarkdown(RobertifyEmoji.END_EMOJI.toString())
+                Emoji.fromFormatted(RobertifyEmoji.PREVIOUS_EMOJI.toString()),
+                Emoji.fromFormatted(RobertifyEmoji.REWIND_EMOJI.toString()),
+                Emoji.fromFormatted(RobertifyEmoji.PLAY_EMOJI.toString()),
+                Emoji.fromFormatted(RobertifyEmoji.END_EMOJI.toString())
         );
     }
 

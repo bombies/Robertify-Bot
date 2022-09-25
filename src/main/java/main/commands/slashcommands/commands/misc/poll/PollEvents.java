@@ -17,7 +17,7 @@ public class PollEvents extends ListenerAdapter {
         if (!polls.containsKey(event.getMessageIdLong())) return;
         if (event.getUser().isBot()) return;
 
-        final var emoji = event.getReactionEmote().getEmoji();
+        final var emoji = event.getReaction().getEmoji().getName();
         var countMap = polls.get(event.getMessageIdLong());
         var oldVal = countMap.get(GeneralUtils.parseNumEmoji(emoji));
 
@@ -29,7 +29,7 @@ public class PollEvents extends ListenerAdapter {
         if (!polls.containsKey(event.getMessageIdLong())) return;
         if (event.getUser().isBot()) return;
 
-        final var emoji = event.getReactionEmote().getEmoji();
+        final var emoji = event.getReaction().getEmoji().getName();
         var countMap = polls.get(event.getMessageIdLong());
         var oldVal = countMap.get(GeneralUtils.parseNumEmoji(emoji));
 

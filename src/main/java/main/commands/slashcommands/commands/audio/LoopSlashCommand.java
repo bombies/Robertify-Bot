@@ -3,7 +3,7 @@ package main.commands.slashcommands.commands.audio;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.LoopCommand;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class LoopSlashCommand extends AbstractSlashCommand {
@@ -35,7 +35,7 @@ public class LoopSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 

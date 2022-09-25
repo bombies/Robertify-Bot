@@ -7,7 +7,8 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,7 @@ public class RandomMessageCommand extends AbstractSlashCommand implements IDevCo
                 .replaceAll("\\\\n", "\n");
 
         new RandomMessageManager().addMessage(message);
-        msg.addReaction("✅").queue();
+        msg.addReaction(Emoji.fromFormatted("✅")).queue();
     }
 
     public void remove(Message msg, List<String> args) {
@@ -63,7 +64,7 @@ public class RandomMessageCommand extends AbstractSlashCommand implements IDevCo
 
         try {
             new RandomMessageManager().removeMessage(id);
-            msg.addReaction("✅").queue();
+            msg.addReaction(Emoji.fromFormatted("✅")).queue();
         } catch (IndexOutOfBoundsException e) {
             msg.reply(e.getMessage()).queue();
         }
@@ -150,7 +151,7 @@ public class RandomMessageCommand extends AbstractSlashCommand implements IDevCo
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
         final RandomMessageManager randomMessageManager = new RandomMessageManager();

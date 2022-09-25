@@ -19,8 +19,8 @@ import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -79,12 +79,12 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var memberVoiceState = member.getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL).build();
 
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!selfVoiceState.inVoiceChannel())
+        if (!selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.MUST_BE_PLAYING).build();
 
         if (!selfVoiceState.getChannel().equals(memberVoiceState.getChannel()))
@@ -190,7 +190,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
 
-    private void handeSlashList(SlashCommandEvent event) {
+    private void handeSlashList(SlashCommandInteractionEvent event) {
         final var config = FavouriteTracksCache.getInstance();
         final var member = event.getMember();
         final var guild = member.getGuild();
@@ -303,7 +303,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 
@@ -321,8 +321,8 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
-        if (!event.getSelectionMenu().getId().startsWith("menupage")) return;
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+        if (!event.getSelectMenu().getId().startsWith("menupage")) return;
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1]))
             return;
 
@@ -337,20 +337,20 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         final var memberVoiceState = event.getMember().getVoiceState();
         final var selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL).build())
                     .setEphemeral(true)
                     .queue();
             return;
         }
 
-        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                             .build())
                     .setEphemeral(true)
                     .queue();
             return;
-        } else if (!selfVoiceState.inVoiceChannel()) {
+        } else if (!selfVoiceState.inAudioChannel()) {
             if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);
@@ -378,11 +378,11 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                 .setEphemeral(true)
                 .queue();
 
-        event.getTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+        event.getChannel().asTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
             switch (source) {
-                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
-                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
-                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getTextChannel(), event.getUser(), addingMsg, false);
+                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
+                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
+                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
             }
         });
     }

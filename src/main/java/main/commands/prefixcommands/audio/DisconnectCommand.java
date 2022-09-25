@@ -26,7 +26,7 @@ public class DisconnectCommand implements ICommand {
 
         EmbedBuilder eb;
 
-        if (!selfState.inVoiceChannel()) {
+        if (!selfState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "I'm already not in a voice channel!");
             msg.replyEmbeds(eb.build()).queue();
             return;
@@ -35,7 +35,7 @@ public class DisconnectCommand implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You need to be in the same voice channel as me for this to work");
             msg.replyEmbeds(eb.build()).queue();
             return;

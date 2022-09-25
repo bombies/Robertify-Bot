@@ -22,7 +22,7 @@ public class CommandContext {
     }
 
     public TextChannel getChannel() {
-        return this.getEvent().getTextChannel();
+        return this.getEvent().getChannel().asTextChannel();
     }
 
     public Message getMessage() {

@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
-import net.dv8tion.jda.api.interactions.components.selections.SelectionMenu;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 public class SearchResultLoader implements AudioLoadResultHandler {
@@ -72,14 +72,14 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                     .append("]").append("\n");
         }
 
-        SelectionMenu selectionMenu = selectionMenuBuilder.build();
+        SelectMenu selectionMenu = selectionMenuBuilder.build();
 
         if (botMsg != null)
             botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
                             .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                             .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                             .build())
-                    .setActionRows(
+                    .setComponents(
                             ActionRow.of(selectionMenu),
                             ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_END_INTERACTION)))
                     )
@@ -88,7 +88,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                         .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                         .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                         .build())
-                .addActionRows(
+                .setComponents(
                         ActionRow.of(selectionMenu),
                         ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_END_INTERACTION)))
                 )

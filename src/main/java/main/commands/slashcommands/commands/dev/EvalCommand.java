@@ -11,7 +11,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import okhttp3.OkHttpClient;
 import org.jetbrains.annotations.NotNull;
@@ -139,7 +139,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
         final var guild = event.getGuild();
@@ -148,7 +148,7 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
 
         try {
             engine.put("event", event);
-            engine.put("channel", event.getTextChannel());
+            engine.put("channel", event.getChannel().asTextChannel());
             engine.put("api", event.getJDA());
             engine.put("shards",  Robertify.getShardManager());
             engine.put("guild", event.getGuild());

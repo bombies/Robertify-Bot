@@ -5,7 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.MoveCommand;
 import main.utils.GeneralUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,7 +47,7 @@ public class MoveSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 

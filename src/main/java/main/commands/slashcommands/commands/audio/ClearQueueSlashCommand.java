@@ -12,7 +12,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class ClearQueueSlashCommand extends AbstractSlashCommand {
@@ -35,7 +35,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -56,7 +56,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
 
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
-        if (selfVoiceState.inVoiceChannel()) {
+        if (selfVoiceState.inAudioChannel()) {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!musicCommandDJCheck(event)) {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.DJ_PERMS_NEEDED));

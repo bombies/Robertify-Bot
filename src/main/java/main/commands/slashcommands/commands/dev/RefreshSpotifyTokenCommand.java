@@ -3,7 +3,7 @@ package main.commands.slashcommands.commands.dev;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.spotify.SpotifyAuthorizationUtils;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class RefreshSpotifyTokenCommand extends AbstractSlashCommand {
@@ -24,7 +24,7 @@ public class RefreshSpotifyTokenCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
         SpotifyAuthorizationUtils.setTokens();

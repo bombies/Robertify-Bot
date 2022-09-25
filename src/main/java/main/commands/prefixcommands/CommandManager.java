@@ -41,8 +41,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +137,6 @@ public class CommandManager {
                 //Dev Commands
                 new UpdateCommand(),
                 new DeveloperCommand(),
-                new ViewConfigCommand(),
                 new EvalCommand(),
                 new GuildCommand(),
                 new NodeInfoCommand(),
@@ -150,10 +149,6 @@ public class CommandManager {
                 new SpotifyURLToURICommand(),
                 new PlaySpotifyURICommand(),
 //                new KotlinTestCommand(),
-                new LyricsTestCommand(),
-                new MongoTestCommand(),
-                new GuildConfigTestCommand(),
-                new ImageTestCommand(),
                 new MenuPaginationTestCommand()
         );
 
@@ -388,7 +383,7 @@ public class CommandManager {
                         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
                             final var rcConfig = new RestrictedChannelsConfig(guild);
                             if (!rcConfig.isRestrictedChannel(
-                                    msg.getTextChannel().getIdLong(),
+                                    msg.getChannel().asTextChannel().getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
                             )) {
                                 return;

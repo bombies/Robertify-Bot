@@ -9,7 +9,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +43,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         event.deferReply().queue();
@@ -52,7 +52,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
         final var memberVoiceState = event.getMember().getVoiceState();
 
         if (!musicCommandDJCheck(event)) {
-            if (!selfVoiceState.inVoiceChannel()) {
+            if (!selfVoiceState.inAudioChannel()) {
                 event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
                         .setEphemeral(true)
                         .queue();
@@ -60,7 +60,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
             }
 
             if (selfVoiceState.getChannel().getMembers().size() != 2) {
-                MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getTextChannel(), selfVoiceState, memberVoiceState);
+                MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {
                     event.getHook().sendMessageEmbeds(embed)
                             .setEphemeral(false)

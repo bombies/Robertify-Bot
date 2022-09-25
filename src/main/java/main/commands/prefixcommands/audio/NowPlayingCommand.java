@@ -47,12 +47,12 @@ public class NowPlayingCommand implements ICommand {
     public EmbedBuilder getNowPlayingEmbed(Guild guild, TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         EmbedBuilder eb;
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
             return eb;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
             return eb;
         }

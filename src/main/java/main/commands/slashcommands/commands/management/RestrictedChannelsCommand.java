@@ -18,7 +18,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -117,7 +118,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                     .queue();
         } catch (Exception e) {
             logger.error("Unexpected error!", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -180,7 +181,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                     .queue();
         } catch (Exception e) {
             logger.error("Unexpected error!", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -201,7 +202,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
             msg.replyEmbeds(embedBuilder.build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -277,13 +278,13 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         final var config = new RestrictedChannelsConfig(event.getGuild());
         switch (event.getSubcommandName()) {
             case "add" -> {
-                final var channel = event.getOption("channel").getAsGuildChannel();
+                final var channel = event.getOption("channel").getAsChannel();
                 final var guild = event.getGuild();
                 final long channelId;
                 final RestrictedChannelsConfig.ChannelType field;
@@ -339,7 +340,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
                 }
             }
             case "remove" -> {
-                final var channel = event.getOption("channel").getAsGuildChannel();
+                final var channel = event.getOption("channel").getAsChannel();
                 final var guild = event.getGuild();
                 final long channelId;
                 final RestrictedChannelsConfig.ChannelType field;

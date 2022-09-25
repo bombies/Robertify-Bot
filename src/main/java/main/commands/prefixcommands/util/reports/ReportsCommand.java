@@ -10,6 +10,7 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ReportsCommand implements ICommand {
                     .queue(success -> {
                         guild.createTextChannel("opened-reports", category).queue(openedChannel -> {
                             config.initReportChannels(category.getIdLong(), openedChannel.getIdLong());
-                            msg.addReaction("✅").queue();
+                            msg.addReaction(Emoji.fromFormatted("✅")).queue();
                         });
                     });
         });
@@ -125,7 +126,7 @@ public class ReportsCommand implements ICommand {
                                                 .build())
                                         .queue(success -> {
                                             reportMsg.delete().queue();
-                                            msg.addReaction("✅").queue();
+                                            msg.addReaction(Emoji.fromFormatted("✅")).queue();
                                         }, new ErrorHandler()
                                                 .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
                             }));
@@ -173,7 +174,7 @@ public class ReportsCommand implements ICommand {
                     )
                     .queue(success -> {
                         activeReports.add(user.getIdLong());
-                        msg.addReaction("✅").queue();
+                        msg.addReaction(Emoji.fromFormatted("✅")).queue();
                     }, new ErrorHandler()
                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, e -> {
                                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must have your private messages " +
@@ -218,7 +219,7 @@ public class ReportsCommand implements ICommand {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -258,7 +259,7 @@ public class ReportsCommand implements ICommand {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 

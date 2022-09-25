@@ -7,7 +7,7 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public class JoinSlashCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
         sendRandomMessage(event);
 
@@ -52,7 +52,7 @@ public class JoinSlashCommand extends AbstractSlashCommand {
 
         event.getHook().sendMessageEmbeds(new JoinCommand().handleJoin(
                 event.getGuild(),
-                event.getTextChannel(),
+                event.getChannel().asTextChannel(),
                 event.getMember().getVoiceState(),
                 event.getGuild().getSelfMember().getVoiceState()
         )).queue();

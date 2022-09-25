@@ -10,7 +10,8 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
         switch (args.get(0).toLowerCase()) {
             case "db" -> {
                 AbstractMongoDatabase.initAllCaches();
-                msg.addReaction("✅").queue();
+                msg.addReaction(Emoji.fromFormatted("✅")).queue();
             }
             case "dedichannel", "dc" -> handleDedicatedChannelUpdates(msg, args);
             default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid args!").build()).queue();
@@ -73,10 +74,10 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                 }
                 default -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Invalid arg").build()).queue();
             }
-            msg.addReaction("✅").queue();
+            msg.addReaction(Emoji.fromFormatted("✅")).queue();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -125,7 +126,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
 

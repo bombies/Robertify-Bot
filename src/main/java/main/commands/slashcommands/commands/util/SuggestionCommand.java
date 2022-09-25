@@ -11,7 +11,8 @@ import main.utils.database.mongodb.cache.BotBDCache;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -74,7 +75,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
                                   guild.createTextChannel("denied-suggestions", category)
                                           .queueAfter(1, TimeUnit.SECONDS, deniedChannel -> {
                                               config.initSuggestionChannels(category.getIdLong(), pendingChannel.getIdLong(), acceptedChannel.getIdLong(), deniedChannel.getIdLong());
-                                                msg.addReaction("✅").queue();
+                                                msg.addReaction(Emoji.fromFormatted("✅")).queue();
                                           });
                                });
                    });
@@ -160,7 +161,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
                                 acceptedEmbed.addField("Comments", reason, false);
 
                             channel.sendMessageEmbeds(acceptedEmbed.build())
-                                    .queue(success -> msg.addReaction("✅").queue(), new ErrorHandler()
+                                    .queue(success -> msg.addReaction(Emoji.fromFormatted("✅")).queue(), new ErrorHandler()
                                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
                         });
                     });
@@ -239,7 +240,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
                                 deniedEmbed.addField("Reason", reason, false);
 
                             channel.sendMessageEmbeds(deniedEmbed.build())
-                                    .queue(success -> msg.addReaction("✅").queue(), new ErrorHandler()
+                                    .queue(success -> msg.addReaction(Emoji.fromFormatted("✅")).queue(), new ErrorHandler()
                                             .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}));
                         });
                     });
@@ -295,8 +296,8 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
         eb.setTimestamp(Instant.now());
 
         pendingChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
-            msg.addReaction("👍").queue();
-            msg.addReaction("👎").queue();
+            msg.addReaction(Emoji.fromFormatted("👍")).queue();
+            msg.addReaction(Emoji.fromFormatted("👎")).queue();
         });
 
         return RobertifyEmbedUtils.embedMessage(guild, "You have successfully sent your suggestion!\n\n" +
@@ -340,7 +341,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -380,7 +381,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build()).queue();
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            msg.addReaction("❌").queue();
+            msg.addReaction(Emoji.fromFormatted("❌")).queue();
         }
     }
 
@@ -430,7 +431,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         event.replyEmbeds(handleSuggestion(event.getGuild(), event.getUser(), event.getOption("suggestion").getAsString()))

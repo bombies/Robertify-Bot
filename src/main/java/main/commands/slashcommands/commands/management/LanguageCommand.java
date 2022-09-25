@@ -8,10 +8,10 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
-import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +43,7 @@ public class LanguageCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
@@ -77,8 +77,8 @@ public class LanguageCommand extends AbstractSlashCommand {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
-        final var selectionMenu = event.getSelectionMenu();
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+        final var selectionMenu = event.getSelectMenu();
         if (!selectionMenu.getId().startsWith("languagemenu")) return;
 
         final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);

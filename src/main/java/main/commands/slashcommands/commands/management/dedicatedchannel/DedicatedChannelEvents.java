@@ -19,17 +19,14 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SelectionMenuEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.Button;
-import net.dv8tion.jda.api.interactions.components.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -42,7 +39,10 @@ import java.util.concurrent.TimeUnit;
 public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
-    public void onTextChannelDelete(@NotNull TextChannelDeleteEvent event) {
+    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+        if (!event.isFromType(ChannelType.TEXT))
+            return;
+
         final Guild guild = event.getGuild();
         final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
 
@@ -75,7 +75,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = eventMessage.getContentRaw();
 
         if (!message.startsWith(new GuildConfig(guild).getPrefix()) && !user.isBot() && !event.isWebhookMessage()) {
-            if (!memberVoiceState.inVoiceChannel()) {
+            if (!memberVoiceState.inAudioChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())
                         .queue();
@@ -83,7 +83,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                 return;
             }
 
-            if (selfVoiceState.inVoiceChannel()) {
+            if (selfVoiceState.inAudioChannel()) {
                 if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
                     event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                                     .build())
@@ -117,7 +117,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (!eventMessage.getAttachments().isEmpty()) {
                 var audioFile = eventMessage.getAttachments().get(0);
-                new PlayCommand().playLocalAudio(guild, event.getTextChannel(), eventMessage, event.getMember(), audioFile);
+                new PlayCommand().playLocalAudio(guild, event.getChannel().asTextChannel(), eventMessage, event.getMember(), audioFile);
 
                 event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS, null, new ErrorHandler()
                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
@@ -165,13 +165,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (addToBeginning)
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
+                        .loadAndPlayFromDedicatedChannel(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
             else if (shuffled) {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannelShuffled(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannelShuffled(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             } else {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannel(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             }
         }
 
@@ -187,7 +187,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
@@ -195,7 +195,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
 
         if (!config.isChannelSet()) return;
-        if (event.getTextChannel().getIdLong() != config.getChannelID()) return;
+        if (event.getChannel().asTextChannel().getIdLong() != config.getChannelID()) return;
 
         final String id = event.getButton().getId();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
@@ -203,13 +203,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
         final Member member = event.getMember();
 
-        if (!selfVoiceState.inVoiceChannel()) {
+        if (!selfVoiceState.inAudioChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED).build())
                     .queue();
             return;
         }
 
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build())
                     .queue();
@@ -371,7 +371,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
     }
 
     @Override
-    public void onSelectionMenu(@NotNull SelectionMenuEvent event) {
+    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
         if (!event.getComponentId().startsWith(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId()))
             return;
 
@@ -388,7 +388,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (!GeneralUtils.checkPremium(guild, event))
             return;
 
-        if (!selfMember.getVoiceState().inVoiceChannel()) {
+        if (!selfMember.getVoiceState().inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.VOICE_CHANNEL_NEEDED)).build())
                     .setEphemeral(true)
                     .queue();
@@ -396,7 +396,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         }
 
         GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
-        if (!memberVoiceState.inVoiceChannel()) {
+        if (!memberVoiceState.inAudioChannel()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL)).build())
                     .setEphemeral(true)
                     .queue();

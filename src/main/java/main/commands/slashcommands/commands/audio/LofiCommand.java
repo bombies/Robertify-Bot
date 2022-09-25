@@ -61,14 +61,14 @@ public class LofiCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        if (!memberVoiceState.inVoiceChannel())
+        if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build();
 
 
-        if (selfVoiceState.inVoiceChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+        if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                     .build();
-        } else if (!selfVoiceState.inVoiceChannel()) {
+        } else if (!selfVoiceState.inAudioChannel()) {
             if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);

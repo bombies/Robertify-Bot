@@ -104,7 +104,7 @@ public class ReminderScheduler {
                         return;
                     }
 
-                    if (!guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_WRITE)) {
+                    if (!guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_SEND)) {
                         dmReminder(guild, user, reminder);
                         return;
                     }

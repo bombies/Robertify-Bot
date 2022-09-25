@@ -39,7 +39,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.4.0_352</version>
+            <version>5.0.0-alpha.18</version>
         </dependency>
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>2b1b439ea65be2ee9a83f2b924566fdefe94d8ed</version>
+            <version>c0e644dd9fc9ce74e39c9c12cbfa62e96ae88b3b</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
