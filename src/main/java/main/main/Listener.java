@@ -22,6 +22,7 @@ import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -66,8 +68,20 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet())
+            if (dedicatedChannelConfig.isChannelSet()) {
                 dedicatedChannelConfig.updateAll();
+
+                final var dedicatedChannel = dedicatedChannelConfig.getTextChannel();
+                dedicatedChannel.getManager().putMemberPermissionOverride(
+                        g.getSelfMember().getIdLong(),
+                        List.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY),
+                        List.of()
+                ).putPermissionOverride(
+                        g.getPublicRole(),
+                        List.of(Permission.MESSAGE_HISTORY),
+                        List.of(Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE)
+                ).queue();
+            }
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);
