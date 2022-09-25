@@ -44,7 +44,7 @@
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>7.1.0</version>
+            <version>7.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -75,12 +75,12 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.6.1</version>
+            <version>4.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.walkyst</groupId>
