@@ -103,7 +103,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         final var requester = RobertifyAudioManager.getRequester(guild, track);
 
         if (announcementChannel != null) {
-            final var localeManager =LocaleManager.getLocaleManager(guild);
+            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            if (dedicatedChannelConfig.isChannelSet())
+                if (dedicatedChannelConfig.getChannelID() == announcementChannel.getIdLong())
+                    return;
+
+            final var localeManager = LocaleManager.getLocaleManager(guild);
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", track.getInfo().title), Pair.of("{author}", track.getInfo().author))
                     + (new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
                     "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
