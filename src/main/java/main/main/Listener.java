@@ -68,20 +68,8 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet()) {
+            if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.updateAll();
-
-                final var dedicatedChannel = dedicatedChannelConfig.getTextChannel();
-                dedicatedChannel.getManager().putMemberPermissionOverride(
-                        g.getSelfMember().getIdLong(),
-                        List.of(Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY),
-                        List.of()
-                ).putPermissionOverride(
-                        g.getPublicRole(),
-                        List.of(Permission.MESSAGE_HISTORY),
-                        List.of(Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE)
-                ).queue();
-            }
 
             try {
                 ResumeUtils.getInstance().loadInfo(g);
