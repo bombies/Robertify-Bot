@@ -104,10 +104,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackStart(IPlayer player, AudioTrack track) {
-        if (disconnectExecutors.containsKey(guild.getIdLong())) {
-            disconnectExecutors.get(guild.getIdLong()).cancel(true);
-            disconnectExecutors.remove(guild.getIdLong());
-        }
+        if (disconnectScheduled(guild))
+            removeScheduledDisconnect(guild);
 
         lastPlayedTrackBuffer = track;
 
@@ -222,8 +220,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             }
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack);
-        } catch (AutoPlayException e) {
-            throw e;
         }
 
         final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
@@ -311,6 +307,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     public void clearSavedQueue(Guild guild) {
         savedQueue.remove(guild);
+    }
+
+    public boolean disconnectScheduled(Guild guild) {
+        return disconnectExecutors.containsKey(guild.getIdLong());
     }
 
     public void removeScheduledDisconnect(Guild guild) {
