@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final boolean addToBeginning;
     private final TextChannel announcementChannel;
 
-    public AudioLoader(User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
+    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
@@ -125,10 +126,9 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (!announceMsg)
                 RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0).getIdentifier());
 
-            if (sender != null) {
-                trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+            trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
+            if (sender != null)
                 trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
-            }
 
             final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
@@ -211,7 +211,8 @@ public class AudioLoader implements AudioLoadResultHandler {
             botMsg.editMessageEmbeds(eb.build()).queue();
         else {
             new DedicatedChannelConfig(guild).getTextChannel()
-                    .sendMessageEmbeds(eb.build()).queue();
+                    .sendMessageEmbeds(eb.build())
+                    .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         }
 
         if (musicManager.getScheduler().queue.isEmpty())
