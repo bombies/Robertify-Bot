@@ -280,7 +280,10 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             if (scheduler.repeating) {
                 scheduler.repeating = false;
                 scheduler.playlistRepeating = true;
-                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
+                loopEmbed = RobertifyEmbedUtils.embedMessage(guild,
+                        RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START,
+                        Pair.of("{title}", info.title)
+                );
 
                 new LogUtils(guild).sendLog(
                         LogType.QUEUE_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG,
