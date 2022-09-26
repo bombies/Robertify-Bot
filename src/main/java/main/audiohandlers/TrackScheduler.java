@@ -71,6 +71,30 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         }
     }
 
+    public void addToBeginningOfQueue(AudioTrack track) {
+        if (getMusicPlayer().getPlayingTrack() == null) {
+            getMusicPlayer().playTrack(track);
+            return;
+        }
+
+        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
+        newQueue.offer(track);
+        newQueue.addAll(queue);
+        queue = newQueue;
+    }
+
+    public void addToBeginningOfQueue(List<AudioTrack> tracks) {
+        if (getMusicPlayer().getPlayingTrack() == null) {
+            getMusicPlayer().playTrack(tracks.get(0));
+            tracks.remove(0);
+        }
+
+        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
+        tracks.forEach(newQueue::offer);
+        newQueue.addAll(queue);
+        queue = newQueue;
+    }
+
     public void stop() {
         queue.clear();
 
@@ -287,20 +311,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     public void clearSavedQueue(Guild guild) {
         savedQueue.remove(guild);
-    }
-
-    public void addToBeginningOfQueue(AudioTrack track) {
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        newQueue.offer(track);
-        newQueue.addAll(queue);
-        queue = newQueue;
-    }
-
-    public void addToBeginningOfQueue(List<AudioTrack> tracks) {
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        tracks.forEach(newQueue::offer);
-        newQueue.addAll(queue);
-        queue = newQueue;
     }
 
     public void removeScheduledDisconnect(Guild guild) {
