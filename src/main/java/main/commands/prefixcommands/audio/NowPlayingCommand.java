@@ -97,8 +97,8 @@ public class NowPlayingCommand implements ICommand {
                 "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
 
         switch (track.getSourceManager().getSourceName().toLowerCase()) {
-            case "spotify" -> eb.setThumbnail(SpotifyUtils.getArtworkUrl(track.getInfo().identifier));
-            case "deezer" -> eb.setThumbnail(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier)));
+            case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(track.getInfo().identifier));
+            case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier)));
         }
 
         eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_AUTHOR), GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig(guild).getTheme().getTransparent());
