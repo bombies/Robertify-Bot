@@ -140,7 +140,8 @@ public class Robertify {
                             CacheFlag.EMOJI,
                             CacheFlag.CLIENT_STATUS,
                             CacheFlag.ROLE_TAGS,
-                            CacheFlag.ONLINE_STATUS
+                            CacheFlag.ONLINE_STATUS,
+                            CacheFlag.STICKER
                     )
                     .disableIntents(
                             GatewayIntent.DIRECT_MESSAGE_TYPING,
