@@ -343,8 +343,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void disconnect(boolean announceMsg) {
         final var channel = guild.getSelfMember().getVoiceState().getChannel();
 
-        if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
-            return;
+//        Sussy line 🤔
+//        if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
+//            return;
 
         if (!new GuildConfig(guild).get247()) {
             if (channel != null) {
