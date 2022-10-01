@@ -330,13 +330,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (new GuildConfig(guild).get247())
             return;
 
-        ScheduledFuture<?> schedule = executor.schedule(() -> disconnect(announceMsg), delay, timeUnit);
-
         if (disconnectExecutors.containsKey(guild.getIdLong())) {
             logger.debug("Scheduled disconnect already existed... Cancelling.");
             disconnectExecutors.get(guild.getIdLong()).cancel(false);
         }
 
+        ScheduledFuture<?> schedule = executor.schedule(() -> disconnect(announceMsg), delay, timeUnit);
         disconnectExecutors.put(guild.getIdLong(), schedule);
     }
 
