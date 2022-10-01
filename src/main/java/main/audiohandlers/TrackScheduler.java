@@ -274,7 +274,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void onTrackException(IPlayer player, AudioTrack track, Exception exception) {
         if (exception.getMessage().contains("matching track")) {
             if (announcementChannel != null)
-                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE).build())
+                announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+                                RobertifyLocaleMessage.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE,
+                                Pair.of("{title}", track.getInfo().title),
+                                Pair.of("{author}", track.getInfo().author)
+                        ).build())
                         .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         } else if (exception.getMessage().contains("copyright")) {
             if (announcementChannel != null)
