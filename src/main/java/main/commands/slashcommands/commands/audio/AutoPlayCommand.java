@@ -74,7 +74,9 @@ public class AutoPlayCommand extends AbstractSlashCommand implements ICommand {
 
         Guild guild = event.getGuild();
 
-        event.replyEmbeds(handleAutoPlay(guild)).queue();
+        event.replyEmbeds(handleAutoPlay(guild))
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                .queue();
     }
 
     @Override

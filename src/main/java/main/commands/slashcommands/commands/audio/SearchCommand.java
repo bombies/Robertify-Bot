@@ -130,7 +130,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SearchMessages.LOOKING_FOR, Pair.of("{query}", query)).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue(addingMsg -> getSearchResults(guild, event.getUser(), addingMsg, SpotifySourceManager.SEARCH_PREFIX + query));
     }
 

@@ -47,7 +47,7 @@ public abstract class Pages {
     public static Message paginateMessage(SlashCommandInteractionEvent event, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        WebhookMessageCreateAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(false);
+        WebhookMessageCreateAction<Message> messageAction = event.getHook().sendMessageEmbeds(messagePages.get(0).getEmbed()).setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
 
         if (messagePages.size() > 1) {
             messageAction = messageAction.addComponents(
@@ -128,7 +128,7 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, ReplyCallbackAction msg, List<SelectMenuOption> options) {
+    public static void paginateMenu(User user, GuildMessageChannel channel, ReplyCallbackAction msg, List<SelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic("null", options);
 
         final var firstPage = menuPages.get(0);
@@ -141,7 +141,7 @@ public abstract class Pages {
         ).build();
 
         msg.addActionRow(menu)
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(channel))
                 .queue(success -> success.retrieveOriginal().queue(og -> menuMessages.put(og.getIdLong(), menuPages)));
     }
 
@@ -156,7 +156,7 @@ public abstract class Pages {
 
     public static void paginateMenu(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         final var msg = menuLogic(event, options, startingPage, numberEachEntry);
-        paginateMenu(event.getUser(), msg, options);
+        paginateMenu(event.getUser(), event.getChannel().asGuildMessageChannel(), msg, options);
     }
 
     private static Message menuLogic(TextChannel channel, int startingPage, List<SelectMenuOption> options) {

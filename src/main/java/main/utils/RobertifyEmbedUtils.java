@@ -1,10 +1,12 @@
 package main.utils;
 
 import main.main.Robertify;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.LocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.HashMap;
@@ -76,6 +78,20 @@ public class RobertifyEmbedUtils {
     public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, String message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
         return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title, placeholders)).setDescription(message);
+    }
+
+    public static boolean getEphemeralState(GuildMessageChannel channel) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        if (!dedicatedChannelConfig.isChannelSet())
+            return false;
+        return dedicatedChannelConfig.getChannelID() == channel.getIdLong();
+    }
+
+    public static boolean getEphemeralState(GuildMessageChannel channel, boolean _default) {
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        if (!dedicatedChannelConfig.isChannelSet())
+            return _default;
+        return dedicatedChannelConfig.getChannelID() == channel.getIdLong();
     }
 
     private static EmbedBuilder getDefaultEmbed(long gid) {

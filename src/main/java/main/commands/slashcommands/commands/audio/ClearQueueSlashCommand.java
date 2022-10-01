@@ -50,7 +50,9 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
 
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.CQ_NOTHING_IN_QUEUE));
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
             return;
         }
 
@@ -60,13 +62,17 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 if (!musicCommandDJCheck(event)) {
                     EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.DJ_PERMS_NEEDED));
-                    event.getHook().sendMessageEmbeds(eb.build()).queue();
+                    event.getHook().sendMessageEmbeds(eb.build())
+                            .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                            .queue();
                     return;
                 }
             }
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NO_VOICE_CHANNEL));
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
             return;
         }
 
@@ -74,7 +80,9 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEAR));
-        event.getHook().sendMessageEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build())
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                .queue();
         ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         GeneralUtils.setDefaultEmbed(event.getGuild());
     }

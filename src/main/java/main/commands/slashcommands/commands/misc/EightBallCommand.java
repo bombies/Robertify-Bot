@@ -370,27 +370,27 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
             case "ask" -> {
                 GeneralUtils.setCustomEmbed(event.getGuild(), "");
                 event.replyEmbeds(handle8Ball(guild, event.getUser(), event.getOption("question").getAsString()).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
                 GeneralUtils.setDefaultEmbed(event.getGuild());
             }
             case "add" -> {
                 final var response = event.getOption("response").getAsString();
                 event.replyEmbeds(handleAdd(guild, user, response).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
             case "remove" -> {
                 final var indexToRemove = event.getOption("index").getAsLong();
                 event.replyEmbeds(handleRemove(guild, user, (int) indexToRemove).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
             case "clear" -> event.replyEmbeds(handleClear(guild, user).build())
-                    .setEphemeral(false)
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();
             case "list" -> event.replyEmbeds(handleList(guild, user).build())
-                    .setEphemeral(false)
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();
         }
     }

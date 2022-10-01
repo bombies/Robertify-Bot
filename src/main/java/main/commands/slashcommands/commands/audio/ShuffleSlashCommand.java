@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.ShuffleCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,6 @@ public class ShuffleSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         event.getHook().sendMessageEmbeds(new ShuffleCommand().handleShuffle(event.getGuild(), event.getUser()).build())
-                .setEphemeral(false).queue();
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
     }
 }

@@ -86,7 +86,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
 
                                 try {
                                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
-                                            .setEphemeral(false)
+                                            .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                                             .queue();
                                 } catch (InsufficientPermissionException e) {
                                     if (e.getMessage().contains("MESSAGE_HISTORY"))

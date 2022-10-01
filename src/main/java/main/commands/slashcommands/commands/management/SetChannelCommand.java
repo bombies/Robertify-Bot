@@ -153,7 +153,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
 
         guildConfig.setAnnouncementChannelID(channel.getIdLong());
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You have set the announcement channel to: " + channel.getAsMention()).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

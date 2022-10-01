@@ -49,7 +49,7 @@ public class SendAlertCommand extends AbstractSlashCommand {
                                 Button.of(ButtonStyle.SUCCESS, "sendalert:yes", "Yes"),
                                 Button.of(ButtonStyle.DANGER, "sendalert:no", "No")
                         )
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
     }
 

@@ -108,13 +108,14 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
         if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED);
-            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
+            event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel())).queue();
             return;
         }
 
         if (selfVoiceState.inAudioChannel() && !memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()))
                             .build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                     .queue();
             return;
         }
@@ -147,14 +148,14 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             final var linkDestination = GeneralUtils.getLinkDestination(link);
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
                 event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
-                        .setEphemeral(true)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                         .queue();
                 return;
             }
         }
 
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue(msg -> RobertifyAudioManager.getInstance()
                         .loadAndPlay(
                                 link,
@@ -179,7 +180,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                     } catch (Exception e) {
                         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.LOCAL_DIR_ERR).build())
                                 .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
-                                .setEphemeral(true)
+                                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                                 .queue();
 
                         logger.error("[FATAL ERROR] Could not create audio directory!", e);
@@ -194,7 +195,8 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                     if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
                         final var trackFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
                         audioFile.getProxy().downloadToFile(trackFile)
-                                .thenAccept(file -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+                                .thenAccept(file -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
+                                        .queue(addingMsg -> {
                                     RobertifyAudioManager.getInstance()
                                             .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
                                 }))
@@ -202,12 +204,14 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
                                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
                                             .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                            .setEphemeral(true)
                                             .queue();
                                     return null;
                                 });
                     } else {
                         File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
-                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
+                                .queue(addingMsg -> {
                             RobertifyAudioManager.getInstance()
                                     .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
                         }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
@@ -217,10 +221,12 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
                             .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                            .setEphemeral(true)
                             .queue();
                 }
             }
             default -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.INVALID_FILE).build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                     .queue();
         }
     }

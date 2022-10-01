@@ -45,7 +45,7 @@ public class JoinSlashCommand extends AbstractSlashCommand {
         if (!musicCommandDJCheck(event)) {
             event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS, Pair.of("{permissions}", Permission.ROBERTIFY_DJ.name().toUpperCase()))
                     .build())
-                    .setEphemeral(true)
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();
             return;
         }

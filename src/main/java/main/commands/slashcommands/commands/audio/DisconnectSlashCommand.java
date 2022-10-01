@@ -51,19 +51,25 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
 
         if (!selfVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.NOT_IN_CHANNEL));
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
             return;
         }
 
         if (!memberVoiceState.inAudioChannel()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention())));
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
             return;
         }
 
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
             eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention())));
-            event.getHook().sendMessageEmbeds(eb.build()).queue();
+            event.getHook().sendMessageEmbeds(eb.build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
             return;
         }
 
@@ -73,7 +79,9 @@ public class DisconnectSlashCommand extends AbstractSlashCommand {
         new LogUtils(guild).sendLog(LogType.BOT_DISCONNECTED, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED_USER));
 
         eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.DisconnectMessages.DISCONNECTED));
-        event.getHook().sendMessageEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build())
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                .queue();
 
         ResumeUtils.getInstance().removeInfo(guild);
     }

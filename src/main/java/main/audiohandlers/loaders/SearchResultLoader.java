@@ -13,6 +13,7 @@ import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -93,7 +94,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                         ActionRow.of(selectionMenu),
                         ActionRow.of(Button.of(ButtonStyle.DANGER, "searchresult:end:" + searcher.getId(), localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_END_INTERACTION)))
                 )
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState((GuildMessageChannel) interactionBotMsg.getInteraction().getMessageChannel()))
                 .queue();
     }
 

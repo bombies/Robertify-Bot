@@ -706,7 +706,9 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 }
             }
         }
-        event.getHook().sendMessageEmbeds(eb.build()).queue();
+        event.getHook().sendMessageEmbeds(eb.build())
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                .queue();
     }
 
     @Override

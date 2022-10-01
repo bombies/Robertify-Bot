@@ -56,6 +56,6 @@ public class UptimeCommand extends AbstractSlashCommand implements ICommand {
                         event.getGuild(),
                         GeneralUtils.getDurationString(System.currentTimeMillis() - BotBDCache.getInstance().getLastStartup())
                 ).build()
-        ).setEphemeral(false).queue();
+        ).setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
     }
 }

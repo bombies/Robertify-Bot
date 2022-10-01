@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.NowPlayingCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,7 +36,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

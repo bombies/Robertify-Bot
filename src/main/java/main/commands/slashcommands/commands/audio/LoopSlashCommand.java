@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.LoopCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -56,9 +57,9 @@ public class LoopSlashCommand extends AbstractSlashCommand {
 
         switch (event.getSubcommandName()) {
             case "track" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager, event.getUser()).build())
-                    .setEphemeral(false).queue();
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
             case "queue" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, event.getUser()).build())
-                    .setEphemeral(false).queue();
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
         }
     }
 }

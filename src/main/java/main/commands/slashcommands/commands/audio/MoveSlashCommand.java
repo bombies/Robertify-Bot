@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.MoveCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -59,7 +60,7 @@ public class MoveSlashCommand extends AbstractSlashCommand {
         final int pos = GeneralUtils.longToInt(event.getOption("position").getAsLong());
 
         event.getHook().sendMessageEmbeds(new MoveCommand().handleMove(event.getGuild(), event.getUser(), queue, id, pos).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

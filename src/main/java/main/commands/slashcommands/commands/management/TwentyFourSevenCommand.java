@@ -94,7 +94,7 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
         if (!checksWithPremium(event)) return;
         sendRandomMessage(event);
 
-        event.replyEmbeds(logic(event.getGuild())).setEphemeral(false)
+        event.replyEmbeds(logic(event.getGuild())).setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 

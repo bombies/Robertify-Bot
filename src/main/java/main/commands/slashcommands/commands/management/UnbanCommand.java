@@ -141,7 +141,7 @@ public class UnbanCommand extends AbstractSlashCommand implements ICommand {
         final var userToUnban = event.getOption("user").getAsUser();
 
         event.replyEmbeds(handleUnban(event.getGuild(), userToUnban).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

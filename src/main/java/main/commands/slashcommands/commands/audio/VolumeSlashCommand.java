@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.VolumeCommand;
 import main.utils.GeneralUtils;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -53,7 +54,7 @@ public class VolumeSlashCommand extends AbstractSlashCommand {
                 selfVoiceState ,memberVoiceState,
                         GeneralUtils.longToInt(event.getOption("volume").getAsLong())
                 ).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

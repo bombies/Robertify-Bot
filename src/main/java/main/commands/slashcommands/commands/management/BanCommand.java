@@ -191,7 +191,7 @@ public class BanCommand extends AbstractSlashCommand implements ICommand {
         final var duration = event.getOption("duration") == null ? null : event.getOption("duration").getAsString();
 
         event.replyEmbeds(handleBan(guild, userToBan, event.getUser(), duration).build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

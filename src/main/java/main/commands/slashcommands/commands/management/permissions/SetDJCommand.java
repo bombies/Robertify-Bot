@@ -176,13 +176,13 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
             case "role" -> {
                 var role = event.getOption("role").getAsRole();
                 event.replyEmbeds(handleSetDJ(event.getGuild(), role).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
             case "user" -> {
                 var user = event.getOption("user").getAsUser();
                 event.replyEmbeds(handleSetDJ(event.getGuild(), user).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
         }

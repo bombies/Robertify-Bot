@@ -69,7 +69,7 @@ public class ListDJCommand extends AbstractSlashCommand implements ICommand {
                 .addField(localeManager.getMessage(RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_ROLES), roles.isEmpty() ? localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NOTHING_HERE) : GeneralUtils.listToString(roles), false)
                 .addField(localeManager.getMessage(RobertifyLocaleMessage.PermissionsMessages.PERMISSIONS_USERS), users.isEmpty() ? localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.NOTHING_HERE) : GeneralUtils.listToString(users), false);
         event.replyEmbeds(eb.build())
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 }

@@ -123,7 +123,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
                         localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_EMBED_DESC)
         ).build())
                 .addActionRow(getSelectionMenu(guild, event.getUser().getIdLong()))
-                .setEphemeral(false)
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                 .queue();
     }
 

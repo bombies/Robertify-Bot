@@ -63,7 +63,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                 MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {
                     event.getHook().sendMessageEmbeds(embed)
-                            .setEphemeral(false)
+                            .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                             .queue();
                 } else {
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED).build())
@@ -77,14 +77,14 @@ public class SkipSlashCommand extends AbstractSlashCommand {
 
         if (event.getOptions().isEmpty()) {
             event.getHook().sendMessageEmbeds(new SkipCommand().handleSkip(selfVoiceState, memberVoiceState))
-                    .setEphemeral(false)
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();
         } else {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
             final int tracksToSkip = GeneralUtils.longToInt(event.getOption("trackstoskip").getAsLong());
             event.getHook().sendMessageEmbeds(new SkipToCommand().handleSkip(event.getUser(), queue, musicManager, tracksToSkip).build())
-                    .setEphemeral(false)
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();
         }
         sendRandomMessage(event);

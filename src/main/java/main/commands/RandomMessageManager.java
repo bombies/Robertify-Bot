@@ -6,6 +6,7 @@ import main.constants.Toggles;
 import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotBDCache;
+import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -60,9 +61,16 @@ public class RandomMessageManager {
         if (!new TogglesConfig(channel.getGuild()).getToggle(Toggles.TIPS))
             return;
 
+        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        if (dedicatedChannelConfig.isChannelSet()) {
+            if (dedicatedChannelConfig.getChannelID() == channel.getIdLong())
+                return;
+        }
+
         if (!hasMessages()) return;
 
         if (new Random().nextDouble() <= chance)
-            channel.sendMessageEmbeds(getMessage(channel.getGuild())).queue();
+            channel.sendMessageEmbeds(getMessage(channel.getGuild()))
+                    .queue();
     }
 }

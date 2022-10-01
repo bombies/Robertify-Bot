@@ -165,13 +165,13 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
             case "role" -> {
                 var role = event.getOption("role").getAsRole();
                 event.replyEmbeds(handleDJRemove(event.getGuild(), role).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
             case "user" -> {
                 var user = event.getOption("user").getAsUser();
                 event.replyEmbeds(handleDJRemove(event.getGuild(), user).build())
-                        .setEphemeral(false)
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }
         }

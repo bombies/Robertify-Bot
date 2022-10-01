@@ -43,6 +43,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
     private final TextChannel announcementChannel;
+    private final DedicatedChannelConfig dedicatedChannelConfig;
 
     public AudioLoader(@NotNull User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
@@ -57,6 +58,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
         this.announcementChannel = botMsg != null ? botMsg.getChannel().asTextChannel() : null;
+        this.dedicatedChannelConfig = new DedicatedChannelConfig(this.guild);
     }
 
     @Override
@@ -88,8 +90,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (dedicatedChannelConfig.isChannelSet())
+            dedicatedChannelConfig.updateMessage();
 
     }
 
@@ -101,11 +103,16 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         if (botMsg != null) {
             botMsg.editMessageEmbeds(eb.build())
-                    .queue(success -> success.editMessageComponents().queue());
+                    .queue(success -> success.editMessageComponents().queue(msg -> {
+                        if (dedicatedChannelConfig.isChannelSet())
+                            if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                                msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                    }));
         } else {
-            if (new DedicatedChannelConfig(guild).isChannelSet())
-                new DedicatedChannelConfig(guild).getTextChannel()
-                        .sendMessageEmbeds(eb.build()).queue();
+            if (dedicatedChannelConfig.isChannelSet())
+                dedicatedChannelConfig.getTextChannel()
+                        .sendMessageEmbeds(eb.build())
+                        .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         }
     }
 
@@ -151,7 +158,11 @@ public class AudioLoader implements AudioLoadResultHandler {
             );
 
             if (botMsg != null)
-                botMsg.editMessageEmbeds(eb.build()).queue();
+                botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
+                    if (dedicatedChannelConfig.isChannelSet())
+                        if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                            msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                });
             else {
                 if (dedicatedChannelConfig.isChannelSet())
                     dedicatedChannelConfig.getTextChannel()
@@ -200,7 +211,11 @@ public class AudioLoader implements AudioLoadResultHandler {
         EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", trackUrl.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, "")))
                 : RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND_ALT);
         if (botMsg != null)
-            botMsg.editMessageEmbeds(eb.build()).queue();
+            botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
+                if (dedicatedChannelConfig.isChannelSet())
+                    if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                        msg.delete().queueAfter(10, TimeUnit.SECONDS);
+            });
         else {
             new DedicatedChannelConfig(guild).getTextChannel()
                     .sendMessageEmbeds(eb.build())
@@ -225,10 +240,14 @@ public class AudioLoader implements AudioLoadResultHandler {
                         LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.AudioLoaderMessages.ERROR_LOADING_TRACK)
         );
         if (botMsg != null)
-            botMsg.editMessageEmbeds(eb.build()).queue();
+            botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
+                if (dedicatedChannelConfig.isChannelSet())
+                    if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                        msg.delete().queueAfter(10, TimeUnit.SECONDS);
+            });
         else {
             new DedicatedChannelConfig(guild).getTextChannel()
-                    .sendMessageEmbeds(eb.build()).queue();
+                    .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         }
     }
 }

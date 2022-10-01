@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.SeekCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -63,6 +64,6 @@ public class SeekSlashCommand extends AbstractSlashCommand {
         final GuildVoiceState memberVoiceState = event.getMember().getVoiceState();
 
         event.getHook().sendMessageEmbeds(new SeekCommand().handleSeek(selfVoiceState, memberVoiceState, hours, minutes, seconds).build())
-                .setEphemeral(false).queue();
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
     }
 }

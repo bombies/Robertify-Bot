@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.PauseCommand;
+import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,6 +36,6 @@ public class PauseSlashCommand extends AbstractSlashCommand {
         final GuildVoiceState selfVoiceState = event.getGuild().getSelfMember().getVoiceState();
 
         event.getHook().sendMessageEmbeds(new PauseCommand().handlePauseEvent(event.getGuild(), selfVoiceState, memberVoiceState).build())
-                .setEphemeral(false).queue();
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
      }
 }
