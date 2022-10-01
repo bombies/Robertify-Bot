@@ -45,7 +45,6 @@ public class SlashCommandManager {
                 new ClearQueueSlashCommand(),
                 new JoinSlashCommand(),
                 new JumpSlashCommand(),
-                new LofiSlashCommand(),
                 new LoopSlashCommand(),
                 new MoveSlashCommand(),
                 new NowPlayingSlashCommand(),
