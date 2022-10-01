@@ -52,6 +52,7 @@ disabled_feature: "This feature has been disabled in this server!"
 premium_instance_needed: "This server must be upgraded to premium before this instance can be used!"
 premium_embed_title: "Premium Bot"
 premium_upgrade_button: "Upgrade to Premium!"
+no_youtube_support: "Due to recent events, YouTube support has been removed from Robertify. For more information, you can join our [support server](https://discord.gg/vbjmtfjdvu) and read the announcement."
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"

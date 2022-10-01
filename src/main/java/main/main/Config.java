@@ -66,6 +66,10 @@ public class Config {
         return getBoolean(ENV.PREMIUM_BOT);
     }
 
+    public static boolean isYoutubeEnabled() {
+        return getBoolean(ENV.YOUTUBE_ENABLED);
+    }
+
     public static int getInt(ENV key) {
         return Integer.parseInt(get(key));
     }

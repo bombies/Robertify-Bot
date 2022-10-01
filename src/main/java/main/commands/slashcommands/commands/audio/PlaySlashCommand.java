@@ -140,6 +140,13 @@ public class PlaySlashCommand extends AbstractSlashCommand {
     }
 
     private void handlePlayTracks(SlashCommandInteractionEvent event, Guild guild, Member member, String link, boolean addToBeginning) {
+        if (GeneralUtils.isUrl(link) && !Config.isYoutubeEnabled() && (link.contains("youtube.com") || link.contains("youtu.be"))) {
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
                 .setEphemeral(false)
                 .queue(msg -> RobertifyAudioManager.getInstance()

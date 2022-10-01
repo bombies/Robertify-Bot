@@ -13,6 +13,7 @@ public enum ENV {
     BOT_SUPPORT_SERVER("bot_support_server"),
     ICON_URL("icon_url"),
     RANDOM_MESSAGE_CHANCE("random_message_chance"),
+    YOUTUBE_ENABLED("youtube_enabled"),
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),

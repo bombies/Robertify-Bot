@@ -1,7 +1,9 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
+import main.main.Config;
 import main.main.Listener;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -70,7 +72,15 @@ public class ShufflePlaySlashCommand extends AbstractSlashCommand {
 
         String url = event.getOption("playlist").getAsString();
 
+        if (GeneralUtils.isUrl(url) && !Config.isYoutubeEnabled() && (url.contains("youtube.com") || url.contains("youtu.be"))) {
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
         if (!url.contains("deezer.page.link")) {
+
             if (url.contains("soundcloud.com") && !url.contains("sets")) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShufflePlayMessages.NOT_PLAYLIST, Pair.of("{source}", "SoundCloud")).build()).queue();
                 return;
