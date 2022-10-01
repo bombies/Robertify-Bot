@@ -207,7 +207,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                     .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
         }
 
-        if (musicManager.getScheduler().queue.isEmpty())
+        if (musicManager.getScheduler().queue.isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
             musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
