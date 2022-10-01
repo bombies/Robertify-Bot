@@ -487,7 +487,7 @@ auto_play_embed_footer: "You can toggle autoplay off by running the \"autoplay\"
 
 # TRACK SCHEDULER MESSAGES
 track_could_not_be_played: "`{title} by {author}` could not be played!\nSkipped to the next song. (If available)"
-could_not_find_source: "I couldn't find a source for `{title} by {author}` track\nSkipping to the next track (If available)"
+could_not_find_source: "I couldn't find a source for a track\nSkipping to the next track (If available)"
 copyright_track: "I couldn't play `{title} by {author}` as it has blocked copyright content\nSkipping to the next track (If available)"
 unavailable_track: "I couldn't play `{title} by {author}` because is it unavailable\nSkipping to the next track (If available)"
 unviewable_playlist: "I couldn't play a playlist because it is un-viewable..."
