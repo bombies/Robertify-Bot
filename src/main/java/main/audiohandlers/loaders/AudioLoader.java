@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.slashcommands.commands.audio.LofiCommand;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
@@ -100,14 +100,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         );
 
         if (botMsg != null) {
-            if (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) && LofiCommand.getAnnounceLofiMode().contains(guild.getIdLong())) {
-                LofiCommand.getAnnounceLofiMode().remove(guild.getIdLong());
-                botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LofiMessages.LOFI_ENABLED).build())
-                        .queue();
-            } else {
-                botMsg.editMessageEmbeds(eb.build())
-                        .queue(success -> success.editMessageComponents().queue());
-            }
+            botMsg.editMessageEmbeds(eb.build())
+                    .queue(success -> success.editMessageComponents().queue());
         } else {
             if (new DedicatedChannelConfig(guild).isChannelSet())
                 new DedicatedChannelConfig(guild).getTextChannel()
@@ -203,7 +197,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", trackUrl.replaceFirst("ytsearch:", "")))
+        EmbedBuilder eb = (trackUrl.length() < 4096) ? RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", trackUrl.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, "")))
                 : RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND_ALT);
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue();

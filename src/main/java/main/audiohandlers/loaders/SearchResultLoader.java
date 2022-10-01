@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
@@ -76,7 +77,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
         if (botMsg != null)
             botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                            .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
+                            .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                             .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                             .build())
                     .setComponents(
@@ -85,7 +86,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
                     )
                     .queue();
         else interactionBotMsg.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, embedDescription.toString())
-                        .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
+                        .setAuthor(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_AUTHOR, Pair.of("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))), null, new ThemesConfig(guild).getTheme().getTransparent())
                         .setFooter(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_EMBED_FOOTER))
                         .build())
                 .setComponents(
@@ -98,7 +99,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
     @Override
     public void noMatches() {
-        botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", query.replaceFirst("ytsearch:", ""))).build())
+        botMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND, Pair.of("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))).build())
                 .queue();
     }
 

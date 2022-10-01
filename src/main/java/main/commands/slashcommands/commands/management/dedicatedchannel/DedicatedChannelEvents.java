@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.management.dedicatedchannel;
 
 import lavalink.client.io.filters.*;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.ICommand;
 import main.commands.prefixcommands.audio.*;
 import main.commands.slashcommands.commands.audio.*;
@@ -131,12 +132,12 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             final var split = message.split(" ");
 
             if (split.length == 1) {
-                message = (GeneralUtils.isUrl(message) ? "" : "ytsearch:")  + message;
+                message = (GeneralUtils.isUrl(message) ? "" : SpotifySourceManager.SEARCH_PREFIX)  + message;
             } else {
                 switch (split[split.length-1].toLowerCase()) {
                     case "-n", "-next" -> {
                         String msgNoFlags = message.replaceAll("\\s-(n|next)$", "");
-                        message = GeneralUtils.isUrl(msgNoFlags) ? msgNoFlags : "ytsearch:" + msgNoFlags;
+                        message = GeneralUtils.isUrl(msgNoFlags) ? msgNoFlags : SpotifySourceManager.SEARCH_PREFIX + msgNoFlags;
                         addToBeginning = true;
                     }
                     case "-s", "-shuffle" -> {
@@ -159,7 +160,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                         message = msgNoFlags;
                         shuffled = true;
                     }
-                    default -> message = GeneralUtils.isUrl(message) ? "" : "ytsearch:" + message;
+                    default -> message = GeneralUtils.isUrl(message) ? "" : SpotifySourceManager.SEARCH_PREFIX + message;
                 }
             }
 

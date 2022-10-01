@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
@@ -52,7 +53,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         final String query = String.join(" ", args);
 
         msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SearchMessages.LOOKING_FOR, Pair.of("{query}", query)).build())
-                .queue(searchingMsg -> getSearchResults(guild, user, searchingMsg, "ytsearch:" + query));
+                .queue(searchingMsg -> getSearchResults(guild, user, searchingMsg, SpotifySourceManager.SEARCH_PREFIX + query));
     }
 
     private void getSearchResults(Guild guild, User requester, Message botMsg, String query) {
@@ -130,7 +131,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SearchMessages.LOOKING_FOR, Pair.of("{query}", query)).build())
                 .setEphemeral(false)
-                .queue(addingMsg -> getSearchResults(guild, event.getUser(), addingMsg, "ytsearch:" + query));
+                .queue(addingMsg -> getSearchResults(guild, event.getUser(), addingMsg, SpotifySourceManager.SEARCH_PREFIX + query));
     }
 
     @Override
@@ -171,7 +172,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
                 .setEphemeral(true)
                 .queue();
 
-        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), "ytsearch:" + trackID,
+        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), SpotifySourceManager.SEARCH_PREFIX + trackID,
                 voiceState, memberVoiceState, event.getMessage(), false);
     }
 

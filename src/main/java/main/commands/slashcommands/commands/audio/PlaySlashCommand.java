@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.audio.PlayCommand;
 import main.constants.ENV;
 import main.main.Config;
@@ -121,7 +122,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             case "tracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))
-                    link = "ytmsearch:" + link;
+                    link = SpotifySourceManager.SEARCH_PREFIX + link;
 
                 handlePlayTracks(event, guild, member, link, false);
             }
@@ -132,7 +133,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             case "nexttracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))
-                    link = "ytmsearch:" + link;
+                    link = SpotifySourceManager.SEARCH_PREFIX + link;
 
                 handlePlayTracks(event, guild, member, link, true);
             }
