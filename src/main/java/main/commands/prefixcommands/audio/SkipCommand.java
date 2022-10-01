@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.constants.BotConstants;
 import main.constants.Permission;
 import main.constants.Toggles;
@@ -156,8 +155,6 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
 
         if (new DedicatedChannelConfig(guild).isChannelSet())
             new DedicatedChannelConfig(guild).updateMessage();
-
-        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         clearVoteSkipInfo(guild);
     }

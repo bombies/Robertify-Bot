@@ -6,7 +6,6 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.exceptions.AutoPlayException;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -80,8 +79,6 @@ public class SkipToCommand implements ICommand {
 
         if (new DedicatedChannelConfig(guild).isChannelSet())
             new DedicatedChannelConfig(guild).updateMessage();
-
-        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         new LogUtils(guild).sendLog(LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
         SkipCommand.clearVoteSkipInfo(guild);

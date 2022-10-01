@@ -2,10 +2,8 @@ package main.commands.slashcommands.commands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.GuildMusicManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -13,7 +11,6 @@ import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
-import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -64,8 +61,6 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
 
         if (new DedicatedChannelConfig(guild).isChannelSet())
             new DedicatedChannelConfig(guild).updateMessage();
-
-        LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
         new LogUtils(guild).sendLog(LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 

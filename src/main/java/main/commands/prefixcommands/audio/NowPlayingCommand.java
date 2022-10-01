@@ -6,7 +6,6 @@ import lavalink.client.io.filters.Filters;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -77,24 +76,20 @@ public class NowPlayingCommand implements ICommand {
         final Filters filters = audioPlayer.getFilters();
         final String requester = RobertifyAudioManager.getRequester(guild, track);
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong())
-                ? localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LOFI_TITLE)
-                        :
-                localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_EMBED_TITLE, Pair.of("{title}", info.title), Pair.of("{author}", info.author))),
-
+        eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_EMBED_TITLE, Pair.of("{title}", info.title), Pair.of("{author}", info.author))),
                 (((new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_REQUESTER, Pair.of("{requester}", requester))
                         :
                         "") +
                 "\n\n "+ (info.isStream ? "" : "`[0:00]`") +
-                        (LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? "" : (
+                        (
                 GeneralUtils.progressBar(guild, channel, progress, GeneralUtils.ProgressBar.DURATION) + (info.isStream ? "" : "`["+ GeneralUtils.formatTime(track.getInfo().length) +"]`") + "\n\n" +
                 (info.isStream ?
                         localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LIVESTREAM) + "\n"
                                 :
                         localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_TIME_LEFT, Pair.of("{time}", GeneralUtils.formatTime(track.getInfo().length-audioPlayer.getTrackPosition()))) + "\n") +
 
-                "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊")));
+                "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊"));
 
         switch (track.getSourceManager().getSourceName().toLowerCase()) {
             case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(track.getInfo().identifier));

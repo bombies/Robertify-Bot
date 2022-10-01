@@ -2,7 +2,6 @@ package main.events;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
@@ -44,8 +43,6 @@ public class VoiceChannelEvents extends ListenerAdapter {
             final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
             if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.updateMessage();
-
-            LofiCommand.getLofiEnabledGuilds().remove(guild.getIdLong());
 
             SkipCommand.clearVoteSkipInfo(guild);
         } else {

@@ -3,7 +3,6 @@ package main.utils.json.dedicatedchannel;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.slashcommands.commands.audio.LofiCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.constants.RobertifyEmoji;
 import main.main.Robertify;
@@ -172,8 +171,6 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setColor(theme.getColor());
 
             eb.setTitle(
-                    LofiCommand.getLofiEnabledGuilds().contains(guild.getIdLong()) ? localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_LOFI_TITLE)
-                            :
                     localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
                             Pair.of("{title}", trackInfo.title),
                             Pair.of("{author}", trackInfo.author),
