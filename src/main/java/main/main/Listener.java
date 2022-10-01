@@ -63,7 +63,7 @@ public class Listener extends ListenerAdapter {
                 LocaleManager.getLocaleManager(g).setLocale(locale);
 
             loadNeededSlashCommands(g);
-            unloadCommands(g);
+            unloadCommands(g, "lofi");
 //            unloadDevCommands(g, "");
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
