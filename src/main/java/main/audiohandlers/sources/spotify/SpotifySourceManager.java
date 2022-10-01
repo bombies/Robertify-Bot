@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.io.DataInput;
@@ -57,10 +58,19 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
 
     @Override
     public AudioItem loadItem(AudioPlayerManager manager, AudioReference reference) {
-        for (Function<AudioReference, AudioItem> loader : this.loaders) {
-            AudioItem item;
-            if ((item = loader.apply(reference)) != null)
-                return item;
+        try {
+            if (reference.identifier.startsWith(SEARCH_PREFIX))
+                return this.getSearch(reference.identifier.substring(SEARCH_PREFIX.length()).trim());
+
+            for (Function<AudioReference, AudioItem> loader : this.loaders) {
+                AudioItem item;
+                if ((item = loader.apply(reference)) != null)
+                    return item;
+            }
+        } catch (IOException | ParseException | SpotifyWebApiException e) {
+            if (e instanceof NotFoundException)
+                return AudioReference.NO_TRACK;
+            throw new RuntimeException(e);
         }
         return null;
     }
