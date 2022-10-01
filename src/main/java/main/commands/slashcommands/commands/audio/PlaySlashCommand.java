@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.audio;
 
+import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.audio.PlayCommand;
@@ -27,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,11 +42,11 @@ public class PlaySlashCommand extends AbstractSlashCommand {
         setCommand(
                 getBuilder()
                         .setName(new PlayCommand().getName())
-                        .setDescription("Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...")
+                        .setDescription("Play a song! Links are accepted by Spotify, Deezer, SoundCloud, etc...")
                         .addSubCommands(
                                 SubCommand.of(
                                         "tracks",
-                                        "Play a song! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
+                                        "Play a song! Links are accepted by Spotify, Deezer, SoundCloud, etc...",
                                         List.of(
                                                 CommandOption.of(
                                                         OptionType.STRING,
@@ -68,7 +70,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                 ),
                                 SubCommand.of(
                                         "nexttracks",
-                                        "Add songs to the beginning of the queue! Links are accepted by Spotify, YouTube, SoundCloud, etc...",
+                                        "Add songs to the beginning of the queue! Links are accepted by Spotify, Deezer, SoundCloud, etc...",
                                         List.of(
                                                 CommandOption.of(
                                                         OptionType.STRING,
@@ -99,7 +101,6 @@ public class PlaySlashCommand extends AbstractSlashCommand {
         final var guild = event.getGuild();
 
         EmbedBuilder eb;
-        final TextChannel channel = event.getChannel().asTextChannel();
 
         final Member member = event.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
@@ -140,12 +141,16 @@ public class PlaySlashCommand extends AbstractSlashCommand {
         }
     }
 
+    @SneakyThrows
     private void handlePlayTracks(SlashCommandInteractionEvent event, Guild guild, Member member, String link, boolean addToBeginning) {
-        if (GeneralUtils.isUrl(link) && !Config.isYoutubeEnabled() && (link.contains("youtube.com") || link.contains("youtu.be"))) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
-                    .setEphemeral(true)
-                    .queue();
-            return;
+        if (GeneralUtils.isUrl(link) && !Config.isYoutubeEnabled()) {
+            final var linkDestination = GeneralUtils.getLinkDestination(link);
+            if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
+                        .setEphemeral(true)
+                        .queue();
+                return;
+            }
         }
 
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())

@@ -32,8 +32,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -111,6 +110,18 @@ public class GeneralUtils {
         } catch (URISyntaxException e) {
             return false;
         }
+    }
+
+    public static String getLinkDestination(String location) throws IOException {
+        var con = (HttpURLConnection) new URL(location).openConnection();
+        con.setInstanceFollowRedirects(false);
+
+        while (con.getResponseCode() / 100 == 3) {
+            location = con.getHeaderField("location");
+            con = (HttpURLConnection) new URL(location).openConnection();
+        }
+
+        return location;
     }
 
     public static String getDigitsOnly(String s) {
