@@ -78,6 +78,6 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException exception) {
-
+        throw new FriendlyException("Unexpected error", FriendlyException.Severity.SUSPICIOUS, exception);
     }
 }
