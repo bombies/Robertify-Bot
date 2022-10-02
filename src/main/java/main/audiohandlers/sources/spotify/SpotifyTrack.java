@@ -82,7 +82,7 @@ public class SpotifyTrack extends RobertifyAudioTrack {
     }
 
     public AudioSourceManager getSourceManager() {
-        return (AudioSourceManager)this.spotifySourceManager;
+        return this.spotifySourceManager;
     }
 
     protected AudioTrack makeShallowClone() {

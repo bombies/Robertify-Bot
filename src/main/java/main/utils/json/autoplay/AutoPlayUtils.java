@@ -38,6 +38,9 @@ public class AutoPlayUtils {
     }
 
     public static Recommendations getSpotifyRecommendations(SpotifyTrack track) {
+        logger.debug("Attempting to load recommendations with info:\nArtist ID: {}\nGenres: {}\nTrack ID: {}", track.getArtist().getId(),
+                track.getArtist().getGenres().toString(),
+                track.getIdentifier());
         return getSpotifyRecommendations(
                 track.getArtist().getId(),
                 track.getArtist().getGenres().toString().replaceAll("[\\[\\]\\s]", ""),
@@ -51,7 +54,8 @@ public class AutoPlayUtils {
 
         final var recommendations = getSpotifyRecommendations(track);
         final var jsonQuery = createAudioTrackObject(recommendations);
-
+        logger.debug("Loaded recommendations. Now attempting to load through LavaLink.");
+        logger.debug("Query: {}", AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
         RobertifyAudioManager.getInstance()
                 .loadRecommendedTracks(RobertifyAudioManager.getInstance().getMusicManager(guild), channel, AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
     }
@@ -65,7 +69,7 @@ public class AutoPlayUtils {
                             .put("info_author", track.getArtists()[0].getName())
                             .put("info_title", track.getName())
                             .put("info_length", track.getDurationMs())
-                            .put("info_uri", track.getUri())
+                            .put("info_uri", "https://open.spotify.com/track/" + track.getId())
                             .put("info_isstream", false)
                             .put("source", "spotify")
             );

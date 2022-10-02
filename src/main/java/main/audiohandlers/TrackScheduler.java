@@ -192,6 +192,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     if (new AutoPlayConfig(guild).getStatus()) {
                         switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
                             case "spotify", "autoplay" -> {
+                                logger.debug("Now autoplaying");
                                 final var spotifyTrack = (SpotifyTrack) lastTrack;
                                 AutoPlayUtils.loadRecommendedTracks(
                                         guild,
@@ -284,6 +285,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             logger.error("There was an exception with playing the track.", exception);
         }
     }
+
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
         ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);

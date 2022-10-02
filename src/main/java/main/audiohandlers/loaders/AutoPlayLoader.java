@@ -12,6 +12,8 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AutoPlayLoader implements AudioLoadResultHandler {
+    private final Logger logger = LoggerFactory.getLogger(AutoPlayLoader.class);
+
     private final GuildMusicManager musicManager;
     private final Guild guild;
     private final TextChannel channel;
@@ -39,6 +43,7 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         if (playlist.isSearchResult())
             throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
 
+        logger.debug("Successfully loaded all recommended tracks.");
         final var scheduler = musicManager.getScheduler();
 
         HashMap<Long, List<String>> tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
