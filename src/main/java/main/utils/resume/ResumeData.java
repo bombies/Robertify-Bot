@@ -32,6 +32,7 @@ import se.michaelthelin.spotify.model_objects.specification.Track;
 
 import java.util.AbstractQueue;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ResumeData extends RedisCache {
@@ -138,10 +139,12 @@ public class ResumeData extends RedisCache {
 
             for (int j = 0; j < tracks.length; j++) {
                 Image[] images = tracks[j].getAlbum().getImages();
+                final var artist = spotifyApi.getArtist(tracks[j].getArtists()[0].getId()).build().execute();
                 spotifyTracks.add(new SpotifyTrack(
                         trackInfos.get(j),
                         tracks[j].getExternalIds().getExternalIds().getOrDefault("isrc", null),
                         images.length > 0 ? images[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(),
+                        new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
                         new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
                 ));
             }
@@ -159,11 +162,15 @@ public class ResumeData extends RedisCache {
         switch (source) {
             case "spotify" -> {
                 if (assembleSpotify) {
-                    Track spotifyTrack = Robertify.getSpotifyApi().getTrack(trackInfo.identifier).build().execute();
+                    final var spotifyApi = Robertify.getSpotifyApi();
+                    final var spotifyTrack = spotifyApi.getTrack(trackInfo.identifier).build().execute();
+                    final var artist = spotifyApi.getArtist(spotifyTrack.getArtists()[0].getId()).build().execute();
+
                     track = new SpotifyTrack(
                             trackInfo,
                             spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
                             spotifyTrack.getAlbum().getImages()[0].getUrl(),
+                            new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
                             new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
                     );
                 } else return null;

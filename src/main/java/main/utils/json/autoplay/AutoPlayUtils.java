@@ -1,13 +1,21 @@
 package main.utils.json.autoplay;
 
+import com.neovisionaries.i18n.CountryCode;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.autoplay.AutoPlaySourceManager;
+import main.audiohandlers.sources.spotify.SpotifyTrack;
+import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import okhttp3.HttpUrl;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import se.michaelthelin.spotify.model_objects.specification.Recommendations;
 
 import java.util.HashMap;
 
@@ -18,27 +26,50 @@ public class AutoPlayUtils {
     @Getter
     private static final HashMap<Long, String> guildSeeds = new HashMap<>();
 
-    public static String getVideoRadioId(String videoID) {
-        return RADIO_LIST_PREFIX + videoID;
+    @SneakyThrows
+    public static Recommendations getSpotifyRecommendations(String seedArtist, String seedGenre, String seedTrack) {
+        return Robertify.getSpotifyApi().getRecommendations()
+                .limit(10)
+                .market(CountryCode.US)
+                .seed_artists(seedArtist)
+                .seed_genres(seedGenre)
+                .seed_tracks(seedTrack)
+                .build().execute();
     }
 
-    public static String getRecommendedTracksURL(String seedVideoId, String lastVideoId) {
-        return new HttpUrl.Builder().scheme("https").host("youtube.com").addPathSegment("watch")
-                .addQueryParameter("v", seedVideoId).addQueryParameter("list", getVideoRadioId(lastVideoId))
-                .build().url().toString();
+    public static Recommendations getSpotifyRecommendations(SpotifyTrack track) {
+        return getSpotifyRecommendations(
+                track.getArtist().getId(),
+                track.getArtist().getGenres().toString().replaceAll("[\\[\\]\\s]", ""),
+                track.getIdentifier()
+        );
     }
 
-    public static void loadRecommendedTracks(Guild guild, TextChannel channel, AudioTrack track) {
-        loadRecommendedTracks(guild, channel, track.getInfo().identifier);
-    }
-
-    public static void loadRecommendedTracks(Guild guild, TextChannel channel, String identifier) {
+    public static void loadRecommendedTracks(Guild guild, TextChannel channel, SpotifyTrack track) {
         if (!guildSeeds.containsKey(guild.getIdLong()))
-            guildSeeds.put(guild.getIdLong(), identifier);
+            guildSeeds.put(guild.getIdLong(), track.getIdentifier());
 
-        String recommendedTracksURL = getRecommendedTracksURL(guildSeeds.get(guild.getIdLong()), identifier);
+        final var recommendations = getSpotifyRecommendations(track);
+        final var jsonQuery = createAudioTrackObject(recommendations);
 
         RobertifyAudioManager.getInstance()
-                .loadRecommendedTracks(RobertifyAudioManager.getInstance().getMusicManager(guild), channel, recommendedTracksURL);
+                .loadRecommendedTracks(RobertifyAudioManager.getInstance().getMusicManager(guild), channel, AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
+    }
+
+    private static JSONArray createAudioTrackObject(Recommendations recommendations) {
+        final var ret = new JSONArray();
+        for (final var track : recommendations.getTracks()) {
+            ret.put(
+                    new JSONObject()
+                            .put("info_identifier", track.getId())
+                            .put("info_author", track.getArtists()[0].getName())
+                            .put("info_title", track.getName())
+                            .put("info_length", track.getDurationMs())
+                            .put("info_uri", track.getUri())
+                            .put("info_isstream", false)
+                            .put("source", "spotify")
+            );
+        }
+        return ret;
     }
 }

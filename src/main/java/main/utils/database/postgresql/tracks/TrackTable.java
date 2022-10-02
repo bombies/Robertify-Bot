@@ -1,18 +1,20 @@
 package main.utils.database.postgresql.tracks;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import main.utils.database.postgresql.AbstractPostgresTable;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.Collection;
 
 public class TrackTable extends AbstractPostgresTable {
     private final TrackDB database;
+
     private final Connection con;
+
     private final Table table;
-    private final static int SPOTIFY_ID_LENGTH = 22;
-    private final static int DEEZER_ID_LENGTH = 10;
-    private final static int YOUTUBE_ID_LENGTH = 11;
 
     protected TrackTable(TrackDB database, Table table) {
         super(database.getConnection(), table.toString());
@@ -22,71 +24,79 @@ public class TrackTable extends AbstractPostgresTable {
     }
 
     @SneakyThrows
-    public void addTrack(String sourceID, String youTubeID) {
-        if (trackExists(sourceID))
-            removeTrack(sourceID);
-
-        final String sql = "INSERT INTO " + getTableName() + " VALUES('"+sourceID+"', '"+youTubeID+"');";
-        con.createStatement().executeUpdate(sql);
+    public void addTrack(String trackID, String artistID, String genre) {
+        if (trackExists(trackID))
+            return;
+        String sql = "INSERT INTO " + getTableName() + " VALUES('" + trackID + "', '" + artistID + "', '"+genre+"');";
+        this.con.createStatement().executeUpdate(sql);
     }
 
     @SneakyThrows
-    public String getTrackYouTubeID(String sourceID) {
-        if (!trackExists(sourceID))
+    public void addTrack(String trackID, String artistID, String[] genre) {
+        addTrack(trackID, artistID, Arrays.toString(genre).replaceAll("[\\[\\]\\s]", ""));
+    }
+
+    public void addTrack(String trackID, String artistID, Collection<String> genre) {
+        addTrack(trackID, artistID, genre.toString().replaceAll("[\\[\\]\\s]", ""));
+    }
+
+    @SneakyThrows
+    public TrackInfo getTrackInfo(String trackID) {
+        if (!trackExists(trackID))
             return null;
-
-        final String sql = "SELECT * FROM " + getTableName() + " WHERE " + (table.equals(Table.SPOTIFY) ?
-                SpotifyTracksTable.Fields.SPOTIFY_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='"+sourceID+"';";
-
-        String ret = getString(sql);
-
-        if (ret == null)
-            throw new NullPointerException("There was no matching YouTube track ID found for Spotify track with ID: " + sourceID);
-        return ret;
+        final var sql = "SELECT * FROM " + getTableName() + " WHERE " + SpotifyTracksTable.Fields.TRACK_ID +"='"+trackID+"';";
+        final var res = con.prepareStatement(sql).executeQuery();
+        if (res.next())
+            return new TrackInfo(
+                    res.getString(SpotifyTracksTable.Fields.TRACK_ID.toString()),
+                    res.getString(SpotifyTracksTable.Fields.ARTIST_ID.toString()),
+                    res.getString(SpotifyTracksTable.Fields.GENRE.toString())
+            );
+        throw new NullPointerException("There was no Spotify track with ID "+trackID+" found in the database!");
     }
 
     @SneakyThrows
     public void removeTrack(String sourceID) {
-        final String sql = "DELETE FROM " + getTableName() + " WHERE " + (table.equals(Table.SPOTIFY) ?
-                SpotifyTracksTable.Fields.SPOTIFY_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='"+sourceID+"';";
-        con.createStatement().executeUpdate(sql);
+        String sql = "DELETE FROM " + getTableName() + " WHERE " + (this.table.equals(Table.SPOTIFY) ? SpotifyTracksTable.Fields.TRACK_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='" + sourceID + "';";
+        this.con.createStatement().executeUpdate(sql);
     }
 
     @SneakyThrows
     public boolean trackExists(String sourceID) {
-        final String sql= "SELECT * FROM " + getTableName() + " WHERE " + (table.equals(Table.SPOTIFY) ?
-                SpotifyTracksTable.Fields.SPOTIFY_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='"+sourceID+"';";
-        ResultSet resultSet = con.createStatement().executeQuery(sql);
+        String sql = "SELECT * FROM " + getTableName() + " WHERE " + (this.table.equals(Table.SPOTIFY) ? SpotifyTracksTable.Fields.TRACK_ID : DeezerTracksTable.Fields.DEEZER_ID) + "='" + sourceID + "';";
+        ResultSet resultSet = this.con.createStatement().executeQuery(sql);
         return resultSet.next();
     }
 
-    @Override @SneakyThrows
+    @SneakyThrows
     public void init() {
-        switch (table) {
-            case DEEZER: {
-                final String sql = "CREATE TABLE " + getTableName() + "(" +
-                        ""+ DeezerTracksTable.Fields.DEEZER_ID+" char("+DEEZER_ID_LENGTH+") PRIMARY KEY," +
-                        ""+ DeezerTracksTable.Fields.YOUTUBE_ID+" char("+YOUTUBE_ID_LENGTH+")" +
-                        ");";
-                con.createStatement().execute(sql);
-            }
-            case SPOTIFY: {
-                final String sql = "CREATE TABLE " + getTableName() + "(" +
-                        ""+ SpotifyTracksTable.Fields.SPOTIFY_ID+" char("+SPOTIFY_ID_LENGTH+") PRIMARY KEY," +
-                        ""+ SpotifyTracksTable.Fields.YOUTUBE_ID+" char("+YOUTUBE_ID_LENGTH+")" +
-                        ");";
-                con.createStatement().execute(sql);
-            }
+        String sql;
+        switch (this.table) {
+            case SPOTIFY:
+                sql = "CREATE TABLE " + getTableName() + "(" + SpotifyTracksTable.Fields.TRACK_ID + " char(22) PRIMARY KEY," + SpotifyTracksTable.Fields.ARTIST_ID + " char(22) NOT NULL, "+ SpotifyTracksTable.Fields.GENRE +" char(64) NOT NULL);";
+                this.con.createStatement().execute(sql);
+                break;
         }
     }
 
     public String getTableName() {
-        return table.toString();
+        return this.table.toString();
+    }
+
+    public static class TrackInfo {
+        @Getter
+        final String trackID, artistID, genre;
+
+        public TrackInfo(String trackID, String artistID, String genre) {
+            this.trackID = trackID;
+            this.artistID = artistID;
+            this.genre = genre;
+        }
     }
 
     public enum Table {
-        SPOTIFY("spotifytracks"),
-        DEEZER("deezertracks");
+        SPOTIFY("spotifytracks_new"),
+        DEEZER("deezertracks_new");
 
         private final String str;
 
@@ -94,9 +104,8 @@ public class TrackTable extends AbstractPostgresTable {
             this.str = str;
         }
 
-        @Override
         public String toString() {
-            return str;
+            return this.str;
         }
     }
 }

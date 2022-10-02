@@ -3,6 +3,7 @@ package main.commands.slashcommands;
 import lombok.Getter;
 import main.commands.slashcommands.commands.dev.ManagePremiumCommand;
 import main.commands.slashcommands.commands.audio.*;
+import main.commands.slashcommands.commands.dev.test.SpotifyRecommendationTest;
 import main.commands.slashcommands.commands.management.*;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
@@ -122,7 +123,8 @@ public class SlashCommandManager {
                 new SendAlertCommand(),
                 new PostCommandInfoCommand(),
                 new RefreshSpotifyTokenCommand(),
-                new ManagePremiumCommand()
+                new ManagePremiumCommand(),
+                new SpotifyRecommendationTest()
         );
     }
 

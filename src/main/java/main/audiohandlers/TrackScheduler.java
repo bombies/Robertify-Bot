@@ -8,6 +8,7 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.commands.slashcommands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
@@ -190,30 +191,15 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 if (lastTrack != null) {
                     if (new AutoPlayConfig(guild).getStatus()) {
                         switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
-                            case "youtube" -> AutoPlayUtils.loadRecommendedTracks(
-                                    guild,
-                                    announcementChannel,
-                                    lastTrack
-                            );
-                            case "spotify" -> {
-                                String youTubeID = TrackDB.getInstance().getSpotifyTable()
-                                        .getTrackYouTubeID(lastTrack.getInfo().identifier);
+                            case "spotify", "autoplay" -> {
+                                final var spotifyTrack = (SpotifyTrack) lastTrack;
                                 AutoPlayUtils.loadRecommendedTracks(
                                         guild,
                                         announcementChannel,
-                                        youTubeID
+                                        spotifyTrack
                                 );
                             }
-                            case "deezer" -> {
-                                String youTubeID = TrackDB.getInstance().getDeezerTable()
-                                        .getTrackYouTubeID(lastTrack.getInfo().identifier);
-                                AutoPlayUtils.loadRecommendedTracks(
-                                        guild,
-                                        announcementChannel,
-                                        youTubeID
-                                );
-                            }
-                            default -> throw new AutoPlayException("This track can't be auto-played!");
+                            default -> throw new AutoPlayException("This track can't be auto played!");
                         }
                     } else scheduleDisconnect(true);
                 } else scheduleDisconnect(true);
