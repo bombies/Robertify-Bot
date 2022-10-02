@@ -54,8 +54,8 @@ public class AutoPlayUtils {
 
         final var recommendations = getSpotifyRecommendations(track);
         final var jsonQuery = createAudioTrackObject(recommendations);
-        logger.debug("Loaded recommendations. Now attempting to load through LavaLink.");
-        logger.debug("Query: {}", AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
+        logger.info("Loaded recommendations. Now attempting to load through LavaLink.");
+        logger.info("Query: {}", AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
         RobertifyAudioManager.getInstance()
                 .loadRecommendedTracks(RobertifyAudioManager.getInstance().getMusicManager(guild), channel, AutoPlaySourceManager.SEARCH_PREFIX + jsonQuery);
     }
