@@ -43,7 +43,7 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         if (playlist.isSearchResult())
             throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
 
-        logger.info("Successfully loaded all recommended tracks.");
+        logger.info("Successfully loaded all recommended tracks for {}.", guild.getName());
         final var scheduler = musicManager.getScheduler();
 
         HashMap<Long, List<String>> tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();

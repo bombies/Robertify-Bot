@@ -192,7 +192,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     if (new AutoPlayConfig(guild).getStatus()) {
                         switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
                             case "spotify", "autoplay" -> {
-                                logger.info("Now autoplaying");
+                                logger.info("Now starting AutoPlay for {}", guild.getName());
                                 final var spotifyTrack = (SpotifyTrack) lastTrack;
                                 AutoPlayUtils.loadRecommendedTracks(
                                         guild,
