@@ -32,13 +32,13 @@ public class SpotifyTrack extends RobertifyAudioTrack {
     }
 
     public SpotifyTrack(AudioTrackInfo trackInfo, String isrc, String artworkURL, SpotifyArtist artist, SpotifySourceManager spotifySourceManager) {
-        super(trackInfo, isrc, artworkURL, spotifySourceManager);
+        super(trackInfo, isrc, artworkURL, artist.id, artist.genres, spotifySourceManager);
         this.artist = artist;
         this.spotifySourceManager = spotifySourceManager;
     }
 
     public SpotifyTrack(AudioTrackInfo trackInfo, String isrc, String artworkURL, String artist, SpotifySourceManager spotifySourceManager) {
-        super(trackInfo, isrc, artworkURL, spotifySourceManager);
+        super(trackInfo, isrc, artworkURL, artist, spotifySourceManager);
         this.artist = assembleArtist(artist);
         this.spotifySourceManager = spotifySourceManager;
     }
@@ -93,7 +93,7 @@ public class SpotifyTrack extends RobertifyAudioTrack {
         return artist.getId()  + ":" + artist.getGenres();
     }
 
-    public SpotifyArtist assembleArtist(String str) {
+    public static SpotifyArtist assembleArtist(String str) {
         final var split = str.split(":");
         final var genreStr = split[1].replaceAll("[\\[\\]\\s]", "").strip();
         final var genres = Arrays.stream(genreStr.split(","))
