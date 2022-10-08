@@ -1,7 +1,11 @@
 package main.utils.apis.robertify.models;
 
 import lombok.Getter;
+import main.constants.RobertifyTheme;
 import main.main.Robertify;
+import main.utils.json.autoplay.AutoPlayConfig;
+import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.themes.ThemesConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 
@@ -72,5 +76,11 @@ public class RobertifyPremium {
             }
             default -> throw new IllegalArgumentException(tierID + " is an invalid tier code!");
         }
+    }
+
+    public static void resetPremiumFeatures(Guild guild) {
+        new AutoPlayConfig(guild).setStatus(false);
+        new GuildConfig(guild).set247(false);
+        new ThemesConfig(guild).setTheme(RobertifyTheme.GREEN);
     }
 }

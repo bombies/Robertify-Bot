@@ -124,7 +124,8 @@ public class SlashCommandManager {
                 new PostCommandInfoCommand(),
                 new RefreshSpotifyTokenCommand(),
                 new ManagePremiumCommand(),
-                new SpotifyRecommendationTest()
+                new SpotifyRecommendationTest(),
+                new ResetPremiumFeaturesCommand()
         );
     }
 

@@ -12,6 +12,7 @@ import main.commands.slashcommands.commands.management.dedicatedchannel.Dedicate
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.models.RobertifyPremium;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
@@ -71,6 +72,7 @@ public class Listener extends ListenerAdapter {
             if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.updateAll();
 
+            RobertifyPremium.resetPremiumFeatures(g);
             try {
                 ResumeUtils.getInstance().loadInfo(g);
             } catch (Exception e) {
