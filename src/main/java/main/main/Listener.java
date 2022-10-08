@@ -64,13 +64,11 @@ public class Listener extends ListenerAdapter {
                 LocaleManager.getLocaleManager(g).setLocale(locale);
 
             loadNeededSlashCommands(g);
-            unloadCommands(g, "lofi");
-//            unloadDevCommands(g, "");
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
             if (dedicatedChannelConfig.isChannelSet())
-                dedicatedChannelConfig.updateAll();
+                dedicatedChannelConfig.updateMessage();
             try {
                 ResumeUtils.getInstance().loadInfo(g);
             } catch (Exception e) {
@@ -206,7 +204,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        AbstractSlashCommand.loadAllCommands(g);
+
     }
 
     /**

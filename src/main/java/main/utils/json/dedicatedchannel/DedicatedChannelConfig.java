@@ -134,7 +134,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     public synchronized RestAction<Message> getMessageRequest() {
         try {
             return getTextChannel().retrieveMessageById(getMessageID());
-        } catch (MissingAccessException e) {
+        } catch (InsufficientPermissionException e) {
                 TextChannel channel = RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .getScheduler().getAnnouncementChannel();
 
@@ -244,7 +244,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             final var msgRequest = config.getMessageRequest();
             if (msgRequest == null) continue;
 
-            msgRequest.queue(msg -> config.buttonUpdateRequest(msg).queue());
+            msgRequest.queue(msg -> config.buttonUpdateRequest(msg).queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> logger.warn("Couldn't update buttons in {}", g.getName()))));
         }
     }
 

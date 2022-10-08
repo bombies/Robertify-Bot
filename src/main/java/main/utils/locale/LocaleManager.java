@@ -95,10 +95,10 @@ public class LocaleManager {
         if (!localeFile.exists())
             createLocaleFile(locale);
 
-        if (localeFile.length() == 0) {
-            logger.error("There was no information found in the file for locale: " + locale.getCode().toUpperCase());
-            System.exit(-1);
-        }
+//        if (localeFile.length() == 0) {
+//            logger.error("There was no information found in the file for locale: " + locale.getCode().toUpperCase());
+//            System.exit(-1);
+//        }
 
         Map<String, String> fileMap = new Yaml().load(GeneralUtils.getFileContent(localeFile.getPath()));
         return checkLocaleFile(localeFile, fileMap);
