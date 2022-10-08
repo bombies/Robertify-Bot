@@ -1,8 +1,11 @@
 package main.utils.json.guildconfig;
 
+import main.constants.RobertifyTheme;
 import main.main.Robertify;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
+import main.utils.json.autoplay.AutoPlayConfig;
+import main.utils.json.reminders.RemindersConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,6 +57,10 @@ public class GuildConfig extends AbstractGuildConfig {
             throw new IllegalArgumentException("The prefix must be 4 or less characters!");
 
         getCache().setField(gid, GuildDB.Field.GUILD_PREFIX, prefix);
+    }
+
+    public void setManyFields(ConfigBuilder builder) {
+        getCache().setFields(gid, builder.build());
     }
 
     @Deprecated
@@ -208,6 +215,60 @@ public class GuildConfig extends AbstractGuildConfig {
         public String toString() {
             return String.valueOf(user);
         }
+    }
+
+    public static class ConfigBuilder {
+        private JSONObject reminders;
+        private JSONObject dedicatedChannel;
+        private JSONObject restrictedChannels;
+        private JSONObject permissions;
+        private JSONObject toggles;
+        private JSONArray eightBall;
+        private RobertifyTheme theme;
+        private JSONArray bannedUsers;
+        private Boolean twentyFourSeven;
+        private Boolean autoPlay;
+
+        public ConfigBuilder set247(boolean status) {
+            this.twentyFourSeven = status;
+            return this;
+        }
+
+        public ConfigBuilder setAutoPlay(boolean status) {
+            this.autoPlay = status;
+            return this;
+        }
+
+        public ConfigBuilder setTheme(RobertifyTheme theme) {
+            this.theme = theme;
+            return this;
+        }
+
+        public JSONObject build() {
+            final var obj = new JSONObject();
+            if (reminders != null)
+                obj.put(RemindersConfig.Fields.REMINDERS.name().toLowerCase(), reminders);
+            if (dedicatedChannel != null)
+                obj.put(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString(), dedicatedChannel);
+            if (restrictedChannels != null)
+                obj.put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), restrictedChannels);
+            if (permissions != null)
+                obj.put(GuildDB.Field.PERMISSIONS_OBJECT.toString(), permissions);
+            if (toggles != null)
+                obj.put(GuildDB.Field.TOGGLES_OBJECT.toString(), toggles);
+            if (eightBall != null)
+                obj.put(GuildDB.Field.EIGHT_BALL_ARRAY.toString(), eightBall);
+            if (theme != null)
+                obj.put(GuildDB.Field.THEME.toString(), theme.name().toLowerCase());
+            if (bannedUsers != null)
+                obj.put(GuildDB.Field.BANNED_USERS_ARRAY.toString(), bannedUsers);
+            if (twentyFourSeven != null)
+                obj.put(GuildDB.Field.TWENTY_FOUR_SEVEN.toString(), twentyFourSeven.booleanValue());
+            if (autoPlay != null)
+                obj.put(AutoPlayConfig.Field.AUTOPLAY.name().toLowerCase(), autoPlay.booleanValue());
+            return obj;
+        }
+
     }
 
 }

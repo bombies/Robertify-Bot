@@ -79,8 +79,11 @@ public class RobertifyPremium {
     }
 
     public static void resetPremiumFeatures(Guild guild) {
-        new AutoPlayConfig(guild).setStatus(false);
-        new GuildConfig(guild).set247(false);
-        new ThemesConfig(guild).setTheme(RobertifyTheme.GREEN);
+        new GuildConfig(guild)
+                .setManyFields(new GuildConfig.ConfigBuilder()
+                        .setAutoPlay(false)
+                        .set247(false)
+                        .setTheme(RobertifyTheme.GREEN)
+                );
     }
 }

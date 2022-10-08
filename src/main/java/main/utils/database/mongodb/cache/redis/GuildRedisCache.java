@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,23 @@ public class GuildRedisCache extends AbstractRedisCache {
 
         JSONObject guildInfo = getGuildInfo(gid);
         guildInfo.put(field.toString(), value);
+        setex(gid, 3600, guildInfo);
+        updateGuild(guildInfo);
+    }
+
+    public synchronized void setFields(long gid, JSONObject fields) {
+        if (!guildHasInfo(gid))
+            loadGuild(gid);
+
+        final var validKeys = Arrays.stream(GuildDB.Field.values())
+                .map(GuildDB.Field::toString)
+                .toList();
+        final var guildInfo = getGuildInfo(gid);
+        for (var key : fields.keySet()) {
+            if (!validKeys.contains(key))
+                continue;
+            guildInfo.put(key, fields.get(key));
+        }
         setex(gid, 3600, guildInfo);
         updateGuild(guildInfo);
     }
