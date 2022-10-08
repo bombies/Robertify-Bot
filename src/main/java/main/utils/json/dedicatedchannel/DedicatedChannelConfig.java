@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -34,11 +35,15 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DedicatedChannelConfig extends AbstractGuildConfig {
+    private final static Logger logger = LoggerFactory.getLogger(DedicatedChannelConfig.class);
+
     private final Guild guild;
     private final long gid;
 
@@ -221,9 +226,14 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     }
 
     public void updateAll() {
-        updateMessage();
-        updateButtons();
-        updateAllTopics();
+        try {
+            updateMessage();
+            updateButtons();
+            updateAllTopics();
+        } catch (InsufficientPermissionException e) {
+            logger.error("I didn't have enough permissions to update the dedicated channel in {}", guild.getName());
+        }
+
     }
 
     public static void updateAllButtons() {
