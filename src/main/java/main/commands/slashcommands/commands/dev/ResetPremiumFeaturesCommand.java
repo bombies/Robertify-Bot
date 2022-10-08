@@ -55,6 +55,7 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
         if (!devCheck(event)) return;
 
         final var cmdGuild = event.getGuild();
+        event.deferReply().queue();
 
         try {
             switch (event.getSubcommandName()) {
@@ -70,7 +71,7 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
                     final var guildID = event.getOption("guildid").getAsLong();
                     final var guild = Robertify.getShardManager().getGuildById(guildID);
                     if (guild == null) {
-                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "There was no such guild with the ID: " + guildID).build())
+                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "There was no such guild with the ID: " + guildID).build())
                                 .setEphemeral(true)
                                 .queue();
                         return;
@@ -78,14 +79,14 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
 
                     RobertifyPremium.resetPremiumFeatures(guild);
                     logger.info("Reset all premium features for {}", guild.getName());
-                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "Successfully reset all premium features for " + guild.getName()).build())
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "Successfully reset all premium features for " + guild.getName()).build())
                             .setEphemeral(true)
                             .queue();
                 }
             }
         } catch (Exception e) {
             logger.error("Unexpected error", e);
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
                     cmdGuild, RobertifyLocaleMessage.GeneralMessages.UNEXPECTED_ERROR
             ).build())
                     .setEphemeral(true)
