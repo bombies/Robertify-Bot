@@ -66,6 +66,9 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
                                 RobertifyPremium.resetPremiumFeatures(g);
                                 logger.info("Reset all premium features for {}", g.getName());
                             });
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "Reset premium features for all guilds!").build())
+                            .setEphemeral(true)
+                            .queue();
                 }
                 case "guild" -> {
                     final var guildID = event.getOption("guildid").getAsLong();
