@@ -220,7 +220,8 @@ public class Listener extends ListenerAdapter {
         g.retrieveCommands().queue(commands -> commands.stream()
                 .filter(command -> GeneralUtils.equalsAny(command.getName(), commandNames))
                 .toList()
-                .forEach(command -> g.deleteCommandById(command.getIdLong()).queue())
+                .forEach(command -> g.deleteCommandById(command.getIdLong()).queue()),
+                new ErrorHandler().handle(ErrorResponse.UNKNOWN_COMMAND, e -> logger.warn("Could not remove some commands from {}", g.getName()))
         );
     }
 
