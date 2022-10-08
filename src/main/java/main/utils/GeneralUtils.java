@@ -1,11 +1,7 @@
 package main.utils;
 
 import lombok.SneakyThrows;
-import main.constants.Permission;
-import main.constants.BotConstants;
-import main.constants.ENV;
-import main.constants.RobertifyEmoji;
-import main.constants.TimeFormat;
+import main.constants.*;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.json.GenericJSONField;
@@ -32,7 +28,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -106,7 +105,7 @@ public class GeneralUtils {
 
         try {
             new URI(url);
-            return true;
+            return url.contains("://");
         } catch (URISyntaxException e) {
             return false;
         }
@@ -119,8 +118,11 @@ public class GeneralUtils {
         while (con.getResponseCode() / 100 == 3) {
             location = con.getHeaderField("location");
             con = (HttpURLConnection) new URL(location).openConnection();
+            if (con.getResponseCode() / 100 == 2) {
+                location = con.getURL().toString();
+                con = (HttpURLConnection) new URL(location).openConnection();
+            }
         }
-
         return location;
     }
 
