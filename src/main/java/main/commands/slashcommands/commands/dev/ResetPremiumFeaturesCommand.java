@@ -61,7 +61,10 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
                 case "all" -> {
                     Robertify.getShardManager()
                             .getGuildCache()
-                            .forEach(RobertifyPremium::resetPremiumFeatures);
+                            .forEach(g -> {
+                                RobertifyPremium.resetPremiumFeatures(g);
+                                logger.info("Reset all premium features for {}", g.getName());
+                            });
                 }
                 case "guild" -> {
                     final var guildID = event.getOption("guildid").getAsLong();
@@ -74,6 +77,7 @@ public class ResetPremiumFeaturesCommand extends AbstractSlashCommand {
                     }
 
                     RobertifyPremium.resetPremiumFeatures(guild);
+                    logger.info("Reset all premium features for {}", guild.getName());
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(cmdGuild, "Successfully reset all premium features for " + guild.getName()).build())
                             .setEphemeral(true)
                             .queue();

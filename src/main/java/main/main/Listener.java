@@ -71,8 +71,6 @@ public class Listener extends ListenerAdapter {
 
             if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.updateAll();
-
-            RobertifyPremium.resetPremiumFeatures(g);
             try {
                 ResumeUtils.getInstance().loadInfo(g);
             } catch (Exception e) {
