@@ -187,7 +187,8 @@ public class Robertify {
                     .setRedirectUri(SpotifyHttpManager.makeUri("http://localhost/callback/"))
                     .build();
 
-            deezerApi = new DeezerApi();
+            deezerApi = new DeezerApi()
+                    .setAccessToken(Config.get(ENV.DEEZER_ACCESS_TOKEN));
 
             initVoteSiteAPIs();
 
