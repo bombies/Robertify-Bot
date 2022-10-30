@@ -5,8 +5,12 @@ import main.audiohandlers.RobertifyAudioManager;
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResumeUtils {
+    private final Logger logger = LoggerFactory.getLogger(ResumeUtils.class);
+
     private final ResumeData data;
     private static ResumeUtils instance;
 
@@ -32,11 +36,16 @@ public class ResumeUtils {
         if (info == null)
             return;
 
-        RobertifyAudioManager.getInstance().loadAndPlay(
-                guild.getIdLong(),
-                info.getChannelId(),
-                info
-        );
+        try {
+            RobertifyAudioManager.getInstance().loadAndPlay(
+                    guild.getIdLong(),
+                    info.getChannelId(),
+                    info
+            );
+        } catch (Exception e) {
+            logger.error("Unexpected error", e);
+        }
+
         data.removeGuild(guild.getIdLong());
     }
 

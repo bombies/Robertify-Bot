@@ -305,7 +305,10 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                             if (dedicatedChannelConfig.isChannelSet())
                                 if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                                     msg.delete().queueAfter(10, TimeUnit.SECONDS);
-                        });
+                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+                            if (!e.getMessage().contains("MESSAGE_SEND"))
+                                logger.error("Unexpected error when attempting to send an unread alert message", e.getCause());
+                        }));
         }
 
         if (!adminCheck(event)) return false;

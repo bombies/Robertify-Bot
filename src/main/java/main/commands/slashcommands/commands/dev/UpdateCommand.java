@@ -113,6 +113,10 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                                 SubCommand.of(
                                         "message",
                                         "Update the message in all request channels"
+                                ),
+                                SubCommand.of(
+                                        "clean",
+                                        "Clean all the request channels"
                                 )
                         )
                         .setDevCommand()
@@ -153,7 +157,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
             }
             case "buttons" -> {
                 DedicatedChannelConfig.updateAllButtons();
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully all buttons").build())
+                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all buttons").build())
                         .setEphemeral(true)
                         .queue();
             }
@@ -161,6 +165,14 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                 for (Guild g : Robertify.shardManager.getGuilds())
                     new DedicatedChannelConfig(g).updateMessage();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all messages").build())
+                        .setEphemeral(true)
+                        .queue();
+            }
+            case "clean" -> {
+                event.deferReply().queue();
+                for (Guild g : Robertify.shardManager.getGuilds())
+                    new DedicatedChannelConfig(g).cleanChannel();
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully cleaned all channels").build())
                         .setEphemeral(true)
                         .queue();
             }

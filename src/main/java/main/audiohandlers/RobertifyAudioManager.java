@@ -133,13 +133,15 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(guild);
 
         try {
-            joinVoiceChannel(null, guild.getVoiceChannelById(channelID), musicManager);
+            final var voiceChannel = guild.getVoiceChannelById(channelID);
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(null, voiceChannel, musicManager);
+                    loadTrack(track, musicManager);
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadTrack(track, musicManager);
     }
 
     @SneakyThrows
@@ -150,20 +152,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            memberVoiceState.getMember().getUser(),
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadTrack(
-                trackUrl,
-                musicManager,
-                memberVoiceState.getMember().getUser(),
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                addToBeginning
-        );
     }
 
     @SneakyThrows
@@ -174,20 +178,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            user,
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadTrack(
-                trackUrl,
-                musicManager,
-                user,
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                addToBeginning
-        );
     }
 
     @SneakyThrows
@@ -197,19 +203,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(ctx.getChannel(), memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(ctx.getChannel(), voiceChannel, musicManager);
+                    loadPlaylistShuffled(
+                            memberVoiceState.getMember().getUser(),
+                            trackUrl,
+                            musicManager,
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-        loadPlaylistShuffled(
-                memberVoiceState.getMember().getUser(),
-                trackUrl,
-                musicManager,
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                addToBeginning
-        );
     }
 
     @SneakyThrows
@@ -220,20 +229,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            memberVoiceState.getMember().getUser(),
+                            false,
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadTrack(
-                trackUrl,
-                musicManager,
-                memberVoiceState.getMember().getUser(),
-                false,
-                botMsg,
-                addToBeginning
-        );
     }
 
     @SneakyThrows
@@ -244,20 +255,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    loadPlaylistShuffled(
+                            memberVoiceState.getMember().getUser(),
+                            trackUrl,
+                            musicManager,
+                            false,
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadPlaylistShuffled(
-                memberVoiceState.getMember().getUser(),
-                trackUrl,
-                musicManager,
-                false,
-                botMsg,
-                addToBeginning
-        );
     }
 
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
@@ -266,20 +279,23 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            event.getUser(),
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
             return;
         }
-
-        loadTrack(
-                trackUrl,
-                musicManager,
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                event.getUser(),
-                addToBeginning
-        );
     }
 
     public void loadAndPlayShuffled(String trackUrl, GuildVoiceState selfVoiceState,
@@ -288,20 +304,23 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    loadPlaylistShuffled(
+                            trackUrl,
+                            musicManager,
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            event.getUser(),
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
             return;
         }
-
-        loadPlaylistShuffled(
-                trackUrl,
-                musicManager,
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                event.getUser(),
-                addToBeginning
-        );
     }
 
     public void loadAndPlayFromDedicatedChannel(String trackUrl, GuildVoiceState selfVoiceState,
@@ -310,20 +329,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
 
         try {
-            joinVoiceChannel(event.getChannel().asTextChannel(), memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            false,
+                            botMsg,
+                            event.getUser(),
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-
-        loadTrack(
-                trackUrl,
-                musicManager,
-                false,
-                botMsg,
-                event.getUser(),
-                addToBeginning
-        );
     }
 
     public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState,
@@ -332,19 +353,22 @@ public class RobertifyAudioManager {
         final var musicManager = getMusicManager(channel.getGuild());
 
         try {
-            joinVoiceChannel(channel, memberVoiceState.getChannel(), musicManager);
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    loadTrack(
+                            path,
+                            musicManager,
+                            memberVoiceState.getMember().getUser(),
+                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            addToBeginning
+                    );
+                }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
-        loadTrack(
-                path,
-                musicManager,
-                memberVoiceState.getMember().getUser(),
-                new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
-                botMsg,
-                addToBeginning
-        );
     }
 
     private void loadTrack(ResumeData.GuildResumeData track, GuildMusicManager musicManager) {

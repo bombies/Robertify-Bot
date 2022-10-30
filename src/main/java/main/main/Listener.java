@@ -6,6 +6,7 @@ import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.HistoryCommand;
 import main.commands.slashcommands.commands.dev.PostCommandInfoCommand;
 import main.commands.slashcommands.commands.dev.RefreshSpotifyTokenCommand;
+import main.commands.slashcommands.commands.dev.UpdateCommand;
 import main.commands.slashcommands.commands.management.LanguageCommand;
 import main.commands.slashcommands.commands.management.TogglesCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
@@ -67,16 +68,15 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet()) {
-                dedicatedChannelConfig.updateMessage();
-                dedicatedChannelConfig.cleanChannel();
-            }
+//            if (dedicatedChannelConfig.isChannelSet()) {
+//                dedicatedChannelConfig.updateMessage();
+//            }
 
-            try {
-                ResumeUtils.getInstance().loadInfo(g);
-            } catch (Exception e) {
-                logger.error("There was an error resuming tracks in {}", g.getName(), e);
-            }
+//            try {
+//                ResumeUtils.getInstance().loadInfo(g);
+//            } catch (Exception e) {
+//                logger.error("There was an error resuming tracks in {}", g.getName(), e);
+//            }
         }
 
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
@@ -208,7 +208,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-
+        new UpdateCommand().loadCommand(g);
     }
 
     /**

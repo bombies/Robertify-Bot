@@ -18,6 +18,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
@@ -40,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DedicatedChannelConfig extends AbstractGuildConfig {
@@ -90,6 +92,8 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     public synchronized void removeChannel() {
         if (!isChannelSet())
             throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+
+        getTextChannel().delete().queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {}));
 
         var obj = getGuildObject().getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
         obj.put(GuildDB.Field.DEDICATED_CHANNEL_ID.toString(), -1);
@@ -170,7 +174,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
             eb.setImage(theme.getIdleBanner());
 
             msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                    .setEmbeds(eb.build()).queue());
+                    .setEmbeds(eb.build()).queue(),
+                    new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
+            );
         } else {
             final var trackInfo = playingTrack.getInfo();
 
@@ -222,7 +228,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
             msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING, Pair.of("{songs}", nextTenSongs.toString())))
                     .setEmbeds(eb.build())
-                    .queue());
+                    .queue()
+                    , new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
+            );
         }
     }
 
@@ -325,9 +333,18 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
     public void cleanChannel() {
         if (!isChannelSet())
             return;
+        if (!guild.getSelfMember().hasPermission(Permission.MESSAGE_HISTORY))
+            return;
         final var channel = getTextChannel();
         MessageHistory.getHistoryAfter(channel, String.valueOf(getMessageID()))
-                .queue(messages -> channel.deleteMessages(messages.getRetrievedHistory()).queue());
+                .queue(messages -> {
+                    final var validMessages = messages.getRetrievedHistory()
+                            .stream()
+                            .filter(msg -> msg.getTimeCreated().toEpochSecond() > ((int)(new Date().getTime() / 1000)) - (14 * 24 * 60 * 60))
+                            .toList();
+                    if (validMessages.size() >= 2)
+                        channel.deleteMessages(validMessages.subList(0, Math.min(validMessages.size(), 100))).queue();
+                });
     }
 
     public static class ChannelConfig {
