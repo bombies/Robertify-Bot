@@ -11,13 +11,7 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceM
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeHttpContextFilter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.lava.extensions.youtuberotator.YoutubeIpRotatorSetup;
-import com.sedmelluq.lava.extensions.youtuberotator.planner.AbstractRoutePlanner;
-import com.sedmelluq.lava.extensions.youtuberotator.planner.RotatingNanoIpRoutePlanner;
-import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.IpBlock;
-import com.sedmelluq.lava.extensions.youtuberotator.tools.ip.Ipv6Block;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
@@ -29,17 +23,16 @@ import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
-import main.constants.ENV;
 import main.constants.Toggles;
-import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeData;
-import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -47,7 +40,6 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetAddress;
 import java.util.*;
 
 public class RobertifyAudioManager {
@@ -136,7 +128,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = guild.getVoiceChannelById(channelID);
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(null, voiceChannel, musicManager);
+                    joinAudioChannel(null, voiceChannel, musicManager);
                     loadTrack(track, musicManager);
                 }
         } catch (Exception e) {
@@ -155,7 +147,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    joinAudioChannel(channel, voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -181,7 +173,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    joinAudioChannel(channel, voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -206,7 +198,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(ctx.getChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(ctx.getChannel(), voiceChannel, musicManager);
                     loadPlaylistShuffled(
                             memberVoiceState.getMember().getUser(),
                             trackUrl,
@@ -232,7 +224,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    joinAudioChannel(channel, voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -258,7 +250,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    joinAudioChannel(channel, voiceChannel, musicManager);
                     loadPlaylistShuffled(
                             memberVoiceState.getMember().getUser(),
                             trackUrl,
@@ -282,7 +274,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -307,7 +299,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
                     loadPlaylistShuffled(
                             trackUrl,
                             musicManager,
@@ -319,7 +311,6 @@ public class RobertifyAudioManager {
                 }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
         }
     }
 
@@ -332,7 +323,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -356,7 +347,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinVoiceChannel(channel, voiceChannel, musicManager);
+                    joinAudioChannel(channel, voiceChannel, musicManager);
                     loadTrack(
                             path,
                             musicManager,
@@ -422,7 +413,7 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
-    public void joinVoiceChannel(TextChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
+    public void joinAudioChannel(TextChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
         if (vc.getMembers().size() == 0)
             throw new IllegalStateException("I can't join a voice channel with no one in it!");
 

@@ -10,6 +10,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
@@ -61,7 +62,7 @@ public class JoinCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.ALREADY_JOINED, placeholderPair).build();
         try {
             RobertifyAudioManager.getInstance()
-                    .joinVoiceChannel(textChannel, channel, musicManager);
+                    .joinAudioChannel(textChannel, channel, musicManager);
         } catch (IllegalStateException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.CANT_JOIN, placeholderPair)
                     .build();

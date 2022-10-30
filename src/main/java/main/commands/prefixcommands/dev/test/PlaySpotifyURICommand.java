@@ -6,7 +6,7 @@ import main.commands.prefixcommands.ITestCommand;
 import main.exceptions.InvalidSpotifyURIException;
 import main.utils.spotify.SpotifyURI;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 import javax.script.ScriptException;
 import java.util.List;
@@ -26,7 +26,7 @@ public class PlaySpotifyURICommand implements ITestCommand {
 
         try {
             var uri = SpotifyURI.parse(args.get(0));
-            RobertifyAudioManager.getInstance().joinVoiceChannel(ctx.getChannel(), (VoiceChannel) ctx.getMember().getVoiceState().getChannel(), RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild()));
+            RobertifyAudioManager.getInstance().joinAudioChannel(ctx.getChannel(), ctx.getMember().getVoiceState().getChannel(), RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild()));
 
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
         } catch (InvalidSpotifyURIException e) {

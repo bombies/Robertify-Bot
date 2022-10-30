@@ -18,6 +18,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;

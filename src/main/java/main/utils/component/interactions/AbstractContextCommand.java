@@ -51,7 +51,7 @@ public abstract class AbstractContextCommand extends AbstractInteraction {
         @Getter @NotNull
         private final String name;
 
-        private ContextCommand(Command.@NotNull Type type, @NotNull String name) {
+        private ContextCommand(@NotNull Command.Type type, @NotNull String name) {
             this.type = type;
             this.name = name;
         }

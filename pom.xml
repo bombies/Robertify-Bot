@@ -26,12 +26,6 @@
             <version>2.3.11</version>
         </dependency>
         <dependency>
-            <groupId>com.jagrosh</groupId>
-            <artifactId>jda-utilities</artifactId>
-            <version>3.0.5</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>2.2.4</version>
@@ -39,7 +33,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-alpha.18</version>
+            <version>5.0.0-alpha.21</version>
         </dependency>
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
@@ -95,7 +89,7 @@
         <dependency>
             <groupId>com.github.freyacodes</groupId>
             <artifactId>Lavalink-Client</artifactId>
-            <version>c0e644dd9fc9ce74e39c9c12cbfa62e96ae88b3b</version>
+            <version>cde746afc23b462adb6e9d797707fc4a7e85e1d1</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
@@ -135,16 +129,6 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.jagrosh</groupId>
-                <artifactId>jda-utilities</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.json</groupId>
-                        <artifactId>json</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
             <dependency>
                 <groupId>net.dv8tion</groupId>
                 <artifactId>JDA</artifactId>

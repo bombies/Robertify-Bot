@@ -15,6 +15,8 @@ import main.utils.json.reminders.RemindersConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

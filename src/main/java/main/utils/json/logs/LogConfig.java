@@ -3,7 +3,7 @@ package main.utils.json.logs;
 import main.main.Robertify;
 import main.utils.json.AbstractGuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.bson.Document;
 import org.json.JSONObject;
 

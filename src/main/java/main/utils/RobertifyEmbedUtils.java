@@ -6,7 +6,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.LocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.util.HashMap;

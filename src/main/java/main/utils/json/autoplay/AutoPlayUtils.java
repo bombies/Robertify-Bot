@@ -9,7 +9,7 @@ import main.audiohandlers.sources.autoplay.AutoPlaySourceManager;
 import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import okhttp3.HttpUrl;
 import org.json.JSONArray;
 import org.json.JSONObject;
