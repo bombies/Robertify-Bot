@@ -5,9 +5,6 @@ import main.main.Robertify;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class SpotifyUtils {
     private static final SpotifyApi api = Robertify.getSpotifyApi();
 

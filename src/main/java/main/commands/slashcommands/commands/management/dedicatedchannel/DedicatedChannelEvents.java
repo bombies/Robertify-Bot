@@ -6,9 +6,11 @@ import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.ICommand;
 import main.commands.prefixcommands.audio.*;
 import main.commands.slashcommands.commands.audio.*;
+import main.constants.ENV;
 import main.constants.Permission;
 import main.constants.SourcePlaylistPatterns;
 import main.constants.Toggles;
+import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -76,6 +78,14 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         String message = eventMessage.getContentRaw();
 
         if (!message.startsWith(new GuildConfig(guild).getPrefix()) && !user.isBot() && !event.isWebhookMessage()) {
+            if (!Config.getBoolean(ENV.MESSAGE_CONTENT_INTENT_ENABLED)) {
+                event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NO_CONTENT_INTENT)
+                        .build()
+                ).queue();
+                event.getMessage().delete().queueAfter(10, TimeUnit.SECONDS);
+                return;
+            }
+
             if (!memberVoiceState.inAudioChannel()) {
                 event.getMessage().reply(user.getAsMention()).setEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                                 .build())

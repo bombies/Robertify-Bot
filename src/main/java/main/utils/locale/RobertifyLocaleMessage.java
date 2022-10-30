@@ -392,7 +392,8 @@ public enum RobertifyLocaleMessage {
         DEDICATED_CHANNEL_SHUFFLE,
         DEDICATED_CHANNEL_DISCONNECT,
         DEDICATED_CHANNEL_FILTERS,
-        DEDICATED_CHANNEL_BUTTON_TOGGLE
+        DEDICATED_CHANNEL_BUTTON_TOGGLE,
+        DEDICATED_CHANNEL_NO_CONTENT_INTENT
     }
 
     public enum PermissionsMessages implements LocaleMessage {

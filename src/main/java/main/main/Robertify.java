@@ -158,15 +158,12 @@ public class Robertify {
                     GatewayIntent.DIRECT_MESSAGE_REACTIONS
             );
 
-            final var enabledIntents = new ArrayList<GatewayIntent>();
+            final var enabledIntents = Lists.newArrayList(GatewayIntent.GUILD_MESSAGES);
 
-            if (Config.getBoolean(ENV.MESSAGE_CONTENT_INTENT_ENABLED)) {
-                enabledIntents.add(GatewayIntent.GUILD_MESSAGES);
+            if (Config.getBoolean(ENV.MESSAGE_CONTENT_INTENT_ENABLED))
                 enabledIntents.add(GatewayIntent.MESSAGE_CONTENT);
-            } else {
-                disabledIntents.add(GatewayIntent.GUILD_MESSAGES);
+            else
                 disabledIntents.add(GatewayIntent.MESSAGE_CONTENT);
-            }
 
             jdaBuilder.enableIntents(enabledIntents);
             jdaBuilder.disableIntents(disabledIntents);
