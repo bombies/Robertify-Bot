@@ -121,12 +121,11 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
             for (TrackSimplified t : album.getTracks().getItems()) {
                 if (t != null) {
                     final var info = new AudioTrackInfo(t.getName(), album.getArtists()[0].getName(), t.getDurationMs(), t.getId(), false, "https://open.spotify.com/track/" + t.getId());
-                    final var artist = SpotifySourceManager.getApi().getArtist(album.getArtists()[0].getId()).build().execute();
                     SpotifyTrack track = new SpotifyTrack(
                             info,
                             t.getExternalUrls().getExternalUrls().getOrDefault("isrc", null),
                             album.getImages()[0].getUrl(),
-                            new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
+                            new SpotifyTrack.SpotifyArtist(album.getArtists()[0].getId(), List.of(" ")),
                             this
                     );
                     playlist.add(track);
@@ -149,12 +148,12 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
             for (Track t : tracks) {
                 if (t != null) {
                     AudioTrackInfo info = new AudioTrackInfo(t.getName(), t.getArtists()[0].getName(), t.getDurationMs(), t.getId(), false, "https://open.spotify.com/track/" + t.getId());
-                    final var artist = SpotifySourceManager.getApi().getArtist(t.getArtists()[0].getId()).build().execute();
+                    final var artist = t.getArtists()[0];
                     SpotifyTrack track = new SpotifyTrack(
                             info,
-                            (String)t.getExternalIds().getExternalIds().getOrDefault("isrc", null),
+                            t.getExternalIds().getExternalIds().getOrDefault("isrc", null),
                             ((t.getAlbum().getImages()).length >= 1) ? t.getAlbum().getImages()[0].getUrl() : "https://i.imgur.com/VNQvjve.png",
-                            new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
+                            new SpotifyTrack.SpotifyArtist(artist.getId(), List.of(" ")),
                             this
                     );
                     playlist.add(track);
@@ -185,12 +184,12 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
                     Track plTrack = (Track)playlistTrack.getTrack();
                     if (plTrack != null) {
                         AudioTrackInfo info = new AudioTrackInfo(plTrack.getName(), plTrack.getArtists()[0].getName(), playlistTrack.getTrack().getDurationMs(), plTrack.getId(), false, "https://open.spotify.com/track/" + plTrack.getId());
-                        final var artist = SpotifySourceManager.getApi().getArtist(plTrack.getArtists()[0].getId()).build().execute();
+                        final var artist = plTrack.getArtists()[0];
                         SpotifyTrack track = new SpotifyTrack(
                                 info,
                                 plTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
                                 ((plTrack.getAlbum().getImages()).length >= 1) ? plTrack.getAlbum().getImages()[0].getUrl() : "https://i.imgur.com/VNQvjve.png",
-                                new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
+                                new SpotifyTrack.SpotifyArtist(artist.getId(), List.of(" ")),
                                 this
                         );
                         finalPlaylist.add(track);
@@ -226,13 +225,13 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
             Future<Track> trackFuture = api.getTrack(res.group(res.groupCount())).build().executeAsync();
             Track track = trackFuture.get();
             AudioTrackInfo info = new AudioTrackInfo(track.getName(), track.getArtists()[0].getName(), track.getDurationMs(), track.getId(), false, "https://open.spotify.com/track/" + track.getId());
-            final var artist = SpotifySourceManager.getApi().getArtist(track.getArtists()[0].getId()).build().execute();
+            final var artist = track.getArtists()[0];
 
             return new SpotifyTrack(
                     info,
                     track.getExternalIds().getExternalIds().getOrDefault("isrc", null),
                     track.getAlbum().getImages()[0].getUrl(),
-                    new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
+                    new SpotifyTrack.SpotifyArtist(artist.getId(), List.of(" ")),
                     this
             );
         } catch (Exception e) {

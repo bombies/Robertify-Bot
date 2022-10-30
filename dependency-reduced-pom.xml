@@ -114,13 +114,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.jagrosh</groupId>
-      <artifactId>jda-utilities</artifactId>
-      <version>3.0.5</version>
-      <type>pom</type>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>org.jetbrains.kotlin</groupId>
       <artifactId>kotlin-test-junit</artifactId>
       <version>1.7.20</version>
@@ -139,16 +132,6 @@
   </dependencies>
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>com.jagrosh</groupId>
-        <artifactId>jda-utilities</artifactId>
-        <exclusions>
-          <exclusion>
-            <artifactId>json</artifactId>
-            <groupId>org.json</groupId>
-          </exclusion>
-        </exclusions>
-      </dependency>
       <dependency>
         <groupId>net.dv8tion</groupId>
         <artifactId>JDA</artifactId>
