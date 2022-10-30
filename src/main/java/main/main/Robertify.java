@@ -1,6 +1,7 @@
 package main.main;
 
 import api.deezer.DeezerApi;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import io.sentry.Sentry;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -143,17 +145,31 @@ public class Robertify {
                             CacheFlag.ONLINE_STATUS,
                             CacheFlag.STICKER
                     )
-                    .disableIntents(
-                            GatewayIntent.DIRECT_MESSAGE_TYPING,
-                            GatewayIntent.GUILD_BANS,
-                            GatewayIntent.GUILD_INVITES,
-                            GatewayIntent.GUILD_MEMBERS,
-                            GatewayIntent.GUILD_MESSAGE_TYPING,
-                            GatewayIntent.GUILD_PRESENCES,
-                            GatewayIntent.DIRECT_MESSAGE_REACTIONS
-                    )
                     .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."));
+
+            final var disabledIntents = Lists.newArrayList(
+                    GatewayIntent.DIRECT_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_BANS,
+                    GatewayIntent.GUILD_INVITES,
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS
+            );
+
+            final var enabledIntents = new ArrayList<GatewayIntent>();
+
+            if (Config.getBoolean(ENV.MESSAGE_CONTENT_INTENT_ENABLED)) {
+                enabledIntents.add(GatewayIntent.GUILD_MESSAGES);
+                enabledIntents.add(GatewayIntent.MESSAGE_CONTENT);
+            } else {
+                disabledIntents.add(GatewayIntent.GUILD_MESSAGES);
+                disabledIntents.add(GatewayIntent.MESSAGE_CONTENT);
+            }
+
+            jdaBuilder.enableIntents(enabledIntents);
+            jdaBuilder.disableIntents(disabledIntents);
 
             // Register all slash commands
             SlashCommandManager slashCommandManager = new SlashCommandManager();

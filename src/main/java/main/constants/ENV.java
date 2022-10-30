@@ -14,6 +14,7 @@ public enum ENV {
     ICON_URL("icon_url"),
     RANDOM_MESSAGE_CHANCE("random_message_chance"),
     YOUTUBE_ENABLED("youtube_enabled"),
+    MESSAGE_CONTENT_INTENT_ENABLED("message_content_intent_enabled"),
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
