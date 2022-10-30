@@ -18,6 +18,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -319,6 +320,14 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
 
     protected void updateConfig(long gid, JSONObject config) {
         getCache().setField(gid, GuildDB.Field.DEDICATED_CHANNEL_OBJECT, config);
+    }
+
+    public void cleanChannel() {
+        if (!isChannelSet())
+            return;
+        final var channel = getTextChannel();
+        MessageHistory.getHistoryAfter(channel, String.valueOf(getMessageID()))
+                .queue(messages -> channel.deleteMessages(messages.getRetrievedHistory()).queue());
     }
 
     public static class ChannelConfig {
