@@ -44,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -68,6 +67,8 @@ public class Robertify {
     private static SpotifyApi spotifyApi;
     @Getter
     private static RobertifyAPI robertifyAPI;
+    @Getter
+    private static ScheduledExecutorService spotifyTokenRefreshScheduler;
     @Getter
     private static final EventWaiter commandWaiter = new EventWaiter();
 
@@ -205,8 +206,8 @@ public class Robertify {
 
             initVoteSiteAPIs();
 
-            final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            scheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
+            spotifyTokenRefreshScheduler = Executors.newScheduledThreadPool(1);
+            spotifyTokenRefreshScheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
 
             String masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
             if (masterPassword != null)
