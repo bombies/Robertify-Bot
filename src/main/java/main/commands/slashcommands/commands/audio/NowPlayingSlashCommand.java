@@ -80,15 +80,15 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                                     .setArtistName(info.author)
                                     .setAlbumImage(
                                             track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                                    SpotifyUtils.getArtworkUrl(track.getInfo().identifier)
+                                                    SpotifyUtils.getArtworkUrl(info.identifier)
                                                         :
                                                     track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                                        DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier))
+                                                        DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
                                                             :
                                                         new ThemesConfig(guild).getTheme().getNowPlayingBanner()
                                     )
                                     .setDuration(info.length)
-                                    .setCurrentTime(audioPlayer.getTrackPosition() / track.getInfo().length)
+                                    .setCurrentTime(audioPlayer.getTrackPosition())
                                     .build()
                     ))
                     .setEphemeral(ephemeralState)
