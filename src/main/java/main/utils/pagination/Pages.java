@@ -78,8 +78,9 @@ public abstract class Pages {
     public static Message paginateQueueMessage(SlashCommandInteractionEvent event, List<QueuePage> queuePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
+        final var image = queuePages.get(0).getImage();
         WebhookMessageCreateAction<Message> messageAction = event.getHook()
-                .sendFiles(FileUpload.fromData(queuePages.get(0).getImage()))
+                .sendFiles(FileUpload.fromData(image))
                 .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
 
         if (queuePages.size() > 1) {
@@ -89,6 +90,8 @@ public abstract class Pages {
         }
 
         messageAction.queue(msg -> {
+            image.delete();
+
             if (queuePages.size() > 1) {
                 queueMessages.put(msg.getIdLong(), queuePages);
                 ret.set(msg);

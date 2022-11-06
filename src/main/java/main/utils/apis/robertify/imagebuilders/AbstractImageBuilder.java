@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.UUID;
 
 public abstract class AbstractImageBuilder {
     final Logger logger = LoggerFactory.getLogger(AbstractImageBuilder.class);
@@ -33,7 +34,7 @@ public abstract class AbstractImageBuilder {
 
     @SneakyThrows
     public File build() {
-        final var imageFile = new File("./built_image.png");
+        final var imageFile = new File("./" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.toString());
         try(final var is = url.openStream();
             final var os = new FileOutputStream(imageFile)){

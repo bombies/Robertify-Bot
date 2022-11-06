@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.AttachedFile;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -84,31 +85,36 @@ public class PaginationEvents extends ListenerAdapter {
 
             if (event.getButton().getId().equals("queue:" + MessageButton.FRONT + event.getUser().getId())) {
                 currentPage.put(msg, 0);
-                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(0).getImage()))
+                File image = queuePages.get(0).getImage();
+                event.editMessageAttachments(AttachedFile.fromData(image))
                         .setComponents(((currentPage.get(msg) == 0) ?
                                 Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                 Paginator.getQueueButtons(event.getUser())))
-                        .queue();
+                        .queue(done -> image.delete());
             } else if (event.getButton().getId().equals("queue:" + MessageButton.PREVIOUS + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) - 1);
-                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                File image = queuePages.get(currentPage.get(msg)).getImage();
+                event.editMessageAttachments(AttachedFile.fromData(image))
                         .setComponents(((currentPage.get(msg) == 0) ?
                                 Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                 Paginator.getQueueButtons(event.getUser())))
-                        .queue();
+                        .queue(done -> image.delete());
             } else if (event.getButton().getId().equals("queue:" + MessageButton.NEXT + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) + 1);
-                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                File image = queuePages.get(currentPage.get(msg)).getImage();
+                event.editMessageAttachments(AttachedFile.fromData(image))
                         .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
                                 Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
                                 Paginator.getQueueButtons(event.getUser())))
-                        .queue();
+                        .queue(done -> image.delete());
             } else if (event.getButton().getId().equals("queue:" + MessageButton.END + event.getUser().getId())) {
                 currentPage.put(msg, queuePages.size()-1);
-                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                File image = queuePages.get(currentPage.get(msg)).getImage();
+                event.editMessageAttachments(AttachedFile.fromData(image))
                         .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
                                 Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
-                                Paginator.getQueueButtons(event.getUser()))).queue();
+                                Paginator.getQueueButtons(event.getUser())))
+                        .queue(done -> image.delete());
             } else {
                 EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.NO_PERMS_BUTTON);
                 event.replyEmbeds(eb.build()).setEphemeral(true).queue();
