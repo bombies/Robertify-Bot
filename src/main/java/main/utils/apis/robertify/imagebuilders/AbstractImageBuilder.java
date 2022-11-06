@@ -1,9 +1,7 @@
 package main.utils.apis.robertify.imagebuilders;
 
 import lombok.SneakyThrows;
-import me.duncte123.botcommons.web.ContentType;
 import me.duncte123.botcommons.web.WebUtils;
-import okhttp3.Response;
 import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +11,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
-public abstract class ImageBuilder {
-    final Logger logger = LoggerFactory.getLogger(ImageBuilder.class);
+public abstract class AbstractImageBuilder {
+    final Logger logger = LoggerFactory.getLogger(AbstractImageBuilder.class);
 
     private final ImageType imageType;
     private final URIBuilder uri;
     private final WebUtils webUtils;
 
     @SneakyThrows
-    ImageBuilder(ImageType imageType) {
+    AbstractImageBuilder(ImageType imageType) {
         this.imageType = imageType;
         this.webUtils = WebUtils.ins;
         this.uri = new URIBuilder("https://dev.robertify.me/api/images")

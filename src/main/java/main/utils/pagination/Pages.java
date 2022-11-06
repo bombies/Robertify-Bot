@@ -1,8 +1,12 @@
 package main.utils.pagination;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.RobertifyAudioManager;
 import main.constants.InteractionLimits;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.QueueImageBuilder;
 import main.utils.component.interactions.selectionmenu.SelectMenuOption;
 import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,16 +18,20 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction;
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 public abstract class Pages {
     private static final HashMap<Long, List<MessagePage>> messages = new HashMap<>();
+    private static final HashMap<Long, List<QueuePage>> queueMessages = new HashMap<>();
     private static final HashMap<Long, List<MenuPage>> menuMessages = new HashMap<>();
     private static Supplier<EmbedBuilder> embedStyle = EmbedBuilder::new;
 
@@ -67,6 +75,29 @@ public abstract class Pages {
         return ret.get();
     }
 
+    public static Message paginateQueueMessage(SlashCommandInteractionEvent event, List<QueuePage> queuePages) {
+        AtomicReference<Message> ret = new AtomicReference<>();
+
+        WebhookMessageCreateAction<Message> messageAction = event.getHook()
+                .sendFiles(FileUpload.fromData(queuePages.get(0).getImage()))
+                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
+
+        if (queuePages.size() > 1) {
+            messageAction = messageAction.addComponents(
+                    Paginator.getQueueButtons(event.getUser(), false, false, true, true)
+            );
+        }
+
+        messageAction.queue(msg -> {
+            if (queuePages.size() > 1) {
+                queueMessages.put(msg.getIdLong(), queuePages);
+                ret.set(msg);
+            }
+        });
+
+        return ret.get();
+    }
+
     public static Message paginateMessage(TextChannel channel, User user, List<String> content, int maxPerPage) {
         List<MessagePage> messagePages = new ArrayList<>();
 
@@ -83,6 +114,68 @@ public abstract class Pages {
         messageLogic(event.getGuild(), messagePages, content, maxPerPage);
 
         return paginateMessage(event, messagePages);
+    }
+
+    public static Message paginateQueue(int maxPerPage, SlashCommandInteractionEvent event) {
+        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+        final var queue = musicManager.getScheduler().queue;
+        final var queuePages = new ArrayList<QueuePage>();
+
+        event.deferReply().queue();
+
+        messageLogic(queuePages, queue, maxPerPage);
+
+        return paginateQueueMessage(event, queuePages);
+    }
+
+    private static class QueueItem {
+        @Getter
+        private final String trackTitle;
+        @Getter
+        private final String artist;
+        @Getter
+        private final long duration;
+
+        public QueueItem(String trackTitle, String artist, long duration) {
+            this.trackTitle = trackTitle;
+            this.artist = artist;
+            this.duration = duration;
+        }
+    }
+
+    protected final static class QueuePage {
+        @Getter
+        private final int pageNumber;
+        @Getter
+        private final List<QueueItem> queueItems;
+
+        public QueuePage(int pageNumber, List<QueueItem> queueItems) {
+            this.pageNumber = pageNumber;
+            this.queueItems = queueItems;
+        }
+
+        public QueuePage(int pageNumber) {
+            this.pageNumber = pageNumber;
+            this.queueItems = new ArrayList<>();
+        }
+
+        public void addItem(QueueItem item) {
+            queueItems.add(item);
+        }
+
+        public void addItem(String title, String artist, long duration) {
+            queueItems.add(new QueueItem(title, artist, duration));
+        }
+
+        public File getImage() {
+            final var builder = new QueueImageBuilder()
+                    .setPage(pageNumber);
+
+            for (final var item : queueItems)
+                builder.addTrack(item.trackTitle, item.artist, item.duration);
+
+            return builder.build();
+        }
     }
 
     private static void messageLogic(Guild guild, List<MessagePage> messagePages, List<String> content, int maxPerPage) {
@@ -108,8 +201,37 @@ public abstract class Pages {
         }
     }
 
+    private static void messageLogic(List<QueuePage> messagePages, ConcurrentLinkedQueue<AudioTrack> queue, int maxPerPage) {
+        if (queue.size() <= maxPerPage) {
+            for (final var track : queue) {
+                final var trackInfo = track.getInfo();
+                messagePages.add(new QueuePage(1, List.of(new QueueItem(trackInfo.title, trackInfo.author, trackInfo.length))));
+            }
+        } else {
+            final var trackList = queue.stream().toList();
+            int pagesRequired = (int)Math.ceil((double)queue.size() / maxPerPage);
+            int lastIndex = 0;
+
+            for (int i = 0; i < pagesRequired; i++) {
+                final var page = new QueuePage(i + 1);
+                for (int j = 0; j < maxPerPage; j++) {
+                    if (lastIndex == queue.size()) break;
+                    final var trackInfo = trackList.get(lastIndex).getInfo();
+
+                    page.addItem(trackInfo.title, trackInfo.author, trackInfo.length);
+                    lastIndex++;
+                }
+                messagePages.add(page);
+            }
+        }
+    }
+
     public static List<MessagePage> getMessagePages(long msg) {
         return messages.get(msg);
+    }
+
+    public static List<QueuePage> getQueuePages(long msg) {
+        return queueMessages.get(msg);
     }
 
     @SneakyThrows

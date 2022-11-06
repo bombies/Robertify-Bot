@@ -17,6 +17,8 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
     @Override
@@ -71,28 +73,26 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                     .setEphemeral(ephemeralState)
                     .queue();
         } else {
-            AudioTrackInfo info = track.getInfo();
-
+            final var info = track.getInfo();
+            final var image = new NowPlayingImageBuilder()
+                    .setTitle(info.title)
+                    .setArtistName(info.author)
+                    .setAlbumImage(
+                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
+                                    SpotifyUtils.getArtworkUrl(info.identifier)
+                                    :
+                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
+                                            DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
+                                            :
+                                            new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                    )
+                    .setDuration(info.length)
+                    .setCurrentTime(audioPlayer.getTrackPosition())
+                    .build();
             event.getHook()
-                    .sendFiles(FileUpload.fromData(
-                            new NowPlayingImageBuilder()
-                                    .setTitle(info.title)
-                                    .setArtistName(info.author)
-                                    .setAlbumImage(
-                                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                                    SpotifyUtils.getArtworkUrl(info.identifier)
-                                                        :
-                                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                                        DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
-                                                            :
-                                                        new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                                    )
-                                    .setDuration(info.length)
-                                    .setCurrentTime(audioPlayer.getTrackPosition())
-                                    .build()
-                    ))
+                    .sendFiles(FileUpload.fromData(image))
                     .setEphemeral(ephemeralState)
-                    .queue();
+                    .queue(done -> image.delete());
         }
 
     }

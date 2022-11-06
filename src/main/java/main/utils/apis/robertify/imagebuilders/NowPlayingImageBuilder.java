@@ -1,6 +1,6 @@
 package main.utils.apis.robertify.imagebuilders;
 
-public class NowPlayingImageBuilder extends ImageBuilder {
+public class NowPlayingImageBuilder extends AbstractImageBuilder {
     public NowPlayingImageBuilder() {
         super(ImageType.NOW_PLAYING);
     }

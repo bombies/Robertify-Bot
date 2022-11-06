@@ -29,11 +29,11 @@ public class Paginator {
         );
     }
 
-    public static ActionRow getButtons(User user, Paginator paginator, boolean frontEnabled, boolean previousEnabled, boolean nextEnabled, boolean endEnabled) {
-        Button frontButton = Button.of(ButtonStyle.SECONDARY, MessageButton.FRONT + user.getId(), paginator.getFrontEmoji());
-        Button previousButton = Button.of(ButtonStyle.SECONDARY, MessageButton.PREVIOUS + user.getId(), paginator.getPreviousEmoji());
-        Button nextButton = Button.of(ButtonStyle.SECONDARY, MessageButton.NEXT + user.getId(), paginator.getNextEmoji());
-        Button endButton = Button.of(ButtonStyle.SECONDARY, MessageButton.END + user.getId(), paginator.getEndEmoji());
+    public static ActionRow getButtons(User user, Paginator paginator, boolean frontEnabled, boolean previousEnabled, boolean nextEnabled, boolean endEnabled, boolean isQueue) {
+        Button frontButton = Button.of(ButtonStyle.SECONDARY, (isQueue ? "queue:" : "") +  MessageButton.FRONT + user.getId(), paginator.getFrontEmoji());
+        Button previousButton = Button.of(ButtonStyle.SECONDARY, (isQueue ? "queue:" : "") +  MessageButton.PREVIOUS + user.getId(), paginator.getPreviousEmoji());
+        Button nextButton = Button.of(ButtonStyle.SECONDARY, (isQueue ? "queue:" : "") +  MessageButton.NEXT + user.getId(), paginator.getNextEmoji());
+        Button endButton = Button.of(ButtonStyle.SECONDARY, (isQueue ? "queue:" : "") +  MessageButton.END + user.getId(), paginator.getEndEmoji());
         return ActionRow.of(
                 frontEnabled ? frontButton : frontButton.asDisabled(),
                 previousEnabled ? previousButton : previousButton.asDisabled(),
@@ -43,15 +43,27 @@ public class Paginator {
     }
 
     public static ActionRow getButtons(User user, boolean frontEnabled, boolean previousEnabled, boolean nextEnabled, boolean endEnabled) {
-        return getButtons(user, getDefaultPaginator(), frontEnabled, previousEnabled, nextEnabled, endEnabled);
+        return getButtons(user, getDefaultPaginator(), frontEnabled, previousEnabled, nextEnabled, endEnabled, false);
+    }
+
+    public static ActionRow getQueueButtons(User user, boolean frontEnabled, boolean previousEnabled, boolean nextEnabled, boolean endEnabled) {
+        return getButtons(user, getDefaultPaginator(), frontEnabled, previousEnabled, nextEnabled, endEnabled, true);
     }
 
     public static ActionRow getButtons(User user, Paginator paginator){
-        return getButtons(user, paginator, true, true, true, true);
+        return getButtons(user, paginator, true, true, true, true, false);
+    }
+
+    public static ActionRow getQueueButtons(User user, Paginator paginator){
+        return getButtons(user, paginator, true, true, true, true, true);
     }
 
     public static ActionRow getButtons(User user) {
         return getButtons(user, getDefaultPaginator());
+    }
+
+    public static ActionRow getQueueButtons(User user) {
+        return getQueueButtons(user, getDefaultPaginator());
     }
 
 }

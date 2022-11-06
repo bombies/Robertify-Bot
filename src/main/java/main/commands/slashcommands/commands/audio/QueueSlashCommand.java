@@ -40,17 +40,12 @@ public class QueueSlashCommand extends AbstractSlashCommand {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
         final var queue = musicManager.getScheduler().queue;
 
-        GeneralUtils.setCustomEmbed(event.getGuild(), "Queue");
-
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
             event.replyEmbeds(eb.build()).queue();
             return;
         }
 
-        var content = new QueueCommand().getContent(guild, queue, new ArrayList<>(queue));
-        Pages.paginateMessage(content, 10, event);
-
-        GeneralUtils.setDefaultEmbed(event.getGuild());
+        Pages.paginateQueue(10, event);
     }
 }

@@ -5,11 +5,13 @@ import main.constants.MessageButton;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.AttachedFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -20,52 +22,97 @@ public class PaginationEvents extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        if (!event.getButton().getId().startsWith(MessageButton.PAGE_ID.toString()))
-            return;
+        if (event.getButton().getId().startsWith(MessageButton.PAGE_ID.toString())) {
+            event.getHook().setEphemeral(true);
 
-        event.getHook().setEphemeral(true);
+            if (!currentPage.containsKey(event.getMessage().getIdLong()))
+                currentPage.put(event.getMessage().getIdLong(), 0);
 
-        if (!currentPage.containsKey(event.getMessage().getIdLong()))
-            currentPage.put(event.getMessage().getIdLong(), 0);
+            long msg = event.getMessage().getIdLong();
+            List<MessagePage> messagePages = Pages.getMessagePages(msg);
 
-        long msg = event.getMessage().getIdLong();
-        List<MessagePage> messagePages = Pages.getMessagePages(msg);
+            if (messagePages == null) {
+                event.deferEdit().queue();
+                return;
+            }
 
-        if (messagePages == null) {
-            event.deferEdit().queue();
-            return;
-        }
-
-        if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
-            currentPage.put(msg, 0);
-            event.editMessageEmbeds(messagePages.get(0).getEmbed())
-                    .setComponents(((currentPage.get(msg) == 0) ?
-                            Paginator.getButtons(event.getUser(), false, false, true, true) :
-                            Paginator.getButtons(event.getUser())))
-                    .queue();
-        } else if (event.getButton().getId().equals(MessageButton.PREVIOUS + event.getUser().getId())) {
+            if (event.getButton().getId().equals(MessageButton.FRONT + event.getUser().getId())) {
+                currentPage.put(msg, 0);
+                event.editMessageEmbeds(messagePages.get(0).getEmbed())
+                        .setComponents(((currentPage.get(msg) == 0) ?
+                                Paginator.getButtons(event.getUser(), false, false, true, true) :
+                                Paginator.getButtons(event.getUser())))
+                        .queue();
+            } else if (event.getButton().getId().equals(MessageButton.PREVIOUS + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) - 1);
                 event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                         .setComponents(((currentPage.get(msg) == 0) ?
                                 Paginator.getButtons(event.getUser(), false, false, true, true) :
                                 Paginator.getButtons(event.getUser())))
                         .queue();
-        } else if (event.getButton().getId().equals(MessageButton.NEXT + event.getUser().getId())) {
+            } else if (event.getButton().getId().equals(MessageButton.NEXT + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) + 1);
                 event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                         .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
                                 Paginator.getButtons(event.getUser(), true, true, false, false) :
                                 Paginator.getButtons(event.getUser())))
                         .queue();
-        } else if (event.getButton().getId().equals(MessageButton.END + event.getUser().getId())) {
-            currentPage.put(msg, messagePages.size()-1);
-            event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
-                    .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
-                            Paginator.getButtons(event.getUser(), true, true, false, false) :
-                            Paginator.getButtons(event.getUser()))).queue();
-        } else {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), "You do not have permission to interact with this button.");
-            event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+            } else if (event.getButton().getId().equals(MessageButton.END + event.getUser().getId())) {
+                currentPage.put(msg, messagePages.size()-1);
+                event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                        .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
+                                Paginator.getButtons(event.getUser(), true, true, false, false) :
+                                Paginator.getButtons(event.getUser()))).queue();
+            } else {
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.NO_PERMS_BUTTON);
+                event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+            }
+
+        } else if (event.getButton().getId().startsWith( "queue:" + MessageButton.PAGE_ID)) {
+            event.getHook().setEphemeral(true);
+
+            if (!currentPage.containsKey(event.getMessage().getIdLong()))
+                currentPage.put(event.getMessage().getIdLong(), 0);
+
+            long msg = event.getMessage().getIdLong();
+            final var queuePages = Pages.getQueuePages(msg);
+
+            if (queuePages == null) {
+                event.deferEdit().queue();
+                return;
+            }
+
+            if (event.getButton().getId().equals("queue:" + MessageButton.FRONT + event.getUser().getId())) {
+                currentPage.put(msg, 0);
+                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(0).getImage()))
+                        .setComponents(((currentPage.get(msg) == 0) ?
+                                Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
+                                Paginator.getQueueButtons(event.getUser())))
+                        .queue();
+            } else if (event.getButton().getId().equals("queue:" + MessageButton.PREVIOUS + event.getUser().getId())) {
+                currentPage.put(msg, currentPage.get(msg) - 1);
+                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                        .setComponents(((currentPage.get(msg) == 0) ?
+                                Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
+                                Paginator.getQueueButtons(event.getUser())))
+                        .queue();
+            } else if (event.getButton().getId().equals("queue:" + MessageButton.NEXT + event.getUser().getId())) {
+                currentPage.put(msg, currentPage.get(msg) + 1);
+                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                        .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
+                                Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
+                                Paginator.getQueueButtons(event.getUser())))
+                        .queue();
+            } else if (event.getButton().getId().equals("queue:" + MessageButton.END + event.getUser().getId())) {
+                currentPage.put(msg, queuePages.size()-1);
+                event.editMessageAttachments(AttachedFile.fromData(queuePages.get(currentPage.get(msg)).getImage()))
+                        .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
+                                Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
+                                Paginator.getQueueButtons(event.getUser()))).queue();
+            } else {
+                EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.NO_PERMS_BUTTON);
+                event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+            }
         }
     }
 
