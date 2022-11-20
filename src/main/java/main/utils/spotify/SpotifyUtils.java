@@ -5,6 +5,9 @@ import main.main.Robertify;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.model_objects.specification.Image;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 public class SpotifyUtils {
     private static final SpotifyApi api = Robertify.getSpotifyApi();
 
@@ -15,10 +18,8 @@ public class SpotifyUtils {
     }
 
     private static Image findBestImage(Image[] images) {
-        Image bestImage = images[0];
-        for (final var image : images)
-            if (image.getHeight() > bestImage.getHeight())
-                bestImage = image;
-        return bestImage;
+        return Arrays.stream(images)
+                .max(Comparator.comparingInt(Image::getHeight))
+                .orElse(images[0]);
     }
 }
