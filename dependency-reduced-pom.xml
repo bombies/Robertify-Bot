@@ -26,30 +26,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-maven-plugin</artifactId>
-        <version>${kotlin.version}</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>test-compile</id>
-            <phase>test-compile</phase>
-            <goals>
-              <goal>test-compile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <jvmTarget>1.8</jvmTarget>
-        </configuration>
-      </plugin>
-      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.10.1</version>
         <executions>
@@ -113,22 +89,6 @@
       <version>1.18.24</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-test-junit</artifactId>
-      <version>1.7.20</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>kotlin-test</artifactId>
-          <groupId>org.jetbrains.kotlin</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
@@ -160,7 +120,6 @@
   </dependencyManagement>
   <properties>
     <maven.compiler.target>16</maven.compiler.target>
-    <kotlin.version>1.7.20</kotlin.version>
     <maven.compiler.source>16</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
