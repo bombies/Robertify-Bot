@@ -44,7 +44,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    private final static HashMap<Long, ScheduledFuture<?>> disconnectExecutors = new HashMap<>();
 
     private final Guild guild;
     private final Link audioPlayer;
@@ -57,11 +56,13 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public boolean repeating = false;
     public boolean playlistRepeating = false;
     private Message lastSentMsg = null;
+    private final DisconnectManager.GuildDisconnectManager disconnectManager;
 
     public TrackScheduler(Guild guild, Link audioPlayer) {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
         this.queue = new ConcurrentLinkedQueue<>();
+        this.disconnectManager = DisconnectManager.getInstance().getGuildDisconnector(guild);
     }
 
     public void queue(AudioTrack track) {
@@ -105,9 +106,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackStart(IPlayer player, AudioTrack track) {
-        if (disconnectScheduled(guild))
-            removeScheduledDisconnect(guild);
-
+        disconnectManager.cancelDisconnect();
         lastPlayedTrackBuffer = track;
 
         if (repeating) return;
@@ -202,8 +201,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                             }
                             default -> throw new AutoPlayException("This track can't be auto played!");
                         }
-                    } else scheduleDisconnect(true);
-                } else scheduleDisconnect(true);
+                    } else disconnectManager.scheduleDisconnect(true);
+                } else disconnectManager.scheduleDisconnect(true);
             }
         } catch (IllegalStateException e) {
             getMusicPlayer().playTrack(nextTrack);
@@ -297,36 +296,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         savedQueue.remove(guild);
     }
 
-    public boolean disconnectScheduled(Guild guild) {
-        return disconnectExecutors.containsKey(guild.getIdLong());
-    }
-
-    public void removeScheduledDisconnect(Guild guild) {
-        if (disconnectExecutors.containsKey(guild.getIdLong())) {
-            disconnectExecutors.get(guild.getIdLong()).cancel(false);
-            disconnectExecutors.remove(guild.getIdLong());
-            logger.debug("Removed scheduled player disconnect");
-        }
-    }
-
-    public void scheduleDisconnect(boolean announceMsg) {
-        logger.debug("Scheduling player disconnect in 5 minutes");
-        scheduleDisconnect(announceMsg, 5, TimeUnit.MINUTES);
-    }
-
-    public void scheduleDisconnect(boolean announceMsg, long delay, TimeUnit timeUnit) {
-        if (new GuildConfig(guild).get247())
-            return;
-
-        if (disconnectExecutors.containsKey(guild.getIdLong())) {
-            logger.debug("Scheduled disconnect already existed... Cancelling.");
-            disconnectExecutors.get(guild.getIdLong()).cancel(false);
-        }
-
-        ScheduledFuture<?> schedule = executor.schedule(() -> disconnect(announceMsg), delay, timeUnit);
-        disconnectExecutors.put(guild.getIdLong(), schedule);
-    }
-
     public void disconnect(boolean announceMsg) {
         final var channel = guild.getSelfMember().getVoiceState().getChannel();
 
@@ -338,14 +307,20 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             if (channel != null) {
                 RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .leave();
-                disconnectExecutors.remove(guild.getIdLong());
-                logger.debug("Removed scheduled disconnect from mapping");
 
                 if (announceMsg && announcementChannel != null)
                     announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.INACTIVITY_LEAVE, Pair.of("{channel}", channel.getAsMention())).build())
                             .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
             }
         }
+    }
+
+    public void scheduleDisconnect(boolean announceMsg) {
+        disconnectManager.scheduleDisconnect(announceMsg);
+    }
+
+    public void scheduleDisconnect(boolean announceMsg, long time, TimeUnit timeUnit) {
+        disconnectManager.scheduleDisconnect(announceMsg, time, timeUnit);
     }
 
     public void removeSavedQueue(Guild guild) {

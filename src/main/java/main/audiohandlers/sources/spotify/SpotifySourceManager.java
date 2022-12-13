@@ -7,12 +7,14 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.*;
 import main.audiohandlers.sources.RobertifyAudioSourceManager;
 import main.main.Robertify;
+import main.utils.spotify.SpotifyAuthorizationUtils;
 import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.exceptions.detailed.NotFoundException;
+import se.michaelthelin.spotify.exceptions.detailed.UnauthorizedException;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.io.DataInput;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,9 +73,17 @@ public class SpotifySourceManager extends RobertifyAudioSourceManager {
         } catch (IOException | ParseException | SpotifyWebApiException e) {
             if (e instanceof NotFoundException)
                 return AudioReference.NO_TRACK;
-            throw new RuntimeException(e);
+            if (e instanceof UnauthorizedException) {
+                Robertify.getSpotifyTokenRefreshScheduler()
+                        .scheduleAtFixedRate(
+                                SpotifyAuthorizationUtils.doTokenRefresh(),
+                                0, 1,
+                                TimeUnit.HOURS
+                        );
+                loadItem(manager, reference);
+            } else throw new RuntimeException(e);
         }
-        return null;
+        return AudioReference.NO_TRACK;
     }
 
     @Override
