@@ -32,7 +32,7 @@ public class AutoPlaySourceManager extends RobertifyAudioSourceManager {
 
         try {
             if (reference.identifier.startsWith(SEARCH_PREFIX)) {
-                final JSONArray arr = new JSONArray(reference.identifier.replaceAll(SEARCH_PREFIX, ""));
+                final JSONArray arr = new JSONArray(reference.identifier.replaceFirst(SEARCH_PREFIX, ""));
                 final var autoplayData = new ResumeData();
                 final List<AudioTrack> queue = new ArrayList<>(autoplayData.assembleSpotifyTracks(arr));
 

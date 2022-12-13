@@ -3,6 +3,8 @@ package main.audiohandlers;
 import lombok.val;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.concurrent.Executors;
@@ -11,6 +13,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class DisconnectManager {
+    private final static Logger logger = LoggerFactory.getLogger(DisconnectManager.class);
+
     private static DisconnectManager instance;
     private final ScheduledExecutorService executorService;
     private final HashMap<Long, GuildDisconnectManager> guildDisconnects;
@@ -46,6 +50,8 @@ public class DisconnectManager {
 
 
     protected static class GuildDisconnectManager {
+        private final static Logger logger = LoggerFactory.getLogger(GuildDisconnectManager.class);
+
         private final Guild guild;
         private final ScheduledExecutorService executorService;
         private ScheduledFuture<?> scheduledDisconnect;
@@ -56,18 +62,25 @@ public class DisconnectManager {
         }
 
         public void scheduleDisconnect(boolean announceMsg, long time, TimeUnit timeUnit) {
-            if (new GuildConfig(guild).get247())
+            logger.debug("{} | Starting scheduled disconnect", guild.getName());
+
+            if (new GuildConfig(guild).get247()) {
+                logger.debug("{} | 24/7 mode is enabled, cancelling disconnect scheduling.", guild.getName());
                 return;
+            }
 
             cancelDisconnect();
+            logger.debug("{} | Cleared any previously scheduled disconnects", guild.getName());
 
             scheduledDisconnect = executorService.schedule(() -> {
                 RobertifyAudioManager.getInstance()
                         .getMusicManager(guild)
                         .getScheduler()
                         .disconnect(announceMsg);
+                logger.debug("{} | Bot disconnected.", guild.getName());
                 this.scheduledDisconnect = null;
             }, time, timeUnit);
+            logger.debug("{} | Successfully scheduled bot disconnect.", guild.getName());
         }
 
         public void scheduleDisconnect(boolean announceMsg) {
@@ -76,6 +89,7 @@ public class DisconnectManager {
 
         public void cancelDisconnect() {
             if (disconnectScheduled()) {
+                logger.debug("{} | Cancelling disconnect.", guild.getName());
                 scheduledDisconnect.cancel(true);
                 scheduledDisconnect = null;
             }

@@ -323,6 +323,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         disconnectManager.scheduleDisconnect(announceMsg, time, timeUnit);
     }
 
+    public void removeScheduledDisconnect() {
+        DisconnectManager.getInstance()
+                .destroyGuildDisconnector(guild);
+    }
+
     public void removeSavedQueue(Guild guild) {
         savedQueue.remove(guild);
     }

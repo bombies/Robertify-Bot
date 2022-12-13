@@ -54,7 +54,8 @@ public class TwentyFourSevenCommand extends AbstractSlashCommand implements ICom
             config.set247(true);
 
             RobertifyAudioManager.getInstance().getMusicManager(guild)
-                    .getScheduler().removeScheduledDisconnect(guild);
+                    .getScheduler().
+                    removeScheduledDisconnect();
 
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TwentyFourSevenMessages.TWENTY_FOUR_SEVEN_TOGGLED,
                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())

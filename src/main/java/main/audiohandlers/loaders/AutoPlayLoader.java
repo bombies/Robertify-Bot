@@ -77,7 +77,10 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
     @Override
     public void noMatches() {
         channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_SIMILAR_TRACKS).build())
-                .queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
+                .queue(msg -> {
+                    msg.delete().queueAfter(5, TimeUnit.MINUTES);
+                    musicManager.getScheduler().scheduleDisconnect(true);
+                });
         throw new FriendlyException("There were no similar tracks found!", FriendlyException.Severity.COMMON, new NullPointerException());
     }
 
