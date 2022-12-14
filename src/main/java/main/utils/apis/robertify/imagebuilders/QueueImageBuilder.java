@@ -20,13 +20,14 @@ public class QueueImageBuilder extends AbstractImageBuilder {
         return this;
     }
 
-    public QueueImageBuilder addTrack(AudioTrack track) {
+    public QueueImageBuilder addTrack(int index, AudioTrack track) {
         if (!obj.has(QueryFields.TRACKS.toString()))
             obj.put(QueryFields.TRACKS.toString(), new JSONArray());
 
         final var trackInfo = track.getInfo();
         final var trackArr = obj.getJSONArray(QueryFields.TRACKS.toString());
         trackArr.put(new JSONObject()
+                .put(QueryFields.TRACK_INDEX.toString(), index)
                 .put(QueryFields.TRACK_NAME.toString(), trackInfo.title)
                 .put(QueryFields.TRACK_ARTIST.toString(), trackInfo.author)
                 .put(QueryFields.TRACK_DURATION.toString(), trackInfo.length)
@@ -35,12 +36,13 @@ public class QueueImageBuilder extends AbstractImageBuilder {
         return this;
     }
 
-    public QueueImageBuilder addTrack(String title, String artist, long duration) {
+    public QueueImageBuilder addTrack(int index, String title, String artist, long duration) {
         if (!obj.has(QueryFields.TRACKS.toString()))
             obj.put(QueryFields.TRACKS.toString(), new JSONArray());
 
         final var trackArr = obj.getJSONArray(QueryFields.TRACKS.toString());
         trackArr.put(new JSONObject()
+                .put(QueryFields.TRACK_INDEX.toString(), index)
                 .put(QueryFields.TRACK_NAME.toString(), title)
                 .put(QueryFields.TRACK_ARTIST.toString(), artist)
                 .put(QueryFields.TRACK_DURATION.toString(), duration)
@@ -63,6 +65,7 @@ public class QueueImageBuilder extends AbstractImageBuilder {
     private enum QueryFields implements ImageQueryField {
         PAGE,
         TRACKS,
+        TRACK_INDEX,
         TRACK_NAME,
         TRACK_ARTIST,
         TRACK_DURATION;

@@ -133,13 +133,16 @@ public abstract class Pages {
 
     private static class QueueItem {
         @Getter
+        private final int trackIndex;
+        @Getter
         private final String trackTitle;
         @Getter
         private final String artist;
         @Getter
         private final long duration;
 
-        public QueueItem(String trackTitle, String artist, long duration) {
+        public QueueItem(int trackIndex, String trackTitle, String artist, long duration) {
+            this.trackIndex = trackIndex;
             this.trackTitle = trackTitle;
             this.artist = artist;
             this.duration = duration;
@@ -166,8 +169,8 @@ public abstract class Pages {
             queueItems.add(item);
         }
 
-        public void addItem(String title, String artist, long duration) {
-            queueItems.add(new QueueItem(title, artist, duration));
+        public void addItem(int trackIndex, String title, String artist, long duration) {
+            queueItems.add(new QueueItem(trackIndex, title, artist, duration));
         }
 
         public File getImage() {
@@ -175,7 +178,7 @@ public abstract class Pages {
                     .setPage(pageNumber);
 
             for (final var item : queueItems)
-                builder.addTrack(item.trackTitle, item.artist, item.duration);
+                builder.addTrack(item.trackIndex, item.trackTitle, item.artist, item.duration);
 
             return builder.build();
         }
@@ -206,9 +209,10 @@ public abstract class Pages {
 
     private static void messageLogic(List<QueuePage> messagePages, ConcurrentLinkedQueue<AudioTrack> queue, int maxPerPage) {
         if (queue.size() <= maxPerPage) {
-            for (final var track : queue) {
+            for (int i = 0; i < queue.size(); i++) {
+                final var track = queue.stream().toList().get(i);
                 final var trackInfo = track.getInfo();
-                messagePages.add(new QueuePage(1, List.of(new QueueItem(trackInfo.title, trackInfo.author, trackInfo.length))));
+                messagePages.add(new QueuePage(1, List.of(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length))));
             }
         } else {
             final var trackList = queue.stream().toList();
@@ -221,7 +225,7 @@ public abstract class Pages {
                     if (lastIndex == queue.size()) break;
                     final var trackInfo = trackList.get(lastIndex).getInfo();
 
-                    page.addItem(trackInfo.title, trackInfo.author, trackInfo.length);
+                    page.addItem(lastIndex + 1, trackInfo.title, trackInfo.author, trackInfo.length);
                     lastIndex++;
                 }
                 messagePages.add(page);
