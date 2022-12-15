@@ -37,6 +37,8 @@ public class RobertifyEmbedUtils {
     }
 
     public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message) {
+        if (guild == null)
+            return embedMessage(message);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message));
     }

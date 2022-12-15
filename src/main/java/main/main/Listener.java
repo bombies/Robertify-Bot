@@ -7,6 +7,7 @@ import main.commands.slashcommands.commands.audio.PlaySlashCommand;
 import main.commands.slashcommands.commands.dev.UpdateCommand;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
+import main.commands.slashcommands.commands.util.VoteCommand;
 import main.commands.slashcommands.commands.util.WebsiteCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
@@ -56,7 +57,7 @@ public class Listener extends ListenerAdapter {
             if (locale != null)
                 LocaleManager.getLocaleManager(g).setLocale(locale);
 
-            unloadCommands(g, "website");
+            unloadCommands(g, "website", "vote");
             loadNeededSlashCommands(g);
             loadNeededGlobalCommands();
 
@@ -211,6 +212,7 @@ public class Listener extends ListenerAdapter {
 
     public void loadNeededGlobalCommands() {
         new WebsiteCommand().loadCommand();
+        new VoteCommand().loadCommand();
     }
 
     /**

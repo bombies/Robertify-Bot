@@ -15,7 +15,7 @@ import javax.script.ScriptException;
 public class VoteCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), RobertifyLocaleMessage.GeneralMessages.VOTE_EMBED_DESC)
+        ctx.getMessage().replyEmbeds(RobertifyEmbedUtils.embedMessage(RobertifyLocaleMessage.GeneralMessages.VOTE_EMBED_DESC)
                         .build())
                 .setActionRow(
                         Button.of(ButtonStyle.LINK, "https://top.gg/bot/893558050504466482/vote", "Top.gg"),
