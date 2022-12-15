@@ -3,9 +3,11 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.audio.PlaySlashCommand;
 import main.commands.slashcommands.commands.dev.UpdateCommand;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
+import main.commands.slashcommands.commands.util.WebsiteCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -54,7 +56,10 @@ public class Listener extends ListenerAdapter {
             if (locale != null)
                 LocaleManager.getLocaleManager(g).setLocale(locale);
 
+            unloadCommands(g, "website");
             loadNeededSlashCommands(g);
+            loadNeededGlobalCommands();
+
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
@@ -198,6 +203,14 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
+    }
+
+    public void loadGlobalSlashCommands() {
+        AbstractSlashCommand.loadAllCommands();
+    }
+
+    public void loadNeededGlobalCommands() {
+        new WebsiteCommand().loadCommand();
     }
 
     /**

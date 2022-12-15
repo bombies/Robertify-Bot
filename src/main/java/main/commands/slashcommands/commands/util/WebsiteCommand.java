@@ -18,13 +18,13 @@ import javax.script.ScriptException;
 public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        ctx.getMessage().replyEmbeds(getEmbed(ctx.getGuild()))
+        ctx.getMessage().replyEmbeds(getEmbed())
                 .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
                 .queue();
     }
 
-    public MessageEmbed getEmbed(Guild guild) {
-        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.WEBSITE_EMBED_DESC).build();
+    public MessageEmbed getEmbed() {
+        return RobertifyEmbedUtils.embedMessage(RobertifyLocaleMessage.GeneralMessages.WEBSITE_EMBED_DESC).build();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
-        event.replyEmbeds(getEmbed(event.getGuild()))
+        event.replyEmbeds(getEmbed())
                 .addActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/", "Website", RobertifyTheme.GREEN.getEmoji()))
                 .setEphemeral(true)
                 .queue();
