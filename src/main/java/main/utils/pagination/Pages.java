@@ -209,11 +209,13 @@ public abstract class Pages {
 
     private static void messageLogic(List<QueuePage> messagePages, ConcurrentLinkedQueue<AudioTrack> queue, int maxPerPage) {
         if (queue.size() <= maxPerPage) {
+            final List<QueueItem> items = new ArrayList<>();
             for (int i = 0; i < queue.size(); i++) {
                 final var track = queue.stream().toList().get(i);
                 final var trackInfo = track.getInfo();
-                messagePages.add(new QueuePage(1, List.of(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length))));
+                items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length));
             }
+            messagePages.add(new QueuePage(1, items));
         } else {
             final var trackList = queue.stream().toList();
             int pagesRequired = (int)Math.ceil((double)queue.size() / maxPerPage);
