@@ -144,7 +144,8 @@ public class Robertify {
                             CacheFlag.CLIENT_STATUS,
                             CacheFlag.ROLE_TAGS,
                             CacheFlag.ONLINE_STATUS,
-                            CacheFlag.STICKER
+                            CacheFlag.STICKER,
+                            CacheFlag.SCHEDULED_EVENTS
                     )
                     .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."));
@@ -156,7 +157,8 @@ public class Robertify {
                     GatewayIntent.GUILD_MEMBERS,
                     GatewayIntent.GUILD_MESSAGE_TYPING,
                     GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.DIRECT_MESSAGE_REACTIONS
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                    GatewayIntent.SCHEDULED_EVENTS
             );
 
             final var enabledIntents = Lists.newArrayList(GatewayIntent.GUILD_MESSAGES);
