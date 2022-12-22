@@ -121,7 +121,7 @@ public class DeezerSourceManager extends RobertifyAudioSourceManager {
             PaginationRequest<TrackData> playlistTackRequest = api.playlist().getTracks(playlistID);
             int offset = 0;
             do {
-                List<Track> tracks = playlistTackRequest.offset((offset == 0) ? 25 : offset).execute().getData();
+                List<Track> tracks = playlistTackRequest.index((offset == 0) ? 25 : offset).execute().getData();
                 for (Track track : tracks) {
                     if (track == null)
                         continue;
