@@ -25,14 +25,16 @@ public class LocaleManager {
     private RobertifyLocale locale;
     private Map<String, String> localeFile;
     private final Guild guild;
-    private final long guildID;
 
     private LocaleManager(Guild guild, RobertifyLocale locale) {
         locales.putIfAbsent(locale, retrieveLocaleFile(locale));
         this.guild = guild;
-        this.guildID = guild.getIdLong();
         this.locale = locale;
         this.localeFile = locales.get(locale);
+    }
+
+    public static LocaleManager globalManager() {
+        return new LocaleManager(null, RobertifyLocale.ENGLISH);
     }
 
     public static LocaleManager getLocaleManager(Guild guild) {

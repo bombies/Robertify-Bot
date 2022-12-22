@@ -457,6 +457,15 @@ public class GeneralUtils {
         Files.createFile(Path.of(path));
     }
 
+    public static void setDefaultEmbed() {
+        final var theme = RobertifyTheme.GREEN;
+        RobertifyEmbedUtils.setEmbedBuilder(
+                () -> new EmbedBuilder()
+                        .setColor(theme.getColor())
+                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, theme.getTransparent())
+        );
+    }
+
     public static void setDefaultEmbed(Guild guild) {
         final ThemesConfig themesConfig = new ThemesConfig(guild);
         final var theme = themesConfig.getTheme();

@@ -3,11 +3,13 @@ package main.utils.component.interactions;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.RandomMessageManager;
+import main.commands.contextcommands.ContextCommandManager;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.BotConstants;
 import main.constants.Permission;
 import main.constants.Toggles;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
@@ -212,24 +214,95 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         });
     }
 
+    @SneakyThrows
+    public void loadCommand() {
+        buildCommand();
+
+        if (command == null)
+            throw new IllegalStateException("The command is null! Cannot load into guild.");
+
+        if (!new SlashCommandManager().isGlobalCommand(this))
+            return;
+
+        if (command.isPrivate)
+            return;
+
+        // Initial request builder
+        for (final var jda : Robertify.getShardManager().getShards()) {
+            CommandCreateAction commandCreateAction = jda.upsertCommand(command.getName(), command.getDescription());
+
+            // Adding subcommands
+            if (!command.getSubCommands().isEmpty() || !command.getSubCommandGroups().isEmpty()) {
+                if (!command.getSubCommands().isEmpty()) {
+                    for (SubCommand subCommand : command.getSubCommands()) {
+                        var subCommandData = new SubcommandData(subCommand.getName(), subCommand.getDescription());
+
+                        // Adding options for subcommands
+                        for (CommandOption options : subCommand.getOptions()) {
+                            OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+                            if (options.getChoices() != null)
+                                for (String choices : options.getChoices())
+                                    optionData.addChoice(choices, choices);
+
+                            subCommandData.addOptions(optionData);
+                        }
+                        commandCreateAction = commandCreateAction.addSubcommands(subCommandData);
+                    }
+                }
+
+                if (!command.getSubCommandGroups().isEmpty())
+                    for (var subCommandGroup : command.getSubCommandGroups())
+                        commandCreateAction = commandCreateAction.addSubcommandGroups(subCommandGroup.build());
+            } else {
+                // Adding options for the main command
+                for (CommandOption options : command.getOptions()) {
+                    OptionData optionData = new OptionData(options.getType(), options.getName(), options.getDescription(), options.isRequired());
+
+                    if (options.getChoices() != null)
+                        for (String choices : options.getChoices())
+                            optionData.addChoice(choices, choices);
+                    commandCreateAction = commandCreateAction.addOptions(optionData);
+                }
+            }
+
+            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+                    .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
+        }
+    }
+
+    public void unload() {
+        for (final var jda : Robertify.getShardManager().getShards()) {
+            jda.retrieveCommands().queue(commands -> {
+                final net.dv8tion.jda.api.interactions.commands.Command matchedCommand = commands.stream()
+                        .filter(command -> command.getName().equals(this.getName()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (matchedCommand == null) return;
+
+                jda.deleteCommandById(matchedCommand.getIdLong()).queue();
+            });
+        }
+    }
+
     public static void loadAllCommands(Guild g) {
         SlashCommandManager slashCommandManager = new SlashCommandManager();
         List<AbstractSlashCommand> commands = slashCommandManager.getCommands();
         List<AbstractSlashCommand> devCommands = slashCommandManager.getDevCommands();
         CommandListUpdateAction commandListUpdateAction = g.updateCommands();
 
-//        ContextCommandManager contextCommandManager = new ContextCommandManager();
-//        List<AbstractContextCommand> contextCommands = contextCommandManager.getCommands();
+        ContextCommandManager contextCommandManager = new ContextCommandManager();
+        List<AbstractContextCommand> contextCommands = contextCommandManager.getCommands();
 
         for (var cmd : commands)
             commandListUpdateAction = commandListUpdateAction.addCommands(
                     cmd.getCommandData()
             );
 
-//        for (var cmd : contextCommands)
-//            commandListUpdateAction = commandListUpdateAction.addCommands(
-//                    cmd.getCommandData()
-//            );
+        for (var cmd : contextCommands)
+            commandListUpdateAction = commandListUpdateAction.addCommands(
+                    cmd.getCommandData()
+            );
 
         if (g.getOwnerIdLong() == Config.getOwnerID()) {
             for (var cmd : devCommands)
@@ -264,6 +337,30 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 //                    );
                 })
         );
+    }
+
+    public static void loadAllCommands() {
+        SlashCommandManager slashCommandManager = new SlashCommandManager();
+        List<AbstractSlashCommand> commands = slashCommandManager.getGlobalCommands();
+
+        for (final var jda : Robertify.getShardManager().getShards()) {
+            CommandListUpdateAction commandListUpdateAction = jda.updateCommands();
+
+            ContextCommandManager contextCommandManager = new ContextCommandManager();
+            List<AbstractContextCommand> contextCommands = contextCommandManager.getCommands();
+
+            for (var cmd : commands)
+                commandListUpdateAction = commandListUpdateAction.addCommands(
+                        cmd.getCommandData()
+                );
+
+            for (var cmd : contextCommands)
+                commandListUpdateAction = commandListUpdateAction.addCommands(
+                        cmd.getCommandData()
+                );
+
+            commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS);
+        }
     }
 
     protected void setCommand(Command command) {
@@ -315,19 +412,37 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return djCheck(event);
     }
 
+    /**
+     * Conducts all the normal checks but with a check to see if the guild the command is
+     * coming from is a premium guild.
+     * @param event
+     * @return True if all the checks have been passed, false otherwise.
+     */
     protected boolean checksWithPremium(SlashCommandInteractionEvent event) {
         return checks(event);
 //        return premiumCheck(event);
     }
 
+    /**
+     * Checks if the name of the command in the event passed is the same name as this command object
+     * @param event
+     * @return True if the names are the same, false if otherwise.
+     */
     protected boolean nameCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
         return command.getName().equals(event.getName());
     }
 
+    /***
+     * Checks if the user who is attempting to execute the command is a banned user
+     * @param event
+     * @return True if the user is banned, false if otherwise.
+     */
     protected boolean banCheck(SlashCommandInteractionEvent event) {
         final Guild guild = event.getGuild();
+        if (guild == null)
+            return true;
         if (!new GuildConfig(guild).isBannedUser(event.getUser().getIdLong()))
             return true;
 
@@ -378,6 +493,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return true;
 
         final var guild = event.getGuild();
+        if (guild == null)
+            return true;
+
         if (!new GuildConfig(guild).isPremium()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.GeneralMessages.PREMIUM_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.PREMIUM_INSTANCE_NEEDED).build())
                     .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
@@ -388,6 +506,14 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
+    /***
+     * Checks if the user executing the command is a DJ or not if the command is DJ-only.
+     * @param event
+     * @return If the command is a DJ-only command, true will be returned if the user
+     *         attempting to execute the command is a DJ. If the command is not DJ-only,
+     *         true will be returned.
+     *         False will be returned if and only if the command is DJ-only and the user is not a DJ.
+     */
     protected boolean djCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
@@ -402,6 +528,14 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return true;
     }
 
+    /***
+     * Checks if the user executing the command is an admin or not if the command is admin-only.
+     * @param event
+     * @return If the command is an admin-only command, true will be returned if the user
+     *         attempting to execute the command is an admin. If the command is not admin-only,
+     *         true will be returned.
+     *         False will be returned if and only if the command is admin-only and the user is not an admin.
+     */
     protected boolean adminCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
@@ -431,6 +565,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             return true;
 
         final Guild guild = event.getGuild();
+        if (guild == null)
+            return true;
+
         final var self = guild.getSelfMember();
         if (!self.hasPermission(command.botRequiredPermissions)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS, Pair.of("{permissions}", GeneralUtils.listToString(command.botRequiredPermissions))).build())
@@ -443,6 +580,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
     protected boolean botEmbedCheck(SlashCommandInteractionEvent event) {
         final var guild = event.getGuild();
+        if (guild == null)
+            return true;
         if (!guild.getSelfMember().hasPermission(event.getGuildChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
                     .queue();
@@ -453,6 +592,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
 
     protected boolean restrictedChannelCheck(SlashCommandInteractionEvent event) {
         final Guild guild = event.getGuild();
+        if (guild == null)
+            return true;
+
         final TogglesConfig togglesConfig = new TogglesConfig(guild);
         final RestrictedChannelsConfig config = new RestrictedChannelsConfig(guild);
 

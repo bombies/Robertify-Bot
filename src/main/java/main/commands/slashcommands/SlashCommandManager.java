@@ -39,6 +39,8 @@ public class SlashCommandManager {
     private final List<AbstractSlashCommand> utilityCommands = new ArrayList<>();
     @Getter
     private final List<AbstractSlashCommand> devCommands = new ArrayList<>();
+    @Getter
+    private final List<AbstractSlashCommand> globalCommands = new ArrayList<>();
 
     public SlashCommandManager() {
         addMusicCommands(
@@ -129,6 +131,10 @@ public class SlashCommandManager {
                 new ResetPremiumFeaturesCommand(),
                 new ImageBuilderTest()
         );
+
+        addGlobalCommands(
+                new WebsiteCommand()
+        );
     }
 
     private void addMusicCommands(AbstractSlashCommand... commands) {
@@ -145,6 +151,10 @@ public class SlashCommandManager {
 
     private void addUtilityCommands(AbstractSlashCommand... commands) {
         utilityCommands.addAll(Arrays.asList(commands));
+    }
+
+    private void addGlobalCommands(AbstractSlashCommand... commands) {
+        globalCommands.addAll(Arrays.asList(commands));
     }
 
     private void addDevCommands(AbstractSlashCommand... commands) {
@@ -192,6 +202,12 @@ public class SlashCommandManager {
         return getDevCommands()
                 .stream()
                 .anyMatch(it -> it.getName().equalsIgnoreCase(name));
+    }
+
+    public boolean isGlobalCommand(AbstractSlashCommand command) {
+        return getGlobalCommands()
+                .stream()
+                .anyMatch(it -> it.getName().equalsIgnoreCase(command.getName()));
     }
 
 

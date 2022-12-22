@@ -19,6 +19,10 @@ public class RobertifyEmbedUtils {
         guildEmbedSuppliers.put(guild.getIdLong(), supplier);
     }
 
+    public static void setEmbedBuilder(Supplier<EmbedBuilder> supplier) {
+        guildEmbedSuppliers.put(0L, supplier);
+    }
+
     public static EmbedBuilder getEmbedBuilder(Guild guild) {
         try {
             return guildEmbedSuppliers.get(guild.getIdLong()).get();
@@ -33,8 +37,15 @@ public class RobertifyEmbedUtils {
     }
 
     public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message) {
+        if (guild == null)
+            return embedMessage(message);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message));
+    }
+
+    public static EmbedBuilder embedMessage(LocaleMessage message) {
+        final var localeManager = LocaleManager.globalManager();
+        return getDefaultEmbed().setDescription(localeManager.getMessage(message));
     }
 
     @SafeVarargs
@@ -100,6 +111,15 @@ public class RobertifyEmbedUtils {
         } catch (NullPointerException e) {
             GeneralUtils.setDefaultEmbed(Robertify.getShardManager().getGuildById(gid));
             return guildEmbedSuppliers.get(gid).get();
+        }
+    }
+
+    private static EmbedBuilder getDefaultEmbed() {
+        try {
+            return guildEmbedSuppliers.get(0L).get();
+        } catch (NullPointerException e) {
+            GeneralUtils.setDefaultEmbed();
+            return guildEmbedSuppliers.get(0L).get();
         }
     }
 
