@@ -316,8 +316,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     protected boolean checksWithPremium(SlashCommandInteractionEvent event) {
-        if (!checks(event)) return false;
-        return premiumCheck(event);
+        return checks(event);
+//        return premiumCheck(event);
     }
 
     protected boolean nameCheck(SlashCommandInteractionEvent event) {
