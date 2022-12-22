@@ -464,7 +464,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
         final var config = new TogglesConfig(guild);
-        final var path = event.getCommandPath().split("/");
+        final var path = event.getFullCommandName().split("/");
         final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb = null;
 

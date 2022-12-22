@@ -8,15 +8,15 @@ import main.constants.RobertifyTheme;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -42,29 +42,29 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
         );
     }
 
-    private SelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userID) {
+    private StringSelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userID) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return new SelectionMenuBuilder()
+        return new StringSelectionMenuBuilder()
                 .setName(menuName)
                 .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_SELECT_MENU_PLACEHOLDER))
                 .setRange(1, 1)
                 .addOptions(
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GREEN), "themes:green", RobertifyTheme.GREEN.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_MINT), "themes:mint", RobertifyTheme.MINT.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GOLD), "themes:gold", RobertifyTheme.GOLD.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_RED), "themes:red", RobertifyTheme.RED.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_RED), "themes:pastel_red", RobertifyTheme.PASTEL_RED.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PINK), "themes:pink", RobertifyTheme.PINK.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PURPLE), "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_PURPLE), "themes:pastel_purple", RobertifyTheme.PASTEL_PURPLE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BLUE), "themes:blue", RobertifyTheme.BLUE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT_BLUE), "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BABY_BLUE), "themes:baby_blue", RobertifyTheme.BABY_BLUE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_ORANGE), "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_YELLOW), "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_YELLOW), "themes:pastel_yellow", RobertifyTheme.PASTEL_YELLOW.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_DARK), "themes:dark", RobertifyTheme.DARK.getEmoji()),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT), "themes:light", RobertifyTheme.LIGHT.getEmoji())
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GREEN), "themes:green", RobertifyTheme.GREEN.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_MINT), "themes:mint", RobertifyTheme.MINT.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_GOLD), "themes:gold", RobertifyTheme.GOLD.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_RED), "themes:red", RobertifyTheme.RED.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_RED), "themes:pastel_red", RobertifyTheme.PASTEL_RED.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PINK), "themes:pink", RobertifyTheme.PINK.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PURPLE), "themes:purple", RobertifyTheme.PURPLE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_PURPLE), "themes:pastel_purple", RobertifyTheme.PASTEL_PURPLE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BLUE), "themes:blue", RobertifyTheme.BLUE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT_BLUE), "themes:lightblue", RobertifyTheme.LIGHT_BLUE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_BABY_BLUE), "themes:baby_blue", RobertifyTheme.BABY_BLUE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_ORANGE), "themes:orange", RobertifyTheme.ORANGE.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_YELLOW), "themes:yellow", RobertifyTheme.YELLOW.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_PASTEL_YELLOW), "themes:pastel_yellow", RobertifyTheme.PASTEL_YELLOW.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_DARK), "themes:dark", RobertifyTheme.DARK.getEmoji()),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.ThemeMessages.THEME_LIGHT), "themes:light", RobertifyTheme.LIGHT.getEmoji())
                 )
                 .limitToUser(userID);
     }
@@ -128,7 +128,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         final Guild guild = event.getGuild();

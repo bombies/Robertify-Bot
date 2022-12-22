@@ -8,8 +8,8 @@ import main.constants.RobertifyEmoji;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
@@ -26,7 +26,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
-import net.dv8tion.jda.api.exceptions.MissingAccessException;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -278,16 +277,16 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 .filter(config::getState)
                 .map(field -> Button.of(field.equals(ChannelConfig.Field.DISCONNECT) ? ButtonStyle.DANGER : ButtonStyle.SECONDARY, field.getId(), field.getEmoji()))
                 .toList());
-        final var thirdRow = ActionRow.of(SelectionMenuBuilder.of(
+        final var thirdRow = ActionRow.of(StringSelectionMenuBuilder.of(
                 ChannelConfig.Field.FILTERS.id,
                 LocaleManager.getLocaleManager(msg.getGuild()).getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_SELECT_PLACEHOLDER),
                 Pair.of(0,5),
                 List.of(
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D), ChannelConfig.Field.FILTERS.id + ":8d"),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE), ChannelConfig.Field.FILTERS.id + ":karaoke"),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.NIGHTCORE), ChannelConfig.Field.FILTERS.id + ":nightcore"),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.TREMOLO), ChannelConfig.Field.FILTERS.id + ":tremolo"),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.VIBRATO), ChannelConfig.Field.FILTERS.id + ":vibrato")
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D), ChannelConfig.Field.FILTERS.id + ":8d"),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE), ChannelConfig.Field.FILTERS.id + ":karaoke"),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.NIGHTCORE), ChannelConfig.Field.FILTERS.id + ":nightcore"),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.TREMOLO), ChannelConfig.Field.FILTERS.id + ":tremolo"),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.VIBRATO), ChannelConfig.Field.FILTERS.id + ":vibrato")
                 )
 
         ).build());

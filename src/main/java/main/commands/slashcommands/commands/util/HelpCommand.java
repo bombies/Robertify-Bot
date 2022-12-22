@@ -7,8 +7,8 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -17,8 +17,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -57,17 +56,17 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         return getSelectionMenuBuilder(guild, userId).build();
     }
 
-    private SelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userId) {
+    private StringSelectionMenuBuilder getSelectionMenuBuilder(Guild guild, long userId) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return new SelectionMenuBuilder()
+        return new StringSelectionMenuBuilder()
                 .setName(menuName)
             .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.SELECT_MENU_PLACEHOLDER))
                 .setRange(1, 1)
                 .addOptions(
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), "help:management", Emoji.fromUnicode("💼")),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), "help:music", Emoji.fromUnicode("🎶")),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), "help:misc", Emoji.fromUnicode("⚒️")),
-                        SelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), "help:utility", Emoji.fromUnicode("❓"))
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), "help:management", Emoji.fromUnicode("💼")),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), "help:music", Emoji.fromUnicode("🎶")),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MISCELLANEOUS_OPTION), "help:misc", Emoji.fromUnicode("⚒️")),
+                        StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_UTILITY_OPTION), "help:utility", Emoji.fromUnicode("❓"))
                 )
                 .limitToUser(userId);
     }
@@ -190,7 +189,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
     }
 
     @Override @SneakyThrows
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
 
         final var guild = event.getGuild();

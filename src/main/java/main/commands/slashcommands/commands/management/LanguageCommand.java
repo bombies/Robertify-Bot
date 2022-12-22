@@ -2,15 +2,14 @@ package main.commands.slashcommands.commands.management;
 
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -51,12 +50,12 @@ public class LanguageCommand extends AbstractSlashCommand {
         final var lang = event.getOption("lang");
         if (lang == null) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_EMBED_DESC, Pair.of("{language}", localeManager.getLocale().getLocalName() + " " + localeManager.getLocale().getFlag())).build())
-                    .addActionRow(SelectionMenuBuilder.of(
+                    .addActionRow(StringSelectionMenuBuilder.of(
                             "languagemenu",
                             localeManager.getMessage(RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_SELECT_MENU_PLACE_HOLDER),
                             Pair.of(1,1),
                             RobertifyLocale.getAvailableLanguages().stream()
-                                    .map(locale -> SelectMenuOption.of(
+                                    .map(locale -> StringSelectMenuOption.of(
                                             locale.getName(),
                                             "languagemenu:" + locale.name().toLowerCase(),
                                             Emoji.fromUnicode(locale.getFlag())
@@ -75,9 +74,10 @@ public class LanguageCommand extends AbstractSlashCommand {
                     .queue();
         }
     }
-
+    
+    
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         final var selectionMenu = event.getSelectMenu();
         if (!selectionMenu.getId().startsWith("languagemenu")) return;
 

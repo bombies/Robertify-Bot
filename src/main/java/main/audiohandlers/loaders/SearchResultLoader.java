@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -58,7 +58,7 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
         final var tracks = playlist.getTracks();
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        SelectionMenuBuilder selectionMenuBuilder = new SelectionMenuBuilder()
+        StringSelectionMenuBuilder selectionMenuBuilder = new StringSelectionMenuBuilder()
                 .setName("searchresult:" + searcher.getId() + ":" + query.toLowerCase()
                         .replaceAll(" ", "%SPACE%"))
                 .setPlaceHolder(localeManager.getMessage(RobertifyLocaleMessage.SearchMessages.SEARCH_MENU_PLACEHOLDER))

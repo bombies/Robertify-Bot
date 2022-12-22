@@ -5,13 +5,13 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import main.utils.component.InvalidBuilderException;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
-public class SelectMenuOption {
+public class StringSelectMenuOption {
     @Getter
     private final String label;
     @Getter
@@ -19,9 +19,9 @@ public class SelectMenuOption {
     @Getter
     private final Emoji emoji;
     @Getter
-    private final Predicate<SelectMenuInteractionEvent> predicate;
+    private final Predicate<StringSelectInteractionEvent> predicate;
 
-    private SelectMenuOption(@NotNull String label, @NotNull String value, @Nullable Emoji emoji, @Nullable Predicate<SelectMenuInteractionEvent> predicate) {
+    private StringSelectMenuOption(@NotNull String label, @NotNull String value, @Nullable Emoji emoji, @Nullable Predicate<StringSelectInteractionEvent> predicate) {
         this.label = label;
         this.value = value;
         this.emoji = emoji;
@@ -32,15 +32,15 @@ public class SelectMenuOption {
         return new OptionBuilder();
     }
 
-    public static SelectMenuOption of(@NotNull String label, @NotNull String id, @Nullable Emoji emoji, @Nullable Predicate<SelectMenuInteractionEvent> predicate) {
-        return new SelectMenuOption(label, id, emoji, predicate);
+    public static StringSelectMenuOption of(@NotNull String label, @NotNull String id, @Nullable Emoji emoji, @Nullable Predicate<StringSelectInteractionEvent> predicate) {
+        return new StringSelectMenuOption(label, id, emoji, predicate);
     }
 
-    public static SelectMenuOption of(String label, String id, Emoji emoji) {
+    public static StringSelectMenuOption of(String label, String id, Emoji emoji) {
         return of(label, id, emoji, null);
     }
 
-    public static SelectMenuOption of(String label, String id) {
+    public static StringSelectMenuOption of(String label, String id) {
         return of(label, id, null);
     }
 
@@ -52,19 +52,19 @@ public class SelectMenuOption {
         @Setter
         private Emoji emoji;
         @Setter
-        private Predicate<SelectMenuInteractionEvent> predicate;
+        private Predicate<StringSelectInteractionEvent> predicate;
 
         private OptionBuilder() {}
 
         @SneakyThrows
-        public SelectMenuOption build() {
+        public StringSelectMenuOption build() {
             if (label == null || label.isEmpty())
                 throw new InvalidBuilderException("The label must not be null or empty!");
 
             if (id == null || id.isEmpty())
                 throw new InvalidBuilderException("The ID must not be null or empty!");
 
-            return new SelectMenuOption(label, id, emoji, predicate);
+            return new StringSelectMenuOption(label, id, emoji, predicate);
         }
     }
 

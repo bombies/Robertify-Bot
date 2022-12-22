@@ -7,8 +7,8 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.constants.InteractionLimits;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.QueueImageBuilder;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
-import main.utils.component.interactions.selectionmenu.SelectionMenuBuilder;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -244,12 +244,12 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, Message msg, List<SelectMenuOption> options) {
+    public static void paginateMenu(User user, Message msg, List<StringSelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic(msg.getId(), options);
 
         final var firstPage = menuPages.get(0);
 
-        SelectMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = StringSelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -261,12 +261,12 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static void paginateMenu(User user, GuildMessageChannel channel, ReplyCallbackAction msg, List<SelectMenuOption> options) {
+    public static void paginateMenu(User user, GuildMessageChannel channel, ReplyCallbackAction msg, List<StringSelectMenuOption> options) {
         List<MenuPage> menuPages = menuLogic("null", options);
 
         final var firstPage = menuPages.get(0);
 
-        SelectMenu menu = SelectionMenuBuilder.of(
+        SelectMenu menu = StringSelectionMenuBuilder.of(
                 "menupage:" + user.getId(),
                 "Select an option",
                 Pair.of(1, 1),
@@ -278,37 +278,37 @@ public abstract class Pages {
                 .queue(success -> success.retrieveOriginal().queue(og -> menuMessages.put(og.getIdLong(), menuPages)));
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<SelectMenuOption> options, int startingPage) {
+    public static void paginateMenu(TextChannel channel, User user, List<StringSelectMenuOption> options, int startingPage) {
         paginateMenu(channel, user, options, startingPage, false);
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    public static void paginateMenu(TextChannel channel, User user, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         Message msg = menuLogic(channel, options, startingPage, numberEachEntry);
         paginateMenu(user, msg, options);
     }
 
-    public static void paginateMenu(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    public static void paginateMenu(SlashCommandInteractionEvent event, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         final var msg = menuLogic(event, options, startingPage, numberEachEntry);
         paginateMenu(event.getUser(), event.getChannel().asGuildMessageChannel(), msg, options);
     }
 
-    private static Message menuLogic(TextChannel channel, int startingPage, List<SelectMenuOption> options) {
+    private static Message menuLogic(TextChannel channel, int startingPage, List<StringSelectMenuOption> options) {
         return menuLogic(channel, options, startingPage, false);
     }
 
-    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, int startingPage, List<SelectMenuOption> options) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, int startingPage, List<StringSelectMenuOption> options) {
         return menuLogic(event, options, startingPage, false);
     }
 
-    private static Message menuLogic(TextChannel channel, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static Message menuLogic(TextChannel channel, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return channel.sendMessageEmbeds(getPaginatedEmbed(channel.getGuild(), options, 25, startingPage, numberEachEntry)).complete();
     }
 
-    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, List<SelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static ReplyCallbackAction menuLogic(SlashCommandInteractionEvent event, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return event.replyEmbeds(getPaginatedEmbed(event.getGuild(), options, 25, startingPage, numberEachEntry));
     }
 
-    private static List<MenuPage> menuLogic(String msgID, List<SelectMenuOption> options) {
+    private static List<MenuPage> menuLogic(String msgID, List<StringSelectMenuOption> options) {
         final List<MenuPage> menuPages = new ArrayList<>();
 
         if (options.size() <= InteractionLimits.SELECTION_MENU) {
@@ -329,12 +329,12 @@ public abstract class Pages {
                     if (lastIndex == options.size()) break;
 
                     if (j == 0 && i != 0) {
-                        tempPage.addOption(SelectMenuOption.of("Previous Page", "menuPage:previousPage:" + msgID));
+                        tempPage.addOption(StringSelectMenuOption.of("Previous Page", "menuPage:previousPage:" + msgID));
                         continue;
                     }
 
                     if (j == InteractionLimits.SELECTION_MENU - 1) {
-                        tempPage.addOption(SelectMenuOption.of("Next Page", "menuPage:nextPage:" + msgID));
+                        tempPage.addOption(StringSelectMenuOption.of("Next Page", "menuPage:nextPage:" + msgID));
                         continue;
                     }
 
@@ -353,8 +353,8 @@ public abstract class Pages {
     }
 
     @SneakyThrows
-    public static SelectMenu getSelectionMenu(User user, List<SelectMenuOption> options) {
-        return SelectionMenuBuilder.of(
+    public static SelectMenu getSelectionMenu(User user, List<StringSelectMenuOption> options) {
+        return StringSelectionMenuBuilder.of(
                 "menuPage:" + user.getIdLong(),
                 "Select an option",
                 Pair.of(1, 1),

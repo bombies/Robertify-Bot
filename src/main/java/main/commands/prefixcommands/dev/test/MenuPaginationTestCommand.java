@@ -2,11 +2,9 @@ package main.commands.prefixcommands.dev.test;
 
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ITestCommand;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.pagination.Pages;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import org.jetbrains.annotations.NotNull;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
@@ -17,10 +15,10 @@ public class MenuPaginationTestCommand extends ListenerAdapter implements ITestC
     public void handle(CommandContext ctx) throws ScriptException {
         if (!permissionCheck(ctx)) return;
 
-        List<SelectMenuOption> options = new ArrayList<>();
+        List<StringSelectMenuOption> options = new ArrayList<>();
 
         for (int i = 0; i < 30; i++)
-            options.add(SelectMenuOption.of("Test " + i, "Test:" + i));
+            options.add(StringSelectMenuOption.of("Test " + i, "Test:" + i));
 
         ctx.getMessage().reply("Menu Pagination Test")
                 .queue(success -> Pages.paginateMenu(ctx.getAuthor(), success, options));

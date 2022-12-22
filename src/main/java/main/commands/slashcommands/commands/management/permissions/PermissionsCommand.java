@@ -542,7 +542,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
         final var guild = event.getGuild();
         final var config = new PermissionsConfig(guild);
-        final var path = event.getCommandPath().split("/");
+        final var path = event.getFullCommandName().split("\\s");
 
         switch (path[1]) {
             case "list" -> {

@@ -875,7 +875,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             return;
         }
 
-        String[] split = event.getCommandPath().split("/");
+        String[] split = event.getFullCommandName().split("/");
         List<OptionMapping> options = event.getOptions();
 
         final Member member = event.getMember();

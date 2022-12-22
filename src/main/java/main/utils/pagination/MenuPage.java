@@ -1,16 +1,16 @@
 package main.utils.pagination;
 
 import lombok.Getter;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuPage {
     @Getter
-    private final List<SelectMenuOption> options = new ArrayList<>();
+    private final List<StringSelectMenuOption> options = new ArrayList<>();
 
-    public void addOption(SelectMenuOption option) {
+    public void addOption(StringSelectMenuOption option) {
         if (options.size() >= 25)
             throw new IllegalArgumentException("You cannot add any more options to the page!");
 
@@ -21,13 +21,13 @@ public class MenuPage {
         options.remove(i);
     }
 
-    public SelectMenuOption getOption(int i) {
+    public StringSelectMenuOption getOption(int i) {
         return options.get(i);
     }
 
     public List<String> toStringList() {
         final List<String> ret = new ArrayList<>();
-        for (SelectMenuOption option : options) {
+        for (StringSelectMenuOption option : options) {
             if (option.toString().contains("Next Page") ||
                     option.toString().contains("Previous Page")
             ) continue;

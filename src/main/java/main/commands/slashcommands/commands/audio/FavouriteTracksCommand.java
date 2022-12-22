@@ -9,7 +9,7 @@ import main.constants.TrackSource;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.component.interactions.selectionmenu.SelectMenuOption;
+import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.themes.ThemesConfig;
@@ -20,7 +20,7 @@ import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.interaction.component.SelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -172,12 +172,12 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
             return;
         }
 
-        final List<SelectMenuOption> list = new ArrayList<>();
+        final List<StringSelectMenuOption> list = new ArrayList<>();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
         for (final var track : tracks)
             list.add(
-                    SelectMenuOption.of(
+                    StringSelectMenuOption.of(
                             localeManager.getMessage(
                                     RobertifyLocaleMessage.FavouriteTracksMessages.FT_SELECT_MENU_OPTION,
                                     Pair.of("{title}", track.title().substring(0, Math.min(75, track.title().length()))),
@@ -204,12 +204,12 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
             return;
         }
 
-        final List<SelectMenuOption> list = new ArrayList<>();
+        final List<StringSelectMenuOption> list = new ArrayList<>();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
         for (final var track : tracks)
             list.add(
-                    SelectMenuOption.of(
+                    StringSelectMenuOption.of(
                             localeManager.getMessage(
                                     RobertifyLocaleMessage.FavouriteTracksMessages.FT_SELECT_MENU_OPTION,
                                     Pair.of("{title}", track.title().substring(0, Math.min(75, track.title().length()))),
@@ -322,7 +322,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
     }
 
     @Override
-    public void onSelectMenuInteraction(@NotNull SelectMenuInteractionEvent event) {
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!event.getSelectMenu().getId().startsWith("menupage")) return;
         if (!event.getUser().getId().equals(event.getComponentId().split(":")[1]))
             return;
