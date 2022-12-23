@@ -22,6 +22,7 @@ import main.events.SuggestionCategoryDeletionEvents;
 import main.events.VoiceChannelEvents;
 import main.utils.EventWaiter;
 import main.utils.apis.robertify.RobertifyAPI;
+import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
@@ -32,6 +33,7 @@ import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -220,9 +222,19 @@ public class Robertify {
                 options.setDsn(Config.get(ENV.SENTRY_DSN));
                 options.setTracesSampleRate(1.0);
             });
+
+            loadNeededGlobalCommands();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
+    }
+
+    private static void loadNeededGlobalCommands() {
+
+    }
+
+    private void loadGlobalSlashCommands() {
+        AbstractSlashCommand.loadAllCommands();
     }
 
     public static void initVoteSiteAPIs() {

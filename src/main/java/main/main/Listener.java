@@ -50,8 +50,6 @@ public class Listener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
 
-        loadNeededGlobalCommands();
-
         for (Guild g : jda.getGuildCache()) {
             final var dedicatedChannelConfig = new DedicatedChannelConfig(g);
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
@@ -204,14 +202,6 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-    }
-
-    public void loadGlobalSlashCommands() {
-        AbstractSlashCommand.loadAllCommands();
-    }
-
-    public void loadNeededGlobalCommands() {
-
     }
 
     /**
