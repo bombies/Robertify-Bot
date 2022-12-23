@@ -19,6 +19,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -106,7 +108,9 @@ public class AudioLoader implements AudioLoadResultHandler {
                     .queue(success -> success.editMessageComponents().queue(msg -> {
                         if (dedicatedChannelConfig.isChannelSet())
                             if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
-                                msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                                msg.delete().queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                );
                     }));
         } else {
             if (dedicatedChannelConfig.isChannelSet())
