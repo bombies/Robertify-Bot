@@ -150,6 +150,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     announcementChannel.sendFiles(FileUpload.fromData(
                             new NowPlayingImageBuilder()
                                     .setTitle(trackInfo.title)
+                                    .setArtistName(trackInfo.author)
                                     .setAlbumImage(
                                             track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
                                                     SpotifyUtils.getArtworkUrl(trackInfo.identifier)
