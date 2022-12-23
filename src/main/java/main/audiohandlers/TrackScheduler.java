@@ -39,6 +39,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
@@ -147,28 +148,28 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             try {
                 if (announcementChannel != null) {
                     final var requesterObj = requester.startsWith("<@") ? Robertify.getShardManager().retrieveUserById(requester.replaceAll("[<@>]", "")).complete() : null;
-                    announcementChannel.sendFiles(FileUpload.fromData(
-                            new NowPlayingImageBuilder()
-                                    .setTitle(trackInfo.title)
-                                    .setArtistName(trackInfo.author)
-                                    .setAlbumImage(
-                                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                                    SpotifyUtils.getArtworkUrl(trackInfo.identifier)
+                    final var img = new NowPlayingImageBuilder()
+                            .setTitle(trackInfo.title)
+                            .setArtistName(trackInfo.author)
+                            .setAlbumImage(
+                                    track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
+                                            SpotifyUtils.getArtworkUrl(trackInfo.identifier)
+                                            :
+                                            track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
+                                                    DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier))
                                                     :
-                                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                                            DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier))
-                                                            :
-                                                            new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                                    )
-                                    .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
-                                    .build()
-                    )).queue(msg -> {
-                                if (lastSentMsg != null)
-                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                lastSentMsg = msg;
-                            }, new ErrorHandler()
-                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessageEmbeds(eb.build())
+                                                    new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                            )
+                            .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
+                            .build();
+                    announcementChannel.sendFiles(FileUpload.fromData(img)).queue(msg -> {
+                        img.delete();
+                        if (lastSentMsg != null)
+                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                        lastSentMsg = msg;
+                        }, new ErrorHandler()
+                            .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessageEmbeds(eb.build())
                                             .queue(embedMsg -> {
                                                 if (lastSentMsg != null)
                                                     lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
