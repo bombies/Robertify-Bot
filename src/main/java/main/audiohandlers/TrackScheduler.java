@@ -14,15 +14,19 @@ import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.database.postgresql.tracks.TrackDB;
+import main.utils.deezer.DeezerUtils;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.json.autoplay.AutoPlayUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeUtils;
+import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,6 +34,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,8 +135,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 if (dedicatedChannelConfig.getChannelID() == announcementChannel.getIdLong())
                     return;
 
+            final var trackInfo = track.getInfo();
             final var localeManager = LocaleManager.getLocaleManager(guild);
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", track.getInfo().title), Pair.of("{author}", track.getInfo().author))
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", trackInfo.title), Pair.of("{author}", trackInfo.author))
                     + (new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
                     "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
                     :
@@ -139,21 +145,45 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             ));
 
             try {
-                if (announcementChannel != null)
-                    announcementChannel.sendMessageEmbeds(eb.build())
-                            .queue(msg -> {
+                if (announcementChannel != null) {
+                    final var requesterObj = requester.startsWith("<@") ? Robertify.getShardManager().retrieveUserById(requester.replaceAll("[<@>]", "")).complete() : null;
+                    announcementChannel.sendFiles(FileUpload.fromData(
+                            new NowPlayingImageBuilder()
+                                    .setTitle(trackInfo.title)
+                                    .setAlbumImage(
+                                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
+                                                    SpotifyUtils.getArtworkUrl(trackInfo.identifier)
+                                                    :
+                                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
+                                                            DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier))
+                                                            :
+                                                            new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                                    )
+                                    .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
+                                    .build()
+                    )).queue(msg -> {
                                 if (lastSentMsg != null)
                                     lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
                                             .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
                                 lastSentMsg = msg;
                             }, new ErrorHandler()
-                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessage(eb.build().getDescription())
-                                            .queue(nonEmbedMsg -> {
+                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessageEmbeds(eb.build())
+                                            .queue(embedMsg -> {
                                                 if (lastSentMsg != null)
                                                     lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
                                                             .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                            })
-                                    ));
+                                                lastSentMsg = embedMsg;
+                                            }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
+                                                    .queue(nonEmbedMsg -> {
+                                                        if (lastSentMsg != null)
+                                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                                        lastSentMsg = nonEmbedMsg;
+                                                    })
+                                            ))
+                                    )
+                    );
+                }
             } catch (InsufficientPermissionException ignored) {}
         }
     }

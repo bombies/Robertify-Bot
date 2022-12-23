@@ -1,5 +1,9 @@
 package main.utils.apis.robertify.imagebuilders;
 
+import org.json.JSONObject;
+
+import javax.annotation.Nullable;
+
 public class NowPlayingImageBuilder extends AbstractImageBuilder {
     public NowPlayingImageBuilder() {
         super(ImageType.NOW_PLAYING);
@@ -30,11 +34,23 @@ public class NowPlayingImageBuilder extends AbstractImageBuilder {
         return this;
     }
 
+    public NowPlayingImageBuilder setUser(String userName, @Nullable String userAvatar) {
+        addQuery(QueryFields.REQUESTER, new JSONObject()
+                .put(QueryFields.USER_NAME.toString(), userName)
+                .put(QueryFields.USER_IMAGE.toString(), userAvatar != null ? userAvatar : "")
+                .toString()
+        );
+        return this;
+    }
+
     private enum QueryFields implements ImageQueryField {
         ARTIST,
         TITLE,
         ALBUM_IMAGE,
         DURATION,
+        REQUESTER,
+        USER_NAME,
+        USER_IMAGE,
         CURRENT_TIME;
 
         @Override
