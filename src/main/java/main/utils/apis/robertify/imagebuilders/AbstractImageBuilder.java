@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 public abstract class AbstractImageBuilder {
@@ -34,7 +36,11 @@ public abstract class AbstractImageBuilder {
 
     @SneakyThrows
     public File build() {
-        final var imageFile = new File("./" + UUID.randomUUID() + ".png");
+        final var img_dir = Path.of("./built_images");
+        if (!Files.exists(img_dir))
+            Files.createDirectory(img_dir);
+
+        final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.toString());
         try(final var is = url.openStream();
             final var os = new FileOutputStream(imageFile)){
