@@ -50,6 +50,8 @@ public class Listener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
 
+        loadNeededGlobalCommands();
+
         for (Guild g : jda.getGuildCache()) {
             final var dedicatedChannelConfig = new DedicatedChannelConfig(g);
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
@@ -57,9 +59,7 @@ public class Listener extends ListenerAdapter {
             if (locale != null)
                 LocaleManager.getLocaleManager(g).setLocale(locale);
 
-            unloadCommands(g, "website", "vote");
             loadNeededSlashCommands(g);
-            loadNeededGlobalCommands();
 
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
@@ -211,8 +211,7 @@ public class Listener extends ListenerAdapter {
     }
 
     public void loadNeededGlobalCommands() {
-        new WebsiteCommand().loadCommand();
-        new VoteCommand().loadCommand();
+
     }
 
     /**
