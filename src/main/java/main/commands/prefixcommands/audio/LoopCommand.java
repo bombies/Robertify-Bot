@@ -103,7 +103,7 @@ public class LoopCommand implements ICommand {
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
         } else {
             scheduler.repeating = true;
-            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
+            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START, Pair.of("{title}", info.title));
         }
 
         new LogUtils(guild).sendLog(
