@@ -5,6 +5,8 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
+import main.utils.locale.LocaleMessage;
+import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
@@ -99,71 +101,74 @@ public class ManagePremiumCommand extends AbstractSlashCommand {
             return;
         }
 
-        event.deferReply().queue();
-        switch (event.getSubcommandName()) {
-            case "add" -> {
-                final var tier = getTierCode(event.getOption("tier").getAsString());
-                final var expiration = event.getOption("expiration") != null ? Long.parseLong(event.getOption("expiration").getAsString()) : -1;
-
-                try {
-                    if (expiration != -1) {
-                        robertifyAPI.addPremiumUser(userID, 0, tier, expiration);
-
-                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
-                                        RobertifyEmbedUtils.embedMessage(
-                                                guild,
-                                                "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user until `"+ GeneralUtils.formatDate(expiration, TimeFormat.DD_M_YYYY_HH_MM_SS) +"`."
-                                        ).build())
-                                .queue()
-                        );
-                    } else {
-                        robertifyAPI.addPremiumUser(userID, 0, tier, 32503680000000L);
-                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
-                                        RobertifyEmbedUtils.embedMessage(
-                                                guild,
-                                                "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user permanently."
-                                        ).build())
-                                .queue()
-                        );
-
-                    }
-                } catch (IllegalArgumentException e) {
-                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                            .queue();
-                }
-            }
-            case "remove" -> {
-                try {
-                    robertifyAPI.deletePremiumUser(userID);
-
-                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
-                                    guild,
-                                    "You have successfully removed " + user.getName() + "#" + user.getDiscriminator() + " as a premium user."
-                            ).build())
-                            .queue()
-                    );
-                } catch (IllegalArgumentException e) {
-                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                            .queue();
-                }
-            }
-            case "update" -> {
-                final var tier = getTierCode(event.getOption("tier").getAsString());
-
-                try {
-                    robertifyAPI.updateUserTier(userID, tier);
-                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
-                            guild,
-                            "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
-                        ).build()).queue()
-                    );
-
-                } catch (IllegalArgumentException e) {
-                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                            .queue();
-                }
-            }
-        }
+        event.replyEmbeds(
+                RobertifyEmbedUtils.embedMessage(RobertifyLocaleMessage.GeneralMessages.DISABLED_COMMAND)
+                        .build()
+        ).queue();
+//        switch (event.getSubcommandName()) {
+//            case "add" -> {
+//                final var tier = getTierCode(event.getOption("tier").getAsString());
+//                final var expiration = event.getOption("expiration") != null ? Long.parseLong(event.getOption("expiration").getAsString()) : -1;
+//
+//                try {
+//                    if (expiration != -1) {
+//                        robertifyAPI.addPremiumUser(userID, 0, tier, expiration);
+//
+//                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
+//                                        RobertifyEmbedUtils.embedMessage(
+//                                                guild,
+//                                                "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user until `"+ GeneralUtils.formatDate(expiration, TimeFormat.DD_M_YYYY_HH_MM_SS) +"`."
+//                                        ).build())
+//                                .queue()
+//                        );
+//                    } else {
+//                        robertifyAPI.addPremiumUser(userID, 0, tier, 32503680000000L);
+//                        Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(
+//                                        RobertifyEmbedUtils.embedMessage(
+//                                                guild,
+//                                                "You have successfully added " + user.getName() + "#" + user.getDiscriminator() + " as a premium user permanently."
+//                                        ).build())
+//                                .queue()
+//                        );
+//
+//                    }
+//                } catch (IllegalArgumentException e) {
+//                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
+//                            .queue();
+//                }
+//            }
+//            case "remove" -> {
+//                try {
+//                    robertifyAPI.deletePremiumUser(userID);
+//
+//                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+//                                    guild,
+//                                    "You have successfully removed " + user.getName() + "#" + user.getDiscriminator() + " as a premium user."
+//                            ).build())
+//                            .queue()
+//                    );
+//                } catch (IllegalArgumentException e) {
+//                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
+//                            .queue();
+//                }
+//            }
+//            case "update" -> {
+//                final var tier = getTierCode(event.getOption("tier").getAsString());
+//
+//                try {
+//                    robertifyAPI.updateUserTier(userID, tier);
+//                    Robertify.getShardManager().retrieveUserById(userID).queue(user -> event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+//                            guild,
+//                            "You have successfully updated " + user.getName() + "#" + user.getDiscriminator() + "'s premium tier to **" + event.getOption("tier").getAsString() + "**!"
+//                        ).build()).queue()
+//                    );
+//
+//                } catch (IllegalArgumentException e) {
+//                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
+//                            .queue();
+//                }
+//            }
+//        }
     }
 
     private int getTierCode(String tier) {

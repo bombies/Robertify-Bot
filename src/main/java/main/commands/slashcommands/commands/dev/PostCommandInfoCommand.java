@@ -4,11 +4,21 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import netscape.javascript.JSException;
+import org.apache.http.HttpException;
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class PostCommandInfoCommand extends AbstractSlashCommand {
+    final Logger logger = LoggerFactory.getLogger(PostCommandInfoCommand.class);
+
     @Override
     protected void buildCommand() {
         setCommand(
@@ -46,7 +56,31 @@ public class PostCommandInfoCommand extends AbstractSlashCommand {
         }
 
         body.put("commands", cmdsArr);
-        Robertify.getRobertifyAPI().postCommandInfo(body);
-        event.reply("Posted!").queue();
+
+        event.deferReply().queue();
+        try (final var response = Robertify.getRobertifyAPI().postCommandInfo(body)) {
+            if (response.code() == HttpStatus.SC_CREATED)
+                event.getHook().sendMessage("Posted!")
+                        .setEphemeral(true)
+                        .queue();
+            else {
+                try {
+                    final var errMsg = new JSONObject(response.body().string()).getString("message");
+
+                    event.getHook().sendMessage("There was an issue attempting to post commands! Check console for more information.\n\nError Message: `"+errMsg+"`\nError Code: `"+response.code()+"`")
+                            .setEphemeral(true)
+                            .queue();
+                    logger.error("There was an error when trying to POST commands: " + errMsg);
+                } catch (JSONException e) {
+                    event.getHook().sendMessage("There was an issue attempting to post commands! Check console for more information.\n\nError Code: `"+response.code()+"`")
+                            .setEphemeral(true)
+                            .queue();
+                    logger.error(response.body().string());
+                }
+
+            }
+        } catch (Exception e) {
+            logger.error("Unexpected error", e);
+        }
     }
 }

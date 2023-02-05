@@ -59,7 +59,8 @@ public enum RobertifyLocaleMessage {
         PREMIUM_INSTANCE_NEEDED,
         PREMIUM_EMBED_TITLE,
         PREMIUM_UPGRADE_BUTTON,
-        NO_YOUTUBE_SUPPORT
+        NO_YOUTUBE_SUPPORT,
+        DISABLED_COMMAND,
     }
 
     public enum RandomMessages implements LocaleMessage {

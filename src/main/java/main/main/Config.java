@@ -18,11 +18,7 @@ import java.util.List;
 
 public class Config {
     private final static Logger logger = LoggerFactory.getLogger(Config.class);
-    private static Dotenv dotenv = Dotenv.configure()
-            .directory("./")
-            .ignoreIfMalformed()
-            .ignoreIfMissing()
-            .load();
+    private static Dotenv dotenv = Dotenv.load();
 
     /**
      * Get a string value from its specific key from the .env file

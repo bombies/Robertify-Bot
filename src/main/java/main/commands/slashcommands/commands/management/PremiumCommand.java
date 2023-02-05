@@ -35,26 +35,31 @@ public class PremiumCommand extends AbstractSlashCommand {
         final var api = Robertify.getRobertifyAPI();
         final var guild = event.getGuild();
 
-        event.deferReply().queue();
+        event.replyEmbeds(
+                RobertifyEmbedUtils.embedMessage(RobertifyLocaleMessage.GeneralMessages.DISABLED_COMMAND)
+                        .build()
+        ).queue();
 
-        if (!api.guildIsPremium(guild.getId())) {
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
-                            RobertifyLocaleMessage.PremiumMessages.NOT_PREMIUM
-                    ).build())
-                    .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
-                    .queue();
-            return;
-        }
-
-        final var premiumSetterInfo = api.getGuildPremiumSetter(guild.getId());
-
-        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
-                        RobertifyLocaleMessage.PremiumMessages.IS_PREMIUM,
-                        Pair.of("{user}", premiumSetterInfo.getUser().getId()),
-                        Pair.of("{tier}", RobertifyPremium.parseTier(premiumSetterInfo.getTier())),
-                        Pair.of("{premium_started}", "<t:"+ Math.round(premiumSetterInfo.getStartedAt() / 1000.0) +":F>"),
-                        Pair.of("{premium_ends}", "<t:"+ Math.round(premiumSetterInfo.getEndsAt() / 1000.0) +":F>")
-                ).build())
-                .queue();
+//        event.deferReply().queue();
+//
+//        if (!api.guildIsPremium(guild.getId())) {
+//            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+//                            RobertifyLocaleMessage.PremiumMessages.NOT_PREMIUM
+//                    ).build())
+//                    .addActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
+//                    .queue();
+//            return;
+//        }
+//
+//        final var premiumSetterInfo = api.getGuildPremiumSetter(guild.getId());
+//
+//        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+//                        RobertifyLocaleMessage.PremiumMessages.IS_PREMIUM,
+//                        Pair.of("{user}", premiumSetterInfo.getUser().getId()),
+//                        Pair.of("{tier}", RobertifyPremium.parseTier(premiumSetterInfo.getTier())),
+//                        Pair.of("{premium_started}", "<t:"+ Math.round(premiumSetterInfo.getStartedAt() / 1000.0) +":F>"),
+//                        Pair.of("{premium_ends}", "<t:"+ Math.round(premiumSetterInfo.getEndsAt() / 1000.0) +":F>")
+//                ).build())
+//                .queue();
     }
 }

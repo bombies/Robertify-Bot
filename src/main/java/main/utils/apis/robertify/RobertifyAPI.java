@@ -5,18 +5,21 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.apis.robertify.models.RobertifyGuild;
 import main.utils.apis.robertify.models.RobertifyPremium;
+import me.duncte123.botcommons.web.ContentType;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.entities.User;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.hc.core5.net.URIBuilder;
+import org.apache.http.HttpStatus;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 public class RobertifyAPI {
@@ -26,6 +29,8 @@ public class RobertifyAPI {
     private final URI uri;
     private final WebUtils webUtils;
     private final String accessToken;
+
+    private final String AUTHORIZATION_HEADER = "Authorization";
 
     @SneakyThrows
     public RobertifyAPI() {
@@ -37,67 +42,79 @@ public class RobertifyAPI {
 
     @SneakyThrows
     private String getAccessToken() {
-        Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("login").toString())
-                .post(RequestBody.create(
-                        MediaType.get("application/json"),
-                        new JSONObject()
-                                .put("user_name", "bombies")
-                                .put("master_password", masterPassword)
+        Response response = webUtils.getClient()
+                .newCall(webUtils.prepareGet(new URIBuilder(uri.toString())
+                                .appendPath("auth")
+                                .appendPath("login")
                                 .toString()
-                ))
-                .build()).execute();
+                        )
+                        .post(RequestBody.create(
+                                ContentType.JSON.toMediaType(),
+                                new JSONObject()
+                                        .put("username", "bombies")
+                                        .put("password", masterPassword)
+                                        .toString()
+                        ))
+                .build())
+                .execute();
         final var responseObj = new JSONObject(response.body().string());
-        if (responseObj.has("token"))
-            return responseObj.getString("token");
+        if (responseObj.has("access_token"))
+            return responseObj.getString("access_token");
         else
             throw new IllegalStateException(responseObj.getString("message"));
     }
 
     @SneakyThrows
     public RobertifyGuild getGuild(long gid) {
-        Response guild = webUtils.getClient().newCall(
-                webUtils.prepareGet(new URIBuilder(uri.toString()).appendPathSegments("guilds", String.valueOf(gid)).toString())
-                        .addHeader("auth-token", accessToken)
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+
+        try (Response guild = webUtils.getClient().newCall(
+                webUtils.prepareGet(new URIBuilder(uri.toString()).appendPathSegments("guild", String.valueOf(gid)).toString())
+                        .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build()
-        ).execute();
+        ).execute()) {
+            final var guildObj = new JSONObject(guild.body().string());
 
-        final var guildObj = new JSONObject(guild.body().string());
+            if (guildObj.has("message"))
+                throw new IllegalArgumentException(guildObj.getString("message"));
 
-        guild.close();
-
-        if (guildObj.has("message"))
-            throw new IllegalArgumentException(guildObj.getString("message"));
-
-        return new RobertifyGuild(
-                guildObj.getJSONObject("dedicated_channel"),
-                guildObj.getJSONObject("restricted_channels"),
-                guildObj.getString("prefix"),
-                guildObj.getJSONObject("permissions"),
-                guildObj.getJSONObject("toggles"),
-                guildObj.getJSONArray("eight_ball"),
-                guildObj.getJSONObject("announcement_channel"),
-                guildObj.getString("theme"),
-                guildObj.getJSONObject("server_id"),
-                guildObj.getJSONArray("banned_users")
-        );
+            return new RobertifyGuild(
+                    guildObj.getJSONObject("dedicated_channel"),
+                    guildObj.getJSONObject("restricted_channels"),
+                    guildObj.getString("prefix"),
+                    guildObj.getJSONObject("permissions"),
+                    guildObj.getJSONObject("toggles"),
+                    guildObj.getJSONArray("eight_ball"),
+                    guildObj.getJSONObject("announcement_channel"),
+                    guildObj.getString("theme"),
+                    guildObj.getJSONObject("server_id"),
+                    guildObj.getJSONArray("banned_users")
+            );
+        }
     }
 
     @SneakyThrows
-    public void postCommandInfo(JSONObject commandInfo) {
-        webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
-                .addHeader("auth-token", accessToken)
+    public Response postCommandInfo(JSONObject commandInfo) {
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+        return webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
+                .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .post(RequestBody.create(
-                        MediaType.get("application/json"),
+                        ContentType.JSON.toMediaType(),
                         commandInfo.toString()
                 ))
-                .build()).execute().close();
+                .build()).execute();
     }
 
     @SneakyThrows
     public RobertifyPremium getPremiumInfo(long userId) {
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+
         Response premiumInfo = webUtils.getClient().newCall(
                 webUtils.prepareGet(new URIBuilder(uri.toString()).appendPathSegments("premium", String.valueOf(userId)).toString())
-                        .addHeader("auth-token", accessToken)
+                        .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build()
         ).execute();
 
@@ -138,10 +155,13 @@ public class RobertifyAPI {
 
     @SneakyThrows
     public void addPremiumUser(long userId, int premiumType, int premiumTier, long premiumExpires) {
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+
         Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
-                .addHeader("auth-token", accessToken)
+                .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .post(RequestBody.create(
-                        MediaType.get("application/json"),
+                        ContentType.JSON.toMediaType(),
                         new JSONObject()
                                 .put("user_id", String.valueOf(userId))
                                 .put("user_email", "thisdocumentwasforced@email.com")
@@ -169,9 +189,12 @@ public class RobertifyAPI {
 
     @SneakyThrows
     public void deletePremiumUser(long userId) {
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+
         Response response = webUtils.getClient().newCall(
                 webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath(String.valueOf(userId)).toString())
-                        .addHeader("auth-token", accessToken)
+                        .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .delete()
                         .build()
         ).execute();
@@ -187,11 +210,14 @@ public class RobertifyAPI {
 
     @SneakyThrows
     public void updateUserTier(long userId, int tier) {
+        if (accessToken == null)
+            throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
+
         final var premiumInfo = getPremiumInfo(userId);
         if (premiumInfo == null)
             throw new IllegalArgumentException("There is no information for user with that ID!");
         Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
-                .addHeader("auth-token", accessToken)
+                .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .patch(RequestBody.create(
                         MediaType.get("application/json"),
                         new JSONObject()
@@ -227,7 +253,7 @@ public class RobertifyAPI {
     @SneakyThrows
     private List<String> getPremiumGuilds() {
         final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").toString())
-                        .addHeader("auth-token", accessToken)
+                        .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build())
                 .execute();
         final var responseObj = new JSONArray(response.body().string());
@@ -245,11 +271,11 @@ public class RobertifyAPI {
     @SneakyThrows
     public RobertifyPremium getGuildPremiumSetter(String gid) {
         final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").appendPath("user").appendPath(gid).toString())
-                        .addHeader("auth-token", accessToken)
+                        .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build())
                 .execute();
 
-        if (response.code() == 404)
+        if (response.code() == HttpStatus.SC_NOT_FOUND)
             throw new NullPointerException("Guild with ID " + gid + " isn't premium.");
         final var responseObj = new JSONObject(response.body().string());
         response.close();
@@ -264,5 +290,9 @@ public class RobertifyAPI {
                 responseObj.getString("premium_started"),
                 responseObj.getString("premium_expires")
         );
+    }
+
+    private String getBearerToken() {
+        return "Bearer " + this.accessToken;
     }
 }

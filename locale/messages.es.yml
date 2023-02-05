@@ -52,6 +52,7 @@ premium_instance_needed: "¡Este servidor debe actualizarse a premium antes de p
 premium_embed_title: "Robot Premium"
 premium_upgrade_button: "¡Mejorado a Premium!"
 no_youtube_support: "Debido a eventos recientes, se eliminó el soporte de YouTube de Robertify. Para obtener más información, puede unirse a nuestro [servidor de soporte](https://discord.gg/vbjmtfjdvu) y leer el anuncio."
+disabled_command: "This command has been disabled!"
 no_random_messages: "¡No hay mensajes aleatorios!"
 tip_title: "✨ Consejo de Robertify"
 tip_footer: "Puede alternar los consejos ejecutando \"Consejos de alternar\""
