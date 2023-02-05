@@ -143,7 +143,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.MISSING_RESPONSE_TO_ADD);
 
         if (phraseToAdd.isEmpty())
-        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.MISSING_RESPONSE_TO_ADD);
+          return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.MISSING_RESPONSE_TO_ADD);
         var config = new EightBallConfig(guild);
 
         try {
@@ -240,21 +240,25 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!customAnswers.isEmpty()) {
             if (random < 0.11) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())))
                 );
             } else if (random > 0.11 && random < 0.22) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}",nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())))
                 );
             } else if (random > 0.22 && random < 0.33) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", negativeAnswers.get(new Random().nextInt(negativeAnswers.size())))
                 );
             } else if (random > 0.33) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", customAnswers.get(new Random().nextInt(customAnswers.size())))
                 );
@@ -262,16 +266,19 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         } else {
             if (random < 0.5) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", affirmativeAnswers.get(new Random().nextInt(affirmativeAnswers.size())))
                 );
             } else if (random > 0.5 && random < 0.75) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", nonCommittalAnswers.get(new Random().nextInt(nonCommittalAnswers.size())))
                 );
             } else if (random > 0.75) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.EightBallMessages.QUESTION_ASKED,
+                        Pair.of("{user}", asker.getAsMention()),
                         Pair.of("{question}", question),
                         Pair.of("{response}", negativeAnswers.get(new Random().nextInt(negativeAnswers.size())))
                 );
