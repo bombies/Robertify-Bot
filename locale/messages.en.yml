@@ -54,6 +54,7 @@ premium_embed_title: "Premium Bot"
 premium_upgrade_button: "Upgrade to Premium!"
 no_youtube_support: "Due to recent events, YouTube support has been removed from Robertify. For more information, you can join our [support server](https://discord.gg/vbjmtfjdvu) and read the announcement."
 disabled_command: "This command has been disabled!"
+guild_command_only: "This command can only be used in a server!"
 
 # RANDOM MESSAGES
 no_random_messages: "There are no random messages!"

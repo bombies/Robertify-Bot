@@ -43,6 +43,7 @@ public class WebsiteCommand extends AbstractSlashCommand implements ICommand {
                 getBuilder()
                         .setName("website")
                         .setDescription("Visit our website using this command")
+                        .allowGlobalUse()
                         .build()
         );
     }

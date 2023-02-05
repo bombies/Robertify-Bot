@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
 import main.commands.slashcommands.commands.audio.PlaySlashCommand;
+import main.commands.slashcommands.commands.dev.UnloadGuildCommandsCommand;
 import main.commands.slashcommands.commands.dev.UpdateCommand;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
@@ -62,9 +63,9 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             ReminderScheduler.getInstance().scheduleGuildReminders(g);
 
-//            if (dedicatedChannelConfig.isChannelSet()) {
-//                dedicatedChannelConfig.updateMessage();
-//            }
+            if (dedicatedChannelConfig.isChannelSet()) {
+                dedicatedChannelConfig.updateMessage();
+            }
 
 //            try {
 //                ResumeUtils.getInstance().loadInfo(g);
@@ -202,6 +203,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
+        new UnloadGuildCommandsCommand().loadCommand(g);
     }
 
     /**
@@ -218,6 +220,10 @@ public class Listener extends ListenerAdapter {
                 .forEach(command -> g.deleteCommandById(command.getIdLong()).queue()),
                 new ErrorHandler().handle(ErrorResponse.UNKNOWN_COMMAND, e -> logger.warn("Could not remove some commands from {}", g.getName()))
         );
+    }
+
+    public void unloadCommands(Guild g) {
+        g.updateCommands().addCommands().queue();
     }
 
     public void unloadDevCommands(Guild g, String... commandNames) {

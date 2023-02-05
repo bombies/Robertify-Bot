@@ -18,6 +18,7 @@ public class AlertCommand extends AbstractSlashCommand {
                 getBuilder()
                         .setName("alert")
                         .setDescription("View the latest alert from the developer!")
+                        .allowGlobalUse()
                         .build()
         );
     }

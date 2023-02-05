@@ -41,6 +41,7 @@ public class VoteCommand extends AbstractSlashCommand implements ICommand {
                 getBuilder()
                         .setName("vote")
                         .setDescription("Want to support us? Help spread our reach by voting for us!")
+                        .allowGlobalUse()
                         .build()
         );
     }

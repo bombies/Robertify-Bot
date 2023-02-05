@@ -38,6 +38,7 @@ public class UptimeCommand extends AbstractSlashCommand implements ICommand {
                 getBuilder()
                         .setName("uptime")
                         .setDescription("Get how long the bot has been online")
+                        .allowGlobalUse()
                         .build()
         );
     }

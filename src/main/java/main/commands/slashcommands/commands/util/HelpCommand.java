@@ -48,6 +48,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                                         false
                                 )
                         )
+                        .allowGlobalUse()
                         .build()
         );
     }

@@ -39,8 +39,6 @@ public class SlashCommandManager {
     private final List<AbstractSlashCommand> utilityCommands = new ArrayList<>();
     @Getter
     private final List<AbstractSlashCommand> devCommands = new ArrayList<>();
-    @Getter
-    private final List<AbstractSlashCommand> globalCommands = new ArrayList<>();
 
     public SlashCommandManager() {
         addMusicCommands(
@@ -129,11 +127,8 @@ public class SlashCommandManager {
                 new ManagePremiumCommand(),
                 new SpotifyRecommendationTest(),
                 new ResetPremiumFeaturesCommand(),
-                new ImageBuilderTest()
-        );
-
-        addGlobalCommands(
-                new WebsiteCommand()
+                new ImageBuilderTest(),
+                new UnloadGuildCommandsCommand()
         );
     }
 
@@ -151,10 +146,6 @@ public class SlashCommandManager {
 
     private void addUtilityCommands(AbstractSlashCommand... commands) {
         utilityCommands.addAll(Arrays.asList(commands));
-    }
-
-    private void addGlobalCommands(AbstractSlashCommand... commands) {
-        globalCommands.addAll(Arrays.asList(commands));
     }
 
     private void addDevCommands(AbstractSlashCommand... commands) {
@@ -204,24 +195,31 @@ public class SlashCommandManager {
                 .anyMatch(it -> it.getName().equalsIgnoreCase(name));
     }
 
-    public boolean isGlobalCommand(AbstractSlashCommand command) {
-        return getGlobalCommands()
-                .stream()
-                .anyMatch(it -> it.getName().equalsIgnoreCase(command.getName()));
-    }
 
-
-    public List<AbstractSlashCommand> getCommands() {
+    public List<AbstractSlashCommand> getGlobalCommands() {
         final List<AbstractSlashCommand> abstractSlashCommands = new ArrayList<>();
         abstractSlashCommands.addAll(musicCommands);
         abstractSlashCommands.addAll(managementCommands);
         abstractSlashCommands.addAll(miscCommands);
         abstractSlashCommands.addAll(utilityCommands);
-        return abstractSlashCommands;
+        return abstractSlashCommands.stream()
+                .filter(command -> !command.isGuildCommand())
+                .toList();
+    }
+
+    public List<AbstractSlashCommand> getGuildCommands() {
+        final List<AbstractSlashCommand> abstractSlashCommands = new ArrayList<>();
+        abstractSlashCommands.addAll(musicCommands);
+        abstractSlashCommands.addAll(managementCommands);
+        abstractSlashCommands.addAll(miscCommands);
+        abstractSlashCommands.addAll(utilityCommands);
+        return abstractSlashCommands.stream()
+                .filter(AbstractSlashCommand::isGuildCommand)
+                .toList();
     }
 
     public AbstractSlashCommand getCommand(String name) {
-        return getCommands().stream()
+        return getGlobalCommands().stream()
                 .filter(cmd -> cmd.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElse(null);

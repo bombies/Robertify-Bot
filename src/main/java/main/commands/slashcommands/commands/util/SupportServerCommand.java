@@ -39,6 +39,7 @@ public class SupportServerCommand extends AbstractSlashCommand implements IComma
                 getBuilder()
                         .setName("support")
                         .setDescription("Need help? Use this command to join our support server!")
+                        .allowGlobalUse()
                         .build()
         );
     }

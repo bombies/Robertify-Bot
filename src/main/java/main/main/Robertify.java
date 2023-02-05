@@ -33,7 +33,6 @@ import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -175,7 +174,9 @@ public class Robertify {
 
             // Register all slash commands
             SlashCommandManager slashCommandManager = new SlashCommandManager();
-            for (var cmd : slashCommandManager.getCommands())
+            for (var cmd : slashCommandManager.getGlobalCommands())
+                jdaBuilder.addEventListeners(cmd);
+            for (var cmd : slashCommandManager.getGuildCommands())
                 jdaBuilder.addEventListeners(cmd);
             for (var cmd : slashCommandManager.getDevCommands())
                 jdaBuilder.addEventListeners(cmd);
@@ -193,11 +194,11 @@ public class Robertify {
             AbstractMongoDatabase.initAllCaches();
             logger.info("Initialized all caches");
 
-            new ChangeLogConfig().initConfig();
             GuildRedisCache.getInstance().loadAllGuilds();
             logger.info("All guilds have been loaded into cache");
 
             shardManager = jdaBuilder.build();
+//            AbstractSlashCommand.loadAllCommands();
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))

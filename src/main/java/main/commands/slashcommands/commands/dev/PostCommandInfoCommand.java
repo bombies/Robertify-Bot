@@ -4,8 +4,6 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.main.Robertify;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import netscape.javascript.JSException;
-import org.apache.http.HttpException;
 import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -13,8 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class PostCommandInfoCommand extends AbstractSlashCommand {
     final Logger logger = LoggerFactory.getLogger(PostCommandInfoCommand.class);
@@ -40,7 +36,7 @@ public class PostCommandInfoCommand extends AbstractSlashCommand {
         if (!devCheck(event)) return;
 
         SlashCommandManager slashCommandManager = new SlashCommandManager();
-        final var commands = slashCommandManager.getCommands();
+        final var commands = slashCommandManager.getGlobalCommands();
 
         final JSONObject body = new JSONObject();
         final JSONArray cmdsArr = new JSONArray();

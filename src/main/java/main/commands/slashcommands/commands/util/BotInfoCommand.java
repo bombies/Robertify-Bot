@@ -52,6 +52,7 @@ public class BotInfoCommand extends AbstractSlashCommand implements ICommand {
                 getBuilder()
                         .setName("botinfo")
                         .setDescription("View some cool stuff about Robertify!")
+                        .allowGlobalUse()
                         .build()
         );
     }

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
@@ -32,11 +33,12 @@ public class RobertifyEmbedUtils {
         }
     }
 
-    public static EmbedBuilder embedMessage(Guild guild, String message) {
-        return getDefaultEmbed(guild.getIdLong()).setDescription(message);
+    public static EmbedBuilder embedMessage(@Nullable Guild guild, String message) {
+        final var builder = guild == null ? getDefaultEmbed() : getDefaultEmbed(guild.getIdLong());
+        return builder.setDescription(message);
     }
 
-    public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message) {
+    public static EmbedBuilder embedMessage(@Nullable Guild guild, LocaleMessage message) {
         if (guild == null)
             return embedMessage(message);
         final var localeManager = LocaleManager.getLocaleManager(guild);

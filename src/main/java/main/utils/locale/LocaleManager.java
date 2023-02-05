@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,9 @@ public class LocaleManager {
         return new LocaleManager(null, RobertifyLocale.ENGLISH);
     }
 
-    public static LocaleManager getLocaleManager(Guild guild) {
+    public static LocaleManager getLocaleManager(@Nullable Guild guild) {
+        if (guild == null)
+            return LocaleManager.globalManager();
         if (!localeManagers.containsKey(guild.getIdLong()))
             localeManagers.put(guild.getIdLong(), new LocaleManager(guild, RobertifyLocale.ENGLISH));
         return localeManagers.get(guild.getIdLong());

@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class DedicatedChannelConfig extends AbstractGuildConfig {
     private final static Logger logger = LoggerFactory.getLogger(DedicatedChannelConfig.class);
@@ -153,84 +154,86 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         if (!isChannelSet())
             return;
 
-        final var msgRequest = getMessageRequest();
+        CompletableFuture.runAsync(() -> {
+            final var msgRequest = getMessageRequest();
 
-        if (msgRequest == null) return;
+            if (msgRequest == null) return;
 
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        final var audioPlayer = musicManager.getPlayer();
-        final var playingTrack = audioPlayer.getPlayingTrack();
-        final var queue = musicManager.getScheduler().queue;
-        final var queueAsList = new ArrayList<>(queue);
-        final var theme = new ThemesConfig(guild).getTheme();
-        final var localeManager = LocaleManager.getLocaleManager(guild);
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+            final var audioPlayer = musicManager.getPlayer();
+            final var playingTrack = audioPlayer.getPlayingTrack();
+            final var queue = musicManager.getScheduler().queue;
+            final var queueAsList = new ArrayList<>(queue);
+            final var theme = new ThemesConfig(guild).getTheme();
+            final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        EmbedBuilder eb = new EmbedBuilder();
+            EmbedBuilder eb = new EmbedBuilder();
 
-        if (playingTrack == null) {
-            eb.setColor(theme.getColor());
-            eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
-            eb.setImage(theme.getIdleBanner());
+            if (playingTrack == null) {
+                eb.setColor(theme.getColor());
+                eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
+                eb.setImage(theme.getIdleBanner());
 
-            msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                    .setEmbeds(eb.build()).queue(),
-                    new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
-            );
-        } else {
-            final var trackInfo = playingTrack.getInfo();
-
-            eb.setColor(theme.getColor());
-
-            eb.setTitle(
-                    localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
-                            Pair.of("{title}", trackInfo.title),
-                            Pair.of("{author}", trackInfo.author),
-                            Pair.of("{duration}", GeneralUtils.formatTime(playingTrack.getInfo().length))
-                    )
-            );
-
-            var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
-            eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
-
-            switch (playingTrack.getSourceManager().getSourceName()) {
-                case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.identifier));
-                case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier)));
-                default -> eb.setImage(theme.getNowPlayingBanner());
-            }
-
-            eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
-                    Pair.of("{numSongs}", String.valueOf(queueAsList.size())),
-                    Pair.of("{volume}", String.valueOf((int)(audioPlayer.getFilters().getVolume() * 100)))
-            ));
-
-            final StringBuilder nextTenSongs = new StringBuilder();
-            nextTenSongs.append("```");
-            if (queueAsList.size() > 10) {
-                int index = 1;
-                for (AudioTrack track : queueAsList.subList(0, 10))
-                    nextTenSongs.append(index++).append(". → ").append(track.getInfo().title)
-                            .append(" - ").append(track.getInfo().author)
-                            .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
-                            .append("]\n");
+                msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                                .setEmbeds(eb.build()).queue(),
+                        new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
+                );
             } else {
-                if (queue.size() == 0)
-                    nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS));
-                else {
+                final var trackInfo = playingTrack.getInfo();
+
+                eb.setColor(theme.getColor());
+
+                eb.setTitle(
+                        localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
+                                Pair.of("{title}", trackInfo.title),
+                                Pair.of("{author}", trackInfo.author),
+                                Pair.of("{duration}", GeneralUtils.formatTime(playingTrack.getInfo().length))
+                        )
+                );
+
+                var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
+                eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
+
+                switch (playingTrack.getSourceManager().getSourceName()) {
+                    case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.identifier));
+                    case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier)));
+                    default -> eb.setImage(theme.getNowPlayingBanner());
+                }
+
+                eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
+                        Pair.of("{numSongs}", String.valueOf(queueAsList.size())),
+                        Pair.of("{volume}", String.valueOf((int)(audioPlayer.getFilters().getVolume() * 100)))
+                ));
+
+                final StringBuilder nextTenSongs = new StringBuilder();
+                nextTenSongs.append("```");
+                if (queueAsList.size() > 10) {
                     int index = 1;
-                    for (AudioTrack track : queueAsList)
-                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
+                    for (AudioTrack track : queueAsList.subList(0, 10))
+                        nextTenSongs.append(index++).append(". → ").append(track.getInfo().title)
+                                .append(" - ").append(track.getInfo().author)
                                 .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
                                 .append("]\n");
+                } else {
+                    if (queue.size() == 0)
+                        nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS));
+                    else {
+                        int index = 1;
+                        for (AudioTrack track : queueAsList)
+                            nextTenSongs.append(index++).append(". → ").append(track.getInfo().title).append(" - ").append(track.getInfo().author)
+                                    .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
+                                    .append("]\n");
+                    }
                 }
-            }
-            nextTenSongs.append("```");
+                nextTenSongs.append("```");
 
-            msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING, Pair.of("{songs}", nextTenSongs.toString())))
-                    .setEmbeds(eb.build())
-                    .queue()
-                    , new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
-            );
-        }
+                msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING, Pair.of("{songs}", nextTenSongs.toString())))
+                                .setEmbeds(eb.build())
+                                .queue()
+                        , new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
+                );
+            }
+        });
     }
 
     public void updateAll() {

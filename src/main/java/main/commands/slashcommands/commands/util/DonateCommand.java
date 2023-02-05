@@ -45,6 +45,7 @@ public class DonateCommand extends AbstractSlashCommand implements ICommand {
                 getBuilder()
                         .setName("donate")
                         .setDescription("Help keep Robertify online!")
+                        .allowGlobalUse()
                         .build()
         );
     }
