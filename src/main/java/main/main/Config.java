@@ -66,6 +66,18 @@ public class Config {
         return getBoolean(ENV.YOUTUBE_ENABLED);
     }
 
+    public static String getEnvironment() {
+        return get(ENV.ENVIRONMENT);
+    }
+
+    public static boolean isProdEnv() {
+        return getEnvironment().equalsIgnoreCase("prod");
+    }
+
+    public static boolean isDevEnv() {
+        return getEnvironment().equalsIgnoreCase("dev");
+    }
+
     public static int getInt(ENV key) {
         return Integer.parseInt(get(key));
     }

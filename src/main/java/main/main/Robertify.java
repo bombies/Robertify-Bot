@@ -198,7 +198,9 @@ public class Robertify {
             logger.info("All guilds have been loaded into cache");
 
             shardManager = jdaBuilder.build();
-//            AbstractSlashCommand.loadAllCommands();
+
+            if (Config.isProdEnv())
+                AbstractSlashCommand.loadAllCommands();
 
             spotifyApi = new SpotifyApi.Builder()
                     .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))
