@@ -62,6 +62,10 @@ public class Config {
         return getBoolean(ENV.PREMIUM_BOT);
     }
 
+    public static boolean loadCommands() {
+        return getBoolean(ENV.LOAD_COMMANDS);
+    }
+
     public static boolean isYoutubeEnabled() {
         return getBoolean(ENV.YOUTUBE_ENABLED);
     }

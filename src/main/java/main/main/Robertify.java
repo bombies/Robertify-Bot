@@ -199,7 +199,7 @@ public class Robertify {
 
             shardManager = jdaBuilder.build();
 
-            if (Config.isProdEnv())
+            if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
 
             spotifyApi = new SpotifyApi.Builder()
@@ -225,8 +225,6 @@ public class Robertify {
                 options.setDsn(Config.get(ENV.SENTRY_DSN));
                 options.setTracesSampleRate(1.0);
             });
-
-            loadNeededGlobalCommands();
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
