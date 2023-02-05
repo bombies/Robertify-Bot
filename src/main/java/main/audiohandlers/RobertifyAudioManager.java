@@ -2,6 +2,8 @@ package main.audiohandlers;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
@@ -66,8 +68,6 @@ public class RobertifyAudioManager {
         this.musicManagers = new HashMap<>();
         this.playerManager = new DefaultAudioPlayerManager();
 
-        YoutubeAudioSourceManager youtubeAudioSourceManager = new YoutubeAudioSourceManager();
-
         // TODO IPv6 rotation stuff
         // Snippet acquired from Mantaro Bot
 //        if (true) {
@@ -94,20 +94,13 @@ public class RobertifyAudioManager {
 //                    .setup();
 //        }
 
+        AudioSourceManagers.registerLocalSource(this.playerManager);
+        AudioSourceManagers.registerRemoteSources(this.playerManager);
         this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(playerManager));
         this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
         this.playerManager.registerSourceManager(new AutoPlaySourceManager(playerManager));
         this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
-        this.playerManager.registerSourceManager(youtubeAudioSourceManager);
-        this.playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        this.playerManager.registerSourceManager(new BeamAudioSourceManager());
-        this.playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        this.playerManager.registerSourceManager(new BandcampAudioSourceManager());
-        this.playerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        this.playerManager.registerSourceManager(new VimeoAudioSourceManager());
-        this.playerManager.registerSourceManager(new HttpAudioSourceManager());
-        this.playerManager.registerSourceManager(new LocalAudioSourceManager());
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -370,7 +363,6 @@ public class RobertifyAudioManager {
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            User user, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
-
         final AudioLoader loader = new AudioLoader(user, musicManager, tracksRequestedByUsers, trackUrl, announceMsg, botMsg, false, addToBeginning);
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }

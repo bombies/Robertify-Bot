@@ -1,5 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.sources.spotify.SpotifySourceManager;
@@ -12,6 +14,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -178,7 +181,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                     try {
                         Files.createDirectories(Paths.get(Config.get(ENV.AUDIO_DIR)));
                     } catch (Exception e) {
-                        event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.LOCAL_DIR_ERR).build())
+                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.LOCAL_DIR_ERR).build())
                                 .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
                                 .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                                 .queue();
@@ -192,31 +195,46 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                 final var memberVoiceState = member.getVoiceState();
 
                 try {
-                    if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()))) {
-                        final var trackFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
-                        audioFile.getProxy().downloadToFile(trackFile)
-                                .thenAccept(file -> channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
-                                        .queue(addingMsg -> {
+                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
+                            .queue(addingMsg -> {
+                                File file = new File(Path.of(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName()).toString());
+
+                                if (!file.exists()) {
+                                    audioFile.getProxy().downloadToFile(file)
+                                            .thenAccept(downloadedFile -> {
+                                                RobertifyAudioManager.getInstance()
+                                                        .loadAndPlayLocal(
+                                                                channel,
+                                                                downloadedFile.getAbsolutePath(),
+                                                                selfVoiceState,
+                                                                memberVoiceState,
+                                                                addingMsg,
+                                                                false
+                                                        );
+                                            })
+                                            .exceptionally(e -> {
+                                                logger.error("[FATAL ERROR] Error when attempting to download track", e);
+                                                addingMsg.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
+                                                        .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
+                                                        .queue();
+                                                return null;
+                                            });
+                                } else {
                                     RobertifyAudioManager.getInstance()
-                                            .loadAndPlayLocal(channel, file.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
-                                }))
-                                .exceptionally(e -> {
-                                    logger.error("[FATAL ERROR] Error when attempting to download track", e);
-                                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
-                                            .setActionRow(Button.of(ButtonStyle.LINK, "https://robertify.me/support", "Support Server"))
-                                            .setEphemeral(true)
-                                            .queue();
-                                    return null;
-                                });
-                    } else {
-                        File localAudioFile = new File(Config.get(ENV.AUDIO_DIR) + "/" + audioFile.getFileName());
-                        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
-                                .queue(addingMsg -> {
-                            RobertifyAudioManager.getInstance()
-                                    .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, addingMsg, false);
-                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> RobertifyAudioManager.getInstance()
-                                .loadAndPlayLocal(channel, localAudioFile.getPath(), selfVoiceState, memberVoiceState, null, false)));
-                    }
+                                            .loadAndPlayLocal(
+                                                    channel,
+                                                    file.getAbsolutePath(),
+                                                    selfVoiceState,
+                                                    memberVoiceState,
+                                                    addingMsg,
+                                                    false
+                                            );
+                                }
+                            }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+                                event.getHook().sendMessage(LocaleManager.getLocaleManager(event.getGuild()).getMessage(RobertifyLocaleMessage.GeneralMessages.NO_EMBED_PERMS))
+                                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                                        .queue();
+                            }));
                 } catch (IllegalArgumentException e) {
                     logger.error("[FATAL ERROR] Error when attempting to download track", e);
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PlayMessages.FILE_DOWNLOAD_ERR).build())
