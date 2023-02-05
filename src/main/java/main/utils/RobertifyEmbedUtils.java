@@ -25,6 +25,9 @@ public class RobertifyEmbedUtils {
     }
 
     public static EmbedBuilder getEmbedBuilder(Guild guild) {
+        if (guild == null)
+            return getDefaultEmbed();
+
         try {
             return guildEmbedSuppliers.get(guild.getIdLong()).get();
         } catch (NullPointerException e) {
@@ -34,7 +37,7 @@ public class RobertifyEmbedUtils {
     }
 
     public static EmbedBuilder embedMessage(@Nullable Guild guild, String message) {
-        final var builder = guild == null ? getDefaultEmbed() : getDefaultEmbed(guild.getIdLong());
+        final var builder = guild == null ? getDefaultEmbed() : getDefaultEmbed(guild);
         return builder.setDescription(message);
     }
 
@@ -42,7 +45,7 @@ public class RobertifyEmbedUtils {
         if (guild == null)
             return embedMessage(message);
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message));
+        return getDefaultEmbed(guild).setDescription(localeManager.getMessage(message));
     }
 
     public static EmbedBuilder embedMessage(LocaleMessage message) {
@@ -53,44 +56,44 @@ public class RobertifyEmbedUtils {
     @SafeVarargs
     public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setDescription(localeManager.getMessage(message, placeholders));
+        return getDefaultEmbed(guild).setDescription(localeManager.getMessage(message, placeholders));
     }
 
     public static EmbedBuilder embedMessageWithTitle(Guild guild, String title, String message) {
-        return getDefaultEmbed(guild.getIdLong()).setTitle(title).setDescription(message);
+        return getDefaultEmbed(guild).setTitle(title).setDescription(message);
     }
 
     public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, LocaleMessage message) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message));
+        return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message));
     }
 
     public static EmbedBuilder embedMessageWithTitle(Guild guild, String title, LocaleMessage message) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(title).setDescription(localeManager.getMessage(message));
+        return getDefaultEmbed(guild).setTitle(title).setDescription(localeManager.getMessage(message));
     }
 
     public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, String message) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title)).setDescription(message);
+        return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title)).setDescription(message);
     }
 
     @SafeVarargs
     public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, LocaleMessage message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message, placeholders));
+        return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title)).setDescription(localeManager.getMessage(message, placeholders));
     }
 
     @SafeVarargs
     public static EmbedBuilder embedMessageWithTitle(Guild guild, String title, LocaleMessage message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(title).setDescription(localeManager.getMessage(message, placeholders));
+        return getDefaultEmbed(guild).setTitle(title).setDescription(localeManager.getMessage(message, placeholders));
     }
 
     @SafeVarargs
     public static EmbedBuilder embedMessageWithTitle(Guild guild, LocaleMessage title, String message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        return getDefaultEmbed(guild.getIdLong()).setTitle(localeManager.getMessage(title, placeholders)).setDescription(message);
+        return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title, placeholders)).setDescription(message);
     }
 
     public static boolean getEphemeralState(GuildMessageChannel channel) {
@@ -107,12 +110,15 @@ public class RobertifyEmbedUtils {
         return dedicatedChannelConfig.getChannelID() == channel.getIdLong();
     }
 
-    private static EmbedBuilder getDefaultEmbed(long gid) {
+    private static EmbedBuilder getDefaultEmbed(@Nullable Guild guild) {
+        if (guild == null)
+            return getDefaultEmbed();
+
         try {
-            return guildEmbedSuppliers.get(gid).get();
+            return guildEmbedSuppliers.get(guild.getIdLong()).get();
         } catch (NullPointerException e) {
-            GeneralUtils.setDefaultEmbed(Robertify.getShardManager().getGuildById(gid));
-            return guildEmbedSuppliers.get(gid).get();
+            GeneralUtils.setDefaultEmbed(Robertify.getShardManager().getGuildById(guild.getIdLong()));
+            return guildEmbedSuppliers.get(guild.getIdLong()).get();
         }
     }
 
