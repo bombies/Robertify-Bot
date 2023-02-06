@@ -1,7 +1,7 @@
 package main.audiohandlers.sources.deezer;
 
 import api.deezer.DeezerApi;
-import api.deezer.http.impl.PaginationRequest;
+import api.deezer.http.PagingRequest;
 import api.deezer.objects.Album;
 import api.deezer.objects.Playlist;
 import api.deezer.objects.Track;
@@ -118,7 +118,7 @@ public class DeezerSourceManager extends RobertifyAudioSourceManager {
         try {
             List<AudioTrack> finalPlaylist = new ArrayList<>();
             Playlist retrievedPlaylist = api.playlist().getById(playlistID).execute();
-            PaginationRequest<TrackData> playlistTackRequest = api.playlist().getTracks(playlistID);
+            PagingRequest<TrackData> playlistTackRequest = api.playlist().getTracks(playlistID);
             int offset = 0;
             do {
                 List<Track> tracks = playlistTackRequest.index((offset == 0) ? 25 : offset).execute().getData();

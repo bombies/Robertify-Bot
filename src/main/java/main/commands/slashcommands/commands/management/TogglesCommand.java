@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
+import java.util.Arrays;
 import java.util.List;
 
 public class TogglesCommand extends AbstractSlashCommand implements ICommand {
@@ -464,10 +465,9 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
         final var config = new TogglesConfig(guild);
-        final var path = event.getFullCommandName().split("/");
+        final var path = event.getFullCommandName().split("\\s");
         final var localeManager = LocaleManager.getLocaleManager(guild);
         EmbedBuilder eb = null;
-
         switch (path[1]) {
             case "list" -> {
                 var toggleIDs = new StringBuilder();

@@ -174,16 +174,24 @@ public class Robertify {
 
             // Register all slash commands
             SlashCommandManager slashCommandManager = new SlashCommandManager();
-            for (var cmd : slashCommandManager.getGlobalCommands())
+            for (var cmd : slashCommandManager.getGlobalCommands()) {
                 jdaBuilder.addEventListeners(cmd);
-            for (var cmd : slashCommandManager.getGuildCommands())
+                logger.info("Registered the \"{}\" command.", cmd.getName());
+            }
+            for (var cmd : slashCommandManager.getGuildCommands()) {
                 jdaBuilder.addEventListeners(cmd);
-            for (var cmd : slashCommandManager.getDevCommands())
+                logger.debug("Registered the \"{}\" command.", cmd.getName());
+            }
+            for (var cmd : slashCommandManager.getDevCommands()) {
                 jdaBuilder.addEventListeners(cmd);
+                logger.debug("Registered the \"{}\" command.", cmd.getName());
+            }
 
             ContextCommandManager contextCommandManager = new ContextCommandManager();
-            for (var cmd : contextCommandManager.getCommands())
+            for (var cmd : contextCommandManager.getCommands()) {
                 jdaBuilder.addEventListeners(cmd);
+                logger.debug("Registered the \"{}\" context command.", cmd.getName());
+            }
 
             // Initialize the JSON directory
             // This is a deprecated feature and is marked for removal
