@@ -12,6 +12,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -97,16 +98,12 @@ public class LocaleManager {
 
         File localeFile = new File("./locale/messages." + locale.getCode().toLowerCase() + ".yml");
 
-        if (!localeFile.exists())
+        if (!localeFile.exists()) {
+            logger.warn("{} locale didn't exist. Creating it.", locale.getCode());
             createLocaleFile(locale);
+        }
 
-//        if (localeFile.length() == 0) {
-//            logger.error("There was no information found in the file for locale: " + locale.getCode().toUpperCase());
-//            System.exit(-1);
-//        }
-
-        Map<String, String> fileMap = new Yaml().load(GeneralUtils.getFileContent(localeFile.getPath()));
-        return checkLocaleFile(localeFile, fileMap);
+        return new Yaml().load(new FileInputStream(localeFile));
     }
 
     @SneakyThrows
@@ -136,7 +133,9 @@ public class LocaleManager {
         for (final var fieldSection : RobertifyLocaleMessage.getMessageTypes().values()) {
             for (final var field : fieldSection)
                 if (!fileMap.containsKey(field.name().toLowerCase())) {
-                    contentToAppend.append(field.name().toLowerCase()).append(": \"Fill me out!\"\n");
+                    contentToAppend.append("\n")
+                            .append(field.name().toLowerCase())
+                            .append(": \"Fill me out!\"\n");
                     fileMap.put(field.name().toLowerCase(), "Fill me out!");
                 }
         }

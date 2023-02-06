@@ -37,10 +37,9 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.reader.ReaderException;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Listener extends ListenerAdapter {
 
@@ -56,7 +55,12 @@ public class Listener extends ListenerAdapter {
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             final var locale = new LocaleConfig(g).getLocale();
             if (locale != null)
-                LocaleManager.getLocaleManager(g).setLocale(locale);
+                CompletableFuture.runAsync(() -> LocaleManager.getLocaleManager(g).setLocale(locale), Executors.newScheduledThreadPool(5))
+                        .exceptionally(e -> {
+                            if (e instanceof ReaderException)
+                                logger.error("Couldn't set the locale for {}", g.getName());
+                            return null;
+                        });
 
             loadNeededSlashCommands(g);
 

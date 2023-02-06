@@ -234,7 +234,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                             .map(AbstractSlashCommand::getCommandData)
                             .toList()
                     )
-                    .queue();
+                    .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_ACCESS, e -> {
+                        logger.error("I didn't have enough permission to unload guilds commands from {}", g.getName());
+                    }));
         }
     }
 

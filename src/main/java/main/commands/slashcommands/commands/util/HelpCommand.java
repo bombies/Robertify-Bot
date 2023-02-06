@@ -163,12 +163,6 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
         if (event.getOptions().isEmpty()) {
             final var localeManager = LocaleManager.getLocaleManager(guild);
 
-            GeneralUtils.setCustomEmbed(
-                    guild,
-                    localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_AUTHOR),
-                    localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_FOOTER)
-            );
-
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_EMBED_DESC)
                     .addField("💼 " + localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MANAGEMENT_OPTION_DESC), true)
                     .addField("🎶 "+ localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION), localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_MUSIC_OPTION_DESC), true)
@@ -185,8 +179,6 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
             event.replyEmbeds(searchCommand(manager, command, guild).build())
                     .setEphemeral(true).queue();
         }
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override @SneakyThrows
