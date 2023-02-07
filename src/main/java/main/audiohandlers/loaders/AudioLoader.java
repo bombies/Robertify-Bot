@@ -232,8 +232,8 @@ public class AudioLoader implements AudioLoadResultHandler {
 
     @Override
     public void loadFailed(FriendlyException e) {
-            if (musicManager.getPlayer().getPlayingTrack() == null)
-                musicManager.getGuild().getAudioManager().closeAudioConnection();
+        if (musicManager.getPlayer().getPlayingTrack() == null)
+            musicManager.getGuild().getAudioManager().closeAudioConnection();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
             logger.error("[FATAL ERROR] Could not load track!", e);

@@ -94,11 +94,12 @@ public class RobertifyAudioManager {
 //        }
 
         AudioSourceManagers.registerLocalSource(this.playerManager);
-        AudioSourceManagers.registerRemoteSources(this.playerManager);
         this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
         this.playerManager.registerSourceManager(new DeezerAudioSourceManager(Config.get(ENV.DEEZER_ACCESS_TOKEN)));
         this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
+        AudioSourceManagers.registerRemoteSources(this.playerManager);
+
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -260,7 +261,6 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandInteractionEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
-        logger.info(trackUrl);
 
         try {
             final var voiceChannel = memberVoiceState.getChannel();
