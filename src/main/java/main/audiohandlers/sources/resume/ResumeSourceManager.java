@@ -43,7 +43,8 @@ public class ResumeSourceManager extends RobertifyAudioSourceManager {
                 ResumeData resumeData = new ResumeData();
 
                 final AudioTrack playingTrack = resumeData.assembleTrack(object.getJSONObject(ResumeData.Fields.PLAYING_TRACK.toString()), true);
-                final List<AudioTrack> queue = new ArrayList<>(resumeData.assembleSpotifyTracks(object.getJSONArray(ResumeData.Fields.QUEUE.toString())));
+                // TODO Re-implement
+                final List<AudioTrack> queue = new ArrayList<>();
 
                 for (var obj : object.getJSONArray(ResumeData.Fields.QUEUE.toString())) {
                     final JSONObject trackObj = (JSONObject) obj;

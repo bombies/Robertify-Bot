@@ -36,6 +36,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -384,7 +386,7 @@ public class RobertifyAudioManager {
 
     public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
-        musicManager.getPlayerManager().loadItemOrdered(musicManager, SpotifySourceManager.RECOMMENDATIONS_PREFIX + query.getInfo().title + " " + query.getInfo().author, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, SpotifySourceManager.RECOMMENDATIONS_PREFIX + URLEncoder.encode(query.getInfo().title + " " + query.getInfo().author, StandardCharsets.UTF_8), loader);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,
