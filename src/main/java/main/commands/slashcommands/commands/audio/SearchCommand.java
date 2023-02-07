@@ -1,8 +1,8 @@
 package main.commands.slashcommands.commands.audio;
 
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;

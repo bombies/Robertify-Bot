@@ -1,8 +1,8 @@
 package main.commands.slashcommands.commands.management.dedicatedchannel;
 
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import lavalink.client.io.filters.*;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.audio.*;
 import main.commands.slashcommands.commands.audio.*;
 import main.constants.ENV;

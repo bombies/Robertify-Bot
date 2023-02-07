@@ -1,9 +1,6 @@
 package main.commands.slashcommands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -16,8 +13,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
 

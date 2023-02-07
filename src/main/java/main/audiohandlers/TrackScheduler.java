@@ -8,14 +8,12 @@ import lavalink.client.player.event.PlayerEventListenerAdapter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.commands.slashcommands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
-import main.utils.database.postgresql.tracks.TrackDB;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.json.autoplay.AutoPlayUtils;
@@ -39,12 +37,13 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.sql.Time;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
@@ -221,18 +220,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             else {
                 if (lastTrack != null) {
                     if (new AutoPlayConfig(guild).getStatus()) {
-                        switch (lastTrack.getSourceManager().getSourceName().toLowerCase()) {
-                            case "spotify", "autoplay" -> {
-                                logger.info("Now starting AutoPlay for {}", guild.getName());
-                                final var spotifyTrack = (SpotifyTrack) lastTrack;
-                                AutoPlayUtils.loadRecommendedTracks(
-                                        guild,
-                                        announcementChannel,
-                                        spotifyTrack
-                                );
-                            }
-                            default -> throw new AutoPlayException("This track can't be auto played!");
-                        }
+                        AutoPlayUtils.loadRecommendedTracks(
+                                guild,
+                                announcementChannel,
+                                lastTrack
+                        );
                     } else disconnectManager.scheduleDisconnect(true);
                 } else disconnectManager.scheduleDisconnect(true);
             }

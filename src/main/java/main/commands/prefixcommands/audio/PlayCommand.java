@@ -1,7 +1,7 @@
 package main.commands.prefixcommands.audio;
 
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.constants.ENV;

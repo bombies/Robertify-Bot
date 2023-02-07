@@ -1,38 +1,32 @@
 package main.audiohandlers;
 
+import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager;
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager;
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
-import main.audiohandlers.sources.applemusic.AppleMusicSourceManager;
-import main.audiohandlers.sources.autoplay.AutoPlaySourceManager;
-import main.audiohandlers.sources.deezer.DeezerSourceManager;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.CommandContext;
+import main.constants.ENV;
 import main.constants.Toggles;
+import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.resume.ResumeData;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -42,7 +36,10 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
@@ -96,10 +93,9 @@ public class RobertifyAudioManager {
 
         AudioSourceManagers.registerLocalSource(this.playerManager);
         AudioSourceManagers.registerRemoteSources(this.playerManager);
-        this.playerManager.registerSourceManager(new SpotifySourceManager(playerManager));
-        this.playerManager.registerSourceManager(new AppleMusicSourceManager(playerManager));
-        this.playerManager.registerSourceManager(new DeezerSourceManager(playerManager));
-        this.playerManager.registerSourceManager(new AutoPlaySourceManager(playerManager));
+        this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
+        this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
+        this.playerManager.registerSourceManager(new DeezerAudioSourceManager(Config.get(ENV.DEEZER_ACCESS_TOKEN)));
         this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
     }
 
@@ -262,6 +258,7 @@ public class RobertifyAudioManager {
                             GuildVoiceState memberVoiceState, Message botMsg,
                             SlashCommandInteractionEvent event, boolean addToBeginning) {
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
+        logger.info(trackUrl);
 
         try {
             final var voiceChannel = memberVoiceState.getChannel();
@@ -385,9 +382,9 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
     }
 
-    public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, String query) {
+    public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
-        musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, SpotifySourceManager.RECOMMENDATIONS_PREFIX + query.getInfo().title + " " + query.getInfo().author, loader);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,

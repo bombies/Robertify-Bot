@@ -1,5 +1,9 @@
 package main.utils.resume;
 
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager;
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioTrack;
+import com.github.topisenpai.lavasrc.spotify.SpotifyAudioTrack;
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -9,18 +13,11 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.deezer.DeezerSourceManager;
-import main.audiohandlers.sources.deezer.DeezerTrack;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
-import main.audiohandlers.sources.spotify.SpotifyTrack;
 import main.constants.BotConstants;
-import main.constants.JSONConfigFile;
+import main.constants.ENV;
+import main.main.Config;
 import main.main.Robertify;
-import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.database.mongodb.cache.redis.AbstractRedisCache;
 import main.utils.database.mongodb.cache.redis.RedisCache;
-import main.utils.json.AbstractJSON;
-import main.utils.json.AbstractJSONFile;
 import main.utils.json.GenericJSONField;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -110,8 +107,8 @@ public class ResumeData extends RedisCache {
     }
 
     @SneakyThrows
-    public List<AudioTrack> assembleSpotifyTracks(JSONArray trackArr) {
-        final List<AudioTrack> spotifyTracks = new ArrayList<>();
+    public List<AudioTrack> assembleSpotifyAudioTracks(JSONArray trackArr) {
+        final List<AudioTrack> SpotifyAudioTracks = new ArrayList<>();
         final List<StringBuilder>  ids = new ArrayList<>();
         final List<AudioTrackInfo> trackInfos = new ArrayList<>();
 
@@ -140,17 +137,16 @@ public class ResumeData extends RedisCache {
             for (int j = 0; j < tracks.length; j++) {
                 Image[] images = tracks[j].getAlbum().getImages();
                 final var artist = spotifyApi.getArtist(tracks[j].getArtists()[0].getId()).build().execute();
-                spotifyTracks.add(new SpotifyTrack(
+                SpotifyAudioTracks.add(new SpotifyAudioTrack(
                         trackInfos.get(j),
                         tracks[j].getExternalIds().getExternalIds().getOrDefault("isrc", null),
                         images.length > 0 ? images[0].getUrl() : BotConstants.DEFAULT_IMAGE.toString(),
-                        new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
-                        new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                        new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", RobertifyAudioManager.getInstance().getPlayerManager())
                 ));
             }
         }
 
-        return spotifyTracks;
+        return SpotifyAudioTracks;
     }
 
     @SneakyThrows
@@ -163,25 +159,24 @@ public class ResumeData extends RedisCache {
             case "spotify" -> {
                 if (assembleSpotify) {
                     final var spotifyApi = Robertify.getSpotifyApi();
-                    final var spotifyTrack = spotifyApi.getTrack(trackInfo.identifier).build().execute();
-                    final var artist = spotifyApi.getArtist(spotifyTrack.getArtists()[0].getId()).build().execute();
+                    final var SpotifyAudioTrack = spotifyApi.getTrack(trackInfo.identifier).build().execute();
+                    final var artist = spotifyApi.getArtist(SpotifyAudioTrack.getArtists()[0].getId()).build().execute();
 
-                    track = new SpotifyTrack(
+                    track = new SpotifyAudioTrack(
                             trackInfo,
-                            spotifyTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
-                            spotifyTrack.getAlbum().getImages()[0].getUrl(),
-                            new SpotifyTrack.SpotifyArtist(artist.getId(), Arrays.asList(artist.getGenres())),
-                            new SpotifySourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                            SpotifyAudioTrack.getExternalIds().getExternalIds().getOrDefault("isrc", null),
+                            SpotifyAudioTrack.getAlbum().getImages()[0].getUrl(),
+                            new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", RobertifyAudioManager.getInstance().getPlayerManager())
                     );
                 } else return null;
             }
             case "deezer" -> {
                 api.deezer.objects.Track deezerTrack = Robertify.getDeezerApi().track().getById(Integer.parseInt(trackInfo.identifier)).execute();
-                track = new DeezerTrack(
+                track = new DeezerAudioTrack(
                         trackInfo,
                         deezerTrack.getIsrc(),
                         (deezerTrack.getAlbum().getCoverXl() == null) ? "https://i.imgur.com/VNQvjve.png" : deezerTrack.getAlbum().getCoverXl(),
-                        new DeezerSourceManager(RobertifyAudioManager.getInstance().getPlayerManager())
+                        new DeezerAudioSourceManager(Config.get(ENV.DEEZER_ACCESS_TOKEN))
                 );
             }
             case "soundcloud" -> track = new SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault());
@@ -242,7 +237,7 @@ public class ResumeData extends RedisCache {
 
             this.queue = new ArrayList<>();
 
-            queue.addAll(resumeData.assembleSpotifyTracks(queueObj));
+            queue.addAll(resumeData.assembleSpotifyAudioTracks(queueObj));
 
             for (var obj : queueObj) {
                 final var trackObj = (JSONObject) obj;

@@ -14,6 +14,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Config {
@@ -82,6 +83,16 @@ public class Config {
         return getEnvironment().equalsIgnoreCase("dev");
     }
 
+    public static String[] getProviders() {
+        final var config = getConfigJSON();
+        final var providers = config.getJSONArray("providers");
+
+        return providers.toList()
+                .stream()
+                .map(Object::toString)
+                .toArray(String[]::new);
+    }
+
     public static int getInt(ENV key) {
         return Integer.parseInt(get(key));
     }
@@ -98,9 +109,7 @@ public class Config {
     public static List<LavaNode> getLavaNodes() {
         try {
             final List<LavaNode> ret = new ArrayList<>();
-            File file = new File("./json/config.json");
-
-            JSONObject jsonObject = new JSONObject(GeneralUtils.getFileContent(file.getPath()));
+            JSONObject jsonObject = getConfigJSON();
 
             for (final var obj : jsonObject.getJSONArray("nodes")) {
                 final var actualObj = (JSONObject) obj;
@@ -113,10 +122,18 @@ public class Config {
 
             return ret;
         } catch (NullPointerException e) {
-            Files.createFile(Path.of("./json/config.json"));
-            logger.warn("config.json didn't exist, so I created one.");
             return new ArrayList<>();
         }
+    }
+
+    @SneakyThrows
+    private static JSONObject getConfigJSON() {
+        File file = new File("./json/config.json");
+        if (!file.exists()) {
+            file.createNewFile();
+            logger.warn("config.json didn't exist, so I created one.");
+        }
+        return new JSONObject(GeneralUtils.getFileContent(file.getPath()));
     }
 
     private static class YamlConfig {

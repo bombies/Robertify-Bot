@@ -1,23 +1,21 @@
 package main.commands.slashcommands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.track.AudioReference;
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.sources.spotify.SpotifySourceManager;
 import main.commands.prefixcommands.audio.PlayCommand;
 import main.constants.ENV;
 import main.main.Config;
-import main.main.Listener;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
-import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -30,8 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -123,7 +119,9 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             return;
         }
 
-        switch (event.getSubcommandName()) {
+        final var commandPath = event.getFullCommandName().split("\\s");
+
+        switch (commandPath[1]) {
             case "tracks" -> {
                 String link = event.getOption("tracks").getAsString();
                 if (!GeneralUtils.isUrl(link))

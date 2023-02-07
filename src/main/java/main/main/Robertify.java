@@ -176,7 +176,7 @@ public class Robertify {
             SlashCommandManager slashCommandManager = new SlashCommandManager();
             for (var cmd : slashCommandManager.getGlobalCommands()) {
                 jdaBuilder.addEventListeners(cmd);
-                logger.info("Registered the \"{}\" command.", cmd.getName());
+                logger.debug("Registered the \"{}\" command.", cmd.getName());
             }
             for (var cmd : slashCommandManager.getGuildCommands()) {
                 jdaBuilder.addEventListeners(cmd);
