@@ -67,6 +67,14 @@ public class Config {
         return getBoolean(ENV.LOAD_COMMANDS);
     }
 
+    public static String getGatewayUrl() {
+        return get(ENV.GATEWAY_URL);
+    }
+
+    public static boolean hasGatewayUrl() {
+        return !getGatewayUrl().isEmpty() && !getGatewayUrl().isBlank();
+    }
+
     public static boolean isYoutubeEnabled() {
         return getBoolean(ENV.YOUTUBE_ENABLED);
     }

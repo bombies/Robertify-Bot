@@ -38,8 +38,11 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.SessionController;
+import net.dv8tion.jda.api.utils.SessionControllerAdapter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.discordbots.api.client.DiscordBotListAPI;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -89,17 +92,17 @@ public class Robertify {
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getPlayerPenalty);
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getCpuPenalty);
 
-            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
-            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
-                logger.info("Destroying all players (If any left)");
-                shardManager.getGuildCache().stream()
-                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
-                        .forEach(guild -> {
-                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                            musicManager.getScheduler().disconnect(false);
-                        });
-                shardManager.shutdown();
-            }));
+//            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
+//            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
+//                logger.info("Destroying all players (If any left)");
+//                shardManager.getGuildCache().stream()
+//                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
+//                        .forEach(guild -> {
+//                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+//                            musicManager.getScheduler().disconnect(false);
+//                        });
+//                shardManager.shutdown();
+//            }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
                             Config.getBotToken(),
@@ -148,6 +151,27 @@ public class Robertify {
                             CacheFlag.STICKER,
                             CacheFlag.SCHEDULED_EVENTS
                     )
+                    .setSessionController(new SessionControllerAdapter() {
+                        @NotNull
+                        @Override
+                        public String getGateway() {
+                            return Config.hasGatewayUrl() ? Config.getGatewayUrl() : super.getGateway();
+                        }
+
+                        @Override
+                        public void setGlobalRatelimit(long ratelimit) {
+                            if (Config.hasGatewayUrl())
+                                super.setGlobalRatelimit(0);
+                            else super.setGlobalRatelimit(ratelimit);
+                        }
+
+                        @Override
+                        public long getGlobalRatelimit() {
+                            if (Config.hasGatewayUrl())
+                                return 0L;
+                            return super.getGlobalRatelimit();
+                        }
+                    })
                     .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."));
 

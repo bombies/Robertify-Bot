@@ -2,6 +2,7 @@ package main.constants;
 
 public enum ENV {
     ENVIRONMENT("environment"),
+    GATEWAY_URL("gateway_url"),
     BOT_TOKEN("bot_token"),
     OWNER_ID("owner_id"),
     PREMIUM_BOT("premium_bot"),
