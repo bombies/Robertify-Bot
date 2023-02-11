@@ -5,12 +5,11 @@ import main.constants.ENV;
 import main.main.Config;
 import main.utils.apis.robertify.models.RobertifyGuild;
 import main.utils.apis.robertify.models.RobertifyPremium;
+import me.duncte123.botcommons.BotCommons;
 import me.duncte123.botcommons.web.ContentType;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.entities.User;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.http.HttpStatus;
 import org.json.JSONArray;
@@ -18,31 +17,59 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RobertifyAPI {
-    private final Logger logger = LoggerFactory.getLogger(RobertifyAPI.class);
+    private final static Logger logger = LoggerFactory.getLogger(RobertifyAPI.class);
 
     private final String masterPassword;
     private final URI uri;
     private final WebUtils webUtils;
-    private final String accessToken;
+    private final OkHttpClient httpClient;
+    private String accessToken;
+    private ScheduledExecutorService executorService;
 
     private final String AUTHORIZATION_HEADER = "Authorization";
+    private final long TOKEN_REFRESH_INTERVAL = 12L;
+    public final static RobertifyAPI ins = new RobertifyAPI();
 
     @SneakyThrows
-    public RobertifyAPI() {
+    private RobertifyAPI() {
+        final long DEFAULT_TIMEOUT = 5L;
+        this.httpClient = new OkHttpClient.Builder()
+                .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .build();
         this.webUtils = WebUtils.ins;
         this.masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
         this.uri = new URIBuilder(Config.get(ENV.ROBERTIFY_API_HOSTNAME)).build();
-        this.accessToken = getAccessToken();
+        this.executorService = Executors.newSingleThreadScheduledExecutor();
+
+        try {
+            this.accessToken = getAccessToken();
+            this.executorService.scheduleAtFixedRate(
+                    doTokenRefresh(),
+                    TOKEN_REFRESH_INTERVAL,
+                    TOKEN_REFRESH_INTERVAL,
+                    TimeUnit.HOURS
+            );
+        } catch (ConnectException e) {
+            logger.error("I couldn't connect to the API.");
+            this.accessToken = null;
+        }
     }
 
     @SneakyThrows
-    private String getAccessToken() {
-        Response response = webUtils.getClient()
+    private String getAccessToken() throws ConnectException {
+        Response response = httpClient
                 .newCall(webUtils.prepareGet(new URIBuilder(uri.toString())
                                 .appendPath("auth")
                                 .appendPath("login")
@@ -69,7 +96,7 @@ public class RobertifyAPI {
         if (accessToken == null)
             throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
 
-        try (Response guild = webUtils.getClient().newCall(
+        try (Response guild = httpClient.newCall(
                 webUtils.prepareGet(new URIBuilder(uri.toString()).appendPathSegments("guild", String.valueOf(gid)).toString())
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build()
@@ -98,7 +125,7 @@ public class RobertifyAPI {
     public Response postCommandInfo(JSONObject commandInfo) {
         if (accessToken == null)
             throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
-        return webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
+        return httpClient.newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("commands").toString())
                 .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .post(RequestBody.create(
                         ContentType.JSON.toMediaType(),
@@ -112,7 +139,7 @@ public class RobertifyAPI {
         if (accessToken == null)
             throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
 
-        Response premiumInfo = webUtils.getClient().newCall(
+        Response premiumInfo = httpClient.newCall(
                 webUtils.prepareGet(new URIBuilder(uri.toString()).appendPathSegments("premium", String.valueOf(userId)).toString())
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build()
@@ -158,7 +185,7 @@ public class RobertifyAPI {
         if (accessToken == null)
             throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
 
-        Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
+        Response response = httpClient.newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
                 .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .post(RequestBody.create(
                         ContentType.JSON.toMediaType(),
@@ -192,7 +219,7 @@ public class RobertifyAPI {
         if (accessToken == null)
             throw new AccessDeniedException("There was no access token set for the API wrapper! I am not able to make any requests.");
 
-        Response response = webUtils.getClient().newCall(
+        Response response = httpClient.newCall(
                 webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath(String.valueOf(userId)).toString())
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .delete()
@@ -216,7 +243,7 @@ public class RobertifyAPI {
         final var premiumInfo = getPremiumInfo(userId);
         if (premiumInfo == null)
             throw new IllegalArgumentException("There is no information for user with that ID!");
-        Response response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
+        Response response = httpClient.newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").toString())
                 .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                 .patch(RequestBody.create(
                         MediaType.get("application/json"),
@@ -252,7 +279,7 @@ public class RobertifyAPI {
 
     @SneakyThrows
     private List<String> getPremiumGuilds() {
-        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").toString())
+        final var response = httpClient.newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").toString())
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build())
                 .execute();
@@ -270,7 +297,7 @@ public class RobertifyAPI {
 
     @SneakyThrows
     public RobertifyPremium getGuildPremiumSetter(String gid) {
-        final var response = webUtils.getClient().newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").appendPath("user").appendPath(gid).toString())
+        final var response = httpClient.newCall(webUtils.prepareGet(new URIBuilder(uri.toString()).appendPath("premium").appendPath("guilds").appendPath("user").appendPath(gid).toString())
                         .addHeader(AUTHORIZATION_HEADER, getBearerToken())
                         .build())
                 .execute();
@@ -290,6 +317,17 @@ public class RobertifyAPI {
                 responseObj.getString("premium_started"),
                 responseObj.getString("premium_expires")
         );
+    }
+
+    private Runnable doTokenRefresh() {
+        return () -> {
+            try {
+                this.accessToken = getAccessToken();
+                logger.debug("Refreshed API token.");
+            } catch (ConnectException e) {
+                logger.error("I was unable to refresh the API token. I couldn't connect!");
+            }
+        };
     }
 
     private String getBearerToken() {

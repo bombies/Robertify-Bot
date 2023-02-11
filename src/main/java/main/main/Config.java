@@ -27,7 +27,7 @@ public class Config {
      * @return The string attached to the key
      */
     public static String get(ENV key) {
-        return dotenv.get(key.toString().toUpperCase());
+        return dotenv.get(key.toString().toUpperCase(), "");
     }
 
     /**
@@ -72,11 +72,16 @@ public class Config {
     }
 
     public static boolean hasGatewayUrl() {
-        return !getGatewayUrl().isEmpty() && !getGatewayUrl().isBlank();
+        return hasValue(ENV.GATEWAY_URL);
+    }
+
+    public static boolean hasValue(ENV value) {
+        final var valueString = get(value);
+        return !valueString.isEmpty() && !valueString.isBlank();
     }
 
     public static boolean isYoutubeEnabled() {
-        return getBoolean(ENV.YOUTUBE_ENABLED);
+        return hasValue(ENV.YOUTUBE_ENABLED) && getBoolean(ENV.YOUTUBE_ENABLED);
     }
 
     public static String getEnvironment() {

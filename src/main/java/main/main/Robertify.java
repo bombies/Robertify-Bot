@@ -248,15 +248,14 @@ public class Robertify {
             spotifyTokenRefreshScheduler = Executors.newScheduledThreadPool(1);
             spotifyTokenRefreshScheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
 
-            String masterPassword = Config.get(ENV.ROBERTIFY_API_PASSWORD);
-            if (masterPassword != null)
-                if (!masterPassword.isBlank() && !masterPassword.isEmpty())
-                    robertifyAPI = new RobertifyAPI();
+            if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
+                    robertifyAPI = RobertifyAPI.ins;
 
-            Sentry.init(options -> {
-                options.setDsn(Config.get(ENV.SENTRY_DSN));
-                options.setTracesSampleRate(1.0);
-            });
+            if (Config.hasValue(ENV.SENTRY_DSN))
+                Sentry.init(options -> {
+                    options.setDsn(Config.get(ENV.SENTRY_DSN));
+                    options.setTracesSampleRate(1.0);
+                });
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
