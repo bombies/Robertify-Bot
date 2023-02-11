@@ -115,7 +115,7 @@ public class Config {
     }
 
     public static boolean getBoolean(ENV key) {
-        return Boolean.parseBoolean(get(key));
+        return Config.hasValue(key) && Boolean.parseBoolean(get(key));
     }
 
     @SneakyThrows
