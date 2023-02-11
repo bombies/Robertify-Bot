@@ -92,17 +92,17 @@ public class Robertify {
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getPlayerPenalty);
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getCpuPenalty);
 
-//            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
-//            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
-//                logger.info("Destroying all players (If any left)");
-//                shardManager.getGuildCache().stream()
-//                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
-//                        .forEach(guild -> {
-//                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-//                            musicManager.getScheduler().disconnect(false);
-//                        });
-//                shardManager.shutdown();
-//            }));
+            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
+            Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
+                logger.info("Destroying all players (If any left)");
+                shardManager.getGuildCache().stream()
+                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
+                        .forEach(guild -> {
+                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+                            musicManager.getScheduler().disconnect(false);
+                        });
+                shardManager.shutdown();
+            }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
                             Config.getBotToken(),
