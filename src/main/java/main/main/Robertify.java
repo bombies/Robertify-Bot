@@ -157,7 +157,6 @@ public class Robertify {
                             return super.getGlobalRatelimit();
                         }
                     })
-                    .setGatewayEncoding(GatewayEncoding.ETF)
                     .setActivity(Activity.listening("Starting up..."));
 
             final var disabledIntents = Lists.newArrayList(
