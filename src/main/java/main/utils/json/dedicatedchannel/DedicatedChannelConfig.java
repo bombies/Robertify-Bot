@@ -1,5 +1,6 @@
 package main.utils.json.dedicatedchannel;
 
+import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import main.audiohandlers.RobertifyAudioManager;
@@ -16,7 +17,6 @@ import main.utils.json.AbstractGuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageHistory;
@@ -194,11 +194,9 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
                 eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
 
-                switch (playingTrack.getSourceManager().getSourceName()) {
-                    case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(trackInfo.identifier));
-                    case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier)));
-                    default -> eb.setImage(theme.getNowPlayingBanner());
-                }
+                if (playingTrack instanceof MirroringAudioTrack mirroringAudioTrack)
+                    eb.setImage(mirroringAudioTrack.getArtworkURL());
+                else eb.setImage(theme.getNowPlayingBanner());
 
                 eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
                         Pair.of("{numSongs}", String.valueOf(queueAsList.size())),

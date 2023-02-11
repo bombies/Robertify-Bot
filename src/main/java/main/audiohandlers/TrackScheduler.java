@@ -1,5 +1,6 @@
 package main.audiohandlers;
 
+import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lavalink.client.io.Link;
@@ -16,15 +17,12 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.autoplay.AutoPlayConfig;
-import main.utils.json.autoplay.AutoPlayUtils;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.resume.ResumeUtils;
-import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -60,6 +58,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public boolean playlistRepeating = false;
     private Message lastSentMsg = null;
     private final DisconnectManager.GuildDisconnectManager disconnectManager;
+    private final static RobertifyAudioManager audioManager = RobertifyAudioManager.getInstance();
 
     public TrackScheduler(Guild guild, Link audioPlayer) {
         this.guild = guild;
@@ -115,8 +114,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         if (repeating) return;
 
         final var selfChannel = guild.getSelfMember().getVoiceState().getChannel();
-        if (selfChannel != null)
-            ResumeUtils.getInstance().saveInfo(guild, selfChannel);
 
         if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
@@ -151,13 +148,9 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                     .setTitle(trackInfo.title)
                                     .setArtistName(trackInfo.author)
                                     .setAlbumImage(
-                                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                                    SpotifyUtils.getArtworkUrl(trackInfo.identifier)
-                                                    :
-                                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                                            DeezerUtils.getArtworkUrl(Integer.valueOf(trackInfo.identifier))
-                                                            :
-                                                            new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                                            track instanceof MirroringAudioTrack  mirroringAudioTrack ?
+                                                    mirroringAudioTrack.getArtworkURL() :
+                                                    new ThemesConfig(guild).getTheme().getNowPlayingBanner()
                                     )
                                     .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
                                     .build();
@@ -245,8 +238,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             else {
                 if (lastTrack != null) {
                     if (new AutoPlayConfig(guild).getStatus()) {
-                        AutoPlayUtils.loadRecommendedTracks(
-                                guild,
+                        audioManager.loadRecommendedTracks(
+                                audioManager.getMusicManager(guild),
                                 announcementChannel,
                                 lastTrack
                         );

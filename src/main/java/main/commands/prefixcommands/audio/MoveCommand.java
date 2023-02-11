@@ -11,7 +11,6 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -101,7 +100,6 @@ public class MoveCommand implements ICommand {
                 Pair.of("{author}", info.author),
                 Pair.of("{position}", String.valueOf(position))
         );
-        ResumeUtils.getInstance().saveInfo(guild, guild.getSelfMember().getVoiceState().getChannel());
         return RobertifyEmbedUtils.embedMessage(guild,
                 RobertifyLocaleMessage.MoveMessages.MOVED,
                 Pair.of("{title}", info.title),

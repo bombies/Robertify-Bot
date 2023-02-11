@@ -7,7 +7,6 @@ import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
-import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -56,7 +55,6 @@ public class DisconnectCommand implements ICommand {
 
         musicManager.leave();
         new LogUtils(guild).sendLog(LogType.BOT_DISCONNECTED, disconnecter.getAsMention() + " has disconnected the bot.");
-        ResumeUtils.getInstance().removeInfo(guild);
         return RobertifyEmbedUtils.embedMessage(guild, "Disconnected!");
     }
 

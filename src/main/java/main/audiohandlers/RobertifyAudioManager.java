@@ -12,17 +12,14 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
-import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
 import main.constants.Toggles;
 import main.main.Config;
-import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.resume.ResumeData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -97,7 +94,6 @@ public class RobertifyAudioManager {
         this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
         this.playerManager.registerSourceManager(new DeezerAudioSourceManager(Config.get(ENV.DEEZER_ACCESS_TOKEN)));
-        this.playerManager.registerSourceManager(new ResumeSourceManager(playerManager));
         AudioSourceManagers.registerRemoteSources(this.playerManager);
 
     }
@@ -109,23 +105,6 @@ public class RobertifyAudioManager {
     public void removeMusicManager(Guild guild) {
         this.musicManagers.get(guild.getIdLong()).destroy();
         this.musicManagers.remove(guild.getIdLong());
-    }
-
-    @SneakyThrows
-    public void loadAndPlay(long gid, long channelID, ResumeData.GuildResumeData track) {
-        final var guild = Robertify.getShardManager().getGuildById(gid);
-        final var musicManager = getMusicManager(guild);
-
-        try {
-            final var voiceChannel = guild.getVoiceChannelById(channelID);
-            if (voiceChannel != null)
-                if (voiceChannel.getMembers().size() != 0) {
-                    joinAudioChannel(null, voiceChannel, musicManager);
-                    loadTrack(track, musicManager);
-                }
-        } catch (Exception e) {
-            logger.info("An unexpected error occurred!", e);
-        }
     }
 
     @SneakyThrows
@@ -352,11 +331,6 @@ public class RobertifyAudioManager {
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
         }
-    }
-
-    private void loadTrack(ResumeData.GuildResumeData track, GuildMusicManager musicManager) {
-        final AudioLoader loader = new AudioLoader(musicManager.getGuild().getSelfMember().getUser(), musicManager, tracksRequestedByUsers, track.getGuildObject().toString(), false, null, false, false);
-        musicManager.getPlayerManager().loadItemOrdered(musicManager, ResumeSourceManager.SEARCH_PREFIX + track.getGuildObject().toString(), loader);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,

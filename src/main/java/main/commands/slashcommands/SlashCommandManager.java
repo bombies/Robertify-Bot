@@ -1,10 +1,10 @@
 package main.commands.slashcommands;
 
 import lombok.Getter;
-import main.commands.slashcommands.commands.dev.ManagePremiumCommand;
 import main.commands.slashcommands.commands.audio.*;
+import main.commands.slashcommands.commands.audio.filters.*;
+import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
-import main.commands.slashcommands.commands.dev.test.SpotifyRecommendationTest;
 import main.commands.slashcommands.commands.management.*;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
@@ -17,10 +17,7 @@ import main.commands.slashcommands.commands.misc.PingCommand;
 import main.commands.slashcommands.commands.misc.PlaytimeCommand;
 import main.commands.slashcommands.commands.misc.poll.PollCommand;
 import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
-import main.commands.slashcommands.commands.audio.filters.*;
-import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.util.*;
-import main.commands.slashcommands.commands.util.AlertCommand;
 import main.utils.component.interactions.AbstractSlashCommand;
 
 import java.util.ArrayList;
@@ -123,9 +120,7 @@ public class SlashCommandManager {
                 new ShardInfoCommand(),
                 new SendAlertCommand(),
                 new PostCommandInfoCommand(),
-                new RefreshSpotifyTokenCommand(),
                 new ManagePremiumCommand(),
-                new SpotifyRecommendationTest(),
                 new ResetPremiumFeaturesCommand(),
                 new ImageBuilderTest(),
                 new UnloadGuildCommandsCommand()

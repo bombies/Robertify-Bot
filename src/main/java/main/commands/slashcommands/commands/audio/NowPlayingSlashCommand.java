@@ -1,14 +1,13 @@
 package main.commands.slashcommands.commands.audio;
 
+import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import main.utils.pagination.Pages;
-import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -77,13 +76,9 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         .setTitle(info.title)
                         .setArtistName(info.author)
                         .setAlbumImage(
-                                track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                        SpotifyUtils.getArtworkUrl(info.identifier)
-                                        :
-                                        track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                                DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
-                                                :
-                                                new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                                track instanceof MirroringAudioTrack mirroringAudioTrack ?
+                                        mirroringAudioTrack.getArtworkURL() :
+                                        new ThemesConfig(guild).getTheme().getNowPlayingBanner()
                         )
                         .setDuration(info.length)
                         .setCurrentTime(audioPlayer.getTrackPosition())

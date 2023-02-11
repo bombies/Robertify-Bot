@@ -10,7 +10,6 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.resume.ResumeUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -65,7 +64,6 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         new LogUtils(guild).sendLog(LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 
         scheduler.scheduleDisconnect(true);
-        ResumeUtils.getInstance().removeInfo(guild);
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.StopMessages.STOPPED);
     }
 

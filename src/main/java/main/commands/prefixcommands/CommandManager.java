@@ -145,9 +145,6 @@ public class CommandManager {
                 new StatisticsCommand(),
 
                 //Test Commands
-                new SpotifyURLToURICommand(),
-                new PlaySpotifyURICommand(),
-//                new KotlinTestCommand(),
                 new MenuPaginationTestCommand()
         );
 

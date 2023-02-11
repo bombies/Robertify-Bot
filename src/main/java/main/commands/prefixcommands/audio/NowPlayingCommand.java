@@ -1,5 +1,6 @@
 package main.commands.prefixcommands.audio;
 
+import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lavalink.client.io.filters.Filters;
@@ -9,15 +10,16 @@ import main.commands.prefixcommands.ICommand;
 import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
@@ -92,10 +94,8 @@ public class NowPlayingCommand implements ICommand {
 
                 "\n🔇 " + GeneralUtils.progressBar(guild, channel, filters.getVolume(), GeneralUtils.ProgressBar.FILL) + " 🔊"));
 
-        switch (track.getSourceManager().getSourceName().toLowerCase()) {
-            case "spotify" -> eb.setImage(SpotifyUtils.getArtworkUrl(track.getInfo().identifier));
-            case "deezer" -> eb.setImage(DeezerUtils.getArtworkUrl(Integer.valueOf(track.getInfo().identifier)));
-        }
+        if (track instanceof MirroringAudioTrack mirroringAudioTrack)
+            eb.setImage(mirroringAudioTrack.getArtworkURL());
 
         eb.setAuthor(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_AUTHOR), GeneralUtils.isUrl(info.uri) ? info.uri : null, new ThemesConfig(guild).getTheme().getTransparent());
 

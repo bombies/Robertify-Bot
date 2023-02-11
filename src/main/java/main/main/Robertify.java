@@ -26,9 +26,7 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
-import main.utils.json.changelog.ChangeLogConfig;
 import main.utils.pagination.PaginationEvents;
-import main.utils.spotify.SpotifyAuthorizationUtils;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.GatewayEncoding;
@@ -38,7 +36,6 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.api.utils.SessionController;
 import net.dv8tion.jda.api.utils.SessionControllerAdapter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.discordbots.api.client.DiscordBotListAPI;
@@ -49,9 +46,6 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.util.Base64;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Robertify {
 
@@ -68,11 +62,7 @@ public class Robertify {
     @Getter
     private static DeezerApi deezerApi;
     @Getter
-    private static SpotifyApi spotifyApi;
-    @Getter
     private static RobertifyAPI robertifyAPI;
-    @Getter
-    private static ScheduledExecutorService spotifyTokenRefreshScheduler;
     @Getter
     private static final EventWaiter commandWaiter = new EventWaiter();
 
@@ -234,19 +224,10 @@ public class Robertify {
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
 
-            spotifyApi = new SpotifyApi.Builder()
-                    .setClientId(Config.get(ENV.SPOTIFY_CLIENT_ID))
-                    .setClientSecret(Config.get(ENV.SPOTIFY_CLIENT_SECRET))
-                    .setRedirectUri(SpotifyHttpManager.makeUri("http://localhost/callback/"))
-                    .build();
-
             deezerApi = new DeezerApi()
                     .setAccessToken(Config.get(ENV.DEEZER_ACCESS_TOKEN));
 
             initVoteSiteAPIs();
-
-            spotifyTokenRefreshScheduler = Executors.newScheduledThreadPool(1);
-            spotifyTokenRefreshScheduler.scheduleAtFixedRate(SpotifyAuthorizationUtils.doTokenRefresh(), 0, 1, TimeUnit.HOURS);
 
             if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
                     robertifyAPI = RobertifyAPI.ins;
