@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.audio;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
+import main.commands.prefixcommands.audio.NowPlayingCommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -88,9 +89,10 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         .setEphemeral(ephemeralState)
                         .queue(done -> image.delete());
             } catch (SocketTimeoutException e) {
-                Pages.paginateQueue(10, event);
+                event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState).build())
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
+                        .queue();
             }
-
         }
 
     }
