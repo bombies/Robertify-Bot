@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.dev.test;
 
+import lombok.SneakyThrows;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,7 +22,7 @@ public class ImageBuilderTest extends AbstractSlashCommand {
         return null;
     }
 
-    @Override
+    @Override @SneakyThrows
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 

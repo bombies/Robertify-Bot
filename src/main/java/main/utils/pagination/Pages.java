@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.io.File;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,25 +79,30 @@ public abstract class Pages {
     public static Message paginateQueueMessage(SlashCommandInteractionEvent event, List<QueuePage> queuePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
-        final var image = queuePages.get(0).getImage();
-        WebhookMessageCreateAction<Message> messageAction = event.getHook()
-                .sendFiles(FileUpload.fromData(image))
-                .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
-
-        if (queuePages.size() > 1) {
-            messageAction = messageAction.addComponents(
-                    Paginator.getQueueButtons(event.getUser(), false, false, true, true)
-            );
-        }
-
-        messageAction.queue(msg -> {
-            image.delete();
+        try {
+            final var image = queuePages.get(0).getImage();
+            WebhookMessageCreateAction<Message> messageAction = event.getHook()
+                    .sendFiles(FileUpload.fromData(image))
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
 
             if (queuePages.size() > 1) {
-                queueMessages.put(msg.getIdLong(), queuePages);
-                ret.set(msg);
+                messageAction = messageAction.addComponents(
+                        Paginator.getQueueButtons(event.getUser(), false, false, true, true)
+                );
             }
-        });
+
+            messageAction.queue(msg -> {
+                image.delete();
+
+                if (queuePages.size() > 1) {
+                    queueMessages.put(msg.getIdLong(), queuePages);
+                    ret.set(msg);
+                }
+            });
+        } catch (SocketTimeoutException e) {
+            // TODO
+        }
+
 
         return ret.get();
     }
@@ -173,7 +179,7 @@ public abstract class Pages {
             queueItems.add(new QueueItem(trackIndex, title, artist, duration));
         }
 
-        public File getImage() {
+        public File getImage() throws SocketTimeoutException {
             final var builder = new QueueImageBuilder()
                     .setPage(pageNumber);
 

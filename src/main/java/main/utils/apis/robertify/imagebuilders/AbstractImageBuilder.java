@@ -2,6 +2,7 @@ package main.utils.apis.robertify.imagebuilders;
 
 import lombok.SneakyThrows;
 import me.duncte123.botcommons.web.WebUtils;
+import okhttp3.OkHttpClient;
 import org.apache.hc.core5.net.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,21 +10,29 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractImageBuilder {
     final Logger logger = LoggerFactory.getLogger(AbstractImageBuilder.class);
 
     private final ImageType imageType;
     private final URIBuilder uri;
+    private final OkHttpClient httpClient;
     private final WebUtils webUtils;
 
     @SneakyThrows
     AbstractImageBuilder(ImageType imageType) {
         this.imageType = imageType;
+        this.httpClient = new OkHttpClient.Builder()
+                .connectTimeout(5L, TimeUnit.SECONDS)
+                .readTimeout(5L, TimeUnit.SECONDS)
+                .writeTimeout(5L, TimeUnit.SECONDS)
+                .build();
         this.webUtils = WebUtils.ins;
         this.uri = new URIBuilder("https://dev.robertify.me/api/images")
                 .appendPath(imageType.toString());
@@ -35,21 +44,26 @@ public abstract class AbstractImageBuilder {
     }
 
     @SneakyThrows
-    public File build() {
+    public File build() throws SocketTimeoutException {
         final var img_dir = Path.of("./built_images");
         if (!Files.exists(img_dir))
             Files.createDirectory(img_dir);
 
         final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.toString());
-        try(final var is = url.openStream();
+
+        try(final var is = httpClient.newCall(webUtils.prepareGet(url.toString()).build())
+                .execute()
+                .body()
+                .byteStream();
             final var os = new FileOutputStream(imageFile)){
             final var b = new byte[2048];
             int length;
-
             while ((length = is.read(b)) != -1)
                 os.write(b, 0, length);
             return imageFile;
+        } catch (SocketTimeoutException e) {
+            throw e;
         } catch (IOException e) {
             logger.error("Unexpected error", e);
         }

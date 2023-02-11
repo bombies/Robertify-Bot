@@ -7,12 +7,15 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.deezer.DeezerUtils;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.pagination.Pages;
 import main.utils.spotify.SpotifyUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.SocketTimeoutException;
 
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
@@ -69,25 +72,30 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                     .queue();
         } else {
             final var info = track.getInfo();
-            final var image = new NowPlayingImageBuilder()
-                    .setTitle(info.title)
-                    .setArtistName(info.author)
-                    .setAlbumImage(
-                            track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
-                                    SpotifyUtils.getArtworkUrl(info.identifier)
-                                    :
-                                    track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
-                                            DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
-                                            :
-                                            new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                    )
-                    .setDuration(info.length)
-                    .setCurrentTime(audioPlayer.getTrackPosition())
-                    .build();
-            event.getHook()
-                    .sendFiles(FileUpload.fromData(image))
-                    .setEphemeral(ephemeralState)
-                    .queue(done -> image.delete());
+            try {
+                final var image = new NowPlayingImageBuilder()
+                        .setTitle(info.title)
+                        .setArtistName(info.author)
+                        .setAlbumImage(
+                                track.getSourceManager().getSourceName().equalsIgnoreCase("spotify") ?
+                                        SpotifyUtils.getArtworkUrl(info.identifier)
+                                        :
+                                        track.getSourceManager().getSourceName().equalsIgnoreCase("deezer") ?
+                                                DeezerUtils.getArtworkUrl(Integer.valueOf(info.identifier))
+                                                :
+                                                new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                        )
+                        .setDuration(info.length)
+                        .setCurrentTime(audioPlayer.getTrackPosition())
+                        .build();
+                event.getHook()
+                        .sendFiles(FileUpload.fromData(image))
+                        .setEphemeral(ephemeralState)
+                        .queue(done -> image.delete());
+            } catch (SocketTimeoutException e) {
+                Pages.paginateQueue(10, event);
+            }
+
         }
 
     }
