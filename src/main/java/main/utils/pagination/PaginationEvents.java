@@ -78,6 +78,7 @@ public class PaginationEvents extends ListenerAdapter {
 
             long msg = event.getMessage().getIdLong();
             final var queuePages = Pages.getQueuePages(msg);
+            final var messagePages = Pages.getMessagePages(msg);
 
             if (queuePages == null) {
                 event.deferEdit().queue();
@@ -94,7 +95,11 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
                 } catch (SocketTimeoutException e) {
-                    // TODO
+                    event.editMessageEmbeds(messagePages.get(0).getEmbed())
+                            .setComponents(((currentPage.get(msg) == 0) ?
+                                    Paginator.getButtons(event.getUser(), false, false, true, true) :
+                                    Paginator.getButtons(event.getUser())))
+                            .queue();
                 }
 
             } else if (event.getButton().getId().equals("queue:" + MessageButton.PREVIOUS + event.getUser().getId())) {
@@ -107,7 +112,11 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
                 } catch (SocketTimeoutException e) {
-                    // TODO
+                    event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                            .setComponents(((currentPage.get(msg) == 0) ?
+                                    Paginator.getButtons(event.getUser(), false, false, true, true) :
+                                    Paginator.getButtons(event.getUser())))
+                            .queue();
                 }
 
             } else if (event.getButton().getId().equals("queue:" + MessageButton.NEXT + event.getUser().getId())) {
@@ -120,7 +129,11 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
                 } catch (SocketTimeoutException e) {
-                    // TODO
+                    event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                            .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
+                                    Paginator.getButtons(event.getUser(), true, true, false, false) :
+                                    Paginator.getButtons(event.getUser())))
+                            .queue();
                 }
 
             } else if (event.getButton().getId().equals("queue:" + MessageButton.END + event.getUser().getId())) {
@@ -133,7 +146,11 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
                 } catch (SocketTimeoutException e) {
-                    // TODO
+                    event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
+                            .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
+                                    Paginator.getButtons(event.getUser(), true, true, false, false) :
+                                    Paginator.getButtons(event.getUser())))
+                            .queue();
                 }
 
             } else {

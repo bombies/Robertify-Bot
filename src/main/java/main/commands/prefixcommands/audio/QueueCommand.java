@@ -46,15 +46,13 @@ public class QueueCommand implements ICommand {
     }
 
     private void sendQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {
-        final List<AudioTrack> trackList = new ArrayList<>(queue);
-
-        List<String> content = getContent(guild, queue, trackList);
-
+        List<String> content = getContent(guild, queue);
         Pages.paginateMessage(channel, user, content, 10);
     }
 
-    public List<String> getContent(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, List<AudioTrack> trackList) {
-        List<String> content = new ArrayList<>();
+    public List<String> getContent(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
+        final List<String> content = new ArrayList<>();
+        final var trackList = new ArrayList<>(queue);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         for (int i = 0; i < queue.size(); i++) {
             final AudioTrack track = trackList.get(i);

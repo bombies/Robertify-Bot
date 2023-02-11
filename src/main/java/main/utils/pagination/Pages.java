@@ -4,6 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
+import main.commands.prefixcommands.audio.QueueCommand;
 import main.constants.InteractionLimits;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.QueueImageBuilder;
@@ -78,6 +79,7 @@ public abstract class Pages {
 
     public static Message paginateQueueMessage(SlashCommandInteractionEvent event, List<QueuePage> queuePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
+        assert event.getGuild() != null;
 
         try {
             final var image = queuePages.get(0).getImage();
@@ -100,7 +102,13 @@ public abstract class Pages {
                 }
             });
         } catch (SocketTimeoutException e) {
-            // TODO
+            final var pages = new ArrayList<MessagePage>();
+            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
+            final var queue = musicManager.getScheduler().queue;
+            final var content = new QueueCommand().getContent(event.getGuild(), queue);
+
+            messageLogic(event.getGuild(), pages, content, 10);
+            paginateMessage(event, pages);
         }
 
 
