@@ -42,7 +42,7 @@ public class RobertifyAPI {
 
     @SneakyThrows
     private RobertifyAPI() {
-        final long DEFAULT_TIMEOUT = 5L;
+        final long DEFAULT_TIMEOUT = 5_000;
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
