@@ -1,6 +1,8 @@
 package main.utils.apis.robertify.imagebuilders;
 
 import lombok.SneakyThrows;
+import main.constants.ENV;
+import main.main.Config;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.OkHttpClient;
 import org.apache.http.client.utils.URIBuilder;
@@ -35,7 +37,7 @@ public abstract class AbstractImageBuilder {
                 .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .build();
         this.webUtils = WebUtils.ins;
-        this.uri = new URIBuilder("https://dev.robertify.me/")
+        this.uri = new URIBuilder(Config.get(ENV.ROBERTIFY_WEB_HOSTNAME))
                 .setPathSegments("api", "images", imageType.toString());
     }
 

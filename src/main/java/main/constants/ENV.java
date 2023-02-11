@@ -48,6 +48,7 @@ public enum ENV {
     PSID("youtube_psid"),
 
     ROBERTIFY_API_HOSTNAME("robertify_api_hostname"),
+    ROBERTIFY_WEB_HOSTNAME("robertify_web_hostname"),
     ROBERTIFY_API_PASSWORD("robertify_api_master_password"),
 
     SENTRY_DSN("sentry_dsn");
