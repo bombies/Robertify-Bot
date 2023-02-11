@@ -27,11 +27,13 @@ public abstract class AbstractImageBuilder {
 
     @SneakyThrows
     AbstractImageBuilder(ImageType imageType) {
+        final long DEFAULT_TIMEOUT = 5_000;
+
         this.imageType = imageType;
         this.httpClient = new OkHttpClient.Builder()
-                .connectTimeout(5L, TimeUnit.SECONDS)
-                .readTimeout(5L, TimeUnit.SECONDS)
-                .writeTimeout(5L, TimeUnit.SECONDS)
+                .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .build();
         this.webUtils = WebUtils.ins;
         this.uri = new URIBuilder("https://dev.robertify.me/api/images")
