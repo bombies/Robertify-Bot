@@ -1,6 +1,5 @@
 package main.main;
 
-import api.deezer.DeezerApi;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.sentry.Sentry;
@@ -42,8 +41,6 @@ import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.util.Base64;
 
@@ -59,8 +56,6 @@ public class Robertify {
     private static DiscordBotListAPI topGGAPI;
     @Getter
     private static DBLApi discordBotListAPI;
-    @Getter
-    private static DeezerApi deezerApi;
     @Getter
     private static RobertifyAPI robertifyAPI;
     @Getter
@@ -223,9 +218,6 @@ public class Robertify {
 
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
-
-            deezerApi = new DeezerApi()
-                    .setAccessToken(Config.get(ENV.DEEZER_ACCESS_TOKEN));
 
             initVoteSiteAPIs();
 

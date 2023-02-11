@@ -3,7 +3,7 @@ package main.utils.apis.robertify.imagebuilders;
 import lombok.SneakyThrows;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.OkHttpClient;
-import org.apache.hc.core5.net.URIBuilder;
+import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractImageBuilder {
     final Logger logger = LoggerFactory.getLogger(AbstractImageBuilder.class);
 
-    private final ImageType imageType;
     private final URIBuilder uri;
     private final OkHttpClient httpClient;
     private final WebUtils webUtils;
@@ -29,7 +29,6 @@ public abstract class AbstractImageBuilder {
     AbstractImageBuilder(ImageType imageType) {
         final long DEFAULT_TIMEOUT = 5_000;
 
-        this.imageType = imageType;
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -37,7 +36,7 @@ public abstract class AbstractImageBuilder {
                 .build();
         this.webUtils = WebUtils.ins;
         this.uri = new URIBuilder("https://dev.robertify.me/api/images")
-                .appendPath(imageType.toString());
+                .setPathSegments(imageType.toString());
     }
 
 
@@ -52,7 +51,7 @@ public abstract class AbstractImageBuilder {
             Files.createDirectory(img_dir);
 
         final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
-        final var url = new URL(uri.toString());
+        final var url = new URL(uri.build().toString());
 
         try(final var is = httpClient.newCall(webUtils.prepareGet(url.toString()).build())
                 .execute()

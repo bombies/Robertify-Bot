@@ -12,7 +12,6 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import main.utils.database.mongodb.databases.GuildDB;
-import main.utils.deezer.DeezerUtils;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;

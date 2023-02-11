@@ -15,7 +15,6 @@ import main.exceptions.AutoPlayException;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
-import main.utils.deezer.DeezerUtils;
 import main.utils.json.autoplay.AutoPlayConfig;
 import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
