@@ -1,17 +1,19 @@
 package main.utils.apis.robertify.imagebuilders;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum ImageType {
-    NOW_PLAYING("music/nowplaying"),
-    QUEUE("music/queue");
+    NOW_PLAYING("music", "nowplaying"),
+    QUEUE("music", "queue");
 
-    private final String str;
+    private final String[] segments;
 
-    ImageType(String str) {
-        this.str = str;
+    ImageType(String... segments) {
+        this.segments = segments;
     }
 
-    @Override
-    public String toString() {
-        return str;
+    public List<String> getSegments() {
+        return Arrays.stream(segments).toList();
     }
 }

@@ -17,6 +17,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -37,8 +39,11 @@ public abstract class AbstractImageBuilder {
                 .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
                 .build();
         this.webUtils = WebUtils.ins;
+
+        final var segments = new ArrayList<>(List.of("api", "images"));
+        segments.addAll(imageType.getSegments());
         this.uri = new URIBuilder(Config.get(ENV.ROBERTIFY_WEB_HOSTNAME))
-                .setPathSegments("api", "images", imageType.toString());
+                .setPathSegments(segments);
     }
 
 
