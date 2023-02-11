@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
@@ -88,7 +89,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         .sendFiles(FileUpload.fromData(image))
                         .setEphemeral(ephemeralState)
                         .queue(done -> image.delete());
-            } catch (SocketTimeoutException e) {
+            } catch (SocketTimeoutException | ConnectException e) {
                 event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();

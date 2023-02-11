@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 
 public class QueueImageBuilder extends AbstractImageBuilder {
@@ -53,7 +54,7 @@ public class QueueImageBuilder extends AbstractImageBuilder {
     }
 
     @Override
-    public File build() throws SocketTimeoutException {
+    public File build() throws SocketTimeoutException, ConnectException {
         if (!obj.has(QueryFields.PAGE.toString()))
             throw new IllegalArgumentException("The page must be provided before building the queue image!");
         if (!obj.has(QueryFields.TRACKS.toString()))

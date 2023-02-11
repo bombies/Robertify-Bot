@@ -34,6 +34,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
@@ -176,7 +177,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                                     ))
                                             )
                             );
-                        } catch (SocketTimeoutException e) {
+                        } catch (SocketTimeoutException | ConnectException e) {
                             logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
                             announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
                                 if (lastSentMsg != null)

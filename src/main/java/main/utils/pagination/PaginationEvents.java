@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.utils.AttachedFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
-                } catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(0).getEmbed())
                             .setComponents(((currentPage.get(msg) == 0) ?
                                     Paginator.getButtons(event.getUser(), false, false, true, true) :
@@ -111,7 +112,7 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
-                } catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == 0) ?
                                     Paginator.getButtons(event.getUser(), false, false, true, true) :
@@ -128,7 +129,7 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
-                } catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
                                     Paginator.getButtons(event.getUser(), true, true, false, false) :
@@ -145,7 +146,7 @@ public class PaginationEvents extends ListenerAdapter {
                                     Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
                                     Paginator.getQueueButtons(event.getUser())))
                             .queue(done -> image.delete());
-                } catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
                                     Paginator.getButtons(event.getUser(), true, true, false, false) :

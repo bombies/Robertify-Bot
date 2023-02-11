@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import java.io.File;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +102,7 @@ public abstract class Pages {
                     ret.set(msg);
                 }
             });
-        } catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException | ConnectException e) {
             final var pages = new ArrayList<MessagePage>();
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
             final var queue = musicManager.getScheduler().queue;
@@ -187,7 +188,7 @@ public abstract class Pages {
             queueItems.add(new QueueItem(trackIndex, title, artist, duration));
         }
 
-        public File getImage() throws SocketTimeoutException {
+        public File getImage() throws SocketTimeoutException, ConnectException {
             final var builder = new QueueImageBuilder()
                     .setPage(pageNumber);
 

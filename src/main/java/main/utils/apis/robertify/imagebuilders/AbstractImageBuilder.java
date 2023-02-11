@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -44,7 +45,7 @@ public abstract class AbstractImageBuilder {
     }
 
     @SneakyThrows
-    public File build() throws SocketTimeoutException {
+    public File build() throws SocketTimeoutException, ConnectException {
         final var img_dir = Path.of("./built_images");
         if (!Files.exists(img_dir))
             Files.createDirectory(img_dir);
@@ -62,7 +63,7 @@ public abstract class AbstractImageBuilder {
             while ((length = is.read(b)) != -1)
                 os.write(b, 0, length);
             return imageFile;
-        } catch (SocketTimeoutException e) {
+        } catch (SocketTimeoutException | ConnectException e) {
             throw e;
         } catch (IOException e) {
             logger.error("Unexpected error", e);
