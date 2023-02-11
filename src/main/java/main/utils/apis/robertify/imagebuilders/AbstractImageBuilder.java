@@ -27,7 +27,7 @@ public abstract class AbstractImageBuilder {
 
     @SneakyThrows
     AbstractImageBuilder(ImageType imageType) {
-        final long DEFAULT_TIMEOUT = 5_000;
+        final long DEFAULT_TIMEOUT = 5;
 
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
