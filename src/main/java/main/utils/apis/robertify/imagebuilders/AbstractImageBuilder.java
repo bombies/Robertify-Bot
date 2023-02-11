@@ -29,7 +29,7 @@ public abstract class AbstractImageBuilder {
 
     @SneakyThrows
     AbstractImageBuilder(ImageType imageType) {
-        final long DEFAULT_TIMEOUT = 5;
+        final long DEFAULT_TIMEOUT = 1;
 
         this.httpClient = new OkHttpClient.Builder()
                 .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -54,6 +54,7 @@ public abstract class AbstractImageBuilder {
 
         final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.build().toString());
+        logger.info(url.toString());
 
         try(final var is = httpClient.newCall(webUtils.prepareGet(url.toString()).build())
                 .execute()
