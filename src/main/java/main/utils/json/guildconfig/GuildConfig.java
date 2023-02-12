@@ -202,7 +202,8 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     public boolean isPremium() {
-        return Robertify.getRobertifyAPI().guildIsPremium(gid);
+        return true;
+//        return Robertify.getRobertifyAPI().guildIsPremium(gid);
     }
 
     @Override
