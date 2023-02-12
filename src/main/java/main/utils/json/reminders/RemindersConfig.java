@@ -20,6 +20,8 @@ public class RemindersConfig extends AbstractGuildConfig {
         super(guild);
         this.guild = guild;
         this.gid = guild.getIdLong();
+        if (!getGuildObject().has(Fields.REMINDERS.toString()))
+            update();
     }
 
     public void addUser(long uid) {
