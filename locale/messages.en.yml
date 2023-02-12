@@ -213,6 +213,7 @@ shuffled_log: "{user} has shuffled the queue"
 
 # SKIP MESSAGES
 vote_skip_started: "Started a vote skip!"
+vote_skip_cancelled: "The vote skip for {title} by {author} was cancelled."
 vote_skip_started_log: "{user} has started a vote skip."
 vote_skip_started_embed: "{user} has started a vote skip!\n\n**Votes: 1/{neededVotes}**"
 nothing_to_skip: "There is nothing to skip!"

@@ -59,7 +59,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                 return;
             }
 
-            if (selfVoiceState.getChannel().getMembers().size() != 2) {
+            if (selfVoiceState.getChannel().getMembers().size() > 2) {
                 MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {
                     event.getHook().sendMessageEmbeds(embed)

@@ -244,6 +244,7 @@ public enum RobertifyLocaleMessage {
 
     public enum SkipMessages implements LocaleMessage {
         VOTE_SKIP_STARTED,
+        VOTE_SKIP_CANCELLED,
         VOTE_SKIP_STARTED_LOG,
         VOTE_SKIP_STARTED_EMBED,
         NOTHING_TO_SKIP,

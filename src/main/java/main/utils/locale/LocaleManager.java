@@ -76,9 +76,8 @@ public class LocaleManager {
     public final String getMessage(LocaleMessage message, Pair<String, String>... placeholders) {
         String msg = localeFile.get(message.name().toLowerCase());
 
-        if (placeholders.length != 0)
-            for (final var placeholder : placeholders)
-                msg = msg.replaceAll(Pattern.quote(placeholder.getLeft()), Matcher.quoteReplacement(placeholder.getRight()));
+        for (final var placeholder : placeholders)
+            msg = msg.replaceAll(Pattern.quote(placeholder.getLeft()), Matcher.quoteReplacement(placeholder.getRight()));
         return msg;
     }
 

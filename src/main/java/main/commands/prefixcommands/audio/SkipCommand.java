@@ -37,7 +37,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
     private final static HashMap<Long, Integer> voteSkips = new HashMap<>();
     private final static HashMap<Long, ArrayList<Long>> voters = new HashMap<>();
     private final static HashMap<Long, Pair<Long, Long>> voteSkipMessages = new HashMap<>();
-    private final static HashMap<Long, String> voteSkipStarters = new HashMap<>();
+    private final static HashMap<Long, Long> voteSkipStarters = new HashMap<>();
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
@@ -115,7 +115,8 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                         Pair.of("{neededVotes}", String.valueOf(neededVotes))).build()
                 )
                 .setActionRow(
-                        Button.of(ButtonStyle.SUCCESS, "voteskip:upvote:" + guild.getId(), "Vote")
+                        Button.of(ButtonStyle.SUCCESS, "voteskip:upvote:" + guild.getId(), "Vote"),
+                        Button.of(ButtonStyle.DANGER, "voteskip:cancel:" + guild.getId(), "Cancel")
                 ).queue(success -> {
                     new LogUtils(guild).sendLog(LogType.TRACK_VOTE_SKIP, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
                     voteSkips.put(guild.getIdLong(), 1);
@@ -125,7 +126,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                     list.add(memberVoiceState.getIdLong());
                     voters.put(guild.getIdLong(), list);
 
-                    voteSkipStarters.put(guild.getIdLong(), memberVoiceState.getMember().getAsMention());
+                    voteSkipStarters.put(guild.getIdLong(), memberVoiceState.getMember().getIdLong());
                 });
         return null;
     }
@@ -208,7 +209,8 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
 
     private void doVoteSkip(Guild guild) {
         Pair<Long, Long> pair = voteSkipMessages.get(guild.getIdLong());
-        Message message = guild.getTextChannelById(pair.getLeft()).retrieveMessageById(pair.getRight()).complete();
+        Message message = guild.getTextChannelById(pair.getLeft())
+                .retrieveMessageById(pair.getRight()).complete();
 
         voteSkipMessages.remove(guild.getIdLong());
 
@@ -251,7 +253,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
 
         final int neededVotes = getNeededVotes(guild);
         message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_STARTED_EMBED,
-                    Pair.of("{user}", voteSkipStarters.get(guild.getIdLong())),
+                    Pair.of("{user}", GeneralUtils.toMention(guild, voteSkipStarters.get(guild.getIdLong()), GeneralUtils.Mentioner.USER)),
                     Pair.of("{neededVotes}", String.valueOf(neededVotes))
                 ).build()).queue();
     }
@@ -298,9 +300,9 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             return;
         }
 
+        User user = event.getUser();
         switch (voteType) {
             case "upvote" -> {
-                User user = event.getUser();
                 ArrayList<Long> list = voters.get(guild.getIdLong());
                 if (list.contains(user.getIdLong())) {
                     list.remove(user.getIdLong());
@@ -327,6 +329,37 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
                             .queue();
                     updateVoteSkipMessage(guild);
                 }
+            }
+            case "cancel" -> {
+                if (voteSkipStarters.get(guild.getIdLong()) != user.getIdLong()) {
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            RobertifyLocaleMessage.GeneralMessages.NO_PERMS_BUTTON
+                    ).build())
+                            .setEphemeral(true)
+                            .queue();
+                    return;
+                }
+
+                Pair<Long, Long> pair = voteSkipMessages.get(guild.getIdLong());
+                Message message = guild.getTextChannelById(pair.getLeft())
+                        .retrieveMessageById(pair.getRight()).complete();
+
+                AudioTrackInfo info = RobertifyAudioManager.getInstance()
+                        .getMusicManager(guild)
+                        .getPlayer()
+                        .getPlayingTrack()
+                        .getInfo();
+
+                voteSkipMessages.remove(guild.getIdLong());
+                clearVoteSkipInfo(guild);
+                message.editMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        RobertifyLocaleMessage.SkipMessages.VOTE_SKIP_CANCELLED,
+                        Pair.of("{title}", info.title),
+                        Pair.of("{author}", info.author)
+                        ).build()
+                ).queue();
             }
         }
     }
