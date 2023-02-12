@@ -622,6 +622,9 @@ public class GeneralUtils {
             case 9 -> {
                 return "9️⃣";
             }
+            case 10 -> {
+                return "🔟";
+            }
             default -> throw new IllegalArgumentException("Invalid argument \""+num+"\"");
         }
     }
