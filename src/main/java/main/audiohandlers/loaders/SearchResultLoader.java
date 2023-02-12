@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -68,7 +69,13 @@ public class SearchResultLoader implements AudioLoadResultHandler {
 
         for (int i = 0; i < Math.min(10, tracks.size()); i++) {
             AudioTrackInfo info = tracks.get(i).getInfo();
-            selectionMenuBuilder.addOption(info.title, info.identifier, null);
+            final var label = info.title + " by " + info.author;
+            final var SAFE_LABEL = label.substring(0, Math.min(label.length(), 100));
+            selectionMenuBuilder.addOption(
+                    SAFE_LABEL,
+                    "https://open.spotify.com/track/" + info.identifier,
+                    Emoji.fromUnicode(GeneralUtils.parseNumEmoji(i + 1))
+            );
             embedDescription.append("**").append(i+1).append(".** - ").append(info.title).append(" by ")
                     .append(info.author).append(" [").append(GeneralUtils.formatTime(info.length))
                     .append("]").append("\n");

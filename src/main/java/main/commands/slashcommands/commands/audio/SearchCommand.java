@@ -166,13 +166,13 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
             return;
         }
 
-        final var trackID = event.getSelectedOptions().get(0).getValue();
+        final var trackQuery = event.getSelectedOptions().get(0).getValue();
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE).build())
                 .setEphemeral(true)
                 .queue();
 
-        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), SpotifySourceManager.SEARCH_PREFIX + trackID,
+        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), trackQuery,
                 voiceState, memberVoiceState, event.getMessage(), false);
     }
 
