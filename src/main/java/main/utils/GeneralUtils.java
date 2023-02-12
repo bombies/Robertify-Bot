@@ -462,7 +462,6 @@ public class GeneralUtils {
         RobertifyEmbedUtils.setEmbedBuilder(
                 () -> new EmbedBuilder()
                         .setColor(theme.getColor())
-                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, theme.getTransparent())
         );
     }
 
@@ -473,7 +472,6 @@ public class GeneralUtils {
                 guild,
                 () -> new EmbedBuilder()
                         .setColor(theme.getColor())
-                        .setAuthor(BotConstants.ROBERTIFY_EMBED_TITLE.toString(), null, theme.getTransparent())
         );
     }
 
