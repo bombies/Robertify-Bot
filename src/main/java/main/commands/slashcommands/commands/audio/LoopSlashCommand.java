@@ -55,7 +55,7 @@ public class LoopSlashCommand extends AbstractSlashCommand {
             return;
         }
 
-        switch (event.getSubcommandName()) {
+        switch (event.getFullCommandName().split("\\s")[1]) {
             case "track" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleRepeat(musicManager, event.getUser()).build())
                     .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel())).queue();
             case "queue" -> event.getHook().sendMessageEmbeds(new LoopCommand().handleQueueRepeat(musicManager, event.getUser()).build())

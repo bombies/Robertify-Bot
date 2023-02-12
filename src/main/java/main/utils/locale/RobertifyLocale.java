@@ -2,6 +2,7 @@ package main.utils.locale;
 
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.List;
 
 public enum RobertifyLocale {
@@ -30,38 +31,30 @@ public enum RobertifyLocale {
     }
 
     public static List<RobertifyLocale> getAvailableLanguages() {
-        return List.of(
-                ENGLISH,
-                DUTCH,
-                SPANISH,
-                PORTUGUESE,
-                RUSSIAN,
-                GERMAN,
-                FRENCH
-        );
+        return Arrays.stream(RobertifyLocale.values()).toList();
     }
 
     public static RobertifyLocale parse(String locale) {
         switch (locale.toUpperCase()) {
-            case "ENGLISH" -> {
+            case "ENGLISH", "EN" -> {
                 return ENGLISH;
             }
-            case "SPANISH" -> {
+            case "SPANISH", "ES" -> {
                 return SPANISH;
             }
-            case "PORTUGUESE" -> {
+            case "PORTUGUESE", "PT" -> {
                 return PORTUGUESE;
             }
-            case "RUSSIAN" -> {
+            case "RUSSIAN", "RU" -> {
                 return RUSSIAN;
             }
-            case "DUTCH" -> {
+            case "DUTCH", "NL" -> {
                 return DUTCH;
             }
-            case "GERMAN" -> {
+            case "GERMAN", "DE" -> {
                 return GERMAN;
             }
-            case "FRENCH" -> {
+            case "FRENCH", "FR" -> {
                 return FRENCH;
             }
             default -> throw new IllegalArgumentException("There is no such locale with the name: " + locale);

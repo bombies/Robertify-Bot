@@ -236,14 +236,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             if (nextTrack != null)
                 getMusicPlayer().playTrack(nextTrack);
             else {
-                if (lastTrack != null) {
-                    if (new AutoPlayConfig(guild).getStatus()) {
-                        audioManager.loadRecommendedTracks(
-                                audioManager.getMusicManager(guild),
-                                announcementChannel,
-                                lastTrack
-                        );
-                    } else disconnectManager.scheduleDisconnect(true);
+                if (lastTrack != null && new AutoPlayConfig(guild).getStatus()) {
+                    audioManager.loadRecommendedTracks(
+                            audioManager.getMusicManager(guild),
+                            announcementChannel,
+                            lastTrack
+                    );
                 } else disconnectManager.scheduleDisconnect(true);
             }
         } catch (IllegalStateException e) {
@@ -268,7 +266,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 } catch (UnsupportedOperationException e) {
                     player.seekTo(0);
                 }
-            } else nextTrack(null);
+            } else {
+                repeating = false;
+                nextTrack(null);
+            }
         } else if (endReason.mayStartNext) {
             if (!pastQueue.containsKey(guild.getIdLong()))
                 pastQueue.put(guild.getIdLong(), new Stack<>());
@@ -330,7 +331,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
         ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);
-
         TrackScheduler.savedQueue.put(guild, savedQueue);
     }
 

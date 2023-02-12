@@ -32,26 +32,22 @@ public class GuildMusicManager {
     public void leave() {
         getScheduler().queue.clear();
 
-        if (getLink().getPlayer().getPlayingTrack() != null)
-            getLink().getPlayer().stopTrack();
-
         getScheduler().repeating = false;
         getScheduler().playlistRepeating = false;
         getScheduler().clearSavedQueue(guild);
-        getScheduler().getPastQueue().clear();
+        TrackScheduler.getPastQueue().clear();
         getPlayer().getFilters().clear().commit();
         RobertifyAudioManager.clearRequesters(guild);
 
-        if (getLink().getPlayer().isPaused())
-            getLink().getPlayer().setPaused(false);
+        if (getPlayer().isPaused())
+            getPlayer().setPaused(false);
 
         scheduler.stop();
         RobertifyAudioManager.getInstance().removeMusicManager(guild);
     }
 
     public void destroy() {
-        getLink().getPlayer().removeListener(scheduler);
-        getLink().resetPlayer();
+        getPlayer().removeListener(scheduler);
 
         if (!getLink().getState().equals(Link.State.DESTROYED))
                 getLink().destroy();

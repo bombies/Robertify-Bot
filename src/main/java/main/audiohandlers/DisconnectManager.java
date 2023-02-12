@@ -3,6 +3,7 @@ package main.audiohandlers;
 import lombok.val;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,10 @@ public class DisconnectManager {
         }
 
         public void scheduleDisconnect(boolean announceMsg, long time, TimeUnit timeUnit) {
+            final var botVoiceState = guild.getSelfMember().getVoiceState();
+            if (botVoiceState == null || !botVoiceState.inAudioChannel())
+                return;
+
             logger.debug("{} | Starting scheduled disconnect", guild.getName());
 
             if (new GuildConfig(guild).get247()) {
