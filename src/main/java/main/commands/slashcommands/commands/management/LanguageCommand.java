@@ -1,5 +1,7 @@
 package main.commands.slashcommands.commands.management;
 
+import main.constants.Permission;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
@@ -83,6 +85,18 @@ public class LanguageCommand extends AbstractSlashCommand {
 
         final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);
         final var guild = event.getGuild();
+        final var member = event.getMember();
+
+        if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                    guild,
+                    RobertifyLocaleMessage.GeneralMessages.NO_MENU_PERMS
+                            ).build()
+                    )
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
 
         event.deferReply().queue();
 
