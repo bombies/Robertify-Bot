@@ -130,9 +130,19 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!event.getComponentId().startsWith(menuName)) return;
-
         final Guild guild = event.getGuild();
         final var localeManager = LocaleManager.getLocaleManager(guild);
+
+        if (!GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_THEME)) {
+            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild,
+                            RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS,
+                            Pair.of("{permissions}", Permission.ROBERTIFY_THEME.name())
+                    ).build())
+                    .setEphemeral(true)
+                    .queue();
+            return;
+        }
+
         if (isPremiumCommand()) {
             if (!new VoteManager().userVoted(event.getUser().getId(), VoteManager.Website.TOP_GG)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild,

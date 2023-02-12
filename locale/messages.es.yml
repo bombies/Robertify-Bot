@@ -166,6 +166,7 @@ must_provide_valid_playlist: "¡Debe proporcionar el enlace de un álbum/lista d
 shuffled: "Barajó la cola!"
 shuffled_log: "{user} ha barajado la cola"
 vote_skip_started: "¡Comenzó un salto de voto!"
+vote_skip_cancelled: "El salto de votación para {title} de {author} fue cancelado."
 vote_skip_started_log: "{user} ha comenzado un omisión de voto."
 vote_skip_started_embed: "{user} ha comenzado un salto de voto!\n\n**Votos: 1/{neededVotes}**"
 nothing_to_skip: "¡No hay nada que saltar!"
