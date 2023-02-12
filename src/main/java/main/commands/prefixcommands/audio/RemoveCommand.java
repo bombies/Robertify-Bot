@@ -33,8 +33,6 @@ public class RemoveCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(),  "Queue");
-
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
@@ -58,7 +56,6 @@ public class RemoveCommand implements ICommand {
     }
 
     public EmbedBuilder handleRemove(Guild guild, User remover, ConcurrentLinkedQueue<AudioTrack> queue, int id) {
-        GeneralUtils.setCustomEmbed(guild, "Queue");
         final List<AudioTrack> trackList = new ArrayList<>(queue);
 
         if (queue.isEmpty()) {
