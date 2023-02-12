@@ -607,7 +607,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
                         try {
                             new PermissionsConfig(guild).addPermissionToUser(user.getIdLong(), Permission.valueOf(perm));
-                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PermissionsMessages.PERMISSION_ADDED,
                                     Pair.of("{mentionable}", user.getAsMention()),
                                     Pair.of("{permission}", perm.toUpperCase())
                             );
