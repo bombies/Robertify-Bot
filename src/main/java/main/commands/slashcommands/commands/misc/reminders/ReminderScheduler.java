@@ -23,10 +23,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ReminderScheduler {
     private final static Logger logger = LoggerFactory.getLogger(ReminderScheduler.class);
@@ -46,26 +43,28 @@ public class ReminderScheduler {
     }
 
     public void scheduleGuildReminders(Guild guild) {
-        RemindersConfig config = new RemindersConfig(guild);
+        CompletableFuture.runAsync(() -> {
+            RemindersConfig config = new RemindersConfig(guild);
 
-        if (!config.guildHasReminders())
-            return;
+            if (!config.guildHasReminders())
+                return;
 
-        List<ReminderUser> allGuildUsers = config.getAllGuildUsers();
+            List<ReminderUser> allGuildUsers = config.getAllGuildUsers();
 
-        for (var user : allGuildUsers) {
-            final var reminders = user.getReminders();
+            for (var user : allGuildUsers) {
+                final var reminders = user.getReminders();
 
-            for (var reminder : reminders)
-                scheduleReminder(
-                        user.getId(),
-                        user.getGuildID(),
-                        reminder.getChannelID(),
-                        reminder.getReminderTime(),
-                        reminder.getReminder(),
-                        reminder.getId()
-                );
-        }
+                for (var reminder : reminders)
+                    scheduleReminder(
+                            user.getId(),
+                            user.getGuildID(),
+                            reminder.getChannelID(),
+                            reminder.getReminderTime(),
+                            reminder.getReminder(),
+                            reminder.getId()
+                    );
+            }
+        });
     }
 
     public void scheduleReminder(long user, long guildID, long destination, long timeOfDay, String reminder, int reminderID) {
