@@ -74,12 +74,6 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
                 return;
             }
 
-            if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
-                msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SOURCE_NOT_SUPPORTED).build())
-                        .queue();
-                return;
-            }
-
             AudioTrackInfo trackInfo = playingTrack.getInfo();
             query = trackInfo.title + " by " + trackInfo.author;
         } else {
@@ -235,13 +229,6 @@ public class LyricsCommand extends AbstractSlashCommand implements ICommand {
 
             if (playingTrack == null) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING).build())
-                        .setEphemeral(true)
-                        .queue();
-                return;
-            }
-
-            if (!playingTrack.getSourceManager().getSourceName().equals("spotify") && !playingTrack.getSourceManager().getSourceName().equals("deezer")) {
-                event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LyricsMessages.LYRICS_SOURCE_NOT_SUPPORTED).build())
                         .setEphemeral(true)
                         .queue();
                 return;
