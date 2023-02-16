@@ -25,9 +25,7 @@ public class GuildCommand extends AbstractSlashCommand implements IDevCommand {
         guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");
         for (var guild : guilds) guildNames.add(guild.getName() + " (" + guild.getMembers().size() + " members in cache)");
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Guilds");
         Pages.paginateMessage(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @Override

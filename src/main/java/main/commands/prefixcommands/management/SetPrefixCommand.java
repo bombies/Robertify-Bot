@@ -21,8 +21,6 @@ public class SetPrefixCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Set Prefix");
-
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a prefix to set!");
             msg.replyEmbeds(eb.build()).queue();
@@ -40,8 +38,6 @@ public class SetPrefixCommand implements ICommand {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You have set the bot's prefix to `" + args.get(0) + "`");
             msg.replyEmbeds(eb.build()).queue();
         }
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override

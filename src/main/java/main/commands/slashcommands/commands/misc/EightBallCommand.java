@@ -36,8 +36,6 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         if (!new TogglesConfig(guild).getToggle(Toggles.EIGHT_BALL))
             return;
 
-        GeneralUtils.setCustomEmbed(guild, "");
-
         if (args.isEmpty()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(ctx.getGuild(), RobertifyLocaleMessage.EightBallMessages.MUST_PROVIDE_SOMETHING_TO_RESPOND_TO)
                     .build())
@@ -131,8 +129,6 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
                 ctx.getMessage().replyEmbeds(eb.build()).queue();
             }
         }
-
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     private EmbedBuilder handleAdd(Guild guild, Member user, String phraseToAdd) {
@@ -375,11 +371,9 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
         switch(event.getSubcommandName()) {
             case "ask" -> {
-                GeneralUtils.setCustomEmbed(event.getGuild(), "");
                 event.replyEmbeds(handle8Ball(guild, event.getUser(), event.getOption("question").getAsString()).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
-                GeneralUtils.setDefaultEmbed(event.getGuild());
             }
             case "add" -> {
                 final var response = event.getOption("response").getAsString();

@@ -60,8 +60,6 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         final TextChannel channel = ctx.getChannel();
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Polls");
-
         if (args.isEmpty()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!").build())
                     .queue();

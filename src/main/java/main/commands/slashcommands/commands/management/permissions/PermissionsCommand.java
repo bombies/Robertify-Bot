@@ -38,8 +38,6 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
         final Message msg = ctx.getMessage();
         final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(guild, "Permissions", new Color(109, 254, 99));
-
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide arguments!");
             msg.replyEmbeds(eb.build()).queue();
@@ -58,7 +56,6 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
                 msg.replyEmbeds(eb.build()).queue();
             }
         }
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     /**

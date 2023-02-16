@@ -33,8 +33,6 @@ public class MoveCommand implements ICommand {
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Queue");
-
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to move in the queue and the position to move it to.");
             msg.replyEmbeds(eb.build()).queue();
@@ -59,13 +57,9 @@ public class MoveCommand implements ICommand {
         final int position = Integer.parseInt(args.get(1));
 
         msg.replyEmbeds(handleMove(ctx.getGuild(), ctx.getAuthor(), queue, id, position).build()).queue();
-
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     public EmbedBuilder handleMove(Guild guild, User mover, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
-        GeneralUtils.setCustomEmbed(guild, "Queue");
-
         if (queue.isEmpty())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
 

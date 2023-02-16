@@ -44,8 +44,6 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN))
             return;
 
-        GeneralUtils.setCustomEmbed(guild, RobertifyLocaleMessage.TogglesMessages.TOGGLES_EMBED_TITLE);
-
         final var localeManager = LocaleManager.getLocaleManager(guild);
         var config = new TogglesConfig(guild);
         if (args.isEmpty()) {
@@ -226,8 +224,6 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
             }
             msg.replyEmbeds(eb.build()).queue();
         }
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {

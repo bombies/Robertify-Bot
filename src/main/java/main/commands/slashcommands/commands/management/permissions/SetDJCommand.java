@@ -33,8 +33,6 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(guild, "Set DJ");
-
         EmbedBuilder eb;
 
         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
@@ -72,8 +70,6 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
             msg.replyEmbeds(handleSetDJ(guild, role).build()).queue();
         else
             msg.replyEmbeds(handleSetDJ(guild, user).build()).queue();
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     private EmbedBuilder handleSetDJ(Guild guild, Role role) {
@@ -171,7 +167,6 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
-        GeneralUtils.setCustomEmbed(event.getGuild(), "Set DJ");
         switch  (event.getSubcommandName()) {
             case "role" -> {
                 var role = event.getOption("role").getAsRole();
@@ -186,6 +181,5 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
                         .queue();
             }
         }
-        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }

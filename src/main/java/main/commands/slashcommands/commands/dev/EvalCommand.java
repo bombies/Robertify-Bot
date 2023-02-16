@@ -56,7 +56,6 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
         final var guild = ctx.getGuild();
 
         EmbedBuilder eb;
-        GeneralUtils.setCustomEmbed(guild, new Color(0, 183, 255));
 
         if (args.isEmpty()) {
             eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide a snippet to evaluate!");
@@ -100,8 +99,6 @@ public class EvalCommand extends AbstractSlashCommand implements IDevCommand {
         }
 
         msg.replyEmbeds(eb.build()).queue();
-
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @Override

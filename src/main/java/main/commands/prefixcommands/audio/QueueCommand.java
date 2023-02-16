@@ -33,8 +33,6 @@ public class QueueCommand implements ICommand {
         final var queue = musicManager.getScheduler().queue;
         final Message msg = ctx.getMessage();
 
-        GeneralUtils.setCustomEmbed(ctx.getGuild(), "Queue");
-
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(ctx.getGuild(), "There is nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
@@ -42,7 +40,6 @@ public class QueueCommand implements ICommand {
         }
 
         sendQueue(ctx.getGuild(), queue, ctx.getChannel(), ctx.getAuthor());
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     private void sendQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {

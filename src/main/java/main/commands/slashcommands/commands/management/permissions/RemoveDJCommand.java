@@ -32,8 +32,6 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(guild, "Remove DJ");
-
         EmbedBuilder eb;
 
         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
@@ -71,8 +69,6 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
             msg.replyEmbeds(handleDJRemove(guild, role).build()).queue();
         else
             msg.replyEmbeds(handleDJRemove(guild, user).build()).queue();
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     private EmbedBuilder handleDJRemove(Guild guild, Role role) {
@@ -160,7 +156,6 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
 
-        GeneralUtils.setCustomEmbed(event.getGuild(), "Remove DJ");
         switch  (event.getSubcommandName()) {
             case "role" -> {
                 var role = event.getOption("role").getAsRole();
@@ -175,6 +170,5 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
                         .queue();
             }
         }
-        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }

@@ -33,7 +33,6 @@ public class HistoryCommand extends AbstractSlashCommand {
 
         final var guild = event.getGuild();
         final var pastTracks = TrackScheduler.getPastQueue().get(event.getGuild().getIdLong());
-        GeneralUtils.setCustomEmbed(guild, RobertifyLocaleMessage.HistoryMessages.HISTORY_EMBED_TITLE);
 
         if (pastTracks == null) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HistoryMessages.NO_PAST_TRACKS).build())
@@ -48,7 +47,5 @@ public class HistoryCommand extends AbstractSlashCommand {
             final var content = new QueueCommand().getContent(guild, pastTracks);
             Pages.paginateMessage(content, 10, event);
         }
-
-        GeneralUtils.setDefaultEmbed(guild);
     }
 }

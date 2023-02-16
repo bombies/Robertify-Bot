@@ -28,8 +28,6 @@ public class ClearQueueCommand implements ICommand {
         final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 
-        GeneralUtils.setCustomEmbed(guild, "Queue");
-
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is already nothing in the queue.");
             msg.replyEmbeds(eb.build()).queue();
@@ -58,7 +56,6 @@ public class ClearQueueCommand implements ICommand {
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();
-        GeneralUtils.setDefaultEmbed(guild);
     }
 
     @Override

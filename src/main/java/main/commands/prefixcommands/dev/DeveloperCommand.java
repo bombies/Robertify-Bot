@@ -24,8 +24,6 @@ public class DeveloperCommand implements IDevCommand {
         final var botUtils = BotBDCache.getInstance();
         final var guild = ctx.getGuild();
 
-        GeneralUtils.setCustomEmbed(guild, "Developer Tools", new Color(118, 0, 236));
-
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, """
                     You must provide arguments.
@@ -46,8 +44,6 @@ public class DeveloperCommand implements IDevCommand {
                 msg.replyEmbeds(eb.build()).queue();
             }
         }
-
-        GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
     @SneakyThrows

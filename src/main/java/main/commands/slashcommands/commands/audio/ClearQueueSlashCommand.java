@@ -45,8 +45,6 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         final var guild = event.getGuild();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        GeneralUtils.setCustomEmbed(event.getGuild(), "Queue");
-
         if (queue.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.CQ_NOTHING_IN_QUEUE));
             event.getHook().sendMessageEmbeds(eb.build())
@@ -82,6 +80,5 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         event.getHook().sendMessageEmbeds(eb.build())
                 .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                 .queue();
-        GeneralUtils.setDefaultEmbed(event.getGuild());
     }
 }
