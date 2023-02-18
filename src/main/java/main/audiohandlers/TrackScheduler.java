@@ -236,7 +236,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             if (nextTrack != null)
                 getMusicPlayer().playTrack(nextTrack);
             else {
-                if (lastTrack != null && new AutoPlayConfig(guild).getStatus()) {
+                if (lastTrack != null && new AutoPlayConfig(guild).getStatus() && lastTrack.getSourceManager().getSourceName().equalsIgnoreCase("spotify")) {
                     audioManager.loadRecommendedTracks(
                             audioManager.getMusicManager(guild),
                             announcementChannel,
