@@ -8,6 +8,7 @@ import main.commands.slashcommands.commands.dev.UnloadGuildCommandsCommand;
 import main.commands.slashcommands.commands.dev.UpdateCommand;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
 import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
+import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.commands.slashcommands.commands.util.VoteCommand;
 import main.commands.slashcommands.commands.util.WebsiteCommand;
 import main.utils.GeneralUtils;
@@ -65,17 +66,11 @@ public class Listener extends ListenerAdapter {
             loadNeededSlashCommands(g);
 
             rescheduleUnbans(g);
-            ReminderScheduler.getInstance().scheduleGuildReminders(g);
+            RemindersCommand.scheduleGuildReminders(g);
 
             if (dedicatedChannelConfig.isChannelSet()) {
                 dedicatedChannelConfig.updateMessage();
             }
-
-//            try {
-//                ResumeUtils.getInstance().loadInfo(g);
-//            } catch (Exception e) {
-//                logger.error("There was an error resuming tracks in {}", g.getName(), e);
-//            }
         }
 
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());

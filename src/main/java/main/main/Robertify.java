@@ -6,6 +6,7 @@ import io.sentry.Sentry;
 import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.contextcommands.ContextCommandManager;
@@ -39,6 +40,9 @@ import net.dv8tion.jda.api.utils.SessionControllerAdapter;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.discordbots.api.client.DiscordBotListAPI;
 import org.jetbrains.annotations.NotNull;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +51,7 @@ import java.util.Base64;
 public class Robertify {
 
     private static final Logger logger = LoggerFactory.getLogger(Robertify.class);
+
 
     @Getter
     public static ShardManager shardManager;
@@ -60,6 +65,16 @@ public class Robertify {
     private static RobertifyAPI robertifyAPI;
     @Getter
     private static final EventWaiter commandWaiter = new EventWaiter();
+    @Getter
+    private static Scheduler cronScheduler;
+
+    static {
+        try {
+            Robertify.cronScheduler = new StdSchedulerFactory().getScheduler();
+        } catch (SchedulerException e) {
+            logger.error("I was unable to initialize the CRON scheduler!");
+        }
+    }
 
     public static void main(String[] args) {
         WebUtils.setUserAgent("Mozilla/Robertify / bombies#4445");
@@ -86,6 +101,12 @@ public class Robertify {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
                             musicManager.getScheduler().disconnect(false);
                         });
+                logger.info("Killing cron scheduler");
+                try {
+                    getCronScheduler().clear();
+                } catch (SchedulerException e) {
+                    logger.error("I couldn't clear scheduling data!");
+                }
                 shardManager.shutdown();
             }));
 
@@ -217,6 +238,8 @@ public class Robertify {
 
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
+
+            Robertify.cronScheduler.start();
 
             initVoteSiteAPIs();
 

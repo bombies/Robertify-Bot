@@ -11,6 +11,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.reminders.Reminder;
+import main.utils.json.reminders.ReminderUser;
 import main.utils.json.reminders.RemindersConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -28,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -38,7 +40,6 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
         final var msg = ctx.getMessage();
-        final var user = ctx.getAuthor();
         final var args = ctx.getArgs();
         final String prefix = new GuildConfig(guild).getPrefix();
 
@@ -122,9 +123,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                         .build();
 
         long timeInMillis = 0;
+        int hour = 0, minute = 0;
 
         try {
             timeInMillis = timeToMillis(time);
+            hour = extractTime(time, TimeUnit.HOURS);
+            minute = extractTime(time, TimeUnit.MINUTES);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("minute")) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build();
@@ -142,12 +146,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 timeInMillis
         );
 
-        ReminderScheduler.getInstance()
+        new ReminderScheduler(guild)
                 .scheduleReminder(
                         user.getIdLong(),
-                        guild.getIdLong(),
                         channelID,
-                        timeInMillis,
+                        hour,
+                        minute,
                         reminder,
                         remindersConfig.getReminders(user.getIdLong()).size()-1
                 );
@@ -193,7 +197,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
         config.removeReminder(user.getIdLong(), id);
 
-        ReminderScheduler.getInstance()
+        new ReminderScheduler(guild)
                 .removeReminder(user.getIdLong(), id);
 
         return RobertifyEmbedUtils.embedMessageWithTitle(guild,
@@ -349,8 +353,15 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
             Reminder reminder = reminders.get(id);
 
-            ReminderScheduler.getInstance()
-                    .editReminder(guild.getIdLong(), channelID, reminder.getUserId(), reminder.getId(), reminder.getReminderTime(), reminder.getReminder());
+            new ReminderScheduler(guild)
+                    .editReminder(
+                            channelID,
+                            reminder.getUserId(),
+                            reminder.getId(),
+                            reminder.getHour(),
+                            reminder.getMinute(),
+                            reminder.getReminder()
+                    );
 
             if (channelID == -1L)
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_REMOVED, Pair.of("{id}", String.valueOf(id+1))).build();
@@ -369,9 +380,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
     private MessageEmbed handleTimeEdit(Guild guild, User user, int id, String timeUnparsed) {
         long timeInMillis = 0;
+        int hour = 0, minute = 0;
 
         try {
             timeInMillis = timeToMillis(timeUnparsed);
+            hour = extractTime(timeUnparsed, TimeUnit.HOURS);
+            minute = extractTime(timeUnparsed, TimeUnit.MINUTES);
         } catch (IllegalArgumentException e) {
             if (e.getMessage().contains("minute")) {
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build();
@@ -399,8 +413,15 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
             Reminder reminder = reminders.get(id);
 
-            ReminderScheduler.getInstance()
-                    .editReminder(guild.getIdLong(), reminder.getChannelID(), reminder.getUserId(), reminder.getId(), timeInMillis, reminder.getReminder());
+            new ReminderScheduler(guild)
+                    .editReminder(
+                            reminder.getChannelID(),
+                            reminder.getUserId(),
+                            reminder.getId(),
+                            hour,
+                            minute,
+                            reminder.getReminder()
+                    );
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_TIME_CHANGED,
                         Pair.of("{time}", timeUnparsed),
                         Pair.of("{id}", String.valueOf(id+1))
@@ -416,46 +437,60 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
     private long timeToMillis(String time) {
         long timeInMillis = 0;
+        final var timeSplit = splitTime(time);
 
+        timeInMillis += TimeUnit.MINUTES.toMillis(timeSplit.getRight());
+        timeInMillis += TimeUnit.HOURS.toMillis(timeSplit.getLeft());
+
+        return timeInMillis;
+    }
+
+    private int extractTime(String time, TimeUnit unit) {
+        final var timeSplit = splitTime(time);
+
+        switch (unit) {
+            case HOURS ->  {
+                return timeSplit.getLeft();
+            }
+            case MINUTES -> {
+                return timeSplit.getRight();
+            }
+            default -> throw new IllegalArgumentException("Invalid time to extract!");
+        }
+    }
+
+    private Pair<Integer, Integer> splitTime(String time) {
+        int hour, minute;
+        String meridiemIndicator = null;
         if (Pattern.matches("^\\d{1,2}:\\d{1,2}(AM|PM)$", time)) {
             String[] split = time.split(":");
-            final int hour = Integer.parseInt(split[0]);
+            hour = Integer.parseInt(split[0]);
 
             if (hour < 0 || hour > 12)
                 throw new IllegalArgumentException("Invalid hour");
 
-            final int minute = Integer.parseInt(GeneralUtils.getDigitsOnly(split[1]));
+            minute = Integer.parseInt(GeneralUtils.getDigitsOnly(split[1]));
 
             if (minute < 0 || minute > 59)
                 throw new IllegalArgumentException("Invalid minute");
 
-            final String meridiemIndicator = GeneralUtils.removeAllDigits(split[1]);
-
-            timeInMillis += TimeUnit.MINUTES.toMillis(minute);
-
-            switch (meridiemIndicator.toLowerCase()) {
-                case "am" -> timeInMillis += TimeUnit.HOURS.toMillis(hour);
-                case "pm" -> timeInMillis += TimeUnit.HOURS.toMillis(hour + 12L);
-            }
+            meridiemIndicator = GeneralUtils.removeAllDigits(split[1]);
+            if (meridiemIndicator.equalsIgnoreCase("pm"))
+                hour += 12;
         } else if (Pattern.matches("^\\d{1,2}:\\d{1,2}$", time)) {
             String[] split = time.split(":");
-            final int hour = Integer.parseInt(split[0]);
+            hour = Integer.parseInt(split[0]);
 
             if (hour < 0 || hour > 24)
                 throw new IllegalArgumentException("Invalid hour");
 
-            final int minute = Integer.parseInt(GeneralUtils.getDigitsOnly(split[1]));
+            minute = Integer.parseInt(GeneralUtils.getDigitsOnly(split[1]));
 
             if (minute < 0 || minute > 59)
                 throw new IllegalArgumentException("Invalid minute");
-
-
-            timeInMillis += TimeUnit.HOURS.toMillis(hour);
-            timeInMillis += TimeUnit.MINUTES.toMillis(minute);
         } else
             throw new IllegalArgumentException("Invalid time format!");
-
-        return timeInMillis;
+        return Pair.of(hour, minute);
     }
 
     private void banUser(Message msg, List<String> args) {
@@ -924,16 +959,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                     }
                 }
             }
-            case "clear" -> {
-                event.replyEmbeds(handleClear(guild, eventUser))
-                        .setEphemeral(true)
-                        .queue();
-            }
-            case "list" -> {
-                event.replyEmbeds(handleList(guild, eventUser))
-                        .setEphemeral(true)
-                        .queue();
-            }
+            case "clear" -> event.replyEmbeds(handleClear(guild, eventUser))
+                    .setEphemeral(true)
+                    .queue();
+            case "list" -> event.replyEmbeds(handleList(guild, eventUser))
+                    .setEphemeral(true)
+                    .queue();
             case "ban" -> {
                 if (!GeneralUtils.hasPerms(guild, member, Permission.ROBERTIFY_ADMIN)) {
                     event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
@@ -945,13 +976,6 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 switch (split[2]) {
                     case "channel" -> {
                         final var channel = options.get(0).getAsChannel().asGuildMessageChannel();
-
-                        if (channel == null) {
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())
-                                    .setEphemeral(true)
-                                    .queue();
-                            return;
-                        }
 
                         event.replyEmbeds(handleChannelBan(guild, channel.getIdLong()))
                                 .setEphemeral(true)
@@ -978,13 +1002,6 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                     case "channel" -> {
                         final var channel = options.get(0).getAsChannel().asGuildMessageChannel();
 
-                        if (channel == null) {
-                            event.replyEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, RobertifyLocaleMessage.GeneralMessages.MUST_PROVIDE_VALID_CHANNEL).build())
-                                    .setEphemeral(true)
-                                    .queue();
-                            return;
-                        }
-
                         event.replyEmbeds(handleChannelUnBan(guild, channel.getIdLong()))
                                 .setEphemeral(true)
                                 .queue();
@@ -999,5 +1016,74 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 }
             }
         }
+    }
+
+    public static void scheduleAllReminders() {
+        for (var guild : Robertify.shardManager.getGuilds())
+            scheduleGuildReminders(guild);
+    }
+
+    public static void unscheduleAllReminders() {
+        for (var guild : Robertify.shardManager.getGuilds())
+            unscheduleGuildReminders(guild);
+    }
+
+    public static void scheduleGuildReminders(Guild guild) {
+        CompletableFuture.runAsync(() -> {
+            logger.debug("Attempting to schedule guild reminders for {}", guild.getName());
+
+            final var config = new RemindersConfig(guild);
+            final var scheduler = new ReminderScheduler(guild);
+
+            if (!config.guildHasReminders()) {
+                logger.debug("{} didn't have any reminders to schedule.", guild.getName());
+                return;
+            }
+
+            List<ReminderUser> allGuildUsers = config.getAllGuildUsers();
+
+            for (var user : allGuildUsers) {
+                final var reminders = user.getReminders();
+
+                logger.debug("Attempting to schedule reminder(s) for {} in {}", user.getId(), guild.getName());
+                for (var reminder : reminders) {
+                    logger.debug(
+                            "Scheduling reminder with information:\nUser ID: {}\nChannel ID: {}\n Hour: {}\n Minute: {}\n Reminder: {}\nReminder ID: {}\n\n",
+                            user.getId(), reminder.getChannelID(), reminder.getHour(), reminder.getMinute(), reminder.getReminder(), reminder.getId()
+                    );
+                    scheduler.scheduleReminder(
+                            user.getId(),
+                            reminder.getChannelID(),
+                            reminder.getHour(),
+                            reminder.getMinute(),
+                            reminder.getReminder(),
+                            reminder.getId()
+                    );
+                }
+                logger.debug("Scheduled all {} reminder(s) for {} in {}.", reminders.size(), user.getId(), guild.getName());
+            }
+        });
+    }
+
+    public static void unscheduleGuildReminders(Guild guild) {
+        CompletableFuture.runAsync(() -> {
+            final var config = new RemindersConfig(guild);
+            final var scheduler = new ReminderScheduler(guild);
+
+            if (!config.guildHasReminders())
+                return;
+
+            List<ReminderUser> allGuildUsers = config.getAllGuildUsers();
+
+            for (var user : allGuildUsers) {
+                final var reminders = user.getReminders();
+
+                for (var reminder : reminders)
+                    scheduler.removeReminder(
+                            user.getId(),
+                            reminder.getId()
+                    );
+            }
+        });
     }
 }
