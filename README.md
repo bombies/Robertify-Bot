@@ -15,5 +15,5 @@ A Discord music bot with an easily understood interface and is easy to use!
 ## Help
 Confused about something? Try taking a look at the **help menu** that comes with tbe bot! You can see all help commands and even get help with a specific command. <br><br>
 Robertify has so many features that are waiting for you to use, so don't be afraid to explore and have fun!<br><br>
-![Main Help Menu](https://i.imgur.com/YBM415M.png) <br><br>
-![Specific Help Menu](https://i.imgur.com/H9AbvXi.png)
+![Main Help Menu](https://i.imgur.com/Jfj8Z3b.png) <br><br>
+![Specific Help Menu](https://i.imgur.com/wI1KU7Z.png)
