@@ -352,7 +352,15 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
                 if (announceMsg && announcementChannel != null)
                     announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TrackSchedulerMessages.INACTIVITY_LEAVE, Pair.of("{channel}", channel.getAsMention())).build())
-                            .queue(msg -> msg.delete().queueAfter(2, TimeUnit.MINUTES));
+                            .queue(msg -> msg.delete()
+                                    .queueAfter(
+                                            2,
+                                            TimeUnit.MINUTES,
+                                            null,
+                                            new ErrorHandler()
+                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                    )
+                            );
             }
         }
     }
