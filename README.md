@@ -7,7 +7,7 @@ A Discord music bot with an easily understood interface and is easy to use!
 ## What Can It Do?
 
 ## Interactive Request Channel
-![Request Channel](https://i.imgur.com/ZZT2qBx.png)
+![Request Channel](https://i.imgur.com/sSDPqig.png)
 
 ## And So Much More...
 ![Feature List](https://i.imgur.com/ZZT2qBx.png)
