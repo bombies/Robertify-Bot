@@ -13,6 +13,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.time.Instant;
 import java.util.List;
@@ -57,7 +58,7 @@ public class RandomMessageManager {
         BotBDCache.getInstance().clearMessages();
     }
 
-    public void randomlySendMessage(TextChannel channel) {
+    public void randomlySendMessage(GuildMessageChannel channel) {
         if (!new TogglesConfig(channel.getGuild()).getToggle(Toggles.TIPS))
             return;
 

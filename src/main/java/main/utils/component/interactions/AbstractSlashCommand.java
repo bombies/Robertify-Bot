@@ -410,8 +410,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected void sendRandomMessage(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
-        if (new SlashCommandManager().isMusicCommand(this) && event.getChannelType().isMessage())
-            new RandomMessageManager().randomlySendMessage(event.getChannel().asTextChannel());
+        if (new SlashCommandManager().isMusicCommand(this) && event.getChannel().getType().isMessage())
+            new RandomMessageManager().randomlySendMessage(event.getChannel().asGuildMessageChannel());
     }
 
     protected boolean checks(SlashCommandInteractionEvent event) {
