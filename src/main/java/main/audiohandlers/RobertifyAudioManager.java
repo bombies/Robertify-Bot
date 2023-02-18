@@ -389,7 +389,6 @@ public class RobertifyAudioManager {
             if (channel != null)
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, Pair.of("{channel}", vc.getAsMention())).build())
                         .queue();
-            throw e;
         }
     }
 
