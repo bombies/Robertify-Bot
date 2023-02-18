@@ -37,7 +37,7 @@ public class NowPlayingImageBuilder extends AbstractImageBuilder {
     public NowPlayingImageBuilder setUser(String userName, @Nullable String userAvatar) {
         addQuery(QueryFields.REQUESTER, new JSONObject()
                 .put(QueryFields.USER_NAME.toString(), userName)
-                .put(QueryFields.USER_IMAGE.toString(), userAvatar != null ? userAvatar : "")
+                .put(QueryFields.USER_IMAGE.toString(), userAvatar != null ? userAvatar : "https://i.imgur.com/t0Y0EbT.png")
                 .toString()
         );
         return this;

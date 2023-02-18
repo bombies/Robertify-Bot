@@ -59,6 +59,7 @@ public abstract class AbstractImageBuilder {
 
         final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.build().toString());
+        logger.debug("Built image URL:\n{}", url.toString());
 
         try(final var is = httpClient.newCall(webUtils.prepareGet(url.toString()).build())
                 .execute()
