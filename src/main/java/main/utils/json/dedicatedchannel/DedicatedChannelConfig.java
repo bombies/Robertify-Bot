@@ -4,6 +4,7 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.TrackScheduler;
 import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.constants.RobertifyEmoji;
 import main.main.Robertify;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class DedicatedChannelConfig extends AbstractGuildConfig {
     private final static Logger logger = LoggerFactory.getLogger(DedicatedChannelConfig.class);
@@ -174,7 +176,28 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 eb.setImage(theme.getIdleBanner());
 
                 msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                                .setEmbeds(eb.build()).queue(),
+                                .setEmbeds(eb.build())
+                                .queue(
+                                        null,
+                                        new ErrorHandler()
+                                                .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+                                                    final var scheduler = musicManager.getScheduler();
+                                                    final var announcementChannel = scheduler.getAnnouncementChannel();
+
+                                                    if (announcementChannel != null)
+                                                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                                                                guild,
+                                                                RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
+                                                        ).build())
+                                                                .queue(errMsg -> errMsg.delete().queueAfter(
+                                                                        10,
+                                                                        TimeUnit.SECONDS,
+                                                                        null,
+                                                                        new ErrorHandler()
+                                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                                                ));
+                                                })
+                                ),
                         new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
                 );
             } else {

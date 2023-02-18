@@ -355,6 +355,8 @@ dedicated_channel_disconnect: "Disconnect"
 dedicated_channel_filters: "Filters"
 dedicated_channel_button_toggle: "You have toggled visibility for the **{button}** button **{status}**!"
 dedicated_channel_no_content_intent: "Hey, playing tracks by just typing their names in is no longer supported (for now).\nPlease resort to using the `play` command to play your music while we work hard to restore this feature to you!"
+dedicated_channel_self_insufficient_perms_edit: "I do not have enough permissions to edit the request channel message!\nPlease give my role the following permissions to execute this in the request channel:\n`View Channel, Manage Channel, Send Messages, Read Message History`\n\n*For the recommended permissions please invite the bot using this link: https://bit.ly/3DfaNNl*"
+
 
 # PERMISSIONS MESSAGES
 permissions_none: "There are no permissions yet!"
