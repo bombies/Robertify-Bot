@@ -182,7 +182,7 @@ public class Robertify {
 
             final var disabledIntents = Lists.newArrayList(
                     GatewayIntent.DIRECT_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_BANS,
+                    GatewayIntent.GUILD_MODERATION,
                     GatewayIntent.GUILD_INVITES,
                     GatewayIntent.GUILD_MEMBERS,
                     GatewayIntent.GUILD_MESSAGE_TYPING,

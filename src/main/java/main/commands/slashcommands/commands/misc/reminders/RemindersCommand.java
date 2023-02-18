@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.script.ScriptException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -251,12 +253,17 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
 
         final var sb = new StringBuilder();
 
+
         for (int i = 0; i < reminders.size(); i++) {
             Reminder reminder = reminders.get(i);
             sb.append("**").append(i + 1).append(".** - ")
-                    .append(reminder.getReminder()).append(" `@ ")
-                    .append(GeneralUtils.formatTime(reminder.getReminderTime(), "HH:mm"))
-                    .append(" EDT`")
+                    .append(reminder.getReminder())
+                    .append(" <t:")
+                    .append(getNextUNIXTimestamp(reminder))
+                    .append(":t>")
+                    .append(" (<t:")
+                    .append(getNextUNIXTimestamp(reminder))
+                    .append(":R>)")
                     .append("\n");
         }
 
@@ -264,6 +271,12 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE,
                 sb.toString()
         ).build();
+    }
+
+    private long getNextUNIXTimestamp(Reminder reminder) {
+        long todaysTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + TimeUnit.MILLISECONDS.toSeconds(reminder.getReminderTime());
+        long tomorrowsTime = todaysTime + 86400L;
+        return todaysTime < TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) ? tomorrowsTime : todaysTime;
     }
 
     private void edit(Message msg, List<String> args) {
