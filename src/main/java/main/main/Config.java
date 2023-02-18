@@ -89,11 +89,20 @@ public class Config {
     }
 
     public static String getSentryEnvironment() {
-        return get(ENV.ENVIRONMENT).equalsIgnoreCase("prod") ? "production" : "development";
+        switch (getEnvironment().toLowerCase()) {
+            case "dev", "development" -> { return "development"; }
+            case "prod", "production" -> { return "production"; }
+            case "staging" -> { return "staging"; }
+            default -> throw new IllegalArgumentException("\"" + getEnvironment() + "\" isn't a valid environment!");
+        }
     }
 
     public static boolean isProdEnv() {
         return getEnvironment().equalsIgnoreCase("prod");
+    }
+
+    public static boolean isStagingEnv() {
+        return getEnvironment().equalsIgnoreCase("staging");
     }
 
     public static boolean isDevEnv() {
