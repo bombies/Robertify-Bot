@@ -88,6 +88,10 @@ public class Config {
         return get(ENV.ENVIRONMENT);
     }
 
+    public static String getSentryEnvironment() {
+        return get(ENV.ENVIRONMENT).equalsIgnoreCase("prod") ? "production" : "development";
+    }
+
     public static boolean isProdEnv() {
         return getEnvironment().equalsIgnoreCase("prod");
     }

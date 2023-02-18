@@ -2,11 +2,12 @@ package main.main;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.sentry.Instrumenter;
 import io.sentry.Sentry;
+import io.sentry.opentelemetry.OpenTelemetryLinkErrorEventProcessor;
 import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
-import lombok.SneakyThrows;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.contextcommands.ContextCommandManager;
@@ -29,7 +30,6 @@ import main.utils.json.AbstractJSONFile;
 import main.utils.pagination.PaginationEvents;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
-import net.dv8tion.jda.api.GatewayEncoding;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
@@ -249,7 +249,10 @@ public class Robertify {
             if (Config.hasValue(ENV.SENTRY_DSN))
                 Sentry.init(options -> {
                     options.setDsn(Config.get(ENV.SENTRY_DSN));
+                    options.setEnvironment(Config.getSentryEnvironment());
                     options.setTracesSampleRate(1.0);
+                    options.setInstrumenter(Instrumenter.OTEL);
+                    options.addEventProcessor(new OpenTelemetryLinkErrorEventProcessor());
                 });
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
