@@ -116,7 +116,13 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.getTextChannel()
                         .sendMessageEmbeds(eb.build())
-                        .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                        .queue(msg -> msg.delete().queueAfter(
+                                10,
+                                TimeUnit.SECONDS,
+                                null,
+                                new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                        ));
         }
     }
 
@@ -165,7 +171,13 @@ public class AudioLoader implements AudioLoadResultHandler {
                 botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
                     if (dedicatedChannelConfig.isChannelSet())
                         if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
-                            msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                            msg.delete().queueAfter(
+                                    10,
+                                    TimeUnit.SECONDS,
+                                    null,
+                                    new ErrorHandler()
+                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                            );
                 });
             else {
                 if (dedicatedChannelConfig.isChannelSet())
@@ -218,12 +230,24 @@ public class AudioLoader implements AudioLoadResultHandler {
             botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
                 if (dedicatedChannelConfig.isChannelSet())
                     if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
-                        msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                        msg.delete().queueAfter(
+                                10,
+                                TimeUnit.SECONDS,
+                                null,
+                                new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                        );
             });
         else {
             new DedicatedChannelConfig(guild).getTextChannel()
                     .sendMessageEmbeds(eb.build())
-                    .queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                    .queue(msg -> msg.delete().queueAfter(
+                            10,
+                            TimeUnit.SECONDS,
+                            null,
+                            new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                    ));
         }
 
         if (musicManager.getScheduler().queue.isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
@@ -247,11 +271,23 @@ public class AudioLoader implements AudioLoadResultHandler {
             botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
                 if (dedicatedChannelConfig.isChannelSet())
                     if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
-                        msg.delete().queueAfter(10, TimeUnit.SECONDS);
+                        msg.delete().queueAfter(
+                                10,
+                                TimeUnit.SECONDS,
+                                null,
+                                new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                        );
             });
         else {
             new DedicatedChannelConfig(guild).getTextChannel()
-                    .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                    .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete().queueAfter(
+                            10,
+                            TimeUnit.SECONDS,
+                            null,
+                            new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                    ));
         }
     }
 }
