@@ -11,6 +11,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
@@ -66,6 +67,8 @@ public class JoinCommand implements ICommand {
         } catch (IllegalStateException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.CANT_JOIN, placeholderPair)
                     .build();
+        } catch (InsufficientPermissionException e) {
+            return RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, placeholderPair).build();
         }
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.JOINED, placeholderPair).build();
     }
