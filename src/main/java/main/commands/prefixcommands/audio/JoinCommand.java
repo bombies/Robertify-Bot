@@ -63,7 +63,7 @@ public class JoinCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.ALREADY_JOINED, placeholderPair).build();
         try {
             RobertifyAudioManager.getInstance()
-                    .joinAudioChannel(textChannel, channel, musicManager);
+                    .joinAudioChannel(channel, musicManager);
         } catch (IllegalStateException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JoinMessages.CANT_JOIN, placeholderPair)
                     .build();

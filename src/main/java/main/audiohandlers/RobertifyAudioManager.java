@@ -379,17 +379,21 @@ public class RobertifyAudioManager {
     }
 
     public void joinAudioChannel(TextChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
-        if (vc.getMembers().size() == 0)
-            throw new IllegalStateException("I can't join a voice channel with no one in it!");
-
         try {
-            musicManager.getLink().connect(vc);
-            musicManager.getScheduler().scheduleDisconnect(true);
+            joinAudioChannel(vc, musicManager);
         } catch (InsufficientPermissionException e) {
             if (channel != null)
                 channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), RobertifyLocaleMessage.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN, Pair.of("{channel}", vc.getAsMention())).build())
                         .queue();
         }
+    }
+
+    public void joinAudioChannel(AudioChannel vc, GuildMusicManager musicManager) throws InsufficientPermissionException {
+        if (vc.getMembers().size() == 0)
+            throw new IllegalStateException("I can't join a voice channel with no one in it!");
+
+        musicManager.getLink().connect(vc);
+        musicManager.getScheduler().scheduleDisconnect(true);
     }
 
     public static String getRequester(Guild guild, AudioTrack track) {
