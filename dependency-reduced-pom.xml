@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>5.1.5</version>
+  <version>5.1.7</version>
   <build>
     <plugins>
       <plugin>
@@ -45,8 +45,8 @@
           </execution>
         </executions>
         <configuration>
-          <source>16</source>
-          <target>16</target>
+          <source>19</source>
+          <target>19</target>
         </configuration>
       </plugin>
     </plugins>
@@ -119,8 +119,8 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <maven.compiler.target>16</maven.compiler.target>
-    <maven.compiler.source>16</maven.compiler.source>
+    <maven.compiler.target>19</maven.compiler.target>
+    <maven.compiler.source>19</maven.compiler.source>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
