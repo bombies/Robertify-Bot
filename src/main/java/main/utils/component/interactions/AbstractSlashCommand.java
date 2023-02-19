@@ -659,9 +659,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!togglesConfig.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS))
             return true;
 
-        if (!config.isRestrictedChannel(event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
-            && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
-
+        if (
+                !config.isRestrictedChannel(event.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL)
+                        && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)
+                        && !GeneralUtils.isDeveloper(event.getUser().getIdLong())
+        ) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL_ARGS,
                     Pair.of("{channels}", GeneralUtils.listOfIDsToMentions(
                             guild,
