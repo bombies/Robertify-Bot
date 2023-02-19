@@ -567,7 +567,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             buildCommand();
 
         final Guild guild = event.getGuild();
-        if (command.isDjOnly() && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)) {
+        if (
+                command.isDjOnly()
+                && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)
+                && !GeneralUtils.isDeveloper(event.getUser().getIdLong())
+        ) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_DJ)).build())
                     .setEphemeral(true)
                     .queue();
@@ -589,7 +593,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             buildCommand();
 
         final Guild guild = event.getGuild();
-        if (command.adminOnly && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)) {
+        if (
+                command.adminOnly
+                && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_ADMIN)
+                && !GeneralUtils.isDeveloper(event.getUser().getIdLong())
+        ) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, BotConstants.getInsufficientPermsMessage(guild, Permission.ROBERTIFY_ADMIN)).build())
                     .setEphemeral(true)
                     .queue();
@@ -602,6 +610,8 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             buildCommand();
         if (command.getCheckPermission() == null)
+            return true;
+        if (GeneralUtils.isDeveloper(event.getId()))
             return true;
         return command.getCheckPermission().test(event);
     }

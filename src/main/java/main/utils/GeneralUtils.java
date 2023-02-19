@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import main.constants.*;
 import main.main.Config;
 import main.main.Robertify;
+import main.utils.database.mongodb.cache.BotBDCache;
 import main.utils.json.GenericJSONField;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.permissions.PermissionsConfig;
@@ -167,6 +168,14 @@ public class GeneralUtils {
 
 
         return permissionsConfig.getUsersForPermission(perm.name()).contains(sender.getIdLong());
+    }
+
+    public static boolean isDeveloper(long uid) {
+        return BotBDCache.getInstance().isDeveloper(uid);
+    }
+
+    public static boolean isDeveloper(String uid) {
+        return isDeveloper(Long.parseLong(uid));
     }
 
     public static boolean hasPerms(Guild guild, Member sender, Permission... perms) {
