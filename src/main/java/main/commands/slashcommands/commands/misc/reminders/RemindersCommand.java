@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.misc.reminders;
 
+import lombok.SneakyThrows;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.constants.BotConstants;
@@ -33,6 +34,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 public class RemindersCommand extends AbstractSlashCommand implements ICommand {
@@ -103,6 +105,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 .queue();
     }
 
+    @SneakyThrows
     private MessageEmbed handleAdd(Guild guild, User user, String reminder, String time, @Nullable Long channelID) {
         RemindersConfig remindersConfig = new RemindersConfig(guild);
 
@@ -116,49 +119,68 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                     )
                     .build();
 
-        TextChannel channel = guild.getTextChannelById(channelID);
-        Member selfMember = guild.getSelfMember();
+        final var channel = guild.getTextChannelById(channelID);
+        final var selfMember = guild.getSelfMember();
 
-        if (channel != null)
-            if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND))
-                return RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
-                        .build();
+        final long finalChannelID = channelID;
+        final AtomicReference<MessageEmbed> retEmbed = new AtomicReference<>();
+        guild.retrieveMemberById(user.getIdLong()).queue(member -> {
+            if (channel != null) {
+                if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND)) {
+                    retEmbed.set(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                            .build());
+                    return;
+                }
 
-        long timeInMillis = 0;
-        int hour = 0, minute = 0;
+                if (!member.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND)) {
+                    retEmbed.set(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "You do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                            .build());
+                    return;
+                }
 
-        try {
-            timeInMillis = timeToMillis(time);
-            hour = extractTime(time, TimeUnit.HOURS);
-            minute = extractTime(time, TimeUnit.MINUTES);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("minute")) {
-                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build();
-            } else if (e.getMessage().contains("hour")) {
-                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_HOUR).build();
-            } else if (e.getMessage().contains("time")) {
-                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_INVALID_TIME_FORMAT).build();
             }
-        }
 
-        remindersConfig.addReminder(
-                user.getIdLong(),
-                reminder,
-                channelID,
-                timeInMillis
-        );
 
-        new ReminderScheduler(guild)
-                .scheduleReminder(
-                        user.getIdLong(),
-                        channelID,
-                        hour,
-                        minute,
-                        reminder,
-                        remindersConfig.getReminders(user.getIdLong()).size()-1
-                );
+            long timeInMillis = 0;
+            int hour = 0, minute = 0;
 
-        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_ADDED).build();
+            try {
+                timeInMillis = timeToMillis(time);
+                hour = extractTime(time, TimeUnit.HOURS);
+                minute = extractTime(time, TimeUnit.MINUTES);
+            } catch (IllegalArgumentException e) {
+                if (e.getMessage().contains("minute")) {
+                    retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_MINUTE).build());
+                    return;
+                } else if (e.getMessage().contains("hour")) {
+                    retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.INVALID_HOUR).build());
+                    return;
+                } else if (e.getMessage().contains("time")) {
+                    retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_INVALID_TIME_FORMAT).build());
+                    return;
+                }
+            }
+
+            remindersConfig.addReminder(
+                    user.getIdLong(),
+                    reminder,
+                    finalChannelID,
+                    timeInMillis
+            );
+
+            new ReminderScheduler(guild)
+                    .scheduleReminder(
+                            user.getIdLong(),
+                            finalChannelID,
+                            hour,
+                            minute,
+                            reminder,
+                            remindersConfig.getReminders(user.getIdLong()).size()-1
+                    );
+
+            retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_ADDED).build());
+        });
+        return retEmbed.get();
     }
 
     private void remove(Message msg, List<String> args) {
@@ -362,27 +384,48 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             if (id < 0 || id > reminders.size())
                 return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDER_WITH_ID).build();
 
-            config.editReminderChannel(user.getIdLong(), id, channelID);
+            final var channel = guild.getTextChannelById(channelID);
+            final var selfMember = guild.getSelfMember();
+            final AtomicReference<MessageEmbed> retEmbed = new AtomicReference<>();
+            guild.retrieveMemberById(user.getIdLong()).queue(member -> {
+                if (channel != null) {
+                    if (!selfMember.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND)) {
+                        retEmbed.set(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "I do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                                .build());
+                        return;
+                    }
 
-            Reminder reminder = reminders.get(id);
+                    if (!member.hasPermission(channel, net.dv8tion.jda.api.Permission.MESSAGE_SEND)) {
+                        retEmbed.set(RobertifyEmbedUtils.embedMessageWithTitle(guild, RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE, "You do not have enough permissions to send your reminder in: " + channel.getAsMention())
+                                .build());
+                        return;
+                    }
 
-            new ReminderScheduler(guild)
-                    .editReminder(
-                            channelID,
-                            reminder.getUserId(),
-                            reminder.getId(),
-                            reminder.getHour(),
-                            reminder.getMinute(),
-                            reminder.getReminder()
-                    );
+                }
 
-            if (channelID == -1L)
-                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_REMOVED, Pair.of("{id}", String.valueOf(id+1))).build();
-            else
-                return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_CHANNEL_CHANGED,
-                        Pair.of("{id}", String.valueOf(id+1)),
-                        Pair.of("{channel}", GeneralUtils.toMention(guild, channelID, GeneralUtils.Mentioner.CHANNEL))
-                ).build();
+                config.editReminderChannel(user.getIdLong(), id, channelID);
+
+                Reminder reminder = reminders.get(id);
+
+                new ReminderScheduler(guild)
+                        .editReminder(
+                                channelID,
+                                reminder.getUserId(),
+                                reminder.getId(),
+                                reminder.getHour(),
+                                reminder.getMinute(),
+                                reminder.getReminder()
+                        );
+
+                if (channelID == -1L)
+                    retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_REMOVED, Pair.of("{id}", String.valueOf(id+1))).build());
+                else
+                    retEmbed.set(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_CHANNEL_CHANGED,
+                            Pair.of("{id}", String.valueOf(id+1)),
+                            Pair.of("{channel}", GeneralUtils.toMention(guild, channelID, GeneralUtils.Mentioner.CHANNEL))
+                    ).build());
+            });
+            return retEmbed.get();
         } catch (NullPointerException e) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.NO_REMINDERS).build();
         } catch (Exception e) {
@@ -475,7 +518,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     private Pair<Integer, Integer> splitTime(String time) {
         int hour, minute;
         String meridiemIndicator = null;
-        if (Pattern.matches("^\\d{1,2}:\\d{1,2}(AM|PM)$", time)) {
+        if (Pattern.matches("^\\d{1,2}:\\d{1,2}(AM|PM|am|pm)$", time)) {
             String[] split = time.split(":");
             hour = Integer.parseInt(split[0]);
 
