@@ -15,7 +15,7 @@ import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
-import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEvents;
+import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
 import main.constants.ENV;
 import main.events.LogChannelEvents;
@@ -126,7 +126,7 @@ public class Robertify {
                             commandWaiter,
                             new Listener(),
                             new VoiceChannelEvents(),
-                            new DedicatedChannelEvents(),
+                            new RequestChannelEvents(),
                             new PollEvents(),
                             new SuggestionCategoryDeletionEvents(),
                             new ReportsEvents(),

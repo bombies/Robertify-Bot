@@ -7,7 +7,7 @@ import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -37,7 +37,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
 
         if (args.isEmpty()) {
             final var channel = ctx.getChannel();
-            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            final var dedicatedChannelConfig = new RequestChannelConfig(guild);
 
             if (dedicatedChannelConfig.isChannelSet())
                 if (channel.getIdLong() == dedicatedChannelConfig.getChannelID()) {
@@ -74,7 +74,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
                 return;
             }
 
-            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            final var dedicatedChannelConfig = new RequestChannelConfig(guild);
             if (dedicatedChannelConfig.isChannelSet())
                 if (channel.getIdLong() == dedicatedChannelConfig.getChannelID()) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to that channel!")

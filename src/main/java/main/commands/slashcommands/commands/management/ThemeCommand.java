@@ -10,7 +10,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -172,8 +172,8 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
         GeneralUtils.setDefaultEmbed(guild);
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, msg)
                         .setImage(theme.getTransparent())

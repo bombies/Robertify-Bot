@@ -2,12 +2,11 @@ package main.commands.slashcommands.commands.dev;
 
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.IDevCommand;
-import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.AbstractMongoDatabase;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -58,17 +57,17 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
             switch (args.get(1).toLowerCase()) {
                 case "all" -> {
                     for (Guild g : Robertify.shardManager.getGuilds()) {
-                        final var config = new DedicatedChannelConfig(g);
+                        final var config = new RequestChannelConfig(g);
                         config.updateButtons();
                         config.updateTopic();
                         config.updateMessage();
                     }
                 }
-                case "topic" -> DedicatedChannelConfig.updateAllTopics();
-                case "buttons" -> DedicatedChannelConfig.updateAllButtons();
+                case "topic" -> RequestChannelConfig.updateAllTopics();
+                case "buttons" -> RequestChannelConfig.updateAllButtons();
                 case "message" -> {
                     for (Guild g : Robertify.shardManager.getGuilds()) {
-                        final var config = new DedicatedChannelConfig(g);
+                        final var config = new RequestChannelConfig(g);
                         config.updateMessage();
                     }
                 }
@@ -139,7 +138,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
         switch (event.getSubcommandName()) {
             case "all" -> {
                 for (Guild g : Robertify.shardManager.getGuilds()) {
-                    final var conf = new DedicatedChannelConfig(g);
+                    final var conf = new RequestChannelConfig(g);
                     conf.updateButtons();
                     conf.updateTopic();
                     conf.updateMessage();
@@ -150,20 +149,20 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
                         .queue();
             }
             case "topic" -> {
-                DedicatedChannelConfig.updateAllTopics();
+                RequestChannelConfig.updateAllTopics();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all topics").build())
                         .setEphemeral(true)
                         .queue();
             }
             case "buttons" -> {
-                DedicatedChannelConfig.updateAllButtons();
+                RequestChannelConfig.updateAllButtons();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all buttons").build())
                         .setEphemeral(true)
                         .queue();
             }
             case "message" -> {
                 for (Guild g : Robertify.shardManager.getGuilds())
-                    new DedicatedChannelConfig(g).updateMessage();
+                    new RequestChannelConfig(g).updateMessage();
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully updated all messages").build())
                         .setEphemeral(true)
                         .queue();
@@ -171,7 +170,7 @@ public class UpdateCommand extends AbstractSlashCommand implements IDevCommand {
             case "clean" -> {
                 event.deferReply().queue();
                 for (Guild g : Robertify.shardManager.getGuilds())
-                    new DedicatedChannelConfig(g).cleanChannel();
+                    new RequestChannelConfig(g).cleanChannel();
                 event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, "Successfully cleaned all channels").build())
                         .setEphemeral(true)
                         .queue();

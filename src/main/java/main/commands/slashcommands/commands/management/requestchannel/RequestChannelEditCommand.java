@@ -1,4 +1,4 @@
-package main.commands.slashcommands.commands.management.dedicatedchannel;
+package main.commands.slashcommands.commands.management.requestchannel;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.constants.Permission;
@@ -7,7 +7,7 @@ import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-public class DedicatedChannelEditCommand extends AbstractSlashCommand {
+public class RequestChannelEditCommand extends AbstractSlashCommand {
     @Override
     protected void buildCommand() {
         setCommand(
@@ -53,7 +53,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
     protected void handleSetup(SlashCommandInteractionEvent event) {
         final var guild = event.getGuild();
 
-        if (new DedicatedChannelConfig(guild).isChannelSet()) {
+        if (new RequestChannelConfig(guild).isChannelSet()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
@@ -64,7 +64,7 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
                     final var theme = new ThemesConfig(guild).getTheme();
-                    final var dediChannelConfig = new DedicatedChannelConfig(guild);
+                    final var dediChannelConfig = new RequestChannelConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
                     manager.setPosition(0).queue();
@@ -113,8 +113,8 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
             return;
         }
 
-        DedicatedChannelConfig dedicatedChannelConfig = new DedicatedChannelConfig(guild);
-        if (!dedicatedChannelConfig.isChannelSet()) {
+        RequestChannelConfig requestChannelConfig = new RequestChannelConfig(guild);
+        if (!requestChannelConfig.isChannelSet()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOT_SET).build())
                     .queue();
             return;
@@ -160,49 +160,49 @@ public class DedicatedChannelEditCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         final var config = dedicatedChannelConfig.getConfig();
-        final DedicatedChannelConfig.ChannelConfig.Field field;
+        final RequestChannelConfig.ChannelConfig.Field field;
         final String buttonName;
         switch (split[1]) {
             case "previous" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.PREVIOUS;
+                field = RequestChannelConfig.ChannelConfig.Field.PREVIOUS;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS);
             }
             case "rewind" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.REWIND;
+                field = RequestChannelConfig.ChannelConfig.Field.REWIND;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND);
             }
             case "pnp" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.PLAY_PAUSE;
+                field = RequestChannelConfig.ChannelConfig.Field.PLAY_PAUSE;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE);
             }
             case "stop" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.STOP;
+                field = RequestChannelConfig.ChannelConfig.Field.STOP;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_STOP);
             }
             case "skip" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.SKIP;
+                field = RequestChannelConfig.ChannelConfig.Field.SKIP;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP);
             }
             case "favourite" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.FAVOURITE;
+                field = RequestChannelConfig.ChannelConfig.Field.FAVOURITE;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE);
             }
             case "loop" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.LOOP;
+                field = RequestChannelConfig.ChannelConfig.Field.LOOP;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP);
             }
             case "shuffle" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.SHUFFLE;
+                field = RequestChannelConfig.ChannelConfig.Field.SHUFFLE;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE);
             }
             case "disconnect" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.DISCONNECT;
+                field = RequestChannelConfig.ChannelConfig.Field.DISCONNECT;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT);
             }
             case "filters" -> {
-                field = DedicatedChannelConfig.ChannelConfig.Field.FILTERS;
+                field = RequestChannelConfig.ChannelConfig.Field.FILTERS;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS);
             }
             default -> throw new IllegalArgumentException("The button ID doesn't map to a case to be handled! ID: " + event.getButton().getId());

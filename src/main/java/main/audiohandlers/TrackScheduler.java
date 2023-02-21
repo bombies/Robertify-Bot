@@ -16,7 +16,7 @@ import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.json.autoplay.AutoPlayConfig;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -123,7 +123,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         final var requester = RobertifyAudioManager.getRequester(guild, track);
 
         if (announcementChannel != null) {
-            final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+            final var dedicatedChannelConfig = new RequestChannelConfig(guild);
             if (dedicatedChannelConfig.isChannelSet())
                 if (dedicatedChannelConfig.getChannelID() == announcementChannel.getIdLong())
                     return;
@@ -244,7 +244,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             getMusicPlayer().playTrack(nextTrack);
         }
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet())
             dedicatedChannelConfig.updateMessage();
     }

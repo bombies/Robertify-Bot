@@ -6,7 +6,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -58,8 +58,8 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         if (audioPlayer.isPaused())
             audioPlayer.setPaused(false);
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         new LogUtils(guild).sendLog(LogType.PLAYER_STOP, RobertifyLocaleMessage.StopMessages.STOPPED_LOG, Pair.of("{user}", stopper.getAsMention()));
 

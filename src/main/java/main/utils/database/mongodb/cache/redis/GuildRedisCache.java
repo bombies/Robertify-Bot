@@ -12,8 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static main.utils.database.mongodb.databases.GuildDB.getGuildDocument;
 
@@ -170,11 +168,11 @@ public class GuildRedisCache extends AbstractRedisCache {
             }
         }
 
-        final var dedicatedChannelObj = obj.getJSONObject(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString());
-        if (dedicatedChannelObj.get(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString()) instanceof String)
-            dedicatedChannelObj.put(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), Long.parseLong(dedicatedChannelObj.getString(GuildDB.Field.DEDICATED_CHANNEL_MESSAGE_ID.toString())));
-        if (dedicatedChannelObj.get(GuildDB.Field.DEDICATED_CHANNEL_ID.toString()) instanceof String)
-            dedicatedChannelObj.put(GuildDB.Field.DEDICATED_CHANNEL_ID.toString(), Long.parseLong(dedicatedChannelObj.getString(GuildDB.Field.DEDICATED_CHANNEL_ID.toString())));
+        final var dedicatedChannelObj = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
+        if (dedicatedChannelObj.get(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString()) instanceof String)
+            dedicatedChannelObj.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), Long.parseLong(dedicatedChannelObj.getString(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString())));
+        if (dedicatedChannelObj.get(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) instanceof String)
+            dedicatedChannelObj.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), Long.parseLong(dedicatedChannelObj.getString(GuildDB.Field.REQUEST_CHANNEL_ID.toString())));
 
         if (obj.has(GuildDB.Field.BANNED_USERS_ARRAY.toString())) {
             final var bannedUserArr = obj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString());

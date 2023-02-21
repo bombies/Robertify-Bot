@@ -3,19 +3,13 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
-import main.commands.slashcommands.commands.audio.PlaySlashCommand;
 import main.commands.slashcommands.commands.dev.UnloadGuildCommandsCommand;
-import main.commands.slashcommands.commands.dev.UpdateCommand;
-import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
-import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
-import main.commands.slashcommands.commands.util.VoteCommand;
-import main.commands.slashcommands.commands.util.WebsiteCommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.database.mongodb.cache.BotBDCache;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.LocaleConfig;
 import main.utils.locale.LocaleManager;
@@ -52,7 +46,7 @@ public class Listener extends ListenerAdapter {
         final var jda = event.getJDA();
 
         for (Guild g : jda.getGuildCache()) {
-            final var dedicatedChannelConfig = new DedicatedChannelConfig(g);
+            final var dedicatedChannelConfig = new RequestChannelConfig(g);
             logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
             final var locale = new LocaleConfig(g).getLocale();
             if (locale != null)

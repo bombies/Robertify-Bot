@@ -1,4 +1,4 @@
-package main.commands.slashcommands.commands.management.dedicatedchannel;
+package main.commands.slashcommands.commands.management.requestchannel;
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager;
 import lavalink.client.io.filters.*;
@@ -13,7 +13,7 @@ import main.main.Config;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
@@ -39,7 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class DedicatedChannelEvents extends ListenerAdapter {
+public class RequestChannelEvents extends ListenerAdapter {
 
     @Override
     public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
@@ -47,7 +47,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             return;
 
         final Guild guild = event.getGuild();
-        final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
+        final RequestChannelConfig config = new RequestChannelConfig(guild);
 
         if (!config.isChannelSet()) return;
         if (config.getChannelID() != event.getChannel().getIdLong()) return;
@@ -60,7 +60,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         if (!event.isFromGuild()) return;
 
         final Guild guild = event.getGuild();
-        final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
+        final RequestChannelConfig config = new RequestChannelConfig(guild);
 
         try {
             if (!config.isChannelSet()) return;
@@ -199,11 +199,11 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        if (!event.getButton().getId().startsWith(DedicatedChannelCommand.ButtonID.IDENTIFIER.toString()))
+        if (!event.getButton().getId().startsWith(RequestChannelCommand.ButtonID.IDENTIFIER.toString()))
             return;
 
         final var guild = event.getGuild();
-        final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
+        final RequestChannelConfig config = new RequestChannelConfig(guild);
 
         if (!config.isChannelSet()) return;
         if (event.getChannel().asGuildMessageChannel().getIdLong() != config.getChannelID()) return;
@@ -237,7 +237,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             return;
         }
 
-        if (id.equals(DedicatedChannelCommand.ButtonID.REWIND.toString())) {
+        if (id.equals(RequestChannelCommand.ButtonID.REWIND.toString())) {
             if (!djCheck(new RewindSlashCommand(), guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .setEphemeral(true)
@@ -250,7 +250,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.PLAY_AND_PAUSE.toString())) {
             if (!djCheck(new PauseSlashCommand(), guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .setEphemeral(true)
@@ -263,7 +263,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.END.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.END.toString())) {
             if (!djCheck(new SkipSlashCommand(), guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .setEphemeral(true)
@@ -276,7 +276,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.LOOP.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.LOOP.toString())) {
             final LoopSlashCommand loopCommand = new LoopSlashCommand();
             if (!djCheck(loopCommand, guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
@@ -330,7 +330,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.SHUFFLE.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.SHUFFLE.toString())) {
             if (!djCheck(new ShuffleSlashCommand(), guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .setEphemeral(true)
@@ -343,7 +343,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.DISCONNECT.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.DISCONNECT.toString())) {
             if (!djCheck(new DisconnectSlashCommand(), guild, member)) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .setEphemeral(true)
@@ -356,7 +356,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.STOP.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.STOP.toString())) {
             if (!djCheck(new StopCommand(), guild, member)) {
                 event.reply(member.getAsMention()).addEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DJ_BUTTON).build())
                         .queue();
@@ -368,7 +368,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.PREVIOUS.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.PREVIOUS.toString())) {
             if (!GeneralUtils.checkPremium(guild, event))
                 return;
 
@@ -384,7 +384,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
                     .setEphemeral(true)
                     .queue(null, new ErrorHandler()
                             .handle(ErrorResponse.UNKNOWN_INTERACTION, ignored -> {}));
-        } else if (id.equals(DedicatedChannelCommand.ButtonID.FAVOURITE.toString())) {
+        } else if (id.equals(RequestChannelCommand.ButtonID.FAVOURITE.toString())) {
             if (!GeneralUtils.checkPremium(guild, event))
                 return;
 
@@ -404,7 +404,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
-        if (!event.getComponentId().startsWith(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId()))
+        if (!event.getComponentId().startsWith(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId()))
             return;
 
         final var guild = event.getGuild();
@@ -444,7 +444,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
         final List<MessageEmbed> embedsToSend = new ArrayList<>();
 
-        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":8d")) {
+        if (selectedOptions.contains(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":8d")) {
             if (filters.getRotation() == null) {
                 filters.setRotation(new Rotation()
                         .setFrequency(0.05F)).commit();
@@ -465,7 +465,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":karaoke")) {
+        if (selectedOptions.contains(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":karaoke")) {
             if (filters.getKaraoke() == null) {
                 filters.setKaraoke(new Karaoke()).commit();
                 embedsToSend.add(RobertifyEmbedUtils.embedMessage(
@@ -485,7 +485,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":nightcore")) {
+        if (selectedOptions.contains(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":nightcore")) {
             if (filters.getTimescale() == null) {
                 filters.setTimescale(new Timescale()
                         .setPitch(1.5F)
@@ -508,7 +508,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":tremolo")) {
+        if (selectedOptions.contains(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":tremolo")) {
             if (filters.getTremolo() == null) {
                 filters.setTremolo(new Tremolo()).commit();
                 embedsToSend.add(RobertifyEmbedUtils.embedMessage(
@@ -529,7 +529,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
             }
         }
 
-        if (selectedOptions.contains(DedicatedChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":vibrato")) {
+        if (selectedOptions.contains(RequestChannelConfig.ChannelConfig.Field.FILTERS.getId() + ":vibrato")) {
             if (filters.getVibrato() == null) {
                 filters.setVibrato(new Vibrato()).commit();
                 embedsToSend.add(RobertifyEmbedUtils.embedMessage(

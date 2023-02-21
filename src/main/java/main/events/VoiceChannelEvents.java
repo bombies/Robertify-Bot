@@ -3,7 +3,7 @@ package main.events;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.EventWaiter;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
@@ -54,7 +54,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                 musicManager.getScheduler().queue.clear();
                 musicManager.getPlayer().getFilters().clear().commit();
 
-                final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+                final var dedicatedChannelConfig = new RequestChannelConfig(guild);
                 if (dedicatedChannelConfig.isChannelSet())
                     dedicatedChannelConfig.updateMessage();
 

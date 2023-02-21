@@ -9,7 +9,7 @@ import main.commands.prefixcommands.dev.*;
 import main.commands.prefixcommands.dev.test.*;
 import main.commands.prefixcommands.management.*;
 import main.commands.slashcommands.commands.management.*;
-import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
+import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import main.commands.slashcommands.commands.management.permissions.ListDJCommand;
 import main.commands.slashcommands.commands.management.permissions.PermissionsCommand;
 import main.commands.slashcommands.commands.management.permissions.RemoveDJCommand;
@@ -24,9 +24,7 @@ import main.commands.prefixcommands.util.reports.ReportsCommand;
 import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.util.*;
 import main.constants.Permission;
-import main.constants.RobertifyTheme;
 import main.constants.Toggles;
-import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotBDCache;
@@ -35,14 +33,11 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.votes.VoteManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +47,6 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -101,7 +95,7 @@ public class CommandManager {
                 new SeekCommand(),
                 new BanCommand(),
                 new UnbanCommand(),
-                new DedicatedChannelCommand(),
+                new RequestChannelCommand(),
                 new EightBallCommand(),
                 new PreviousTrackCommand(),
                 new PollCommand(),
@@ -190,7 +184,7 @@ public class CommandManager {
                 new TogglesCommand(),
                 new BanCommand(),
                 new UnbanCommand(),
-                new DedicatedChannelCommand(),
+                new RequestChannelCommand(),
                 new RestrictedChannelsCommand(),
                 new ThemeCommand(),
                 new TwentyFourSevenCommand(),

@@ -6,7 +6,7 @@ import main.commands.prefixcommands.ICommand;
 import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
@@ -51,8 +51,8 @@ public class ClearQueueCommand implements ICommand {
         queue.clear();
         new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queue");
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
         msg.replyEmbeds(eb.build()).queue();

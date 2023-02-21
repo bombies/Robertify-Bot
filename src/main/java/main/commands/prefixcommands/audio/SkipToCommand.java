@@ -1,7 +1,6 @@
 package main.commands.prefixcommands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
 import main.commands.prefixcommands.CommandContext;
@@ -9,7 +8,7 @@ import main.commands.prefixcommands.ICommand;
 import main.exceptions.AutoPlayException;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import net.dv8tion.jda.annotations.ForRemoval;
@@ -77,8 +76,8 @@ public class SkipToCommand implements ICommand {
             scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());
         } catch (AutoPlayException ignored) {}
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         new LogUtils(guild).sendLog(LogType.TRACK_SKIP, skipper.getAsMention() + " has skipped to `track #"+id+"`");
         SkipCommand.clearVoteSkipInfo(guild);

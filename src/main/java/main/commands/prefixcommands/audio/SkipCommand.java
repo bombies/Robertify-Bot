@@ -11,7 +11,7 @@ import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.json.toggles.TogglesConfig;
@@ -155,8 +155,8 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
             scheduler.scheduleDisconnect(true);
         }
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         clearVoteSkipInfo(guild);
     }

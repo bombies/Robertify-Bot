@@ -6,7 +6,7 @@ import main.commands.prefixcommands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -60,8 +60,8 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
 
         audioPlayer.playTrack(previouslyPlayedTracks.get(guild.getIdLong()).pop());
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         new LogUtils(guild).sendLog(LogType.TRACK_PREVIOUS, RobertifyLocaleMessage.PreviousTrackMessages.PREV_TRACK_LOG, Pair.of("{user}", memberVoiceState.getMember().getAsMention()));
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.PLAYING_PREV_TRACK);

@@ -7,7 +7,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -82,8 +82,8 @@ public class MoveCommand implements ICommand {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.COULDNT_MOVE, Pair.of("{id}", String.valueOf(id)));
         }
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         AudioTrackInfo info = trackList.get(id - 1).getInfo();
 

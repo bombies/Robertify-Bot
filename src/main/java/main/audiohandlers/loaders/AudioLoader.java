@@ -9,7 +9,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.LocaleManager;
@@ -17,7 +17,6 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -46,7 +45,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
     private final GuildMessageChannel announcementChannel;
-    private final DedicatedChannelConfig dedicatedChannelConfig;
+    private final RequestChannelConfig requestChannelConfig;
 
     public AudioLoader(@NotNull User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
@@ -61,7 +60,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
         this.announcementChannel = botMsg != null ? botMsg.getChannel().asGuildMessageChannel() : null;
-        this.dedicatedChannelConfig = new DedicatedChannelConfig(this.guild);
+        this.requestChannelConfig = new RequestChannelConfig(this.guild);
     }
 
     @Override
@@ -93,8 +92,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (scheduler.playlistRepeating)
             scheduler.setSavedQueue(guild, scheduler.queue);
 
-        if (dedicatedChannelConfig.isChannelSet())
-            dedicatedChannelConfig.updateMessage();
+        if (requestChannelConfig.isChannelSet())
+            requestChannelConfig.updateMessage();
 
     }
 
@@ -107,15 +106,15 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (botMsg != null) {
             botMsg.editMessageEmbeds(eb.build())
                     .queue(success -> success.editMessageComponents().queue(msg -> {
-                        if (dedicatedChannelConfig.isChannelSet())
-                            if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                        if (requestChannelConfig.isChannelSet())
+                            if (requestChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                                 msg.delete().queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler()
                                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
                                 );
                     }));
         } else {
-            if (dedicatedChannelConfig.isChannelSet())
-                dedicatedChannelConfig.getTextChannel()
+            if (requestChannelConfig.isChannelSet())
+                requestChannelConfig.getTextChannel()
                         .sendMessageEmbeds(eb.build())
                         .queue(msg -> msg.delete().queueAfter(
                                 10,
@@ -131,7 +130,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     public void playlistLoaded(AudioPlaylist audioPlaylist) {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
 
         if (audioPlaylist.isSearchResult()) {
@@ -229,8 +228,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                 : RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.NO_TRACK_FOUND_ALT);
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
-                if (dedicatedChannelConfig.isChannelSet())
-                    if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                if (requestChannelConfig.isChannelSet())
+                    if (requestChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                         msg.delete().queueAfter(
                                 10,
                                 TimeUnit.SECONDS,
@@ -240,7 +239,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                         );
             });
         else {
-            new DedicatedChannelConfig(guild).getTextChannel()
+            new RequestChannelConfig(guild).getTextChannel()
                     .sendMessageEmbeds(eb.build())
                     .queue(msg -> msg.delete().queueAfter(
                             10,
@@ -270,8 +269,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         );
         if (botMsg != null)
             botMsg.editMessageEmbeds(eb.build()).queue(msg -> {
-                if (dedicatedChannelConfig.isChannelSet())
-                    if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
+                if (requestChannelConfig.isChannelSet())
+                    if (requestChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                         msg.delete().queueAfter(
                                 10,
                                 TimeUnit.SECONDS,
@@ -281,7 +280,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                         );
             });
         else {
-            new DedicatedChannelConfig(guild).getTextChannel()
+            new RequestChannelConfig(guild).getTextChannel()
                     .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete().queueAfter(
                             10,
                             TimeUnit.SECONDS,

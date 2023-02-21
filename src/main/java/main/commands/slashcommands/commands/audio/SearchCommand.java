@@ -7,7 +7,7 @@ import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -34,7 +34,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
         final var msg = ctx.getMessage();
         final var args = ctx.getArgs();
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet())
             if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.CANT_BE_USED_IN_CHANNEL).build())
@@ -118,7 +118,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet())
             if (dedicatedChannelConfig.getChannelID() == event.getChannel().asGuildMessageChannel().getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())

@@ -5,7 +5,7 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
 import main.utils.json.logs.LogUtils;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -44,8 +44,8 @@ public class ShuffleCommand implements ICommand {
         queue.clear();
         queue.addAll(trackList);
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         new LogUtils(guild).sendLog(LogType.QUEUE_SHUFFLE, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED_LOG, Pair.of("{user}", shuffler.getAsMention()));
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ShuffleMessages.SHUFFLED);

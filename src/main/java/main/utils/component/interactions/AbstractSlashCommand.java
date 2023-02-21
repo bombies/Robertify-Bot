@@ -15,7 +15,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotBDCache;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
@@ -436,7 +436,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             )
                 event.getChannel().asGuildMessageChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build())
                         .queue(msg -> {
-                            final var dedicatedChannelConfig = new DedicatedChannelConfig(msg.getGuild());
+                            final var dedicatedChannelConfig = new RequestChannelConfig(msg.getGuild());
                             if (dedicatedChannelConfig.isChannelSet())
                                 if (dedicatedChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                                     msg.delete().queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> {}));

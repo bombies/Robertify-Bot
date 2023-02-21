@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
@@ -61,8 +61,8 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
             scheduler.clearSavedQueue(guild);
         }
 
-        if (new DedicatedChannelConfig(guild).isChannelSet())
-            new DedicatedChannelConfig(guild).updateMessage();
+        if (new RequestChannelConfig(guild).isChannelSet())
+            new RequestChannelConfig(guild).updateMessage();
 
         if (channel != null) {
             final var localeManager = LocaleManager.getLocaleManager(guild);

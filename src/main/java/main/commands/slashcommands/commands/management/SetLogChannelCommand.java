@@ -7,7 +7,7 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
@@ -57,7 +57,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
             return;
         }
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet()) {
             if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 message.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())
@@ -127,7 +127,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
             return;
         }
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet()) {
             if (dedicatedChannelConfig.getChannelID() == channel.getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LogChannelMessages.CANNOT_SET_LOG_CHANNEL).build())

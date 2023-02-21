@@ -1,7 +1,7 @@
 package main.utils;
 
 import main.main.Robertify;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.LocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -97,14 +97,14 @@ public class RobertifyEmbedUtils {
     }
 
     public static boolean getEphemeralState(GuildMessageChannel channel) {
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        final var dedicatedChannelConfig = new RequestChannelConfig(channel.getGuild());
         if (!dedicatedChannelConfig.isChannelSet())
             return false;
         return dedicatedChannelConfig.getChannelID() == channel.getIdLong();
     }
 
     public static boolean getEphemeralState(GuildMessageChannel channel, boolean _default) {
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        final var dedicatedChannelConfig = new RequestChannelConfig(channel.getGuild());
         if (!dedicatedChannelConfig.isChannelSet())
             return _default;
         return dedicatedChannelConfig.getChannelID() == channel.getIdLong();

@@ -1,4 +1,4 @@
-package main.commands.slashcommands.commands.management.dedicatedchannel;
+package main.commands.slashcommands.commands.management.requestchannel;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
@@ -8,7 +8,7 @@ import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.script.ScriptException;
 import java.util.List;
 
-public class DedicatedChannelCommand extends AbstractSlashCommand implements ICommand {
+public class RequestChannelCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var guild = ctx.getGuild();
@@ -38,7 +38,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
 
         final Message msg = ctx.getMessage();
 
-        if (new DedicatedChannelConfig(guild).isChannelSet()) {
+        if (new RequestChannelConfig(guild).isChannelSet()) {
             msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP).build())
                     .queue();
             return;
@@ -53,7 +53,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
                     final var theme = new ThemesConfig(guild).getTheme();
-                    final var dediChannelConfig = new DedicatedChannelConfig(guild);
+                    final var dediChannelConfig = new RequestChannelConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
 
@@ -128,7 +128,7 @@ public class DedicatedChannelCommand extends AbstractSlashCommand implements ICo
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
-        new DedicatedChannelEditCommand().handleSetup(event);
+        new RequestChannelEditCommand().handleSetup(event);
     }
 
     @Override

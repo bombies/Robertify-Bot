@@ -1,7 +1,6 @@
 package main.utils.json.guildconfig;
 
 import main.constants.RobertifyTheme;
-import main.main.Robertify;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.autoplay.AutoPlayConfig;
@@ -250,7 +249,7 @@ public class GuildConfig extends AbstractGuildConfig {
             if (reminders != null)
                 obj.put(RemindersConfig.Fields.REMINDERS.name().toLowerCase(), reminders);
             if (dedicatedChannel != null)
-                obj.put(GuildDB.Field.DEDICATED_CHANNEL_OBJECT.toString(), dedicatedChannel);
+                obj.put(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString(), dedicatedChannel);
             if (restrictedChannels != null)
                 obj.put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), restrictedChannels);
             if (permissions != null)

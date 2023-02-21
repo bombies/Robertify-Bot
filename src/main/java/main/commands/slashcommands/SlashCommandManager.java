@@ -6,8 +6,8 @@ import main.commands.slashcommands.commands.audio.filters.*;
 import main.commands.slashcommands.commands.dev.*;
 import main.commands.slashcommands.commands.dev.test.ImageBuilderTest;
 import main.commands.slashcommands.commands.management.*;
-import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelCommand;
-import main.commands.slashcommands.commands.management.dedicatedchannel.DedicatedChannelEditCommand;
+import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
+import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEditCommand;
 import main.commands.slashcommands.commands.management.permissions.ListDJCommand;
 import main.commands.slashcommands.commands.management.permissions.PermissionsCommand;
 import main.commands.slashcommands.commands.management.permissions.RemoveDJCommand;
@@ -80,8 +80,8 @@ public class SlashCommandManager {
                 new UnbanCommand(),
                 new PermissionsCommand(),
                 new TogglesCommand(),
-                new DedicatedChannelCommand(),
-                new DedicatedChannelEditCommand(),
+                new RequestChannelCommand(),
+                new RequestChannelEditCommand(),
                 new ThemeCommand(),
                 new RestrictedChannelsCommand(),
                 new LogCommand(),

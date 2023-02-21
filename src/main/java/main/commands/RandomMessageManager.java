@@ -6,13 +6,12 @@ import main.constants.Toggles;
 import main.main.Config;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.database.mongodb.cache.BotBDCache;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 
 import java.time.Instant;
@@ -62,7 +61,7 @@ public class RandomMessageManager {
         if (!new TogglesConfig(channel.getGuild()).getToggle(Toggles.TIPS))
             return;
 
-        final var dedicatedChannelConfig = new DedicatedChannelConfig(channel.getGuild());
+        final var dedicatedChannelConfig = new RequestChannelConfig(channel.getGuild());
         if (dedicatedChannelConfig.isChannelSet()) {
             if (dedicatedChannelConfig.getChannelID() == channel.getIdLong())
                 return;

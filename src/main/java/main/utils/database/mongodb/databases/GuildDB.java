@@ -48,9 +48,9 @@ public class GuildDB extends AbstractMongoDatabase {
                 .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
                 .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
                 .addField(Field.BANNED_USERS_ARRAY, new JSONArray())
-                .addField(Field.DEDICATED_CHANNEL_OBJECT, new JSONObject()
-                        .put(Field.DEDICATED_CHANNEL_ID.toString(), -1L)
-                        .put(Field.DEDICATED_CHANNEL_MESSAGE_ID.toString(), -1L)
+                .addField(Field.REQUEST_CHANNEL_OBJECT, new JSONObject()
+                        .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
+                        .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
                 )
                 .addField(Field.PERMISSIONS_OBJECT, new JSONObject()
                         .put(Field.PERMISSIONS_DJ.toString(), new JSONArray())
@@ -80,10 +80,10 @@ public class GuildDB extends AbstractMongoDatabase {
             BANNED_BY("banned_by"),
             BANNED_UNTIL("banned_until"),
             BANNED_AT("banned_at"),
-        DEDICATED_CHANNEL_OBJECT("dedicated_channel"),
-            DEDICATED_CHANNEL_ID("channel_id"),
-            DEDICATED_CHANNEL_MESSAGE_ID("message_id"),
-            DEDICATED_CHANNEL_CONFIG("config"),
+        REQUEST_CHANNEL_OBJECT("dedicated_channel"),
+            REQUEST_CHANNEL_ID("channel_id"),
+            REQUEST_CHANNEL_MESSAGE_ID("message_id"),
+            REQUEST_CHANNEL_CONFIG("config"),
         PERMISSIONS_OBJECT("permissions"),
             PERMISSIONS_DJ("0"),
             PERMISSIONS_ADMIN("1"),

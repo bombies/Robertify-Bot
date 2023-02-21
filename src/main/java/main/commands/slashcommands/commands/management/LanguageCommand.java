@@ -6,7 +6,7 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
-import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -69,7 +69,7 @@ public class LanguageCommand extends AbstractSlashCommand {
         } else {
             final var newLocale = RobertifyLocale.parse(lang.getAsString());
             localeManager.setLocale(newLocale);
-            new DedicatedChannelConfig(guild).updateAll();
+            new RequestChannelConfig(guild).updateAll();
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                     .build())
                     .setEphemeral(true)
@@ -101,7 +101,7 @@ public class LanguageCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         LocaleManager.getLocaleManager(guild).setLocale(newLocale);
-        new DedicatedChannelConfig(guild).updateAll();
+        new RequestChannelConfig(guild).updateAll();
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                 .build())
                 .setEphemeral(true)
