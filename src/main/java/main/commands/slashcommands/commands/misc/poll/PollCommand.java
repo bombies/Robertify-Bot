@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -57,7 +58,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         }
 
         final List<String> args = ctx.getArgs();
-        final TextChannel channel = ctx.getChannel();
+        final var channel = ctx.getChannel();
         final Message msg = ctx.getMessage();
 
         if (args.isEmpty()) {
@@ -76,7 +77,7 @@ public class PollCommand extends AbstractSlashCommand implements ICommand {
         GeneralUtils.setDefaultEmbed(ctx.getGuild());
     }
 
-    public EmbedBuilder handlePoll(TextChannel channel, User sender, String question) {
+    public EmbedBuilder handlePoll(GuildMessageChannel channel, User sender, String question) {
         final Pattern choiceWithDurationRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s\\d+[sSmMhHdD]\\s$");
         final Pattern choiceRegex = Pattern.compile("^[\\w\\d\\W\\D]+(\\s\"[\\w\\d\\W\\D\\s]+\"(?=\\s))\\s$");
         final var guild = channel.getGuild();

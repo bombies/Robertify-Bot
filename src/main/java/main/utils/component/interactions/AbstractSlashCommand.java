@@ -429,9 +429,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             final var latestAlert = botDB.getLatestAlert().getLeft();
             final var user = event.getUser();
 
-            if (!botDB.userHasViewedAlert(user.getIdLong()) && (!latestAlert.isEmpty() && !latestAlert.isBlank())
-                    && new SlashCommandManager().isMusicCommand(this))
-                event.getChannel().asTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build())
+            if (
+                    !botDB.userHasViewedAlert(user.getIdLong())
+                    && (!latestAlert.isEmpty() && !latestAlert.isBlank())
+                    && new SlashCommandManager().isMusicCommand(this)
+            )
+                event.getChannel().asGuildMessageChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build())
                         .queue(msg -> {
                             final var dedicatedChannelConfig = new DedicatedChannelConfig(msg.getGuild());
                             if (dedicatedChannelConfig.isChannelSet())

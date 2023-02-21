@@ -378,7 +378,7 @@ public class CommandManager {
                         if (!GeneralUtils.hasPerms(guild, ctx.getMember(), Permission.ROBERTIFY_ADMIN)) {
                             final var rcConfig = new RestrictedChannelsConfig(guild);
                             if (!rcConfig.isRestrictedChannel(
-                                    msg.getChannel().asTextChannel().getIdLong(),
+                                    msg.getChannel().asGuildMessageChannel().getIdLong(),
                                     RestrictedChannelsConfig.ChannelType.TEXT_CHANNEL
                             )) {
                                 return;

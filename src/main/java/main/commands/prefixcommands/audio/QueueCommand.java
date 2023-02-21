@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.script.ScriptException;
@@ -42,7 +43,7 @@ public class QueueCommand implements ICommand {
         sendQueue(ctx.getGuild(), queue, ctx.getChannel(), ctx.getAuthor());
     }
 
-    private void sendQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, TextChannel channel, User user) {
+    private void sendQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue, GuildMessageChannel channel, User user) {
         List<String> content = getContent(guild, queue);
         Pages.paginateMessage(channel, user, content, 10);
     }

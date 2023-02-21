@@ -18,7 +18,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -96,7 +96,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.SkipMessages.SKIPPED).build();
     }
 
-    public MessageEmbed handleVoteSkip(TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+    public MessageEmbed handleVoteSkip(GuildMessageChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         final var guild = selfVoiceState.getGuild();
 
         if (checks(selfVoiceState, memberVoiceState) != null)

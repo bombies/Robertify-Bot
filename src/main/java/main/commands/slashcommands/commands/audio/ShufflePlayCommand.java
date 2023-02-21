@@ -24,7 +24,7 @@ import java.util.List;
 public class ShufflePlayCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final TextChannel channel = ctx.getChannel();
+        final var channel = ctx.getChannel();
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
         final Member self = ctx.getSelfMember();

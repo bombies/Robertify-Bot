@@ -170,7 +170,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
     public void handleLocalTrack(SlashCommandInteractionEvent event, Message.Attachment audioFile) {
         final var guild = event.getGuild();
-        final var channel = event.getChannel().asTextChannel();
+        final var channel = event.getChannel().asGuildMessageChannel();
         final var member = event.getMember();
 
         switch (audioFile.getFileExtension().toLowerCase()) {

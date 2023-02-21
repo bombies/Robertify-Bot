@@ -40,7 +40,7 @@ public abstract class Pages {
 
     private static final Paginator paginator = Paginator.getDefaultPaginator();
 
-    public static Message paginateMessage(TextChannel channel, User user, List<MessagePage> messagePages) {
+    public static Message paginateMessage(GuildMessageChannel channel, User user, List<MessagePage> messagePages) {
         AtomicReference<Message> ret = new AtomicReference<>();
 
         channel.sendMessageEmbeds(messagePages.get(0).getEmbed()).queue(msg -> {
@@ -116,7 +116,7 @@ public abstract class Pages {
         return ret.get();
     }
 
-    public static Message paginateMessage(TextChannel channel, User user, List<String> content, int maxPerPage) {
+    public static Message paginateMessage(GuildMessageChannel channel, User user, List<String> content, int maxPerPage) {
         List<MessagePage> messagePages = new ArrayList<>();
 
         messageLogic(channel.getGuild(), messagePages, content, maxPerPage);
@@ -293,11 +293,11 @@ public abstract class Pages {
                 .queue(success -> success.retrieveOriginal().queue(og -> menuMessages.put(og.getIdLong(), menuPages)));
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<StringSelectMenuOption> options, int startingPage) {
+    public static void paginateMenu(GuildMessageChannel channel, User user, List<StringSelectMenuOption> options, int startingPage) {
         paginateMenu(channel, user, options, startingPage, false);
     }
 
-    public static void paginateMenu(TextChannel channel, User user, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    public static void paginateMenu(GuildMessageChannel channel, User user, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         Message msg = menuLogic(channel, options, startingPage, numberEachEntry);
         paginateMenu(user, msg, options);
     }
@@ -307,7 +307,7 @@ public abstract class Pages {
         paginateMenu(event.getUser(), event.getChannel().asGuildMessageChannel(), msg, options);
     }
 
-    private static Message menuLogic(TextChannel channel, int startingPage, List<StringSelectMenuOption> options) {
+    private static Message menuLogic(GuildMessageChannel channel, int startingPage, List<StringSelectMenuOption> options) {
         return menuLogic(channel, options, startingPage, false);
     }
 
@@ -315,7 +315,7 @@ public abstract class Pages {
         return menuLogic(event, options, startingPage, false);
     }
 
-    private static Message menuLogic(TextChannel channel, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
+    private static Message menuLogic(GuildMessageChannel channel, List<StringSelectMenuOption> options, int startingPage, boolean numberEachEntry) {
         return channel.sendMessageEmbeds(getPaginatedEmbed(channel.getGuild(), options, 25, startingPage, numberEachEntry)).complete();
     }
 

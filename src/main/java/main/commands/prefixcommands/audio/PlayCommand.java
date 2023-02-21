@@ -20,6 +20,7 @@ import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -43,7 +44,7 @@ public class PlayCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
-        final TextChannel channel = ctx.getChannel();
+        final var channel = ctx.getChannel();
         final List<String> args = ctx.getArgs();
         final Message msg = ctx.getMessage();
         final Member self = ctx.getSelfMember();
@@ -159,7 +160,7 @@ public class PlayCommand implements ICommand {
                 .loadAndPlay(channel, finalLink, selfVoiceState, memberVoiceState, null, finalAddToBeginning)));
     }
 
-    public void playLocalAudio(Guild guild, TextChannel channel, Message msg, Member member, Message.Attachment audioFile) {
+    public void playLocalAudio(Guild guild, GuildMessageChannel channel, Message msg, Member member, Message.Attachment audioFile) {
         switch (audioFile.getFileExtension().toLowerCase()) {
             case "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
                 if (!Files.exists(Path.of(Config.get(ENV.AUDIO_DIR) + "/"))) {

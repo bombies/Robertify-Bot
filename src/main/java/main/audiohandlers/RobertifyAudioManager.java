@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -108,7 +109,7 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlay(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+    public void loadAndPlay(GuildMessageChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
                             GuildVoiceState memberVoiceState,
                             Message botMsg, boolean addToBeginning) {
 
@@ -135,7 +136,7 @@ public class RobertifyAudioManager {
 
     @SneakyThrows
     public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
-                            GuildVoiceState memberVoiceState, TextChannel channel,
+                            GuildVoiceState memberVoiceState, GuildMessageChannel channel,
                             User user, Message botMsg, boolean addToBeginning) {
 
         final var musicManager = getMusicManager(memberVoiceState.getGuild());
@@ -185,7 +186,7 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlayFromDedicatedChannel(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+    public void loadAndPlayFromDedicatedChannel(GuildMessageChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
                                                 GuildVoiceState memberVoiceState, Message botMsg,
                                                 boolean addToBeginning) {
 
@@ -211,7 +212,7 @@ public class RobertifyAudioManager {
     }
 
     @SneakyThrows
-    public void loadAndPlayFromDedicatedChannelShuffled(TextChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
+    public void loadAndPlayFromDedicatedChannelShuffled(GuildMessageChannel channel, String trackUrl, GuildVoiceState selfVoiceState,
                                                 GuildVoiceState memberVoiceState, Message botMsg,
                                                 boolean addToBeginning) {
 
@@ -245,7 +246,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asGuildMessageChannel(), voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -270,7 +271,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asGuildMessageChannel(), voiceChannel, musicManager);
                     loadPlaylistShuffled(
                             trackUrl,
                             musicManager,
@@ -294,7 +295,7 @@ public class RobertifyAudioManager {
             final var voiceChannel = memberVoiceState.getChannel();
             if (voiceChannel != null)
                 if (voiceChannel.getMembers().size() != 0) {
-                    joinAudioChannel(event.getChannel().asTextChannel(), voiceChannel, musicManager);
+                    joinAudioChannel(event.getChannel().asGuildMessageChannel(), voiceChannel, musicManager);
                     loadTrack(
                             trackUrl,
                             musicManager,
@@ -309,7 +310,7 @@ public class RobertifyAudioManager {
         }
     }
 
-    public void loadAndPlayLocal(TextChannel channel, String path, GuildVoiceState selfVoiceState,
+    public void loadAndPlayLocal(GuildMessageChannel channel, String path, GuildVoiceState selfVoiceState,
                                  GuildVoiceState memberVoiceState, Message botMsg,
                                  boolean addToBeginning) {
         final var musicManager = getMusicManager(channel.getGuild());
@@ -358,7 +359,7 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, query, loader);
     }
 
-    public void loadRecommendedTracks(GuildMusicManager musicManager, TextChannel channel, AudioTrack query) {
+    public void loadRecommendedTracks(GuildMusicManager musicManager, GuildMessageChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
         musicManager.getPlayerManager().loadItemOrdered(musicManager, SpotifySourceManager.RECOMMENDATIONS_PREFIX + "seed_tracks=" + query.getIdentifier(), loader);
     }
@@ -378,7 +379,7 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
-    public void joinAudioChannel(TextChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
+    public void joinAudioChannel(GuildMessageChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
         try {
             joinAudioChannel(vc, musicManager);
         } catch (InsufficientPermissionException e) {

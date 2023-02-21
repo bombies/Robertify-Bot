@@ -60,7 +60,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
             }
 
             if (selfVoiceState.getChannel().getMembers().size() > 2) {
-                MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState);
+                MessageEmbed embed = new SkipCommand().handleVoteSkip(event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState);
                 if (embed != null) {
                     event.getHook().sendMessageEmbeds(embed)
                             .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))

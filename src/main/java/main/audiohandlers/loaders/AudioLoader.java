@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -44,7 +45,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final Message botMsg;
     private final boolean loadPlaylistShuffled;
     private final boolean addToBeginning;
-    private final TextChannel announcementChannel;
+    private final GuildMessageChannel announcementChannel;
     private final DedicatedChannelConfig dedicatedChannelConfig;
 
     public AudioLoader(@NotNull User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
@@ -59,7 +60,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.botMsg = botMsg;
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
-        this.announcementChannel = botMsg != null ? botMsg.getChannel().asTextChannel() : null;
+        this.announcementChannel = botMsg != null ? botMsg.getChannel().asGuildMessageChannel() : null;
         this.dedicatedChannelConfig = new DedicatedChannelConfig(this.guild);
     }
 

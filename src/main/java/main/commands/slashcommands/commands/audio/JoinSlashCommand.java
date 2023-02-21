@@ -52,7 +52,6 @@ public class JoinSlashCommand extends AbstractSlashCommand {
 
         event.getHook().sendMessageEmbeds(new JoinCommand().handleJoin(
                 event.getGuild(),
-                event.getChannel().asTextChannel(),
                 event.getMember().getVoiceState(),
                 event.getGuild().getSelfMember().getVoiceState()
         )).queue();

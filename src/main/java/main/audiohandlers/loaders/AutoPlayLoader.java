@@ -11,7 +11,7 @@ import main.utils.json.dedicatedchannel.DedicatedChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +25,9 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
 
     private final GuildMusicManager musicManager;
     private final Guild guild;
-    private final TextChannel channel;
+    private final GuildMessageChannel channel;
 
-    public AutoPlayLoader(GuildMusicManager musicManager, TextChannel channel) {
+    public AutoPlayLoader(GuildMusicManager musicManager, GuildMessageChannel channel) {
         this.musicManager = musicManager;
         this.guild = musicManager.getGuild();
         this.channel = channel;

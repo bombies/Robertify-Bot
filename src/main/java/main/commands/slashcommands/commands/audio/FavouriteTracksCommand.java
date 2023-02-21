@@ -20,6 +20,7 @@ import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -160,7 +161,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
         }
     }
 
-    private void handeList(TextChannel channel, Member member) {
+    private void handeList(GuildMessageChannel channel, Member member) {
         final var config = FavouriteTracksCache.getInstance();
         final var guild = member.getGuild();
 
@@ -379,11 +380,11 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
                 .setEphemeral(true)
                 .queue();
 
-        event.getChannel().asTextChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
+        event.getChannel().asGuildMessageChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build()).queue(addingMsg -> {
             switch (source) {
-                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
-                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
-                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getChannel().asTextChannel(), event.getUser(), addingMsg, false);
+                case DEEZER -> audioManager.loadAndPlay("https://www.deezer.com/us/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asGuildMessageChannel(), event.getUser(), addingMsg, false);
+                case SPOTIFY -> audioManager.loadAndPlay("https://open.spotify.com/track/" + id, selfVoiceState, memberVoiceState, event.getChannel().asGuildMessageChannel(), event.getUser(), addingMsg, false);
+                case YOUTUBE -> audioManager.loadAndPlay(id, selfVoiceState, memberVoiceState, event.getChannel().asGuildMessageChannel(), event.getUser(), addingMsg, false);
             }
         });
     }

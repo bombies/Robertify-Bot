@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class NowPlayingCommand implements ICommand {
         msg.replyEmbeds(getNowPlayingEmbed(ctx.getGuild(), ctx.getChannel(), selfVoiceState, memberVoiceState).build()).queue();
     }
 
-    public EmbedBuilder getNowPlayingEmbed(Guild guild, TextChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
+    public EmbedBuilder getNowPlayingEmbed(Guild guild, GuildMessageChannel channel, GuildVoiceState selfVoiceState, GuildVoiceState memberVoiceState) {
         EmbedBuilder eb;
 
         if (!selfVoiceState.inAudioChannel()) {

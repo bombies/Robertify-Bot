@@ -25,7 +25,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
@@ -49,7 +49,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     private final Guild guild;
     private final Link audioPlayer;
     @Setter @Getter
-    private TextChannel announcementChannel = null;
+    private GuildMessageChannel announcementChannel = null;
     private AudioTrack lastPlayedTrackBuffer;
     @Getter
     private final static HashMap<Long, Stack<AudioTrack>> pastQueue = new HashMap<>();
@@ -113,8 +113,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (repeating) return;
 
-        final var selfChannel = guild.getSelfMember().getVoiceState().getChannel();
-
         if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
         if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getIdentifier())) {
@@ -140,69 +138,67 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             ));
 
             try {
-                if (announcementChannel != null) {
-                    final var requesterObj = requester.startsWith("<@") ? Robertify.getShardManager().retrieveUserById(requester.replaceAll("[<@>]", "")).complete() : null;
-                    CompletableFuture.runAsync(() -> {
-                        try {
-                            final var img = new NowPlayingImageBuilder()
-                                    .setTitle(trackInfo.title)
-                                    .setArtistName(trackInfo.author)
-                                    .setAlbumImage(
-                                            track instanceof MirroringAudioTrack  mirroringAudioTrack ?
-                                                    mirroringAudioTrack.getArtworkURL() :
-                                                    new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                                    )
-                                    .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
-                                    .build();
-                            announcementChannel.sendFiles(FileUpload.fromData(img)).queue(msg -> {
-                                        img.delete();
-                                        if (lastSentMsg != null)
-                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                        lastSentMsg = msg;
-                                    }, new ErrorHandler()
-                                            .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessageEmbeds(eb.build())
-                                                    .queue(embedMsg -> {
-                                                        if (lastSentMsg != null)
-                                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                                        lastSentMsg = embedMsg;
-                                                    }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
-                                                            .queue(nonEmbedMsg -> {
-                                                                if (lastSentMsg != null)
-                                                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                                                lastSentMsg = nonEmbedMsg;
-                                                            })
-                                                    ))
-                                            )
-                            );
-                        } catch (SocketTimeoutException | ConnectException e) {
-                            logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
-                            announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
-                                if (lastSentMsg != null)
-                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                lastSentMsg = msg;
-                            }, new ErrorHandler()
-                                    .handle(ErrorResponse.MISSING_PERMISSIONS, ex -> announcementChannel.sendMessageEmbeds(eb.build())
-                                            .queue(embedMsg -> {
-                                                if (lastSentMsg != null)
-                                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                                lastSentMsg = embedMsg;
-                                            }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
-                                                    .queue(nonEmbedMsg -> {
-                                                        if (lastSentMsg != null)
-                                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
-                                                        lastSentMsg = nonEmbedMsg;
-                                                    })
-                                            ))
-                                    ));
-                        }
-                    });
-                }
+                final var requesterObj = requester.startsWith("<@") ? Robertify.getShardManager().retrieveUserById(requester.replaceAll("[<@>]", "")).complete() : null;
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        final var img = new NowPlayingImageBuilder()
+                                .setTitle(trackInfo.title)
+                                .setArtistName(trackInfo.author)
+                                .setAlbumImage(
+                                        track instanceof MirroringAudioTrack  mirroringAudioTrack ?
+                                                mirroringAudioTrack.getArtworkURL() :
+                                                new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                                )
+                                .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
+                                .build();
+                        announcementChannel.sendFiles(FileUpload.fromData(img)).queue(msg -> {
+                                    img.delete();
+                                    if (lastSentMsg != null)
+                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                    lastSentMsg = msg;
+                                }, new ErrorHandler()
+                                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> announcementChannel.sendMessageEmbeds(eb.build())
+                                                .queue(embedMsg -> {
+                                                    if (lastSentMsg != null)
+                                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                                    lastSentMsg = embedMsg;
+                                                }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
+                                                        .queue(nonEmbedMsg -> {
+                                                            if (lastSentMsg != null)
+                                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                                            lastSentMsg = nonEmbedMsg;
+                                                        })
+                                                ))
+                                        )
+                        );
+                    } catch (SocketTimeoutException | ConnectException e) {
+                        logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
+                        announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
+                            if (lastSentMsg != null)
+                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                            lastSentMsg = msg;
+                        }, new ErrorHandler()
+                                .handle(ErrorResponse.MISSING_PERMISSIONS, ex -> announcementChannel.sendMessageEmbeds(eb.build())
+                                        .queue(embedMsg -> {
+                                            if (lastSentMsg != null)
+                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                            lastSentMsg = embedMsg;
+                                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
+                                                .queue(nonEmbedMsg -> {
+                                                    if (lastSentMsg != null)
+                                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {}));
+                                                    lastSentMsg = nonEmbedMsg;
+                                                })
+                                        ))
+                                ));
+                    }
+                });
             } catch (InsufficientPermissionException ignored) {}
         }
     }

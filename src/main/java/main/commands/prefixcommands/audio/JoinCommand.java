@@ -11,6 +11,7 @@ import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
@@ -25,11 +26,11 @@ public class JoinCommand implements ICommand {
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
 
-        msg.replyEmbeds(handleJoin(guild, ctx.getChannel(), memberVoiceState, selfVoiceState))
+        msg.replyEmbeds(handleJoin(guild, memberVoiceState, selfVoiceState))
                 .queue();
     }
 
-    public MessageEmbed handleJoin(Guild guild, TextChannel textChannel, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
+    public MessageEmbed handleJoin(Guild guild, GuildVoiceState memberVoiceState, GuildVoiceState selfVoiceState) {
         if (!memberVoiceState.inAudioChannel()) {
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                     .build();

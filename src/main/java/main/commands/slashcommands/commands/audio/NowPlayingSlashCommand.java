@@ -90,7 +90,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         .setEphemeral(ephemeralState)
                         .queue(done -> image.delete());
             } catch (SocketTimeoutException | ConnectException e) {
-                event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asTextChannel(), selfVoiceState, memberVoiceState).build())
+                event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
             }

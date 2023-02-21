@@ -141,7 +141,7 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
         try {
             return getTextChannel().retrieveMessageById(getMessageID());
         } catch (InsufficientPermissionException e) {
-                TextChannel channel = RobertifyAudioManager.getInstance().getMusicManager(guild)
+                final var channel = RobertifyAudioManager.getInstance().getMusicManager(guild)
                         .getScheduler().getAnnouncementChannel();
 
                 if (channel != null)

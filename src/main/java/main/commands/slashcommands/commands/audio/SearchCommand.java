@@ -120,7 +120,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
 
         final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
         if (dedicatedChannelConfig.isChannelSet())
-            if (dedicatedChannelConfig.getChannelID() == event.getChannel().asTextChannel().getIdLong()) {
+            if (dedicatedChannelConfig.getChannelID() == event.getChannel().asGuildMessageChannel().getIdLong()) {
                 event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.USER_VOICE_CHANNEL_NEEDED).build())
                         .queue();
                 return;
@@ -172,7 +172,7 @@ public class SearchCommand extends AbstractSlashCommand implements ICommand {
                 .setEphemeral(true)
                 .queue();
 
-        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asTextChannel(), trackQuery,
+        RobertifyAudioManager.getInstance().loadAndPlay(event.getChannel().asGuildMessageChannel(), trackQuery,
                 voiceState, memberVoiceState, event.getMessage(), false);
     }
 

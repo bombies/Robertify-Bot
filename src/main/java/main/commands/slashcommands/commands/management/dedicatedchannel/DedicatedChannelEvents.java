@@ -128,7 +128,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (!eventMessage.getAttachments().isEmpty()) {
                 var audioFile = eventMessage.getAttachments().get(0);
-                new PlayCommand().playLocalAudio(guild, event.getChannel().asTextChannel(), eventMessage, event.getMember(), audioFile);
+                new PlayCommand().playLocalAudio(guild, event.getChannel().asGuildMessageChannel(), eventMessage, event.getMember(), audioFile);
 
                 event.getMessage().delete().queueAfter(2, TimeUnit.SECONDS, null, new ErrorHandler()
                         .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
@@ -176,13 +176,13 @@ public class DedicatedChannelEvents extends ListenerAdapter {
 
             if (addToBeginning)
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
+                        .loadAndPlayFromDedicatedChannel(event.getChannel().asGuildMessageChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, true);
             else if (shuffled) {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannelShuffled(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannelShuffled(event.getChannel().asGuildMessageChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             } else {
                 RobertifyAudioManager.getInstance()
-                        .loadAndPlayFromDedicatedChannel(event.getChannel().asTextChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
+                        .loadAndPlayFromDedicatedChannel(event.getChannel().asGuildMessageChannel(), message, guild.getSelfMember().getVoiceState(), event.getMember().getVoiceState(), null, false);
             }
         }
 
@@ -206,7 +206,7 @@ public class DedicatedChannelEvents extends ListenerAdapter {
         final DedicatedChannelConfig config = new DedicatedChannelConfig(guild);
 
         if (!config.isChannelSet()) return;
-        if (event.getChannel().asTextChannel().getIdLong() != config.getChannelID()) return;
+        if (event.getChannel().asGuildMessageChannel().getIdLong() != config.getChannelID()) return;
 
         final String id = event.getButton().getId();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());

@@ -14,7 +14,7 @@ import main.utils.locale.LocaleMessage;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
@@ -214,7 +214,7 @@ public class GeneralUtils {
         return retrieveUser(Long.parseLong(id));
     }
 
-    public static String progressBar(Guild guild, TextChannel channel, double percent, ProgressBar barType) {
+    public static String progressBar(Guild guild, GuildMessageChannel channel, double percent, ProgressBar barType) {
         final var self = guild.getSelfMember();
         switch (barType) {
             case DURATION -> {

@@ -36,9 +36,9 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
         var guildConfig = new GuildConfig(guild);
 
         if (args.isEmpty()) {
-            TextChannel channel = ctx.getChannel();
-
+            final var channel = ctx.getChannel();
             final var dedicatedChannelConfig = new DedicatedChannelConfig(guild);
+
             if (dedicatedChannelConfig.isChannelSet())
                 if (channel.getIdLong() == dedicatedChannelConfig.getChannelID()) {
                     msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, "The announcement channel cannot be set to this channel!")
