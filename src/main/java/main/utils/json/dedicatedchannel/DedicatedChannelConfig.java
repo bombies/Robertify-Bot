@@ -20,6 +20,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageHistory;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -175,31 +176,26 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
                 eb.setImage(theme.getIdleBanner());
 
-                msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                                .setEmbeds(eb.build())
-                                .queue(
-                                        null,
-                                        new ErrorHandler()
-                                                .handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
-                                                    final var scheduler = musicManager.getScheduler();
-                                                    final var announcementChannel = scheduler.getAnnouncementChannel();
+                final var scheduler = musicManager.getScheduler();
+                final var announcementChannel = scheduler.getAnnouncementChannel();
 
-                                                    if (announcementChannel != null)
-                                                        announcementChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
-                                                                guild,
-                                                                RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
-                                                        ).build())
-                                                                .queue(errMsg -> errMsg.delete().queueAfter(
-                                                                        10,
-                                                                        TimeUnit.SECONDS,
-                                                                        null,
-                                                                        new ErrorHandler()
-                                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
-                                                                ));
-                                                })
-                                ),
-                        new ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
-                );
+                try {
+                    msgRequest.queue(msg -> msg.editMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                                    .setEmbeds(eb.build())
+                                    .queue(
+                                            null,
+                                            new ErrorHandler()
+                                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> sendEditErrorMessage(announcementChannel))
+                                    ),
+                            new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, e -> removeChannel())
+                                    .handle(ErrorResponse.MISSING_PERMISSIONS, e -> sendEditErrorMessage(announcementChannel))
+                    );
+                } catch (InsufficientPermissionException e) {
+                    if (e.getMessage().contains("MESSAGE_SEND"))
+                        sendEditErrorMessage(announcementChannel);
+                }
+
             } else {
                 final var trackInfo = playingTrack.getInfo();
 
@@ -254,6 +250,25 @@ public class DedicatedChannelConfig extends AbstractGuildConfig {
                 );
             }
         });
+    }
+
+    private void sendEditErrorMessage(GuildMessageChannel announcementChannel) {
+        sendErrorMessage(announcementChannel, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT);
+    }
+
+    private void sendErrorMessage(GuildMessageChannel messageChannel, RobertifyLocaleMessage.DedicatedChannelMessages message) {
+        if (messageChannel != null)
+            messageChannel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(
+                            guild,
+                            message
+                    ).build())
+                    .queue(errMsg -> errMsg.delete().queueAfter(
+                            10,
+                            TimeUnit.SECONDS,
+                            null,
+                            new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                    ));
     }
 
     public void updateAll() {
