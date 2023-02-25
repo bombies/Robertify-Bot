@@ -1,6 +1,8 @@
 package main.utils.json.reminders;
 
 import lombok.SneakyThrows;
+import lombok.val;
+import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler;
 import main.main.Robertify;
 import main.utils.json.AbstractGuildConfig;
 import main.utils.json.GenericJSONField;
@@ -97,6 +99,10 @@ public class RemindersConfig extends AbstractGuildConfig {
         final var userReminders = userArr
                 .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, uid))
                 .getJSONArray(Fields.USER_REMINDERS.toString());
+
+        final var reminderScheduler = new ReminderScheduler(guild);
+        for (int i = 0; i < userReminders.length(); i++)
+            reminderScheduler.removeReminder(uid, i);
 
         userReminders.clear();
 
