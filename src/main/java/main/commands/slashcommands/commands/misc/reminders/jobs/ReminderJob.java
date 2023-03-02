@@ -11,16 +11,12 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 public class ReminderJob implements Job {
 
@@ -34,6 +30,8 @@ public class ReminderJob implements Job {
 
         final Guild guild = Robertify.shardManager.getGuildById(guildID);
 
+        if (guild == null) return;
+
         if (destination == -1L) {
             dmReminder(guild, user, reminder);
             return;
@@ -45,7 +43,7 @@ public class ReminderJob implements Job {
             return;
         }
 
-        TextChannel channel = guild.getTextChannelById(destination);
+        final TextChannel channel = guild.getTextChannelById(destination);
 
         if (channel == null) {
             dmReminder(guild, user, reminder);
