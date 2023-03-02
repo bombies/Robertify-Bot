@@ -39,7 +39,8 @@ public class ReminderJob implements Job {
             return;
         }
 
-        if (new RemindersConfig(guild).userIsBanned(user)) {
+        final var remindersConfig = new RemindersConfig(guild);
+        if (remindersConfig.userIsBanned(user)) {
             dmReminder(guild, user, reminder);
             return;
         }
@@ -56,6 +57,11 @@ public class ReminderJob implements Job {
             return;
         }
 
+        if (!remindersConfig.channelIsBanned(channel.getIdLong())) {
+            dmReminder(guild, user, reminder);
+            return;
+        }
+
         if (!new TogglesConfig(guild).getToggle(Toggles.REMINDERS))
             return;
 
@@ -68,16 +74,12 @@ public class ReminderJob implements Job {
     }
 
     private void dmReminder(Guild guild, long user, String reminder) {
-        final var u = Robertify.shardManager.retrieveUserById(user).complete();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        u.openPrivateChannel().queue(channel ->
-                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessageWithTitle(guild, localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE), reminder)
-                                .setFooter(localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDER_FROM, Pair.of("{server}", guild.getName())))
-                                .setTimestamp(Instant.now())
-                                .build())
-                        .queue(null, new ErrorHandler()
-                                .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {}))
+        GeneralUtils.dmUser(user, RobertifyEmbedUtils.embedMessageWithTitle(guild, localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDERS_EMBED_TITLE), reminder)
+                .setFooter(localeManager.getMessage(RobertifyLocaleMessage.ReminderMessages.REMINDER_FROM, Pair.of("{server}", guild.getName())))
+                .setTimestamp(Instant.now())
+                .build()
         );
     }
 }

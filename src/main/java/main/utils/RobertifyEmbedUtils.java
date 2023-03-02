@@ -53,6 +53,11 @@ public class RobertifyEmbedUtils {
         return getDefaultEmbed().setDescription(localeManager.getMessage(message));
     }
 
+    public static EmbedBuilder embedMessage(String message) {
+        final var localeManager = LocaleManager.globalManager();
+        return getDefaultEmbed().setDescription(message);
+    }
+
     @SafeVarargs
     public static EmbedBuilder embedMessage(Guild guild, LocaleMessage message, Pair<String, String>... placeholders) {
         final var localeManager = LocaleManager.getLocaleManager(guild);

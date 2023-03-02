@@ -17,8 +17,10 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,8 +80,8 @@ public class GeneralUtils {
         for (int i = 0; i < list.size(); i++) {
             var elem = list.get(i);
             sb.append(elem instanceof net.dv8tion.jda.api.Permission ?
-                    ((net.dv8tion.jda.api.Permission) elem).getName()
-                    : elem.toString())
+                            ((net.dv8tion.jda.api.Permission) elem).getName()
+                            : elem.toString())
                     .append(i != list.size() - 1 ? ", " : "");
         }
         return sb.toString();
@@ -139,19 +141,20 @@ public class GeneralUtils {
     public static void updateENVField(ENV field, String str) throws IOException {
         switch (field) {
             case BOT_TOKEN -> throw new IllegalAccessError("This env value can't be changed from the bot!");
-            default -> {}
+            default -> {
+            }
         }
         String fileContent = getFileContent(".env");
         String envFieldTitle = field.name();
         String envFieldValue = Config.get(field);
         setFileContent(
                 ".env",
-                fileContent.replace(envFieldTitle+"="+envFieldValue, envFieldTitle+"="+str)
+                fileContent.replace(envFieldTitle + "=" + envFieldValue, envFieldTitle + "=" + str)
         );
         Config.reload();
     }
 
-    public static boolean  hasPerms(Guild guild, Member sender, Permission perm) {
+    public static boolean hasPerms(Guild guild, Member sender, Permission perm) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
                 || new PermissionsConfig(guild).userHasPermission(sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
                 || sender.isOwner())
@@ -180,8 +183,8 @@ public class GeneralUtils {
 
     public static boolean hasPerms(Guild guild, Member sender, Permission... perms) {
         if (sender.hasPermission(net.dv8tion.jda.api.Permission.ADMINISTRATOR)
-        || new PermissionsConfig(guild).userHasPermission(sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
-        || sender.isOwner())
+                || new PermissionsConfig(guild).userHasPermission(sender.getIdLong(), Permission.ROBERTIFY_ADMIN)
+                || sender.isOwner())
             return true;
 
         List<Role> userRoles = sender.getRoles();
@@ -219,8 +222,8 @@ public class GeneralUtils {
         switch (barType) {
             case DURATION -> {
                 StringBuilder str = new StringBuilder();
-                for(int i = 0; i < 12; i++)
-                    if(i == (int)(percent*12))
+                for (int i = 0; i < 12; i++)
+                    if (i == (int) (percent * 12))
                         str.append("\uD83D\uDD18"); // 🔘
                     else
                         str.append("▬");
@@ -271,18 +274,18 @@ public class GeneralUtils {
         if (!string.contains(delimiter)) return string;
 
         switch (delimiter) {
-            case "?", "^", "[", ".", "$", "{", "&", "(", "+", ")", "|", "<", ">", "]", "}"
-                -> delimiter = "\\\\" + delimiter;
+            case "?", "^", "[", ".", "$", "{", "&", "(", "+", ")", "|", "<", ">", "]", "}" ->
+                    delimiter = "\\\\" + delimiter;
         }
 
-        return string.replaceAll(delimiter+"[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "");
+        return string.replaceAll(delimiter + "[a-zA-Z0-9~!@#$%^&*()\\-_=;:'\"|\\\\,./]*", "");
     }
 
     public static String getJoinedString(List<String> args, int startIndex) {
         StringBuilder arg = new StringBuilder();
         for (int i = startIndex; i < args.size(); i++)
             arg.append(args.get(i)).append((i < args.size() - 1) ? " " : "");
-        return  arg.toString();
+        return arg.toString();
     }
 
     public static long getTimeFromMillis(long time, TimeUnit unit) {
@@ -292,8 +295,8 @@ public class GeneralUtils {
     public static long getTimeFromSeconds(long time, TimeUnit unit) {
         return switch (unit) {
             case SECONDS -> ((time % 86400) % 3600) % 60;
-            case MINUTES -> ((time % 86400 ) % 3600 ) / 60;
-            case HOURS -> (time % 86400 ) / 3600;
+            case MINUTES -> ((time % 86400) % 3600) / 60;
+            case HOURS -> (time % 86400) / 3600;
             default -> throw new IllegalArgumentException("The enum provided isn't a supported enum!");
         };
     }
@@ -301,7 +304,7 @@ public class GeneralUtils {
     public static long getTimeFromMillis(Duration duration, TimeUnit unit) {
         return switch (unit) {
             case SECONDS -> duration.toSeconds() % 60;
-            case MINUTES ->  duration.toMinutes() % 60;
+            case MINUTES -> duration.toMinutes() % 60;
             case HOURS -> duration.toHours() % 24;
             case DAYS -> duration.toDays();
             default -> throw new IllegalArgumentException("The enum provided isn't a supported enum!");
@@ -341,8 +344,8 @@ public class GeneralUtils {
     }
 
     public static long getFutureTime(String timeUnparsed) {
-        String timeDigits       = timeUnparsed.substring(0, timeUnparsed.length()-1);
-        char duration           = timeUnparsed.charAt(timeUnparsed.length()-1);
+        String timeDigits = timeUnparsed.substring(0, timeUnparsed.length() - 1);
+        char duration = timeUnparsed.charAt(timeUnparsed.length() - 1);
         long scheduledDuration;
 
         if (Integer.parseInt(timeDigits) < 0)
@@ -350,11 +353,16 @@ public class GeneralUtils {
 
         if (GeneralUtils.stringIsInt(timeDigits))
             switch (duration) {
-                case 's' -> scheduledDuration = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Integer.parseInt(timeDigits));
-                case 'm' -> scheduledDuration = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(Integer.parseInt(timeDigits));
-                case 'h' -> scheduledDuration = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(Integer.parseInt(timeDigits));
-                case 'd' -> scheduledDuration = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(Integer.parseInt(timeDigits));
-                default -> throw new IllegalArgumentException("The duration specifier \""+duration+"\" is invalid!");
+                case 's' ->
+                        scheduledDuration = System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(Integer.parseInt(timeDigits));
+                case 'm' ->
+                        scheduledDuration = System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(Integer.parseInt(timeDigits));
+                case 'h' ->
+                        scheduledDuration = System.currentTimeMillis() + TimeUnit.HOURS.toMillis(Integer.parseInt(timeDigits));
+                case 'd' ->
+                        scheduledDuration = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(Integer.parseInt(timeDigits));
+                default ->
+                        throw new IllegalArgumentException("The duration specifier \"" + duration + "\" is invalid!");
             }
         else throw new IllegalArgumentException("There was no valid integer provided!");
 
@@ -367,8 +375,8 @@ public class GeneralUtils {
 
     public static String formatDuration(String timeUnparsed) {
         String ret;
-        String timeDigits       = timeUnparsed.substring(0, timeUnparsed.length()-1);
-        char duration           = timeUnparsed.charAt(timeUnparsed.length()-1);
+        String timeDigits = timeUnparsed.substring(0, timeUnparsed.length() - 1);
+        char duration = timeUnparsed.charAt(timeUnparsed.length() - 1);
 
         if (GeneralUtils.stringIsInt(timeDigits))
             switch (duration) {
@@ -376,7 +384,8 @@ public class GeneralUtils {
                 case 'm' -> ret = timeDigits + " minutes";
                 case 'h' -> ret = timeDigits + " hours";
                 case 'd' -> ret = timeDigits + " days";
-                default -> throw new IllegalArgumentException("The duration specifier \""+duration+"\" is invalid!");
+                default ->
+                        throw new IllegalArgumentException("The duration specifier \"" + duration + "\" is invalid!");
             }
         else throw new IllegalArgumentException("There was no valid integer provided!");
 
@@ -531,7 +540,7 @@ public class GeneralUtils {
                 guild,
                 () -> new EmbedBuilder()
                         .setColor(theme.getColor())
-                        .setAuthor(author,null, theme.getTransparent())
+                        .setAuthor(author, null, theme.getTransparent())
                         .setFooter(footer)
         );
     }
@@ -595,7 +604,7 @@ public class GeneralUtils {
             case "9️⃣" -> {
                 return 9;
             }
-            default -> throw new IllegalArgumentException("Invalid argument \""+emoji+"\"");
+            default -> throw new IllegalArgumentException("Invalid argument \"" + emoji + "\"");
         }
     }
 
@@ -634,7 +643,7 @@ public class GeneralUtils {
             case 10 -> {
                 return "🔟";
             }
-            default -> throw new IllegalArgumentException("Invalid argument \""+num+"\"");
+            default -> throw new IllegalArgumentException("Invalid argument \"" + num + "\"");
         }
     }
 
@@ -672,7 +681,7 @@ public class GeneralUtils {
         return getID(obj, field.toString());
     }
 
-    public static long  getID(JSONObject obj, String field) {
+    public static long getID(JSONObject obj, String field) {
         try {
             return obj.getLong(field);
         } catch (JSONException e) {
@@ -713,6 +722,66 @@ public class GeneralUtils {
                 .setActionRow(Button.link("https://robertify.me/premium", LocaleManager.getLocaleManager(guild).getMessage(RobertifyLocaleMessage.GeneralMessages.PREMIUM_UPGRADE_BUTTON)))
                 .queue();
         return false;
+    }
+
+    public static void dmUser(User user, LocaleMessage message) {
+        user.openPrivateChannel().queue(channel -> {
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(message).build())
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {
+                            }));
+        });
+    }
+
+    public static void dmUser(User user, String message) {
+        user.openPrivateChannel().queue(channel -> {
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(message).build())
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {
+                            }));
+        });
+    }
+
+    public static void dmUser(User user, MessageEmbed embed) {
+        user.openPrivateChannel().queue(channel -> {
+            channel.sendMessageEmbeds(embed)
+                    .queue(null, new ErrorHandler()
+                            .handle(ErrorResponse.CANNOT_SEND_TO_USER, ignored -> {
+                            }));
+        });
+    }
+
+    public static void dmUser(long uid, String message) {
+        Robertify.shardManager.retrieveUserById(uid).queue(user -> {
+            if (user != null)
+                dmUser(user, message);
+        });
+    }
+
+    public static void dmUser(long uid, LocaleMessage message) {
+        Robertify.shardManager.retrieveUserById(uid).queue(user -> {
+            if (user != null)
+                dmUser(user, message);
+        });
+    }
+
+    public static void dmUser(long uid, MessageEmbed message) {
+        Robertify.shardManager.retrieveUserById(uid).queue(user -> {
+            if (user != null)
+                dmUser(user, message);
+        });
+    }
+
+    public static void dmUser(String uid, String message) {
+        dmUser(Long.parseLong(uid), message);
+    }
+
+    public static void dmUser(String uid, LocaleMessage message) {
+        dmUser(Long.parseLong(uid), message);
+    }
+
+    public static void dmUser(String uid, MessageEmbed message) {
+        dmUser(Long.parseLong(uid), message);
     }
 
     public enum Mentioner {
