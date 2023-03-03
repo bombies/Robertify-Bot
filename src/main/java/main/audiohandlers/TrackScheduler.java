@@ -225,6 +225,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         AudioTrack nextTrack = queue.poll();
 
+        getMusicPlayer().stopTrack();
+
         if (nextTrack != null)
             getMusicPlayer().playTrack(nextTrack);
         else {
@@ -277,8 +279,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                 RobertifyEmbedUtils.embedMessage(
                                                 guild,
                                                 RobertifyLocaleMessage.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
-                                                Pair.of("{title}", track.getInfo().title),
-                                                Pair.of("{author}", track.getInfo().author)
+                                                Pair.of("{title}", track != null ? track.getInfo().title : "Unknown Title"),
+                                                Pair.of("{author}", track != null ? track.getInfo().author : "Unknown Author")
                                         )
                                         .build()
                         )
