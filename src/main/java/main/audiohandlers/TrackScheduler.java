@@ -225,23 +225,16 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         AudioTrack nextTrack = queue.poll();
 
-        if (getMusicPlayer().getPlayingTrack() != null)
-            getMusicPlayer().stopTrack();
-
-        try {
-            if (nextTrack != null)
-                getMusicPlayer().playTrack(nextTrack);
-            else {
-                if (lastTrack != null && new AutoPlayConfig(guild).getStatus() && lastTrack.getSourceManager().getSourceName().equalsIgnoreCase("spotify")) {
-                    audioManager.loadRecommendedTracks(
-                            audioManager.getMusicManager(guild),
-                            announcementChannel,
-                            lastTrack
-                    );
-                } else disconnectManager.scheduleDisconnect(true);
-            }
-        } catch (IllegalStateException e) {
+        if (nextTrack != null)
             getMusicPlayer().playTrack(nextTrack);
+        else {
+            if (lastTrack != null && new AutoPlayConfig(guild).getStatus() && lastTrack.getSourceManager().getSourceName().equalsIgnoreCase("spotify")) {
+                audioManager.loadRecommendedTracks(
+                        audioManager.getMusicManager(guild),
+                        announcementChannel,
+                        lastTrack
+                );
+            } else disconnectManager.scheduleDisconnect(true);
         }
 
         final var dedicatedChannelConfig = new RequestChannelConfig(guild);
