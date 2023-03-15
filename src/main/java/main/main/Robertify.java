@@ -1,5 +1,6 @@
 package main.main;
 
+import api.RobertifySpringApi;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.sentry.Instrumenter;
@@ -238,6 +239,8 @@ public class Robertify {
 
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
+
+            RobertifySpringApi.start(args);
 
             Robertify.cronScheduler.start();
 
