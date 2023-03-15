@@ -51,7 +51,8 @@ public enum ENV {
     ROBERTIFY_WEB_HOSTNAME("robertify_web_hostname"),
     ROBERTIFY_API_PASSWORD("robertify_api_master_password"),
 
-    SENTRY_DSN("sentry_dsn");
+    SENTRY_DSN("sentry_dsn"),
+    SPRING_API_SECRET_KEY("spring_api_secret_key");
 
     private final String str;
 
