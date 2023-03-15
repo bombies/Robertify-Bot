@@ -40,3 +40,4 @@ Lavalink/plugins
 Lavalink/logs
 logback.xml
 locale/*.yml
+resources/application.yml
