@@ -1,4 +1,4 @@
-package api.locale.dto;
+package api.routes.locale.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

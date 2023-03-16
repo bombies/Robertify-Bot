@@ -14,6 +14,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -50,10 +51,17 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
             return;
         }
 
+        createRequestChannel(guild, msg);
+    }
+
+    public void createRequestChannel(Guild guild, Message msg) {
+        final var dediChannelConfig = new RequestChannelConfig(guild);
+        if (dediChannelConfig.isChannelSet())
+            throw new IllegalArgumentException("The request channel for this guild is already created!");
+
         guild.createTextChannel("robertify-requests").queue(
                 textChannel -> {
                     final var theme = new ThemesConfig(guild).getTheme();
-                    final var dediChannelConfig = new RequestChannelConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
 
@@ -74,14 +82,16 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
                                 if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
                                     dediChannelConfig.updateMessage();
 
-                                try {
-                                    msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
-                                                    .queue();
-                                } catch (InsufficientPermissionException e) {
-                                    if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
+                                if (msg != null) {
+                                    try {
+                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
                                                 .queue();
-                                    else e.printStackTrace();
+                                    } catch (InsufficientPermissionException e) {
+                                        if (e.getMessage().contains("MESSAGE_HISTORY"))
+                                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
+                                                    .queue();
+                                        else e.printStackTrace();
+                                    }
                                 }
                             });
                 },

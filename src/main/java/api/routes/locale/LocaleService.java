@@ -1,7 +1,7 @@
-package api.locale;
+package api.routes.locale;
 
-import api.ApiUtils;
-import api.locale.dto.LocaleDto;
+import api.utils.ApiUtils;
+import api.routes.locale.dto.LocaleDto;
 import lombok.NoArgsConstructor;
 import main.commands.slashcommands.commands.management.LanguageCommand;
 import org.springframework.http.ResponseEntity;

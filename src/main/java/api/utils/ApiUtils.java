@@ -1,4 +1,4 @@
-package api;
+package api.utils;
 
 import main.main.Robertify;
 import net.dv8tion.jda.api.entities.Guild;

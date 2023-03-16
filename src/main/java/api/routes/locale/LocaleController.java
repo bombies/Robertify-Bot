@@ -1,7 +1,6 @@
-package api.locale;
+package api.routes.locale;
 
-import api.ApiUtils;
-import api.locale.dto.LocaleDto;
+import api.routes.locale.dto.LocaleDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
