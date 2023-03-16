@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -18,7 +19,7 @@ import java.util.Map;
 public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(null, userDetails);
+        return generateToken(Map.of(), userDetails);
     }
 
     public String generateToken(
@@ -29,7 +30,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60))) // Expires after an hour.
+                .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60))) // Expires after an hour.
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -70,7 +71,7 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(Config.get(ENV.SPRING_API_SECRET_KEY));
+        byte[] keyBytes = Config.get(ENV.SPRING_API_SECRET_KEY).getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
