@@ -1,4 +1,4 @@
-package api.routes.themes.dto;
+package api.locale.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ThemeDto {
+public class LocaleDto {
     @NotBlank()
-    public String server_id;
+    String server_id;
     @NotBlank()
-    @Pattern(regexp = "^(green|gold|red|yellow|orange|dark|light|blue|light_blue|lightblue|pink|purple|mint|pastel_yellow|pastel_purple|pastel_red|baby_blue)$")
-    public String theme;
+    @Pattern(regexp = "^(en|english|spanish|es|portuguese|pt|russian|ru|dutch|nl|german|de|french|fr)$", flags = { Pattern.Flag.CASE_INSENSITIVE })
+    String locale;
 }
