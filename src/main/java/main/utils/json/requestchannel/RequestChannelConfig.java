@@ -94,7 +94,9 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         if (!isChannelSet())
             throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
 
-        getTextChannel().delete().queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {}));
+        final var textChannel = getTextChannel();
+        if (textChannel != null)
+            textChannel.delete().queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {}));
 
         var obj = getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
         obj.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), -1);
