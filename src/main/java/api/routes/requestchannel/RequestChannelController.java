@@ -1,6 +1,7 @@
 package api.routes.requestchannel;
 
 import api.routes.requestchannel.dto.CreateRequestChannelDto;
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto;
 import api.utils.ApiUtils;
 import api.utils.GeneralResponse;
 import jakarta.validation.Valid;
@@ -22,5 +23,10 @@ public class RequestChannelController {
     @PostMapping("")
     public ResponseEntity<GeneralResponse> createChannel(@Valid @RequestBody CreateRequestChannelDto createRequestChannelDto) {
         return service.createChannel(createRequestChannelDto);
+    }
+
+    @PostMapping("/button")
+    public ResponseEntity<GeneralResponse> toggleButtonVisibility(@Valid @RequestBody ToggleRequestChannelButtonDto toggleRequestChannelButtonDto) {
+        return service.toggleButton(toggleRequestChannelButtonDto);
     }
 }

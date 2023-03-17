@@ -13,6 +13,7 @@ import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -158,13 +160,17 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
         }
 
         event.deferReply().queue();
-
-        final var localeManager = LocaleManager.getLocaleManager(guild);
+        handleChannelButtonToggle(guild, split[1], event);
+    }
+    
+    public void handleChannelButtonToggle(Guild guild, String button, @Nullable ButtonInteractionEvent event) {
+        final LocaleManager localeManager = LocaleManager.getLocaleManager(guild);
         final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         final var config = dedicatedChannelConfig.getConfig();
         final RequestChannelConfig.ChannelConfig.Field field;
         final String buttonName;
-        switch (split[1]) {
+        
+        switch (button) {
             case "previous" -> {
                 field = RequestChannelConfig.ChannelConfig.Field.PREVIOUS;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS);
@@ -210,18 +216,20 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
 
         if (config.getState(field)) {
             config.setState(field, false);
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                        Pair.of("{button}", buttonName),
-                        Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
-                    ).build())
-                    .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+            if (event != null)
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                                Pair.of("{button}", buttonName),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        ).build())
+                        .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
         } else {
             config.setState(field, true);
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                            Pair.of("{button}", buttonName),
-                            Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
-                    ).build())
-                    .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+            if (event != null)
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                                Pair.of("{button}", buttonName),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        ).build())
+                        .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
         }
 
         dedicatedChannelConfig.updateButtons();
