@@ -52,7 +52,9 @@ public enum ENV {
     ROBERTIFY_API_PASSWORD("robertify_api_master_password"),
 
     SENTRY_DSN("sentry_dsn"),
-    SPRING_API_SECRET_KEY("spring_api_secret_key");
+    SPRING_API_SECRET_KEY("spring_api_secret_key"),
+    SPRING_API_PORT("spring_api_port");
+
 
     private final String str;
 
