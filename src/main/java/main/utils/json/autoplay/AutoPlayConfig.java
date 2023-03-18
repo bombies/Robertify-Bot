@@ -29,7 +29,6 @@ public class AutoPlayConfig extends AbstractGuildConfig {
     public void setStatus(boolean status) {
         JSONObject guildObject = getGuildObject();
         guildObject.put(Field.AUTOPLAY.name().toLowerCase(), status);
-
         getCache().updateGuild(guildObject, gid);
     }
 
