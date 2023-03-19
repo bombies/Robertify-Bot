@@ -26,6 +26,12 @@ public class ThemesService {
                     "Invalid theme",
                     e
             );
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Internal Server Error",
+                    e
+            );
         }
     }
 }

@@ -240,8 +240,6 @@ public class Robertify {
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
 
-            RobertifySpringApi.start(args);
-
             Robertify.cronScheduler.start();
 
             initVoteSiteAPIs();
@@ -257,6 +255,8 @@ public class Robertify {
                     options.setInstrumenter(Instrumenter.OTEL);
                     options.addEventProcessor(new OpenTelemetryLinkErrorEventProcessor());
                 });
+
+            RobertifySpringApi.start(args);
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }
