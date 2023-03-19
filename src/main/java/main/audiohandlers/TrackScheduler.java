@@ -42,7 +42,8 @@ import java.util.Stack;
 import java.util.concurrent.*;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
-    private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
+    @Getter
+    private ConcurrentLinkedQueue<AudioTrack> savedQueue;
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
 
     private final Guild guild;
@@ -51,7 +52,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     private GuildMessageChannel announcementChannel = null;
     private AudioTrack lastPlayedTrackBuffer;
     @Getter
-    private final static HashMap<Long, Stack<AudioTrack>> pastQueue = new HashMap<>();
+    private final Stack<AudioTrack> pastQueue;
     @Getter
     private ConcurrentLinkedQueue<AudioTrack> queue;
     @Getter @Setter
@@ -66,6 +67,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
         this.queue = new ConcurrentLinkedQueue<>();
+        this.pastQueue = new Stack<>();
+        this.savedQueue = new ConcurrentLinkedQueue<>();
         this.disconnectManager = DisconnectManager.getInstance().getGuildDisconnector(guild);
     }
 
@@ -223,7 +226,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (queue.isEmpty())
             if (playlistRepeating)
-                this.queue = new ConcurrentLinkedQueue<>(savedQueue.get(guild));
+                this.queue = new ConcurrentLinkedQueue<>(savedQueue);
 
         AudioTrack nextTrack = queue.poll();
 
@@ -264,9 +267,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 nextTrack(null);
             }
         } else if (endReason.mayStartNext) {
-            if (!pastQueue.containsKey(guild.getIdLong()))
-                pastQueue.put(guild.getIdLong(), new Stack<>());
-            pastQueue.get(guild.getIdLong()).push(trackToUse);
+            pastQueue.push(trackToUse);
             nextTrack(trackToUse);
         }
     }
@@ -322,13 +323,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     }
 
 
-    public void setSavedQueue(Guild guild, ConcurrentLinkedQueue<AudioTrack> queue) {
-        ConcurrentLinkedQueue<AudioTrack> savedQueue = new ConcurrentLinkedQueue<>(queue);
-        TrackScheduler.savedQueue.put(guild, savedQueue);
+    public void setSavedQueue(ConcurrentLinkedQueue<AudioTrack> queue) {
+        this.savedQueue = new ConcurrentLinkedQueue<>(queue);
     }
 
-    public void clearSavedQueue(Guild guild) {
-        savedQueue.remove(guild);
+    public void clearSavedQueue() {
+        savedQueue.clear();
     }
 
     public void disconnect(boolean announceMsg) {

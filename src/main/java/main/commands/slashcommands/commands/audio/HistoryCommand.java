@@ -32,7 +32,8 @@ public class HistoryCommand extends AbstractSlashCommand {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
-        final var pastTracks = TrackScheduler.getPastQueue().get(event.getGuild().getIdLong());
+        final var scheduler = RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler();
+        final var pastTracks = scheduler.getPastQueue();
 
         if (pastTracks == null) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HistoryMessages.NO_PAST_TRACKS).build())

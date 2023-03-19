@@ -58,7 +58,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
             scheduler.addToBeginningOfQueue(nowPlayingTrack);
         }
 
-        audioPlayer.playTrack(previouslyPlayedTracks.get(guild.getIdLong()).pop());
+        audioPlayer.playTrack(previouslyPlayedTracks.pop());
 
         if (new RequestChannelConfig(guild).isChannelSet())
             new RequestChannelConfig(guild).updateMessage();

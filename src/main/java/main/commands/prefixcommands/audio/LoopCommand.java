@@ -144,7 +144,7 @@ public class LoopCommand implements ICommand {
             }
 
             scheduler.addToBeginningOfQueue(thisTrack);
-            scheduler.setSavedQueue(guild, scheduler.getQueue());
+            scheduler.setSavedQueue(scheduler.getQueue());
             scheduler.getQueue().remove(thisTrack);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
         }

@@ -34,8 +34,8 @@ public class GuildMusicManager {
 
         getScheduler().setRepeating(false);
         getScheduler().setPlaylistRepeating(false);
-        getScheduler().clearSavedQueue(guild);
-        TrackScheduler.getPastQueue().clear();
+        getScheduler().clearSavedQueue();
+        getScheduler().getPastQueue().clear();
         getPlayer().getFilters().clear().commit();
         RobertifyAudioManager.clearRequesters(guild);
 

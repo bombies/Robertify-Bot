@@ -65,12 +65,10 @@ public class SkipToCommand implements ICommand {
 
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
-        HashMap<Long, Stack<AudioTrack>> pastQueue = scheduler.getPastQueue();
-        if (!pastQueue.containsKey(guild.getIdLong()))
-            pastQueue.put(guild.getIdLong(), new Stack<>());
 
-        AudioTrack playingTrack = audioPlayer.getPlayingTrack();
-        pastQueue.get(guild.getIdLong()).push(playingTrack);
+        final var pastQueue = scheduler.getPastQueue();
+        final var playingTrack = audioPlayer.getPlayingTrack();
+        pastQueue.push(playingTrack);
 
         try {
             scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());
