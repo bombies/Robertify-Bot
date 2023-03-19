@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.locale.LocaleManager;
@@ -43,21 +44,21 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         if (playlist.isSearchResult())
             throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
 
-        logger.info("Successfully loaded all recommended tracks for {}.", guild.getName());
+        logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
         final var scheduler = musicManager.getScheduler();
 
-        HashMap<Long, List<String>> tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
+        final var tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
         tracksRequestedByUsers.putIfAbsent(guild.getIdLong(), new ArrayList<>());
 
-        List<AudioTrack> tracks = playlist.getTracks();
-        for (final AudioTrack track : tracks.subList(1, tracks.size())) {
+        final var tracks = playlist.getTracks();
+        for (final var track : tracks) {
             tracksRequestedByUsers.get(guild.getIdLong()).add(guild.getSelfMember().getId() + ":" + track.getIdentifier());
             scheduler.queue(track);
         }
 
         if (scheduler.playlistRepeating) {
             scheduler.playlistRepeating = false;
-            scheduler.getPastQueue().clear();
+            TrackScheduler.getPastQueue().clear();
             scheduler.clearSavedQueue(guild);
         }
 

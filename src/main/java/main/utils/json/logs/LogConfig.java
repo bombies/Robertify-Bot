@@ -34,7 +34,7 @@ public class LogConfig extends AbstractGuildConfig {
         if (!guildObject.has(Field.LOG_CHANNEL.name().toLowerCase()))
             return false;
 
-        if (guildObject.get(Field.LOG_CHANNEL.name().toLowerCase()) == null)
+        if (JSONObject.NULL.equals(guildObject.get(Field.LOG_CHANNEL.name().toLowerCase())))
             return false;
 
         return guildObject.getLong(Field.LOG_CHANNEL.name().toLowerCase()) != -1L;
