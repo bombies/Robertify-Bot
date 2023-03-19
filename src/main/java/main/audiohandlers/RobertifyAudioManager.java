@@ -361,7 +361,7 @@ public class RobertifyAudioManager {
 
     public void loadRecommendedTracks(GuildMusicManager musicManager, GuildMessageChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
-        musicManager.getPlayerManager().loadItemOrdered(musicManager, SpotifySourceManager.RECOMMENDATIONS_PREFIX + "seed_tracks=" + query.getIdentifier(), loader);
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, String.format("%sseed_tracks=%s&limit=%d", SpotifySourceManager.RECOMMENDATIONS_PREFIX, query.getIdentifier(), 10), loader);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,
