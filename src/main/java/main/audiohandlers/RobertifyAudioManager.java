@@ -47,7 +47,7 @@ public class RobertifyAudioManager {
     private static RobertifyAudioManager INSTANCE;
 
     @Getter
-    private final Map<Long, GuildMusicManager> musicManagers;
+    private static final Map<Long, GuildMusicManager> musicManagers = new HashMap<>();
 
     /**
      * Each guild will have a list that consists of tracks formatted "userid:trackstring"
@@ -62,7 +62,6 @@ public class RobertifyAudioManager {
     private final AudioPlayerManager playerManager;
 
     private RobertifyAudioManager() {
-        this.musicManagers = new HashMap<>();
         this.playerManager = new DefaultAudioPlayerManager();
 
         // TODO IPv6 rotation stuff
@@ -100,12 +99,15 @@ public class RobertifyAudioManager {
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
-        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new GuildMusicManager(guild));
+        return musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> {
+            logger.debug("Creating new music manager for {}", guild.getName());
+            return new GuildMusicManager(guild);
+        });
     }
 
     public void removeMusicManager(Guild guild) {
-        this.musicManagers.get(guild.getIdLong()).destroy();
-        this.musicManagers.remove(guild.getIdLong());
+        musicManagers.get(guild.getIdLong()).destroy();
+        musicManagers.remove(guild.getIdLong());
     }
 
     @SneakyThrows
@@ -362,6 +364,10 @@ public class RobertifyAudioManager {
     public void loadRecommendedTracks(GuildMusicManager musicManager, GuildMessageChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
         musicManager.getPlayerManager().loadItemOrdered(musicManager, String.format("%sseed_tracks=%s&limit=%d", SpotifySourceManager.RECOMMENDATIONS_PREFIX, query.getIdentifier(), 10), loader);
+    }
+
+    public void loadRecommendedTracks(Guild guild, GuildMessageChannel channel, AudioTrack query) {
+        loadRecommendedTracks(getMusicManager(guild), channel, query);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,

@@ -28,7 +28,7 @@ public class MoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();

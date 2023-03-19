@@ -45,8 +45,8 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
             throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
 
         logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
-        final var scheduler = musicManager.getScheduler();
 
+        final var scheduler = musicManager.getScheduler();
         final var tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
         tracksRequestedByUsers.putIfAbsent(guild.getIdLong(), new ArrayList<>());
 
@@ -56,10 +56,9 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
             scheduler.queue(track);
         }
 
-        if (scheduler.playlistRepeating) {
-            scheduler.playlistRepeating = false;
-            TrackScheduler.getPastQueue().clear();
-            scheduler.clearSavedQueue(guild);
+        if (scheduler.isPlaylistRepeating()) {
+            scheduler.setPlaylistRepeating(false);
+            scheduler.removeSavedQueue(guild);
         }
 
         if (new RequestChannelConfig(guild).isChannelSet())

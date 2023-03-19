@@ -165,7 +165,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
             final var audioPlayer = musicManager.getPlayer();
             final var playingTrack = audioPlayer.getPlayingTrack();
-            final var queue = musicManager.getScheduler().queue;
+            final var queue = musicManager.getScheduler().getQueue();
             final var queueAsList = new ArrayList<>(queue);
             final var theme = new ThemesConfig(guild).getTheme();
             final var localeManager = LocaleManager.getLocaleManager(guild);

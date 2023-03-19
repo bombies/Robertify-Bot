@@ -28,7 +28,7 @@ public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
@@ -65,12 +65,10 @@ public class SkipToCommand implements ICommand {
 
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
-        HashMap<Long, Stack<AudioTrack>> pastQueue = scheduler.getPastQueue();
-        if (!pastQueue.containsKey(guild.getIdLong()))
-            pastQueue.put(guild.getIdLong(), new Stack<>());
+        final var pastQueue = scheduler.getPastQueue();
 
         AudioTrack playingTrack = audioPlayer.getPlayingTrack();
-        pastQueue.get(guild.getIdLong()).push(playingTrack);
+        pastQueue.push(playingTrack);
 
         try {
             scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());

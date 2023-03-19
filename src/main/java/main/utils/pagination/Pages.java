@@ -105,7 +105,7 @@ public abstract class Pages {
         } catch (SocketTimeoutException | ConnectException e) {
             final var pages = new ArrayList<MessagePage>();
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            final var queue = musicManager.getScheduler().queue;
+            final var queue = musicManager.getScheduler().getQueue();
             final var content = new QueueCommand().getContent(event.getGuild(), queue);
 
             messageLogic(event.getGuild(), pages, content, 10);
@@ -136,7 +136,7 @@ public abstract class Pages {
 
     public static Message paginateQueue(int maxPerPage, SlashCommandInteractionEvent event) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
         final var queuePages = new ArrayList<QueuePage>();
 
         event.deferReply().queue();

@@ -89,8 +89,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                 Pair.of("{author}", info.author)
         );
 
-        if (scheduler.playlistRepeating)
-            scheduler.setSavedQueue(guild, scheduler.queue);
+        if (scheduler.isPlaylistRepeating())
+            scheduler.setSavedQueue(guild, scheduler.getQueue());
 
         if (requestChannelConfig.isChannelSet())
             requestChannelConfig.updateMessage();
@@ -158,8 +158,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                         Pair.of("{author}", info.author)
                 );
 
-            if (scheduler.playlistRepeating)
-                scheduler.setSavedQueue(guild, scheduler.queue);
+            if (scheduler.isPlaylistRepeating())
+                scheduler.setSavedQueue(guild, scheduler.getQueue());
 
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
@@ -214,8 +214,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                     scheduler.queue(track);
             }
 
-            if (scheduler.playlistRepeating)
-                scheduler.setSavedQueue(guild, scheduler.queue);
+            if (scheduler.isPlaylistRepeating())
+                scheduler.setSavedQueue(guild, scheduler.getQueue());
 
         }
         if (dedicatedChannelConfig.isChannelSet())
@@ -250,7 +250,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                     ));
         }
 
-        if (musicManager.getScheduler().queue.isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
+        if (musicManager.getScheduler().getQueue().isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
             musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 

@@ -49,10 +49,10 @@ public class StopCommand extends AbstractSlashCommand implements ICommand {
         if (track == null)
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
 
-        scheduler.repeating = false;
-        scheduler.playlistRepeating = false;
+        scheduler.setRepeating(false);
+        scheduler.setPlaylistRepeating(false);
         audioPlayer.stopTrack();
-        scheduler.queue.clear();
+        scheduler.getQueue().clear();
         scheduler.getPastQueue().clear();
 
         if (audioPlayer.isPaused())

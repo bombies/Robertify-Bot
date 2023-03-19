@@ -81,7 +81,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                     .queue();
         } else {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
+            final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
             final int tracksToSkip = GeneralUtils.longToInt(event.getOption("trackstoskip").getAsLong());
             event.getHook().sendMessageEmbeds(new SkipToCommand().handleSkip(event.getUser(), queue, musicManager, tracksToSkip).build())
                     .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))

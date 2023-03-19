@@ -41,7 +41,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
         final var guild = event.getGuild();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 

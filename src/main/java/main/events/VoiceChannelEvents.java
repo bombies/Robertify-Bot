@@ -42,8 +42,8 @@ public class VoiceChannelEvents extends ListenerAdapter {
         } else {
             if (event.getMember().equals(guild.getSelfMember())) {
                 final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                musicManager.getScheduler().repeating = false;
-                musicManager.getScheduler().playlistRepeating = false;
+                musicManager.getScheduler().setRepeating(false);
+                musicManager.getScheduler().setPlaylistRepeating(false);
 
                 if (musicManager.getPlayer().isPaused())
                     musicManager.getPlayer().setPaused(false);
@@ -51,7 +51,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
                 if (musicManager.getPlayer().getPlayingTrack() != null)
                     musicManager.getPlayer().stopTrack();
 
-                musicManager.getScheduler().queue.clear();
+                musicManager.getScheduler().getQueue().clear();
                 musicManager.getPlayer().getFilters().clear().commit();
 
                 final var dedicatedChannelConfig = new RequestChannelConfig(guild);

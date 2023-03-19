@@ -288,9 +288,9 @@ public class RequestChannelEvents extends ListenerAdapter {
             final var scheduler = musicManager.getScheduler();
             final var info = musicManager.getPlayer().getPlayingTrack().getInfo();
             final EmbedBuilder loopEmbed;
-            if (scheduler.repeating) {
-                scheduler.repeating = false;
-                scheduler.playlistRepeating = true;
+            if (scheduler.isRepeating()) {
+                scheduler.setRepeating(false);
+                scheduler.setPlaylistRepeating(true);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild,
                         RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START,
                         Pair.of("{title}", info.title)
@@ -301,9 +301,9 @@ public class RequestChannelEvents extends ListenerAdapter {
                         Pair.of("{user}", member.getAsMention()),
                         Pair.of("{status}", "looped")
                 );
-            } else if (scheduler.playlistRepeating) {
-                scheduler.playlistRepeating = false;
-                scheduler.repeating = false;
+            } else if (scheduler.isPlaylistRepeating()) {
+                scheduler.setPlaylistRepeating(false);
+                scheduler.setRepeating(false);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
 
                 new LogUtils(guild).sendLog(
@@ -312,8 +312,8 @@ public class RequestChannelEvents extends ListenerAdapter {
                         Pair.of("{status}", "unlooped")
                 );
             } else {
-                scheduler.repeating = true;
-                scheduler.playlistRepeating = false;
+                scheduler.setRepeating(true);
+                scheduler.setPlaylistRepeating(false);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START);
 
                 new LogUtils(guild).sendLog(
