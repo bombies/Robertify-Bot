@@ -47,7 +47,7 @@ public class RobertifyAudioManager {
     private static RobertifyAudioManager INSTANCE;
 
     @Getter
-    private final Map<Long, GuildMusicManager> musicManagers;
+    private static final Map<Long, GuildMusicManager> musicManagers = new HashMap<>();
 
     /**
      * Each guild will have a list that consists of tracks formatted "userid:trackstring"
@@ -62,7 +62,6 @@ public class RobertifyAudioManager {
     private final AudioPlayerManager playerManager;
 
     private RobertifyAudioManager() {
-        this.musicManagers = new HashMap<>();
         this.playerManager = new DefaultAudioPlayerManager();
 
         // TODO IPv6 rotation stuff
@@ -100,12 +99,12 @@ public class RobertifyAudioManager {
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
-        return this.musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new GuildMusicManager(guild));
+        return musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new GuildMusicManager(guild));
     }
 
     public void removeMusicManager(Guild guild) {
-        this.musicManagers.get(guild.getIdLong()).destroy();
-        this.musicManagers.remove(guild.getIdLong());
+        musicManagers.get(guild.getIdLong()).destroy();
+        musicManagers.remove(guild.getIdLong());
     }
 
     @SneakyThrows

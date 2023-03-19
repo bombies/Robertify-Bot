@@ -33,7 +33,7 @@ public class ShuffleCommand implements ICommand {
 
     public EmbedBuilder handleShuffle(Guild guild, User shuffler) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
 
         if (queue.isEmpty())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);

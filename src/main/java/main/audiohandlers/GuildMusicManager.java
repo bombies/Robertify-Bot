@@ -30,10 +30,10 @@ public class GuildMusicManager {
     }
 
     public void leave() {
-        getScheduler().queue.clear();
+        getScheduler().getQueue().clear();
 
-        getScheduler().repeating = false;
-        getScheduler().playlistRepeating = false;
+        getScheduler().setRepeating(false);
+        getScheduler().setPlaylistRepeating(false);
         getScheduler().clearSavedQueue(guild);
         TrackScheduler.getPastQueue().clear();
         getPlayer().getFilters().clear().commit();

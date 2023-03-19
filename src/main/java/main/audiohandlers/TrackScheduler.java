@@ -44,7 +44,6 @@ import java.util.concurrent.*;
 public class TrackScheduler extends PlayerEventListenerAdapter {
     private final static HashMap<Guild, ConcurrentLinkedQueue<AudioTrack>> savedQueue = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     private final Guild guild;
     private final Link audioPlayer;
@@ -53,9 +52,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     private AudioTrack lastPlayedTrackBuffer;
     @Getter
     private final static HashMap<Long, Stack<AudioTrack>> pastQueue = new HashMap<>();
-    public ConcurrentLinkedQueue<AudioTrack> queue;
-    public boolean repeating = false;
-    public boolean playlistRepeating = false;
+    @Getter
+    private ConcurrentLinkedQueue<AudioTrack> queue;
+    @Getter @Setter
+    private boolean repeating = false;
+    @Getter @Setter
+    private boolean playlistRepeating = false;
     private Message lastSentMsg = null;
     private final DisconnectManager.GuildDisconnectManager disconnectManager;
     private final static RobertifyAudioManager audioManager = RobertifyAudioManager.getInstance();

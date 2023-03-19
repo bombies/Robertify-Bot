@@ -28,7 +28,7 @@ public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().queue;
+        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();

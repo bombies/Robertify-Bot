@@ -56,8 +56,8 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
             scheduler.queue(track);
         }
 
-        if (scheduler.playlistRepeating) {
-            scheduler.playlistRepeating = false;
+        if (scheduler.isPlaylistRepeating()) {
+            scheduler.setPlaylistRepeating(false);
             TrackScheduler.getPastQueue().clear();
             scheduler.clearSavedQueue(guild);
         }

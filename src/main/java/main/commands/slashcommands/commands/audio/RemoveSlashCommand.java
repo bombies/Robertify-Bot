@@ -46,7 +46,7 @@ public class RemoveSlashCommand extends AbstractSlashCommand {
 
         final int trackSelected = GeneralUtils.longToInt(event.getOption("trackid").getAsLong());
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
 
         event.getHook().sendMessageEmbeds(new RemoveCommand().handleRemove(event.getGuild(), event.getUser(), queue, trackSelected).build())
                 .setEphemeral(true)

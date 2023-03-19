@@ -23,7 +23,7 @@ public class ClearQueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final var queue = musicManager.getScheduler().queue;
+        final var queue = musicManager.getScheduler().getQueue();
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
