@@ -26,13 +26,7 @@ public class DisconnectManager {
     }
 
     public GuildDisconnectManager getGuildDisconnector(Guild guild) {
-        if (guildDisconnects.containsKey(guild.getIdLong()))
-            return guildDisconnects.get(guild.getIdLong());
-        else {
-            val guildDisconnectManager = new GuildDisconnectManager(guild, executorService);
-            guildDisconnects.put(guild.getIdLong(), guildDisconnectManager);
-            return guildDisconnectManager;
-        }
+        return guildDisconnects.computeIfAbsent(guild.getIdLong(), guildId -> new GuildDisconnectManager(guild ,executorService));
     }
 
     public void destroyGuildDisconnector(Guild guild) {

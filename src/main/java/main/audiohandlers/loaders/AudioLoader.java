@@ -90,7 +90,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         );
 
         if (scheduler.isPlaylistRepeating())
-            scheduler.setSavedQueue(guild, scheduler.getQueue());
+            scheduler.setSavedQueue(scheduler.getQueue());
 
         if (requestChannelConfig.isChannelSet())
             requestChannelConfig.updateMessage();
@@ -159,7 +159,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                 );
 
             if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(guild, scheduler.getQueue());
+                scheduler.setSavedQueue(scheduler.getQueue());
 
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
@@ -215,7 +215,7 @@ public class AudioLoader implements AudioLoadResultHandler {
             }
 
             if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(guild, scheduler.getQueue());
+                scheduler.setSavedQueue(scheduler.getQueue());
 
         }
         if (dedicatedChannelConfig.isChannelSet())

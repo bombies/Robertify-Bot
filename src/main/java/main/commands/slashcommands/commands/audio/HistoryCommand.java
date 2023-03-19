@@ -32,8 +32,7 @@ public class HistoryCommand extends AbstractSlashCommand {
         if (!checks(event)) return;
 
         final var guild = event.getGuild();
-        final var scheduler = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild())
-                .getScheduler();
+        final var scheduler = RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler();
         final var pastTracks = scheduler.getPastQueue();
 
         if (pastTracks == null) {

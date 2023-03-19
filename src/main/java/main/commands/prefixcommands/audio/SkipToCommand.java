@@ -65,9 +65,9 @@ public class SkipToCommand implements ICommand {
 
         queue.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
-        final var pastQueue = scheduler.getPastQueue();
 
-        AudioTrack playingTrack = audioPlayer.getPlayingTrack();
+        final var pastQueue = scheduler.getPastQueue();
+        final var playingTrack = audioPlayer.getPlayingTrack();
         pastQueue.push(playingTrack);
 
         try {

@@ -136,20 +136,9 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final var audioPlayer = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
 
-<<<<<<< HEAD
         final var playingTrack = audioPlayer.getPlayingTrack();
         final var pastQueue = musicManager.getScheduler().getPastQueue();
         pastQueue.push(audioPlayer.getPlayingTrack());
-=======
-        AudioTrack playingTrack = audioPlayer.getPlayingTrack();
-        HashMap<Long, Stack<AudioTrack>> pastQueue = musicManager.getScheduler().getPastQueue();
-        if (!pastQueue.containsKey(guild.getIdLong()))
-            pastQueue.put(guild.getIdLong(), new Stack<>());
-        pastQueue.get(guild.getIdLong()).push(audioPlayer.getPlayingTrack());
-
-        if (scheduler.isRepeating())
-            scheduler.setRepeating(false);
->>>>>>> 1f173d748606af2f96273701cdce66240218a441
 
         if (scheduler.isRepeating())
             scheduler.setRepeating(false);
