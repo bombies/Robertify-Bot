@@ -42,3 +42,4 @@ logback.xml
 locale/*.yml
 src/main/resources/application.yml
 built_images
+logs
