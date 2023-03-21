@@ -28,7 +28,7 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
     private final AbstractMongoDatabase mongoDB;
     @Getter
     private final MongoCollection<Document> collection;
-    private final JedisPooled jedis;
+    protected final JedisPooled jedis;
 
     protected AbstractRedisCache(String cacheID, AbstractMongoDatabase mongoDB) {
         super(mongoDB);
@@ -110,6 +110,18 @@ public class AbstractRedisCache extends AbstractMongoDatabase implements Abstrac
         jedis.del(identifier);
         jedis.setex(cacheID + identifier, 3600, documentToJSON(document));
         upsertDocument(document);
+    }
+
+    @SneakyThrows
+    public void updateCacheNoDB(String identifier, Document document) {
+        jedis.del(identifier);
+        jedis.setex(cacheID + identifier, 3600, documentToJSON(document));
+    }
+
+    @SneakyThrows
+    public void updateCacheNoDB(String identifier, JSONObject json) {
+        jedis.del(identifier);
+        jedis.setex(cacheID + identifier, 3600, json.toString());
     }
 
     @SneakyThrows

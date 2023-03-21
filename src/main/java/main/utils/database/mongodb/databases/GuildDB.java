@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.NoSuchElementException;
+
 public class GuildDB extends AbstractMongoDatabase {
     private final static Logger logger = LoggerFactory.getLogger(GuildDB.class);
     private static GuildDB INSTANCE;
@@ -34,6 +36,29 @@ public class GuildDB extends AbstractMongoDatabase {
 
     public synchronized void removeGuild(long gid) {
         removeDocument(findSpecificDocument(Field.GUILD_ID, gid));
+    }
+
+    public synchronized Document findGuild(long gid) {
+        try {
+            return getCollection().find(in(Field.GUILD_ID.toString(), gid, Long.toString(gid))).iterator().next();
+        } catch (NoSuchElementException e) {
+            return null;
+        }
+    }
+
+    public synchronized Document findGuild(String gid) {
+        return findGuild(Long.parseLong(gid));
+    }
+
+    public synchronized void updateGuild(long gid, JSONObject obj) {
+        if (!obj.has(GuildDB.Field.GUILD_ID.toString()))
+            throw new IllegalArgumentException("The JSON object must have a guild_id field!");
+
+        Document document = findGuild(gid);
+        if (document == null)
+            throw new NullPointerException("There was no document found with guild id: " + gid);
+
+        upsertDocument(document, Document.parse(obj.toString()));
     }
 
     public static synchronized GuildDB ins() {

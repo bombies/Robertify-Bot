@@ -5,6 +5,7 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -88,11 +89,105 @@ public class GuildRedisCache extends AbstractRedisCache {
     }
 
     public void updateGuild(JSONObject obj, long gid) {
-        updateCache(correctGuildObj(obj), GuildDB.Field.GUILD_ID, gid);
+        final var db = getDB();
+        updateCacheNoDB(String.valueOf(gid), readyGuildObjForRedis(obj));
+        db.updateGuild(gid, correctGuildObj(obj));
     }
 
     public void updateGuild(JSONObject obj) {
-        updateCache(correctGuildObj(obj), GuildDB.Field.GUILD_ID, GeneralUtils.getID(obj, GuildDB.Field.GUILD_ID));
+        updateGuild(obj, GeneralUtils.getID(obj, GuildDB.Field.GUILD_ID));
+    }
+
+    public JSONObject readyGuildObjForRedis(JSONObject obj) {
+        if (!obj.has(GuildDB.Field.GUILD_ID.toString()))
+            return obj;
+
+        if (obj.get(GuildDB.Field.GUILD_ID.toString()) instanceof Long)
+            obj.put(GuildDB.Field.GUILD_ID.toString(), Long.toString(obj.getLong(GuildDB.Field.GUILD_ID.toString())));
+
+        if (obj.has(GuildDB.Field.LOG_CHANNEL.toString()))
+            if (obj.get(GuildDB.Field.LOG_CHANNEL.toString()) instanceof Long)
+                obj.put(GuildDB.Field.LOG_CHANNEL.toString(), Long.toString(obj.getLong(GuildDB.Field.LOG_CHANNEL.toString())));
+
+        if (obj.has(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())) {
+            final var restrictedChannelObj = obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString());
+            var rtc = restrictedChannelObj.getJSONArray(GuildDB.Field.RESTRICTED_CHANNELS_TEXT.toString());
+            var rvc = restrictedChannelObj.getJSONArray(GuildDB.Field.RESTRICTED_CHANNELS_VOICE.toString());
+
+            if (!rtc.isEmpty()) {
+                if (rtc.get(0) instanceof Long) {
+                    final var newArr = new JSONArray();
+                    rtc.toList().forEach(item -> newArr.put(Long.toString((long) item)));
+                    rtc = newArr;
+                }
+            }
+
+            if (!rvc.isEmpty()) {
+                if (rvc.get(0) instanceof Long) {
+                    final var newArr = new JSONArray();
+                    rvc.toList().forEach(item -> newArr.put(Long.toString((long) item)));
+                    rvc = newArr;
+                }
+            }
+
+            obj.put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), new JSONObject()
+                    .put(GuildDB.Field.RESTRICTED_CHANNELS_TEXT.toString(), rtc)
+                    .put(GuildDB.Field.RESTRICTED_CHANNELS_VOICE.toString(), rvc)
+            );
+        }
+
+        final var permissionsObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString());
+        for (final var code : Permission.getCodes()) {
+            if (!permissionsObj.has(String.valueOf(code)))
+                continue;
+
+            var codeArr = permissionsObj.getJSONArray(String.valueOf(code));
+
+            if (codeArr.isEmpty())
+                continue;
+            if (!(codeArr.get(0) instanceof Long))
+                continue;
+
+            final var newArr = new JSONArray();
+            codeArr.toList().forEach(item -> newArr.put(Long.toString((long)item)));
+            permissionsObj.put(String.valueOf(code), newArr);
+        }
+
+        if (permissionsObj.has("users")) {
+            final var usersObj = permissionsObj.getJSONObject("users");
+            for (final var user : usersObj.keySet()) {
+                final var userPermsArr = usersObj.getJSONArray(user);
+                if (userPermsArr.isEmpty())
+                    continue;
+                if (!(userPermsArr.get(0) instanceof Long))
+                    continue;
+                final var newArr = new JSONArray();
+                userPermsArr.forEach(item -> newArr.put(Integer.toString((int)item)));
+                usersObj.put(user, newArr);
+            }
+        }
+
+        final var dedicatedChannelObj = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
+        if (dedicatedChannelObj.get(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString()) instanceof Long)
+            dedicatedChannelObj.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), Long.toString(dedicatedChannelObj.getLong(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString())));
+        if (dedicatedChannelObj.get(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) instanceof Long)
+            dedicatedChannelObj.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), Long.toString(dedicatedChannelObj.getLong(GuildDB.Field.REQUEST_CHANNEL_ID.toString())));
+
+        if (obj.has(GuildDB.Field.BANNED_USERS_ARRAY.toString())) {
+            final var bannedUserArr = obj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString());
+            for (int i = 0; i < bannedUserArr.length(); i++) {
+                final var bannedUserObj = bannedUserArr.getJSONObject(i);
+                if (bannedUserObj.get(GuildDB.Field.BANNED_AT.toString()) instanceof Long)
+                    bannedUserObj.put(GuildDB.Field.BANNED_AT.toString(), Long.toString(bannedUserObj.getLong(GuildDB.Field.BANNED_AT.toString())));
+                if (bannedUserObj.get(GuildDB.Field.BANNED_USER.toString()) instanceof Long)
+                    bannedUserObj.put(GuildDB.Field.BANNED_USER.toString(), Long.toString(bannedUserObj.getLong(GuildDB.Field.BANNED_USER.toString())));
+                if (bannedUserObj.get(GuildDB.Field.BANNED_UNTIL.toString()) instanceof Long)
+                    bannedUserObj.put(GuildDB.Field.BANNED_UNTIL.toString(), Long.toString(bannedUserObj.getLong(GuildDB.Field.BANNED_UNTIL.toString())));
+                if (bannedUserObj.get(GuildDB.Field.BANNED_BY.toString()) instanceof Long)
+                    bannedUserObj.put(GuildDB.Field.BANNED_BY.toString(), Long.toString(bannedUserObj.getLong(GuildDB.Field.BANNED_BY.toString())));
+            }
+        }
+        return obj;
     }
 
     public JSONObject correctGuildObj(JSONObject obj) {
@@ -218,7 +313,8 @@ public class GuildRedisCache extends AbstractRedisCache {
             String guildJSON = getDocument(GuildDB.Field.GUILD_ID.toString(), Long.parseLong(gid));
 
             if (guildJSON != null) {
-                setex(gid, 3600, new JSONObject(guildJSON));
+                final var guildObj = readyGuildObjForRedis(new JSONObject(guildJSON));
+                setex(gid, 3600, guildObj);
                 logger.debug("Loaded guild with ID: {}", gid);
             }
         } catch (NullPointerException e) {
@@ -238,10 +334,14 @@ public class GuildRedisCache extends AbstractRedisCache {
     public void loadAllGuilds() {
         logger.debug("Attempting to load all guilds");
         getCollection().find().forEach(document -> {
-            JSONObject jsonObject = new JSONObject(document.toJson());
+            JSONObject jsonObject = readyGuildObjForRedis(new JSONObject(document.toJson()));
             final long gid = jsonObject.getLong(GuildDB.Field.GUILD_ID.toString());
             setex(gid, 3600, jsonObject);
             logger.debug("Loaded guild with id {}", gid);
         });
+    }
+
+    private final GuildDB getDB() {
+        return ((GuildDB) getMongoDB());
     }
 }

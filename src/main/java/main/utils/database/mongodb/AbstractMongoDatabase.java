@@ -389,7 +389,12 @@ public abstract class AbstractMongoDatabase {
         return documentToJSON(doc, false);
     }
 
-    private <TItem> Bson eq(String key, TItem value) {
+    protected  <TItem> Bson eq(String key, TItem value) {
         return Filters.eq(key, value);
+    }
+
+    @SafeVarargs
+    protected final <TItem> Bson in(String key, TItem... values) {
+        return Filters.in(key, values);
     }
 }
