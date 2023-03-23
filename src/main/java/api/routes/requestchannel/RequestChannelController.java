@@ -4,6 +4,7 @@ import api.routes.requestchannel.dto.CreateRequestChannelDto;
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto;
 import api.utils.ApiUtils;
 import api.utils.GeneralResponse;
+import api.utils.ReqChannelCreationResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
@@ -21,7 +22,7 @@ public class RequestChannelController {
     private final RequestChannelService service;
 
     @PostMapping("")
-    public ResponseEntity<GeneralResponse> createChannel(@Valid @RequestBody CreateRequestChannelDto createRequestChannelDto) {
+    public ResponseEntity<ReqChannelCreationResponse> createChannel(@Valid @RequestBody CreateRequestChannelDto createRequestChannelDto) {
         return service.createChannel(createRequestChannelDto);
     }
 

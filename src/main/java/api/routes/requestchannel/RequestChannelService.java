@@ -4,29 +4,41 @@ import api.routes.requestchannel.dto.CreateRequestChannelDto;
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto;
 import api.utils.ApiUtils;
 import api.utils.GeneralResponse;
+import api.utils.ReqChannelCreationResponse;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEditCommand;
 import main.utils.json.requestchannel.RequestChannelConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @Service
 @NoArgsConstructor
 public class RequestChannelService {
 
-    public ResponseEntity<GeneralResponse> createChannel(CreateRequestChannelDto createRequestChannelDto) {
+    public ResponseEntity<ReqChannelCreationResponse> createChannel(CreateRequestChannelDto createRequestChannelDto) {
         final var server = ApiUtils.getGuild(createRequestChannelDto.getServer_id());
 
         try {
-            new RequestChannelCommand().createRequestChannel(server, null);
-            return ResponseEntity.ok(GeneralResponse.builder()
-                    .message("Successfully created a request channel for: " + server.getName())
+            final var channel = new RequestChannelCommand().createRequestChannel(server).get();
+            return ResponseEntity.ok(ReqChannelCreationResponse.builder()
+                            .channel_id(String.valueOf(channel.getChannelId()))
+                            .message_id(String.valueOf(channel.getMessageId()))
+                            .config(channel.getConfig().toString())
                     .build());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the request channel", e);
         }
     }
 

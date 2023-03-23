@@ -1,5 +1,6 @@
 package main.commands.slashcommands.commands.management.requestchannel;
 
+import lombok.extern.slf4j.Slf4j;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -22,10 +23,14 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.script.ScriptException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Slf4j
 public class RequestChannelCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
@@ -51,16 +56,29 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
             return;
         }
 
-        createRequestChannel(guild, msg);
+        createRequestChannel(guild)
+                .thenAccept(channel -> {
+                    try {
+                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", GeneralUtils.toMention(guild, channel.getChannelId(), GeneralUtils.Mentioner.CHANNEL))).build())
+                                .queue();
+                    } catch (InsufficientPermissionException e) {
+                        if (e.getMessage().contains("MESSAGE_HISTORY"))
+                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
+                                    .queue();
+                        else log.error("Unexpected error", e);
+                    }
+                });
     }
 
-    public void createRequestChannel(Guild guild, Message msg) {
+    public CompletableFuture<RequestChannelConfig.RequestChannel> createRequestChannel(Guild guild) {
         final var dediChannelConfig = new RequestChannelConfig(guild);
         if (dediChannelConfig.isChannelSet())
             throw new IllegalArgumentException("The request channel for this guild is already created!");
 
-        guild.createTextChannel("robertify-requests").queue(
-                textChannel -> {
+        AtomicLong channelId = new AtomicLong();
+        return guild.createTextChannel("robertify-requests")
+                .submit()
+                .thenCompose(textChannel -> {
                     final var theme = new ThemesConfig(guild).getTheme();
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     final var manager = textChannel.getManager();
@@ -72,33 +90,24 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
                     eb.setColor(theme.getColor());
                     eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
                     eb.setImage(theme.getIdleBanner());
+                    channelId.set(textChannel.getIdLong());
 
-                    textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
-                            .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(textChannel.getIdLong(), message.getIdLong());
-                                dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
+                    return textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build()).submit();
+                })
+                .thenCompose(message -> {
+                    dediChannelConfig.setChannelAndMessage(channelId.get(), message.getIdLong());
+                    dediChannelConfig.buttonUpdateRequest(message).queue();
+                    dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
 
-                                if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
-                                    dediChannelConfig.updateMessage();
+                    if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
+                        dediChannelConfig.updateMessage();
 
-                                if (msg != null) {
-                                    try {
-                                        msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
-                                                .queue();
-                                    } catch (InsufficientPermissionException e) {
-                                        if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                            msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
-                                                    .queue();
-                                        else e.printStackTrace();
-                                    }
-                                }
-                            });
-                },
-                new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> msg.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                                .queue())
-        );
+                    return CompletableFuture.supplyAsync(() -> new RequestChannelConfig.RequestChannel(
+                            dediChannelConfig.getChannelID(),
+                            dediChannelConfig.getMessageID(),
+                            dediChannelConfig.getConfig().getConfig()
+                    ));
+                });
     }
 
     @Override
@@ -154,7 +163,7 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
         PREVIOUS(IDENTIFIER + "previous"),
         REWIND(IDENTIFIER + "rewind"),
         PLAY_AND_PAUSE(IDENTIFIER + "pnp"),
-        STOP(IDENTIFIER  + "stop"),
+        STOP(IDENTIFIER + "stop"),
         END(IDENTIFIER + "end"),
         LOOP(IDENTIFIER + "loop"),
         SHUFFLE(IDENTIFIER + "shuffle"),
