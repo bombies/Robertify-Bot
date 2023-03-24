@@ -16,6 +16,5 @@ public class ToggleRequestChannelButtonsDto {
     @NotBlank()
     String server_id;
     @NotEmpty()
-    @Pattern(regexp = "^(previous|rewind|stop|pnp|skip|favourite|loop|shuffle|disconnect|filters)$", flags = { Pattern.Flag.CASE_INSENSITIVE})
     String[] buttons;
 }
