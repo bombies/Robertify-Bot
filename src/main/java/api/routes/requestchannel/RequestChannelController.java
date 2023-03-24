@@ -2,12 +2,11 @@ package api.routes.requestchannel;
 
 import api.routes.requestchannel.dto.CreateRequestChannelDto;
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto;
-import api.utils.ApiUtils;
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto;
 import api.utils.GeneralResponse;
 import api.utils.ReqChannelCreationResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,5 +28,10 @@ public class RequestChannelController {
     @PostMapping("/button")
     public ResponseEntity<GeneralResponse> toggleButtonVisibility(@Valid @RequestBody ToggleRequestChannelButtonDto toggleRequestChannelButtonDto) {
         return service.toggleButton(toggleRequestChannelButtonDto);
+    }
+
+    @PostMapping("/buttons")
+    public ResponseEntity<GeneralResponse> toggleButtonsVisibility(@Valid @RequestBody ToggleRequestChannelButtonsDto toggleRequestChannelButtonDto) {
+        return service.toggleButtons(toggleRequestChannelButtonDto);
     }
 }

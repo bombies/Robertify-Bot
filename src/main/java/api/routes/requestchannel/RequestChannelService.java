@@ -2,22 +2,21 @@ package api.routes.requestchannel;
 
 import api.routes.requestchannel.dto.CreateRequestChannelDto;
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto;
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto;
 import api.utils.ApiUtils;
 import api.utils.GeneralResponse;
 import api.utils.ReqChannelCreationResponse;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEditCommand;
 import main.utils.json.requestchannel.RequestChannelConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Arrays;
 
 @Slf4j
 @Service
@@ -52,6 +51,21 @@ public class RequestChannelService {
         new RequestChannelEditCommand().handleChannelButtonToggle(server, toggleRequestChannelButtonDto.getButton(), null);
         return ResponseEntity.ok(GeneralResponse.builder()
                 .message("Successfully toggled the " + toggleRequestChannelButtonDto.getButton() + " button in " + server.getName())
+                .build()
+        );
+    }
+
+    public ResponseEntity<GeneralResponse> toggleButtons(ToggleRequestChannelButtonsDto toggleRequestChannelButtonDto) {
+        final var server = ApiUtils.getGuild(toggleRequestChannelButtonDto.getServer_id());
+        final var config = new RequestChannelConfig(server);
+
+        if (!config.isChannelSet())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The request channel hasn't been setup for " + server.getName());
+
+        Arrays.stream(toggleRequestChannelButtonDto.getButtons())
+                .forEach(button -> new RequestChannelEditCommand().handleChannelButtonToggle(server, button, null));
+        return ResponseEntity.ok(GeneralResponse.builder()
+                .message("Successfully toggled the " + Arrays.toString(toggleRequestChannelButtonDto.getButtons()) + " buttons in " + server.getName())
                 .build()
         );
     }
