@@ -144,7 +144,7 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
                 field = RequestChannelConfig.ChannelConfig.Field.REWIND;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND);
             }
-            case "pnp" -> {
+            case "pnp", "play_pause" -> {
                 field = RequestChannelConfig.ChannelConfig.Field.PLAY_PAUSE;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE);
             }
