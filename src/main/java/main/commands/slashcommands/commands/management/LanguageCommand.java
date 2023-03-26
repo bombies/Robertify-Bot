@@ -10,6 +10,7 @@ import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocale;
 import main.utils.locale.RobertifyLocaleMessage;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -83,7 +84,6 @@ public class LanguageCommand extends AbstractSlashCommand {
         final var selectionMenu = event.getSelectMenu();
         if (!selectionMenu.getId().startsWith("languagemenu")) return;
 
-        final var newLocale = RobertifyLocale.parse(event.getSelectedOptions().get(0).getValue().split(":")[1]);
         final var guild = event.getGuild();
         final var member = event.getMember();
 
@@ -100,11 +100,19 @@ public class LanguageCommand extends AbstractSlashCommand {
 
         event.deferReply().queue();
 
-        LocaleManager.getLocaleManager(guild).setLocale(newLocale);
-        new RequestChannelConfig(guild).updateAll();
+        final var locale = event.getSelectedOptions().get(0).getValue().split(":")[1];
+        setLocale(guild, locale);
+        final var newLocale = RobertifyLocale.parse(locale);
+
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LanguageCommandMessages.LANGUAGE_CHANGED, Pair.of("{language}", newLocale.getLocalName() + " " + newLocale.getFlag()))
                 .build())
                 .setEphemeral(true)
                 .queue();
+    }
+
+    public void setLocale(Guild guild, String locale) {
+        final var newLocale = RobertifyLocale.parse(locale);
+        LocaleManager.getLocaleManager(guild).setLocale(newLocale);
+        new RequestChannelConfig(guild).updateAll();
     }
 }

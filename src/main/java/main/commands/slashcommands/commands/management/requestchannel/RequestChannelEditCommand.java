@@ -1,29 +1,26 @@
 package main.commands.slashcommands.commands.management.requestchannel;
 
-import main.audiohandlers.RobertifyAudioManager;
+import lombok.extern.slf4j.Slf4j;
 import main.constants.Permission;
 import main.constants.RobertifyEmoji;
-import main.constants.Toggles;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.requestchannel.RequestChannelConfig;
-import main.utils.json.themes.ThemesConfig;
-import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.ErrorResponse;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class RequestChannelEditCommand extends AbstractSlashCommand {
     @Override
     protected void buildCommand() {
@@ -58,49 +55,19 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
                     .queue();
             return;
         }
-
         event.deferReply().queue();
-
-        guild.createTextChannel("robertify-requests").queue(
-                textChannel -> {
-                    final var theme = new ThemesConfig(guild).getTheme();
-                    final var dediChannelConfig = new RequestChannelConfig(guild);
-                    final var localeManager = LocaleManager.getLocaleManager(guild);
-                    final var manager = textChannel.getManager();
-                    manager.setPosition(0).queue();
-                    dediChannelConfig.channelTopicUpdateRequest(textChannel).queue();
-
-                    EmbedBuilder eb = new EmbedBuilder();
-                    eb.setColor(theme.getColor());
-                    eb.setTitle(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING));
-                    eb.setImage(theme.getIdleBanner());
-
-                    textChannel.sendMessage(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING)).setEmbeds(eb.build())
-                            .queue(message -> {
-                                dediChannelConfig.setChannelAndMessage(textChannel.getIdLong(), message.getIdLong());
-                                dediChannelConfig.buttonUpdateRequest(message).queue();
-                                dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
-
-                                if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
-                                    dediChannelConfig.updateMessage();
-
-                                try {
-                                    event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", textChannel.getAsMention())).build())
-                                            .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
-                                            .queue();
-                                } catch (InsufficientPermissionException e) {
-                                    if (e.getMessage().contains("MESSAGE_HISTORY"))
-                                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
-                                                .queue();
-                                    else e.printStackTrace();
-                                }
-                            });
-                },
-                new ErrorHandler()
-                        .handle(ErrorResponse.MISSING_PERMISSIONS, e -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, e.getMessage()).build())
-                                .setEphemeral(true)
-                                .queue())
-        );
+        new RequestChannelCommand().createRequestChannel(event.getGuild())
+                .thenAccept(channel -> {
+                    try {
+                        event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP, Pair.of("{channel}", GeneralUtils.toMention(guild, channel.getChannelId(), GeneralUtils.Mentioner.CHANNEL))).build())
+                                .queue();
+                    } catch (InsufficientPermissionException e) {
+                        if (e.getMessage().contains("MESSAGE_HISTORY"))
+                            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2).build())
+                                    .queue();
+                        else log.error("Unexpected error", e);
+                    }
+                });
     }
 
     private void handleEdit(SlashCommandInteractionEvent event) {
@@ -158,13 +125,17 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
         }
 
         event.deferReply().queue();
-
-        final var localeManager = LocaleManager.getLocaleManager(guild);
+        handleChannelButtonToggle(guild, split[1], event);
+    }
+    
+    public void handleChannelButtonToggle(Guild guild, String button, @Nullable ButtonInteractionEvent event) {
+        final LocaleManager localeManager = LocaleManager.getLocaleManager(guild);
         final var dedicatedChannelConfig = new RequestChannelConfig(guild);
         final var config = dedicatedChannelConfig.getConfig();
         final RequestChannelConfig.ChannelConfig.Field field;
         final String buttonName;
-        switch (split[1]) {
+        
+        switch (button) {
             case "previous" -> {
                 field = RequestChannelConfig.ChannelConfig.Field.PREVIOUS;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS);
@@ -173,7 +144,7 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
                 field = RequestChannelConfig.ChannelConfig.Field.REWIND;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND);
             }
-            case "pnp" -> {
+            case "pnp", "play_pause" -> {
                 field = RequestChannelConfig.ChannelConfig.Field.PLAY_PAUSE;
                 buttonName = localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE);
             }
@@ -210,18 +181,20 @@ public class RequestChannelEditCommand extends AbstractSlashCommand {
 
         if (config.getState(field)) {
             config.setState(field, false);
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                        Pair.of("{button}", buttonName),
-                        Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
-                    ).build())
-                    .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+            if (event != null)
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                                Pair.of("{button}", buttonName),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        ).build())
+                        .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
         } else {
             config.setState(field, true);
-            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                            Pair.of("{button}", buttonName),
-                            Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
-                    ).build())
-                    .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+            if (event != null)
+                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                                Pair.of("{button}", buttonName),
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        ).build())
+                        .queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
         }
 
         dedicatedChannelConfig.updateButtons();

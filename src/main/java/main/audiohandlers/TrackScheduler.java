@@ -237,7 +237,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         else {
             if (lastTrack != null && new AutoPlayConfig(guild).getStatus() && lastTrack.getSourceManager().getSourceName().equalsIgnoreCase("spotify")) {
                 audioManager.loadRecommendedTracks(
-                        audioManager.getMusicManager(guild),
+                        guild,
                         announcementChannel,
                         lastTrack
                 );
@@ -330,7 +330,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void clearSavedQueue() {
         savedQueue.clear();
     }
-
     public void disconnect(boolean announceMsg) {
         final var channel = guild.getSelfMember().getVoiceState().getChannel();
 

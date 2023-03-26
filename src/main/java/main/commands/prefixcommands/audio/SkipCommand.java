@@ -143,7 +143,6 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         if (scheduler.isRepeating())
             scheduler.setRepeating(false);
 
-
         try {
             musicManager.getScheduler().nextTrack(playingTrack, true, audioPlayer.getTrackPosition());
         } catch (AutoPlayException e) {

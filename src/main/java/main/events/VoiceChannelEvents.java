@@ -1,5 +1,6 @@
 package main.events;
 
+import main.audiohandlers.DisconnectManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.EventWaiter;
@@ -21,113 +22,50 @@ public class VoiceChannelEvents extends ListenerAdapter {
         final var guild = event.getGuild();
         final var channelLeft = event.getChannelLeft();
         final var channelJoined = event.getChannelJoined();
+        final var self = guild.getSelfMember();
+        final var selfVoiceState = self.getVoiceState();
+        final var guildMusicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
 
-        if (channelJoined != null && channelLeft != null) {
-            Member self = guild.getSelfMember();
-            GuildVoiceState voiceState = self.getVoiceState();
-
-            if (!voiceState.inAudioChannel()) return;
-
-            final var guildConfig = new GuildConfig(guild);
-
-            if (event.getMember().getIdLong() == self.getIdLong() && !guildConfig.get247()) {
-                doAutoLeave(event, channelLeft);
-            } else if (event.getChannelJoined().equals(voiceState.getChannel())) {
-                resumeSong(event);
-            } else if (voiceState.getChannel().equals(channelLeft) && !guildConfig.get247()) {
-                doAutoLeave(event, channelLeft);
-            }
-        } else if (channelLeft == null) {
-            resumeSong(event);
-        } else {
-            if (event.getMember().equals(guild.getSelfMember())) {
-                final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                musicManager.getScheduler().setRepeating(false);
-                musicManager.getScheduler().setPlaylistRepeating(false);
-
-                if (musicManager.getPlayer().isPaused())
-                    musicManager.getPlayer().setPaused(false);
-
-                if (musicManager.getPlayer().getPlayingTrack() != null)
-                    musicManager.getPlayer().stopTrack();
-
-                musicManager.getScheduler().getQueue().clear();
-                musicManager.getPlayer().getFilters().clear().commit();
-
-                final var dedicatedChannelConfig = new RequestChannelConfig(guild);
-                if (dedicatedChannelConfig.isChannelSet())
-                    dedicatedChannelConfig.updateMessage();
-
-                SkipCommand.clearVoteSkipInfo(guild);
-            } else {
-                final var selfVoiceState = guild.getSelfMember().getVoiceState();
-
-                if (!selfVoiceState.inAudioChannel()) return;
-
-                if (!selfVoiceState.getChannel().equals(channelLeft)) return;
-
-                if (!new GuildConfig(guild).get247())
-                    doAutoLeave(event, channelLeft);
-            }
+        /*
+         * If the bot has left voice channels entirely
+         */
+        if (event.getMember().getId().equals(self.getId()) && (channelLeft != null && channelJoined == null)) {
+            guildMusicManager.clear();
+            return;
         }
-    }
 
-    void pauseSong(GuildVoiceUpdateEvent event) {
-        Member self = event.getGuild().getSelfMember();
-        GuildVoiceState voiceState = self.getVoiceState();
+        if (selfVoiceState == null || !selfVoiceState.inAudioChannel())
+            return;
 
-        if (voiceState == null) return;
+        final var guildConfig = new GuildConfig(guild);
+        final var guildDisconnector = DisconnectManager.getInstance().getGuildDisconnector(guild);
 
-        if (!voiceState.inAudioChannel()) return;
-
-        final var channel = event.getChannelLeft();
-
-        if (!channel.equals(voiceState.getChannel())) return;
-
-        if (channel.getMembers().size() == 1) {
-            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            musicManager.getPlayer().setPaused(true);
+        /*
+         * If the user has left voice channels entirely or
+         * switched and the channel left is empty we want
+         * to disconnect the bot unless 24/7 mode is enabled.
+         */
+        if (
+                ((channelJoined == null && channelLeft != null) || (channelJoined != null && channelLeft != null))
+                        && channelLeft.getIdLong() == selfVoiceState.getChannel().getIdLong()
+        ) {
+            if (guildConfig.get247() || guildDisconnector.disconnectScheduled() || channelLeft.getMembers().size() > 1)
+                return;
+            guildMusicManager.getPlayer().setPaused(true);
+            guildDisconnector.scheduleDisconnect(true);
         }
-    }
 
-    void resumeSong(GuildVoiceUpdateEvent event) {
-        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        if (musicManager.getPlayer().isPaused() && event.getChannelJoined().getIdLong() == event.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong()
-             && !musicManager.isForcePaused())
-            musicManager.getPlayer().setPaused(false);
-    }
-
-    void doAutoLeave(GuildVoiceUpdateEvent event, AudioChannel channelLeft) {
-        if (channelLeft.getMembers().size() == 1) {
-            pauseSong(event);
-            waiter.waitForEvent(
-                    GuildVoiceUpdateEvent.class,
-                    (e) -> {
-                        // If it's a leave event
-                        if (e.getChannelJoined() == null)
-                            return false;
-
-                        final var channelJoined = e.getChannelJoined();
-
-                        // If it's a move event
-                        if (event.getChannelLeft() != null)
-                            return e.getMember().getIdLong() == event.getGuild().getSelfMember().getIdLong() ?
-                                    channelJoined.getMembers().size() > 1 : channelJoined.equals(channelLeft);
-                        // If it's a join event
-                        else
-                            return channelJoined.equals(channelLeft);
-                    },
-                    (e) -> {
-                        final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-                        if (musicManager.getPlayer().isPaused() && !musicManager.isForcePaused())
-                            musicManager.getPlayer().setPaused(false);
-                    },
-                    1L, TimeUnit.MINUTES,
-                    () -> {
-                        if (!new GuildConfig(event.getGuild()).get247())
-                            RobertifyAudioManager.getInstance().getMusicManager(event.getGuild()).leave();
-                    }
-            );
+        /*
+         * If the user is joining a voice channel for the
+         * first time and the bot is awaiting disconnect,
+         * cancel the disconnect and resume playing the song
+         * if the song is paused.
+         */
+        else if (channelJoined != null && channelJoined.getIdLong() == selfVoiceState.getChannel().getIdLong()) {
+            if (!guildDisconnector.disconnectScheduled())
+                return;
+            guildDisconnector.cancelDisconnect();
+            guildMusicManager.getPlayer().setPaused(false);
         }
     }
 }

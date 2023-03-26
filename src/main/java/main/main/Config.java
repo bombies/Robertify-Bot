@@ -31,6 +31,16 @@ public class Config {
     }
 
     /**
+     * Get a string value from its specific key from the .env file
+     * @param key .env key to retrieve.
+     * @param defaultValue The value to return if the key specified doesn't have a value.
+     * @return The string attached to the key
+     */
+    public static String get(ENV key, String defaultValue) {
+        return dotenv.get(key.toString().toUpperCase(), defaultValue);
+    }
+
+    /**
      * Get a specific path from the .env file
      * @param dir The directory of the path
      * @param file The specific file to get in the directory

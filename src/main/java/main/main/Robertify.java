@@ -1,5 +1,6 @@
 package main.main;
 
+import api.RobertifySpringApi;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.sentry.Instrumenter;
@@ -254,6 +255,8 @@ public class Robertify {
                     options.setInstrumenter(Instrumenter.OTEL);
                     options.addEventProcessor(new OpenTelemetryLinkErrorEventProcessor());
                 });
+
+            RobertifySpringApi.start(args);
         } catch (Exception e) {
             logger.error("[FATAL ERROR] An unexpected error occurred!", e);
         }

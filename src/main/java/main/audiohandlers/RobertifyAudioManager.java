@@ -99,7 +99,10 @@ public class RobertifyAudioManager {
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
-        return musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> new GuildMusicManager(guild));
+        return musicManagers.computeIfAbsent(guild.getIdLong(), (gid) -> {
+            logger.debug("Creating new music manager for {}", guild.getName());
+            return new GuildMusicManager(guild);
+        });
     }
 
     public void removeMusicManager(Guild guild) {
@@ -361,6 +364,10 @@ public class RobertifyAudioManager {
     public void loadRecommendedTracks(GuildMusicManager musicManager, GuildMessageChannel channel, AudioTrack query) {
         final AutoPlayLoader loader = new AutoPlayLoader(musicManager, channel);
         musicManager.getPlayerManager().loadItemOrdered(musicManager, String.format("%sseed_tracks=%s&limit=%d", SpotifySourceManager.RECOMMENDATIONS_PREFIX, query.getIdentifier(), 10), loader);
+    }
+
+    public void loadRecommendedTracks(Guild guild, GuildMessageChannel channel, AudioTrack query) {
+        loadRecommendedTracks(getMusicManager(guild), channel, query);
     }
 
     private void loadPlaylistShuffled(User requester, String trackUrl, GuildMusicManager musicManager, boolean announceMsg, Message botMsg,

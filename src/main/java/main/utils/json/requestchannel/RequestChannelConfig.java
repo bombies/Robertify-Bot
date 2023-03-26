@@ -3,6 +3,7 @@ package main.utils.json.requestchannel;
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import main.constants.RobertifyEmoji;
@@ -39,6 +40,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -72,6 +74,15 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         var dediChannelObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
         dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), cid);
         dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), mid);
+
+        getCache().setField(gid, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject);
+    }
+
+    public synchronized void setChannel(long cid) {
+        var obj = getGuildObject();
+
+        var dediChannelObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
+        dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), cid);
 
         getCache().setField(gid, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject);
     }
@@ -430,7 +441,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
             return getConfig().has(field.name().toLowerCase());
         }
 
-        private JSONObject getConfig() {
+        public JSONObject getConfig() {
             var dedicatedChannelObj = getFullConfig();
 
             if (!dedicatedChannelObj.has(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())) {
@@ -480,6 +491,16 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                 return List.of(FILTERS);
             }
         }
+    }
+
+    @RequiredArgsConstructor
+    public static class RequestChannel {
+        @Getter
+        private final long channelId;
+        @Getter
+        private final long messageId;
+        @Getter
+        private final JSONObject config;
     }
 
 

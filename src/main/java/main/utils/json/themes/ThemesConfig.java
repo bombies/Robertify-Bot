@@ -11,12 +11,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ThemesConfig extends AbstractGuildConfig {
-    private final Guild guild;
     private final long gid;
 
     public ThemesConfig(Guild guild) {
         super(guild);
-        this.guild = guild;
         this.gid = guild.getIdLong();
     }
 

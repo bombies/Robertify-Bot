@@ -6,8 +6,12 @@ import lavalink.client.io.jda.JdaLink;
 import lavalink.client.player.LavalinkPlayer;
 import lombok.Getter;
 import lombok.Setter;
+import main.commands.prefixcommands.audio.SkipCommand;
 import main.main.Robertify;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import net.dv8tion.jda.api.entities.Guild;
+
+import java.util.concurrent.CompletableFuture;
 
 public class GuildMusicManager {
     @Getter
@@ -29,7 +33,7 @@ public class GuildMusicManager {
         this.playerManager = RobertifyAudioManager.getInstance().getPlayerManager();
     }
 
-    public void leave() {
+    public void clear() {
         getScheduler().getQueue().clear();
 
         getScheduler().setRepeating(false);
@@ -37,11 +41,22 @@ public class GuildMusicManager {
         getScheduler().clearSavedQueue();
         getScheduler().getPastQueue().clear();
         getPlayer().getFilters().clear().commit();
-        RobertifyAudioManager.clearRequesters(guild);
+
+        if (getPlayer().getPlayingTrack() != null)
+            getPlayer().stopTrack();
 
         if (getPlayer().isPaused())
             getPlayer().setPaused(false);
 
+        RobertifyAudioManager.clearRequesters(guild);
+        SkipCommand.clearVoteSkipInfo(guild);
+
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
+        dedicatedChannelConfig.updateMessage();
+    }
+
+    public void leave() {
+        clear();
         scheduler.stop();
         RobertifyAudioManager.getInstance().removeMusicManager(guild);
     }

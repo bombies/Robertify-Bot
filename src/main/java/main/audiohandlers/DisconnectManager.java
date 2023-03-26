@@ -1,6 +1,7 @@
 package main.audiohandlers;
 
 import lombok.val;
+import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.json.guildconfig.GuildConfig;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
@@ -44,7 +45,7 @@ public class DisconnectManager {
     }
 
 
-    protected static class GuildDisconnectManager {
+    public static class GuildDisconnectManager {
         private final static Logger logger = LoggerFactory.getLogger(GuildDisconnectManager.class);
 
         private final Guild guild;
@@ -89,7 +90,7 @@ public class DisconnectManager {
         public void cancelDisconnect() {
             if (disconnectScheduled()) {
                 logger.debug("{} | Cancelling disconnect.", guild.getName());
-                scheduledDisconnect.cancel(true);
+                scheduledDisconnect.cancel(false);
                 scheduledDisconnect = null;
             }
         }
