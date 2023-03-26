@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEditCommand;
 import main.utils.json.requestchannel.RequestChannelConfig;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,8 @@ public class RequestChannelService {
                     .build());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (InsufficientPermissionException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "I don't have the required permissions to create a request channel", e);
         } catch (Exception e) {
             log.error("Unexpected error", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the request channel", e);
@@ -51,6 +54,8 @@ public class RequestChannelService {
                     .build());
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (InsufficientPermissionException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "I don't have the required permissions to delete a request channel", e);
         } catch (Exception e) {
             log.error("Unexpected error", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the request channel", e);
