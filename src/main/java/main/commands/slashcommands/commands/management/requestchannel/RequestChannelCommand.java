@@ -110,6 +110,11 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
                 });
     }
 
+    public void deleteRequestChannel(Guild guild) {
+        new RequestChannelConfig(guild)
+                .removeChannel();
+    }
+
     @Override
     public String getName() {
         return "setup";

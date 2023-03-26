@@ -8,10 +8,7 @@ import api.utils.ReqChannelCreationResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/reqchannel")
@@ -33,5 +30,10 @@ public class RequestChannelController {
     @PostMapping("/buttons")
     public ResponseEntity<GeneralResponse> toggleButtonsVisibility(@Valid @RequestBody ToggleRequestChannelButtonsDto toggleRequestChannelButtonDto) {
         return service.toggleButtons(toggleRequestChannelButtonDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<GeneralResponse> deleteChannel(@PathVariable String id) {
+        return service.deleteChannel(id);
     }
 }

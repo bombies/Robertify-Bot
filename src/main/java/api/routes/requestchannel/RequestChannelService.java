@@ -41,6 +41,22 @@ public class RequestChannelService {
         }
     }
 
+    public ResponseEntity<GeneralResponse> deleteChannel(String id) {
+        final var server = ApiUtils.getGuild(id);
+
+        try {
+            new RequestChannelCommand().deleteRequestChannel(server);
+            return ResponseEntity.ok(GeneralResponse.builder()
+                    .message("Successfully deleted request channel for " + server.getName() + "!")
+                    .build());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Unexpected error", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the request channel", e);
+        }
+    }
+
     public ResponseEntity<GeneralResponse> toggleButton(ToggleRequestChannelButtonDto toggleRequestChannelButtonDto) {
         final var server = ApiUtils.getGuild(toggleRequestChannelButtonDto.getServer_id());
         final var config = new RequestChannelConfig(server);
