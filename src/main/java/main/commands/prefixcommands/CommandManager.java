@@ -359,7 +359,7 @@ public class CommandManager {
                     final CommandContext ctx = new CommandContext(e, args);
                     final Guild guild = e.getGuild();
                     final Message msg = e.getMessage();
-                    final var toggles = new TogglesConfig(guild);
+                    final var toggles = TogglesConfig.getConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
 
                     if (!guild.getSelfMember().hasPermission(ctx.getChannel(), net.dv8tion.jda.api.Permission.MESSAGE_EMBED_LINKS)) {

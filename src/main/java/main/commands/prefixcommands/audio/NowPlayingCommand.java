@@ -81,7 +81,7 @@ public class NowPlayingCommand implements ICommand {
         final String requester = RobertifyAudioManager.getRequester(guild, track);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_EMBED_TITLE, Pair.of("{title}", info.title), Pair.of("{author}", info.author))),
-                (((new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER))) && requester != null ?
+                (((TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_REQUESTER, Pair.of("{requester}", requester))
                         :
                         "") +

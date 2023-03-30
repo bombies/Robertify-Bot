@@ -39,6 +39,7 @@ Lavalink/application.yml
 Lavalink/plugins
 Lavalink/logs
 logback.xml
+sentry.properties
 locale/*.yml
 src/main/resources/application.yml
 built_images

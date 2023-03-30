@@ -118,7 +118,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
         if (repeating) return;
 
-        if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
         if (RobertifyAudioManager.getUnannouncedTracks().contains(track.getIdentifier())) {
             RobertifyAudioManager.getUnannouncedTracks().remove(track.getIdentifier());
@@ -136,7 +136,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             final var trackInfo = track.getInfo();
             final var localeManager = LocaleManager.getLocaleManager(guild);
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", trackInfo.title), Pair.of("{author}", trackInfo.author))
-                    + (new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
+                    + (TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
                     "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
                     :
                     ""
@@ -274,7 +274,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackStuck(IPlayer player, AudioTrack track, long thresholdMs) {
-        if (!new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
         try {
             if (announcementChannel != null)

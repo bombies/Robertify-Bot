@@ -97,7 +97,7 @@ public class RequestChannelCommand extends AbstractSlashCommand implements IComm
                 .thenCompose(message -> {
                     dediChannelConfig.setChannelAndMessage(channelId.get(), message.getIdLong());
                     dediChannelConfig.buttonUpdateRequest(message).queue();
-                    dediChannelConfig.setOriginalAnnouncementToggle(new TogglesConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
+                    dediChannelConfig.setOriginalAnnouncementToggle(TogglesConfig.getConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES));
 
                     if ((RobertifyAudioManager.getInstance().getMusicManager(guild)).getPlayer().getPlayingTrack() != null)
                         dediChannelConfig.updateMessage();

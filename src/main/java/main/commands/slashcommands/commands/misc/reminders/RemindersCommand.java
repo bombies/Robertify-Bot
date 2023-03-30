@@ -47,7 +47,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         final var args = ctx.getArgs();
         final String prefix = new GuildConfig(guild).getPrefix();
 
-        if (!new TogglesConfig(guild).getToggle(Toggles.REMINDERS))
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.REMINDERS))
             return;
 
         if (args.isEmpty()) {
@@ -960,7 +960,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
         if (!checks(event)) return;
 
         final Guild guild = event.getGuild();
-        if (!new TogglesConfig(guild).getToggle(Toggles.REMINDERS)) {
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.REMINDERS)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
                     .queue();
             return;

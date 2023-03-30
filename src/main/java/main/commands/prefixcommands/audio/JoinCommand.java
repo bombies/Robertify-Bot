@@ -38,7 +38,7 @@ public class JoinCommand implements ICommand {
 
         final var channel = memberVoiceState.getChannel();
 
-        if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+        if (TogglesConfig.getConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
             final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
             final var localeManager = LocaleManager.getLocaleManager(guild);
             if (!restrictedChannelsConfig.isRestrictedChannel(channel.getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
