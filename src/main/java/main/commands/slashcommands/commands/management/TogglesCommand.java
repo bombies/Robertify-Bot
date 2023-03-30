@@ -660,7 +660,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             );
                         } else {
                             config.setDJToggle(command, true);
-                            RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLED,
                                     Pair.of("{command}", command.getName()),
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                             );
