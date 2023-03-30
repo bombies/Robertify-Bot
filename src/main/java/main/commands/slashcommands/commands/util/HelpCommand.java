@@ -92,7 +92,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                 localeManager.getMessage(RobertifyLocaleMessage.HelpMessages.HELP_EMBED_FOOTER)
         );
 
-        final var manager = new SlashCommandManager();
+        final var manager = SlashCommandManager.getInstance();
 
         if (args.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_EMBED_DESC)
@@ -174,7 +174,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
                     .addActionRow(getSelectionMenu(guild, event.getUser().getIdLong()))
                     .setEphemeral(true).queue();
         } else {
-            final var manager = new SlashCommandManager();
+            final var manager = SlashCommandManager.getInstance();
             final String command = event.getOption("command").getAsString();
             event.replyEmbeds(searchCommand(manager, command, guild).build())
                     .setEphemeral(true).queue();
@@ -231,7 +231,7 @@ public class HelpCommand extends AbstractSlashCommand implements ICommand {
 
     private EmbedBuilder getHelpEmbed(Guild guild, HelpType type, String prefix) {
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HelpMessages.HELP_COMMANDS, Pair.of("{prefix}", prefix));
-        final var manager = new SlashCommandManager();
+        final var manager = SlashCommandManager.getInstance();
         final var localeManager = LocaleManager.getLocaleManager(guild);
         StringBuilder sb = new StringBuilder();
 

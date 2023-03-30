@@ -197,7 +197,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                         );
 
-                        final var skipCommand = new SlashCommandManager().getCommand("skip");
+                        final var skipCommand = SlashCommandManager.getInstance().getCommand("skip");
                         if (config.getDJToggle(skipCommand)) {
                             ctx.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
                                     .setActionRow(
@@ -213,7 +213,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                 Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                         );
 
-                        final var skipCommand = new SlashCommandManager().getCommand("skip");
+                        final var skipCommand = SlashCommandManager.getInstance().getCommand("skip");
                         if (!config.getDJToggle(skipCommand))
                             config.setDJToggle(skipCommand, true);
                     }
@@ -227,7 +227,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {
-        final var commandManager = new SlashCommandManager();
+        final var commandManager = SlashCommandManager.getInstance();
         final TogglesConfig config = new TogglesConfig(guild);
 
         if (args.size() < 2)
@@ -616,7 +616,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
                             );
 
-                            final var skipCommand = new SlashCommandManager().getCommand("skip");
+                            final var skipCommand = SlashCommandManager.getInstance().getCommand("skip");
                             if (config.getDJToggle(skipCommand)) {
                                 event.getChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.SKIP_DJ_TOGGLE_PROMPT).build())
                                         .setActionRow(
@@ -632,7 +632,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                     Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
                             );
 
-                            final var skipCommand = new SlashCommandManager().getCommand("skip");
+                            final var skipCommand = SlashCommandManager.getInstance().getCommand("skip");
                             if (!config.getDJToggle(skipCommand))
                                 config.setDJToggle(skipCommand, true);
                         }
@@ -642,10 +642,10 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
             }
             case "dj" -> {
                 switch (path[2]) {
-                    case "list" -> eb = getDJTogglesEmbed(guild, new SlashCommandManager(), config);
+                    case "list" -> eb = getDJTogglesEmbed(guild, SlashCommandManager.getInstance(), config);
                     case "switch" -> {
                         final String toggle = event.getOption("toggle").getAsString();
-                        AbstractSlashCommand command = new SlashCommandManager().getCommand(toggle);
+                        AbstractSlashCommand command = SlashCommandManager.getInstance().getCommand(toggle);
 
                         if (command == null) {
                             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.DJ_TOGGLE_INVALID_COMMAND, Pair.of("{command}", toggle));
@@ -729,7 +729,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         switch (split[1].toLowerCase()) {
             case "yes" -> {
                 final var config = new TogglesConfig(guild);
-                final var skipCommand = new SlashCommandManager().getCommand("skip");
+                final var skipCommand = SlashCommandManager.getInstance().getCommand("skip");
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 
                 config.setDJToggle(skipCommand, false);

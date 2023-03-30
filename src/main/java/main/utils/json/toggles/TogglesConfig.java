@@ -75,7 +75,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         final var djToggles = getDJToggles();
 
         if (!djToggles.containsKey(cmd.getName())) {
-            if (new SlashCommandManager().isMusicCommand(cmd)) {
+            if (SlashCommandManager.getInstance().isMusicCommand(cmd)) {
                 setDJToggle(cmd, false);
                 return false;
             } else {
@@ -223,7 +223,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
             var djTogglesObj = new JSONObject();
 
-            for (AbstractSlashCommand musicCommand : new SlashCommandManager().getMusicCommands())
+            for (AbstractSlashCommand musicCommand : SlashCommandManager.getInstance().getMusicCommands())
                 djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
 
             toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);

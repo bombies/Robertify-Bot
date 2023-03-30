@@ -88,7 +88,7 @@ public class RobertifyGuild {
             togglesMap.put(toggle, toggles.getBoolean(toggle.toString()));
 
         JSONObject djTogglesObj = toggles.getJSONObject("dj_toggles");
-        for (final var cmd : new SlashCommandManager().getMusicCommands())
+        for (final var cmd : SlashCommandManager.getInstance().getMusicCommands())
             djToggles.put(cmd.getName(), djTogglesObj.getBoolean(cmd.getName()));
 
         JSONObject logTogglesObj = toggles.getJSONObject("log_toggles");
