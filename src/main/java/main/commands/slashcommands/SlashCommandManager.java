@@ -124,7 +124,8 @@ public class SlashCommandManager {
                 new ManagePremiumCommand(),
                 new ResetPremiumFeaturesCommand(),
                 new ImageBuilderTest(),
-                new UnloadGuildCommandsCommand()
+                new UnloadGuildCommandsCommand(),
+                new CommandManagerCommand()
         );
     }
     

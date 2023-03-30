@@ -1,5 +1,6 @@
 package main.utils.component.interactions;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.RandomMessageManager;
@@ -108,7 +109,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command.botRequiredPermissions;
     }
 
-    private CommandData getCommandData() {
+    public CommandData getCommandData() {
         if (command == null)
             buildCommand();
 
@@ -163,11 +164,13 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             throw new IllegalStateException("The command is null! Cannot load into guild.");
         
-        if (!command.isGuild)
+        if (!command.isGuild && !command.isPrivate)
             return;
         
         if (command.isPrivate && g.getOwnerIdLong() != Config.getOwnerID())
             return;
+
+        logger.debug("Loading command \"{}\" into guild {}", command.name, g.getName());
 
         // Initial request builder
         CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
@@ -207,7 +210,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
 
         commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
-                .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
+                .handle(ErrorResponse.MISSING_ACCESS, e -> logger.warn("I couldn't create guild commands in {}", g.getName())));
     }
 
     public void unload(Guild g) {
@@ -903,6 +906,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
     }
 
+    @lombok.Builder
     protected static class SubCommand {
         @NotNull @Getter
         private final String name;
@@ -972,6 +976,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
     }
 
+    @lombok.Builder
     protected static class CommandOption {
         @Getter
         private final OptionType type;
