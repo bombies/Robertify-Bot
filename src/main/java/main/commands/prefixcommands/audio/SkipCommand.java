@@ -47,7 +47,7 @@ public class SkipCommand extends ListenerAdapter implements ICommand {
         final Member member = ctx.getMember();
         final GuildVoiceState memberVoiceState = member.getVoiceState();
         final Guild guild = ctx.getGuild();
-        final var togglesConfig = new TogglesConfig(guild);
+        final var togglesConfig = TogglesConfig.getConfig(guild);
 
         if (!togglesConfig.isDJToggleSet(this)) {
             msg.replyEmbeds(handleSkip(selfVoiceState, memberVoiceState)).queue();

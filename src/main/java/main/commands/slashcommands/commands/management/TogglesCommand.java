@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
-import java.util.Arrays;
 import java.util.List;
 
 public class TogglesCommand extends AbstractSlashCommand implements ICommand {
@@ -45,7 +44,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        var config = new TogglesConfig(guild);
+        var config = TogglesConfig.getConfig(guild);
         if (args.isEmpty()) {
             var toggleIDs = new StringBuilder();
             var toggleNames = new StringBuilder();
@@ -228,7 +227,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
     private EmbedBuilder handleDJToggles(Guild guild, List<String> args) {
         final var commandManager = new SlashCommandManager();
-        final TogglesConfig config = new TogglesConfig(guild);
+        final TogglesConfig config = TogglesConfig.getConfig(guild);
 
         if (args.size() < 2)
             return getDJTogglesEmbed(guild, commandManager, config);
@@ -268,8 +267,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private EmbedBuilder handleLogToggles(Guild guild, List<String> args) {
-        final CommandManager commandManager = new CommandManager();
-        final TogglesConfig config = new TogglesConfig(guild);
+        final TogglesConfig config = TogglesConfig.getConfig(guild);
 
         if (args.size() < 2)
             return getLogTogglesEmbed(guild, config);
@@ -456,13 +454,15 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!checks(event)) return;
+        final var guild = event.getGuild();
+        assert guild != null;
 
         event.deferReply().queue();
 
-        final var guild = event.getGuild();
-        final var config = new TogglesConfig(guild);
+        final var config = TogglesConfig.getConfig(guild);
         final var path = event.getFullCommandName().split("\\s");
         final var localeManager = LocaleManager.getLocaleManager(guild);
+        
         EmbedBuilder eb = null;
         switch (path[1]) {
             case "list" -> {
@@ -728,7 +728,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
         switch (split[1].toLowerCase()) {
             case "yes" -> {
-                final var config = new TogglesConfig(guild);
+                final var config = TogglesConfig.getConfig(guild);
                 final var skipCommand = new SlashCommandManager().getCommand("skip");
                 final var localeManager = LocaleManager.getLocaleManager(guild);
 

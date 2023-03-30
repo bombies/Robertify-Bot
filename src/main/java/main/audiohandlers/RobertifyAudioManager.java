@@ -126,7 +126,7 @@ public class RobertifyAudioManager {
                             trackUrl,
                             musicManager,
                             memberVoiceState.getMember().getUser(),
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             addToBeginning
                     );
@@ -152,7 +152,7 @@ public class RobertifyAudioManager {
                             trackUrl,
                             musicManager,
                             user,
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             addToBeginning
                     );
@@ -177,7 +177,7 @@ public class RobertifyAudioManager {
                             memberVoiceState.getMember().getUser(),
                             trackUrl,
                             musicManager,
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             addToBeginning
                     );
@@ -252,7 +252,7 @@ public class RobertifyAudioManager {
                     loadTrack(
                             trackUrl,
                             musicManager,
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             event.getUser(),
                             addToBeginning
@@ -277,7 +277,7 @@ public class RobertifyAudioManager {
                     loadPlaylistShuffled(
                             trackUrl,
                             musicManager,
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             event.getUser(),
                             addToBeginning
@@ -326,7 +326,7 @@ public class RobertifyAudioManager {
                             path,
                             musicManager,
                             memberVoiceState.getMember().getUser(),
-                            new TogglesConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
                             botMsg,
                             addToBeginning
                     );

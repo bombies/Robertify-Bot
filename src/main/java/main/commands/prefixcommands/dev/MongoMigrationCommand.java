@@ -249,7 +249,7 @@
 //            // Toggles
 //            try {
 //                final var oldConfig = new LegacyTogglesConfig();
-//                final var config = new TogglesConfig(guild);
+//                final var config = TogglesConfig.getConfig(guild);
 //
 //                for (var toggle : Toggles.values())
 //                    if (config.getToggle(g, toggle) != oldConfig.getToggle(g, toggle))

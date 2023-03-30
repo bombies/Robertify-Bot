@@ -656,7 +656,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (guild == null)
             return true;
 
-        final TogglesConfig togglesConfig = new TogglesConfig(guild);
+        final TogglesConfig togglesConfig = TogglesConfig.getConfig(guild);
         final RestrictedChannelsConfig config = new RestrictedChannelsConfig(guild);
 
         if (!togglesConfig.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS))
@@ -1061,7 +1061,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         @SneakyThrows
         public Builder setPossibleDJCommand() {
             this.permissionCheck = e -> {
-                final TogglesConfig config = new TogglesConfig(e.getGuild());
+                final TogglesConfig config = TogglesConfig.getConfig(e.getGuild());
 
                 if (!config.isDJToggleSet(e.getName()))
                     return true;
