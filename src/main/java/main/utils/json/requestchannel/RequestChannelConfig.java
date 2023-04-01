@@ -291,7 +291,6 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         } catch (InsufficientPermissionException e) {
             logger.error("I didn't have enough permissions to update the dedicated channel in {}", guild.getName());
         }
-
     }
 
     public static void updateAllButtons() {
@@ -361,6 +360,8 @@ public class RequestChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized TextChannelManager channelTopicUpdateRequest(TextChannel channel) {
+        if (channel == null) return null;
+
         final var localeManager = LocaleManager.getLocaleManager(channel.getGuild());
         return channel.getManager().setTopic(
                 RobertifyEmoji.PREVIOUS_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +
