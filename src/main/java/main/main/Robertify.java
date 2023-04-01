@@ -242,7 +242,8 @@ public class Robertify {
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
 
-            loadNeededGlobalCommands();
+            if (Config.loadNeededCommands())
+                loadNeededGlobalCommands();
 
             Robertify.cronScheduler.start();
 
