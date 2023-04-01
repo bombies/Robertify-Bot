@@ -32,6 +32,7 @@ import javax.script.ScriptException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -102,12 +103,19 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
             reminder = GeneralUtils.getJoinedString(args, 2);
         }
 
-        msg.replyEmbeds(handleAdd(guild, msg.getAuthor(), reminder, timeString, channel))
+        msg.replyEmbeds(handleAdd(guild, msg.getAuthor(), reminder, timeString, channel, null))
                 .queue();
     }
 
     @SneakyThrows
-    private MessageEmbed handleAdd(Guild guild, User user, String reminder, String time, @Nullable Long channelID) {
+    private MessageEmbed handleAdd(
+            Guild guild,
+            User user,
+            String reminder,
+            String time,
+            @Nullable Long channelID,
+            @Nullable String timeZone
+    ) {
         RemindersConfig remindersConfig = new RemindersConfig(guild);
 
         channelID = channelID == null ? -1L : channelID;
@@ -161,7 +169,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                             user.getIdLong(),
                             reminder,
                             finalChannelID,
-                            timeInMillis
+                            timeInMillis,
+                            timeZone
                     );
 
                     new ReminderScheduler(guild)
@@ -171,7 +180,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                                     hour,
                                     minute,
                                     reminder,
-                                    remindersConfig.getReminders(user.getIdLong()).size() - 1
+                                    remindersConfig.getReminders(user.getIdLong()).size() - 1,
+                                    timeZone
                             );
 
                     return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_ADDED).build();
@@ -292,7 +302,7 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
     }
 
     private long getNextUNIXTimestamp(Reminder reminder) {
-        long todaysTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toEpochSecond() + TimeUnit.MILLISECONDS.toSeconds(reminder.getReminderTime());
+        long todaysTime = LocalDate.now().atStartOfDay(reminder.getTimeZone().toZoneId()).toEpochSecond() + TimeUnit.MILLISECONDS.toSeconds(reminder.getReminderTime());
         long tomorrowsTime = todaysTime + 86400L;
         return todaysTime < TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()) ? tomorrowsTime : todaysTime;
     }
@@ -410,7 +420,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                                 reminder.getId(),
                                 reminder.getHour(),
                                 reminder.getMinute(),
-                                reminder.getReminder()
+                                reminder.getReminder(),
+                                reminder.getTimeZone().getID()
                         );
 
                 if (channelID == -1L)
@@ -472,7 +483,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                             reminder.getId(),
                             hour,
                             minute,
-                            reminder.getReminder()
+                            reminder.getReminder(),
+                            reminder.getTimeZone().getID()
                     );
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.ReminderMessages.REMINDER_TIME_CHANGED,
                             Pair.of("{time}", timeUnparsed),
@@ -762,6 +774,26 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 + getUsages(prefix);
     }
 
+    public static List<String> validTimeZones() {
+        return List.of(
+                "UTC",
+                "EST",
+                "CST",
+                "MST",
+                "PST",
+                "GMT",
+                "BST",
+                "CET",
+                "EET",
+                "IST",
+                "JST",
+                "NZST",
+                "AEST",
+                "ACST",
+                "AWST"
+        );
+    }
+
     @Override
     protected void buildCommand() {
         setCommand(
@@ -790,6 +822,13 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                                                         "channel",
                                                         "The channel to send the reminder in",
                                                         false
+                                                ),
+                                                CommandOption.of(
+                                                        OptionType.STRING,
+                                                        "timezone",
+                                                        "The timezone to send the reminder in",
+                                                        false,
+                                                        RemindersCommand.validTimeZones()
                                                 )
                                         )
                                 ),
@@ -978,10 +1017,29 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                 String reminder = options.get(1).getAsString();
 
                 MessageChannel channel = null;
-                if (options.size() == 3)
-                    channel = options.get(2).getAsChannel().asGuildMessageChannel();
+                String timezone = null;
+                if (options.stream().anyMatch(mapping -> mapping.getName().equals("channel")))
+                    channel = options.stream()
+                            .filter(mapping -> mapping.getName().equals("channel"))
+                            .findFirst()
+                            .orElse(null)
+                            .getAsChannel()
+                            .asGuildMessageChannel();
+                if (options.stream().anyMatch(mapping -> mapping.getName().equals("timezone")))
+                    timezone = options.stream()
+                            .filter(mapping -> mapping.getName().equals("timezone"))
+                            .findFirst()
+                            .orElse(null)
+                            .getAsString();
 
-                event.replyEmbeds(handleAdd(guild, eventUser, reminder, time, channel != null ? channel.getIdLong() : -1L))
+                event.replyEmbeds(handleAdd(
+                                guild,
+                                eventUser,
+                                reminder,
+                                time,
+                                channel != null ? channel.getIdLong() : -1L,
+                                timezone
+                        ))
                         .setEphemeral(true)
                         .queue();
             }
@@ -1113,7 +1171,8 @@ public class RemindersCommand extends AbstractSlashCommand implements ICommand {
                             reminder.getHour(),
                             reminder.getMinute(),
                             reminder.getReminder(),
-                            reminder.getId()
+                            reminder.getId(),
+                            null
                     );
                 }
                 logger.debug("Scheduled all {} reminder(s) for {} in {}.", reminders.size(), user.getId(), guild.getName());

@@ -19,6 +19,7 @@ import main.commands.slashcommands.SlashCommandManager;
 import main.commands.slashcommands.commands.management.TogglesCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
+import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.constants.ENV;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -267,6 +268,7 @@ public class Robertify {
 
     private static void loadNeededGlobalCommands() {
         new TogglesCommand().reload();
+        new RemindersCommand().reload();
     }
 
     public static void initVoteSiteAPIs() {
