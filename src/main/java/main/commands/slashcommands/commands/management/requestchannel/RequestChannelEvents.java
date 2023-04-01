@@ -292,8 +292,7 @@ public class RequestChannelEvents extends ListenerAdapter {
                 scheduler.setRepeating(false);
                 scheduler.setPlaylistRepeating(true);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild,
-                        RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START,
-                        Pair.of("{title}", info.title)
+                        RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START
                 );
 
                 new LogUtils(guild).sendLog(
@@ -314,7 +313,11 @@ public class RequestChannelEvents extends ListenerAdapter {
             } else {
                 scheduler.setRepeating(true);
                 scheduler.setPlaylistRepeating(false);
-                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START);
+                loopEmbed = RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        RobertifyLocaleMessage.LoopMessages.LOOP_START,
+                        Pair.of("{title}", info.title)
+                );
 
                 new LogUtils(guild).sendLog(
                         LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
