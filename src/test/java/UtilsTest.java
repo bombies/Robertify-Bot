@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class UtilsTest {
 
@@ -868,6 +869,12 @@ public class UtilsTest {
                 return null;
             }
         };
+    }
+
+    public static List<AudioTrack> getManyTracks(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> getTestTrack(String.valueOf(i)))
+                .toList();
     }
 
     public static Link getTestLink() {

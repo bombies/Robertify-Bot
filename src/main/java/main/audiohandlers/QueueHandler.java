@@ -57,6 +57,10 @@ public class QueueHandler {
         return queue.remove(audioTrack);
     }
 
+    private void setQueue(Collection<AudioTrack> track) {
+
+    }
+
     public boolean removeAll(Collection<AudioTrack> audioTracks) {
         return queue.removeAll(audioTracks);
     }
