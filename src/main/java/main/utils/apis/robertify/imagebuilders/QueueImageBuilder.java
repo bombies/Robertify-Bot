@@ -54,7 +54,7 @@ public class QueueImageBuilder extends AbstractImageBuilder {
     }
 
     @Override
-    public File build() throws SocketTimeoutException, ConnectException {
+    public File build() throws ImageBuilderException {
         if (!obj.has(QueryFields.PAGE.toString()))
             throw new IllegalArgumentException("The page must be provided before building the queue image!");
         if (!obj.has(QueryFields.TRACKS.toString()))

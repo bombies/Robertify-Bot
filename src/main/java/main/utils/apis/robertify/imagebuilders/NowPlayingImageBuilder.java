@@ -43,6 +43,11 @@ public class NowPlayingImageBuilder extends AbstractImageBuilder {
         return this;
     }
 
+    public NowPlayingImageBuilder isLiveStream(boolean val) {
+        addQuery(QueryFields.LIVESTREAM, String.valueOf(val));
+        return this;
+    }
+
     private enum QueryFields implements ImageQueryField {
         ARTIST,
         TITLE,
@@ -51,7 +56,8 @@ public class NowPlayingImageBuilder extends AbstractImageBuilder {
         REQUESTER,
         USER_NAME,
         USER_IMAGE,
-        CURRENT_TIME;
+        CURRENT_TIME,
+        LIVESTREAM;
 
         @Override
         public String toString() {

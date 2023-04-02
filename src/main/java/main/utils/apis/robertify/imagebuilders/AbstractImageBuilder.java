@@ -52,14 +52,14 @@ public abstract class AbstractImageBuilder {
     }
 
     @SneakyThrows
-    public File build() throws SocketTimeoutException, ConnectException {
+    public File build() throws ImageBuilderException {
         final var img_dir = Path.of("./built_images");
         if (!Files.exists(img_dir))
             Files.createDirectory(img_dir);
 
         final var imageFile = new File(img_dir + "/" + UUID.randomUUID() + ".png");
         final var url = new URL(uri.build().toString());
-        logger.debug("Built image URL:\n{}", url.toString());
+        logger.debug("Built image URL:\n{}", url);
 
         try(final var is = httpClient.newCall(webUtils.prepareGet(url.toString()).build())
                 .execute()
@@ -72,7 +72,7 @@ public abstract class AbstractImageBuilder {
                 os.write(b, 0, length);
             return imageFile;
         } catch (SocketTimeoutException | ConnectException e) {
-            throw e;
+            throw new ImageBuilderException(e);
         } catch (IOException e) {
             logger.error("Unexpected error", e);
         }
