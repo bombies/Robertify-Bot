@@ -9,12 +9,16 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+
 public abstract class AbstractGuildConfig implements AbstractJSON {
     private final static Logger logger = LoggerFactory.getLogger(AbstractGuildConfig.class);
     @Getter
     private static GuildRedisCache cache;
     private final Guild guild;
     private final long gid;
+
     protected AbstractGuildConfig(Guild guild) {
         this.guild = guild;
         this.gid = guild.getIdLong();
