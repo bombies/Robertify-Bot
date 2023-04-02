@@ -87,6 +87,7 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         builder
                                 .setDuration(info.length)
                                 .setCurrentTime(audioPlayer.getTrackPosition())
+                                .isLiveStream(false)
                                 .build() :
                         builder
                                 .isLiveStream(true)

@@ -242,10 +242,19 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             getMusicPlayer().playTrack(nextTrack);
         else {
             if (lastTrack != null && new AutoPlayConfig(guild).getStatus() && lastTrack.getSourceManager().getSourceName().equalsIgnoreCase("spotify")) {
+                final var pastSpotifyTackList = pastQueue.stream()
+                        .filter(track -> track.getSourceManager().getSourceName().equals("spotify"))
+                        .map(AudioTrack::getIdentifier)
+                        .toList();
+                final var pastSpotifyTracks = pastSpotifyTackList
+                        .subList(0, Math.min(5, pastSpotifyTackList.size()))
+                        .toString()
+                        .replaceAll("[\\[\\]\\s]", "");
+
                 audioManager.loadRecommendedTracks(
                         guild,
                         announcementChannel,
-                        lastTrack
+                        pastSpotifyTracks
                 );
             } else disconnectManager.scheduleDisconnect(true);
         }
