@@ -81,12 +81,13 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
 
         JdaLavalink lavalink = Robertify.getLavalink();
         DecimalFormat df = new DecimalFormat("###.##");
-        StringBuilder descBuilder = new StringBuilder("```txt");
+        StringBuilder descBuilder = new StringBuilder("```txt\n");
         for (final var node : lavalink.getNodes()) {
             RemoteStats stats = node.getStats();
             descBuilder.append(String.format("""
                                     ===============================
-                                    `%s`
+                                    ✨ %s ✨
+                                    
                                     CPU Cores: %d
                                     Total Lavalink Load: %s%%
                                     Total System Load: %s%%
