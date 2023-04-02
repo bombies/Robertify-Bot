@@ -9,8 +9,11 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import static org.quartz.JobBuilder.newJob;
@@ -26,7 +29,15 @@ public class ReminderScheduler {
     }
 
     @SneakyThrows
-    public void scheduleReminder(long user, long destination, int hour, int minute, String reminder, int reminderID) {
+    public void scheduleReminder(
+            long user,
+            long destination,
+            int hour,
+            int minute,
+            String reminder,
+            int reminderID,
+            @Nullable String timeZone
+    ) {
         if (guild == null)
             throw new NullPointerException("Why is the guild invalid??");
 
@@ -41,6 +52,7 @@ public class ReminderScheduler {
                 .withIdentity("reminder_trigger#" + guild.getId() + "#" + user + "#" + reminderID, "reminders")
                 .withSchedule(
                         CronScheduleBuilder.cronSchedule("0 %d %d * * ?".formatted(minute, hour))
+                                .inTimeZone(timeZone == null ? TimeZone.getDefault() : TimeZone.getTimeZone(timeZone))
                 )
                 .build();
         scheduler.scheduleJob(scheduledJob, jobTrigger);
@@ -51,8 +63,8 @@ public class ReminderScheduler {
         scheduler.deleteJob(JobKey.jobKey("reminder#" + guild.getId() + "#" + user + "#" + reminderID, "reminders"));
     }
 
-    public void editReminder(long channelID, long user, int reminderID, int newHour, int newMinute, String reminder) {
+    public void editReminder(long channelID, long user, int reminderID, int newHour, int newMinute, String reminder, String timeZone) {
         removeReminder(user, reminderID);
-        scheduleReminder(user, channelID, newHour, newMinute, reminder, reminderID);
+        scheduleReminder(user, channelID, newHour, newMinute, reminder, reminderID, timeZone);
     }
 }

@@ -35,7 +35,7 @@ public class PostCommandInfoCommand extends AbstractSlashCommand {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!devCheck(event)) return;
 
-        SlashCommandManager slashCommandManager = new SlashCommandManager();
+        SlashCommandManager slashCommandManager = SlashCommandManager.getInstance();
         final var commands = slashCommandManager.getGlobalCommands();
 
         final JSONObject body = new JSONObject();

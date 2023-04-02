@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SlashCommandManager {
-
+    private final static SlashCommandManager STATIC_INSTANCE = new SlashCommandManager();
+    
     @Getter
     private final List<AbstractSlashCommand> musicCommands = new ArrayList<>();
     @Getter
@@ -37,7 +38,7 @@ public class SlashCommandManager {
     @Getter
     private final List<AbstractSlashCommand> devCommands = new ArrayList<>();
 
-    public SlashCommandManager() {
+    private SlashCommandManager() {
         addMusicCommands(
                 new PlaySlashCommand(),
                 new DisconnectSlashCommand(),
@@ -123,8 +124,13 @@ public class SlashCommandManager {
                 new ManagePremiumCommand(),
                 new ResetPremiumFeaturesCommand(),
                 new ImageBuilderTest(),
-                new UnloadGuildCommandsCommand()
+                new UnloadGuildCommandsCommand(),
+                new CommandManagerCommand()
         );
+    }
+    
+    public static SlashCommandManager getInstance() {
+        return STATIC_INSTANCE;
     }
 
     private void addMusicCommands(AbstractSlashCommand... commands) {

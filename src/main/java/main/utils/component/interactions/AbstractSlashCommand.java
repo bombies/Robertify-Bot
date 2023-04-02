@@ -1,5 +1,6 @@
 package main.utils.component.interactions;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.commands.RandomMessageManager;
@@ -108,7 +109,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         return command.botRequiredPermissions;
     }
 
-    private CommandData getCommandData() {
+    public CommandData getCommandData() {
         if (command == null)
             buildCommand();
 
@@ -163,11 +164,13 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (command == null)
             throw new IllegalStateException("The command is null! Cannot load into guild.");
         
-        if (!command.isGuild)
+        if (!command.isGuild && !command.isPrivate)
             return;
         
         if (command.isPrivate && g.getOwnerIdLong() != Config.getOwnerID())
             return;
+
+        logger.debug("Loading command \"{}\" into guild {}", command.name, g.getName());
 
         // Initial request builder
         CommandCreateAction commandCreateAction = g.upsertCommand(command.getName(), command.getDescription());
@@ -207,7 +210,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
 
         commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
-                .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
+                .handle(ErrorResponse.MISSING_ACCESS, e -> logger.warn("I couldn't create guild commands in {}", g.getName())));
     }
 
     public void unload(Guild g) {
@@ -228,7 +231,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             g.updateCommands().addCommands().queue();
         } else {
             g.updateCommands()
-                    .addCommands(new SlashCommandManager()
+                    .addCommands(SlashCommandManager.getInstance()
                             .getDevCommands()
                             .stream()
                             .map(AbstractSlashCommand::getCommandData)
@@ -291,7 +294,9 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                 }
             }
 
-            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, null, new ErrorHandler()
+            commandCreateAction.queueAfter(1, TimeUnit.SECONDS, cmd -> {
+
+            }, new ErrorHandler()
                     .handle(ErrorResponse.MISSING_ACCESS, e -> {}));
         }
     }
@@ -311,8 +316,14 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
     }
 
+    public void reload() {
+        if (this.isGuildCommand())
+            return;
+        upsertCommand(this);
+    }
+
     public static void loadAllCommands(Guild g) {
-        SlashCommandManager slashCommandManager = new SlashCommandManager();
+        SlashCommandManager slashCommandManager = SlashCommandManager.getInstance();
         List<AbstractSlashCommand> commands = slashCommandManager.getGuildCommands();
         List<AbstractSlashCommand> devCommands = slashCommandManager.getDevCommands();
         CommandListUpdateAction commandListUpdateAction = g.updateCommands();
@@ -366,7 +377,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     }
 
     public static void loadAllCommands() {
-        SlashCommandManager slashCommandManager = new SlashCommandManager();
+        SlashCommandManager slashCommandManager = SlashCommandManager.getInstance();
         List<AbstractSlashCommand> commands = slashCommandManager.getGlobalCommands();
 
         for (final var jda : Robertify.getShardManager().getShards()) {
@@ -410,7 +421,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected void sendRandomMessage(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
-        if (new SlashCommandManager().isMusicCommand(this) && event.getChannel().getType().isMessage())
+        if (SlashCommandManager.getInstance().isMusicCommand(this) && event.getChannel().getType().isMessage())
             new RandomMessageManager().randomlySendMessage(event.getChannel().asGuildMessageChannel());
     }
 
@@ -424,7 +435,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (!premiumBotCheck(event)) return false;
 
         if (command == null) buildCommand();
-        if (new SlashCommandManager().isMusicCommand(this)) {
+        if (SlashCommandManager.getInstance().isMusicCommand(this)) {
             final var botDB = BotBDCache.getInstance();
             final var latestAlert = botDB.getLatestAlert().getLeft();
             final var user = event.getUser();
@@ -432,7 +443,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             if (
                     !botDB.userHasViewedAlert(user.getIdLong())
                     && (!latestAlert.isEmpty() && !latestAlert.isBlank())
-                    && new SlashCommandManager().isMusicCommand(this)
+                    && SlashCommandManager.getInstance().isMusicCommand(this)
             )
                 event.getChannel().asGuildMessageChannel().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), RobertifyLocaleMessage.GeneralMessages.UNREAD_ALERT_MENTION, Pair.of("{user}", user.getAsMention())).build())
                         .queue(msg -> {
@@ -656,7 +667,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         if (guild == null)
             return true;
 
-        final TogglesConfig togglesConfig = new TogglesConfig(guild);
+        final TogglesConfig togglesConfig = TogglesConfig.getConfig(guild);
         final RestrictedChannelsConfig config = new RestrictedChannelsConfig(guild);
 
         if (!togglesConfig.getToggle(Toggles.RESTRICTED_TEXT_CHANNELS))
@@ -895,6 +906,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
     }
 
+    @lombok.Builder
     protected static class SubCommand {
         @NotNull @Getter
         private final String name;
@@ -964,6 +976,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
     }
 
+    @lombok.Builder
     protected static class CommandOption {
         @Getter
         private final OptionType type;
@@ -1061,12 +1074,12 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         @SneakyThrows
         public Builder setPossibleDJCommand() {
             this.permissionCheck = e -> {
-                final TogglesConfig config = new TogglesConfig(e.getGuild());
+                final TogglesConfig config = TogglesConfig.getConfig(e.getGuild());
 
                 if (!config.isDJToggleSet(e.getName()))
                     return true;
 
-                if (config.getDJToggle(new SlashCommandManager().getCommand(e.getName())))
+                if (config.getDJToggle(SlashCommandManager.getInstance().getCommand(e.getName())))
                     return GeneralUtils.hasPerms(e.getGuild(), e.getMember(), Permission.ROBERTIFY_DJ);
 
                 return true;

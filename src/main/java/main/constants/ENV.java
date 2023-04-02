@@ -7,6 +7,7 @@ public enum ENV {
     OWNER_ID("owner_id"),
     PREMIUM_BOT("premium_bot"),
     LOAD_COMMANDS("load_commands"),
+    LOAD_NEEDED_COMMANDS("load_needed_commands"),
     SHARD_COUNT("shard_count"),
     VOTE_WEBHOOK_URL("vote_webhook_url"),
     DATABASE_DIR("database_dir"),

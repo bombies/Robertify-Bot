@@ -3,6 +3,7 @@ package main.main;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandManager;
+import main.commands.slashcommands.commands.dev.CommandManagerCommand;
 import main.commands.slashcommands.commands.dev.UnloadGuildCommandsCommand;
 import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.utils.GeneralUtils;
@@ -196,7 +197,7 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new UnloadGuildCommandsCommand().loadCommand(g);
+        new CommandManagerCommand().loadCommand(g);
     }
 
     /**

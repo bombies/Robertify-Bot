@@ -26,7 +26,7 @@ public class LogUtils {
         if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig(guild).getLogToggle(type))
+        if (!TogglesConfig.getConfig(guild).getLogToggle(type))
             return;
 
         TextChannel channel = config.getChannel();
@@ -45,7 +45,7 @@ public class LogUtils {
         if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig(guild).getLogToggle(type))
+        if (!TogglesConfig.getConfig(guild).getLogToggle(type))
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);
@@ -66,7 +66,7 @@ public class LogUtils {
         if (!config.channelIsSet())
             return;
 
-        if (!new TogglesConfig(guild).getLogToggle(type))
+        if (!TogglesConfig.getConfig(guild).getLogToggle(type))
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);

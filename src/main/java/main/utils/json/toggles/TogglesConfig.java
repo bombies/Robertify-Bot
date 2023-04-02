@@ -18,13 +18,19 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class TogglesConfig extends AbstractGuildConfig {
+    private static final HashMap<Long, TogglesConfig> SINGLETON_MAP = new HashMap<>();
+    
     private final Guild guild;
     private final long gid;
-
-    public TogglesConfig(Guild guild) {
+    
+    private TogglesConfig(Guild guild) {
         super(guild);
         this.guild = guild;
         this.gid = guild.getIdLong();
+    }
+    
+    public static TogglesConfig getConfig(Guild guild) {
+        return SINGLETON_MAP.computeIfAbsent(guild.getIdLong(), id -> new TogglesConfig(guild));
     }
 
     public boolean getToggle(Toggles toggle) {
@@ -75,7 +81,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         final var djToggles = getDJToggles();
 
         if (!djToggles.containsKey(cmd.getName())) {
-            if (new SlashCommandManager().isMusicCommand(cmd)) {
+            if (SlashCommandManager.getInstance().isMusicCommand(cmd)) {
                 setDJToggle(cmd, false);
                 return false;
             } else {
@@ -223,7 +229,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         if (!toggleObj.has(Toggles.TogglesConfigField.DJ_TOGGLES.toString())) {
             var djTogglesObj = new JSONObject();
 
-            for (AbstractSlashCommand musicCommand : new SlashCommandManager().getMusicCommands())
+            for (AbstractSlashCommand musicCommand : SlashCommandManager.getInstance().getMusicCommands())
                 djTogglesObj.put(musicCommand.getName().toLowerCase(), false);
 
             toggleObj.put(Toggles.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj);

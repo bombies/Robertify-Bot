@@ -16,8 +16,10 @@ import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
+import main.commands.slashcommands.commands.management.TogglesCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
+import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.constants.ENV;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -203,7 +205,7 @@ public class Robertify {
             jdaBuilder.disableIntents(disabledIntents);
 
             // Register all slash commands
-            SlashCommandManager slashCommandManager = new SlashCommandManager();
+            SlashCommandManager slashCommandManager = SlashCommandManager.getInstance();
             for (var cmd : slashCommandManager.getGlobalCommands()) {
                 jdaBuilder.addEventListeners(cmd);
                 logger.debug("Registered the \"{}\" command.", cmd.getName());
@@ -240,6 +242,9 @@ public class Robertify {
             if (Config.loadCommands())
                 AbstractSlashCommand.loadAllCommands();
 
+            if (Config.loadNeededCommands())
+                loadNeededGlobalCommands();
+
             Robertify.cronScheduler.start();
 
             initVoteSiteAPIs();
@@ -263,11 +268,8 @@ public class Robertify {
     }
 
     private static void loadNeededGlobalCommands() {
-
-    }
-
-    private void loadGlobalSlashCommands() {
-        AbstractSlashCommand.loadAllCommands();
+        new TogglesCommand().reload();
+        new RemindersCommand().reload();
     }
 
     public static void initVoteSiteAPIs() {

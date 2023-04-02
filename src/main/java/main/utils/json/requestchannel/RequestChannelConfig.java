@@ -40,7 +40,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -221,7 +220,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                         )
                 );
 
-                var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
+                var requester = RobertifyAudioManager.getRequesterAsMention(guild, playingTrack);
                 eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
 
                 if (playingTrack instanceof MirroringAudioTrack mirroringAudioTrack)
@@ -291,7 +290,6 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         } catch (InsufficientPermissionException e) {
             logger.error("I didn't have enough permissions to update the dedicated channel in {}", guild.getName());
         }
-
     }
 
     public static void updateAllButtons() {
@@ -361,6 +359,8 @@ public class RequestChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized TextChannelManager channelTopicUpdateRequest(TextChannel channel) {
+        if (channel == null) return null;
+
         final var localeManager = LocaleManager.getLocaleManager(channel.getGuild());
         return channel.getManager().setTopic(
                 RobertifyEmoji.PREVIOUS_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +

@@ -60,7 +60,7 @@ public class ReminderJob implements Job {
             return;
         }
 
-        if (!new TogglesConfig(guild).getToggle(Toggles.REMINDERS))
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.REMINDERS))
             return;
 
         final var localeManager = LocaleManager.getLocaleManager(guild);

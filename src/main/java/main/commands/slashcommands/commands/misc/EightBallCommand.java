@@ -33,7 +33,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
         final Message msg = ctx.getMessage();
         final var guild = ctx.getGuild();
 
-        if (!new TogglesConfig(guild).getToggle(Toggles.EIGHT_BALL))
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.EIGHT_BALL))
             return;
 
         if (args.isEmpty()) {
@@ -361,7 +361,7 @@ public class EightBallCommand extends AbstractSlashCommand implements ICommand {
 
         final var guild = event.getGuild();
 
-        if (!new TogglesConfig(guild).getToggle(Toggles.EIGHT_BALL)) {
+        if (!TogglesConfig.getConfig(guild).getToggle(Toggles.EIGHT_BALL)) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_FEATURE).build())
                     .queue();
             return;

@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import org.quartz.Scheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,7 @@ public class RemindersConfig extends AbstractGuildConfig {
         getCache().updateGuild(guildObject);
     }
 
-    public void addReminder(long uid, String reminder, long channelID, long reminderTime) {
+    public void addReminder(long uid, String reminder, long channelID, long reminderTime, @Nullable String timeZone) {
         if (!userExists(uid))
             addUser(uid);
 
@@ -59,12 +60,15 @@ public class RemindersConfig extends AbstractGuildConfig {
                 .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, uid))
                 .getJSONArray(Fields.USER_REMINDERS.toString());
 
-        userReminders.put(new JSONObject()
+        final var reminderObj = new JSONObject()
                 .put(Fields.REMINDER.toString(), reminder)
                 .put(Fields.REMINDER_CHANNEL.toString(), channelID)
-                .put(Fields.REMINDER_TIME.toString(), reminderTime)
-        );
+                .put(Fields.REMINDER_TIME.toString(), reminderTime);
 
+        if (timeZone != null)
+            reminderObj.put(Fields.REMINDER_TIMEZONE.toString(), timeZone);
+
+        userReminders.put(reminderObj);
         getCache().updateGuild(guildObj);
     }
 
@@ -226,7 +230,10 @@ public class RemindersConfig extends AbstractGuildConfig {
                         actualObj.getString(Fields.REMINDER.toString()),
                         uid,
                         actualObj.getLong(Fields.REMINDER_CHANNEL.toString()),
-                        actualObj.getLong(Fields.REMINDER_TIME.toString())
+                        actualObj.getLong(Fields.REMINDER_TIME.toString()),
+                        actualObj.has(Fields.REMINDER_TIMEZONE.toString()) ?
+                                actualObj.getString(Fields.REMINDER_TIMEZONE.toString()) :
+                                null
                 ));
             }
             return new ReminderUser(uid, gid, ret, isBanned);
@@ -268,7 +275,10 @@ public class RemindersConfig extends AbstractGuildConfig {
                             actualObj.getString(Fields.REMINDER.toString()),
                             uid,
                             actualObj.getLong(Fields.REMINDER_CHANNEL.toString()),
-                            actualObj.getLong(Fields.REMINDER_TIME.toString())
+                            actualObj.getLong(Fields.REMINDER_TIME.toString()),
+                            actualObj.has(Fields.REMINDER_TIMEZONE.toString()) ?
+                                    actualObj.getString(Fields.REMINDER_TIMEZONE.toString()) :
+                                    null
                     ));
                 }
                 reminderUsers.add(new ReminderUser(uid, gid, reminderList, isBanned));
@@ -382,6 +392,7 @@ public class RemindersConfig extends AbstractGuildConfig {
         REMINDER,
         REMINDER_CHANNEL,
         REMINDER_TIME,
+        REMINDER_TIMEZONE,
         IS_BANNED,
         BANNED_CHANNELS;
 

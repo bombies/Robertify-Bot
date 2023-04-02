@@ -10,7 +10,6 @@ public class AutoPlayConfig extends AbstractGuildConfig {
     private final Guild guild;
     private final long gid;
 
-
     public AutoPlayConfig(Guild guild) {
         super(guild);
         this.guild = guild;

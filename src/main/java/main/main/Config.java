@@ -77,6 +77,10 @@ public class Config {
         return getBoolean(ENV.LOAD_COMMANDS);
     }
 
+    public static boolean loadNeededCommands() {
+        return getBoolean(ENV.LOAD_NEEDED_COMMANDS);
+    }
+
     public static String getGatewayUrl() {
         return get(ENV.GATEWAY_URL);
     }
@@ -130,15 +134,15 @@ public class Config {
     }
 
     public static int getInt(ENV key) {
-        return Integer.parseInt(get(key));
+        return Integer.parseInt(get(key, "-1"));
     }
 
     public static long getLong(ENV key) {
-        return Long.parseLong(get(key));
+        return Long.parseLong(get(key, "-1"));
     }
 
     public static boolean getBoolean(ENV key) {
-        return Config.hasValue(key) && Boolean.parseBoolean(get(key));
+        return Boolean.parseBoolean(get(key, "false"));
     }
 
     @SneakyThrows
@@ -170,13 +174,5 @@ public class Config {
             logger.warn("config.json didn't exist, so I created one.");
         }
         return new JSONObject(GeneralUtils.getFileContent(file.getPath()));
-    }
-
-    private static class YamlConfig {
-        List<LavaNode> nodes;
-
-        public YamlConfig(List<LavaNode> nodes) {
-            this.nodes = nodes;
-        }
     }
 }

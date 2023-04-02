@@ -4,6 +4,7 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.NowPlayingCommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.ImageBuilderException;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.themes.ThemesConfig;
@@ -74,22 +75,27 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
         } else {
             final var info = track.getInfo();
             try {
-                final var image = new NowPlayingImageBuilder()
+                final var builder = new NowPlayingImageBuilder()
                         .setTitle(info.title)
                         .setArtistName(info.author)
                         .setAlbumImage(
                                 track instanceof MirroringAudioTrack mirroringAudioTrack ?
                                         mirroringAudioTrack.getArtworkURL() :
                                         new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                        )
-                        .setDuration(info.length)
-                        .setCurrentTime(audioPlayer.getTrackPosition())
-                        .build();
+                        );
+                final var image = !info.isStream ?
+                        builder
+                                .setDuration(info.length)
+                                .setCurrentTime(audioPlayer.getTrackPosition())
+                                .build() :
+                        builder
+                                .isLiveStream(true)
+                                .build();
                 event.getHook()
                         .sendFiles(FileUpload.fromData(image))
                         .setEphemeral(ephemeralState)
                         .queue(done -> image.delete());
-            } catch (SocketTimeoutException | ConnectException e) {
+            } catch (ImageBuilderException e) {
                 event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();

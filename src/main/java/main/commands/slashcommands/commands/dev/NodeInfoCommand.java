@@ -34,7 +34,7 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
                     "Memory Reservable: " + df.format((stats.getMemReservable() / 1000000)) + "MB\n" +
                     "Memory Used: " + df.format((stats.getMemUsed() / 1000000)) + "MB\n" +
                     "Memory Free: " + df.format((stats.getMemFree() / 1000000)) + "MB\n\n" +
-                    "Total Players: " +  stats.getPlayers() + "\n" +
+                    "Total Players: " + stats.getPlayers() + "\n" +
                     "Playing Players: " + stats.getPlayingPlayers() + "\n" +
                     "Uptime: " + GeneralUtils.getDurationString(stats.getUptime()) +
                     "```\n\n");
@@ -81,22 +81,51 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
 
         JdaLavalink lavalink = Robertify.getLavalink();
         DecimalFormat df = new DecimalFormat("###.##");
-        StringBuilder descBuilder = new StringBuilder();
+        StringBuilder descBuilder = new StringBuilder("```txt\n");
         for (final var node : lavalink.getNodes()) {
             RemoteStats stats = node.getStats();
-            descBuilder.append("**__" + node.getName() + "__**\n```" +
-                    "CPU Cores:" + stats.getCpuCores() + "\n" +
-                    "Total Lavalink Load: " + df.format(stats.getLavalinkLoad() * 100) + "%\n" +
-                    "Total System Load: " + df.format(stats.getSystemLoad() * 100) + "%\n\n" +
-                    "Memory Allocated: " + df.format((stats.getMemAllocated() / 1000000)) + "MB\n" +
-                    "Memory Reservable: " + df.format((stats.getMemReservable() / 1000000)) + "MB\n" +
-                    "Memory Used: " + df.format((stats.getMemUsed() / 1000000)) + "MB\n" +
-                    "Memory Free: " + df.format((stats.getMemFree() / 1000000)) + "MB\n\n" +
-                    "Total Players: " +  stats.getPlayers() + "\n" +
-                    "Playing Players: " + stats.getPlayingPlayers() + "\n" +
-                    "Uptime: " + GeneralUtils.getDurationString(stats.getUptime()) +
-                    "```\n\n");
+            descBuilder.append(String.format("""
+                                    ===============================
+                                    ✨ %s ✨
+                                    
+                                    CPU Cores: %d
+                                    Total Lavalink Load: %s%%
+                                    Total System Load: %s%%
+                                    -------------------------------
+                                    Memory Allocated: %sMB
+                                    Memory Reservable: %sMB
+                                    Memory Used: %sMB
+                                    Memory Free: %sMB
+                                    -------------------------------
+                                    Total Players: %d
+                                    Playing Players: %d
+                                    Frames Sent per minute: %d
+                                    Frames Nulled per minute: %d
+                                    Frames Deficit per minute: %d
+                                    -------------------------------
+                                    Uptime: %s
+                                    ===============================
+                                    
+                                    """,
+                            node.getName(),
+                            stats.getCpuCores(),
+                            df.format(stats.getLavalinkLoad() * 100),
+                            df.format(stats.getSystemLoad() * 100),
+                            df.format((stats.getMemAllocated() / 1000000)),
+                            df.format((stats.getMemReservable() / 1000000)),
+                            df.format((stats.getMemUsed() / 1000000)),
+                            df.format((stats.getMemFree() / 1000000)),
+                            stats.getPlayers(),
+                            stats.getPlayingPlayers(),
+                            stats.getAvgFramesSentPerMinute(),
+                            stats.getAvgFramesNulledPerMinute(),
+                            stats.getAvgFramesDeficitPerMinute(),
+                            GeneralUtils.getDurationString(stats.getUptime())
+                    )
+            );
         }
+
+        descBuilder.append("```");
 
         event.replyEmbeds(RobertifyEmbedUtils.embedMessage(event.getGuild(), descBuilder.toString()).build())
                 .queue();

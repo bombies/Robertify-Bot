@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>5.2.1</version>
+    <version>5.2.7</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -72,9 +72,9 @@
             <version>0.2.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.freyacodes</groupId>
-            <artifactId>Lavalink-Client</artifactId>
-            <version>cde746afc23b462adb6e9d797707fc4a7e85e1d1</version>
+            <groupId>com.github.bombies</groupId>
+            <artifactId>Robertify-Lavalink-Client</artifactId>
+            <version>master-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
@@ -199,12 +199,12 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>com.github.freyacodes</groupId>
-                <artifactId>Lavalink-Client</artifactId>
+                <groupId>com.github.bombies</groupId>
+                <artifactId>Robertify-Lavalink-Client</artifactId>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.sedmelluq</groupId>
-                        <artifactId>lavaplayer</artifactId>
+                        <groupId>com.github.walkyst</groupId>
+                        <artifactId>lavaplayer-fork</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

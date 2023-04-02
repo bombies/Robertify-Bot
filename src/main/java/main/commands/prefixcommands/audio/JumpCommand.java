@@ -99,7 +99,7 @@ public class JumpCommand implements ICommand {
         player.seekTo(player.getTrackPosition() + time);
         new LogUtils(guild).sendLog(LogType.TRACK_JUMP, RobertifyLocaleMessage.JumpMessages.JUMPED_LOG, Pair.of("{user}", jumper.getAsMention()), Pair.of("{duration}", String.valueOf(time)));
 
-        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JumpMessages.JUMPED, Pair.of("{duration}", String.valueOf(time)));
+        return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.JumpMessages.JUMPED, Pair.of("{duration}", String.valueOf(time / 1000)));
     }
 
     @Override

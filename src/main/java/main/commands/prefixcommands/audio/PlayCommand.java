@@ -97,7 +97,7 @@ public class PlayCommand implements ICommand {
                     .queue();
             return;
         } else if (!selfVoiceState.inAudioChannel()) {
-            if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+            if (TogglesConfig.getConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                 final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                 final var localeManager = LocaleManager.getLocaleManager(guild);
                 if (!restrictedChannelsConfig.isRestrictedChannel(memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {

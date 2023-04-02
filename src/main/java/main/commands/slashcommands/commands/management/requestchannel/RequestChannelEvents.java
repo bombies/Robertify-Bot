@@ -103,7 +103,7 @@ public class RequestChannelEvents extends ListenerAdapter {
                     return;
                 }
             } else {
-                if (new TogglesConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
+                if (TogglesConfig.getConfig(guild).getToggle(Toggles.RESTRICTED_VOICE_CHANNELS)) {
                     final var restrictedChannelsConfig = new RestrictedChannelsConfig(guild);
                     final var localeManager = LocaleManager.getLocaleManager(guild);
                     if (!restrictedChannelsConfig.isRestrictedChannel(memberVoiceState.getChannel().getIdLong(), RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL)) {
@@ -292,8 +292,7 @@ public class RequestChannelEvents extends ListenerAdapter {
                 scheduler.setRepeating(false);
                 scheduler.setPlaylistRepeating(true);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild,
-                        RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START,
-                        Pair.of("{title}", info.title)
+                        RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START
                 );
 
                 new LogUtils(guild).sendLog(
@@ -314,7 +313,11 @@ public class RequestChannelEvents extends ListenerAdapter {
             } else {
                 scheduler.setRepeating(true);
                 scheduler.setPlaylistRepeating(false);
-                loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START);
+                loopEmbed = RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        RobertifyLocaleMessage.LoopMessages.LOOP_START,
+                        Pair.of("{title}", info.title)
+                );
 
                 new LogUtils(guild).sendLog(
                         LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
@@ -555,7 +558,7 @@ public class RequestChannelEvents extends ListenerAdapter {
     }
 
     private boolean djCheck(AbstractSlashCommand command, Guild guild, Member user) {
-        final var toggles = new TogglesConfig(guild);
+        final var toggles = TogglesConfig.getConfig(guild);
         if (toggles.isDJToggleSet(command)) {
             if (toggles.getDJToggle(command)) {
                 return GeneralUtils.hasPerms(guild, user, Permission.ROBERTIFY_DJ);

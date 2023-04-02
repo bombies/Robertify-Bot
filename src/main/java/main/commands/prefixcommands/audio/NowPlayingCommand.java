@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
@@ -78,10 +77,10 @@ public class NowPlayingCommand implements ICommand {
 
         double progress = (double)audioPlayer.getTrackPosition() / track.getInfo().length;
         final Filters filters = audioPlayer.getFilters();
-        final String requester = RobertifyAudioManager.getRequester(guild, track);
+        final String requester = RobertifyAudioManager.getRequesterAsMention(guild, track);
         final var localeManager = LocaleManager.getLocaleManager(guild);
         eb =  RobertifyEmbedUtils.embedMessageWithTitle(guild, (localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_EMBED_TITLE, Pair.of("{title}", info.title), Pair.of("{author}", info.author))),
-                (((new TogglesConfig(guild).getToggle(Toggles.SHOW_REQUESTER))) && requester != null ?
+                (((TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER))) && requester != null ?
                         "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_REQUESTER, Pair.of("{requester}", requester))
                         :
                         "") +

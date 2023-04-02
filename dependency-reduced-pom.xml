@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>5.2.0</version>
+  <version>5.2.7</version>
   <build>
     <plugins>
       <plugin>
@@ -119,12 +119,12 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>com.github.freyacodes</groupId>
-        <artifactId>Lavalink-Client</artifactId>
+        <groupId>com.github.bombies</groupId>
+        <artifactId>Robertify-Lavalink-Client</artifactId>
         <exclusions>
           <exclusion>
-            <artifactId>lavaplayer</artifactId>
-            <groupId>com.sedmelluq</groupId>
+            <artifactId>lavaplayer-fork</artifactId>
+            <groupId>com.github.walkyst</groupId>
           </exclusion>
         </exclusions>
       </dependency>
