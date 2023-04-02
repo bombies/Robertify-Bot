@@ -47,12 +47,10 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
 
         final var scheduler = musicManager.getScheduler();
-        final var tracksRequestedByUsers = RobertifyAudioManager.getTracksRequestedByUsers();
-        tracksRequestedByUsers.putIfAbsent(guild.getIdLong(), new ArrayList<>());
 
         final var tracks = playlist.getTracks();
         for (final var track : tracks) {
-            tracksRequestedByUsers.get(guild.getIdLong()).add(guild.getSelfMember().getId() + ":" + track.getIdentifier());
+            scheduler.addRequester(guild.getSelfMember().getId(), track.getIdentifier());
             scheduler.queue(track);
         }
 

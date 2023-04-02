@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
@@ -38,8 +39,8 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final Guild guild;
     private final User sender;
     private final GuildMusicManager musicManager;
+    private final TrackScheduler scheduler;
     private final boolean announceMsg;
-    private final HashMap<Long, List<String>> trackRequestedByUser;
     private final String trackUrl;
     private final Message botMsg;
     private final boolean loadPlaylistShuffled;
@@ -47,13 +48,13 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final GuildMessageChannel announcementChannel;
     private final RequestChannelConfig requestChannelConfig;
 
-    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager, HashMap<Long, List<String>> trackRequestedByUser,
+    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
         this.sender = sender;
         this.musicManager = musicManager;
-        this.trackRequestedByUser = trackRequestedByUser;
+        this.scheduler = musicManager.getScheduler();
         this.trackUrl = trackUrl;
         this.announceMsg = announceMsg;
         this.botMsg = botMsg;
@@ -70,11 +71,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (!announceMsg)
             RobertifyAudioManager.getUnannouncedTracks().add(audioTrack.getIdentifier());
 
-
-        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
-        trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getIdentifier());
-
-        final var scheduler = musicManager.getScheduler();
+        scheduler.addRequester(sender.getId(), audioTrack.getIdentifier());
         scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
@@ -131,7 +128,6 @@ public class AudioLoader implements AudioLoadResultHandler {
         List<AudioTrack> tracks = audioPlaylist.getTracks();
 
         final var dedicatedChannelConfig = new RequestChannelConfig(guild);
-        trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
 
         if (audioPlaylist.isSearchResult()) {
             sendTrackLoadedMessage(tracks.get(0));
@@ -140,15 +136,13 @@ public class AudioLoader implements AudioLoadResultHandler {
                 RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0).getIdentifier());
 
             if (sender != null)
-                trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
+                scheduler.addRequester(sender.getId(), tracks.get(0).getIdentifier());
 
-            final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
 
             if (addToBeginning)
                 scheduler.addToBeginningOfQueue(tracks.get(0));
-            else
-                scheduler.queue(tracks.get(0));
+            else scheduler.queue(tracks.get(0));
 
             AudioTrackInfo info = tracks.get(0).getInfo();
             if (sender != null)
@@ -208,7 +202,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
             for (final var track : tracks) {
                 if (sender != null)
-                    trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + track.getIdentifier());
+                    scheduler.addRequester(sender.getId(), track.getIdentifier());
 
                 if (!addToBeginning)
                     scheduler.queue(track);

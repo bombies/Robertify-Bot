@@ -37,8 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -46,6 +45,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
+    private final List<Requester> requesters = new ArrayList<>();
+
     @Getter
     private ConcurrentLinkedQueue<AudioTrack> savedQueue;
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
@@ -132,7 +133,8 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             return;
         }
 
-        final var requester = RobertifyAudioManager.getRequester(guild, track);
+        final var requester = findRequester(track.getIdentifier());
+        final var requesterMention = RobertifyAudioManager.getRequesterAsMention(guild, track);
 
         if (announcementChannel != null) {
             final var dedicatedChannelConfig = new RequestChannelConfig(guild);
@@ -144,14 +146,14 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             final var localeManager = LocaleManager.getLocaleManager(guild);
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", trackInfo.title), Pair.of("{author}", trackInfo.author))
                     + (TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
-                    "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester))
+                    "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requesterMention))
                     :
                     ""
             ));
 
             try {
                 final var img = new AtomicReference<File>();
-                Robertify.getShardManager().retrieveUserById(requester.replaceAll("[<@>]", ""))
+                Robertify.getShardManager().retrieveUserById(requester.getId())
                         .submit()
                         .thenComposeAsync(requesterObj -> {
                             img.set(new NowPlayingImageBuilder()
@@ -162,7 +164,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                                     mirroringAudioTrack.getArtworkURL() :
                                                     new ThemesConfig(guild).getTheme().getNowPlayingBanner()
                                     )
-                                    .setUser(requesterObj != null ? requesterObj.getName() + "#" + requesterObj.getDiscriminator() : requester, requesterObj != null ? requesterObj.getAvatarUrl() : null)
+                                    .setUser(requesterObj != null ? (requesterObj.getName() + "#" + requesterObj.getDiscriminator()) : requesterMention, requesterObj != null ? requesterObj.getAvatarUrl() : null)
                                     .build());
                             return announcementChannel.sendFiles(FileUpload.fromData(img.get())).submit();
                         })
@@ -383,5 +385,39 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     public IPlayer getMusicPlayer() {
         return audioPlayer.getPlayer();
+    }
+
+    public Requester findRequester(String trackId) {
+        return this.requesters.stream()
+                .filter(requester -> requester.getTrackId().equals(trackId))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void addRequester(String userId, String trackId) {
+        this.requesters.add(new Requester(userId, trackId));
+    }
+
+    public void removeRequester(String userId) {
+        final var newList = this.requesters.stream()
+                .filter(requester -> !requester.getId().equals(userId))
+                .toList();
+        this.requesters.addAll(newList);
+    }
+
+    public void clearRequesters() {
+        this.requesters.clear();
+    }
+
+    public static class Requester {
+        @Getter
+        private final String id;
+        @Getter
+        private final String trackId;
+
+        private Requester(String id, String trackId) {
+            this.id = id;
+            this.trackId = trackId;
+        }
     }
 }

@@ -40,7 +40,6 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -221,7 +220,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                         )
                 );
 
-                var requester = RobertifyAudioManager.getRequester(guild, playingTrack);
+                var requester = RobertifyAudioManager.getRequesterAsMention(guild, playingTrack);
                 eb.setDescription(localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requester)));
 
                 if (playingTrack instanceof MirroringAudioTrack mirroringAudioTrack)
