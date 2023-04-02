@@ -7,7 +7,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.logs.LogType;
@@ -38,6 +40,8 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final Guild guild;
     private final User sender;
     private final GuildMusicManager musicManager;
+    private final TrackScheduler scheduler;
+    private final QueueHandler queueHandler;
     private final boolean announceMsg;
     private final HashMap<Long, List<String>> trackRequestedByUser;
     private final String trackUrl;
@@ -53,6 +57,8 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.guild = musicManager.getGuild();
         this.sender = sender;
         this.musicManager = musicManager;
+        this.scheduler = musicManager.getScheduler();
+        this.queueHandler = scheduler.getQueueHandler();
         this.trackRequestedByUser = trackRequestedByUser;
         this.trackUrl = trackUrl;
         this.announceMsg = announceMsg;
@@ -74,7 +80,6 @@ public class AudioLoader implements AudioLoadResultHandler {
         trackRequestedByUser.putIfAbsent(guild.getIdLong(), new ArrayList<>());
         trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + audioTrack.getIdentifier());
 
-        final var scheduler = musicManager.getScheduler();
         scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
@@ -90,7 +95,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         );
 
         if (scheduler.isPlaylistRepeating())
-            scheduler.setSavedQueue(scheduler.getQueue());
+            queueHandler.setSavedQueue(queueHandler.contents());
 
         if (requestChannelConfig.isChannelSet())
             requestChannelConfig.updateMessage();
@@ -142,7 +147,6 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (sender != null)
                 trackRequestedByUser.get(guild.getIdLong()).add(sender.getId() + ":" + tracks.get(0).getIdentifier());
 
-            final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
 
             if (addToBeginning)
@@ -159,7 +163,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                 );
 
             if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(scheduler.getQueue());
+                queueHandler.setSavedQueue(queueHandler.contents());
 
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
@@ -192,7 +196,6 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (loadPlaylistShuffled)
                 Collections.shuffle(tracks);
 
-            final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
 
             if (addToBeginning)
@@ -215,7 +218,7 @@ public class AudioLoader implements AudioLoadResultHandler {
             }
 
             if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(scheduler.getQueue());
+                queueHandler.setSavedQueue(queueHandler.contents());
 
         }
         if (dedicatedChannelConfig.isChannelSet())
@@ -250,14 +253,14 @@ public class AudioLoader implements AudioLoadResultHandler {
                     ));
         }
 
-        if (musicManager.getScheduler().getQueue().isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
-            musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        if (queueHandler.isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
+            scheduler.scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
         if (musicManager.getPlayer().getPlayingTrack() == null)
-            musicManager.getGuild().getAudioManager().closeAudioConnection();
+            musicManager.leave();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
             logger.error("[FATAL ERROR] Could not load track!", e);

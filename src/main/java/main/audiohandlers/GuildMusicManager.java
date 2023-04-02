@@ -34,12 +34,14 @@ public class GuildMusicManager {
     }
 
     public void clear() {
-        getScheduler().getQueue().clear();
+        final var queueHandler = getScheduler().getQueueHandler();
+
+        queueHandler.clear();
+        queueHandler.clearSavedQueue();
+        queueHandler.clearPreviousTracks();
 
         getScheduler().setRepeating(false);
         getScheduler().setPlaylistRepeating(false);
-        getScheduler().clearSavedQueue();
-        getScheduler().getPastQueue().clear();
         getPlayer().getFilters().clear().commit();
 
         if (getPlayer().getPlayingTrack() != null)

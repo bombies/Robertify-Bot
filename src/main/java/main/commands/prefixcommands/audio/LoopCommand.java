@@ -121,12 +121,13 @@ public class LoopCommand implements ICommand {
     public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, User looper) {
         EmbedBuilder eb;
         final var scheduler = musicManager.getScheduler();
+        final var queueHandler = scheduler.getQueueHandler();
         final var guild = musicManager.getGuild();
         final var audioPlayer = musicManager.getPlayer();
 
         if (scheduler.isPlaylistRepeating()) {
             scheduler.setPlaylistRepeating(false);
-            scheduler.removeSavedQueue(guild);
+            queueHandler.clearSavedQueue();
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
         } else {
             scheduler.setPlaylistRepeating(true);
@@ -138,14 +139,14 @@ public class LoopCommand implements ICommand {
 
             AudioTrack thisTrack = audioPlayer.getPlayingTrack();
 
-            if (scheduler.getQueue().isEmpty()) {
+            if (queueHandler.isEmpty()) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_NOTHING);
                 return eb;
             }
 
             scheduler.addToBeginningOfQueue(thisTrack);
-            scheduler.setSavedQueue(scheduler.getQueue());
-            scheduler.getQueue().remove(thisTrack);
+            queueHandler.setSavedQueue(queueHandler.contents());
+            queueHandler.remove(thisTrack);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
         }
 

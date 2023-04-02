@@ -1,5 +1,6 @@
 package main.commands.prefixcommands.audio;
 
+import com.google.common.collect.ImmutableList;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
@@ -28,7 +29,6 @@ public class SkipToCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
@@ -47,28 +47,30 @@ public class SkipToCommand implements ICommand {
 
         int id = Integer.parseInt(args.get(0));
 
-        msg.replyEmbeds(handleSkip(ctx.getAuthor(), queue, musicManager, id).build()).queue();
+        msg.replyEmbeds(handleSkip(ctx.getAuthor(), musicManager, id).build()).queue();
     }
 
-    public EmbedBuilder handleSkip(User skipper, ConcurrentLinkedQueue<AudioTrack> queue, GuildMusicManager musicManager, int id) {
-        if (id > queue.size() || id <= 0)
+    public EmbedBuilder handleSkip(User skipper, GuildMusicManager musicManager, int id) {
+        final var scheduler = musicManager.getScheduler();
+        final var queueHandler = scheduler.getQueueHandler();
+
+
+        if (id > queueHandler.size() || id <= 0)
             return RobertifyEmbedUtils.embedMessage(musicManager.getGuild(), "ID provided isn't a valid ID!");
 
         final var audioPlayer = musicManager.getPlayer();
-        final var scheduler = musicManager.getScheduler();
         final var guild = musicManager.getGuild();
-        List<AudioTrack> currentQueue = new ArrayList<>(queue);
+        List<AudioTrack> currentQueue = new ArrayList<>(queueHandler.contents());
         List<AudioTrack> songsToRemoveFromQueue = new ArrayList<>();
 
         for (int i = 0; i < id-1; i++)
             songsToRemoveFromQueue.add(currentQueue.get(i));
 
-        queue.removeAll(songsToRemoveFromQueue);
+        queueHandler.removeAll(songsToRemoveFromQueue);
         audioPlayer.seekTo(0);
 
-        final var pastQueue = scheduler.getPastQueue();
         final var playingTrack = audioPlayer.getPlayingTrack();
-        pastQueue.push(playingTrack);
+        queueHandler.pushPastTrack(playingTrack);
 
         try {
             scheduler.nextTrack(playingTrack, true, playingTrack.getPosition());

@@ -36,7 +36,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
     public EmbedBuilder handlePrevious(Guild guild, GuildVoiceState memberVoiceState) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
         final var scheduler = musicManager.getScheduler();
-        final var previouslyPlayedTracks = scheduler.getPastQueue();
+        final var queueHandler = scheduler.getQueueHandler();
         final var audioPlayer = musicManager.getPlayer();
         final var selfVoiceState = guild.getSelfMember().getVoiceState();
 
@@ -49,7 +49,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
         if (!memberVoiceState.getChannel().equals(selfVoiceState.getChannel()))
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.SAME_VOICE_CHANNEL_LOC, Pair.of("{channel}", selfVoiceState.getChannel().getAsMention()));
 
-        if (previouslyPlayedTracks.size() == 0)
+        if (queueHandler.previousTracksSize() == 0)
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.PreviousTrackMessages.NO_PREV_TRACKS);
 
         if (audioPlayer.getPlayingTrack() != null) {
@@ -58,7 +58,7 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
             scheduler.addToBeginningOfQueue(nowPlayingTrack);
         }
 
-        audioPlayer.playTrack(previouslyPlayedTracks.pop());
+        audioPlayer.playTrack(queueHandler.popPreviousTrack());
 
         if (new RequestChannelConfig(guild).isChannelSet())
             new RequestChannelConfig(guild).updateMessage();

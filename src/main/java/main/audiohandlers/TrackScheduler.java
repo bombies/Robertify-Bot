@@ -1,6 +1,7 @@
 package main.audiohandlers;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
+import com.google.common.collect.ImmutableList;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lavalink.client.io.Link;
@@ -37,8 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -46,20 +46,14 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
-    @Getter
-    private ConcurrentLinkedQueue<AudioTrack> savedQueue;
     private final Logger logger = LoggerFactory.getLogger(TrackScheduler.class);
-
+    @Getter
+    private final QueueHandler queueHandler;
     private final Guild guild;
     private final Link audioPlayer;
     @Setter
     @Getter
     private GuildMessageChannel announcementChannel = null;
-    private AudioTrack lastPlayedTrackBuffer;
-    @Getter
-    private final Stack<AudioTrack> pastQueue;
-    @Getter
-    private ConcurrentLinkedQueue<AudioTrack> queue;
     @Getter
     @Setter
     private boolean repeating = false;
@@ -73,15 +67,13 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public TrackScheduler(Guild guild, Link audioPlayer) {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
-        this.queue = new ConcurrentLinkedQueue<>();
-        this.pastQueue = new Stack<>();
-        this.savedQueue = new ConcurrentLinkedQueue<>();
+        this.queueHandler = new QueueHandler();
         this.disconnectManager = DisconnectManager.getInstance().getGuildDisconnector(guild);
     }
 
     public void queue(AudioTrack track) {
         if (getMusicPlayer().getPlayingTrack() != null) {
-            queue.offer(track);
+            queueHandler.add(track);
         } else {
             getMusicPlayer().playTrack(track);
         }
@@ -93,10 +85,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             return;
         }
 
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        newQueue.offer(track);
-        newQueue.addAll(queue);
-        queue = newQueue;
+        queueHandler.addToBeginning(track);
     }
 
     public void addToBeginningOfQueue(List<AudioTrack> tracks) {
@@ -105,14 +94,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             tracks.remove(0);
         }
 
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        tracks.forEach(newQueue::offer);
-        newQueue.addAll(queue);
-        queue = newQueue;
+        queueHandler.addToBeginning(tracks);
     }
 
     public void stop() {
-        queue.clear();
+        queueHandler.clear();
 
         if (audioPlayer.getPlayer().getPlayingTrack() != null)
             audioPlayer.getPlayer().stopTrack();
@@ -121,7 +107,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     @Override
     public void onTrackStart(IPlayer player, AudioTrack track) {
         disconnectManager.cancelDisconnect();
-        lastPlayedTrackBuffer = track;
+        queueHandler.setLastPlayedTrackBuffer(track);
 
         if (repeating) return;
 
@@ -228,11 +214,11 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
             }
         }
 
-        if (queue.isEmpty())
+        if (queueHandler.isEmpty())
             if (playlistRepeating)
-                this.queue = new ConcurrentLinkedQueue<>(savedQueue);
+                queueHandler.loadSavedQueue();
 
-        AudioTrack nextTrack = queue.poll();
+        AudioTrack nextTrack = queueHandler.poll();
 
         getMusicPlayer().stopTrack();
 
@@ -255,13 +241,13 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
 
     @Override
     public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-        final var trackToUse = lastPlayedTrackBuffer;
+        final var trackToUse = queueHandler.getLastPlayedTrackBuffer();
 
         if (repeating) {
             if (trackToUse != null) {
                 try {
                     AudioTrack clonedTrack = trackToUse.makeClone();
-                    lastPlayedTrackBuffer = clonedTrack;
+                    queueHandler.setLastPlayedTrackBuffer(clonedTrack);
                     player.playTrack(clonedTrack);
                 } catch (UnsupportedOperationException e) {
                     player.seekTo(0);
@@ -271,7 +257,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                 nextTrack(null);
             }
         } else if (endReason.mayStartNext) {
-            pastQueue.push(trackToUse);
+            queueHandler.pushPastTrack(trackToUse);
             nextTrack(trackToUse);
         }
     }
@@ -327,15 +313,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         }
     }
 
-
-    public void setSavedQueue(ConcurrentLinkedQueue<AudioTrack> queue) {
-        this.savedQueue = new ConcurrentLinkedQueue<>(queue);
-    }
-
-    public void clearSavedQueue() {
-        savedQueue.clear();
-    }
-
     public void disconnect(boolean announceMsg) {
         final var channel = guild.getSelfMember().getVoiceState().getChannel();
 
@@ -375,10 +352,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void removeScheduledDisconnect() {
         DisconnectManager.getInstance()
                 .destroyGuildDisconnector(guild);
-    }
-
-    public void removeSavedQueue(Guild guild) {
-        savedQueue.remove(guild);
     }
 
     public IPlayer getMusicPlayer() {

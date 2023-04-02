@@ -176,8 +176,8 @@ public class RequestChannelConfig extends AbstractGuildConfig {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
             final var audioPlayer = musicManager.getPlayer();
             final var playingTrack = audioPlayer.getPlayingTrack();
-            final var queue = musicManager.getScheduler().getQueue();
-            final var queueAsList = new ArrayList<>(queue);
+            final var queueHandler = musicManager.getScheduler().getQueueHandler();
+            final var queueAsList = new ArrayList<>(queueHandler.contents());
             final var theme = new ThemesConfig(guild).getTheme();
             final var localeManager = LocaleManager.getLocaleManager(guild);
 
@@ -243,7 +243,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                                 .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
                                 .append("]\n");
                 } else {
-                    if (queue.size() == 0)
+                    if (queueHandler.size() == 0)
                         nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS));
                     else {
                         int index = 1;
