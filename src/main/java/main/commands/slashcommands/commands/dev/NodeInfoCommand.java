@@ -105,6 +105,7 @@ public class NodeInfoCommand extends AbstractSlashCommand implements IDevCommand
                                     -------------------------------
                                     Uptime: %s
                                     ===============================
+                                    
                                     """,
                             node.getName(),
                             stats.getCpuCores(),
