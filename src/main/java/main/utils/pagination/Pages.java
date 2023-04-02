@@ -1,5 +1,6 @@
 package main.utils.pagination;
 
+import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -69,10 +71,10 @@ public abstract class Pages {
         }
 
         messageAction.queue(msg -> {
-           if (messagePages.size() > 1) {
-               messages.put(msg.getIdLong(), messagePages);
-               ret.set(msg);
-           }
+            if (messagePages.size() > 1) {
+                messages.put(msg.getIdLong(), messagePages);
+                ret.set(msg);
+            }
         });
 
         return ret.get();
@@ -155,12 +157,16 @@ public abstract class Pages {
         private final String artist;
         @Getter
         private final long duration;
+        @Getter
+        @Nullable
+        private final String artworkUrl;
 
-        public QueueItem(int trackIndex, String trackTitle, String artist, long duration) {
+        public QueueItem(int trackIndex, String trackTitle, String artist, long duration, String artworkUrl) {
             this.trackIndex = trackIndex;
             this.trackTitle = trackTitle;
             this.artist = artist;
             this.duration = duration;
+            this.artworkUrl = artworkUrl;
         }
     }
 
@@ -184,8 +190,8 @@ public abstract class Pages {
             queueItems.add(item);
         }
 
-        public void addItem(int trackIndex, String title, String artist, long duration) {
-            queueItems.add(new QueueItem(trackIndex, title, artist, duration));
+        public void addItem(int trackIndex, String title, String artist, long duration, @Nullable String artworkUrl) {
+            queueItems.add(new QueueItem(trackIndex, title, artist, duration, artworkUrl));
         }
 
         public File getImage() throws SocketTimeoutException, ConnectException {
@@ -193,7 +199,7 @@ public abstract class Pages {
                     .setPage(pageNumber);
 
             for (final var item : queueItems)
-                builder.addTrack(item.trackIndex, item.trackTitle, item.artist, item.duration);
+                builder.addTrack(item.trackIndex, item.trackTitle, item.artist, item.duration, item.artworkUrl);
 
             return builder.build();
         }
@@ -206,7 +212,7 @@ public abstract class Pages {
                 eb.appendDescription(str + "\n");
             messagePages.add(new MessagePage(eb.build()));
         } else {
-            int pagesRequired = (int)Math.ceil((double)content.size() / maxPerPage);
+            int pagesRequired = (int) Math.ceil((double) content.size() / maxPerPage);
 
             int lastIndex = 0;
             for (int i = 0; i < pagesRequired; i++) {
@@ -228,21 +234,22 @@ public abstract class Pages {
             for (int i = 0; i < queue.size(); i++) {
                 final var track = queue.stream().toList().get(i);
                 final var trackInfo = track.getInfo();
-                items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length));
+                items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null));
             }
             messagePages.add(new QueuePage(1, items));
         } else {
             final var trackList = queue.stream().toList();
-            int pagesRequired = (int)Math.ceil((double)queue.size() / maxPerPage);
+            int pagesRequired = (int) Math.ceil((double) queue.size() / maxPerPage);
             int lastIndex = 0;
 
             for (int i = 0; i < pagesRequired; i++) {
                 final var page = new QueuePage(i + 1);
                 for (int j = 0; j < maxPerPage; j++) {
                     if (lastIndex == queue.size()) break;
-                    final var trackInfo = trackList.get(lastIndex).getInfo();
+                    final var track = trackList.get(lastIndex);
+                    final var trackInfo = track.getInfo();
 
-                    page.addItem(lastIndex + 1, trackInfo.title, trackInfo.author, trackInfo.length);
+                    page.addItem(lastIndex + 1, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null);
                     lastIndex++;
                 }
                 messagePages.add(page);
@@ -333,9 +340,9 @@ public abstract class Pages {
             menuPages.add(menuPage);
         } else {
 
-            final int pagesRequired = (int)Math.ceil((double)options.size() / InteractionLimits.SELECTION_MENU);
-            final int pageControllers = 1 + (int)Math.ceil(((pagesRequired-1) * (4))/2.0);
-            final int actualPagesRequired = (int)Math.ceil((double)(options.size() + pageControllers) / InteractionLimits.SELECTION_MENU);
+            final int pagesRequired = (int) Math.ceil((double) options.size() / InteractionLimits.SELECTION_MENU);
+            final int pageControllers = 1 + (int) Math.ceil(((pagesRequired - 1) * (4)) / 2.0);
+            final int actualPagesRequired = (int) Math.ceil((double) (options.size() + pageControllers) / InteractionLimits.SELECTION_MENU);
 
             int lastIndex = 0;
             for (int i = 0; i < actualPagesRequired; i++) {
@@ -388,11 +395,11 @@ public abstract class Pages {
     public static MessageEmbed getPaginatedEmbed(Guild guild, List<?> content, int maxPerPage, int startingPage, boolean numberEachEntry) {
         EmbedBuilder eb = embedStyle.get().appendDescription("\t");
 
-        int index = (startingPage * (maxPerPage == 0 ? maxPerPage : maxPerPage-1)) + 1;
+        int index = (startingPage * (maxPerPage == 0 ? maxPerPage : maxPerPage - 1)) + 1;
         for (int j = 0; j < content.size(); j++) {
             if (j == maxPerPage) break;
 
-            eb.appendDescription((numberEachEntry ? "**" + (index++) + ".** - ": "") + content.get(j) + "\n");
+            eb.appendDescription((numberEachEntry ? "**" + (index++) + ".** - " : "") + content.get(j) + "\n");
         }
 
         return eb.build();
