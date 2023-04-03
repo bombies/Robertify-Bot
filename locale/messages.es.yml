@@ -379,7 +379,7 @@ help_miscellaneous_option_desc: "*¿Cansado de tocar música todo el tiempo? Bue
 help_utility_option: "Comandos de utilidad"
 help_utility_option_desc: "*¿Curioso sobre el bot? ¡Estos son los comandos para que explore!*"
 help_embed_author: "Comando de ayuda"
-help_embed_desc: "¡Únase a nuestro [servidor de soporte](https://discord.gg/vbjmtfjdvu)!\n\n*¡Seleccione una opción para ver los comandos que tengo para ofrecer!*"
+help_embed_desc: "¡Únase a nuestro [servidor de soporte](https://discord.gg/vbjmtfjdvu)!\n🆕 Need more help? Read through the [comprehensive documentation](https://robertify.me/docs).\n\n*¡Seleccione una opción para ver los comandos que tengo para ofrecer!*"
 help_embed_footer: "Escriba \"/Help <Command>\" para obtener más ayuda para un comando específico."
 help_nothing_found: "Nada encontrado para: `{command}`"
 help_commands: "¡Aquí están tus comandos!\n\n** Prefijo **: `{prefix}`"
