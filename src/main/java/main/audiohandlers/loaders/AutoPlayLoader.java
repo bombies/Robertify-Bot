@@ -5,6 +5,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
@@ -17,19 +18,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class AutoPlayLoader implements AudioLoadResultHandler {
     private final Logger logger = LoggerFactory.getLogger(AutoPlayLoader.class);
 
     private final GuildMusicManager musicManager;
+    private final TrackScheduler scheduler;
+    private final QueueHandler queueHandler;
     private final Guild guild;
     private final GuildMessageChannel channel;
 
     public AutoPlayLoader(GuildMusicManager musicManager, GuildMessageChannel channel) {
         this.musicManager = musicManager;
+        this.scheduler = musicManager.getScheduler();
+        this.queueHandler = scheduler.getQueueHandler();
         this.guild = musicManager.getGuild();
         this.channel = channel;
     }
@@ -46,18 +49,18 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
 
         logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
 
-        final var scheduler = musicManager.getScheduler();
 
+        final var scheduler = musicManager.getScheduler();
         final var tracks = playlist.getTracks();
         for (final var track : tracks) {
             scheduler.addRequester(guild.getSelfMember().getId(), track.getIdentifier());
             scheduler.queue(track);
         }
 
-        if (scheduler.isPlaylistRepeating()) {
-            scheduler.setPlaylistRepeating(false);
-            scheduler.getPastQueue().clear();
-            scheduler.clearSavedQueue();
+        if (queueHandler.isQueueRepeating()) {
+            queueHandler.setQueueRepeating(false);
+            queueHandler.clearPreviousTracks();
+            queueHandler.clearSavedQueue();
         }
 
         if (new RequestChannelConfig(guild).isChannelSet())

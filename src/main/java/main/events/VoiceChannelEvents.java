@@ -1,18 +1,11 @@
 package main.events;
 
-import main.audiohandlers.DisconnectManager;
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.prefixcommands.audio.SkipCommand;
 import main.utils.EventWaiter;
-import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.TimeUnit;
 
 public class VoiceChannelEvents extends ListenerAdapter {
     public static final EventWaiter waiter = new EventWaiter();
@@ -38,7 +31,7 @@ public class VoiceChannelEvents extends ListenerAdapter {
             return;
 
         final var guildConfig = new GuildConfig(guild);
-        final var guildDisconnector = DisconnectManager.getInstance().getGuildDisconnector(guild);
+        final var guildDisconnector = guildMusicManager.getScheduler().getDisconnectManager();
 
         /*
          * If the user has left voice channels entirely or

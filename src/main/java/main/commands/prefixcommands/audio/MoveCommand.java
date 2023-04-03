@@ -2,6 +2,7 @@ package main.commands.prefixcommands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -28,13 +29,13 @@ public class MoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final var queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to move in the queue and the position to move it to.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to move in the queueHandler and the position to move it to.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         } else if (args.size() < 2) {
@@ -56,14 +57,14 @@ public class MoveCommand implements ICommand {
         final int id = Integer.parseInt(args.get(0));
         final int position = Integer.parseInt(args.get(1));
 
-        msg.replyEmbeds(handleMove(ctx.getGuild(), ctx.getAuthor(), queue, id, position).build()).queue();
+        msg.replyEmbeds(handleMove(ctx.getGuild(), ctx.getAuthor(), queueHandler, id, position).build()).queue();
     }
 
-    public EmbedBuilder handleMove(Guild guild, User mover, ConcurrentLinkedQueue<AudioTrack> queue, int id, int position) {
-        if (queue.isEmpty())
+    public EmbedBuilder handleMove(Guild guild, User mover, QueueHandler queueHandler, int id, int position) {
+        if (queueHandler.isEmpty())
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
 
-        final List<AudioTrack> trackList = new ArrayList<>(queue);
+        final List<AudioTrack> trackList = new ArrayList<>(queueHandler.contents());
 
         if (id <= 0 || id > trackList.size()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.INVALID_SONG_ID);
@@ -73,12 +74,12 @@ public class MoveCommand implements ICommand {
             return eb;
         }
 
-        final List<AudioTrack> prevList = new ArrayList<>(queue);
-        queue.clear();
+        final List<AudioTrack> prevList = new ArrayList<>(queueHandler.contents());
+        queueHandler.clear();
         prevList.remove(trackList.get(id-1));
         prevList.add(position-1, trackList.get(id-1));
-        if (!queue.addAll(prevList)) {
-            queue.addAll(trackList);
+        if (!queueHandler.addAll(prevList)) {
+            queueHandler.addAll(trackList);
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.MoveMessages.COULDNT_MOVE, Pair.of("{id}", String.valueOf(id)));
         }
 

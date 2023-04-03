@@ -2,6 +2,7 @@ package main.commands.prefixcommands.audio;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ICommand;
@@ -28,19 +29,19 @@ public class RemoveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final ConcurrentLinkedQueue<AudioTrack> queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
         final Message msg = ctx.getMessage();
         final List<String> args = ctx.getArgs();
         final var guild = ctx.getGuild();
 
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queue.");
+        if (queueHandler.isEmpty()) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is nothing in the queueHandler.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
 
         if (args.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to remove from the queue.");
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "You must provide the ID of a song to remove from the queueHandler.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -52,25 +53,25 @@ public class RemoveCommand implements ICommand {
         }
 
         final int id = Integer.parseInt(args.get(0));
-        msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getAuthor(), queue, id).build()).queue();
+        msg.replyEmbeds(handleRemove(ctx.getGuild(), ctx.getAuthor(), queueHandler, id).build()).queue();
     }
 
-    public EmbedBuilder handleRemove(Guild guild, User remover, ConcurrentLinkedQueue<AudioTrack> queue, int id) {
-        final List<AudioTrack> trackList = new ArrayList<>(queue);
+    public EmbedBuilder handleRemove(Guild guild, User remover, QueueHandler queueHandler, int id) {
+        final List<AudioTrack> trackList = new ArrayList<>(queueHandler.contents());
 
-        if (queue.isEmpty()) {
+        if (queueHandler.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
             return eb;
         }
 
-        if (id <= 0 || id > queue.size())
-            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.REMOVE_INVALID_ID, Pair.of("{max}", String.valueOf(queue.size())));
+        if (id <= 0 || id > queueHandler.size())
+            return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.REMOVE_INVALID_ID, Pair.of("{max}", String.valueOf(queueHandler.size())));
 
         AudioTrack removedTrack = trackList.get(id - 1);
         AudioTrackInfo info = removedTrack.getInfo();
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.REMOVED, Pair.of("{title}", info.title), Pair.of("{author}", info.author));
 
-        if (!queue.remove(removedTrack))
+        if (!queueHandler.remove(removedTrack))
             eb =  RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.RemoveMessages.COULDNT_REMOVE, Pair.of("{id}", String.valueOf(id)));
         else
             new LogUtils(guild).sendLog(LogType.QUEUE_REMOVE, RobertifyLocaleMessage.RemoveMessages.REMOVED_LOG,

@@ -25,7 +25,7 @@ public class GuildMusicManager {
     @Setter @Getter
     private boolean forcePaused;
 
-    public GuildMusicManager(Guild guild) {
+    GuildMusicManager(Guild guild) {
         this.guild = guild;
         this.link = Robertify.getLavalink().getLink(guild);
         this.scheduler = new TrackScheduler(guild, link);
@@ -34,12 +34,14 @@ public class GuildMusicManager {
     }
 
     public void clear() {
-        getScheduler().getQueue().clear();
+        final var queueHandler = getScheduler().getQueueHandler();
 
-        getScheduler().setRepeating(false);
-        getScheduler().setPlaylistRepeating(false);
-        getScheduler().clearSavedQueue();
-        getScheduler().getPastQueue().clear();
+        queueHandler.clear();
+        queueHandler.clearSavedQueue();
+        queueHandler.clearPreviousTracks();
+
+        queueHandler.setTrackRepeating(false);
+        queueHandler.setQueueRepeating(false);
         getPlayer().getFilters().clear().commit();
 
         if (getPlayer().getPlayingTrack() != null)

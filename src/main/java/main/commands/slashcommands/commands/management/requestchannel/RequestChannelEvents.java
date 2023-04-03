@@ -286,11 +286,12 @@ public class RequestChannelEvents extends ListenerAdapter {
             }
 
             final var scheduler = musicManager.getScheduler();
+            final var queueHandler = scheduler.getQueueHandler();
             final var info = musicManager.getPlayer().getPlayingTrack().getInfo();
             final EmbedBuilder loopEmbed;
-            if (scheduler.isRepeating()) {
-                scheduler.setRepeating(false);
-                scheduler.setPlaylistRepeating(true);
+            if (queueHandler.isTrackRepeating()) {
+                queueHandler.setTrackRepeating(false);
+                queueHandler.setQueueRepeating(true);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild,
                         RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START
                 );
@@ -300,9 +301,9 @@ public class RequestChannelEvents extends ListenerAdapter {
                         Pair.of("{user}", member.getAsMention()),
                         Pair.of("{status}", "looped")
                 );
-            } else if (scheduler.isPlaylistRepeating()) {
-                scheduler.setPlaylistRepeating(false);
-                scheduler.setRepeating(false);
+            } else if (queueHandler.isQueueRepeating()) {
+                queueHandler.setQueueRepeating(false);
+                queueHandler.setTrackRepeating(false);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
 
                 new LogUtils(guild).sendLog(
@@ -311,8 +312,8 @@ public class RequestChannelEvents extends ListenerAdapter {
                         Pair.of("{status}", "unlooped")
                 );
             } else {
-                scheduler.setRepeating(true);
-                scheduler.setPlaylistRepeating(false);
+                queueHandler.setTrackRepeating(true);
+                queueHandler.setQueueRepeating(false);
                 loopEmbed = RobertifyEmbedUtils.embedMessage(
                         guild,
                         RobertifyLocaleMessage.LoopMessages.LOOP_START,

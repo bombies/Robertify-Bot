@@ -38,9 +38,9 @@ public class QueueSlashCommand extends AbstractSlashCommand {
 
         final var guild = event.getGuild();
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
 
-        if (queue.isEmpty()) {
+        if (queueHandler.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_IN_QUEUE);
             event.replyEmbeds(eb.build()).queue();
             return;

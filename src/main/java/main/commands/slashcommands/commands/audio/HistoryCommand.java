@@ -33,19 +33,13 @@ public class HistoryCommand extends AbstractSlashCommand {
 
         final var guild = event.getGuild();
         final var scheduler = RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler();
-        final var pastTracks = scheduler.getPastQueue();
+        final var queueHandler = scheduler.getQueueHandler();
 
-        if (pastTracks == null) {
-            event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HistoryMessages.NO_PAST_TRACKS).build())
-                    .queue();
-            return;
-        }
-
-        if (pastTracks.empty()) {
+        if (queueHandler.isPreviousTracksEmpty()) {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HistoryMessages.NO_PAST_TRACKS).build())
                     .queue();
         } else {
-            final var content = new QueueCommand().getContent(guild, pastTracks);
+            final var content = new QueueCommand().getContent(guild, queueHandler);
             Pages.paginateMessage(content, 10, event);
         }
     }
