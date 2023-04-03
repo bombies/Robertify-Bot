@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class PremiumRedisCache extends AbstractRedisCache {
+public class PremiumRedisCache extends DatabaseRedisCache {
     private final static Logger logger = LoggerFactory.getLogger(PremiumRedisCache.class);
     @Getter
     private static PremiumRedisCache instance;

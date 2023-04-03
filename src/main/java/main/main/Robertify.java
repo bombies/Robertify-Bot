@@ -16,10 +16,8 @@ import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
-import main.commands.slashcommands.commands.management.TogglesCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
-import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.constants.ENV;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -104,6 +102,7 @@ public class Robertify {
                             GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
                             musicManager.getScheduler().disconnect(false);
                         });
+
                 logger.info("Killing cron scheduler");
                 try {
                     getCronScheduler().clear();

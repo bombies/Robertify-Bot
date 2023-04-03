@@ -13,7 +13,7 @@ import redis.clients.jedis.JedisPooled;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RedisCache implements AbstractJSON {
+public abstract class RedisCache implements AbstractJSON {
 
     private final String cacheID;
     private final JedisPooled jedis;
@@ -136,7 +136,7 @@ public class RedisCache implements AbstractJSON {
 
         collection.find().forEach(doc -> documentArr.put(new JSONObject(doc.toJson())));
 
-        collectionObj.put(AbstractRedisCache.CacheField.DOCUMENTS.toString(), documentArr);
+        collectionObj.put(DatabaseRedisCache.CacheField.DOCUMENTS.toString(), documentArr);
         return collectionObj;
     }
 
