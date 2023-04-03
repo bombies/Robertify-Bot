@@ -21,6 +21,8 @@ public class QueueHandler {
     @Getter @Setter
     private boolean queueRepeating = false;
 
+    public QueueHandler() {}
+
     public boolean add(AudioTrack audioTrack) {
         return queue.offer(audioTrack);
     }

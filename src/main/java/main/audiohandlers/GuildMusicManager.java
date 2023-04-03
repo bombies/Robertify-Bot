@@ -25,7 +25,7 @@ public class GuildMusicManager {
     @Setter @Getter
     private boolean forcePaused;
 
-    public GuildMusicManager(Guild guild) {
+    GuildMusicManager(Guild guild) {
         this.guild = guild;
         this.link = Robertify.getLavalink().getLink(guild);
         this.scheduler = new TrackScheduler(guild, link);

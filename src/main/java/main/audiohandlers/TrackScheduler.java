@@ -52,14 +52,15 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     @Getter
     private GuildMessageChannel announcementChannel = null;
     private Message lastSentMsg = null;
-    private final DisconnectManager.GuildDisconnectManager disconnectManager;
+    @Getter
+    private final GuildDisconnectManager disconnectManager;
     private final static RobertifyAudioManager audioManager = RobertifyAudioManager.getInstance();
 
     public TrackScheduler(Guild guild, Link audioPlayer) {
         this.guild = guild;
         this.audioPlayer = audioPlayer;
         this.queueHandler = new QueueHandler();
-        this.disconnectManager = DisconnectManager.getInstance().getGuildDisconnector(guild);
+        this.disconnectManager = new GuildDisconnectManager(guild);
     }
 
     public void queue(AudioTrack track) {
@@ -341,8 +342,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     }
 
     public void removeScheduledDisconnect() {
-        DisconnectManager.getInstance()
-                .destroyGuildDisconnector(guild);
+        disconnectManager.cancelDisconnect();
     }
 
     public IPlayer getMusicPlayer() {
