@@ -94,7 +94,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                 Pair.of("{author}", info.author)
         );
 
-        if (scheduler.isPlaylistRepeating())
+        if (queueHandler.isQueueRepeating())
             queueHandler.setSavedQueue(queueHandler.contents());
 
         if (requestChannelConfig.isChannelSet())
@@ -162,7 +162,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                         Pair.of("{author}", info.author)
                 );
 
-            if (scheduler.isPlaylistRepeating())
+            if (queueHandler.isQueueRepeating())
                 queueHandler.setSavedQueue(queueHandler.contents());
 
         } else {
@@ -217,7 +217,7 @@ public class AudioLoader implements AudioLoadResultHandler {
                     scheduler.queue(track);
             }
 
-            if (scheduler.isPlaylistRepeating())
+            if (queueHandler.isQueueRepeating())
                 queueHandler.setSavedQueue(queueHandler.contents());
 
         }

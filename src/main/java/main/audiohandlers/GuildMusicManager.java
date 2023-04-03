@@ -40,8 +40,8 @@ public class GuildMusicManager {
         queueHandler.clearSavedQueue();
         queueHandler.clearPreviousTracks();
 
-        getScheduler().setRepeating(false);
-        getScheduler().setPlaylistRepeating(false);
+        queueHandler.setTrackRepeating(false);
+        queueHandler.setQueueRepeating(false);
         getPlayer().getFilters().clear().commit();
 
         if (getPlayer().getPlayingTrack() != null)

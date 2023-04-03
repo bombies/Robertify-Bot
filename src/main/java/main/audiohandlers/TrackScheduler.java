@@ -1,7 +1,6 @@
 package main.audiohandlers;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
-import com.google.common.collect.ImmutableList;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import lavalink.client.io.Link;
@@ -38,10 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -54,12 +51,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     @Setter
     @Getter
     private GuildMessageChannel announcementChannel = null;
-    @Getter
-    @Setter
-    private boolean repeating = false;
-    @Getter
-    @Setter
-    private boolean playlistRepeating = false;
     private Message lastSentMsg = null;
     private final DisconnectManager.GuildDisconnectManager disconnectManager;
     private final static RobertifyAudioManager audioManager = RobertifyAudioManager.getInstance();
@@ -109,7 +100,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         disconnectManager.cancelDisconnect();
         queueHandler.setLastPlayedTrackBuffer(track);
 
-        if (repeating) return;
+        if (queueHandler.isTrackRepeating()) return;
 
         if (!TogglesConfig.getConfig(guild).getToggle(Toggles.ANNOUNCE_MESSAGES)) return;
 
@@ -215,7 +206,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         }
 
         if (queueHandler.isEmpty())
-            if (playlistRepeating)
+            if (queueHandler.isQueueRepeating())
                 queueHandler.loadSavedQueue();
 
         AudioTrack nextTrack = queueHandler.poll();
@@ -243,7 +234,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void onTrackEnd(IPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
         final var trackToUse = queueHandler.getLastPlayedTrackBuffer();
 
-        if (repeating) {
+        if (queueHandler.isTrackRepeating()) {
             if (trackToUse != null) {
                 try {
                     AudioTrack clonedTrack = trackToUse.makeClone();
@@ -253,7 +244,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     player.seekTo(0);
                 }
             } else {
-                repeating = false;
+                queueHandler.setTrackRepeating(false);
                 nextTrack(null);
             }
         } else if (endReason.mayStartNext) {

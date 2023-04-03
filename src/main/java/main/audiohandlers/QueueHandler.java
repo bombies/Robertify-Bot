@@ -16,6 +16,11 @@ public class QueueHandler {
     private final Stack<AudioTrack> previousTracks = new Stack<>();
     @Getter @Setter
     private AudioTrack lastPlayedTrackBuffer;
+    @Getter @Setter
+    private boolean trackRepeating = false;
+    @Getter @Setter
+    private boolean queueRepeating = false;
+
     public boolean add(AudioTrack audioTrack) {
         return queue.offer(audioTrack);
     }
@@ -41,6 +46,8 @@ public class QueueHandler {
     }
 
     public void setSavedQueue(Collection<AudioTrack> tracks) {
+        if (!isQueueRepeating())
+            return;
         savedQueue.addAll(tracks);
     }
 
@@ -55,10 +62,6 @@ public class QueueHandler {
 
     public boolean remove(AudioTrack audioTrack) {
         return queue.remove(audioTrack);
-    }
-
-    private void setQueue(Collection<AudioTrack> track) {
-
     }
 
     public boolean removeAll(Collection<AudioTrack> audioTracks) {
