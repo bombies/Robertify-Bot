@@ -1,11 +1,11 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import main.utils.resume.GuildResumeCache;
 import main.utils.resume.ResumableTrack;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import main.utils.resume.ResumeData;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
@@ -14,29 +14,76 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 public class ResumeTests {
 
     @Test
-    void testResumableTracksToJSON() {
-        final var tracks = UtilsTest.getManyTracks(10);
+    void testResumableDataToJSON() {
+        final var tracks = UtilsTest.getManyTracksWithRequester(10);
         final var resumableTracks = tracks.stream()
                 .map(ResumableTrack::new)
                 .toList();
-        final var json = ResumableTrack.collectionToString(resumableTracks);
+        final var resumeData = new ResumeData("vcId", resumableTracks);
+        final var json = resumeData.toString();
         log.info("JSON: {}", json);
         assertNotNull("Checking if JSON is valid", json);
     }
 
     @Test
-    void testResumableTrackJSONToObject() {
-        final var tracks = UtilsTest.getManyTracks(10);
+    void testResumableDataJSONToObject() {
+        final var tracks = UtilsTest.getManyTracksWithRequester(10);
         final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
-        final var json = ResumableTrack.collectionToString(resumableTracks);
-        final var revertedTracks = ResumableTrack.stringToList(json);
+        final var resumeData = new ResumeData("vcId", resumableTracks);
+        final var json = resumeData.toString();
 
-        assertNotNull("Checking if list is null", revertedTracks);
-        assertEquals("Checking list length", 10, revertedTracks.size());
+        try {
+            final var revertedData = ResumeData.fromJSON(json);
 
-        for (int i = 0; i < revertedTracks.size(); i++) {
-            log.info("Revered track {}: {}", i, revertedTracks.get(i));
-            assertNotNull("Checking if track %d is not null".formatted(i), revertedTracks.get(i));
+            assertNotNull("Checking if data is null", revertedData);
+            assertNotNull("Checking if voice channel ID is null", revertedData.getChannel_id());
+            assertEquals("Checking track list length", 10, revertedData.getTracks().size());
+
+
+            for (int i = 0; i < revertedData.getTracks().size(); i++) {
+                assertNotNull("Checking if track %d is not null".formatted(i), revertedData.getTracks().get(i));
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Couldn't load tracks for a test!", e);
         }
+    }
+
+    @Test
+    void testSingularResumeCacheLoadAndSave() {
+        final var resumeCache = new GuildResumeCache("1");
+        final var tracks = UtilsTest.getManyTracksWithRequester(10);
+        final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
+        final var resumeData = new ResumeData("vcId", resumableTracks);
+
+        try {
+            resumeCache.setTracks(resumeData);
+            final var loadedData = resumeCache.loadData();
+
+            assertEquals("Testing resume cache", resumeData.toString(), loadedData.toString());
+        } catch (JsonProcessingException e) {
+            log.error("Couldn't load tracks for a test!", e);
+        }
+
+    }
+
+    @Test
+    void testManyResumeCacheLoadAndSave() {
+        final var caches = IntStream.range(0, 10)
+                .mapToObj(i -> new GuildResumeCache(String.valueOf(i)));
+        final var tracks = UtilsTest.getManyTracksWithRequester(50);
+        final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
+        final var resumeData = new ResumeData("vcID", resumableTracks);
+
+        caches.forEach(cache -> {
+            cache.setTracks(resumeData);
+            final ResumeData loadedData;
+            try {
+                loadedData = cache.loadData();
+                assertEquals("Testing resume cache for cache with ID " + cache.getCacheID(), resumeData.toString(), loadedData.toString());
+
+            } catch (JsonProcessingException e) {
+                log.error("Couldn't load tracks for a test!", e);
+            }
+        });
     }
 }

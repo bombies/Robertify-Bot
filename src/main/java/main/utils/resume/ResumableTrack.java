@@ -7,6 +7,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import main.audiohandlers.TrackScheduler;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -27,22 +29,40 @@ public class ResumableTrack {
     @Getter
     @Nullable
     private final String isrc;
+    @Getter
+    @Nullable
+    private final TrackScheduler.Requester requester;
 
     public ResumableTrack() {
         this.artworkURL = null;
         this.isrc = null;
         this.info = null;
+        this.requester = null;
     }
 
-    public ResumableTrack(@Nullable String artworkURL, @Nullable String isrc, AudioTrackInfoWrapper info) {
+    public ResumableTrack(@Nullable String artworkURL, @Nullable String isrc, AudioTrackInfoWrapper info, @Nullable TrackScheduler.Requester requester) {
         this.artworkURL = artworkURL;
         this.isrc = isrc;
         this.info = info;
+        this.requester = requester;
     }
 
-    public ResumableTrack(AudioTrack track) {
+    public ResumableTrack(AudioTrack track, TrackScheduler.Requester requester) {
         this.info = new AudioTrackInfoWrapper(track.getInfo());
+        this.requester = requester;
         if (track instanceof MirroringAudioTrack mt) {
+            this.artworkURL = mt.getArtworkURL();
+            this.isrc = mt.getISRC();
+        } else {
+            this.artworkURL = null;
+            this.isrc = null;
+        }
+    }
+
+    public ResumableTrack(Pair<AudioTrack, TrackScheduler.Requester> info) {
+        this.info = new AudioTrackInfoWrapper(info.getLeft().getInfo());
+        this.requester = info.getRight();
+        if (info.getLeft() instanceof MirroringAudioTrack mt) {
             this.artworkURL = mt.getArtworkURL();
             this.isrc = mt.getISRC();
         } else {
@@ -60,15 +80,21 @@ public class ResumableTrack {
         }
     }
 
-    public static List<ResumableTrack> audioTracksToResumableTracks(List<AudioTrack> tracks) {
+    public static List<ResumableTrack> audioTracksToResumableTracks(Collection<Pair<AudioTrack, TrackScheduler.Requester>> tracks) {
         return tracks.stream()
-                .map(track -> new ResumableTrack(track))
+                .map(trackPair -> new ResumableTrack(trackPair.getLeft(), trackPair.getRight()))
                 .toList();
     }
 
     public static String collectionToString(Collection<ResumableTrack> tracks) {
         final var arr = new JSONArray();
         tracks.forEach(track -> arr.put(new JSONObject(track.toString())));
+        return arr.toString();
+    }
+
+    public static String audioTracksToString(Collection<Pair<AudioTrack, TrackScheduler.Requester>> tracks) {
+        final var arr = new JSONArray();
+        audioTracksToResumableTracks(tracks).forEach(track -> arr.put(new JSONObject(track.toString())));
         return arr.toString();
     }
 

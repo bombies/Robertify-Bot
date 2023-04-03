@@ -389,7 +389,12 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         @Getter
         private final String trackId;
 
-        private Requester(String id, String trackId) {
+        public Requester() {
+            this.id = null;
+            this.trackId = null;
+        }
+
+        public Requester(String id, String trackId) {
             this.id = id;
             this.trackId = trackId;
         }
