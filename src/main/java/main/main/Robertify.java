@@ -268,8 +268,7 @@ public class Robertify {
     }
 
     private static void loadNeededGlobalCommands() {
-        new TogglesCommand().reload();
-        new RemindersCommand().reload();
+
     }
 
     public static void initVoteSiteAPIs() {
