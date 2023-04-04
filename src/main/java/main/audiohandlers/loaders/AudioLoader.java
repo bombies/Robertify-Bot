@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.requestChannelConfig = new RequestChannelConfig(this.guild);
     }
 
-    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager,
+    public AudioLoader(@Nullable User sender, GuildMusicManager musicManager,
                        String trackUrl, boolean announceMsg, Message botMsg, GuildMessageChannel announcementChannel, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
@@ -172,9 +173,6 @@ public class AudioLoader implements AudioLoadResultHandler {
                         Pair.of("{author}", info.author)
                 );
 
-            if (queueHandler.isQueueRepeating())
-                queueHandler.setSavedQueue(queueHandler.contents());
-
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                     Pair.of("{numTracks}", String.valueOf(tracks.size())),
@@ -227,10 +225,10 @@ public class AudioLoader implements AudioLoadResultHandler {
                     scheduler.queue(track);
             }
 
-            if (queueHandler.isQueueRepeating())
-                queueHandler.setSavedQueue(queueHandler.contents());
-
         }
+
+        if (queueHandler.isQueueRepeating())
+            queueHandler.setSavedQueue(queueHandler.contents());
         if (dedicatedChannelConfig.isChannelSet())
             dedicatedChannelConfig.updateMessage();
     }

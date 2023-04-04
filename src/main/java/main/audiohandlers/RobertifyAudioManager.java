@@ -395,9 +395,14 @@ public class RobertifyAudioManager {
     }
 
     private void resumeTracks(Collection<ResumableTrack> trackList, GuildMessageChannel announcementChannel, GuildMusicManager musicManager) {
+        trackList.forEach(track -> {
+            final var requester = track.getRequester();
+            musicManager.getScheduler().addRequester(requester.getId(), requester.getTrackId());
+        });
+
         final var trackURL = ResumeSourceManager.SEARCH_PREFIX + ResumableTrack.collectionToString(trackList);
         final var loader = new AudioLoader(
-                musicManager.getGuild().getSelfMember().getUser(),
+                null,
                 musicManager,
                 trackURL,
                 true,
