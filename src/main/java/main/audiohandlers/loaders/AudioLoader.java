@@ -67,6 +67,23 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.requestChannelConfig = new RequestChannelConfig(this.guild);
     }
 
+    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager,
+                       String trackUrl, boolean announceMsg, Message botMsg, GuildMessageChannel announcementChannel, boolean loadPlaylistShuffled, boolean addToBeginning) {
+
+        this.guild = musicManager.getGuild();
+        this.sender = sender;
+        this.musicManager = musicManager;
+        this.scheduler = musicManager.getScheduler();
+        this.queueHandler = scheduler.getQueueHandler();
+        this.trackUrl = trackUrl;
+        this.announceMsg = announceMsg;
+        this.botMsg = botMsg;
+        this.loadPlaylistShuffled = loadPlaylistShuffled;
+        this.addToBeginning = addToBeginning;
+        this.announcementChannel = announcementChannel;
+        this.requestChannelConfig = new RequestChannelConfig(this.guild);
+    }
+
     @Override
     public void trackLoaded(AudioTrack audioTrack) {
         sendTrackLoadedMessage(audioTrack);

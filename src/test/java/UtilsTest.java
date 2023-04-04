@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.TrackMarker;
 import lavalink.client.io.Lavalink;
 import lavalink.client.io.Link;
 import lavalink.client.player.LavalinkPlayer;
+import main.audiohandlers.TrackScheduler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.Region;
 import net.dv8tion.jda.api.entities.*;
@@ -38,6 +39,7 @@ import net.dv8tion.jda.api.utils.cache.MemberCacheView;
 import net.dv8tion.jda.api.utils.cache.SnowflakeCacheView;
 import net.dv8tion.jda.api.utils.cache.SortedSnowflakeCacheView;
 import net.dv8tion.jda.api.utils.concurrent.Task;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -874,6 +876,12 @@ public class UtilsTest {
     public static List<AudioTrack> getManyTracks(int size) {
         return IntStream.range(0, size)
                 .mapToObj(i -> getTestTrack(String.valueOf(i)))
+                .toList();
+    }
+
+    public static List<Pair<AudioTrack, TrackScheduler.Requester>> getManyTracksWithRequester(int size) {
+        return IntStream.range(0, size)
+                .mapToObj(i -> Pair.of(getTestTrack(String.valueOf(i)), new TrackScheduler.Requester("userid", String.valueOf(i))))
                 .toList();
     }
 

@@ -1,6 +1,8 @@
 package main.utils.database.mongodb.cache.redis;
 
 import com.mongodb.client.MongoCollection;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.json.AbstractJSON;
@@ -13,8 +15,10 @@ import redis.clients.jedis.JedisPooled;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RedisCache implements AbstractJSON {
+@Slf4j
+public abstract class RedisCache implements AbstractJSON {
 
+    @Getter
     private final String cacheID;
     private final JedisPooled jedis;
 
@@ -23,54 +27,82 @@ public class RedisCache implements AbstractJSON {
         this.jedis = RedisDB.getInstance().getJedis();
     }
 
-    void hsetJSON(String identifier, HashMap<String, JSONObject> hash) {
+    protected void hsetJSON(String identifier, HashMap<String, JSONObject> hash) {
         final HashMap<String, String> newHash = new HashMap<>();
         hash.forEach((key, val) -> newHash.put(key, val.toString()));
         hset(identifier, newHash);
     }
 
-    void hset(String identifier, HashMap<String, String> hash) {
+    protected void hset(String identifier, HashMap<String, String> hash) {
         jedis.hset(cacheID + identifier, hash);
     }
 
-    String hget(String identifier, String key) {
+    protected void hset(HashMap<String, String> hash) {
+        jedis.hset(cacheID, hash);
+    }
+
+    protected String hget(String identifier, String key) {
         return jedis.hget(cacheID + identifier, key);
     }
 
-    JSONObject hgetJSON(String identifier, String key) {
+    protected JSONObject hgetJSON(String identifier, String key) {
         return new JSONObject(hget(identifier, key));
     }
 
-    Map<String, String> hgetAll(String key) {
+    protected Map<String, String> hgetAll(String key) {
         return jedis.hgetAll(key);
     }
 
-    void setex(String identifier, int seconds, String value) {
+    protected void setex(String identifier, int seconds, String value) {
         jedis.setex(cacheID + identifier, seconds, value);
     }
 
-    void setex(String identifier, int seconds, JSONObject value) {
+    protected void set(String identifier, String value) {
+        jedis.set(cacheID + identifier, value);
+    }
+
+    protected String set(String value) {
+        return jedis.set(cacheID, value);
+    }
+
+    protected void setex(String identifier, int seconds, JSONObject value) {
         setex(identifier, seconds, value.toString());
     }
 
-    void setex(long identifier, int seconds, JSONObject value) {
+    protected void setex(long identifier, int seconds, JSONObject value) {
         setex(String.valueOf(identifier), seconds, value.toString());
     }
 
-    String get(String identifier) {
+    protected String get(String identifier) {
         return jedis.get(cacheID + identifier);
     }
 
-    String get(long identifier) {
+    protected String get(long identifier) {
         return get(String.valueOf(identifier));
     }
 
-    void del(String identifier) {
-        jedis.del(cacheID + identifier);
+    protected String get() {
+        return jedis.get(cacheID);
     }
 
-    void del(long identifier) {
-        del(String.valueOf(identifier));
+    protected long del(String identifier) {
+        return jedis.del(cacheID + identifier);
+    }
+
+    protected long del(long identifier) {
+        return del(String.valueOf(identifier));
+    }
+
+    protected long del() {
+        return jedis.del(cacheID);
+    }
+
+    protected boolean exists() {
+        return jedis.exists(cacheID);
+    }
+
+    protected boolean exists(String identifier) {
+        return jedis.exists(cacheID + identifier);
     }
 
     public void updateCache(String identifier, Document document) {
@@ -136,29 +168,11 @@ public class RedisCache implements AbstractJSON {
 
         collection.find().forEach(doc -> documentArr.put(new JSONObject(doc.toJson())));
 
-        collectionObj.put(AbstractRedisCache.CacheField.DOCUMENTS.toString(), documentArr);
+        collectionObj.put(DatabaseRedisCache.CacheField.DOCUMENTS.toString(), documentArr);
         return collectionObj;
     }
 
     public JSONObject getCache(String id) {
         return new JSONObject(get(cacheID + id));
-    }
-
-    boolean arrayHasObject(JSONArray array, ObjectId object) {
-        for (int i = 0; i < array.length(); i++) {
-            if (array.getJSONObject(i).getJSONObject("_id").getString("$oid").equals(object.toString()))
-                return true;
-        }
-        return false;
-    }
-
-    int getIndexOfObjectInArray(JSONArray array, ObjectId object) {
-        if (!arrayHasObject(array, object))
-            throw new NullPointerException("There was no such object found in the array!");
-
-        for (int i = 0; i < array.length(); i++)
-            if (array.getJSONObject(i).getJSONObject("_id").getString("$oid").equals(object.toString()))
-                return i;
-        return -1;
     }
 }
