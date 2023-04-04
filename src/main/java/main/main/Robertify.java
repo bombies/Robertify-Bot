@@ -94,29 +94,30 @@ public class Robertify {
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getPlayerPenalty);
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getCpuPenalty);
 
-            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
+            var thread = new ThreadFactoryBuilder()
+                    .setNameFormat("RobertifyShutdownHook")
+                    .build();
             Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
                 logger.info("Destroying all players (If any left)");
-                shardManager.getGuildCache().stream()
-                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
-                        .forEach(guild -> {
-                            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                            final var scheduler = musicManager.getScheduler();
-
-                            if (scheduler.getMusicPlayer().getPlayingTrack() != null) {
-                                new GuildResumeManager(guild).saveTracks();
-                            }
-
-                            musicManager.getScheduler().disconnect(false);
+                RobertifyAudioManager.getMusicManagers()
+                        .values()
+                        .forEach(musicManager -> {
+                            if (musicManager.getPlayer().getPlayingTrack() != null)
+                                new GuildResumeManager(musicManager.getGuild()).saveTracks();
+                            musicManager.destroy();
                         });
+            }));
 
+            var cronShutdownHook = new ThreadFactoryBuilder()
+                    .setNameFormat("RobertifyCronShutdownHook")
+                    .build();
+            Runtime.getRuntime().addShutdownHook(cronShutdownHook.newThread(() -> {
                 logger.info("Killing cron scheduler");
                 try {
                     getCronScheduler().clear();
                 } catch (SchedulerException e) {
                     logger.error("I couldn't clear scheduling data!");
                 }
-                shardManager.shutdown();
             }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
@@ -256,7 +257,7 @@ public class Robertify {
             initVoteSiteAPIs();
 
             if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
-                    robertifyAPI = RobertifyAPI.ins;
+                robertifyAPI = RobertifyAPI.ins;
 
             if (Config.hasValue(ENV.SENTRY_DSN))
                 Sentry.init(options -> {

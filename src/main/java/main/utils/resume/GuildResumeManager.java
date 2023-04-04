@@ -46,8 +46,8 @@ public class GuildResumeManager {
                         .toList()
         );
 
-        log.info("Saving tracks for {}. ({} track(s))", guild.getName(), allTracks.size());
-        resumeCache.setTracks(new ResumeData(channel, scheduler.getAnnouncementChannel().getId(),  allTracks));
+        final var resumeData = new ResumeData(channel, allTracks);
+        resumeCache.setTracks(resumeData);
     }
 
     public boolean hasSave() {
@@ -59,7 +59,6 @@ public class GuildResumeManager {
             return;
         try {
             final var loadedData = resumeCache.loadData();
-            log.info("Restarting {} tracks in {}", loadedData.getTracks().size(), guild.getName());
             RobertifyAudioManager.getInstance().loadAndResume(musicManager, loadedData);
         } catch (JsonProcessingException e) {
             log.error("Could not load resume data for guild with id {}", guild.getId(), e);

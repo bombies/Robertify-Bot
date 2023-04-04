@@ -340,14 +340,6 @@ public class RobertifyAudioManager {
         if (voiceChannel.getMembers().size() == 0)
             return;
 
-        if (data.getAnnouncement_channel_id() != null) {
-            final var announcementChannel =  musicManager.getGuild().getTextChannelById(data.getChannel_id());
-            if (announcementChannel != null) {
-                musicManager.getScheduler()
-                        .setAnnouncementChannel(announcementChannel);
-            }
-        }
-
         joinAudioChannel(voiceChannel, musicManager);
         resumeTracks(data.getTracks(), musicManager.getScheduler().getAnnouncementChannel(),  musicManager);
     }

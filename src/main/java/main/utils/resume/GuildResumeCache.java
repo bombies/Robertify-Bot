@@ -6,6 +6,7 @@ import main.utils.database.mongodb.cache.redis.RedisCache;
 
 @Slf4j
 public class GuildResumeCache extends RedisCache {
+
     public GuildResumeCache(String guildID) {
         super("resume:" + guildID);
     }

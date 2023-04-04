@@ -2,6 +2,7 @@ package main.utils.database.mongodb.cache.redis;
 
 import com.mongodb.client.MongoCollection;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import main.constants.ENV;
 import main.main.Config;
 import main.utils.json.AbstractJSON;
@@ -14,6 +15,7 @@ import redis.clients.jedis.JedisPooled;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 public abstract class RedisCache implements AbstractJSON {
 
     @Getter

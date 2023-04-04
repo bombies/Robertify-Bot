@@ -13,20 +13,15 @@ public class ResumeData {
     @Getter
     private final String channel_id;
     @Getter
-    @Nullable
-    private final String announcement_channel_id;
-    @Getter
     private final List<ResumableTrack> tracks;
 
     public ResumeData() {
         this.channel_id = null;
-        this.announcement_channel_id = null;
         this.tracks = null;
     }
 
-    public ResumeData(String channel_id, @Nullable String announcement_channel_id, List<ResumableTrack> tracks) {
+    public ResumeData(String channel_id, List<ResumableTrack> tracks) {
         this.channel_id = channel_id;
-        this.announcement_channel_id = announcement_channel_id;
         this.tracks = tracks;
     }
 

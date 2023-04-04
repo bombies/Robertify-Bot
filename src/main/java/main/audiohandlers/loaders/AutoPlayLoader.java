@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.QueueHandler;
-import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.requestchannel.RequestChannelConfig;
@@ -17,7 +16,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class AutoPlayLoader implements AudioLoadResultHandler {
@@ -46,11 +44,6 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
     public void playlistLoaded(AudioPlaylist playlist) {
         if (playlist.isSearchResult())
             throw new UnsupportedOperationException("This operation is not supported in the auto-play loader");
-
-        logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
-
-
-
         
         final var scheduler = musicManager.getScheduler();
         final var tracks = playlist.getTracks();
