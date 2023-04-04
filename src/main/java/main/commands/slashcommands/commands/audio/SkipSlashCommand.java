@@ -26,7 +26,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                         .addOptions(
                                 CommandOption.of(
                                         OptionType.INTEGER,
-                                        "trackstoskip",
+                                        "to",
                                         "Number of tacks to skip",
                                         false
                                 )
@@ -81,7 +81,7 @@ public class SkipSlashCommand extends AbstractSlashCommand {
                     .queue();
         } else {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            final int tracksToSkip = GeneralUtils.longToInt(event.getOption("trackstoskip").getAsLong());
+            final int tracksToSkip = GeneralUtils.longToInt(event.getOption("to").getAsLong());
             event.getHook().sendMessageEmbeds(new SkipToCommand().handleSkip(event.getUser(), musicManager, tracksToSkip).build())
                     .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                     .queue();

@@ -16,6 +16,7 @@ import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
+import main.commands.slashcommands.commands.audio.SkipSlashCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
 import main.constants.ENV;
@@ -275,7 +276,7 @@ public class Robertify {
     }
 
     private static void loadNeededGlobalCommands() {
-
+        new SkipSlashCommand().reload();
     }
 
     public static void initVoteSiteAPIs() {
