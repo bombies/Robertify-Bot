@@ -15,6 +15,7 @@ import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.LocaleConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.GuildResumeManager;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -63,9 +64,10 @@ public class Listener extends ListenerAdapter {
             rescheduleUnbans(g);
             RemindersCommand.scheduleGuildReminders(g);
 
-            if (dedicatedChannelConfig.isChannelSet()) {
+            if (dedicatedChannelConfig.isChannelSet())
                 dedicatedChannelConfig.updateMessage();
-            }
+
+            new GuildResumeManager(g).loadTracks();
         }
 
         logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
@@ -197,7 +199,6 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new CommandManagerCommand().loadCommand(g);
     }
 
     /**

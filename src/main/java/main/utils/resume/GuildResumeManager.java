@@ -2,6 +2,7 @@ package main.utils.resume;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.TrackScheduler;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,11 +14,13 @@ import java.util.ArrayList;
 public class GuildResumeManager {
     private final Guild guild;
     private final GuildResumeCache resumeCache;
+    private final GuildMusicManager musicManager;
     private final TrackScheduler scheduler;
 
     public GuildResumeManager(@NotNull Guild guild) {
         this.guild = guild;
-        this.scheduler = RobertifyAudioManager.getInstance().getMusicManager(guild).getScheduler();
+        this.musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+        this.scheduler = musicManager.getScheduler();
         this.resumeCache = new GuildResumeCache(guild.getId());
     }
 
@@ -55,6 +58,7 @@ public class GuildResumeManager {
             return;
         try {
             final var loadedData = resumeCache.loadData();
+            RobertifyAudioManager.getInstance().loadAndResume(musicManager, loadedData);
         } catch (JsonProcessingException e) {
             log.error("Could not load resume data for guild with id {}", guild.getId(), e);
         }

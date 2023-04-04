@@ -16,10 +16,13 @@ import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
 import main.constants.Toggles;
 import main.main.Config;
+import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.ResumableTrack;
+import main.utils.resume.ResumeData;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
@@ -33,10 +36,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
@@ -327,6 +327,21 @@ public class RobertifyAudioManager {
         }
     }
 
+    public void loadAndResume(GuildMusicManager musicManager, ResumeData data) {
+        final var channelId = data.getChannel_id();
+        final var voiceChannel = Robertify.getShardManager().getVoiceChannelById(channelId);
+        if (voiceChannel == null) {
+            logger.warn("There was resume data for a guild but the voice channel is invalid! Data: {}", data);
+            return;
+        }
+
+        if (voiceChannel.getMembers().size() == 0)
+            return;
+
+        joinAudioChannel(voiceChannel, musicManager);
+        resumeTracks(data.getTracks(), musicManager);
+    }
+
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            User user, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
@@ -374,6 +389,20 @@ public class RobertifyAudioManager {
 
         final AudioLoader loader = new AudioLoader(sender, musicManager, trackUrl, announceMsg, botMsg, true, addToBeginning);
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
+    }
+
+    private void resumeTracks(Collection<ResumableTrack> trackList, GuildMusicManager musicManager) {
+        final var trackURL = "rsearch:" + ResumableTrack.collectionToString(trackList);
+        final var loader = new AudioLoader(
+                musicManager.getGuild().getSelfMember().getUser(),
+                musicManager,
+                trackURL,
+                false,
+                null,
+                false,
+                false
+        );
+        musicManager.getPlayerManager().loadItemOrdered(musicManager, trackURL, loader);
     }
 
     public void joinAudioChannel(GuildMessageChannel channel, AudioChannel vc, GuildMusicManager musicManager) {
