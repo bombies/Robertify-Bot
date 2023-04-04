@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
+import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
 import main.constants.Toggles;
@@ -27,6 +28,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -82,11 +84,11 @@ public class RobertifyAudioManager {
 //        }
 
         AudioSourceManagers.registerLocalSource(this.playerManager);
+        this.playerManager.registerSourceManager(new ResumeSourceManager(this.playerManager));
         this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
         this.playerManager.registerSourceManager(new DeezerAudioSourceManager(Config.get(ENV.DEEZER_ACCESS_TOKEN)));
         AudioSourceManagers.registerRemoteSources(this.playerManager);
-
     }
 
     public GuildMusicManager getMusicManager(Guild guild) {
@@ -338,8 +340,16 @@ public class RobertifyAudioManager {
         if (voiceChannel.getMembers().size() == 0)
             return;
 
+        if (data.getAnnouncement_channel_id() != null) {
+            final var announcementChannel =  musicManager.getGuild().getTextChannelById(data.getChannel_id());
+            if (announcementChannel != null) {
+                musicManager.getScheduler()
+                        .setAnnouncementChannel(announcementChannel);
+            }
+        }
+
         joinAudioChannel(voiceChannel, musicManager);
-        resumeTracks(data.getTracks(), musicManager);
+        resumeTracks(data.getTracks(), musicManager.getScheduler().getAnnouncementChannel(),  musicManager);
     }
 
     private void loadTrack(String trackUrl, GuildMusicManager musicManager,
@@ -391,14 +401,15 @@ public class RobertifyAudioManager {
         musicManager.getPlayerManager().loadItemOrdered(musicManager, trackUrl, loader);
     }
 
-    private void resumeTracks(Collection<ResumableTrack> trackList, GuildMusicManager musicManager) {
-        final var trackURL = "rsearch:" + ResumableTrack.collectionToString(trackList);
+    private void resumeTracks(Collection<ResumableTrack> trackList, GuildMessageChannel announcementChannel, GuildMusicManager musicManager) {
+        final var trackURL = ResumeSourceManager.SEARCH_PREFIX + ResumableTrack.collectionToString(trackList);
         final var loader = new AudioLoader(
                 musicManager.getGuild().getSelfMember().getUser(),
                 musicManager,
                 trackURL,
-                false,
+                true,
                 null,
+                announcementChannel,
                 false,
                 false
         );

@@ -19,7 +19,7 @@ public class ResumeTests {
         final var resumableTracks = tracks.stream()
                 .map(ResumableTrack::new)
                 .toList();
-        final var resumeData = new ResumeData("vcId", resumableTracks);
+        final var resumeData = new ResumeData("vcId", "acId", resumableTracks);
         final var json = resumeData.toString();
         log.info("JSON: {}", json);
         assertNotNull("Checking if JSON is valid", json);
@@ -29,7 +29,7 @@ public class ResumeTests {
     void testResumableDataJSONToObject() {
         final var tracks = UtilsTest.getManyTracksWithRequester(10);
         final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
-        final var resumeData = new ResumeData("vcId", resumableTracks);
+        final var resumeData = new ResumeData("vcId", "acId", resumableTracks);
         final var json = resumeData.toString();
 
         try {
@@ -53,7 +53,7 @@ public class ResumeTests {
         final var resumeCache = new GuildResumeCache("1");
         final var tracks = UtilsTest.getManyTracksWithRequester(10);
         final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
-        final var resumeData = new ResumeData("vcId", resumableTracks);
+        final var resumeData = new ResumeData("vcId", "acId", resumableTracks);
 
         try {
             resumeCache.setTracks(resumeData);
@@ -72,7 +72,7 @@ public class ResumeTests {
                 .mapToObj(i -> new GuildResumeCache(String.valueOf(i)));
         final var tracks = UtilsTest.getManyTracksWithRequester(50);
         final var resumableTracks = ResumableTrack.audioTracksToResumableTracks(tracks);
-        final var resumeData = new ResumeData("vcID", resumableTracks);
+        final var resumeData = new ResumeData("vcID", "acId", resumableTracks);
 
         caches.forEach(cache -> {
             cache.setTracks(resumeData);

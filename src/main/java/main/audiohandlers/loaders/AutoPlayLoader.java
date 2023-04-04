@@ -50,6 +50,8 @@ public class AutoPlayLoader implements AudioLoadResultHandler {
         logger.info("Successfully loaded all recommended tracks for {}. ({} tracks)", guild.getName(), playlist.getTracks().size());
 
 
+
+        
         final var scheduler = musicManager.getScheduler();
         final var tracks = playlist.getTracks();
         for (final var track : tracks) {

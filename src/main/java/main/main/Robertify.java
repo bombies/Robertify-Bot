@@ -29,6 +29,7 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.pagination.PaginationEvents;
+import main.utils.resume.GuildResumeManager;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.entities.Activity;
@@ -99,7 +100,13 @@ public class Robertify {
                 shardManager.getGuildCache().stream()
                         .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
                         .forEach(guild -> {
-                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+                            final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
+                            final var scheduler = musicManager.getScheduler();
+
+                            if (scheduler.getMusicPlayer().getPlayingTrack() != null) {
+                                new GuildResumeManager(guild).saveTracks();
+                            }
+
                             musicManager.getScheduler().disconnect(false);
                         });
 

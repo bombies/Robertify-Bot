@@ -8,6 +8,8 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import main.audiohandlers.TrackScheduler;
+import main.audiohandlers.sources.resume.ResumeSourceManager;
+import main.audiohandlers.sources.resume.ResumeTrack;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -116,6 +118,15 @@ public class ResumableTrack {
 
     public static ResumableTrack fromJSON(String json) throws JsonProcessingException {
         return mapper.readValue(json, ResumableTrack.class);
+    }
+
+    public AudioTrack toAudioTrack(ResumeSourceManager sourceManager) {
+        return new ResumeTrack(
+                this.info,
+                this.isrc,
+                this.artworkURL,
+                sourceManager
+        );
     }
 
     public static class AudioTrackInfoWrapper extends AudioTrackInfo {
