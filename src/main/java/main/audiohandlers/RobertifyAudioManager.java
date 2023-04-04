@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public class RobertifyAudioManager {
     private static final Logger logger = LoggerFactory.getLogger(RobertifyAudioManager.class);
@@ -46,7 +47,7 @@ public class RobertifyAudioManager {
     private static RobertifyAudioManager INSTANCE;
 
     @Getter
-    private static final Map<Long, GuildMusicManager> musicManagers = new HashMap<>();
+    private static final Map<Long, GuildMusicManager> musicManagers = new ConcurrentSkipListMap<>();
 
     @Getter
     private static final List<String> unannouncedTracks = new ArrayList<>();
