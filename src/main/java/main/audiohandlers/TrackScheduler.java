@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
     private final List<Requester> requesters = new ArrayList<>();
@@ -130,8 +132,42 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     ""
             ));
 
+            final BiConsumer<Message, Throwable> handleMsgSendErr = (m, ex) -> {
+                if (ex == null)
+                    return;
+
+                if (ex instanceof ImageBuilderException) {
+                    logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
+                    announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
+                        if (lastSentMsg != null)
+                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                    }));
+                        lastSentMsg = msg;
+                    });
+                } else if (ex instanceof PermissionException) {
+                    announcementChannel.sendMessageEmbeds(eb.build())
+                            .queue(embedMsg -> {
+                                if (lastSentMsg != null)
+                                    lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                            }));
+                                lastSentMsg = embedMsg;
+                            }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
+                                    .queue(nonEmbedMsg -> {
+                                        if (lastSentMsg != null)
+                                            lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                                    }));
+                                        lastSentMsg = nonEmbedMsg;
+                                    })
+                            ));
+                }
+            };
+            
             try {
                 final var img = new AtomicReference<File>();
+
                 Robertify.getShardManager().retrieveUserById(requester.getId())
                         .submit()
                         .thenComposeAsync(requesterObj -> {
@@ -156,38 +192,30 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                             lastSentMsg = msg;
                             return msg;
                         })
-                        .whenComplete((v, ex) -> {
-                            if (ex == null)
-                                return;
-
-                            if (ex instanceof ImageBuilderException) {
-                                logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
-                                announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
-                                    if (lastSentMsg != null)
-                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                }));
-                                    lastSentMsg = msg;
-                                });
-                            } else if (ex instanceof PermissionException) {
-                                announcementChannel.sendMessageEmbeds(eb.build())
-                                        .queue(embedMsg -> {
-                                            if (lastSentMsg != null)
-                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                        }));
-                                            lastSentMsg = embedMsg;
-                                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
-                                                .queue(nonEmbedMsg -> {
-                                                    if (lastSentMsg != null)
-                                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                                }));
-                                                    lastSentMsg = nonEmbedMsg;
-                                                })
-                                        ));
-                            }
-                        });
+                        .whenComplete(handleMsgSendErr);
+            } catch (NullPointerException e) {
+                final var img = new NowPlayingImageBuilder()
+                        .setTitle(trackInfo.title)
+                        .setArtistName(trackInfo.author)
+                        .setAlbumImage(
+                                track instanceof MirroringAudioTrack mirroringAudioTrack ?
+                                        mirroringAudioTrack.getArtworkURL() :
+                                        new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                        )
+                        .setUser("Unknown Requester", null)
+                        .build();
+                announcementChannel.sendFiles(FileUpload.fromData(img))
+                        .submit()
+                        .thenApply(msg -> {
+                            img.delete();
+                            if (lastSentMsg != null)
+                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                        }));
+                            lastSentMsg = msg;
+                            return msg;
+                        })
+                        .whenComplete(handleMsgSendErr);
             } catch (InsufficientPermissionException ignored) {
             }
         }
