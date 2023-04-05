@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.github.bombies</groupId>
             <artifactId>Robertify-Lavalink-Client</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
