@@ -16,10 +16,9 @@ import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
-import main.commands.slashcommands.commands.management.TogglesCommand;
+import main.commands.slashcommands.commands.audio.SkipSlashCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
-import main.commands.slashcommands.commands.misc.reminders.RemindersCommand;
 import main.constants.ENV;
 import main.events.LogChannelEvents;
 import main.events.SuggestionCategoryDeletionEvents;
@@ -31,6 +30,7 @@ import main.utils.database.mongodb.AbstractMongoDatabase;
 import main.utils.database.mongodb.cache.redis.GuildRedisCache;
 import main.utils.json.AbstractJSONFile;
 import main.utils.pagination.PaginationEvents;
+import main.utils.resume.GuildResumeManager;
 import main.utils.votes.api.discordbotlist.DBLApi;
 import me.duncte123.botcommons.web.WebUtils;
 import net.dv8tion.jda.api.entities.Activity;
@@ -95,22 +95,30 @@ public class Robertify {
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getPlayerPenalty);
             lavalink.getLoadBalancer().addPenalty(LavalinkLoadBalancer.Penalties::getCpuPenalty);
 
-            var thread = new ThreadFactoryBuilder().setNameFormat("RobertifyShutdownHook").build();
+            var thread = new ThreadFactoryBuilder()
+                    .setNameFormat("RobertifyShutdownHook")
+                    .build();
             Runtime.getRuntime().addShutdownHook(thread.newThread(() -> {
                 logger.info("Destroying all players (If any left)");
-                shardManager.getGuildCache().stream()
-                        .filter(guild -> guild.getSelfMember().getVoiceState().inAudioChannel())
-                        .forEach(guild -> {
-                            GuildMusicManager musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
-                            musicManager.getScheduler().disconnect(false);
+                RobertifyAudioManager.getMusicManagers()
+                        .values()
+                        .forEach(musicManager -> {
+                            if (musicManager.getPlayer().getPlayingTrack() != null)
+                                new GuildResumeManager(musicManager.getGuild()).saveTracks();
+                            musicManager.destroy();
                         });
+            }));
+
+            var cronShutdownHook = new ThreadFactoryBuilder()
+                    .setNameFormat("RobertifyCronShutdownHook")
+                    .build();
+            Runtime.getRuntime().addShutdownHook(cronShutdownHook.newThread(() -> {
                 logger.info("Killing cron scheduler");
                 try {
                     getCronScheduler().clear();
                 } catch (SchedulerException e) {
                     logger.error("I couldn't clear scheduling data!");
                 }
-                shardManager.shutdown();
             }));
 
             DefaultShardManagerBuilder jdaBuilder = DefaultShardManagerBuilder.createDefault(
@@ -250,7 +258,7 @@ public class Robertify {
             initVoteSiteAPIs();
 
             if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
-                    robertifyAPI = RobertifyAPI.ins;
+                robertifyAPI = RobertifyAPI.ins;
 
             if (Config.hasValue(ENV.SENTRY_DSN))
                 Sentry.init(options -> {
@@ -268,8 +276,7 @@ public class Robertify {
     }
 
     private static void loadNeededGlobalCommands() {
-        new TogglesCommand().reload();
-        new RemindersCommand().reload();
+        new SkipSlashCommand().reload();
     }
 
     public static void initVoteSiteAPIs() {

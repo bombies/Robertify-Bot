@@ -23,13 +23,13 @@ public class ClearQueueCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) throws ScriptException {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(ctx.getGuild());
-        final var queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
         final Message msg = ctx.getMessage();
         final Guild guild = ctx.getGuild();
         final GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
 
-        if (queue.isEmpty()) {
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is already nothing in the queue.");
+        if (queueHandler.isEmpty()) {
+            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "There is already nothing in the queueHandler.");
             msg.replyEmbeds(eb.build()).queue();
             return;
         }
@@ -48,13 +48,13 @@ public class ClearQueueCommand implements ICommand {
             return;
         }
 
-        queue.clear();
-        new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queue");
+        queueHandler.clear();
+        new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, ctx.getAuthor().getAsMention() + " has cleared the queueHandler");
 
         if (new RequestChannelConfig(guild).isChannelSet())
             new RequestChannelConfig(guild).updateMessage();
 
-        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queue was cleared!");
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, "The queueHandler was cleared!");
         msg.replyEmbeds(eb.build()).queue();
     }
 

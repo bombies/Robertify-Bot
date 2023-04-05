@@ -15,6 +15,7 @@ import main.utils.json.guildconfig.GuildConfig;
 import main.utils.locale.LocaleConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.resume.GuildResumeManager;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
@@ -22,6 +23,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
@@ -41,35 +43,34 @@ public class Listener extends ListenerAdapter {
 
     public static final Logger logger = LoggerFactory.getLogger(Listener.class);
 
+    @Override
+    public void onGuildReady(@NotNull GuildReadyEvent event) {
+        final var guild = event.getGuild();
+        final var dedicatedChannelConfig = new RequestChannelConfig(guild);
+        final var locale = new LocaleConfig(guild).getLocale();
+        if (locale != null)
+            CompletableFuture.runAsync(() -> LocaleManager.getLocaleManager(guild).setLocale(locale), Executors.newScheduledThreadPool(5))
+                    .exceptionally(e -> {
+                        if (e instanceof ReaderException)
+                            logger.error("Couldn't set the locale for {}", guild.getName());
+                        return null;
+                    });
+
+        loadNeededSlashCommands(guild);
+        rescheduleUnbans(guild);
+        RemindersCommand.scheduleGuildReminders(guild);
+
+        if (dedicatedChannelConfig.isChannelSet())
+            dedicatedChannelConfig.updateMessage();
+
+        new GuildResumeManager(guild).loadTracks();
+    }
+
     @SneakyThrows
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         final var jda = event.getJDA();
-
-        for (Guild g : jda.getGuildCache()) {
-            final var dedicatedChannelConfig = new RequestChannelConfig(g);
-            logger.debug("[Shard #{}] Loading {}...", jda.getShardInfo().getShardId(), g.getName());
-            final var locale = new LocaleConfig(g).getLocale();
-            if (locale != null)
-                CompletableFuture.runAsync(() -> LocaleManager.getLocaleManager(g).setLocale(locale), Executors.newScheduledThreadPool(5))
-                        .exceptionally(e -> {
-                            if (e instanceof ReaderException)
-                                logger.error("Couldn't set the locale for {}", g.getName());
-                            return null;
-                        });
-
-            loadNeededSlashCommands(g);
-
-            rescheduleUnbans(g);
-            RemindersCommand.scheduleGuildReminders(g);
-
-            if (dedicatedChannelConfig.isChannelSet()) {
-                dedicatedChannelConfig.updateMessage();
-            }
-        }
-
-        logger.info("Watching {} guilds on shard #{}", jda.getGuildCache().size(), jda.getShardInfo().getShardId());
-
+        logger.info("Watching {} guilds on shard #{} ({} unavailable)", event.getGuildAvailableCount(), jda.getShardInfo().getShardId(), event.getGuildUnavailableCount());
         BotBDCache.getInstance().setLastStartup(System.currentTimeMillis());
         Robertify.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"));
     }
@@ -197,7 +198,6 @@ public class Listener extends ListenerAdapter {
      * @param g The guild to load the commands in
      */
     public void loadNeededSlashCommands(Guild g) {
-        new CommandManagerCommand().loadCommand(g);
     }
 
     /**

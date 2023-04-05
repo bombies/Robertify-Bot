@@ -73,7 +73,7 @@ public abstract class AbstractMongoDatabase {
         return database.getCollection(name);
     }
 
-    protected BsonObjectId addDocument(Document doc) {
+    public BsonObjectId addDocument(Document doc) {
         return collection.insertOne(doc).getInsertedId().asObjectId();
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractMongoDatabase {
         collection.insertMany(docs);
     }
 
-    protected void upsertManyDocuments(List<Document> docs) {
+    public void upsertManyDocuments(List<Document> docs) {
         List<WriteModel<? extends Document>> bulkWriteModels = new ArrayList<>();
         
         for (var doc : docs) {
@@ -106,7 +106,7 @@ public abstract class AbstractMongoDatabase {
         upsertManyDocuments(documents);
     }
 
-    protected void upsertDocument(Document oldDoc, Document doc) {
+    public void upsertDocument(Document oldDoc, Document doc) {
         if (oldDoc == null)
             throw new NullPointerException("There is no document to be updated!");
 
@@ -114,7 +114,7 @@ public abstract class AbstractMongoDatabase {
         collection.insertOne(doc);
     }
 
-    protected void upsertDocument(Document doc) {
+    public void upsertDocument(Document doc) {
         var id = doc.getObjectId("_id");
         Document oldDoc = collection.find(eq("_id", id)).first();
         if (oldDoc == null)
@@ -137,11 +137,11 @@ public abstract class AbstractMongoDatabase {
         }
     }
 
-    protected void upsertDocument(JSONObject obj) {
+    public void upsertDocument(JSONObject obj) {
         upsertDocument(Document.parse(obj.toString()));
     }
 
-    protected BsonObjectId addDocument(JSONObject obj) {
+    public BsonObjectId addDocument(JSONObject obj) {
         return collection.insertOne(Document.parse(obj.toString())).getInsertedId().asObjectId();
     }
 
@@ -297,7 +297,7 @@ public abstract class AbstractMongoDatabase {
         return collection.find(eq(key, value)).iterator().next();
     }
 
-    protected Document findSpecificDocument(String key, Object value) {
+    public Document findSpecificDocument(String key, Object value) {
         try {
             return collection.find(eq(key, value)).iterator().next();
         } catch (NoSuchElementException e) {
@@ -325,7 +325,7 @@ public abstract class AbstractMongoDatabase {
         return findDocument(Document.parse(obj.toString()));
     }
 
-    protected <T> String getDocument(String key, T value) {
+    public <T> String getDocument(String key, T value) {
         return getDocument(key, value, false);
     }
 
@@ -385,7 +385,7 @@ public abstract class AbstractMongoDatabase {
         );
     }
 
-    protected String documentToJSON(Document doc) {
+    public String documentToJSON(Document doc) {
         return documentToJSON(doc, false);
     }
 

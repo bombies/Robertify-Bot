@@ -4,6 +4,7 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.QueueCommand;
 import main.constants.InteractionLimits;
@@ -13,7 +14,6 @@ import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -107,8 +107,8 @@ public abstract class Pages {
         } catch (SocketTimeoutException | ConnectException e) {
             final var pages = new ArrayList<MessagePage>();
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-            final var queue = musicManager.getScheduler().getQueue();
-            final var content = new QueueCommand().getContent(event.getGuild(), queue);
+            final var queueHandler = musicManager.getScheduler().getQueueHandler();
+            final var content = new QueueCommand().getPastTrackContent(event.getGuild(), queueHandler);
 
             messageLogic(event.getGuild(), pages, content, 10);
             paginateMessage(event, pages);
@@ -138,12 +138,12 @@ public abstract class Pages {
 
     public static Message paginateQueue(int maxPerPage, SlashCommandInteractionEvent event) {
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
         final var queuePages = new ArrayList<QueuePage>();
 
         event.deferReply().queue();
 
-        messageLogic(queuePages, queue, maxPerPage);
+        messageLogic(queuePages, queueHandler, maxPerPage);
 
         return paginateQueueMessage(event, queuePages);
     }
@@ -228,24 +228,25 @@ public abstract class Pages {
         }
     }
 
-    private static void messageLogic(List<QueuePage> messagePages, ConcurrentLinkedQueue<AudioTrack> queue, int maxPerPage) {
-        if (queue.size() <= maxPerPage) {
+    private static void messageLogic(List<QueuePage> messagePages, QueueHandler queueHandler, int maxPerPage) {
+        if (queueHandler.size() <= maxPerPage) {
             final List<QueueItem> items = new ArrayList<>();
-            for (int i = 0; i < queue.size(); i++) {
-                final var track = queue.stream().toList().get(i);
+            for (int i = 0; i < queueHandler.size(); i++) {
+                final var track = queueHandler.contents().get(i);
                 final var trackInfo = track.getInfo();
                 items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null));
             }
             messagePages.add(new QueuePage(1, items));
         } else {
-            final var trackList = queue.stream().toList();
-            int pagesRequired = (int) Math.ceil((double) queue.size() / maxPerPage);
+            final var trackList = queueHandler.contents();
+            int pagesRequired = (int)Math.ceil((double)queueHandler.size() / maxPerPage);
             int lastIndex = 0;
 
             for (int i = 0; i < pagesRequired; i++) {
                 final var page = new QueuePage(i + 1);
                 for (int j = 0; j < maxPerPage; j++) {
-                    if (lastIndex == queue.size()) break;
+                    if (lastIndex == queueHandler.size())
+                        break;
                     final var track = trackList.get(lastIndex);
                     final var trackInfo = track.getInfo();
 

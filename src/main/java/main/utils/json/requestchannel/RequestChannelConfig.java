@@ -102,11 +102,12 @@ public class RequestChannelConfig extends AbstractGuildConfig {
 
     public synchronized void removeChannel() {
         if (!isChannelSet())
-            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "(" + gid + ") doesn't have a channel set");
 
         final var textChannel = getTextChannel();
         if (textChannel != null)
-            textChannel.delete().queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {}));
+            textChannel.delete().queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e -> {
+            }));
 
         var obj = getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
         obj.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), -1);
@@ -116,12 +117,13 @@ public class RequestChannelConfig extends AbstractGuildConfig {
     }
 
     public synchronized boolean isChannelSet() {
+        final var reqChannelObj = getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString());
         try {
-            return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
+            return !reqChannelObj.isNull(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) && reqChannelObj
                     .getLong(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) != -1;
         } catch (JSONException e) {
             if (e.getMessage().contains("is not a ")) {
-                return !getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
+                return !reqChannelObj
                         .getString(GuildDB.Field.REQUEST_CHANNEL_ID.toString()).equals("-1");
             } else throw e;
         }
@@ -129,14 +131,14 @@ public class RequestChannelConfig extends AbstractGuildConfig {
 
     public synchronized long getChannelID() {
         if (!isChannelSet())
-            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "(" + gid + ") doesn't have a channel set");
         return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
                 .getLong(GuildDB.Field.REQUEST_CHANNEL_ID.toString());
     }
 
     public synchronized long getMessageID() {
         if (!isChannelSet())
-            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "("+gid+") doesn't have a channel set");
+            throw new IllegalArgumentException(Robertify.shardManager.getGuildById(gid).getName() + "(" + gid + ") doesn't have a channel set");
         return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
                 .getLong(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString());
     }
@@ -153,21 +155,22 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         try {
             return getTextChannel().retrieveMessageById(getMessageID());
         } catch (InsufficientPermissionException e) {
-                final var channel = RobertifyAudioManager.getInstance().getMusicManager(guild)
-                        .getScheduler().getAnnouncementChannel();
+            final var channel = RobertifyAudioManager.getInstance().getMusicManager(guild)
+                    .getScheduler().getAnnouncementChannel();
 
-                if (channel != null)
-                    channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
-                            .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {}));
+            if (channel != null)
+                channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(channel.getGuild(), "I don't have access to the requests channel anymore! I cannot update it.").build())
+                        .queue(null, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, ignored -> {
+                        }));
             return null;
         }
     }
 
-    public synchronized void updateMessage() {
+    public synchronized CompletableFuture<Void> updateMessage() {
         if (!isChannelSet())
-            return;
+            return null;
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             final var msgRequest = getMessageRequest();
 
             if (msgRequest == null) return;
@@ -175,8 +178,8 @@ public class RequestChannelConfig extends AbstractGuildConfig {
             final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(guild);
             final var audioPlayer = musicManager.getPlayer();
             final var playingTrack = audioPlayer.getPlayingTrack();
-            final var queue = musicManager.getScheduler().getQueue();
-            final var queueAsList = new ArrayList<>(queue);
+            final var queueHandler = musicManager.getScheduler().getQueueHandler();
+            final var queueAsList = new ArrayList<>(queueHandler.contents());
             final var theme = new ThemesConfig(guild).getTheme();
             final var localeManager = LocaleManager.getLocaleManager(guild);
 
@@ -229,7 +232,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
 
                 eb.setFooter(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
                         Pair.of("{numSongs}", String.valueOf(queueAsList.size())),
-                        Pair.of("{volume}", String.valueOf((int)(audioPlayer.getFilters().getVolume() * 100)))
+                        Pair.of("{volume}", String.valueOf((int) (audioPlayer.getFilters().getVolume() * 100)))
                 ));
 
                 final StringBuilder nextTenSongs = new StringBuilder();
@@ -242,7 +245,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                                 .append(" [").append(GeneralUtils.formatTime(track.getInfo().length))
                                 .append("]\n");
                 } else {
-                    if (queue.size() == 0)
+                    if (queueHandler.size() == 0)
                         nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessage.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS));
                     else {
                         int index = 1;
@@ -278,15 +281,16 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                             TimeUnit.SECONDS,
                             null,
                             new ErrorHandler()
-                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                    })
                     ));
     }
 
     public void updateAll() {
         try {
-            updateMessage();
-            updateButtons();
-            updateAllTopics();
+            updateMessage()
+                    .thenComposeAsync(unused -> updateButtons())
+                    .thenComposeAsync(unused -> updateTopic());
         } catch (InsufficientPermissionException e) {
             logger.error("I didn't have enough permissions to update the dedicated channel in {}", guild.getName());
         }
@@ -304,13 +308,14 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         }
     }
 
-    public void updateButtons() {
-        if (!isChannelSet()) return;
+    public CompletableFuture<Message> updateButtons() {
+        if (!isChannelSet()) return null;
 
         final var msgRequest = getMessageRequest();
-        if (msgRequest == null) return;
+        if (msgRequest == null) return null;
 
-        msgRequest.queue(msg -> buttonUpdateRequest(msg).queue());
+        return msgRequest.submit()
+                .thenCompose(msg -> buttonUpdateRequest(msg).submit());
     }
 
     public MessageEditAction buttonUpdateRequest(Message msg) {
@@ -328,7 +333,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
         final var thirdRow = ActionRow.of(StringSelectionMenuBuilder.of(
                 ChannelConfig.Field.FILTERS.id,
                 LocaleManager.getLocaleManager(msg.getGuild()).getMessage(RobertifyLocaleMessage.FilterMessages.FILTER_SELECT_PLACEHOLDER),
-                Pair.of(0,5),
+                Pair.of(0, 5),
                 List.of(
                         StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.EIGHT_D), ChannelConfig.Field.FILTERS.id + ":8d"),
                         StringSelectMenuOption.of(localeManager.getMessage(RobertifyLocaleMessage.FilterMessages.KARAOKE), ChannelConfig.Field.FILTERS.id + ":karaoke"),
@@ -338,14 +343,14 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                 )
 
         ).build());
-        return  config.getState(ChannelConfig.Field.FILTERS) ? msg.editMessageComponents(firstRow, secondRow, thirdRow) : msg.editMessageComponents(firstRow, secondRow);
+        return config.getState(ChannelConfig.Field.FILTERS) ? msg.editMessageComponents(firstRow, secondRow, thirdRow) : msg.editMessageComponents(firstRow, secondRow);
     }
 
-    public void updateTopic() {
-        if (!isChannelSet()) return;
+    public CompletableFuture<Void> updateTopic() {
+        if (!isChannelSet()) return null;
 
         final var channel = getTextChannel();
-        channelTopicUpdateRequest(channel).queue();
+        return channelTopicUpdateRequest(channel).submit();
     }
 
     public static void updateAllTopics() {
@@ -354,6 +359,8 @@ public class RequestChannelConfig extends AbstractGuildConfig {
             if (!config.isChannelSet()) continue;
 
             final var channel = config.getTextChannel();
+            if (channel == null)
+                return;
             config.channelTopicUpdateRequest(channel).queue();
         }
     }
@@ -389,7 +396,7 @@ public class RequestChannelConfig extends AbstractGuildConfig {
                 .queue(messages -> {
                     final var validMessages = messages.getRetrievedHistory()
                             .stream()
-                            .filter(msg -> msg.getTimeCreated().toEpochSecond() > ((int)(new Date().getTime() / 1000)) - (14 * 24 * 60 * 60))
+                            .filter(msg -> msg.getTimeCreated().toEpochSecond() > ((int) (new Date().getTime() / 1000)) - (14 * 24 * 60 * 60))
                             .toList();
                     if (validMessages.size() >= 2)
                         channel.deleteMessages(validMessages.subList(0, Math.min(validMessages.size(), 100))).queue();

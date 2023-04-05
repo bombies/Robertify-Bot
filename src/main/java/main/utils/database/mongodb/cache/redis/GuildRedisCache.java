@@ -5,7 +5,6 @@ import main.constants.Permission;
 import main.utils.GeneralUtils;
 import main.utils.database.mongodb.databases.GuildDB;
 import main.utils.json.AbstractGuildConfig;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -16,7 +15,7 @@ import java.util.Arrays;
 
 import static main.utils.database.mongodb.databases.GuildDB.getGuildDocument;
 
-public class GuildRedisCache extends AbstractRedisCache {
+public class GuildRedisCache extends DatabaseRedisCache {
     private final static Logger logger = LoggerFactory.getLogger(GuildRedisCache.class);
 
     @Getter
@@ -310,7 +309,7 @@ public class GuildRedisCache extends AbstractRedisCache {
     private synchronized void loadGuild(String gid, int attempt) {
         logger.debug("Attempting to load guild with ID: {}", gid);
         try {
-            String guildJSON = getDocument(GuildDB.Field.GUILD_ID.toString(), Long.parseLong(gid));
+            String guildJSON = getMongoDB().getDocument(GuildDB.Field.GUILD_ID.toString(), Long.parseLong(gid));
 
             if (guildJSON != null) {
                 final var guildObj = readyGuildObjForRedis(new JSONObject(guildJSON));
@@ -322,7 +321,7 @@ public class GuildRedisCache extends AbstractRedisCache {
                 return;
 
             logger.debug("Guild with ID {} didn't exist in the database. Attempting to add and reload.", gid);
-            addDocument(getGuildDocument(Long.parseLong(gid)));
+            getMongoDB().addDocument(getGuildDocument(Long.parseLong(gid)));
             loadGuild(gid, ++attempt);
         }
     }

@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.GuildMusicManager;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.TrackScheduler;
 import main.utils.RobertifyEmbedUtils;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +42,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final User sender;
     private final GuildMusicManager musicManager;
     private final TrackScheduler scheduler;
+    private final QueueHandler queueHandler;
     private final boolean announceMsg;
     private final String trackUrl;
     private final Message botMsg;
@@ -55,12 +58,30 @@ public class AudioLoader implements AudioLoadResultHandler {
         this.sender = sender;
         this.musicManager = musicManager;
         this.scheduler = musicManager.getScheduler();
+        this.queueHandler = scheduler.getQueueHandler();
         this.trackUrl = trackUrl;
         this.announceMsg = announceMsg;
         this.botMsg = botMsg;
         this.loadPlaylistShuffled = loadPlaylistShuffled;
         this.addToBeginning = addToBeginning;
         this.announcementChannel = botMsg != null ? botMsg.getChannel().asGuildMessageChannel() : null;
+        this.requestChannelConfig = new RequestChannelConfig(this.guild);
+    }
+
+    public AudioLoader(@Nullable User sender, GuildMusicManager musicManager,
+                       String trackUrl, boolean announceMsg, Message botMsg, GuildMessageChannel announcementChannel, boolean loadPlaylistShuffled, boolean addToBeginning) {
+
+        this.guild = musicManager.getGuild();
+        this.sender = sender;
+        this.musicManager = musicManager;
+        this.scheduler = musicManager.getScheduler();
+        this.queueHandler = scheduler.getQueueHandler();
+        this.trackUrl = trackUrl;
+        this.announceMsg = announceMsg;
+        this.botMsg = botMsg;
+        this.loadPlaylistShuffled = loadPlaylistShuffled;
+        this.addToBeginning = addToBeginning;
+        this.announcementChannel = announcementChannel;
         this.requestChannelConfig = new RequestChannelConfig(this.guild);
     }
 
@@ -86,8 +107,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                 Pair.of("{author}", info.author)
         );
 
-        if (scheduler.isPlaylistRepeating())
-            scheduler.setSavedQueue(scheduler.getQueue());
+        if (queueHandler.isQueueRepeating())
+            queueHandler.setSavedQueue(queueHandler.contents());
 
         if (requestChannelConfig.isChannelSet())
             requestChannelConfig.updateMessage();
@@ -152,9 +173,6 @@ public class AudioLoader implements AudioLoadResultHandler {
                         Pair.of("{author}", info.author)
                 );
 
-            if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(scheduler.getQueue());
-
         } else {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                     Pair.of("{numTracks}", String.valueOf(tracks.size())),
@@ -186,7 +204,6 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (loadPlaylistShuffled)
                 Collections.shuffle(tracks);
 
-            final var scheduler = musicManager.getScheduler();
             scheduler.setAnnouncementChannel(announcementChannel);
 
             if (addToBeginning)
@@ -208,10 +225,10 @@ public class AudioLoader implements AudioLoadResultHandler {
                     scheduler.queue(track);
             }
 
-            if (scheduler.isPlaylistRepeating())
-                scheduler.setSavedQueue(scheduler.getQueue());
-
         }
+
+        if (queueHandler.isQueueRepeating())
+            queueHandler.setSavedQueue(queueHandler.contents());
         if (dedicatedChannelConfig.isChannelSet())
             dedicatedChannelConfig.updateMessage();
     }
@@ -244,14 +261,14 @@ public class AudioLoader implements AudioLoadResultHandler {
                     ));
         }
 
-        if (musicManager.getScheduler().getQueue().isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
-            musicManager.getScheduler().scheduleDisconnect(false, 1, TimeUnit.SECONDS);
+        if (queueHandler.isEmpty() && musicManager.getPlayer().getPlayingTrack() == null)
+            scheduler.scheduleDisconnect(false, 1, TimeUnit.SECONDS);
     }
 
     @Override
     public void loadFailed(FriendlyException e) {
         if (musicManager.getPlayer().getPlayingTrack() == null)
-            musicManager.getGuild().getAudioManager().closeAudioConnection();
+            musicManager.leave();
 
         if (!e.getMessage().contains("available") && !e.getMessage().contains("format"))
             logger.error("[FATAL ERROR] Could not load track!", e);

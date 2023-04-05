@@ -1,84 +1,106 @@
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.extern.slf4j.Slf4j;
+import main.audiohandlers.QueueHandler;
 import main.audiohandlers.TrackScheduler;
-import net.dv8tion.jda.api.entities.Guild;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertNotEquals;
 
 @Slf4j
 public class TestTrackScheduler {
-    private Guild testGuild = UtilsTest.getTestGuild();
-    private TrackScheduler testScheduler = new TrackScheduler(testGuild, UtilsTest.getTestLink());
+    private TrackScheduler underTest;
+    private QueueHandler queueHandler;
 
-    private ConcurrentLinkedQueue<AudioTrack> generateQueue(int size) {
-        var queue = testScheduler.getQueue();
-        var finalQueue = queue;
-        IntStream.range(0, size)
-                .forEach(i -> finalQueue.offer(UtilsTest.getTestTrack(String.valueOf(i))));
-        return finalQueue;
+    @BeforeEach
+    void setUp() {
+        queueHandler = new QueueHandler();
     }
 
     @Test
-    @DisplayName("Generic Queue Test")
-    void testQueue() {
-        final var queue = testScheduler.getQueue();
-        final var track = UtilsTest.getTestTrack("0");
-
-        queue.offer(track);
-        assertEquals(track, queue.poll());
+    void testQueueAdd() {
+        final var track = UtilsTest.getTestTrack("1");
+        queueHandler.add(track);
+        assertEquals("Testing Queue Addition", track, queueHandler.poll());
     }
 
     @Test
-    void testBeginningQueue() {
-        var queue = testScheduler.getQueue();
+    void testQueueAddFail() {
         final var track = UtilsTest.getTestTrack("1");
         final var track2 = UtilsTest.getTestTrack("2");
-
-        queue.offer(track);
-
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        newQueue.offer(track2);
-        newQueue.addAll(queue);
-        queue = newQueue;
-
-        assertEquals(track2, queue.peek());
+        queueHandler.add(track2);
+        assertNotEquals("Testing Queue Addition Mismatch", track, queueHandler.poll());
     }
 
     @Test
-    void testBeginningQueueLarge() {
-        var queue = testScheduler.getQueue();
-        var finalQueue = generateQueue(1000);
-
-        final var newTrack = UtilsTest.getTestTrack("1000");
-
-        final ConcurrentLinkedQueue<AudioTrack> newQueue = new ConcurrentLinkedQueue<>();
-        newQueue.offer(newTrack);
-        newQueue.addAll(finalQueue);
-        queue = newQueue;
-
-        assertEquals(newTrack, queue.peek());
-        queue.poll();
-        assertTrue(queue.containsAll(finalQueue));
+    void testBulkQueueAdd() {
+        final var tracks = UtilsTest.getManyTracks(10);
+        queueHandler.addAll(tracks);
+        assertEquals("Testing Queue Bulk Addition", tracks, queueHandler.contents());
     }
 
     @Test
-    void testQueueRepeat() {
-        var queue = generateQueue(100);
-        var savedQueue = new ConcurrentLinkedQueue<>(queue);
+    void testBulkQueueAddFail() {
+        final var tracks = UtilsTest.getManyTracks(10);
+        final var tracks2 = UtilsTest.getManyTracks(11);
+        queueHandler.addAll(tracks2);
+        assertNotEquals("Testing Queue Bulk Addition", tracks, queueHandler.contents());
+    }
 
-        // Test repeating true
-        for (int i = 0; i < 3; i++) {
-            while (!queue.isEmpty())
-                queue.poll();
-            queue = new ConcurrentLinkedQueue<>(savedQueue);
-        }
+    @Test
+    void testQueueBeginningAdd() {
+        final var tracks = UtilsTest.getManyTracks(10);
+        final var trackToAdd = UtilsTest.getTestTrack("begin");
+        queueHandler.addAll(tracks);
+        queueHandler.addToBeginning(trackToAdd);
+        assertEquals("Testing Queue Beginning Addition", trackToAdd, queueHandler.poll());
+    }
 
-        assertTrue(queue.containsAll(savedQueue));
+    @Test
+    void testQueueBeginningFail() {
+        final var tracks = UtilsTest.getManyTracks(10);
+        final var trackToAdd = UtilsTest.getTestTrack("begin");
+        final var trackToAddAgain = UtilsTest.getTestTrack("begin");
+        queueHandler.addAll(tracks);
+        queueHandler.addToBeginning(trackToAdd);
+        queueHandler.addToBeginning(trackToAddAgain);
+        assertNotEquals("Testing Queue Beginning Addition Fail", trackToAdd, queueHandler.poll());
+    }
+
+    @Test
+    void testQueueRemove() {
+        final var tracks = UtilsTest.getManyTracks(10);
+        queueHandler.addAll(tracks);
+        queueHandler.remove(tracks.get(9));
+
+        final var expected = new ArrayList<>(tracks);
+        expected.remove(9);
+        assertEquals("Testing Queue Remove", expected, queueHandler.contents());
+    }
+
+    @Test
+    void testPreviousTrackAdd() {
+        final var currentTrackList = UtilsTest.getManyTracks(10);
+        queueHandler.addAll(currentTrackList);
+
+        final var pastTrack = queueHandler.poll();
+        queueHandler.pushPastTrack(pastTrack);
+        assertEquals("Testing Previous Track Addition", pastTrack, queueHandler.popPreviousTrack());
+    }
+
+    @Test
+    void testFullPreviousTrackAdd() {
+        final var currentTrackList = UtilsTest.getManyTracks(10);
+        queueHandler.addAll(currentTrackList);
+
+        for (int i = 0; i < 10; i++)
+            queueHandler.pushPastTrack(queueHandler.poll());
+
+        final var expected = new ArrayList<>(currentTrackList);
+        Collections.reverse(expected);
+        assertEquals("Testing Full Previous Queue Addition", currentTrackList, queueHandler.previousTracksContent());
     }
 }

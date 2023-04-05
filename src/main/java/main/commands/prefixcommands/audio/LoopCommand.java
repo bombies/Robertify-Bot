@@ -91,6 +91,7 @@ public class LoopCommand implements ICommand {
 
         final var player = musicManager.getPlayer();
         final var scheduler = musicManager.getScheduler();
+        final var queueHandler = scheduler.getQueueHandler();
 
         if (player.getPlayingTrack() == null)
             return RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
@@ -98,18 +99,18 @@ public class LoopCommand implements ICommand {
         EmbedBuilder eb;
 
         AudioTrackInfo info = player.getPlayingTrack().getInfo();
-        if (scheduler.isRepeating()) {
-            scheduler.setRepeating(false);
+        if (queueHandler.isTrackRepeating()) {
+            queueHandler.setTrackRepeating(false);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_STOP, Pair.of("{title}", info.title));
         } else {
-            scheduler.setRepeating(true);
+            queueHandler.setTrackRepeating(true);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.LOOP_START, Pair.of("{title}", info.title));
         }
 
         new LogUtils(guild).sendLog(
                 LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.LOOP_LOG,
                 Pair.of("{user}", looper.getAsMention()),
-                Pair.of("{status}", (scheduler.isRepeating() ? "looped" : "unlooped")),
+                Pair.of("{status}", (queueHandler.isTrackRepeating() ? "looped" : "unlooped")),
                 Pair.of("{title}", info.title),
                 Pair.of("{author}", info.author)
 
@@ -121,15 +122,16 @@ public class LoopCommand implements ICommand {
     public EmbedBuilder handleQueueRepeat(GuildMusicManager musicManager, User looper) {
         EmbedBuilder eb;
         final var scheduler = musicManager.getScheduler();
+        final var queueHandler = scheduler.getQueueHandler();
         final var guild = musicManager.getGuild();
         final var audioPlayer = musicManager.getPlayer();
 
-        if (scheduler.isPlaylistRepeating()) {
-            scheduler.setPlaylistRepeating(false);
-            scheduler.removeSavedQueue(guild);
+        if (queueHandler.isQueueRepeating()) {
+            queueHandler.setQueueRepeating(false);
+            queueHandler.clearSavedQueue();
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_STOP);
         } else {
-            scheduler.setPlaylistRepeating(true);
+            queueHandler.setQueueRepeating(true);
 
             if (audioPlayer.getPlayingTrack() == null) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NOTHING_PLAYING);
@@ -138,18 +140,18 @@ public class LoopCommand implements ICommand {
 
             AudioTrack thisTrack = audioPlayer.getPlayingTrack();
 
-            if (scheduler.getQueue().isEmpty()) {
+            if (queueHandler.isEmpty()) {
                 eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_NOTHING);
                 return eb;
             }
 
             scheduler.addToBeginningOfQueue(thisTrack);
-            scheduler.setSavedQueue(scheduler.getQueue());
-            scheduler.getQueue().remove(thisTrack);
+            queueHandler.setSavedQueue(queueHandler.contents());
+            queueHandler.remove(thisTrack);
             eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_START);
         }
 
-        new LogUtils(guild).sendLog(LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG, Pair.of("{user}", looper.getAsMention()), Pair.of("{status}", (scheduler.isPlaylistRepeating() ? "looped" : "unlooped")));
+        new LogUtils(guild).sendLog(LogType.TRACK_LOOP, RobertifyLocaleMessage.LoopMessages.QUEUE_LOOP_LOG, Pair.of("{user}", looper.getAsMention()), Pair.of("{status}", (queueHandler.isQueueRepeating() ? "looped" : "unlooped")));
         return eb;
     }
 

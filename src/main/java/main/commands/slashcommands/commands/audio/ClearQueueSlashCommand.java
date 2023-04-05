@@ -41,11 +41,11 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
         event.deferReply().queue();
 
         final var musicManager = RobertifyAudioManager.getInstance().getMusicManager(event.getGuild());
-        final var queue = musicManager.getScheduler().getQueue();
+        final var queueHandler = musicManager.getScheduler().getQueueHandler();
         final var guild = event.getGuild();
         final var localeManager = LocaleManager.getLocaleManager(guild);
 
-        if (queue.isEmpty()) {
+        if (queueHandler.isEmpty()) {
             EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.CQ_NOTHING_IN_QUEUE));
             event.getHook().sendMessageEmbeds(eb.build())
                     .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
@@ -73,7 +73,7 @@ public class ClearQueueSlashCommand extends AbstractSlashCommand {
             return;
         }
 
-        queue.clear();
+        queueHandler.clear();
         new LogUtils(guild).sendLog(LogType.QUEUE_CLEAR, event.getUser().getAsMention() + " " + localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEARED_USER));
 
         EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(guild, localeManager.getMessage(RobertifyLocaleMessage.ClearQueueMessages.QUEUE_CLEAR));
