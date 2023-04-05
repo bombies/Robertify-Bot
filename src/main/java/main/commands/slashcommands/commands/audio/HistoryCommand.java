@@ -39,7 +39,7 @@ public class HistoryCommand extends AbstractSlashCommand {
             event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.HistoryMessages.NO_PAST_TRACKS).build())
                     .queue();
         } else {
-            final var content = new QueueCommand().getContent(guild, queueHandler);
+            final var content = new QueueCommand().getPastTrackContent(guild, queueHandler);
             Pages.paginateMessage(content, 10, event);
         }
     }
