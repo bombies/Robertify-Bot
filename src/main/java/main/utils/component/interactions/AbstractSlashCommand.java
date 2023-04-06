@@ -3,6 +3,7 @@ package main.utils.component.interactions;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import main.audiohandlers.RobertifyAudioManager;
 import main.commands.RandomMessageManager;
 import main.commands.contextcommands.ContextCommandManager;
 import main.commands.slashcommands.SlashCommandManager;
@@ -458,7 +459,17 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         }
 
         if (!adminCheck(event)) return false;
-        return djCheck(event);
+        if (!djCheck(event)) return false;
+
+        if (SlashCommandManager.getInstance().isMusicCommand(this) && event.isFromGuild()) {
+            assert event.getGuild() != null;
+            final var scheduler = RobertifyAudioManager.getInstance()
+                    .getMusicManager(event.getGuild())
+                    .getScheduler();
+            scheduler.setAnnouncementChannel(event.getGuildChannel());
+        }
+
+        return true;
     }
 
     /**
