@@ -144,7 +144,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                         return announcementChannel.sendFiles(FileUpload.fromData(img.get())).submit();
                     })
                     .thenApplyAsync(msg -> {
-                        logger.info("Sent message in {}", msg.getChannel().getName());
+                        if (img.get().length() == 0)
+                            return new CompletableFuture<>()
+                                    .completeExceptionally(new ImageBuilderException("Couldn't generate now playing image"));
+
                         if (lastSentMsg != null)
                             lastSentMsg.delete().queueAfter(
                                     3L, TimeUnit.SECONDS,
