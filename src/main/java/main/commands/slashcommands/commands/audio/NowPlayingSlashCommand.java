@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
@@ -94,11 +95,15 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         builder
                                 .isLiveStream(true)
                                 .build();
-                event.getHook()
-                        .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
-                        .setEphemeral(ephemeralState)
+                if (image.available() > 0)
+                    event.getHook()
+                            .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
+                            .setEphemeral(ephemeralState)
+                            .queue();
+                else event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
+                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
-            } catch (ImageBuilderException e) {
+            } catch (ImageBuilderException | IOException e) {
                 event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();
