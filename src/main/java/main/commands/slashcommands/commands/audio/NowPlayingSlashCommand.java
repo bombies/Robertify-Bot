@@ -1,6 +1,7 @@
 package main.commands.slashcommands.commands.audio;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
+import lombok.extern.slf4j.Slf4j;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.NowPlayingCommand;
 import main.utils.RobertifyEmbedUtils;
@@ -10,7 +11,6 @@ import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.pagination.Pages;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -18,10 +18,8 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
-import java.util.UUID;
 
+@Slf4j
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
     @Override
@@ -95,15 +93,11 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                         builder
                                 .isLiveStream(true)
                                 .build();
-                if (image.available() > 0)
-                    event.getHook()
-                            .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
-                            .setEphemeral(ephemeralState)
-                            .queue();
-                else event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
-                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
+                event.getHook()
+                        .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
+                        .setEphemeral(ephemeralState)
                         .queue();
-            } catch (ImageBuilderException | IOException e) {
+            } catch (ImageBuilderException e) {
                 event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))
                         .queue();

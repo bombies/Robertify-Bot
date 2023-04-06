@@ -130,7 +130,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                         if (requestChannelConfig.isChannelSet())
                             if (requestChannelConfig.getChannelID() == msg.getChannel().getIdLong())
                                 msg.delete().queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                        })
                                 );
                     }));
         } else {
@@ -142,7 +143,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                                 TimeUnit.SECONDS,
                                 null,
                                 new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                        })
                         ));
         }
     }
@@ -192,13 +194,17 @@ public class AudioLoader implements AudioLoadResultHandler {
                                     TimeUnit.SECONDS,
                                     null,
                                     new ErrorHandler()
-                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                            .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                            })
                             );
                 });
             else {
                 if (dedicatedChannelConfig.isChannelSet())
                     dedicatedChannelConfig.getTextChannel()
-                            .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete().queueAfter(10, TimeUnit.SECONDS));
+                            .sendMessageEmbeds(eb.build()).queue(msg -> msg.delete()
+                                    .queueAfter(10, TimeUnit.SECONDS, null, new ErrorHandler()
+                                            .ignore(ErrorResponse.UNKNOWN_MESSAGE))
+                            );
             }
 
             if (!announceMsg)
@@ -250,7 +256,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                                 TimeUnit.SECONDS,
                                 null,
                                 new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                        })
                         );
             });
         else {
@@ -261,7 +268,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                             TimeUnit.SECONDS,
                             null,
                             new ErrorHandler()
-                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                    })
                     ));
         }
 
@@ -291,7 +299,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                                 TimeUnit.SECONDS,
                                 null,
                                 new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                        })
                         );
             });
         else {
@@ -301,7 +310,8 @@ public class AudioLoader implements AudioLoadResultHandler {
                             TimeUnit.SECONDS,
                             null,
                             new ErrorHandler()
-                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {})
+                                    .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                    })
                     ));
         }
     }
