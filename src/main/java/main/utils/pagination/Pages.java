@@ -1,7 +1,6 @@
 package main.utils.pagination;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.QueueHandler;
@@ -9,11 +8,15 @@ import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.QueueCommand;
 import main.constants.InteractionLimits;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.apis.robertify.imagebuilders.QueueImageBuilder;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -24,13 +27,12 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import javax.annotation.Nullable;
-import java.io.File;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -87,7 +89,7 @@ public abstract class Pages {
         try {
             final var image = queuePages.get(0).getImage();
             WebhookMessageCreateAction<Message> messageAction = event.getHook()
-                    .sendFiles(FileUpload.fromData(image))
+                    .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
                     .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()));
 
             if (queuePages.size() > 1) {
@@ -97,8 +99,6 @@ public abstract class Pages {
             }
 
             messageAction.queue(msg -> {
-                image.delete();
-
                 if (queuePages.size() > 1) {
                     queueMessages.put(msg.getIdLong(), queuePages);
                     ret.set(msg);
@@ -194,7 +194,7 @@ public abstract class Pages {
             queueItems.add(new QueueItem(trackIndex, title, artist, duration, artworkUrl));
         }
 
-        public File getImage() throws SocketTimeoutException, ConnectException {
+        public InputStream getImage() throws SocketTimeoutException, ConnectException {
             final var builder = new QueueImageBuilder()
                     .setPage(pageNumber);
 

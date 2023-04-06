@@ -6,9 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javax.annotation.Nullable;
-import java.io.File;
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
+import java.io.InputStream;
 
 public class QueueImageBuilder extends AbstractImageBuilder {
     private final JSONObject obj;
@@ -47,7 +45,7 @@ public class QueueImageBuilder extends AbstractImageBuilder {
     }
 
     @Override
-    public File build() throws ImageBuilderException {
+    public InputStream build() throws ImageBuilderException {
         if (!obj.has(QueryFields.PAGE.toString()))
             throw new IllegalArgumentException("The page must be provided before building the queue image!");
         if (!obj.has(QueryFields.TRACKS.toString()))

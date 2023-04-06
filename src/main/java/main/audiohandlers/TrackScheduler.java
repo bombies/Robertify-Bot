@@ -16,11 +16,12 @@ import main.exceptions.AutoPlayException;
 import main.main.Robertify;
 import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.apis.robertify.imagebuilders.ImageBuilderException;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.json.autoplay.AutoPlayConfig;
-import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
@@ -40,13 +41,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
     private final List<Requester> requesters = new ArrayList<>();
@@ -127,11 +131,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     return;
 
             final var trackInfo = track.getInfo();
-            final var img = new AtomicReference<File>();
             Robertify.getShardManager().retrieveUserById(requester.getId())
                     .submit()
-                    .thenComposeAsync(requesterObj -> {
-                        img.set(new NowPlayingImageBuilder()
+                    .thenCompose(requesterObj -> {
+                        final var img = new NowPlayingImageBuilder()
                                 .setTitle(trackInfo.title)
                                 .setArtistName(trackInfo.author)
                                 .setAlbumImage(
@@ -140,21 +143,17 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                                 new ThemesConfig(guild).getTheme().getNowPlayingBanner()
                                 )
                                 .setUser(requesterObj != null ? (requesterObj.getName() + "#" + requesterObj.getDiscriminator()) : requesterMention, requesterObj != null ? requesterObj.getAvatarUrl() : null)
-                                .build());
-                        return announcementChannel.sendFiles(FileUpload.fromData(img.get())).submit();
+                                .build();
+                        return announcementChannel.sendFiles(FileUpload.fromData(img, AbstractImageBuilder.getRandomFileName()))
+                                .submit();
                     })
-                    .thenApplyAsync(msg -> {
-                        if (img.get().length() == 0)
-                            return new CompletableFuture<>()
-                                    .completeExceptionally(new ImageBuilderException("Couldn't generate now playing image"));
-
+                    .thenApply(msg -> {
                         if (lastSentMsg != null)
                             lastSentMsg.delete().queueAfter(
                                     3L, TimeUnit.SECONDS,
-                                    (unused) -> img.get().delete(),
+                                    null,
                                     new ErrorHandler()
                                             .ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                                            .andThen(e -> img.get().delete())
                             );
                         lastSentMsg = msg;
                         return msg;

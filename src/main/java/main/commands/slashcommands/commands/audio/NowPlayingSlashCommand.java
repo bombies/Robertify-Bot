@@ -4,6 +4,7 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.NowPlayingCommand;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.apis.robertify.imagebuilders.ImageBuilderException;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.UUID;
 
 public class NowPlayingSlashCommand extends AbstractSlashCommand {
 
@@ -93,9 +95,9 @@ public class NowPlayingSlashCommand extends AbstractSlashCommand {
                                 .isLiveStream(true)
                                 .build();
                 event.getHook()
-                        .sendFiles(FileUpload.fromData(image))
+                        .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.getRandomFileName()))
                         .setEphemeral(ephemeralState)
-                        .queue(done -> image.delete());
+                        .queue();
             } catch (ImageBuilderException e) {
                 event.getHook().sendMessageEmbeds(new NowPlayingCommand().getNowPlayingEmbed(event.getGuild(), event.getChannel().asGuildMessageChannel(), selfVoiceState, memberVoiceState).build())
                         .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getChannel().asGuildMessageChannel()))

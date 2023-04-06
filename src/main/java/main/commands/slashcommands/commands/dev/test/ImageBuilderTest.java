@@ -2,6 +2,7 @@ package main.commands.slashcommands.commands.dev.test;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
 import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -37,10 +38,7 @@ public class ImageBuilderTest extends AbstractSlashCommand {
                 .setCurrentTime(25000L)
                 .build();
         event.getHook().sendMessage("Image generated").addFiles(FileUpload.fromData(
-                image
-        )).queue(done -> {
-            if (!image.delete())
-                log.info("Could not delete a generated now playing image! {}", image.getName());
-        });
+                image, AbstractImageBuilder.getRandomFileName()
+        )).queue();
     }
 }

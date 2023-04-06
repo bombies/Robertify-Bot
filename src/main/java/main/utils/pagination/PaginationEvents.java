@@ -3,18 +3,17 @@ package main.utils.pagination;
 import main.commands.slashcommands.commands.audio.FavouriteTracksCommand;
 import main.constants.MessageButton;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.AttachedFile;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
@@ -89,12 +88,12 @@ public class PaginationEvents extends ListenerAdapter {
             if (event.getButton().getId().equals("queue:" + MessageButton.FRONT + event.getUser().getId())) {
                 currentPage.put(msg, 0);
                 try {
-                    File image = queuePages.get(0).getImage();
-                    event.editMessageAttachments(AttachedFile.fromData(image))
+                    final var image = queuePages.get(0).getImage();
+                    event.editMessageAttachments(AttachedFile.fromData(image, AbstractImageBuilder.getRandomFileName()))
                             .setComponents(((currentPage.get(msg) == 0) ?
                                     Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                     Paginator.getQueueButtons(event.getUser())))
-                            .queue(done -> image.delete());
+                            .queue();
                 } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(0).getEmbed())
                             .setComponents(((currentPage.get(msg) == 0) ?
@@ -106,12 +105,12 @@ public class PaginationEvents extends ListenerAdapter {
             } else if (event.getButton().getId().equals("queue:" + MessageButton.PREVIOUS + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) - 1);
                 try {
-                    File image = queuePages.get(currentPage.get(msg)).getImage();
-                    event.editMessageAttachments(AttachedFile.fromData(image))
+                    final var image = queuePages.get(currentPage.get(msg)).getImage();
+                    event.editMessageAttachments(AttachedFile.fromData(image, AbstractImageBuilder.getRandomFileName()))
                             .setComponents(((currentPage.get(msg) == 0) ?
                                     Paginator.getQueueButtons(event.getUser(), false, false, true, true) :
                                     Paginator.getQueueButtons(event.getUser())))
-                            .queue(done -> image.delete());
+                            .queue();
                 } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == 0) ?
@@ -123,12 +122,12 @@ public class PaginationEvents extends ListenerAdapter {
             } else if (event.getButton().getId().equals("queue:" + MessageButton.NEXT + event.getUser().getId())) {
                 currentPage.put(msg, currentPage.get(msg) + 1);
                 try {
-                    File image = queuePages.get(currentPage.get(msg)).getImage();
-                    event.editMessageAttachments(AttachedFile.fromData(image))
+                    final var image = queuePages.get(currentPage.get(msg)).getImage();
+                    event.editMessageAttachments(AttachedFile.fromData(image, AbstractImageBuilder.getRandomFileName()))
                             .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
                                     Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
                                     Paginator.getQueueButtons(event.getUser())))
-                            .queue(done -> image.delete());
+                            .queue();
                 } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
@@ -140,12 +139,12 @@ public class PaginationEvents extends ListenerAdapter {
             } else if (event.getButton().getId().equals("queue:" + MessageButton.END + event.getUser().getId())) {
                 currentPage.put(msg, queuePages.size()-1);
                 try {
-                    File image = queuePages.get(currentPage.get(msg)).getImage();
-                    event.editMessageAttachments(AttachedFile.fromData(image))
+                    final var image = queuePages.get(currentPage.get(msg)).getImage();
+                    event.editMessageAttachments(AttachedFile.fromData(image, AbstractImageBuilder.getRandomFileName()))
                             .setComponents(((currentPage.get(msg) == queuePages.size()-1) ?
                                     Paginator.getQueueButtons(event.getUser(), true, true, false, false) :
                                     Paginator.getQueueButtons(event.getUser())))
-                            .queue(done -> image.delete());
+                            .queue();
                 } catch (SocketTimeoutException | ConnectException e) {
                     event.editMessageEmbeds(messagePages.get(currentPage.get(msg)).getEmbed())
                             .setComponents(((currentPage.get(msg) == messagePages.size()-1) ?
