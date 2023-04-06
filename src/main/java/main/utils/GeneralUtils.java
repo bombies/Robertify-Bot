@@ -657,6 +657,10 @@ public class GeneralUtils {
         return listOfIDsToMentions(guild, List.of(id), mentioner);
     }
 
+    public static String toMention(Guild guild, String id, Mentioner mentioner) {
+        return listOfIDsToMentions(guild, List.of(Long.valueOf(id)), mentioner);
+    }
+
     public static String listOfIDsToMentions(Guild guild, List<Long> mentions, Mentioner mentioner) {
         final String mentionTag;
         switch (mentioner) {

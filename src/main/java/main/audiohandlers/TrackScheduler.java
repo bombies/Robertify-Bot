@@ -3,6 +3,7 @@ package main.audiohandlers;
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import lavalink.client.io.Link;
 import lavalink.client.player.IPlayer;
 import lavalink.client.player.event.PlayerEventListenerAdapter;
@@ -13,6 +14,7 @@ import main.commands.slashcommands.commands.misc.PlaytimeCommand;
 import main.constants.Toggles;
 import main.exceptions.AutoPlayException;
 import main.main.Robertify;
+import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.apis.robertify.imagebuilders.ImageBuilderException;
 import main.utils.apis.robertify.imagebuilders.NowPlayingImageBuilder;
@@ -26,6 +28,7 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
@@ -122,75 +125,99 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                     return;
 
             final var trackInfo = track.getInfo();
-            final var localeManager = LocaleManager.getLocaleManager(guild);
-            EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", trackInfo.title), Pair.of("{author}", trackInfo.author))
-                    + (TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
-                    "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requesterMention))
-                    :
-                    ""
-            ));
+            final var img = new AtomicReference<File>();
+            Robertify.getShardManager().retrieveUserById(requester.getId())
+                    .submit()
+                    .thenComposeAsync(requesterObj -> {
+                        img.set(new NowPlayingImageBuilder()
+                                .setTitle(trackInfo.title)
+                                .setArtistName(trackInfo.author)
+                                .setAlbumImage(
+                                        track instanceof MirroringAudioTrack mirroringAudioTrack ?
+                                                mirroringAudioTrack.getArtworkURL() :
+                                                new ThemesConfig(guild).getTheme().getNowPlayingBanner()
+                                )
+                                .setUser(requesterObj != null ? (requesterObj.getName() + "#" + requesterObj.getDiscriminator()) : requesterMention, requesterObj != null ? requesterObj.getAvatarUrl() : null)
+                                .build());
+                        return announcementChannel.sendFiles(FileUpload.fromData(img.get())).submit();
+                    })
+                    .thenApplyAsync(msg -> {
+                        logger.info("Sent message in {}", msg.getChannel().getName());
+                        if (lastSentMsg != null)
+                            lastSentMsg.delete().queueAfter(
+                                    3L, TimeUnit.SECONDS,
+                                    (unused) -> img.get().delete(),
+                                    new ErrorHandler()
+                                            .ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                                            .andThen(e -> img.get().delete())
+                            );
+                        lastSentMsg = msg;
+                        return msg;
+                    })
+                    .whenComplete((v, ex) -> {
+                        if (ex == null)
+                            return;
 
-            try {
-                final var img = new AtomicReference<File>();
-                Robertify.getShardManager().retrieveUserById(requester.getId())
-                        .submit()
-                        .thenComposeAsync(requesterObj -> {
-                            img.set(new NowPlayingImageBuilder()
-                                    .setTitle(trackInfo.title)
-                                    .setArtistName(trackInfo.author)
-                                    .setAlbumImage(
-                                            track instanceof MirroringAudioTrack mirroringAudioTrack ?
-                                                    mirroringAudioTrack.getArtworkURL() :
-                                                    new ThemesConfig(guild).getTheme().getNowPlayingBanner()
-                                    )
-                                    .setUser(requesterObj != null ? (requesterObj.getName() + "#" + requesterObj.getDiscriminator()) : requesterMention, requesterObj != null ? requesterObj.getAvatarUrl() : null)
-                                    .build());
-                            return announcementChannel.sendFiles(FileUpload.fromData(img.get())).submit();
-                        })
-                        .thenApplyAsync(msg -> {
-                            img.get().delete();
-                            if (lastSentMsg != null)
-                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                        }));
-                            lastSentMsg = msg;
-                            return msg;
-                        })
-                        .whenComplete((v, ex) -> {
-                            if (ex == null)
-                                return;
+                        if (ex.getCause() instanceof PermissionException || ex.getCause() instanceof ImageBuilderException) {
+                            sendNowPlayingEmbed(trackInfo, requesterMention)
+                                    .whenComplete((msg, err) -> {
+                                        if (err == null)
+                                            return;
 
-                            if (ex instanceof ImageBuilderException) {
-                                logger.warn("I was unable to generate a now playing image in {}. Falling back to embed messages.", guild.getName());
-                                announcementChannel.sendMessageEmbeds(eb.build()).queue(msg -> {
-                                    if (lastSentMsg != null)
-                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                }));
-                                    lastSentMsg = msg;
-                                });
-                            } else if (ex instanceof PermissionException) {
-                                announcementChannel.sendMessageEmbeds(eb.build())
-                                        .queue(embedMsg -> {
-                                            if (lastSentMsg != null)
-                                                lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                        .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                        }));
-                                            lastSentMsg = embedMsg;
-                                        }, new ErrorHandler().handle(ErrorResponse.MISSING_PERMISSIONS, e2 -> announcementChannel.sendMessage(eb.build().getDescription())
-                                                .queue(nonEmbedMsg -> {
-                                                    if (lastSentMsg != null)
-                                                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
-                                                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
-                                                                }));
-                                                    lastSentMsg = nonEmbedMsg;
-                                                })
-                                        ));
-                            }
-                        });
-            } catch (InsufficientPermissionException ignored) {
-            }
+                                        sendNowPlayingEmbed(trackInfo, requesterMention)
+                                                .whenComplete((eMsg, embedErr) -> {
+                                                    if (embedErr == null)
+                                                        return;
+                                                    if (embedErr instanceof PermissionException)
+                                                        sendNowPlayingString(trackInfo, requesterMention)
+                                                                .whenComplete((stringMsg, stringErr) -> {
+                                                                    if (stringErr != null)
+                                                                        logger.warn("Was not able to send a now playing message at all in {}", guild.getName());
+                                                                });
+                                                });
+                                    });
+                        }
+                    });
         }
+    }
+
+    private MessageEmbed getNowPlayingEmbed(AudioTrackInfo trackInfo, String requesterMention) {
+        final var localeManager = LocaleManager.getLocaleManager(guild);
+        EmbedBuilder eb = RobertifyEmbedUtils.embedMessage(announcementChannel.getGuild(), localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_DESC, Pair.of("{title}", trackInfo.title), Pair.of("{author}", trackInfo.author))
+                + (TogglesConfig.getConfig(guild).getToggle(Toggles.SHOW_REQUESTER) ?
+                "\n\n" + localeManager.getMessage(RobertifyLocaleMessage.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER, Pair.of("{requester}", requesterMention))
+                :
+                ""
+        ));
+        return eb.build();
+    }
+
+    private CompletableFuture<Message> sendNowPlayingEmbed(AudioTrackInfo trackInfo, String requesterMention) {
+        final var eb = getNowPlayingEmbed(trackInfo, requesterMention);
+        return announcementChannel.sendMessageEmbeds(eb)
+                .submit()
+                .thenApply(message -> {
+                    if (lastSentMsg != null)
+                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                }));
+                    lastSentMsg = message;
+                    return message;
+                });
+    }
+
+    private CompletableFuture<Message> sendNowPlayingString(AudioTrackInfo trackInfo, String requesterMention) {
+        final var eb = getNowPlayingEmbed(trackInfo, requesterMention);
+        return announcementChannel.sendMessage(eb.getDescription())
+                .submit()
+                .thenApply(message -> {
+                    if (lastSentMsg != null)
+                        lastSentMsg.delete().queueAfter(3L, TimeUnit.SECONDS, null, new ErrorHandler()
+                                .handle(ErrorResponse.UNKNOWN_MESSAGE, ignored -> {
+                                }));
+                    lastSentMsg = message;
+                    return message;
+                });
     }
 
     @SneakyThrows
@@ -320,10 +347,6 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
     public void disconnect(boolean announceMsg) {
         final var channel = guild.getSelfMember().getVoiceState().getChannel();
 
-//        Sussy line 🤔
-//        if (RobertifyAudioManager.getInstance().getMusicManager(guild).getPlayer().getPlayingTrack() != null)
-//            return;
-
         if (!new GuildConfig(guild).get247()) {
             if (channel != null) {
                 RobertifyAudioManager.getInstance().getMusicManager(guild)
@@ -365,7 +388,7 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         return this.requesters.stream()
                 .filter(requester -> requester.getTrackId().equals(trackId))
                 .findFirst()
-                .orElse(null);
+                .orElse(new Requester(null, null));
     }
 
     public void addRequester(String userId, String trackId) {
@@ -397,6 +420,10 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
         public Requester(String id, String trackId) {
             this.id = id;
             this.trackId = trackId;
+        }
+
+        public String toMention() {
+            return GeneralUtils.toMention(null, id, GeneralUtils.Mentioner.USER);
         }
     }
 }

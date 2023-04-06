@@ -51,7 +51,7 @@ public class AudioLoader implements AudioLoadResultHandler {
     private final GuildMessageChannel announcementChannel;
     private final RequestChannelConfig requestChannelConfig;
 
-    public AudioLoader(@NotNull User sender, GuildMusicManager musicManager,
+    public AudioLoader(@Nullable User sender, GuildMusicManager musicManager,
                        String trackUrl, boolean announceMsg, Message botMsg, boolean loadPlaylistShuffled, boolean addToBeginning) {
 
         this.guild = musicManager.getGuild();
@@ -92,7 +92,10 @@ public class AudioLoader implements AudioLoadResultHandler {
         if (!announceMsg)
             RobertifyAudioManager.getUnannouncedTracks().add(audioTrack.getIdentifier());
 
-        scheduler.addRequester(sender.getId(), audioTrack.getIdentifier());
+        TrackScheduler.Requester requester = null;
+        if (sender != null)
+            scheduler.addRequester(sender.getId(), audioTrack.getIdentifier());
+        else requester = scheduler.findRequester(audioTrack.getIdentifier());
         scheduler.setAnnouncementChannel(announcementChannel);
 
         if (addToBeginning)
@@ -102,7 +105,7 @@ public class AudioLoader implements AudioLoadResultHandler {
 
         AudioTrackInfo info = audioTrack.getInfo();
         new LogUtils(guild).sendLog(LogType.QUEUE_ADD, RobertifyLocaleMessage.AudioLoaderMessages.QUEUE_ADD_LOG,
-                Pair.of("{user}", sender.getAsMention()),
+                Pair.of("{user}", sender != null ? sender.getAsMention() : requester.toMention()),
                 Pair.of("{title}", info.title),
                 Pair.of("{author}", info.author)
         );
@@ -156,6 +159,7 @@ public class AudioLoader implements AudioLoadResultHandler {
             if (!announceMsg)
                 RobertifyAudioManager.getUnannouncedTracks().add(tracks.get(0).getIdentifier());
 
+            TrackScheduler.Requester requester = null;
             if (sender != null)
                 scheduler.addRequester(sender.getId(), tracks.get(0).getIdentifier());
 
