@@ -45,6 +45,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class TrackScheduler extends PlayerEventListenerAdapter {
     private final List<Requester> requesters = new ArrayList<>();

@@ -54,8 +54,8 @@ public class PreviousTrackCommand extends AbstractSlashCommand implements IComma
 
         if (audioPlayer.getPlayingTrack() != null) {
             final var nowPlayingTrack = audioPlayer.getPlayingTrack();
+            queueHandler.addToBeginning(nowPlayingTrack);
             audioPlayer.stopTrack();
-            scheduler.addToBeginningOfQueue(nowPlayingTrack);
         }
 
         audioPlayer.playTrack(queueHandler.popPreviousTrack());
