@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.github.bombies</groupId>
             <artifactId>Robertify-Lavalink-Client</artifactId>
-            <version>master-SNAPSHOT</version>
+            <version>4.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.discordbots</groupId>
@@ -89,22 +89,22 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
-            <version>6.16.0</version>
+            <version>6.17.0</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.16.0</version>
+            <version>6.17.0</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-opentelemetry-core</artifactId>
-            <version>6.16.0</version>
+            <version>6.17.0</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-opentelemetry-agent</artifactId>
-            <version>6.16.0</version>
+            <version>6.17.0</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
