@@ -3,10 +3,9 @@ package main.commands.slashcommands.commands.dev;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.IDevCommand;
 import main.main.Robertify;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.pagination.Pages;
+import main.utils.pagination.PaginationHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,7 @@ public class GuildCommand extends AbstractSlashCommand implements IDevCommand {
         guildNames.add("🤖 I am in `"+guilds.size()+"` guilds\n");
         for (var guild : guilds) guildNames.add(guild.getName() + " (" + guild.getMembers().size() + " members in cache)");
 
-        Pages.paginateMessage(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
+        PaginationHandler.paginateMessage(ctx.getChannel(), ctx.getAuthor(), guildNames, 20);
     }
 
     @Override

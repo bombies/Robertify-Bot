@@ -7,6 +7,8 @@ import main.utils.apis.robertify.imagebuilders.AbstractImageBuilder;
 import main.utils.database.mongodb.cache.FavouriteTracksCache;
 import main.utils.json.themes.ThemesConfig;
 import main.utils.locale.RobertifyLocaleMessage;
+import main.utils.pagination.pages.MenuPage;
+import main.utils.pagination.pages.MessagePage;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -31,7 +33,7 @@ public class PaginationEvents extends ListenerAdapter {
                 currentPage.put(event.getMessage().getIdLong(), 0);
 
             long msg = event.getMessage().getIdLong();
-            List<MessagePage> messagePages = Pages.getMessagePages(msg);
+            final var messagePages = PaginationHandler.getMessagePages(msg);
 
             if (messagePages == null) {
                 event.deferEdit().queue();
@@ -77,8 +79,8 @@ public class PaginationEvents extends ListenerAdapter {
                 currentPage.put(event.getMessage().getIdLong(), 0);
 
             long msg = event.getMessage().getIdLong();
-            final var queuePages = Pages.getQueuePages(msg);
-            final var messagePages = Pages.getMessagePages(msg);
+            final var queuePages = PaginationHandler.getQueuePages(msg);
+            final var messagePages = PaginationHandler.getMessagePages(msg);
 
             if (queuePages == null) {
                 event.deferEdit().queue();
@@ -188,12 +190,12 @@ public class PaginationEvents extends ListenerAdapter {
 
         currentPage = PaginationEvents.currentPage.get(msg.getIdLong());
 
-        MenuPage menuPage = Pages.getMenuPages(msg.getIdLong())
+        MenuPage menuPage = PaginationHandler.getMenuPages(msg.getIdLong())
                 .get(currentPage);
 
         int finalCurrentPage = currentPage;
         event.editSelectMenu(
-                Pages.getSelectionMenu(
+                PaginationHandler.getSelectionMenu(
                         event.getUser(),
                         menuPage.getOptions()
                 )
@@ -201,7 +203,7 @@ public class PaginationEvents extends ListenerAdapter {
             final var tracks = FavouriteTracksCache.getInstance().getTracks(event.getMember().getIdLong());
             final var theme = new ThemesConfig(guild).getTheme();
             FavouriteTracksCommand.setDefaultEmbed(event.getMember(), tracks, theme);
-            msg.editMessageEmbeds(Pages.getPaginatedEmbed(msg.getGuild(), menuPage.toStringList(), 25, finalCurrentPage, true))
+            msg.editMessageEmbeds(PaginationHandler.getPaginatedEmbed(msg.getGuild(), menuPage.toStringList(), 25, finalCurrentPage, true))
                     .queue();
         });
     }

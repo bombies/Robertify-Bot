@@ -1,13 +1,11 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.audiohandlers.TrackScheduler;
 import main.commands.prefixcommands.audio.QueueCommand;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.pagination.Pages;
+import main.utils.pagination.PaginationHandler;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +38,7 @@ public class HistoryCommand extends AbstractSlashCommand {
                     .queue();
         } else {
             final var content = new QueueCommand().getPastTrackContent(guild, queueHandler);
-            Pages.paginateMessage(content, 10, event);
+            PaginationHandler.paginateMessage(content, 10, event);
         }
     }
 }

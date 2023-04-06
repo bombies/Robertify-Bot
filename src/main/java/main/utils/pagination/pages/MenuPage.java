@@ -1,12 +1,13 @@
-package main.utils.pagination;
+package main.utils.pagination.pages;
 
 import lombok.Getter;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuPage {
+public class MenuPage extends MessagePage {
     @Getter
     private final List<StringSelectMenuOption> options = new ArrayList<>();
 
@@ -36,5 +37,10 @@ public class MenuPage {
         }
 
         return ret;
+    }
+
+    @Override
+    public MessageEmbed getEmbed() {
+        return null;
     }
 }

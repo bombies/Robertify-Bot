@@ -5,6 +5,7 @@ import main.constants.ENV;
 import main.main.Config;
 import me.duncte123.botcommons.web.WebUtils;
 import okhttp3.OkHttpClient;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,15 @@ public abstract class AbstractImageBuilder {
 
     protected void addQuery(ImageQueryField key, String value) {
         uri.addParameter(key.toString(), value);
+    }
+
+    protected String findQuery(ImageQueryField key) {
+        return uri.getQueryParams()
+                .stream()
+                .filter(param -> param.getName().equalsIgnoreCase(key.toString()))
+                .findFirst()
+                .map(NameValuePair::getValue)
+                .orElse(null);
     }
 
     @SneakyThrows

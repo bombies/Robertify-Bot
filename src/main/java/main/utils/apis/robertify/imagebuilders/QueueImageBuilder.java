@@ -2,6 +2,7 @@ package main.utils.apis.robertify.imagebuilders;
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import main.utils.GeneralUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -50,6 +51,16 @@ public class QueueImageBuilder extends AbstractImageBuilder {
             throw new IllegalArgumentException("The page must be provided before building the queue image!");
         if (!obj.has(QueryFields.TRACKS.toString()))
             throw new IllegalArgumentException("The track list must be provided before building the queue image!");
+
+        final var trackObj = obj.getJSONArray(QueryFields.TRACKS.toString());
+        for (final var obj : trackObj) {
+            final var objAsJSON = (JSONObject) obj;
+            final var name = objAsJSON.getString(QueryFields.TRACK_NAME.toString());
+            final var artist = objAsJSON.getString(QueryFields.TRACK_NAME.toString());
+
+            if (GeneralUtils.textIsRightToLeft(name) || GeneralUtils.textIsRightToLeft(artist))
+                throw new ImageBuilderException("Some text has right to left characters which aren't supported!");
+        }
 
         addQuery(QueryFields.TRACKS, obj.toString());
         final var firstTrack = (JSONObject) obj.getJSONArray(QueryFields.TRACKS.toString()).get(0);

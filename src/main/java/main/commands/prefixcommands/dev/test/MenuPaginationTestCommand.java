@@ -3,7 +3,7 @@ package main.commands.prefixcommands.dev.test;
 import main.commands.prefixcommands.CommandContext;
 import main.commands.prefixcommands.ITestCommand;
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption;
-import main.utils.pagination.Pages;
+import main.utils.pagination.PaginationHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import javax.script.ScriptException;
@@ -21,7 +21,7 @@ public class MenuPaginationTestCommand extends ListenerAdapter implements ITestC
             options.add(StringSelectMenuOption.of("Test " + i, "Test:" + i));
 
         ctx.getMessage().reply("Menu Pagination Test")
-                .queue(success -> Pages.paginateMenu(ctx.getAuthor(), success, options));
+                .queue(success -> PaginationHandler.paginateMenu(ctx.getAuthor(), success, options));
     }
 
     @Override

@@ -1,17 +1,13 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
-import main.commands.prefixcommands.audio.QueueCommand;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.pagination.Pages;
+import main.utils.pagination.PaginationHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
 
 public class QueueSlashCommand extends AbstractSlashCommand {
 
@@ -46,6 +42,6 @@ public class QueueSlashCommand extends AbstractSlashCommand {
             return;
         }
 
-        Pages.paginateQueue(10, event);
+        PaginationHandler.paginateQueue(10, event);
     }
 }

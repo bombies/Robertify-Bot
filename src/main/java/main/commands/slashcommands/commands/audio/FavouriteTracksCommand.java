@@ -16,10 +16,9 @@ import main.utils.json.themes.ThemesConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
-import main.utils.pagination.Pages;
+import main.utils.pagination.PaginationHandler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -189,7 +188,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
         final var theme = new ThemesConfig(guild).getTheme();
         setDefaultEmbed(member, tracks, theme);
-        Pages.paginateMenu(channel, member.getUser(),  list, 0,true);
+        PaginationHandler.paginateMenu(channel, member.getUser(),  list, 0,true);
     }
 
     private void handeSlashList(SlashCommandInteractionEvent event) {
@@ -221,7 +220,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
         final var theme = new ThemesConfig(guild).getTheme();
         setDefaultEmbed(member, tracks, theme);
-        Pages.paginateMenu(event, list, 0,true);
+        PaginationHandler.paginateMenu(event, list, 0,true);
     }
 
     @Override
@@ -391,7 +390,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
     public static void setDefaultEmbed(Member member, List<FavouriteTracksCache.Track> tracks, RobertifyTheme theme) {
         final var localeManager  = LocaleManager.getLocaleManager(member.getGuild());
-        Pages.setEmbedStyle(
+        PaginationHandler.setEmbedStyle(
                 () -> new EmbedBuilder()
                         .setColor(theme.getColor())
                         .setTitle(localeManager.getMessage(RobertifyLocaleMessage.FavouriteTracksMessages.FT_EMBED_TITLE, Pair.of("{user}", member.getEffectiveName())))

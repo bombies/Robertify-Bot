@@ -790,6 +790,12 @@ public class GeneralUtils {
         dmUser(Long.parseLong(uid), message);
     }
 
+    public static boolean textIsRightToLeft(@Nullable String text) {
+        if (text == null)
+            return false;
+        return text.chars().anyMatch(i -> i > 0x5D0 && i <= 0x6ff);
+    }
+
     public enum Mentioner {
         USER,
         ROLE,

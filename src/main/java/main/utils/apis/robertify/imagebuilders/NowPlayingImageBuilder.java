@@ -1,8 +1,10 @@
 package main.utils.apis.robertify.imagebuilders;
 
+import main.utils.GeneralUtils;
 import org.json.JSONObject;
 
 import javax.annotation.Nullable;
+import java.io.InputStream;
 
 public class NowPlayingImageBuilder extends AbstractImageBuilder {
     public NowPlayingImageBuilder() {
@@ -46,6 +48,23 @@ public class NowPlayingImageBuilder extends AbstractImageBuilder {
     public NowPlayingImageBuilder isLiveStream(boolean val) {
         addQuery(QueryFields.LIVESTREAM, String.valueOf(val));
         return this;
+    }
+
+    @Override
+    public InputStream build() throws ImageBuilderException {
+        final var artist = findQuery(QueryFields.ARTIST);
+        final var title = findQuery(QueryFields.TITLE);
+        final var requester = findQuery(QueryFields.REQUESTER) != null ?
+                new JSONObject(findQuery(QueryFields.REQUESTER)).getString(QueryFields.USER_IMAGE.toString())
+                : null;
+
+        if (GeneralUtils.textIsRightToLeft(artist)
+                || GeneralUtils.textIsRightToLeft(title)
+                || GeneralUtils.textIsRightToLeft(requester)
+        )
+            throw new ImageBuilderException("Some text has right to left characters which aren't supported!");
+
+        return super.build();
     }
 
     private enum QueryFields implements ImageQueryField {
