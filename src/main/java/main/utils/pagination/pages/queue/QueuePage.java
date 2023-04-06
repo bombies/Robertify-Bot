@@ -39,12 +39,12 @@ public class QueuePage extends MessagePage {
         queueItems.add(item);
     }
 
-    public void addItem(int trackIndex, String title, String artist, long duration, @Nullable String artworkUrl) {
-        queueItems.add(new QueueItem(trackIndex, title, artist, duration, artworkUrl));
+    public void addItem(int trackIndex, String title, String artist, long duration) {
+        queueItems.add(new QueueItem(trackIndex, title, artist, duration));
     }
 
     public InputStream getImage() throws SocketTimeoutException, ConnectException {
-        final var builder = new QueueImageBuilder()
+        final var builder = new QueueImageBuilder(guild)
                 .setPage(pageNumber);
 
         for (final var item : queueItems)
@@ -52,8 +52,7 @@ public class QueuePage extends MessagePage {
                     item.getTrackIndex(),
                     item.getTrackTitle(),
                     item.getArtist(),
-                    item.getDuration(),
-                    item.getArtworkUrl()
+                    item.getDuration()
             );
 
         return builder.build();

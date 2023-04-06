@@ -13,15 +13,11 @@ public class QueueItem {
     private final String artist;
     @Getter
     private final long duration;
-    @Getter
-    @Nullable
-    private final String artworkUrl;
 
-    public QueueItem(int trackIndex, String trackTitle, String artist, long duration, String artworkUrl) {
+    public QueueItem(int trackIndex, String trackTitle, String artist, long duration) {
         this.trackIndex = trackIndex;
         this.trackTitle = trackTitle;
         this.artist = artist;
         this.duration = duration;
-        this.artworkUrl = artworkUrl;
     }
 }

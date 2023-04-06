@@ -60,7 +60,6 @@ public abstract class AbstractImageBuilder {
     @SneakyThrows
     public InputStream build() throws ImageBuilderException {
         final var url = new URL(uri.build().toString());
-        logger.debug("Built image URL:\n{}", url);
 
         try {
             return httpClient.newCall(webUtils.prepareGet(url.toString()).build())

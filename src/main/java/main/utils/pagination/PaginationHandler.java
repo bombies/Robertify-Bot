@@ -181,7 +181,7 @@ public abstract class PaginationHandler {
             for (int i = 0; i < queueHandler.size(); i++) {
                 final var track = queueHandler.contents().get(i);
                 final var trackInfo = track.getInfo();
-                items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null));
+                items.add(new QueueItem(i + 1, trackInfo.title, trackInfo.author, trackInfo.length));
             }
             messagePages.add(new QueuePage(guild, 1, items));
         } else {
@@ -197,7 +197,7 @@ public abstract class PaginationHandler {
                     final var track = trackList.get(lastIndex);
                     final var trackInfo = track.getInfo();
 
-                    page.addItem(lastIndex + 1, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null);
+                    page.addItem(lastIndex + 1, trackInfo.title, trackInfo.author, trackInfo.length);
                     lastIndex++;
                 }
                 messagePages.add(page);

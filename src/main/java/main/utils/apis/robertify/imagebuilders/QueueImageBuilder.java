@@ -1,8 +1,9 @@
 package main.utils.apis.robertify.imagebuilders;
 
-import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.utils.GeneralUtils;
+import main.utils.json.themes.ThemesConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,11 +12,20 @@ import java.io.InputStream;
 
 public class QueueImageBuilder extends AbstractImageBuilder {
     private final JSONObject obj;
+    @Nullable
+    private final Guild guild;
 
 
     public QueueImageBuilder() {
         super(ImageType.QUEUE);
         this.obj = new JSONObject();
+        this.guild = null;
+    }
+
+    public QueueImageBuilder(@Nullable Guild guild) {
+        super(ImageType.QUEUE);
+        this.obj = new JSONObject();
+        this.guild = guild;
     }
 
     public QueueImageBuilder setPage(int page) {
@@ -25,10 +35,10 @@ public class QueueImageBuilder extends AbstractImageBuilder {
 
     public QueueImageBuilder addTrack(int index, AudioTrack track) {
         final var trackInfo = track.getInfo();
-        return this.addTrack(index, trackInfo.title, trackInfo.author, trackInfo.length, track instanceof MirroringAudioTrack mt ? mt.getArtworkURL() : null);
+        return this.addTrack(index, trackInfo.title, trackInfo.author, trackInfo.length);
     }
 
-    public QueueImageBuilder addTrack(int index, String title, String artist, long duration, @Nullable String trackArtwork) {
+    public QueueImageBuilder addTrack(int index, String title, String artist, long duration) {
         if (!obj.has(QueryFields.TRACKS.toString()))
             obj.put(QueryFields.TRACKS.toString(), new JSONArray());
 
@@ -38,9 +48,6 @@ public class QueueImageBuilder extends AbstractImageBuilder {
                 .put(QueryFields.TRACK_NAME.toString(), title)
                 .put(QueryFields.TRACK_ARTIST.toString(), artist)
                 .put(QueryFields.TRACK_DURATION.toString(), duration);
-
-        if (trackArtwork != null)
-            trackObj.put("artwork", trackArtwork);
         trackArr.put(trackObj);
         return this;
     }
@@ -63,9 +70,8 @@ public class QueueImageBuilder extends AbstractImageBuilder {
         }
 
         addQuery(QueryFields.TRACKS, obj.toString());
-        final var firstTrack = (JSONObject) obj.getJSONArray(QueryFields.TRACKS.toString()).get(0);
-        if (firstTrack.has("artwork"))
-            addQuery(QueryFields.NEXT_IMG, firstTrack.getString("artwork"));
+        if (guild != null)
+            addQuery(QueryFields.THEME, new ThemesConfig(guild).getTheme().name().toLowerCase());
         return super.build();
     }
 
@@ -76,7 +82,7 @@ public class QueueImageBuilder extends AbstractImageBuilder {
         TRACK_NAME,
         TRACK_ARTIST,
         TRACK_DURATION,
-        NEXT_IMG;
+        THEME;
 
         @Override
         public String toString() {
