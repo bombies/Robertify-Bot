@@ -144,8 +144,14 @@ public class TrackScheduler extends PlayerEventListenerAdapter {
                                 )
                                 .setUser(requesterObj != null ? (requesterObj.getName() + "#" + requesterObj.getDiscriminator()) : requesterMention, requesterObj != null ? requesterObj.getAvatarUrl() : null)
                                 .build();
-                        return announcementChannel.sendFiles(FileUpload.fromData(img, AbstractImageBuilder.getRandomFileName()))
-                                .submit();
+                        try {
+                            if (img.available() > 0)
+                                return announcementChannel.sendFiles(FileUpload.fromData(img, AbstractImageBuilder.getRandomFileName()))
+                                        .submit();
+                            else return sendNowPlayingEmbed(trackInfo, requesterMention);
+                        } catch (IOException e) {
+                            return sendNowPlayingEmbed(trackInfo, requesterMention);
+                        }
                     })
                     .thenApply(msg -> {
                         if (lastSentMsg != null)
