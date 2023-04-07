@@ -5,6 +5,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
+import main.audiohandlers.sources.local.CustomLocalAudioSourceManager;
 import main.commands.prefixcommands.audio.PlayCommand;
 import main.constants.ENV;
 import main.main.Config;
@@ -140,10 +141,7 @@ public class PlaySlashCommand extends AbstractSlashCommand {
             }
             case "file" -> {
                 final var file = event.getOption("track").getAsAttachment();
-                event.getHook()
-                        .sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.DISABLED_COMMAND).build())
-                        .queue();
-//                handleLocalTrack(event, file);
+                handleLocalTrack(event, file);
             }
             case "nexttracks" -> {
                 String link = event.getOption("tracks").getAsString();
@@ -205,10 +203,11 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                 final var memberVoiceState = member.getVoiceState();
 
                 try {
-                    RobertifyAudioManager.getInstance()
-                            .joinAudioChannel(
+                    final var audioManager = RobertifyAudioManager.getInstance();
+                    final var musicManager = audioManager.getMusicManager(guild);
+                    audioManager.joinAudioChannel(
                                     memberVoiceState.getChannel(),
-                                    RobertifyAudioManager.getInstance().getMusicManager(guild)
+                                    musicManager
                             );
                     event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
                             .queue(addingMsg -> {
@@ -221,7 +220,15 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                             }
 
                                             try {
-                                                final var streamText = new String(file.readAllBytes(), StandardCharsets.UTF_8);
+                                                final var trackURL = generateLocalTrackUrl(audioFile, file);
+                                                audioManager.loadTrack(
+                                                        trackURL,
+                                                        musicManager,
+                                                        member.getUser(),
+                                                        true,
+                                                        addingMsg,
+                                                        false
+                                                );
                                             } catch (IOException e) {
                                                 throw new RuntimeException(e);
                                             }
@@ -277,5 +284,29 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                             .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
                             .queue();
         }
+    }
+
+    private String generateLocalTrackUrl(Message.Attachment attachment, InputStream fileStream) throws IOException {
+        final var extension = attachment.getFileExtension();
+        final var streamText = new String(fileStream.readAllBytes(), StandardCharsets.UTF_8);
+        final var urlBuilder = new StringBuilder();
+
+        if (extension == null)
+            throw new NullPointerException("There was no extension found for the attachment!");
+
+        switch (extension.toLowerCase()) {
+            case "mp3" -> urlBuilder.append(CustomLocalAudioSourceManager.MP3_LOAD_PREFIX);
+            case "m4a" -> urlBuilder.append(CustomLocalAudioSourceManager.M4A_LOAD_PREFIX);
+            case "ogg" -> urlBuilder.append(CustomLocalAudioSourceManager.OGG_LOAD_PREFIX);
+            case "mp4" -> urlBuilder.append(CustomLocalAudioSourceManager.MP4_LOAD_PREFIX);
+            case "wav" -> urlBuilder.append(CustomLocalAudioSourceManager.WAV_LOAD_PREFIX);
+            case "mov" -> urlBuilder.append(CustomLocalAudioSourceManager.MOV_LOAD_PREFIX);
+            case "webm" -> urlBuilder.append(CustomLocalAudioSourceManager.WEBM_LOAD_PREFIX);
+            case "aac" -> urlBuilder.append(CustomLocalAudioSourceManager.AAC_LOAD_PREFIX);
+            case "flac" -> urlBuilder.append(CustomLocalAudioSourceManager.FLAC_LOAD_PREFIX);
+        }
+
+        urlBuilder.append(streamText);
+        return urlBuilder.toString();
     }
 }

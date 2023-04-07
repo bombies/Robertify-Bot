@@ -12,6 +12,7 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
+import main.audiohandlers.sources.local.CustomLocalAudioSourceManager;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
@@ -86,7 +87,7 @@ public class RobertifyAudioManager {
 //                    .setup();
 //        }
 
-        AudioSourceManagers.registerLocalSource(this.playerManager);
+        this.playerManager.registerSourceManager(new CustomLocalAudioSourceManager());
         this.playerManager.registerSourceManager(new ResumeSourceManager(this.playerManager));
         this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
@@ -347,7 +348,7 @@ public class RobertifyAudioManager {
         resumeTracks(data.getTracks(), musicManager.getScheduler().getAnnouncementChannel(),  musicManager);
     }
 
-    private void loadTrack(String trackUrl, GuildMusicManager musicManager,
+    public void loadTrack(String trackUrl, GuildMusicManager musicManager,
                            User user, boolean announceMsg, Message botMsg,
                            boolean addToBeginning) {
         final AudioLoader loader = new AudioLoader(user, musicManager, trackUrl, announceMsg, botMsg, false, addToBeginning);
