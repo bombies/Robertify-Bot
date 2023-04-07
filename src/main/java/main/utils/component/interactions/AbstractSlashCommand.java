@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.*;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -152,8 +153,7 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
             }
         }
 
-//        if (command.isPrivate)
-//            commandData.setDefaultEnabled(false);
+        commandData.setGuildOnly(command.isGuildUseOnly());
         return commandData;
     }
 
@@ -294,6 +294,11 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
                     commandCreateAction = commandCreateAction.addOptions(optionData);
                 }
             }
+
+            commandCreateAction = commandCreateAction.setGuildOnly(command.guildUseOnly)
+                    .setDefaultPermissions(DefaultMemberPermissions.enabledFor(
+                            command.botRequiredPermissions
+                    ));
 
             commandCreateAction.queueAfter(1, TimeUnit.SECONDS, cmd -> {
 
