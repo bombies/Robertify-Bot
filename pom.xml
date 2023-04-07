@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>5.2.9-ALPHA-4</version>
+    <version>5.2.9</version>
     <packaging>jar</packaging>
 
     <dependencies>
