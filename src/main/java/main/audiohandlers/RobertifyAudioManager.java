@@ -12,7 +12,6 @@ import lombok.SneakyThrows;
 import main.audiohandlers.loaders.AudioLoader;
 import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
-import main.audiohandlers.sources.local.CustomLocalAudioSourceManager;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.commands.prefixcommands.CommandContext;
 import main.constants.ENV;
@@ -87,7 +86,7 @@ public class RobertifyAudioManager {
 //                    .setup();
 //        }
 
-        this.playerManager.registerSourceManager(new CustomLocalAudioSourceManager());
+        AudioSourceManagers.registerLocalSource(this.playerManager);
         this.playerManager.registerSourceManager(new ResumeSourceManager(this.playerManager));
         this.playerManager.registerSourceManager(new SpotifySourceManager(Config.getProviders(), Config.get(ENV.SPOTIFY_CLIENT_ID), Config.get(ENV.SPOTIFY_CLIENT_SECRET), "us", this.playerManager));
         this.playerManager.registerSourceManager(new AppleMusicSourceManager(Config.getProviders(), null, "us", this.playerManager));
