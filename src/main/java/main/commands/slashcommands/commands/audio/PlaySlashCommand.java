@@ -28,13 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
 public class PlaySlashCommand extends AbstractSlashCommand {
-    final Logger logger = LoggerFactory.getLogger(PlaySlashCommand.class);
+    static final Logger logger = LoggerFactory.getLogger(PlaySlashCommand.class);
 
     @Override
     protected void buildCommand() {
@@ -145,14 +146,11 @@ public class PlaySlashCommand extends AbstractSlashCommand {
 
     @SneakyThrows
     private void handlePlayTracks(SlashCommandInteractionEvent event, Guild guild, Member member, String link, boolean addToBeginning) {
-        if (GeneralUtils.isUrl(link) && !Config.isYoutubeEnabled()) {
-            final var linkDestination = GeneralUtils.getLinkDestination(link);
-            if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
-                event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
-                        .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
-                        .queue();
-                return;
-            }
+        if (isYouTubeLink(link)) {
+            event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.NO_YOUTUBE_SUPPORT).build())
+                    .setEphemeral(RobertifyEmbedUtils.getEphemeralState(event.getGuildChannel()))
+                    .queue();
+            return;
         }
 
         event.getHook().sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2).build())
@@ -166,6 +164,19 @@ public class PlaySlashCommand extends AbstractSlashCommand {
                                 event,
                                 addToBeginning
                         ));
+    }
+
+    public static boolean isYouTubeLink(String link) {
+        if (GeneralUtils.isUrl(link) && !Config.isYoutubeEnabled()) {
+            try {
+                final var linkDestination = GeneralUtils.getLinkDestination(link);
+                return linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be");
+            } catch (IOException e) {
+                logger.error("Unexpected error", e);
+                return false;
+            }
+        }
+        return false;
     }
 
     public void handleLocalTrack(SlashCommandInteractionEvent event, Message.Attachment audioFile) {

@@ -1,6 +1,7 @@
 package main.commands.contextcommands;
 
 import lombok.Getter;
+import main.commands.contextcommands.music.SearchContextCommand;
 import main.utils.component.interactions.AbstractContextCommand;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class ContextCommandManager {
 
     public ContextCommandManager() {
         addCommands(
-
+            new SearchContextCommand()
         );
     }
 

@@ -9,14 +9,13 @@ import io.sentry.opentelemetry.OpenTelemetryLinkErrorEventProcessor;
 import lavalink.client.io.LavalinkLoadBalancer;
 import lavalink.client.io.jda.JdaLavalink;
 import lombok.Getter;
-import main.audiohandlers.GuildMusicManager;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.contextcommands.ContextCommandManager;
+import main.commands.contextcommands.music.SearchContextCommand;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.dev.test.MenuPaginationTestCommand;
 import main.commands.prefixcommands.util.reports.ReportsEvents;
 import main.commands.slashcommands.SlashCommandManager;
-import main.commands.slashcommands.commands.audio.SkipSlashCommand;
 import main.commands.slashcommands.commands.management.requestchannel.RequestChannelEvents;
 import main.commands.slashcommands.commands.misc.poll.PollEvents;
 import main.constants.ENV;
@@ -276,7 +275,7 @@ public class Robertify {
     }
 
     private static void loadNeededGlobalCommands() {
-        new SkipSlashCommand().reload();
+        new SearchContextCommand().load();
     }
 
     public static void initVoteSiteAPIs() {

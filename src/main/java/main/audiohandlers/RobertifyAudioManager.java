@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.MessageContextInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -256,7 +257,30 @@ public class RobertifyAudioManager {
                 }
         } catch (Exception e) {
             logger.info("An unexpected error occurred!", e);
-            return;
+        }
+    }
+
+    public void loadAndPlay(String trackUrl, GuildVoiceState selfVoiceState,
+                            GuildVoiceState memberVoiceState, Message botMsg,
+                            MessageContextInteractionEvent event, boolean addToBeginning) {
+        final var musicManager = getMusicManager(memberVoiceState.getGuild());
+
+        try {
+            final var voiceChannel = memberVoiceState.getChannel();
+            if (voiceChannel != null)
+                if (voiceChannel.getMembers().size() != 0) {
+                    joinAudioChannel(event.getChannel().asGuildMessageChannel(), voiceChannel, musicManager);
+                    loadTrack(
+                            trackUrl,
+                            musicManager,
+                            TogglesConfig.getConfig(selfVoiceState.getGuild()).getToggle(Toggles.ANNOUNCE_MESSAGES),
+                            botMsg,
+                            event.getUser(),
+                            addToBeginning
+                    );
+                }
+        } catch (Exception e) {
+            logger.info("An unexpected error occurred!", e);
         }
     }
 
