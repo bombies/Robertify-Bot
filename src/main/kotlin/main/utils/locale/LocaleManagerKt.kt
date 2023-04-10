@@ -1,6 +1,7 @@
 package main.utils.locale
 
 import main.utils.GeneralUtilsKt
+import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
@@ -48,10 +49,9 @@ class LocaleManagerKt private constructor(val guild: Guild?, var locale: Roberti
             val file = File("./locale/messages.${locale.code.lowercase()}.yml")
             val content = StringBuilder()
 
-            // TODO: Convert RobertifyLocaleMessage to Kotlin
-            for (fieldSection in RobertifyLocaleMessage.getMessageTypes().values)
+            for (fieldSection in RobertifyLocaleMessageKt.getMessageTypes().values)
                 for (field in fieldSection)
-                    content.append(field.name().lowercase())
+                    content.append(field.name.lowercase())
                         .append(": ")
                         .append("\"Fill me out\"")
             GeneralUtilsKt.setFileContent(file, content.toString())
@@ -86,13 +86,13 @@ class LocaleManagerKt private constructor(val guild: Guild?, var locale: Roberti
     }
 
     fun getMessage(message: LocaleMessageKt): String {
-        return localeFile[message.name().lowercase()] ?:
-        throw NullPointerException("There was no such message found in the mapping with key: ${message.name()}")
+        return localeFile[message.name.lowercase()] ?:
+        throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
     }
 
     fun getMessage(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): String {
-        var msg = localeFile[message.name().lowercase()]
-            ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name()}")
+        var msg = localeFile[message.name.lowercase()]
+            ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
 
         placeholders.forEach { placeholder ->
             msg = msg.replace(Pattern.quote(placeholder.first), Matcher.quoteReplacement(placeholder.second))
