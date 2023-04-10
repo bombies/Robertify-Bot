@@ -84,7 +84,7 @@ public class VolumeCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n\n" +
                 "Control the volume of the bot\n\n" +
                 "**__Usages__**\n`" +
                 prefix + "volume <0-100>`";

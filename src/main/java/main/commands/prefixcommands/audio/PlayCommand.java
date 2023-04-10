@@ -19,7 +19,6 @@ import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.annotations.ForRemoval;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -228,7 +227,7 @@ public class PlayCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Plays a song\n\n" +
                 "**__Usages__**\n" +
                 "`" + prefix + "play <song>`\n" +

@@ -5,7 +5,6 @@ import main.commands.prefixcommands.IDevCommand;
 import main.constants.ENV;
 import main.main.Config;
 import main.main.Robertify;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import me.duncte123.botcommons.web.WebUtils;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.awt.*;
 import java.util.List;
 
 public class EvalCommand extends AbstractSlashCommand implements IDevCommand {

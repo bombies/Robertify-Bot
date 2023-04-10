@@ -1,6 +1,5 @@
 package main.commands.prefixcommands.audio;
 
-import com.google.common.collect.ImmutableList;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.audiohandlers.GuildMusicManager;
@@ -19,10 +18,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Deprecated @ForRemoval
 public class SkipToCommand implements ICommand {
@@ -91,7 +87,7 @@ public class SkipToCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Skip to a specific song in the queue\n" +
                 "\nUsage: `"+ prefix+"skipto <id>`";
     }

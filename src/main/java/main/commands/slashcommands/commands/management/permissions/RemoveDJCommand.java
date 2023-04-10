@@ -104,7 +104,7 @@ public class RemoveDJCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Remove DJ privileges from a specific role\n\n" +
                 "Usage: `"+ prefix +"remove <@role|@user>`";
     }

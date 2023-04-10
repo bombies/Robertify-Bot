@@ -109,7 +109,7 @@ public class NowPlayingCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Displays the song that is currently playing";
     }
 

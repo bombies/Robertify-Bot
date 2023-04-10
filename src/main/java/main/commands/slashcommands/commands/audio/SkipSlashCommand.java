@@ -1,6 +1,5 @@
 package main.commands.slashcommands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.SkipCommand;
 import main.commands.prefixcommands.audio.SkipToCommand;
@@ -12,8 +11,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SkipSlashCommand extends AbstractSlashCommand {
 

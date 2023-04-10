@@ -196,7 +196,7 @@ public class ThemeCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n\n" +
                 "Tired of seeing our boring old green theme? Well, using this command you can have " +
                 "**10** other colours to choose from! It's as easy as selecting the colour you want from the selection menu provided.";
     }

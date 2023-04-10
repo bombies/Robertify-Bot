@@ -230,7 +230,7 @@ public class FavouriteTracksCommand extends AbstractSlashCommand implements ICom
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n\n" +
                 "This command allows you to interact with tracks you may really like when" +
                 " using the bot! Want to save some really good songs for later? No problem! " +
                 "We'll store it for you.\n\n" + getUsages(prefix);

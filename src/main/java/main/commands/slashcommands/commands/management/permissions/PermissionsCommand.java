@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
-import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -364,7 +363,7 @@ public class PermissionsCommand extends AbstractSlashCommand implements ICommand
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Manage bot permissions for roles\n\n" +
                 "\nUsage: `"+ prefix+"permissions add <@role> <" + String.join(
                         "|",

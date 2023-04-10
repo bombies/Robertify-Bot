@@ -1,6 +1,5 @@
 package main.commands.slashcommands.commands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.MoveCommand;
 import main.utils.GeneralUtils;
@@ -9,8 +8,6 @@ import main.utils.component.interactions.AbstractSlashCommand;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MoveSlashCommand extends AbstractSlashCommand {
 

@@ -2,7 +2,6 @@ package main.commands.slashcommands.commands.audio;
 
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.audio.ClearQueueCommand;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.json.logs.LogType;

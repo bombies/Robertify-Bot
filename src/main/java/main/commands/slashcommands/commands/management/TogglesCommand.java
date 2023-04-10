@@ -1,7 +1,6 @@
 package main.commands.slashcommands.commands.management;
 
 import main.commands.prefixcommands.CommandContext;
-import main.commands.prefixcommands.CommandManager;
 import main.commands.prefixcommands.ICommand;
 import main.commands.slashcommands.SlashCommandManager;
 import main.constants.Permission;
@@ -357,7 +356,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Toggle specific features on or off!\n\n**__Usages__**\n" +
                 "`"+ prefix +"toggles`\n" +
                 "`"+ prefix +"toggles <toggle_name>`\n" +

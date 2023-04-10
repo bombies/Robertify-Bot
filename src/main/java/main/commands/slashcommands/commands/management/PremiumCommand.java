@@ -1,15 +1,10 @@
 package main.commands.slashcommands.commands.management;
 
 import main.main.Robertify;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
-import main.utils.apis.robertify.models.RobertifyPremium;
 import main.utils.component.interactions.AbstractSlashCommand;
-import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 public class PremiumCommand extends AbstractSlashCommand {

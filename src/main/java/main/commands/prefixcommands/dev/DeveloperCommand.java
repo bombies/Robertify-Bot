@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 
 import javax.script.ScriptException;
-import java.awt.*;
 import java.util.List;
 
 public class DeveloperCommand implements IDevCommand {
@@ -143,7 +142,7 @@ public class DeveloperCommand implements IDevCommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Developer command.";
     }
 

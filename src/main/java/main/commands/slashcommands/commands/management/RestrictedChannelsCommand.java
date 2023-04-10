@@ -213,7 +213,7 @@ public class RestrictedChannelsCommand extends AbstractSlashCommand implements I
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`" +
                 "\nRestrict the bot to join voice/text channels that you set.\n\n"
                 + getUsages(prefix);
     }

@@ -22,7 +22,6 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Deprecated @ForRemoval
 public class MoveCommand implements ICommand {
@@ -110,7 +109,7 @@ public class MoveCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "\nMove a specific track to a specific position in the queue\n" +
                 "\nUsage: `"+ prefix+"move <id> <position>`";
     }

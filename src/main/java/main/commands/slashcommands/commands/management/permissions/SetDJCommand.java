@@ -115,7 +115,7 @@ public class SetDJCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Set a specific role to be a DJ\n\n" +
                 "Usage: `"+ prefix +"setdj <@role|@user>`";
     }

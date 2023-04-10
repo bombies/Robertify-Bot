@@ -1,6 +1,5 @@
 package main.commands.prefixcommands.audio;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import main.audiohandlers.RobertifyAudioManager;
 import main.commands.prefixcommands.CommandContext;
@@ -30,7 +29,6 @@ import javax.script.ScriptException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 
 @Deprecated @ForRemoval
 public class SkipCommand extends ListenerAdapter implements ICommand {

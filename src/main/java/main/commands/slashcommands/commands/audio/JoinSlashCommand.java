@@ -1,18 +1,13 @@
 package main.commands.slashcommands.commands.audio;
 
 import main.commands.prefixcommands.audio.JoinCommand;
-import main.constants.BotConstants;
 import main.constants.Permission;
-import main.utils.GeneralUtils;
 import main.utils.RobertifyEmbedUtils;
 import main.utils.component.interactions.AbstractSlashCommand;
 import main.utils.locale.RobertifyLocaleMessage;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class JoinSlashCommand extends AbstractSlashCommand {
 

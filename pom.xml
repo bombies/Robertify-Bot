@@ -263,6 +263,11 @@
             <artifactId>kotlinx-coroutines-core</artifactId>
             <version>1.6.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.minndevelopment</groupId>
+            <artifactId>jda-ktx</artifactId>
+            <version>9fc90f616b7c9b68b8680c7bf37d6af361bb0fbb</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

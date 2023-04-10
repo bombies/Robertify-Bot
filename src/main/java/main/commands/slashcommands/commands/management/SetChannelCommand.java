@@ -96,7 +96,7 @@ public class SetChannelCommand extends AbstractSlashCommand implements ICommand 
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`" +
                 "\nSet the announcement channel for when a new song is being played.\n\n" +
                 "Usage: `"+ prefix +"setchannel <channelID>`";
     }

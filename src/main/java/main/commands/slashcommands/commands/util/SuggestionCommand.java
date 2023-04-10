@@ -398,7 +398,7 @@ public class SuggestionCommand extends AbstractSlashCommand implements ICommand 
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `"+ GeneralUtils.listToString(getAliases())+"`\n" +
                 "Want to see something added to Robertify? Suggest it using this command!\n\n" +
                 "**Usage**: `"+ prefix +"suggest <suggestion>`";
     }
