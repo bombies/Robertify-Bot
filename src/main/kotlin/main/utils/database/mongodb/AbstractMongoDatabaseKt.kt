@@ -4,7 +4,7 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.*
 import main.constants.database.MongoDatabaseKt
-import main.utils.json.GenericJSONField
+import main.utils.json.GenericJSONFieldKt
 import org.bson.BsonArray
 import org.bson.BsonObjectId
 import org.bson.Document
@@ -14,15 +14,16 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDatabaseKt) {
+abstract class AbstractMongoDatabaseKt {
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
     }
 
     private val database: MongoDatabase
-    private var collection: MongoCollection<Document>
+    var collection: MongoCollection<Document>
+        protected set
 
-    init {
+    constructor(db: MongoDatabaseKt, collection: MongoDatabaseKt) {
         database = MongoConnectionManagerKt.connect(db).database()
 
         try {
@@ -34,7 +35,12 @@ abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDat
         }
     }
 
-    abstract fun init()
+    constructor(db: AbstractMongoDatabaseKt) {
+        database = db.database
+        collection = db.collection
+    }
+
+    open fun init() {}
 
     fun initAllCaches() {
         //TODO: Implement cache initializations
@@ -171,39 +177,47 @@ abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDat
     protected fun findDocument(key: String, value: String): Iterator<Document> =
         collection.find(Filters.eq(key, value)).iterator()
 
-    protected open fun findDocument(key: String, value: Any): Iterator<Document> {
+    protected fun findDocument(key: String, value: Any): Iterator<Document> {
         return collection.find(Filters.eq(key, value)).iterator()
     }
 
-    protected open fun findSpecificDocument(key: String, value: String): Document? {
+    protected fun <T> findDocument(key: String, value: T): Iterator<Document> {
+        return collection.find(Filters.eq(key, value)).iterator()
+    }
+
+    protected fun findSpecificDocument(key: String, value: String): Document? {
         return collection.find(Filters.eq(key, value)).iterator().next()
     }
 
-    protected open fun findSpecificDocument(key: String, value: Document): Document? {
+    protected fun findSpecificDocument(key: String, value: Document): Document? {
         return collection.find(Filters.eq(key, value)).iterator().next()
     }
 
-    protected open fun findSpecificDocument(key: String, value: JSONObject): Document? {
+    protected fun findSpecificDocument(key: String, value: JSONObject): Document? {
         return collection.find(Filters.eq(key, value)).iterator().next()
     }
 
-    open fun findSpecificDocument(key: String, value: Any): Document? {
+    fun findSpecificDocument(key: String, value: Any): Document? {
         return collection.find(Filters.eq(key, value)).iterator().next()
     }
 
-    protected open fun findSpecificDocument(key: GenericJSONField, value: Any): Document? {
+    fun <T> findSpecificDocument(key: String, value: T): Document? {
+        return collection.find(Filters.eq(key, value)).iterator().next()
+    }
+
+    protected fun findSpecificDocument(key: GenericJSONFieldKt, value: Any): Document? {
         return findSpecificDocument(key.toString(), value)
     }
 
-    protected open fun findDocument(key: String, value: Document): Iterator<Document> {
+    protected fun findDocument(key: String, value: Document): Iterator<Document> {
         return collection.find(Filters.eq(key, value)).iterator()
     }
 
-    protected open fun findDocument(key: String, value: JSONObject): Iterator<Document> {
+    protected fun findDocument(key: String, value: JSONObject): Iterator<Document> {
         return findDocument(key, Document.parse(value.toString()))
     }
 
-    protected open fun <T> getDocument(key: String, value: T, indented: Boolean): String {
+    protected fun <T> getDocument(key: String, value: T, indented: Boolean): String {
         val doc: Document = when (value) {
             is String -> findSpecificDocument(key, value)
             is Document -> findSpecificDocument(key, value)
@@ -216,11 +230,11 @@ abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDat
         return documentToJSON(doc, indented)
     }
 
-    protected open fun <T> getDocuments(key: String, value: T): String {
+    protected fun <T> getDocuments(key: String, value: T): String {
         return getDocuments(key, value, false) ?: throw NullPointerException("Couldn't find any documents where they key ($key) matches the value (${value.toString()})")
     }
 
-    protected open fun <T> getDocuments(key: String, value: T, indented: Boolean): String? {
+    protected fun <T> getDocuments(key: String, value: T, indented: Boolean): String? {
         val doc: Iterator<Document> = when (value) {
             is String -> findDocument(key, value)
             is Document -> findDocument(key, value)
@@ -232,7 +246,7 @@ abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDat
         return sb.toString()
     }
 
-    protected open fun documentToJSON(doc: Document, indented: Boolean): String {
+    protected fun documentToJSON(doc: Document, indented: Boolean): String {
         return doc.toJson(
             JsonWriterSettings.builder()
                 .indent(indented)
@@ -240,11 +254,11 @@ abstract class AbstractMongoDatabaseKt(db: MongoDatabaseKt, collection: MongoDat
         )
     }
 
-    open fun documentToJSON(doc: Document): String {
+    fun documentToJSON(doc: Document): String {
         return documentToJSON(doc, false)
     }
 
-    protected open fun <TItem> eq(key: String, value: TItem): Bson {
+    protected fun <TItem> eq(key: String, value: TItem): Bson {
         return Filters.eq(key, value)
     }
 
