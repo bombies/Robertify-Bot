@@ -4,17 +4,13 @@ import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
 import main.constants.TimeFormat
 import main.utils.json.GenericJSONField
+import main.utils.json.GenericJSONFieldKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
-import main.utils.locale.RobertifyLocaleMessage
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
-import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent
@@ -521,8 +517,7 @@ class GeneralUtilsKt {
             obj.getString(field).toLong()
         }
 
-        // TODO: Change GenericJSONField to Kotlin implementation
-        fun getID(obj: JSONObject, field: GenericJSONField): Long = getID(obj, field.toString())
+        fun getID(obj: JSONObject, field: GenericJSONFieldKt): Long = getID(obj, field.toString())
 
         fun checkPremium(guild: Guild, event: GenericComponentInteractionCreateEvent): Boolean {
             // TODO: Guild config premium check
