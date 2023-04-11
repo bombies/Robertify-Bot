@@ -18,7 +18,41 @@ import java.util.*
 class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_GUILDS) {
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
-        private val INSTANCE: GuildDBKt? = null
+        var ins: GuildDBKt? = null
+            get() {
+                if (field == null)
+                    field = GuildDBKt()
+              return field
+            }
+            private set
+
+        fun getGuildDocument(gid: Long): Document {
+            return DocumentBuilderKt.create()
+                .addField(Field.GUILD_ID, gid)
+                .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
+                .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
+                .addField(Field.BANNED_USERS_ARRAY, JSONArray())
+                .addField(
+                    Field.REQUEST_CHANNEL_OBJECT, JSONObject()
+                        .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
+                        .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
+                )
+                .addField(
+                    Field.PERMISSIONS_OBJECT, JSONObject()
+                        .put(Field.PERMISSIONS_DJ.toString(), JSONArray())
+                        .put(Field.PERMISSIONS_ADMIN.toString(), JSONArray())
+                        .put(Field.PERMISSIONS_USERS.toString(), JSONObject())
+                )
+                .addField(
+                    Field.RESTRICTED_CHANNELS_OBJECT, JSONObject()
+                        .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
+                        .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
+                )
+                .addField(Field.TOGGLES_OBJECT, TogglesConfig.getDefaultToggleObject())
+                .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
+                .addField(Field.THEME, RobertifyTheme.GREEN.name.lowercase(Locale.getDefault()))
+                .build()
+        }
     }
 
     fun addGuild(gid: Long) = addDocument(getGuildDocument(gid))
@@ -35,34 +69,6 @@ class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.R
         val document = findGuild(gid)
             ?: throw java.lang.NullPointerException("There was no document found with guild id: $gid")
         upsertDocument(document, Document.parse(obj.toString()))
-    }
-
-    fun getGuildDocument(gid: Long): Document {
-        return DocumentBuilderKt.create()
-            .addField(Field.GUILD_ID, gid)
-            .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
-            .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
-            .addField(Field.BANNED_USERS_ARRAY, JSONArray())
-            .addField(
-                Field.REQUEST_CHANNEL_OBJECT, JSONObject()
-                    .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
-                    .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
-            )
-            .addField(
-                Field.PERMISSIONS_OBJECT, JSONObject()
-                    .put(Field.PERMISSIONS_DJ.toString(), JSONArray())
-                    .put(Field.PERMISSIONS_ADMIN.toString(), JSONArray())
-                    .put(Field.PERMISSIONS_USERS.toString(), JSONObject())
-            )
-            .addField(
-                Field.RESTRICTED_CHANNELS_OBJECT, JSONObject()
-                    .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
-                    .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
-            )
-            .addField(Field.TOGGLES_OBJECT, TogglesConfig.getDefaultToggleObject())
-            .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
-            .addField(Field.THEME, RobertifyTheme.GREEN.name.lowercase(Locale.getDefault()))
-            .build()
     }
 
     enum class Field(private val str: String) : GenericJSONFieldKt {

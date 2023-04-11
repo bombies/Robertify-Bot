@@ -80,7 +80,11 @@ abstract class AbstractMongoCacheKt protected constructor(val mongoDB: AbstractM
         return collectionObj
     }
 
-    fun getCache(): JSONArray?  = cache?.getJSONArray(CacheField.DOCUMENTS.toString())
+    fun getCache(): JSONArray  {
+        val c = cache
+        requireNotNull(c) { " The cache hasn't been initialized yet! " }
+        return c.getJSONArray(CacheField.DOCUMENTS.toString())
+    }
 
     enum class CacheField(private val str: String): GenericJSONFieldKt {
         DOCUMENTS("documents"),

@@ -73,7 +73,7 @@ class BotDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.ROB
     }
 
     override fun init() {
-        if (getCollection().countDocuments() != 0L)
+        if (collection.countDocuments() != 0L)
             return
         
         addDocument(

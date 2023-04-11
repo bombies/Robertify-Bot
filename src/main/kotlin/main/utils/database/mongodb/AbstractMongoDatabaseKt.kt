@@ -20,7 +20,7 @@ abstract class AbstractMongoDatabaseKt {
     }
 
     private val database: MongoDatabase
-    var collection: MongoCollection<Document>
+     var collection: MongoCollection<Document>
         protected set
 
     constructor(db: MongoDatabaseKt, collection: MongoDatabaseKt) {
@@ -217,7 +217,7 @@ abstract class AbstractMongoDatabaseKt {
         return findDocument(key, Document.parse(value.toString()))
     }
 
-    protected fun <T> getDocument(key: String, value: T, indented: Boolean): String {
+    fun <T> getDocument(key: String, value: T, indented: Boolean = false): String? {
         val doc: Document = when (value) {
             is String -> findSpecificDocument(key, value)
             is Document -> findSpecificDocument(key, value)
@@ -225,8 +225,7 @@ abstract class AbstractMongoDatabaseKt {
             is Long -> findSpecificDocument(key, value)
             is Int -> findSpecificDocument(key, value)
             else -> throw IllegalArgumentException("Invalid value type!")
-        } ?: throw NullPointerException("There is no such document that matches the key: $key")
-
+        } ?: return null
         return documentToJSON(doc, indented)
     }
 
