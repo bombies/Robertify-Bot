@@ -64,7 +64,7 @@ class RobertifyEmbedUtilsKt {
             return builder.setDescription(message)
         }
 
-        fun embedMessage(guild: Guild?, message: LocaleMessageKt): EmbedBuilder? {
+        fun embedMessage(guild: Guild?, message: LocaleMessageKt): EmbedBuilder {
             if (guild == null) return embedMessage(message)
             val localeManager = LocaleManagerKt.getLocaleManager(guild)
             return getDefaultEmbed(guild).setDescription(localeManager.getMessage(message))

@@ -287,11 +287,11 @@ class GeneralUtilsKt {
             }
         }
 
-        fun formatTime(duration: Long): String? {
+        fun formatTime(duration: Long): String {
             return DurationFormatUtils.formatDuration(duration, "HH:mm:ss")
         }
 
-        fun formatTime(duration: Long, format: String?): String? {
+        fun formatTime(duration: Long, format: String): String {
             return DurationFormatUtils.formatDuration(duration, format)
         }
 
