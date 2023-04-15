@@ -11,7 +11,7 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class GuildConfigKit(private val guild: Guild) : AbstractGuildConfig(guild) {
+class GuildConfigKt(private val guild: Guild) : AbstractGuildConfig(guild) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)

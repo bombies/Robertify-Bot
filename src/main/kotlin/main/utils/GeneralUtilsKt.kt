@@ -125,7 +125,10 @@ class GeneralUtilsKt {
         }
 
         // TODO: Change the permission type
-        fun hasPerms(guild: Guild, sender: Member, vararg perms: Any): Boolean {
+        fun hasPerms(guild: Guild, sender: Member?, vararg perms: Any): Boolean {
+            if (sender == null)
+                return false
+
             if (sender.hasPermission(Permission.ADMINISTRATOR)
                 || sender.isOwner
             )
