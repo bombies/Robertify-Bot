@@ -1,8 +1,7 @@
-package main.commands
+package main.commands.slashcommands
 
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+import main.utils.internal.delegates.ImmutableListGetDelegate
 
 class SlashCommandManagerKt private constructor() {
     companion object {
@@ -113,19 +112,5 @@ class SlashCommandManagerKt private constructor() {
         MANAGEMENT,
         MISCELLANEOUS,
         UTILITY
-    }
-
-
-    private class ImmutableListGetDelegate : ReadWriteProperty<Any?, List<AbstractSlashCommandKt>> {
-        var field: List<AbstractSlashCommandKt> = ArrayList()
-
-        override fun getValue(thisRef: Any?, property: KProperty<*>): List<AbstractSlashCommandKt> {
-            return listOf(*field.toTypedArray())
-        }
-
-        override fun setValue(thisRef: Any?, property: KProperty<*>, value: List<AbstractSlashCommandKt>) {
-            field = value
-        }
-
     }
 }

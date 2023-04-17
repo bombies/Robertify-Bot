@@ -2,7 +2,7 @@ package main.utils.component.interactions.slashcommand
 
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.RandomMessageManager
-import main.commands.SlashCommandManagerKt
+import main.commands.slashcommands.SlashCommandManagerKt
 import main.constants.BotConstants
 import main.constants.ToggleKt
 import main.main.ConfigKt
@@ -96,7 +96,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 guild.updateCommands().addCommands().queue()
             else
                 guild.updateCommands()
-                    .addCommands(SlashCommandManagerKt.ins
+                    .addCommands(
+                        SlashCommandManagerKt.ins
                         .devCommands
                         .map { it.info.getCommandData() }
                     )
