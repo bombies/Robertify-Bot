@@ -1,21 +1,21 @@
 package main.utils.json.logs
 
-import main.utils.json.toggles.TogglesConfig
-import main.utils.locale.LocaleManager
+import main.utils.json.toggles.TogglesConfigKt
+import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessage
+import main.utils.locale.LocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
-import net.dv8tion.jda.internal.utils.tuple.Pair
 import java.time.Instant
 
 class LogUtilsKt(private val guild: Guild) {
     private val config: LogConfigKt = LogConfigKt(guild)
 
-    fun sendLog(type: LogType, message: String) {
+    fun sendLog(type: LogTypeKt, message: String) {
         if (!config.channelIsSet()) return
-        if (!TogglesConfig.getConfig(guild).getLogToggle(type)) return
+        if (!TogglesConfigKt(guild).getLogToggle(type)) return
         val channel = config.getChannel()
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
@@ -27,10 +27,10 @@ class LogUtilsKt(private val guild: Guild) {
         ).queue()
     }
 
-    fun sendLog(type: LogType, message: LocaleMessage) {
+    fun sendLog(type: LogTypeKt, message: LocaleMessageKt) {
         if (!config.channelIsSet()) return
-        if (!TogglesConfig.getConfig(guild).getLogToggle(type)) return
-        val localeManager = LocaleManager.getLocaleManager(guild)
+        if (!TogglesConfigKt(guild).getLogToggle(type)) return
+        val localeManager = LocaleManagerKt.getLocaleManager(guild)
         val channel = config.getChannel()
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
@@ -43,10 +43,10 @@ class LogUtilsKt(private val guild: Guild) {
     }
 
     @SafeVarargs
-    fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
+    fun sendLog(type: LogTypeKt, message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
         if (!config.channelIsSet()) return
-        if (!TogglesConfig.getConfig(guild).getLogToggle(type)) return
-        val localeManager = LocaleManager.getLocaleManager(guild)
+        if (!TogglesConfigKt(guild).getLogToggle(type)) return
+        val localeManager = LocaleManagerKt.getLocaleManager(guild)
         val channel = config.getChannel()
         channel!!.sendMessageEmbeds(
             EmbedBuilder()

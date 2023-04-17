@@ -4,7 +4,7 @@ import main.constants.RobertifyEmojiKt
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import java.awt.Color
 
-enum class LogTypeKt(title: String, emoji: Emoji, color: Color, name: String) {
+enum class LogTypeKt(val title: String, val emoji: Emoji, val color: Color, private val _name: String) {
     QUEUE_ADD("Queue Addition", Emoji.fromUnicode("➕"), Color.decode("#35fc03"), "Queue Additions"),
     QUEUE_REMOVE("Queue Removal", Emoji.fromUnicode("➖"), Color.decode("#ff5e5e"), "Queue Removes"),
     QUEUE_CLEAR("Queue Cleared", Emoji.fromUnicode("🗑️"), Color.decode("#00c497"), "Queue Clears"),
@@ -24,6 +24,8 @@ enum class LogTypeKt(title: String, emoji: Emoji, color: Color, name: String) {
     VOLUME_CHANGE("Volume Changed", Emoji.fromUnicode("🔊"), Color.decode("#004770"), "Volume Changes"),
     BOT_DISCONNECTED("Disconnect", RobertifyEmojiKt.QUIT_EMOJI.getEmoji(), Color.decode("#700000"), "Disconnects"),
     FILTER_TOGGLE("Filter Toggle", Emoji.fromUnicode("🎛️"), Color.decode("#077000"), "Filters");
+
+    fun name() = _name
 
     companion object {
         fun toList(): List<String> = LogTypeKt.values().map { it.name }.toList()

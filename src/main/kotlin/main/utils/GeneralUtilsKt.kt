@@ -490,7 +490,7 @@ class GeneralUtilsKt {
             CHANNEL
         }
 
-        fun listOfIDsToMentions(guild: Guild, mentions: List<Long>, mentioner: Mentioner): String {
+        fun listOfIDsToMentions(guild: Guild?, mentions: List<Long>, mentioner: Mentioner): String {
             val mentionTag: String = when (mentioner) {
                 Mentioner.USER -> "@"
                 Mentioner.ROLE -> "@&"
@@ -506,10 +506,10 @@ class GeneralUtilsKt {
             }
         }
 
-        fun toMention(guild: Guild, id: Long, mentioner: Mentioner): String =
+        fun toMention(guild: Guild? = null, id: Long, mentioner: Mentioner): String =
             listOfIDsToMentions(guild, listOf(id), mentioner)
 
-        fun toMention(guild: Guild, id: String, mentioner: Mentioner): String =
+        fun toMention(guild: Guild? = null, id: String, mentioner: Mentioner): String =
             listOfIDsToMentions(guild, listOf(id.toLong()), mentioner)
 
         fun <T> equalsAny(obj: T, arr: Array<T>): Boolean = arr.contains(obj)

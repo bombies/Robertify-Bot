@@ -23,7 +23,7 @@ class ConfigKt {
          * @param key .env key to retrieve.
          * @return The string attached to the key
          */
-        fun get(key: ENV): String {
+        operator fun get(key: ENV): String {
             return dotenv[key.toString().uppercase(Locale.getDefault()), ""]
         }
 
@@ -52,6 +52,14 @@ class ConfigKt {
         fun reload() {
             dotenv = Dotenv.load()
         }
+
+        val providers: Array<String>
+            get() {
+                val config = getConfigJSON()
+                val providers = config.getJSONArray("providers")
+                return providers.map { obj: Any -> obj.toString() }
+                    .toTypedArray()
+            }
 
         fun getShardCount(): Int = getInt(ENV.SHARD_COUNT)
         fun getBotToken(): String = get(ENV.BOT_TOKEN)
@@ -86,13 +94,6 @@ class ConfigKt {
         fun isProdEnv(): Boolean = getEnvironment().equals("prod", ignoreCase = true)
         fun isStagingEnv(): Boolean = getEnvironment().equals("staging", ignoreCase = true)
         fun isDevEnv(): Boolean = getEnvironment().equals("dev", ignoreCase = true)
-
-        fun getProviders(): Array<String> {
-            val config = getConfigJSON()
-            val providers = config.getJSONArray("providers")
-            return providers.map { obj: Any -> obj.toString() }
-                .toTypedArray()
-        }
 
         fun getInt(key: ENV): Int = get(key, "-1").toInt()
         fun getLong(key: ENV): Long = get(key, "-1").toLong()

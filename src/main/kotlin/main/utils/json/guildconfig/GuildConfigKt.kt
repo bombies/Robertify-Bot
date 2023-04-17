@@ -17,6 +17,20 @@ class GuildConfigKt(private val guild: Guild) : AbstractGuildConfig(guild) {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
+    var twentyFourSevenMode: Boolean
+        get() {
+            if (!guildHasInfo()) loadGuild()
+            if (!getCache().hasField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN)) {
+                getCache().setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, false)
+                return false
+            }
+            return getCache().getField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN) as Boolean
+        }
+        set(value) {
+            if (!guildHasInfo()) loadGuild()
+            getCache().setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, value)
+        }
+
     fun addGuild() {
         require(!guildHasInfo()) { "This guild is already added!" }
         database.addGuild(guild.idLong)
@@ -108,20 +122,6 @@ class GuildConfigKt(private val guild: Guild) : AbstractGuildConfig(guild) {
         return false
     }
 
-    fun get247(): Boolean {
-        if (!guildHasInfo()) loadGuild()
-        if (!getCache().hasField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN)) {
-            getCache().setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, false)
-            return false
-        }
-        return getCache().getField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN) as Boolean
-    }
-
-    fun set247(status: Boolean) {
-        if (!guildHasInfo()) loadGuild()
-        getCache().setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, status)
-    }
-
     fun isPremium(): Boolean {
         return true
 //        return Robertify.getRobertifyAPI().guildIsPremium(guild.idLong);
@@ -132,7 +132,6 @@ class GuildConfigKt(private val guild: Guild) : AbstractGuildConfig(guild) {
     }
 
 
-    @JvmRecord
     data class BannedUser(val user: Long, val bannedBy: Long, val bannedAt: Long, val bannedUntil: Long) {
         override fun toString(): String {
             return user.toString()
