@@ -43,6 +43,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
 
     private val requesters = ArrayList<RequesterKt>()
     private var lastSentMsg: Message? = null
+    val unannouncedTracks = emptyList<String>().toMutableList()
     val audioPlayer: IPlayer = link.player
     val queueHandler = QueueHandlerKt()
     val disconnectManager = GuildDisconnectManagerKt(guild)
@@ -92,7 +93,10 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
             return
 
-        // TODO: Unannounced tracks handling
+        if (unannouncedTracks.contains(track.identifier)) {
+            unannouncedTracks.remove(track.identifier)
+            return
+        }
 
         if (announcementChannel == null)
             return
@@ -237,7 +241,11 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                     .toString()
                     .replace("[\\[\\]\\s]".toRegex(), "")
 
-                // TODO: Load recommended tracks
+                audioManager.loadRecommendedTracks(
+                    musicManager = RobertifyAudioManagerKt.ins.getMusicManager(guild),
+                    channel = announcementChannel,
+                    trackIds = pastSpotifyTracks
+                )
             } else disconnectManager.scheduleDisconnect()
         }
 
@@ -338,7 +346,9 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         if (GuildConfigKt(guild).twentyFourSevenMode)
             return
 
-        // TODO: RobertifyAudioManager Kotlin implementation leave logic
+        RobertifyAudioManagerKt.ins
+            .getMusicManager(guild)
+            .leave()
 
         if (announceMsg && announcementChannel != null)
             announcementChannel?.sendMessageEmbeds(

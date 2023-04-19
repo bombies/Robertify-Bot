@@ -37,8 +37,14 @@ class GuildDisconnectManagerKt(private val guild: Guild) {
         logger.debug("${guild.name} | Cleared any previously scheduled disconnects")
 
         scheduledDisconnect = executorService.schedule({
-            // TODO: Audio manager disconnect logic
+            RobertifyAudioManagerKt.ins
+                .getMusicManager(guild)
+                .scheduler
+                .disconnect(announceMsg)
+            logger.debug("${guild.name} | Bot disconnected.")
+            this.scheduledDisconnect = null
         }, time, timeUnit)
+        logger.debug("${guild.name} | successfully scheduled bot disconnect.")
     }
 
     /**

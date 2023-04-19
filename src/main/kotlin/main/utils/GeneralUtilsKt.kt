@@ -72,13 +72,6 @@ class GeneralUtilsKt {
             return listToString(arr.toList())
         }
 
-        fun longToInt(l: Long): Int {
-            when {
-                l > Int.MAX_VALUE || l < Int.MIN_VALUE -> throw IllegalArgumentException("This long exceeds the integer limits!")
-                else -> return l.toInt()
-            }
-        }
-
         fun stringIsID(s: String): Boolean {
             return s.matches("^[0-9]{18}$".toRegex())
         }

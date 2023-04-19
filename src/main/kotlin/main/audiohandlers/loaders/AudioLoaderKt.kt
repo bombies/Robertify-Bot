@@ -5,7 +5,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import main.audiohandlers.GuildMusicManagerKt
-import main.audiohandlers.TrackSchedulerKt
 import main.audiohandlers.models.RequesterKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.logs.LogTypeKt
@@ -13,7 +12,6 @@ import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -26,14 +24,13 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
 class AudioLoaderKt(
-    private val guild: Guild,
     private val musicManager: GuildMusicManagerKt,
-    private val scheduler: TrackSchedulerKt,
     private val trackUrl: String,
     private val loadPlaylistShuffled: Boolean = false,
     private val addToBeginning: Boolean = false,
     private val announceMsg: Boolean = true,
     private val botMsg: Message? = null,
+    private val _announcementChannel: GuildMessageChannel? = null,
     private val sender: User? = null,
 ) : AudioLoadResultHandler {
 
@@ -53,8 +50,10 @@ class AudioLoaderKt(
         }
     }
 
+    private val guild = musicManager.guild
+    private val scheduler = musicManager.scheduler
     private val queueHandler = scheduler.queueHandler
-    private val announcementChannel: GuildMessageChannel? = botMsg?.channel?.asGuildMessageChannel()
+    private val announcementChannel: GuildMessageChannel? = _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfigKt(guild)
 
     private fun handleMessageUpdate(embed: MessageEmbed) {
@@ -76,11 +75,10 @@ class AudioLoaderKt(
 
         sendTrackLoadedMessage(track)
 
-        if (!announceMsg) {
-            // TODO: Handle unannounced track addition
-        }
+        if (!announceMsg)
+            scheduler.unannouncedTracks.add(track.identifier)
 
-        var requester: RequesterKt? = if (sender != null) {
+        val requester: RequesterKt? = if (sender != null) {
             scheduler.addRequester(sender.id, track.identifier)
             RequesterKt(sender.id, track.identifier)
         } else scheduler.findRequester(track.identifier)
@@ -127,7 +125,7 @@ class AudioLoaderKt(
                 val firstResult = tracks[0]
 
                 if (!announceMsg) {
-                    // TODO: Unannounced track addition handling
+                    scheduler.unannouncedTracks.add(firstResult.identifier)
                 }
 
                 if (sender != null)
@@ -159,7 +157,7 @@ class AudioLoaderKt(
                 handleMessageUpdate(embed)
 
                 if (!announceMsg)
-                    tracks.forEach { track -> /* TODO: Unannounced track addition logic */ }
+                    tracks.forEach { track -> scheduler.unannouncedTracks.add(track.identifier) }
 
                 if (loadPlaylistShuffled)
                     tracks.shuffle()
@@ -218,10 +216,12 @@ class AudioLoaderKt(
         if (exception.message?.contains("available") == false && exception.message?.contains("format") == false)
             logger.error("Could not load tracks in ${guild.name}!", exception)
 
-        val embed = RobertifyEmbedUtilsKt.embedMessage(guild,
+        val embed = RobertifyEmbedUtilsKt.embedMessage(
+            guild,
             if (exception.message?.contains("available") == true || exception.message?.contains("format") == true)
                 exception.message!!
-            else LocaleManagerKt.getLocaleManager(guild).getMessage(RobertifyLocaleMessageKt.AudioLoaderMessages.ERROR_LOADING_TRACK)
+            else LocaleManagerKt.getLocaleManager(guild)
+                .getMessage(RobertifyLocaleMessageKt.AudioLoaderMessages.ERROR_LOADING_TRACK)
         ).build()
 
         handleMessageUpdate(embed)
