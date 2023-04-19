@@ -1,10 +1,13 @@
 package main.utils
 
+import main.constants.PermissionKt
 import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
 import main.constants.TimeFormat
-import main.utils.json.GenericJSONField
+import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.GenericJSONFieldKt
+import main.utils.json.permissions.PermissionsConfigKt
+import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
@@ -117,8 +120,7 @@ class GeneralUtilsKt {
             return s.replace("\\d".toRegex(), "")
         }
 
-        // TODO: Change the permission type
-        fun hasPerms(guild: Guild, sender: Member?, vararg perms: Any): Boolean {
+        fun hasPerms(guild: Guild, sender: Member?, vararg perms: PermissionKt): Boolean {
             if (sender == null)
                 return false
 
@@ -128,14 +130,26 @@ class GeneralUtilsKt {
                 return true
 
             val roles = sender.roles
-            // TODO: Setup permission checking from permission config
+            val config = PermissionsConfigKt(guild)
+            var pass = 0
 
-            return true
+            roles.forEach { role ->
+                if (config.getRolesForPermission(PermissionKt.ROBERTIFY_ADMIN).contains(role.idLong))
+                    return true
+                perms.forEach { perm ->
+                    pass += if (config.getRolesForPermission(perm).contains(role.idLong)
+                        || config.getUsersForPermission(perm.name).contains(sender.idLong)
+                    )
+                        1
+                    else 0
+                }
+            }
+
+            return pass >= perms.size
         }
 
-        // TODO: Implement developer checking logic
         fun isDeveloper(uid: Long): Boolean {
-            return false
+            return BotDBCacheKt.instance!!.isDeveloper(uid)
         }
 
         fun isDeveloper(uid: String): Boolean {
@@ -421,16 +435,14 @@ class GeneralUtilsKt {
         }
 
         fun setDefaultEmbed(guild: Guild) {
-            // TODO: Handle themes config
-            val theme = RobertifyThemeKt.RED
+            val theme = ThemesConfigKt(guild).theme
             RobertifyEmbedUtilsKt.setEmbedBuilder(guild) {
                 EmbedBuilder().setColor(theme.color)
             }
         }
 
         fun setCustomEmbed(guild: Guild, author: String? = null, footer: String? = null) {
-            // TODO: Handle themes config
-            val theme = RobertifyThemeKt.RED
+            val theme = ThemesConfigKt(guild).theme
             RobertifyEmbedUtilsKt.setEmbedBuilder(guild) {
                 EmbedBuilder()
                     .setColor(theme.color)
