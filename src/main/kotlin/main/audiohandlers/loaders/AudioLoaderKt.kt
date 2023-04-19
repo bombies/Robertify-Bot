@@ -39,6 +39,18 @@ class AudioLoaderKt(
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+
+        fun RestAction<Message>.queueWithAutoDelete(
+            time: Long = 10,
+            unit: TimeUnit = TimeUnit.SECONDS,
+            deletePredicate: ((message: Message) -> Boolean)? = null,
+            onSuccess: Consumer<Void>? = null
+        ) {
+            this.queue { msg ->
+                if (deletePredicate == null || deletePredicate(msg))
+                    msg.delete().queueAfter(time, unit, onSuccess, ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE))
+            }
+        }
     }
 
     private val queueHandler = scheduler.queueHandler
@@ -213,17 +225,5 @@ class AudioLoaderKt(
         ).build()
 
         handleMessageUpdate(embed)
-    }
-
-    fun RestAction<Message>.queueWithAutoDelete(
-        time: Long = 10,
-        unit: TimeUnit = TimeUnit.SECONDS,
-        deletePredicate: ((message: Message) -> Boolean)? = null,
-        onSuccess: Consumer<Void>? = null
-    ) {
-        this.queue { msg ->
-            if (deletePredicate == null || deletePredicate(msg))
-                msg.delete().queueAfter(time, unit, onSuccess, ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE))
-        }
     }
 }
