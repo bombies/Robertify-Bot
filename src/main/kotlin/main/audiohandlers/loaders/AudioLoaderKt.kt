@@ -11,14 +11,19 @@ import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
+import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
+import net.dv8tion.jda.api.requests.RestAction
+import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 class AudioLoaderKt(
     private val guild: Guild,
@@ -32,9 +37,26 @@ class AudioLoaderKt(
     private val sender: User? = null,
 ) : AudioLoadResultHandler {
 
+    companion object {
+        private val logger = LoggerFactory.getLogger(Companion::class.java)
+    }
+
     private val queueHandler = scheduler.queueHandler
     private val announcementChannel: GuildMessageChannel? = botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfigKt(guild)
+
+    private fun handleMessageUpdate(embed: MessageEmbed) {
+        if (botMsg != null)
+            botMsg.editMessageEmbeds(embed)
+                .queueWithAutoDelete(
+                    deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == msg.channel.idLong }
+                )
+        else {
+            requestChannelConfig.getTextChannel()
+                ?.sendMessageEmbeds(embed)
+                ?.queueWithAutoDelete()
+        }
+    }
 
     override fun trackLoaded(track: AudioTrack?) {
         if (track == null)
@@ -79,27 +101,7 @@ class AudioLoaderKt(
             Pair("{author}", track.info.author)
         ).build()
 
-        if (botMsg != null) {
-            botMsg.editMessageEmbeds(embed).queue { success ->
-                success.editMessageComponents()
-                    .queue { msg ->
-                        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == msg.channel.idLong)
-                            msg.delete().queueAfter(
-                                10,
-                                TimeUnit.SECONDS,
-                                null,
-                                ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                            )
-                    }
-            }
-        } else if (requestChannelConfig.isChannelSet()) {
-            requestChannelConfig.getTextChannel()
-                ?.sendMessageEmbeds(embed)
-                ?.queue { msg ->
-                    msg.delete()
-                        .queueAfter(10, TimeUnit.SECONDS, null, ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE))
-                }
-        }
+        handleMessageUpdate(embed)
     }
 
     override fun playlistLoaded(playlist: AudioPlaylist?) {
@@ -142,28 +144,7 @@ class AudioLoaderKt(
                     Pair("{playlist}", playlist.name)
                 ).build()
 
-                if (botMsg != null) {
-                    botMsg.editMessageEmbeds(embed).queue { msg ->
-                        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == msg.channel.idLong)
-                            msg.delete().queueAfter(
-                                10,
-                                TimeUnit.SECONDS,
-                                null,
-                                ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                            )
-                    }
-                } else {
-                    if (requestChannelConfig.isChannelSet())
-                        requestChannelConfig.getTextChannel()!!.sendMessageEmbeds(embed)
-                            .queue { msg ->
-                                msg.delete().queueAfter(
-                                    10,
-                                    TimeUnit.SECONDS,
-                                    null,
-                                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                                )
-                            }
-                }
+                handleMessageUpdate(embed)
 
                 if (!announceMsg)
                     tracks.forEach { track -> /* TODO: Unannounced track addition logic */ }
@@ -177,7 +158,8 @@ class AudioLoaderKt(
                     scheduler.addToBeginningOfQueue(tracks)
 
                 if (sender != null)
-                    LogUtilsKt(guild).sendLog(LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
+                    LogUtilsKt(guild).sendLog(
+                        LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                         Pair("{user}", sender.asMention),
                         Pair("{numTracks}", tracks.size.toString()),
                         Pair("{playlist}", playlist.name)
@@ -199,10 +181,49 @@ class AudioLoaderKt(
     }
 
     override fun noMatches() {
-        TODO("Not yet implemented")
+        val embed = if (trackUrl.length < 4096)
+            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND)
+                .build()
+        else RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND_ALT)
+            .build()
+
+        handleMessageUpdate(embed)
+
+        if (queueHandler.isEmpty && musicManager.player.playingTrack == null)
+            scheduler.scheduleDisconnect(1, TimeUnit.SECONDS, false)
     }
 
     override fun loadFailed(exception: FriendlyException?) {
-        TODO("Not yet implemented")
+        if (exception == null) {
+            // Highly unlikely but due to Java interop Kotlin thinks the exception could be null
+            logger.warn("The loadFailed method was called while attempting to load tracks in ${guild.name} but the exception was null!")
+            return
+        }
+
+        if (musicManager.player.playingTrack == null)
+            musicManager.leave()
+
+        if (exception.message?.contains("available") == false && exception.message?.contains("format") == false)
+            logger.error("Could not load tracks in ${guild.name}!", exception)
+
+        val embed = RobertifyEmbedUtilsKt.embedMessage(guild,
+            if (exception.message?.contains("available") == true || exception.message?.contains("format") == true)
+                exception.message!!
+            else LocaleManagerKt.getLocaleManager(guild).getMessage(RobertifyLocaleMessageKt.AudioLoaderMessages.ERROR_LOADING_TRACK)
+        ).build()
+
+        handleMessageUpdate(embed)
+    }
+
+    fun RestAction<Message>.queueWithAutoDelete(
+        time: Long = 10,
+        unit: TimeUnit = TimeUnit.SECONDS,
+        deletePredicate: ((message: Message) -> Boolean)? = null,
+        onSuccess: Consumer<Void>? = null
+    ) {
+        this.queue { msg ->
+            if (deletePredicate == null || deletePredicate(msg))
+                msg.delete().queueAfter(time, unit, onSuccess, ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE))
+        }
     }
 }
