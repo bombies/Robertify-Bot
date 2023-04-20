@@ -1,45 +1,42 @@
 package main.audiohandlers.loaders
 
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import dev.minn.jda.ktx.messages.send
+import dev.schlaubi.lavakord.Exception
+import dev.schlaubi.lavakord.audio.player.Player
+import dev.schlaubi.lavakord.rest.models.PartialTrack
+import dev.schlaubi.lavakord.rest.models.TrackResponse
 import main.audiohandlers.GuildMusicManagerKt
-import main.audiohandlers.loaders.AudioLoaderKt.Companion.queueWithAutoDelete
+import main.audiohandlers.loaders.MainAudioLoaderKt.Companion.queueWithAutoDelete
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
-import java.lang.NullPointerException
 import java.util.concurrent.TimeUnit
 
 class AutoPlayLoaderKt(
     private val musicManager: GuildMusicManagerKt,
     private val channel: GuildMessageChannel?,
-) : AudioLoadResultHandler {
+    override val query: String
+) : AudioLoader(musicManager.link) {
 
     private val scheduler = musicManager.scheduler
     private val queueHandler = scheduler.queueHandler
     private val guild = musicManager.guild
 
-    override fun trackLoaded(track: AudioTrack?) {
+    override suspend fun trackLoaded(player: Player, track: PartialTrack) {
         throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
     }
 
-    override fun playlistLoaded(playlist: AudioPlaylist?) {
-        if (playlist == null)
-            return
-
-        if (playlist.isSearchResult)
-            throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
-
+    override suspend fun playlistLoaded(
+        player: Player,
+        tracks: List<PartialTrack>,
+        playlistInfo: TrackResponse.NullablePlaylistInfo
+    ) {
         val self = guild.selfMember
-        val tracks = playlist.tracks
         tracks.forEach { track ->
-            scheduler.addRequester(self.id, track.identifier)
-            scheduler.queue(track)
+            scheduler.addRequester(self.id, track.info.identifier)
+            scheduler.queue(track.toTrack())
         }
 
         if (queueHandler.isQueueRepeating) {
@@ -64,7 +61,11 @@ class AutoPlayLoaderKt(
         }
     }
 
-    override fun noMatches() {
+    override suspend fun searchLoaded(player: Player, tracks: List<PartialTrack>) {
+        throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
+    }
+
+    override suspend fun noMatches() {
         channel?.sendMessageEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
@@ -77,7 +78,8 @@ class AutoPlayLoaderKt(
         throw FriendlyException("There were no similar tracks found!", FriendlyException.Severity.COMMON, NullPointerException())
     }
 
-    override fun loadFailed(exception: FriendlyException?) {
-        throw FriendlyException("Unexpected error", FriendlyException.Severity.SUSPICIOUS, exception)
+    override suspend fun loadFailed(exception: Exception?) {
+        if (exception != null)
+            throw Exception(exception.cause)
     }
 }

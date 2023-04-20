@@ -1,13 +1,31 @@
 package main.audiohandlers
 
+import com.github.topisenpai.lavasrc.applemusic.AppleMusicAudioTrack
+import com.github.topisenpai.lavasrc.deezer.DeezerAudioTrack
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
+import com.github.topisenpai.lavasrc.spotify.SpotifyAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioTrack
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
-import lavalink.client.io.Link
-import lavalink.client.player.IPlayer
-import lavalink.client.player.event.PlayerEventListenerAdapter
+import dev.schlaubi.lavakord.audio.*
+import dev.schlaubi.lavakord.audio.player.Track
 import main.audiohandlers.models.RequesterKt
+import main.audiohandlers.sources.resume.ResumeTrackKt
 import main.constants.ToggleKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -35,132 +53,159 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
 
-class TrackSchedulerKt(private val guild: Guild, private val link: Link) : PlayerEventListenerAdapter() {
+class TrackSchedulerKt(private val guild: Guild, link: Link) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val audioManager = RobertifyAudioManagerKt.ins
+
+        fun Track.toAudioTrack(): AudioTrack {
+            val trackInfo = AudioTrackInfo(title, author, length.inWholeMilliseconds, identifier, isStream, uri)
+            return when (source) {
+                "spotify" -> SpotifyAudioTrack(trackInfo, null, null, audioManager.spotifySourceManager)
+                "deezer" -> DeezerAudioTrack(trackInfo, null, null, audioManager.deezerAudioSourceManager)
+                "applemusic" -> AppleMusicAudioTrack(trackInfo, null, null, audioManager.appleMusicSourceManager)
+                "soundcloud" -> SoundCloudAudioTrack(trackInfo, SoundCloudAudioSourceManager.createDefault())
+                "youtube" -> YoutubeAudioTrack(trackInfo, YoutubeAudioSourceManager())
+                "resume" -> ResumeTrackKt(trackInfo, null, null, audioManager.resumeSourceManager)
+                "bandcamp" -> BandcampAudioTrack(trackInfo, BandcampAudioSourceManager())
+                "vimeo" -> VimeoAudioTrack(trackInfo, VimeoAudioSourceManager())
+                "twitch" -> TwitchStreamAudioTrack(trackInfo, TwitchStreamAudioSourceManager())
+                "getyarn.io" -> GetyarnAudioTrack(trackInfo, GetyarnAudioSourceManager())
+                "http" -> HttpAudioTrack(trackInfo, null, HttpAudioSourceManager())
+                "local" -> LocalAudioTrack(trackInfo, null, LocalAudioSourceManager())
+                else -> throw IllegalStateException("The source \"${source}\" hasn't been configured to provide a valid lavaplayer track!")
+            }
+        }
     }
 
     private val requesters = ArrayList<RequesterKt>()
     private var lastSentMsg: Message? = null
     val unannouncedTracks = emptyList<String>().toMutableList()
-    val audioPlayer: IPlayer = link.player
+    val player = link.player
     val queueHandler = QueueHandlerKt()
     val disconnectManager = GuildDisconnectManagerKt(guild)
     var announcementChannel: GuildMessageChannel? = null
 
-    fun queue(track: AudioTrack) = run {
+    init {
+        trackStartEventHandler()
+        trackEndEventHandler()
+        trackExceptionEventHandler()
+        trackStuckEventHandler()
+    }
+
+    suspend fun queue(track: Track) = run {
         when {
-            audioPlayer.playingTrack != null -> queueHandler.add(track)
-            else -> audioPlayer.playTrack(track)
+            player.playingTrack != null -> queueHandler.add(track)
+            else -> player.playTrack(track)
         }
     }
 
-    fun addToBeginningOfQueue(track: AudioTrack) = run {
+    suspend fun addToBeginningOfQueue(track: Track) = run {
         when {
-            audioPlayer.playingTrack != null -> audioPlayer.playTrack(track)
+            player.playingTrack != null -> player.playTrack(track)
             else -> queueHandler.addToBeginning(track)
         }
     }
 
-    fun addToBeginningOfQueue(tracks: Collection<AudioTrack>) {
+    suspend fun addToBeginningOfQueue(tracks: Collection<Track>) {
         val mutableTracks = tracks.toMutableList()
-        if (audioPlayer.playingTrack == null) {
-            audioPlayer.playTrack(mutableTracks[0])
+        if (player.playingTrack == null) {
+            player.playTrack(mutableTracks[0])
             mutableTracks.removeAt(0)
         }
 
         queueHandler.addToBeginning(mutableTracks)
     }
 
-    fun stop() {
+    suspend fun stop() {
         queueHandler.clear()
 
-        if (audioPlayer.playingTrack != null)
-            audioPlayer.stopTrack()
+        if (player.playingTrack != null)
+            player.stopTrack()
     }
 
-    override fun onTrackStart(player: IPlayer?, track: AudioTrack?) {
-        if (track == null || player == null)
-            return
+    private fun trackStartEventHandler() =
+        player.on<Event, TrackStartEvent> {
+            val track = getTrack()
+            disconnectManager.cancelDisconnect()
+            queueHandler.lastPlayedTrackBuffer = track
 
-        disconnectManager.cancelDisconnect()
-        queueHandler.lastPlayedTrackBuffer = track
+            if (queueHandler.isTrackRepeating)
+                return@on
 
-        if (queueHandler.isTrackRepeating)
-            return
+            if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
+                return@on
 
-        if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
-            return
+            if (unannouncedTracks.contains(track.identifier)) {
+                unannouncedTracks.remove(track.identifier)
+                return@on
+            }
 
-        if (unannouncedTracks.contains(track.identifier)) {
-            unannouncedTracks.remove(track.identifier)
-            return
-        }
+            if (announcementChannel == null)
+                return@on
 
-        if (announcementChannel == null)
-            return
+            val requester = findRequester(track.identifier) ?: return@on
 
-        val requester = findRequester(track.identifier) ?: return
+            val requesterMention = getRequesterAsMention(track)
 
-        val requesterMention = getRequesterAsMention(track)
+            val requestChannelConfig = RequestChannelConfigKt(guild)
+            if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
+                return@on
 
-        val requestChannelConfig = RequestChannelConfigKt(guild)
-        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
-            return
+            val lavaplayerTrack = track.toAudioTrack()
+            RobertifyKt.shardManager.retrieveUserById(requester.id)
+                .submit()
+                .thenCompose { requesterObj ->
+                    val img = NowPlayingImageBuilderKt(
+                        artistName = track.author,
+                        title = track.title,
+                        albumImage = if (lavaplayerTrack is MirroringAudioTrack) lavaplayerTrack.artworkURL else ThemesConfigKt(
+                            guild
+                        ).theme.nowPlayingBanner,
+                        requesterName = "${requesterObj.name}#${requesterObj.discriminator}",
+                        requesterAvatar = requesterObj.avatarUrl
+                    ).build() ?: throw CompletionException(NullPointerException("The generated image was null!"))
 
-        val trackInfo = track.info
-        RobertifyKt.shardManager.retrieveUserById(requester.id)
-            .submit()
-            .thenCompose { requesterObj ->
-                val img = NowPlayingImageBuilderKt(
-                    artistName = trackInfo.author,
-                    title = trackInfo.title,
-                    albumImage = if (track is MirroringAudioTrack) track.artworkURL else ThemesConfigKt(guild).theme.nowPlayingBanner,
-                    requesterName = "${requesterObj.name}#${requesterObj.discriminator}",
-                    requesterAvatar = requesterObj.avatarUrl
-                ).build() ?: throw CompletionException(NullPointerException("The generated image was null!"))
-
-                return@thenCompose announcementChannel!!.sendFiles(
-                    FileUpload.fromData(
-                        img,
-                        AbstractImageBuilderKt.getRandomFileName()
+                    return@thenCompose announcementChannel!!.sendFiles(
+                        FileUpload.fromData(
+                            img,
+                            AbstractImageBuilderKt.getRandomFileName()
+                        )
                     )
-                )
-                    .submit()
-            }
-            .thenApply { msg ->
-                lastSentMsg?.delete()?.queueAfter(
-                    3L, TimeUnit.SECONDS, null,
-                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                )
-
-                lastSentMsg = msg
-                return@thenApply msg
-            }
-            .whenComplete imageCompletion@{ _, ex ->
-                if (ex == null)
-                    return@imageCompletion
-
-                // Either building the image failed or the bot doesn't have enough
-                // permission to send images in a certain channel
-                if (ex.cause is PermissionException || ex.cause is ImageBuilderExceptionKt) {
-                    sendNowPlayingEmbed(trackInfo, requesterMention)
-                        ?.whenComplete embedCompletion@{ _, err ->
-                            if (err == null)
-                                return@embedCompletion
-
-                            // Probably doesn't have permission to send embeds
-                            if (err is PermissionException)
-                                sendNowPlayingString(trackInfo, requesterMention)
-                                    ?.whenComplete { _, stringErr ->
-                                        if (stringErr != null)
-                                            logger.warn("I was not able to send a now playing message at all in ${guild.name}")
-                                    }
-                        }
+                        .submit()
                 }
-            }
-    }
+                .thenApply { msg ->
+                    lastSentMsg?.delete()?.queueAfter(
+                        3L, TimeUnit.SECONDS, null,
+                        ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                    )
+
+                    lastSentMsg = msg
+                    return@thenApply msg
+                }
+                .whenComplete imageCompletion@{ _, ex ->
+                    if (ex == null)
+                        return@imageCompletion
+
+                    // Either building the image failed or the bot doesn't have enough
+                    // permission to send images in a certain channel
+                    if (ex.cause is PermissionException || ex.cause is ImageBuilderExceptionKt) {
+                        sendNowPlayingEmbed(lavaplayerTrack.info, requesterMention)
+                            ?.whenComplete embedCompletion@{ _, err ->
+                                if (err == null)
+                                    return@embedCompletion
+
+                                // Probably doesn't have permission to send embeds
+                                if (err is PermissionException)
+                                    sendNowPlayingString(lavaplayerTrack.info, requesterMention)
+                                        ?.whenComplete { _, stringErr ->
+                                            if (stringErr != null)
+                                                logger.warn("I was not able to send a now playing message at all in ${guild.name}")
+                                        }
+                            }
+                    }
+                }
+        }
 
     private fun getNowPlayingEmbed(trackInfo: AudioTrackInfo, requesterMention: String): MessageEmbed {
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
@@ -216,24 +261,24 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             }
     }
 
-    fun nextTrack(lastTrack: AudioTrack?, skipped: Boolean = false, skippedAt: Long? = null) {
+    suspend fun nextTrack(lastTrack: Track?, skipped: Boolean = false, skippedAt: Long? = null) {
         // TODO: Handle playtime updating
 
         if (queueHandler.isEmpty && queueHandler.isQueueRepeating)
             queueHandler.loadSavedQueue()
 
         val nextTrack = queueHandler.poll()
-        audioPlayer.stopTrack()
+        player.stopTrack()
 
         if (nextTrack != null)
-            audioPlayer.playTrack(nextTrack)
+            player.playTrack(nextTrack)
         else {
             if (lastTrack != null
                 && AutoPlayConfigKt(guild).status
-                && lastTrack.sourceManager.sourceName.equals("spotify", true)
+                && lastTrack.source.equals("spotify", true)
             ) {
                 val pastSpotifyTrackList = queueHandler.previousTracksContents
-                    .filter { track -> track.sourceManager.sourceName == "spotify" }
+                    .filter { track -> track.source == "spotify" }
                     .map { track -> track.identifier }
                 val pastSpotifyTracks = pastSpotifyTrackList
                     .subList(0, pastSpotifyTrackList.size.coerceAtMost(5))
@@ -251,96 +296,87 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         RequestChannelConfigKt(guild).updateMessage()
     }
 
-    override fun onTrackEnd(player: IPlayer?, track: AudioTrack?, endReason: AudioTrackEndReason?) {
-        if (player == null)
-            return
+    private fun trackEndEventHandler() =
+        player.on<Event, TrackEndEvent> {
+            val track = getTrack()
+            val trackToUse = queueHandler.lastPlayedTrackBuffer
 
-        val trackToUse = queueHandler.lastPlayedTrackBuffer
-
-        if (queueHandler.isTrackRepeating) {
-            if (trackToUse != null) {
-                try {
-                    val clonedTrack = trackToUse.makeClone()
-                    queueHandler.lastPlayedTrackBuffer = clonedTrack
-                } catch (e: UnsupportedOperationException) {
-                    player.seekTo(0)
+            if (queueHandler.isTrackRepeating) {
+                if (trackToUse == null) {
+                    queueHandler.isTrackRepeating = false
+                    nextTrack(null)
                 }
-            } else {
-                queueHandler.isTrackRepeating = false
-                nextTrack(null)
+            } else if (reason.mayStartNext) {
+                if (trackToUse != null)
+                    queueHandler.pushPastTrack(trackToUse)
+                nextTrack(trackToUse)
             }
-        } else if (endReason?.mayStartNext == true) {
-            if (trackToUse != null)
-                queueHandler.pushPastTrack(trackToUse)
-            nextTrack(trackToUse)
-        }
-    }
-
-    override fun onTrackException(player: IPlayer?, track: AudioTrack?, exception: Exception?) {
-        if (exception == null)
-            return
-
-        val handleMessageCleanup: (msg: Message) -> Unit = { msg ->
-            msg.delete().queueAfter(10, TimeUnit.SECONDS)
         }
 
-        if (exception.message?.contains("matching track") == true) {
-            announcementChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE
-                ).build()
-            )
-                ?.queue(handleMessageCleanup)
-        } else if (exception.message?.contains("copyright") == true) {
-            announcementChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.COPYRIGHT_TRACK,
-                    Pair("{title}", track!!.info.title),
-                    Pair("{author}", track.info.author)
-                ).build()
-            )
-                ?.queue(handleMessageCleanup)
-        } else if (exception.message?.contains("unavailable") == true) {
-            announcementChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.UNAVAILABLE_TRACK,
-                    Pair("{title}", track!!.info.title),
-                    Pair("{author}", track.info.author)
-                ).build()
-            )
-                ?.queue(handleMessageCleanup)
-        } else if (exception.message?.contains("playlist type is unviewable") == true) {
-            announcementChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.UNVIEWABLE_PLAYLIST
-                ).build()
-            )
-                ?.queue(handleMessageCleanup)
-        } else logger.error("There was an exception with playing the track.", exception)
-    }
+    private fun trackExceptionEventHandler() =
+        player.on<Event, TrackExceptionEvent> {
+            val track = getTrack()
+            val handleMessageCleanup: (msg: Message) -> Unit = { msg ->
+                msg.delete().queueAfter(10, TimeUnit.SECONDS)
+            }
 
-    override fun onTrackStuck(player: IPlayer?, track: AudioTrack?, thresholdMs: Long) {
-        if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
-            return
-
-        try {
-            announcementChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
-                    Pair("{title}", track?.info?.title ?: "Unknown Title"),
-                    Pair("{author}", track?.info?.title ?: "Unknown Author"),
-                ).build()
-            )?.queue { msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES) }
-        } catch (_: InsufficientPermissionException) {
+            if (exception.message.contains("matching track")) {
+                announcementChannel?.sendMessageEmbeds(
+                    RobertifyEmbedUtilsKt.embedMessage(
+                        guild,
+                        RobertifyLocaleMessageKt.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE
+                    ).build()
+                )
+                    ?.queue(handleMessageCleanup)
+            } else if (exception.message.contains("copyright")) {
+                announcementChannel?.sendMessageEmbeds(
+                    RobertifyEmbedUtilsKt.embedMessage(
+                        guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.COPYRIGHT_TRACK,
+                        Pair("{title}", track.title),
+                        Pair("{author}", track.author)
+                    ).build()
+                )
+                    ?.queue(handleMessageCleanup)
+            } else if (exception.message.contains("unavailable")) {
+                announcementChannel?.sendMessageEmbeds(
+                    RobertifyEmbedUtilsKt.embedMessage(
+                        guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.UNAVAILABLE_TRACK,
+                        Pair("{title}", track.title),
+                        Pair("{author}", track.author)
+                    ).build()
+                )
+                    ?.queue(handleMessageCleanup)
+            } else if (exception.message.contains("playlist type is unviewable")) {
+                announcementChannel?.sendMessageEmbeds(
+                    RobertifyEmbedUtilsKt.embedMessage(
+                        guild,
+                        RobertifyLocaleMessageKt.TrackSchedulerMessages.UNVIEWABLE_PLAYLIST
+                    ).build()
+                )
+                    ?.queue(handleMessageCleanup)
+            } else logger.error("There was an exception with playing the track.", exception)
         }
 
-        nextTrack(track)
-    }
+    private fun trackStuckEventHandler() =
+        player.on<Event, TrackStartEvent> {
+            val track = getTrack()
+            if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
+                return@on
 
-    fun disconnect(announceMsg: Boolean = true) {
+            try {
+                announcementChannel?.sendMessageEmbeds(
+                    RobertifyEmbedUtilsKt.embedMessage(
+                        guild,
+                        RobertifyLocaleMessageKt.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
+                        Pair("{title}", track.title),
+                        Pair("{author}", track.author),
+                    ).build()
+                )?.queue { msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES) }
+            } catch (_: InsufficientPermissionException) { }
+            nextTrack(track)
+        }
+
+    suspend fun disconnect(announceMsg: Boolean = true) {
         val channel = guild.selfMember.voiceState?.channel ?: return
         if (GuildConfigKt(guild).twentyFourSevenMode)
             return
@@ -378,7 +414,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
 
     fun clearRequesters() = requesters.clear()
 
-    fun getRequesterAsMention(track: AudioTrack): String {
+    fun getRequesterAsMention(track: Track): String {
         val requester = findRequester(track.identifier)
         return if (requester != null)
             "<@${requester.id}>"

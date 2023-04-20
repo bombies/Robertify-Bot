@@ -1,5 +1,7 @@
 package main.commands.slashcommands
 
+import main.commands.slashcommands.audio.DisconnectCommandKt
+import main.commands.slashcommands.audio.PlayCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
 
@@ -40,7 +42,10 @@ class SlashCommandManagerKt private constructor() {
         }
 
     init {
-        addMusicCommands()
+        addMusicCommands(
+            PlayCommandKt(),
+            DisconnectCommandKt()
+        )
         addManagementCommands()
         addMiscCommands()
         addUtilityCommands()

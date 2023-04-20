@@ -77,22 +77,37 @@ class ConfigKt {
                 emptyList()
             }
 
-        fun getOwnerID(): Long = getLong(ENVKt.OWNER_ID)
-        fun isPremiumBot(): Boolean = getBoolean(ENVKt.PREMIUM_BOT)
-        fun loadCommands(): Boolean = getBoolean(ENVKt.LOAD_COMMANDS)
-        fun loadNeededCommands(): Boolean = getBoolean(ENVKt.LOAD_NEEDED_COMMANDS)
-        fun getGatewayUrl(): String = get(ENVKt.GATEWAY_URL)
-        fun hasGatewayUrl(): Boolean = hasValue(ENVKt.GATEWAY_URL)
+        val youtubeEnabled: Boolean
+            get() =
+                hasValue(ENVKt.YOUTUBE_ENABLED) && getBoolean(ENVKt.YOUTUBE_ENABLED)
+
+        val ownerId: Long
+            get() = getLong(ENVKt.OWNER_ID)
+
+        val premiumBot: Boolean
+            get() = getBoolean(ENVKt.PREMIUM_BOT)
+
+        val loadCommands: Boolean
+            get() = getBoolean(ENVKt.LOAD_COMMANDS)
+
+        val loadNeededCommands: Boolean
+            get() = getBoolean(ENVKt.LOAD_NEEDED_COMMANDS)
+
+        val gatewayUrl: String
+            get() = get(ENVKt.GATEWAY_URL)
+
+        val hasGatewayUrl: Boolean
+            get() = hasValue(ENVKt.GATEWAY_URL)
+
+        val environment: String
+            get() = get(ENVKt.ENVIRONMENT)
 
         fun hasValue(value: ENVKt): Boolean {
             val valueString = get(value)
             return valueString.isNotEmpty() && valueString.isNotBlank()
         }
 
-        fun isYoutubeEnabled(): Boolean = hasValue(ENVKt.YOUTUBE_ENABLED) && getBoolean(ENVKt.YOUTUBE_ENABLED)
-        fun getEnvironment(): String = get(ENVKt.ENVIRONMENT)
-
-        fun getSentryEnvironment(): String = when (getEnvironment().lowercase(Locale.getDefault())) {
+        fun getSentryEnvironment(): String = when (environment.lowercase(Locale.getDefault())) {
             "dev", "development" -> {
                 "development"
             }
@@ -105,12 +120,12 @@ class ConfigKt {
                 "staging"
             }
 
-            else -> throw IllegalArgumentException("\"" + getEnvironment() + "\" isn't a valid environment!")
+            else -> throw IllegalArgumentException("\"$environment\" isn't a valid environment!")
         }
 
-        fun isProdEnv(): Boolean = getEnvironment().equals("prod", ignoreCase = true)
-        fun isStagingEnv(): Boolean = getEnvironment().equals("staging", ignoreCase = true)
-        fun isDevEnv(): Boolean = getEnvironment().equals("dev", ignoreCase = true)
+        fun isProdEnv(): Boolean = environment.equals("prod", ignoreCase = true)
+        fun isStagingEnv(): Boolean = environment.equals("staging", ignoreCase = true)
+        fun isDevEnv(): Boolean = environment.equals("dev", ignoreCase = true)
 
         fun getInt(key: ENVKt): Int = get(key, "-1").toInt()
         fun getLong(key: ENVKt): Long = get(key, "-1").toLong()

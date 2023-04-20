@@ -1,23 +1,22 @@
 package main.audiohandlers
 
-import lavalink.client.io.Link
+import dev.schlaubi.lavakord.audio.Link
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import main.main.RobertifyKt
+import main.utils.internal.delegates.SynchronizedProperty
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import net.dv8tion.jda.api.entities.Guild
 
 class GuildMusicManagerKt(val guild: Guild) {
-    // TODO: Replace with Robertify Kotlin implementation
-    val link = RobertifyKt.lavalink.getLink(guild)
+    val link by SynchronizedProperty { RobertifyKt.lavakord.getLink(guild.id) }
     val player = link.player
     val scheduler = TrackSchedulerKt(guild, link)
     val playerManager = RobertifyAudioManagerKt.ins.playerManager
     var isForcePaused: Boolean = false
 
-    init {
-        player.addListener(scheduler)
-    }
-
-    fun clear() {
+    suspend fun clear() {
         val queueHandler = scheduler.queueHandler
 
         queueHandler.clear()
@@ -26,13 +25,14 @@ class GuildMusicManagerKt(val guild: Guild) {
 
         queueHandler.isTrackRepeating = false
         queueHandler.isQueueRepeating = false
-        player.filters.clear().commit()
+
+        player.filters.reset()
 
         if (player.playingTrack != null)
             player.stopTrack()
 
-        if (player.isPaused)
-            player.isPaused = false
+        if (player.paused)
+            player.pause(false)
 
         // TODO: Requester clearing
         // TODO: Vote skip clearing
@@ -40,15 +40,13 @@ class GuildMusicManagerKt(val guild: Guild) {
         RequestChannelConfigKt(guild).updateMessage()
     }
 
-    fun leave() {
+    suspend fun leave() {
         clear()
         scheduler.stop()
         RobertifyAudioManagerKt.ins.removeMusicManager(guild)
     }
 
-    fun destroy() {
-        player.removeListener(scheduler)
-
+    suspend fun destroy() {
         if (link.state != Link.State.DESTROYED)
             link.destroy()
     }

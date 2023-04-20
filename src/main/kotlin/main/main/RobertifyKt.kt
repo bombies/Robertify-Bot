@@ -1,10 +1,9 @@
 package main.main
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.jdabuilder.defaultShardWithLavakord
 import dev.schlaubi.lavakord.LavaKord
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
@@ -14,7 +13,6 @@ import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
-import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.ShardManager
 import net.dv8tion.jda.api.utils.cache.CacheFlag
@@ -22,20 +20,13 @@ import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CancellationException
-import java.util.concurrent.Executors
-import java.util.concurrent.ForkJoinPool
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.time.Duration.Companion.minutes
 
 object RobertifyKt {
     private val logger = LoggerFactory.getLogger(RobertifyKt::class.java)
-    private val threadPool = Executors.newScheduledThreadPool(ForkJoinPool.getCommonPoolParallelism().coerceAtLeast(3))
     val cronScheduler = StdSchedulerFactory.getDefaultScheduler()
     var topGGAPI: DiscordBotListAPI? = null
-    lateinit var coroutineEventManager: CoroutineEventManager
-        private set
     lateinit var lavalink: JdaLavalink
         private set
     lateinit var lavakord: LavaKord
@@ -51,13 +42,15 @@ object RobertifyKt {
             .build()
         Runtime.getRuntime().addShutdownHook(mainShutdownHook.newThread {
             logger.info("Destroying all players (If any left)")
-            RobertifyAudioManagerKt.ins.musicManagers
-                .values
-                .forEach { musicManager ->
-                    if (musicManager.player.playingTrack != null)
-                        GuildResumeManagerKt(musicManager.guild).saveTracks()
-                    musicManager.destroy()
-                }
+            runBlocking {
+                RobertifyAudioManagerKt.ins.musicManagers
+                    .values
+                    .forEach { musicManager ->
+                        if (musicManager.player.playingTrack != null)
+                            GuildResumeManagerKt(musicManager.guild).saveTracks()
+                        musicManager.destroy()
+                    }
+            }
         })
 
         val cronShutdownHook = ThreadFactoryBuilder()
@@ -81,7 +74,6 @@ object RobertifyKt {
 
         // Build bot connection
         logger.info("Building shard manager...")
-
         runBlocking {
             val lavakordShardManager = defaultShardWithLavakord(
                 token = ConfigKt.botToken,
@@ -126,16 +118,17 @@ object RobertifyKt {
                     .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
                     .forEach { cmd ->
                         addEventListeners(cmd)
-                        logger.debug("Registered the \"${cmd.info.name}\" command.")
+                        logger.info("Registered the \"${cmd.info.name}\" command.")
                     }
             }
             shardManager = lavakordShardManager.shardManager
             lavakord = lavakordShardManager.lavakord
             logger.info("Successfully built shard manager")
-
-            // Initialize coroutine listeners
-            ListenerKt(shardManager)
         }
+
+
+        // Initialize coroutine listeners
+        ListenerKt(shardManager)
 
         // Setup lavakord
         ConfigKt.lavaNodes.forEach { node ->
@@ -143,10 +136,10 @@ object RobertifyKt {
             logger.info("Registered lava node with address: ${node.uri}")
         }
 
-        if (ConfigKt.loadCommands())
+        if (ConfigKt.loadCommands)
             AbstractSlashCommandKt.loadAllCommands()
 
-        if (ConfigKt.loadNeededCommands()) {
+        if (ConfigKt.loadNeededCommands) {
             // TODO: Load needed commands
         }
 

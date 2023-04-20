@@ -5,12 +5,24 @@ import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.interactions.InteractionHook
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
+import net.dv8tion.jda.api.utils.messages.MessageCreateRequest
 
-class RobertifyEmbedUtilsKt {
+class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null) {
 
     companion object {
+        private val guildEmbedUtils = emptyMap<Long, RobertifyEmbedUtilsKt>().toMutableMap()
         private val guildEmbedSuppliers = emptyMap<Long, () -> EmbedBuilder>().toMutableMap()
+
+        fun getGuildUtils(guild: Guild?): RobertifyEmbedUtilsKt {
+            if (guild == null)
+                return RobertifyEmbedUtilsKt()
+            return guildEmbedUtils.computeIfAbsent(guild.idLong) { RobertifyEmbedUtilsKt(guild)}
+        }
 
         fun getDefaultEmbed(): EmbedBuilder {
             return when (val embedSupplier = guildEmbedSuppliers[0L]) {
@@ -151,7 +163,16 @@ class RobertifyEmbedUtilsKt {
             val dedicatedChannelConfig = RequestChannelConfigKt(channel.guild)
             return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.getChannelID() == channel.idLong
         }
+
+        inline fun InteractionHook.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): WebhookMessageCreateAction<Message> {
+            val embedUtils = getGuildUtils(guild)
+            return sendMessageEmbeds(supplier(embedUtils))
+        }
     }
 
+    fun embed(description: LocaleMessageKt, title: LocaleMessageKt, placeholders: Collection<Pair<String, String>> = listOf()): MessageEmbed =
+        embedMessageWithTitle(guild, title, description, *placeholders.toTypedArray()).build()
 
+    fun embed(description: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageEmbed =
+        embedMessage(guild, description, *placeholders).build()
 }

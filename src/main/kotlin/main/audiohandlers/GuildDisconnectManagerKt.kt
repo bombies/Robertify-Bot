@@ -1,5 +1,8 @@
 package main.audiohandlers
 
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import main.utils.json.guildconfig.GuildConfigKt
 import net.dv8tion.jda.api.entities.Guild
 import org.slf4j.LoggerFactory
@@ -37,12 +40,16 @@ class GuildDisconnectManagerKt(private val guild: Guild) {
         logger.debug("${guild.name} | Cleared any previously scheduled disconnects")
 
         scheduledDisconnect = executorService.schedule({
-            RobertifyAudioManagerKt.ins
-                .getMusicManager(guild)
-                .scheduler
-                .disconnect(announceMsg)
-            logger.debug("${guild.name} | Bot disconnected.")
-            this.scheduledDisconnect = null
+            runBlocking {
+                launch {
+                    RobertifyAudioManagerKt.ins
+                        .getMusicManager(guild)
+                        .scheduler
+                        .disconnect(announceMsg)
+                    logger.debug("${guild.name} | Bot disconnected.")
+                    scheduledDisconnect = null
+                }
+            }
         }, time, timeUnit)
         logger.debug("${guild.name} | successfully scheduled bot disconnect.")
     }

@@ -79,7 +79,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
             field = value
 
             if (guild != null)
-                LocaleConfigKt(guild).setLocale(value)
+                LocaleConfigKt(guild).locale = value
         }
 
     private val localeFile: Map<String, String>
@@ -99,6 +99,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
         placeholders.forEach { placeholder ->
             msg = msg.replace(Pattern.quote(placeholder.first), Matcher.quoteReplacement(placeholder.second))
         }
+
         return msg
     }
 }

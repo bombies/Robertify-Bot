@@ -3,7 +3,9 @@ package main.utils.json.requestchannel
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
+import dev.schlaubi.lavakord.audio.player.Track
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.TrackSchedulerKt.Companion.toAudioTrack
 import main.constants.RobertifyEmojiKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
@@ -198,7 +200,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             val msgRequest: RestAction<Message> = getMessageRequest() ?: return@runAsync
             val musicManager = RobertifyAudioManagerKt.ins.getMusicManager(guild)
             val audioPlayer = musicManager.player
-            val playingTrack: AudioTrack? = audioPlayer.playingTrack
+            val playingTrack: Track? = audioPlayer.playingTrack
             val queueHandler = musicManager.scheduler.queueHandler
             val queueAsList = ArrayList(queueHandler.contents)
 
@@ -245,23 +247,22 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                     if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
                 }
             } else {
-                val trackInfo: AudioTrackInfo = playingTrack.info
                 eb.setColor(theme.color)
                 eb.setTitle(
                     localeManager.getMessage(
                         RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
                         Pair(
                             "{title}",
-                            trackInfo.title
+                            playingTrack.title
                         ),
                         Pair(
                             "{author}",
-                            trackInfo.author
+                            playingTrack.author
                         ),
 
                         Pair(
                             "{duration}",
-                            GeneralUtilsKt.formatTime(playingTrack.info.length)
+                            GeneralUtilsKt.formatTime(playingTrack.length.inWholeMilliseconds)
                         )
                     )
                 )
@@ -272,7 +273,8 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         Pair("{requester}", requester)
                     )
                 )
-                if (playingTrack is MirroringAudioTrack) eb.setImage(playingTrack.artworkURL) else eb.setImage(
+                val lavaplayerTrack = playingTrack.toAudioTrack()
+                if (lavaplayerTrack is MirroringAudioTrack) eb.setImage(lavaplayerTrack.artworkURL) else eb.setImage(
                     theme.nowPlayingBanner
                 )
                 eb.setFooter(
@@ -284,7 +286,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         ),
                         Pair(
                             "{volume}",
-                            ((audioPlayer.filters.volume * 100).toInt()).toString()
+                            ((audioPlayer.filters.volume?.times(100))?.toInt()).toString() ?: "Unknown"
                         )
                     )
                 )
@@ -292,20 +294,20 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 nextTenSongs.append("```")
                 if (queueAsList.size > 10) {
                     var index = 1
-                    for (track: AudioTrack in queueAsList.subList(
+                    for (track in queueAsList.subList(
                         0,
                         10
-                    )) nextTenSongs.append(index++).append(". → ").append(track.info.title)
-                        .append(" - ").append(track.info.author)
-                        .append(" [").append(GeneralUtilsKt.formatTime(track.info.length))
+                    )) nextTenSongs.append(index++).append(". → ").append(track.title)
+                        .append(" - ").append(track.author)
+                        .append(" [").append(GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
                         .append("]\n")
                 } else {
                     if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
                         var index = 1
-                        for (track: AudioTrack in queueAsList) nextTenSongs.append(
+                        for (track in queueAsList) nextTenSongs.append(
                             index++
-                        ).append(". → ").append(track.info.title).append(" - ").append(track.info.author)
-                            .append(" [").append(GeneralUtilsKt.formatTime(track.info.length))
+                        ).append(". → ").append(track.title).append(" - ").append(track.author)
+                            .append(" [").append(GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
                             .append("]\n")
                     }
                 }

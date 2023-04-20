@@ -6,7 +6,7 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import main.audiohandlers.loaders.AudioLoaderKt
+import main.audiohandlers.loaders.MainAudioLoaderKt
 import main.audiohandlers.loaders.AutoPlayLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
 import main.audiohandlers.sources.resume.ResumeSourceManagerKt
@@ -39,35 +39,41 @@ class RobertifyAudioManagerKt {
 
     val musicManagers = ConcurrentSkipListMap<Long, GuildMusicManagerKt>()
     val playerManager: AudioPlayerManager
+    val spotifySourceManager: SpotifySourceManager
+    val deezerAudioSourceManager: DeezerAudioSourceManager
+    val appleMusicSourceManager: AppleMusicSourceManager
+    val resumeSourceManager: ResumeSourceManagerKt
 
     init {
         playerManager = DefaultAudioPlayerManager()
+        spotifySourceManager = SpotifySourceManager(
+            ConfigKt.providers,
+            ConfigKt[ENVKt.SPOTIFY_CLIENT_ID],
+            ConfigKt[ENVKt.SPOTIFY_CLIENT_SECRET],
+            "us",
+            playerManager
+        )
+        deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt[ENVKt.DEEZER_ACCESS_TOKEN])
+        appleMusicSourceManager = AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager)
+        resumeSourceManager = ResumeSourceManagerKt(playerManager)
 
         AudioSourceManagers.registerLocalSource(playerManager)
-        playerManager.registerSourceManager(ResumeSourceManagerKt(playerManager))
-        playerManager.registerSourceManager(
-            SpotifySourceManager(
-                ConfigKt.providers,
-                ConfigKt[ENVKt.SPOTIFY_CLIENT_ID],
-                ConfigKt[ENVKt.SPOTIFY_CLIENT_SECRET],
-                "us",
-                playerManager
-            )
-        )
-        playerManager.registerSourceManager(AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager))
-        playerManager.registerSourceManager(DeezerAudioSourceManager(ConfigKt[ENVKt.DEEZER_ACCESS_TOKEN]))
+        playerManager.registerSourceManager(resumeSourceManager)
+        playerManager.registerSourceManager(spotifySourceManager)
+        playerManager.registerSourceManager(appleMusicSourceManager)
+        playerManager.registerSourceManager(deezerAudioSourceManager)
         AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
     fun getMusicManager(guild: Guild): GuildMusicManagerKt =
         musicManagers.computeIfAbsent(guild.idLong) { GuildMusicManagerKt(guild) }
 
-    fun removeMusicManager(guild: Guild) {
+    suspend fun removeMusicManager(guild: Guild) {
         musicManagers[guild.idLong]?.destroy()
         musicManagers.remove(guild.idLong)
     }
 
-    fun loadAndPlay(
+    suspend fun loadAndPlay(
         trackUrl: String,
         memberVoiceState: GuildVoiceState,
         botMessage: Message? = null,
@@ -85,18 +91,18 @@ class RobertifyAudioManagerKt {
         if (voiceChannel.members.isNotEmpty()) {
             joinAudioChannel(voiceChannel, musicManager, messageChannel)
             loadTrack(
-                trackUrl        = trackUrl,
-                musicManager    = musicManager,
-                user            = memberVoiceState.member.user,
+                trackUrl = trackUrl,
+                musicManager = musicManager,
+                user = memberVoiceState.member.user,
                 announceMessage = TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES),
-                botMessage      =  botMessage,
-                addToBeginning  = addToBeginning,
-                shuffled        = shuffled
+                botMessage = botMessage,
+                addToBeginning = addToBeginning,
+                shuffled = shuffled
             )
         }
     }
 
-    fun loadAndResume(musicManager: GuildMusicManagerKt, data: ResumeDataKt) {
+    suspend fun loadAndResume(musicManager: GuildMusicManagerKt, data: ResumeDataKt) {
         val channelId = data.channel_id
         val voiceChannel = RobertifyKt.shardManager.getVoiceChannelById(channelId)
 
@@ -112,7 +118,7 @@ class RobertifyAudioManagerKt {
         resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
     }
 
-    private fun resumeTracks(
+    private suspend fun resumeTracks(
         trackList: List<ResumableTrackKt>,
         announcementChannel: GuildMessageChannel?,
         musicManager: GuildMusicManagerKt
@@ -123,16 +129,15 @@ class RobertifyAudioManagerKt {
                 musicManager.scheduler.addRequester(requester.id, requester.trackId)
         }
 
-        val trackUrl    = ResumeSourceManagerKt.SEARCH_PREFIX + trackList.string()
-        val loader      = AudioLoaderKt(
+        val trackUrl = ResumeSourceManagerKt.SEARCH_PREFIX + trackList.string()
+        MainAudioLoaderKt(
             musicManager = musicManager,
-            trackUrl = trackUrl,
+            query = trackUrl,
             _announcementChannel = announcementChannel
-        )
-        musicManager.playerManager.loadItemOrdered(musicManager, trackUrl, loader)
+        ).loadItem()
     }
 
-    private fun loadTrack(
+    private suspend fun loadTrack(
         trackUrl: String,
         musicManager: GuildMusicManagerKt,
         user: User,
@@ -141,54 +146,52 @@ class RobertifyAudioManagerKt {
         addToBeginning: Boolean = false,
         shuffled: Boolean = false
     ) {
-        val loader = AudioLoaderKt(
-            sender          = user,
-            trackUrl        = trackUrl,
-            musicManager    = musicManager,
-            addToBeginning  = addToBeginning,
-            announceMsg     = announceMessage,
-            botMsg          = botMessage,
+        MainAudioLoaderKt(
+            sender = user,
+            query = trackUrl,
+            musicManager = musicManager,
+            addToBeginning = addToBeginning,
+            announceMsg = announceMessage,
+            botMsg = botMessage,
             loadPlaylistShuffled = shuffled
-        )
-        musicManager.playerManager.loadItemOrdered(musicManager, trackUrl, loader)
+        ).loadItem()
     }
 
-    private fun loadSearchResults(
+    private suspend fun loadSearchResults(
         musicManager: GuildMusicManagerKt,
         searcher: User,
         botMessage: InteractionHook,
         query: String
     ) {
-        val loader = SearchResultLoaderKt(
-            guild       = musicManager.guild,
-            query       = query,
-            botMessage  = botMessage,
-            searcher    = searcher
-        )
-        musicManager.playerManager.loadItemOrdered(musicManager, query, loader)
+        SearchResultLoaderKt(
+            musicManager = musicManager,
+            query = query,
+            botMessage = botMessage,
+            searcher = searcher
+        ).loadItem()
     }
 
-    public fun loadRecommendedTracks(
+    public suspend fun loadRecommendedTracks(
         musicManager: GuildMusicManagerKt,
         channel: GuildMessageChannel?,
         trackIds: String
     ) {
-        val loader = AutoPlayLoaderKt(musicManager, channel)
-        musicManager.playerManager.loadItemOrdered(
+        AutoPlayLoaderKt(
             musicManager,
-            "${SpotifySourceManager.RECOMMENDATIONS_PREFIX}seed_tracks=${trackIds}&limit=${30}",
-            loader
+            channel,
+            "${SpotifySourceManager.RECOMMENDATIONS_PREFIX}seed_tracks=${trackIds}&limit=${30}"
         )
+            .loadItem()
     }
 
-    fun joinAudioChannel(
+    suspend fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManagerKt,
         messageChannel: GuildMessageChannel? = null
     ) {
         try {
-            check(channel.members.size == 0) { "I can't join a voice channel with no one in it!" }
-            musicManager.link.connect(channel)
+            require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
+            musicManager.link.connectAudio(channel.idLong.toULong())
             musicManager.scheduler.scheduleDisconnect()
         } catch (e: InsufficientPermissionException) {
             messageChannel?.sendMessageEmbeds(
