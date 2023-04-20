@@ -96,7 +96,9 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
     suspend fun queue(track: Track) = run {
         when {
             player.playingTrack != null -> queueHandler.add(track)
-            else -> player.playTrack(track)
+            else -> {
+                player.playTrack(track)
+            }
         }
     }
 
@@ -280,6 +282,12 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
                 val pastSpotifyTrackList = queueHandler.previousTracksContents
                     .filter { track -> track.source == "spotify" }
                     .map { track -> track.identifier }
+
+                if (pastSpotifyTrackList.isEmpty()) {
+                    disconnectManager.scheduleDisconnect()
+                    return
+                }
+
                 val pastSpotifyTracks = pastSpotifyTrackList
                     .subList(0, pastSpotifyTrackList.size.coerceAtMost(5))
                     .toString()
@@ -358,7 +366,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
         }
 
     private fun trackStuckEventHandler() =
-        player.on<Event, TrackStartEvent> {
+        player.on<Event, TrackStuckEvent> {
             val track = getTrack()
             if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
                 return@on
