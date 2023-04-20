@@ -3,8 +3,10 @@ package main.main
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.jdabuilder.defaultShard
-import dev.schlaubi.lavakord.interop.jda.LavakordDefaultShardManagerBuilder
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
@@ -16,12 +18,7 @@ import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
-import net.dv8tion.jda.api.utils.ChunkingFilter
-import net.dv8tion.jda.api.utils.MemberCachePolicy
-import net.dv8tion.jda.api.utils.SessionController
-import net.dv8tion.jda.api.utils.SessionControllerAdapter
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
