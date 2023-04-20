@@ -65,7 +65,7 @@ abstract class AbstractMongoCacheKt protected constructor(val mongoDB: AbstractM
     }
 
     fun <T> updateCache(obj: JSONObject, identifier: String, value: T) {
-        require(!obj.has(identifier)) { "The JSON object must have the \"$identifier\" identifier!" }
+        require(obj.has(identifier)) { "The JSON object must have the \"$identifier\" identifier!" }
         val document = findSpecificDocument(identifier, value)
         checkNotNull(document) { "There was no document found with the \"$identifier\" identifier!" }
         updateCache(Document.parse(obj.toString()))

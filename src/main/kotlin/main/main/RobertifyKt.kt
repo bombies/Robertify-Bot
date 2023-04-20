@@ -2,11 +2,9 @@ package main.main
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
-import dev.minn.jda.ktx.jdabuilder.defaultShard
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
+import dev.minn.jda.ktx.jdabuilder.defaultShardWithLavakord
+import dev.schlaubi.lavakord.LavaKord
+import kotlinx.coroutines.*
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
@@ -40,41 +38,13 @@ object RobertifyKt {
         private set
     lateinit var lavalink: JdaLavalink
         private set
+    lateinit var lavakord: LavaKord
+        private set
     lateinit var shardManager: ShardManager
         private set
 
     @JvmStatic
     fun main(args: Array<String>) {
-        // Setup coroutines
-        val dispatcher = threadPool.asCoroutineDispatcher()
-        val supervisor = SupervisorJob()
-        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            if (throwable !is CancellationException)
-                logger.error("Error in coroutine", throwable)
-            if (throwable is Error) {
-                supervisor.cancel()
-                throw throwable
-            }
-        }
-
-        val context = dispatcher + supervisor + exceptionHandler
-        val scope = CoroutineScope(context)
-
-        coroutineEventManager = CoroutineEventManager(scope, 1.minutes)
-        coroutineEventManager.listener<ShutdownEvent> { supervisor.cancel() }
-
-        // Setup lavalink
-        lavalink = JdaLavalink(
-            getIdFromToken(ConfigKt.botToken),
-            ConfigKt.shardCount
-        ) { shardId -> shardManager.getShardById(shardId) }
-
-
-        ConfigKt.lavaNodes.forEach { node ->
-            lavalink.addNode(node.uri, node.password)
-            logger.info("Registered lava node with address: ${node.uri}")
-        }
-
         // Setup graceful shutdown hooks
         val mainShutdownHook = ThreadFactoryBuilder()
             .setNameFormat("RobertifyShutdownHook")
@@ -102,69 +72,76 @@ object RobertifyKt {
             }
         })
 
+        // Init caches
         AbstractMongoDatabaseKt.initAllCaches()
         logger.info("Initialized all caches.")
 
         GuildRedisCacheKt.ins!!.loadAllGuilds()
         logger.info("All guilds have been loaded into cache.")
 
+        // Build bot connection
         logger.info("Building shard manager...")
 
-        shardManager = defaultShard(
-            token = ConfigKt.botToken,
-            intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
-        ) {
-            setShardsTotal(ConfigKt.shardCount)
-            setBulkDeleteSplittingEnabled(false)
-            setEventManagerProvider { _ -> coroutineEventManager}
-            addEventListeners(
-                lavalink
-            )
-            setVoiceDispatchInterceptor(lavalink.voiceInterceptor)
-            enableCache(CacheFlag.VOICE_STATE)
-            disableCache(
-                CacheFlag.ACTIVITY,
-                CacheFlag.EMOJI,
-                CacheFlag.CLIENT_STATUS,
-                CacheFlag.ROLE_TAGS,
-                CacheFlag.ONLINE_STATUS,
-                CacheFlag.STICKER,
-                CacheFlag.SCHEDULED_EVENTS
-            )
-            setActivity(Activity.listening("Starting up..."))
+        runBlocking {
+            val lavakordShardManager = defaultShardWithLavakord(
+                token = ConfigKt.botToken,
+                intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
+            ) {
+                setShardsTotal(ConfigKt.shardCount)
+                setBulkDeleteSplittingEnabled(false)
+                enableCache(CacheFlag.VOICE_STATE)
+                disableCache(
+                    CacheFlag.ACTIVITY,
+                    CacheFlag.EMOJI,
+                    CacheFlag.CLIENT_STATUS,
+                    CacheFlag.ROLE_TAGS,
+                    CacheFlag.ONLINE_STATUS,
+                    CacheFlag.STICKER,
+                    CacheFlag.SCHEDULED_EVENTS
+                )
+                setActivity(Activity.listening("Starting up..."))
 
-            val disabledIntents = mutableListOf(
-                GatewayIntent.DIRECT_MESSAGE_TYPING,
-                GatewayIntent.GUILD_MODERATION,
-                GatewayIntent.GUILD_INVITES,
-                GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.GUILD_MESSAGE_TYPING,
-                GatewayIntent.GUILD_PRESENCES,
-                GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                GatewayIntent.SCHEDULED_EVENTS
-            )
+                val disabledIntents = mutableListOf(
+                    GatewayIntent.DIRECT_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_MODERATION,
+                    GatewayIntent.GUILD_INVITES,
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                    GatewayIntent.SCHEDULED_EVENTS
+                )
 
-            val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
+                val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
 
-            if (ConfigKt[ENVKt.MESSAGE_CONTENT_INTENT_ENABLED].toBoolean())
-                enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-            else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+                if (ConfigKt[ENVKt.MESSAGE_CONTENT_INTENT_ENABLED].toBoolean())
+                    enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+                else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
 
-            enableIntents(enabledIntents)
-            disableIntents(disabledIntents)
+                enableIntents(enabledIntents)
+                disableIntents(disabledIntents)
 
-            val slashCommandManager = SlashCommandManagerKt.ins
-            slashCommandManager.guildCommands
-                .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
-                .forEach { cmd ->
-                    addEventListeners(cmd)
-                    logger.debug("Registered the \"${cmd.info.name}\" command.")
-                }
+                val slashCommandManager = SlashCommandManagerKt.ins
+                slashCommandManager.guildCommands
+                    .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+                    .forEach { cmd ->
+                        addEventListeners(cmd)
+                        logger.debug("Registered the \"${cmd.info.name}\" command.")
+                    }
+            }
+            shardManager = lavakordShardManager.shardManager
+            lavakord = lavakordShardManager.lavakord
+            logger.info("Successfully built shard manager")
+
+            // Initialize coroutine listeners
+            ListenerKt(shardManager)
         }
-        logger.info("Successfully built shard manager")
 
-        ListenerKt(coroutineEventManager)
-        logger.info("Initialized main listener")
+        // Setup lavakord
+        ConfigKt.lavaNodes.forEach { node ->
+            lavakord.addNode(node.uri.toString(), node.password)
+            logger.info("Registered lava node with address: ${node.uri}")
+        }
 
         if (ConfigKt.loadCommands())
             AbstractSlashCommandKt.loadAllCommands()

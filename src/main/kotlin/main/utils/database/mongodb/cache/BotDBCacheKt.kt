@@ -300,7 +300,7 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt.ins()) {
     }
 
     private fun getDocument(): JSONObject {
-        val cache = getCache()?.getJSONObject(0)
+        val cache = getCache().getJSONObject(0)
         checkNotNull(cache) { "The BotDB cache has not been initialized yet!" }
         return cache
     }
