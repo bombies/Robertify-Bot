@@ -97,7 +97,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
             ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
 
         placeholders.forEach { placeholder ->
-            msg = msg.replace(Pattern.quote(placeholder.first), Matcher.quoteReplacement(placeholder.second))
+            msg = msg.replace(placeholder.first, placeholder.second)
         }
 
         return msg

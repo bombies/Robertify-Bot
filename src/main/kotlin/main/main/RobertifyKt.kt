@@ -118,7 +118,7 @@ object RobertifyKt {
                     .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
                     .forEach { cmd ->
                         addEventListeners(cmd)
-                        logger.info("Registered the \"${cmd.info.name}\" command.")
+                        logger.debug("Registered the \"${cmd.info.name}\" command.")
                     }
             }
             shardManager = lavakordShardManager.shardManager

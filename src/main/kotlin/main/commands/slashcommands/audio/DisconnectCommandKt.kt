@@ -6,6 +6,9 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
+import main.utils.json.logs.LogTypeKt
+import main.utils.json.logs.LogUtilsKt
+import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -54,6 +57,12 @@ class DisconnectCommandKt : AbstractSlashCommandKt(CommandKt(
                 event.hook.sendWithEmbed(guild) {
                     embed(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED)
                 }.queue()
+
+                LogUtilsKt(guild)
+                    .sendLog(
+                        LogTypeKt.BOT_DISCONNECTED,
+                        "${event.user.asMention} ${LocaleManagerKt.getLocaleManager(guild).getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)}"
+                    )
             }
         }
     }
