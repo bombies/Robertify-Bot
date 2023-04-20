@@ -1,35 +1,36 @@
 package main.utils.database.mongodb.databases
 
-import main.constants.ENV
-import main.constants.RobertifyTheme
-import main.constants.Toggles
+import main.constants.ENVKt
+import main.constants.RobertifyThemeKt
+import main.constants.ToggleKt
 import main.constants.database.MongoDatabaseKt
-import main.main.Config
+import main.main.ConfigKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.DocumentBuilderKt
 import main.utils.json.GenericJSONFieldKt
-import main.utils.json.toggles.TogglesConfig
+import main.utils.json.toggles.TogglesConfigKt
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_GUILDS) {
+class GuildDBKt private constructor() :
+    AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_GUILDS) {
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
         var ins: GuildDBKt? = null
             get() {
                 if (field == null)
                     field = GuildDBKt()
-              return field
+                return field
             }
             private set
 
         fun getGuildDocument(gid: Long): Document {
             return DocumentBuilderKt.create()
                 .addField(Field.GUILD_ID, gid)
-                .addField(Field.GUILD_PREFIX, Config.get(ENV.PREFIX))
+                .addField(Field.GUILD_PREFIX, ConfigKt[ENVKt.PREFIX])
                 .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
                 .addField(Field.BANNED_USERS_ARRAY, JSONArray())
                 .addField(
@@ -48,9 +49,9 @@ class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.R
                         .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
                         .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
                 )
-                .addField(Field.TOGGLES_OBJECT, TogglesConfig.getDefaultToggleObject())
+                .addField(Field.TOGGLES_OBJECT, TogglesConfigKt.getDefaultToggleObject())
                 .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
-                .addField(Field.THEME, RobertifyTheme.GREEN.name.lowercase(Locale.getDefault()))
+                .addField(Field.THEME, RobertifyThemeKt.GREEN.name.lowercase(Locale.getDefault()))
                 .build()
         }
     }
@@ -65,7 +66,7 @@ class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.R
     fun findGuild(gid: Long): Document? = findSpecificDocument(Field.GUILD_ID, gid)
 
     fun updateGuild(gid: Long, obj: JSONObject) {
-        require(obj.has(GuildDB.Field.GUILD_ID.toString())) { "The JSON object must have a guild_id field!" }
+        require(obj.has(Field.GUILD_ID.toString())) { "The JSON object must have a guild_id field!" }
         val document = findGuild(gid)
             ?: throw java.lang.NullPointerException("There was no document found with guild id: $gid")
         upsertDocument(document, Document.parse(obj.toString()))
@@ -92,8 +93,8 @@ class GuildDBKt private constructor(): AbstractMongoDatabaseKt(MongoDatabaseKt.R
         RESTRICTED_CHANNELS_VOICE("voice_channels"),
         RESTRICTED_CHANNELS_TEXT("text_channels"),
         TOGGLES_OBJECT("toggles"),
-        TOGGLES_DJ(Toggles.TogglesConfigField.DJ_TOGGLES.toString()),
-        TOGGLES_LOGS(Toggles.TogglesConfigField.LOG_TOGGLES.toString()),
+        TOGGLES_DJ(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString()),
+        TOGGLES_LOGS(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString()),
         EIGHT_BALL_ARRAY("eight_ball"),
         THEME("theme"),
         TWENTY_FOUR_SEVEN("twenty_four_seven_mode"),

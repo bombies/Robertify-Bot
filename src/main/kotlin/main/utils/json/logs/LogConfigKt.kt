@@ -1,6 +1,6 @@
 package main.utils.json.logs
 
-import main.main.Robertify
+import main.main.RobertifyKt
 import main.utils.json.AbstractGuildConfigKt
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
@@ -16,8 +16,7 @@ class LogConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
     }
 
     fun getChannel(): TextChannel? {
-        // TODO: Change to Robertify kotlin instance
-        return Robertify.shardManager.getTextChannelById(getChannelID())
+        return RobertifyKt.shardManager.getTextChannelById(getChannelID())
     }
 
     fun channelIsSet(): Boolean {

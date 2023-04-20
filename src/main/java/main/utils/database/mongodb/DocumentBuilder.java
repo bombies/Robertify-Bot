@@ -1,7 +1,7 @@
 package main.utils.database.mongodb;
 
 import lombok.SneakyThrows;
-import main.utils.component.InvalidBuilderException;
+import main.utils.component.InvalidBuilderExceptionKt;
 import main.utils.json.GenericJSONField;
 import org.bson.Document;
 import org.json.JSONObject;

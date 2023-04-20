@@ -9,7 +9,7 @@ import lavalink.client.player.IPlayer
 import lavalink.client.player.event.PlayerEventListenerAdapter
 import main.audiohandlers.models.RequesterKt
 import main.constants.ToggleKt
-import main.main.Robertify
+import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
@@ -110,14 +110,13 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             return
 
         val trackInfo = track.info
-        // TODO: Change to Robertify Kotlin implementation
-        Robertify.getShardManager().retrieveUserById(requester.id)
+        RobertifyKt.shardManager.retrieveUserById(requester.id)
             .submit()
             .thenCompose { requesterObj ->
                 val img = NowPlayingImageBuilderKt(
                     artistName = trackInfo.author,
                     title = trackInfo.title,
-                    albumImage = if (track is MirroringAudioTrack) track.artworkURL else ThemesConfigKt(guild).theme.playingMusic,
+                    albumImage = if (track is MirroringAudioTrack) track.artworkURL else ThemesConfigKt(guild).theme.nowPlayingBanner,
                     requesterName = "${requesterObj.name}#${requesterObj.discriminator}",
                     requesterAvatar = requesterObj.avatarUrl
                 ).build() ?: throw CompletionException(NullPointerException("The generated image was null!"))
@@ -379,7 +378,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
 
     fun clearRequesters() = requesters.clear()
 
-    private fun getRequesterAsMention(track: AudioTrack): String {
+    fun getRequesterAsMention(track: AudioTrack): String {
         val requester = findRequester(track.identifier)
         return if (requester != null)
             "<@${requester.id}>"

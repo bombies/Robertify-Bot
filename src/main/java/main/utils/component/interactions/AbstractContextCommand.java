@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
+import main.utils.component.InvalidBuilderExceptionKt;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;

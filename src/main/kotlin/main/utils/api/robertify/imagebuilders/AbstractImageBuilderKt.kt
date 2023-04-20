@@ -1,6 +1,6 @@
 package main.utils.api.robertify.imagebuilders
 
-import main.constants.ENV
+import main.constants.ENVKt
 import main.main.ConfigKt
 import main.utils.api.robertify.imagebuilders.models.ImageQueryFieldKt
 import me.duncte123.botcommons.web.WebUtils
@@ -33,7 +33,7 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
     init {
         val segments = listOf("api", "images").toMutableList()
         segments.addAll(imageType.getSegments())
-        uri = URIBuilder(ConfigKt.get(ENV.ROBERTIFY_API_HOSTNAME))
+        uri = URIBuilder(ConfigKt.get(ENVKt.ROBERTIFY_API_HOSTNAME))
             .setPathSegments(segments)
     }
 

@@ -1,13 +1,13 @@
 package main.audiohandlers
 
 import lavalink.client.io.Link
-import main.main.Robertify
+import main.main.RobertifyKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import net.dv8tion.jda.api.entities.Guild
 
 class GuildMusicManagerKt(val guild: Guild) {
     // TODO: Replace with Robertify Kotlin implementation
-    val link = Robertify.getLavalink().getLink(guild)
+    val link = RobertifyKt.lavalink.getLink(guild)
     val player = link.player
     val scheduler = TrackSchedulerKt(guild, link)
     val playerManager = RobertifyAudioManagerKt.ins.playerManager

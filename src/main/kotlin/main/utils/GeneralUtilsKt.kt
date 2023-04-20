@@ -3,7 +3,8 @@ package main.utils
 import main.constants.PermissionKt
 import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
-import main.constants.TimeFormat
+import main.constants.TimeFormatKt
+import main.main.RobertifyKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.GenericJSONFieldKt
 import main.utils.json.permissions.PermissionsConfigKt
@@ -248,7 +249,7 @@ class GeneralUtilsKt {
             }
         }
 
-        fun getJoinedString(args: List<String>, startIndex: Int): String {
+        fun getJoinedString(args: List<String>): String {
             val arg = StringBuilder()
             args.forEachIndexed { i, item ->
                 arg.append(item)
@@ -287,9 +288,9 @@ class GeneralUtilsKt {
                     + second + if (second > 1) " seconds" else if (second == 0L) " seconds" else " second")
         }
 
-        fun formatDate(date: Long, style: TimeFormat): String? {
+        fun formatDate(date: Long, style: TimeFormatKt): String? {
             return when (style) {
-                TimeFormat.DD_MMMM_YYYY, TimeFormat.MM_DD_YYYY, TimeFormat.DD_MMMM_YYYY_ZZZZ, TimeFormat.DD_M_YYYY_HH_MM_SS, TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z -> SimpleDateFormat(
+                TimeFormatKt.DD_MMMM_YYYY, TimeFormatKt.MM_DD_YYYY, TimeFormatKt.DD_MMMM_YYYY_ZZZZ, TimeFormatKt.DD_M_YYYY_HH_MM_SS, TimeFormatKt.E_DD_MMM_YYYY_HH_MM_SS_Z -> SimpleDateFormat(
                     style.toString()
                 ).format(date)
 
@@ -314,7 +315,7 @@ class GeneralUtilsKt {
             val timeDigits = timeUnparsed.substring(0, timeUnparsed.length - 1)
             val duration = timeUnparsed[timeUnparsed.length - 1]
             require(timeDigits.toInt() >= 0) { "The time cannot be negative!" }
-            val scheduledDuration: Long = if (GeneralUtils.stringIsInt(timeDigits)) when (duration) {
+            val scheduledDuration: Long = if (stringIsInt(timeDigits)) when (duration) {
                 's' -> System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(
                     timeDigits.toInt().toLong()
                 )
@@ -340,11 +341,11 @@ class GeneralUtilsKt {
             return getFutureTime(timeUnparsed) - System.currentTimeMillis()
         }
 
-        fun formatDuration(timeUnparsed: String): String? {
+        fun formatDuration(timeUnparsed: String): String {
             val ret: String
             val timeDigits = timeUnparsed.substring(0, timeUnparsed.length - 1)
             val duration = timeUnparsed[timeUnparsed.length - 1]
-            ret = if (GeneralUtils.stringIsInt(timeDigits)) when (duration) {
+            ret = if (stringIsInt(timeDigits)) when (duration) {
                 's' -> "$timeDigits seconds"
                 'm' -> "$timeDigits minutes"
                 'h' -> "$timeDigits hours"
@@ -612,6 +613,11 @@ class GeneralUtilsKt {
 
         fun dmUser(uid: Long, message: String) {
             // TODO: Retrieve user from ShardManager then DM them
+        }
+
+        fun dmUser(uid: Long, embed: MessageEmbed) {
+            RobertifyKt.shardManager.retrieveUserById(uid)
+                .queue { user -> dmUser(user, embed)}
         }
 
 

@@ -25,7 +25,7 @@ enum class LogTypeKt(val title: String, val emoji: Emoji, val color: Color, priv
     BOT_DISCONNECTED("Disconnect", RobertifyEmojiKt.QUIT_EMOJI.getEmoji(), Color.decode("#700000"), "Disconnects"),
     FILTER_TOGGLE("Filter Toggle", Emoji.fromUnicode("🎛️"), Color.decode("#077000"), "Filters");
 
-    fun name() = _name
+    fun getName() = _name
 
     companion object {
         fun toList(): List<String> = LogTypeKt.values().map { it.name }.toList()

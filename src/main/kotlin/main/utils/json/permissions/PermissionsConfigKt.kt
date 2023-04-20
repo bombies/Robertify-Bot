@@ -16,7 +16,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     fun addPermissionToUser(userID: Long, p: PermissionKt) {
         var obj = getGuildObject()
         var usersObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-            .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+            .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         try {
             require(!userHasPermission(userID, p)) { "User with id \"" + userID + "\" already has " + p.name + "" }
         } catch (e: NullPointerException) {
@@ -25,7 +25,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         }
         obj = getGuildObject()
         usersObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-            .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+            .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         val array: JSONArray = try {
             usersObj.getJSONArray(userID.toString())
         } catch (e: JSONException) {
@@ -40,7 +40,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     fun userHasPermission(userID: Long, p: PermissionKt): Boolean {
         val userObj = getGuildObject()
             .getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-            .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+            .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         return if (!userObj.has(userID.toString())) false else userObj.getJSONArray(userID.toString()).toList()
             .contains(p.code)
     }
@@ -49,7 +49,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         require(userHasPermission(userID, p)) { "User with id \"$userID\" doesn't have ${p.name}" }
         val obj = getGuildObject()
         val usersObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-            .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+            .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         val array = usersObj.getJSONArray(userID.toString())
         array.remove(getIndexOfObjectInArray(array, p.code))
         usersObj.put(userID.toString(), array)
@@ -116,7 +116,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         return try {
             val obj = getGuildObject()
                 .getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-                .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+                .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
             for (s in obj.keySet())
                 if (obj.getJSONArray(s).toList().contains(code))
                     ret.add(s.toLong())
@@ -124,7 +124,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         } catch (e: JSONException) {
             val obj = getGuildObject()
             obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-                .put(PermissionConfigField.USER_PERMISSIONS.toString(), JSONObject())
+                .put(PermissionConfigFieldKt.USER_PERMISSIONS.toString(), JSONObject())
             cache.updateCache(obj, GuildDBKt.Field.GUILD_ID, guild.idLong)
             ret
         }
@@ -157,7 +157,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         val codes: MutableList<Int> = ArrayList()
         val obj = getGuildObject()
             .getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-            .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
+            .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         val arr: JSONArray = try {
             obj.getJSONArray(uid.toString())
         } catch (e: JSONException) {
@@ -179,10 +179,10 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
             }
 
         if (!obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-                .has(PermissionConfigField.USER_PERMISSIONS.toString())
+                .has(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
         ) {
             obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-                .put(PermissionConfigField.USER_PERMISSIONS.toString(), JSONObject())
+                .put(PermissionConfigFieldKt.USER_PERMISSIONS.toString(), JSONObject())
         }
 
         cache.updateCache(guild.idLong.toString(), Document.parse(obj.toString()))

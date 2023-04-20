@@ -1,7 +1,6 @@
 package main.utils.database.mongodb.cache
 
 import kotlinx.coroutines.*
-import main.utils.database.mongodb.databases.GuildDB
 import main.utils.database.mongodb.databases.GuildDBKt
 import main.utils.database.mongodb.databases.GuildDBKt.Companion.getGuildDocument
 import org.bson.Document

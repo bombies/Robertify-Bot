@@ -3,7 +3,7 @@ package main.utils.component.interactions.selectionmenu;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import main.utils.component.InvalidBuilderException;
+import main.utils.component.InvalidBuilderExceptionKt;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import org.jetbrains.annotations.NotNull;

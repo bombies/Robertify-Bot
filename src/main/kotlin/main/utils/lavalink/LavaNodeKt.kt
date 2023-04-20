@@ -8,8 +8,9 @@ data class LavaNodeKt(
     val password: String
 ) {
 
-    fun getURI(): URI =
-        URI.create("ws://$host${ if (port.isNotEmpty() && port.isNotBlank()) ":$port" else ""}")
+    val uri: URI
+        get() = URI.create("ws://$host${ if (port.isNotEmpty() && port.isNotBlank()) ":$port" else ""}")
+
 
     override fun toString(): String =
         "LavaNode{host='$host', port='$port', password='$password'}"

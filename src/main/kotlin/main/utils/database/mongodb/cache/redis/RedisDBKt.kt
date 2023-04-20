@@ -1,6 +1,6 @@
 package main.utils.database.mongodb.cache.redis
 
-import main.constants.ENV
+import main.constants.ENVKt
 import main.main.ConfigKt
 import redis.clients.jedis.JedisPooled
 
@@ -16,16 +16,16 @@ class RedisDBKt private constructor() {
             private set
     }
 
-    val jedis: JedisPooled = if (ConfigKt.get(ENV.REDIS_PASSWORD).isNotBlank())
+    val jedis: JedisPooled = if (ConfigKt.get(ENVKt.REDIS_PASSWORD).isNotBlank())
         JedisPooled(
-            ConfigKt.get(ENV.REDIS_HOSTNAME),
-            ConfigKt.getInt(ENV.REDIS_PORT),
+            ConfigKt.get(ENVKt.REDIS_HOSTNAME),
+            ConfigKt.getInt(ENVKt.REDIS_PORT),
             null,
-            ConfigKt.get(ENV.REDIS_PASSWORD)
+            ConfigKt.get(ENVKt.REDIS_PASSWORD)
         )
     else JedisPooled(
-        ConfigKt.get(ENV.REDIS_HOSTNAME),
-        ConfigKt.getInt(ENV.REDIS_PORT),
+        ConfigKt.get(ENVKt.REDIS_HOSTNAME),
+        ConfigKt.getInt(ENVKt.REDIS_PORT),
     )
 
 

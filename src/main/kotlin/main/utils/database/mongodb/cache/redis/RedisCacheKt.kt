@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache.redis
 
 import com.mongodb.client.MongoCollection
-import main.constants.ENV
+import main.constants.ENVKt
 import main.main.ConfigKt
 import main.utils.json.AbstractJSONKt
 import org.bson.Document
@@ -13,7 +13,7 @@ import java.util.function.Consumer
 abstract class RedisCacheKt protected constructor(cacheID: String) : AbstractJSONKt {
     
     private val jedis: JedisPooled = RedisDBKt.instance?.jedis ?: throw IllegalArgumentException("There was no connection to the Redis database!")
-    protected val cacheID = "$cacheID#${ConfigKt.get(ENV.MONGO_DATABASE_NAME)}#"
+    protected val cacheID = "$cacheID#${ConfigKt.get(ENVKt.MONGO_DATABASE_NAME)}#"
 
     protected fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) {
         val newHash = HashMap<String, String>()
@@ -159,7 +159,7 @@ abstract class RedisCacheKt protected constructor(cacheID: String) : AbstractJSO
                 JSONObject(doc.toJson())
             )
         })
-        collectionObj.put(DatabaseRedisCache.CacheField.DOCUMENTS.toString(), documentArr)
+        collectionObj.put(DatabaseRedisCacheKt.CacheField.DOCUMENTS.toString(), documentArr)
         return collectionObj
     }
 

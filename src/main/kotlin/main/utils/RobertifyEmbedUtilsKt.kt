@@ -1,6 +1,6 @@
 package main.utils
 
-import main.utils.json.requestchannel.RequestChannelConfig
+import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
@@ -148,8 +148,8 @@ class RobertifyEmbedUtilsKt {
         }
 
         fun getEphemeralState(channel: GuildMessageChannel, default: Boolean = false): Boolean {
-            val dedicatedChannelConfig = RequestChannelConfig(channel.guild)
-            return if (!dedicatedChannelConfig.isChannelSet) default else dedicatedChannelConfig.channelID == channel.idLong
+            val dedicatedChannelConfig = RequestChannelConfigKt(channel.guild)
+            return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.getChannelID() == channel.idLong
         }
     }
 

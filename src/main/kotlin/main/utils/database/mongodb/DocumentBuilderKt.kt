@@ -1,6 +1,6 @@
 package main.utils.database.mongodb
 
-import main.utils.component.InvalidBuilderException
+import main.utils.component.InvalidBuilderExceptionKt
 import main.utils.json.GenericJSONFieldKt
 import org.bson.Document
 import org.json.JSONObject
@@ -24,8 +24,7 @@ class DocumentBuilderKt private constructor() {
 
     fun build(): Document = when {
         obj.isEmpty ->
-            // TODO: Kotlin implementation of InvalidBuilderException
-            throw InvalidBuilderException("You cannot create a document with no fields!")
+            throw InvalidBuilderExceptionKt("You cannot create a document with no fields!")
         else -> Document.parse(obj.toString())
     }
 

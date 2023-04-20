@@ -8,7 +8,7 @@ data class ResumeDataKt(val channel_id: String, val tracks: List<ResumableTrackK
     companion object {
         private val mapper = DefaultObjectMapper()
 
-        fun fromJSON(json: String): ResumeData =
+        fun fromJSON(json: String): ResumeDataKt =
             mapper.readValue(json)
     }
 

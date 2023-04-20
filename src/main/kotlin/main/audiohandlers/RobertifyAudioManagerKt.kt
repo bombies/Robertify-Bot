@@ -10,10 +10,10 @@ import main.audiohandlers.loaders.AudioLoaderKt
 import main.audiohandlers.loaders.AutoPlayLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
 import main.audiohandlers.sources.resume.ResumeSourceManagerKt
-import main.constants.ENV
+import main.constants.ENVKt
 import main.constants.ToggleKt
 import main.main.ConfigKt
-import main.main.Robertify
+import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
@@ -37,7 +37,7 @@ class RobertifyAudioManagerKt {
         val ins = RobertifyAudioManagerKt()
     }
 
-    private val musicManagers = ConcurrentSkipListMap<Long, GuildMusicManagerKt>()
+    val musicManagers = ConcurrentSkipListMap<Long, GuildMusicManagerKt>()
     val playerManager: AudioPlayerManager
 
     init {
@@ -48,14 +48,14 @@ class RobertifyAudioManagerKt {
         playerManager.registerSourceManager(
             SpotifySourceManager(
                 ConfigKt.providers,
-                ConfigKt[ENV.SPOTIFY_CLIENT_ID],
-                ConfigKt[ENV.SPOTIFY_CLIENT_SECRET],
+                ConfigKt[ENVKt.SPOTIFY_CLIENT_ID],
+                ConfigKt[ENVKt.SPOTIFY_CLIENT_SECRET],
                 "us",
                 playerManager
             )
         )
         playerManager.registerSourceManager(AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager))
-        playerManager.registerSourceManager(DeezerAudioSourceManager(ConfigKt[ENV.DEEZER_ACCESS_TOKEN]))
+        playerManager.registerSourceManager(DeezerAudioSourceManager(ConfigKt[ENVKt.DEEZER_ACCESS_TOKEN]))
         AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
@@ -98,8 +98,7 @@ class RobertifyAudioManagerKt {
 
     fun loadAndResume(musicManager: GuildMusicManagerKt, data: ResumeDataKt) {
         val channelId = data.channel_id
-        // TODO: Change to Robertify Kotlin implementation
-        val voiceChannel = Robertify.getShardManager().getVoiceChannelById(channelId)
+        val voiceChannel = RobertifyKt.shardManager.getVoiceChannelById(channelId)
 
         if (voiceChannel == null) {
             logger.warn("There was resume data for ${musicManager.guild.name} but the voice channel is invalid! Data: $data")

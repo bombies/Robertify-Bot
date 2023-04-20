@@ -1,8 +1,8 @@
 package main.utils.json.reminders
 
-import main.commands.slashcommands.commands.misc.reminders.ReminderScheduler
 import main.utils.json.AbstractGuildConfigKt
 import main.utils.json.GenericJSONFieldKt
+import main.utils.json.reminders.scheduler.ReminderSchedulerKt
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONArray
 import org.json.JSONException
@@ -73,7 +73,7 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
             .getJSONArray(Fields.USER_REMINDERS.toString())
 
         // TODO: Change ReminderScheduler to Kotlin implementation
-        val reminderScheduler = ReminderScheduler(guild)
+        val reminderScheduler = ReminderSchedulerKt(guild)
 
         for (i in 0 until userReminders.length())
             reminderScheduler.removeReminder(uid, i)
@@ -150,15 +150,14 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         if (!userExists(uid)) false else getReminders(uid) != null
 
 
-    fun getReminders(uid: Long): List<Reminder>? =
+    fun getReminders(uid: Long): List<ReminderKt>? =
         Collections.unmodifiableList(getUser(uid)!!.reminders)
 
 
-    fun getUser(uid: Long): ReminderUser? {
+    fun getUser(uid: Long): ReminderUserKt? {
         val guildObject = getGuildObject()
-        val reminderObj: JSONObject
 
-        reminderObj = try {
+        val reminderObj: JSONObject = try {
             guildObject.getJSONObject(Fields.REMINDERS.toString())
         } catch (e: JSONException) {
             update()
@@ -175,11 +174,11 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
             val userObj = users.getJSONObject(getIndexOfObjectInArray(users, Fields.USER_ID, uid))
             val reminders = userObj.getJSONArray(Fields.USER_REMINDERS.toString())
             val isBanned = userObj.getBoolean(Fields.IS_BANNED.toString())
-            val ret: MutableList<Reminder> = ArrayList()
+            val ret: MutableList<ReminderKt> = ArrayList()
             for ((i, reminder) in reminders.withIndex()) {
                 val actualObj = reminder as JSONObject
                 ret.add(
-                    Reminder(
+                    ReminderKt(
                         i,
                         actualObj.getString(Fields.REMINDER.toString()),
                         uid,
@@ -191,17 +190,16 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
                     )
                 )
             }
-            ReminderUser(uid, guild.idLong, ret, isBanned)
+            ReminderUserKt(uid, guild.idLong, ret, isBanned)
         } catch (e: NullPointerException) {
             null
         }
     }
 
-    fun getAllGuildUsers(): List<ReminderUser?>? {
+    fun getAllGuildUsers(): List<ReminderUserKt> {
         val guildObject = getGuildObject()
-        val reminderObj: JSONObject
 
-        reminderObj = try {
+        val reminderObj: JSONObject = try {
             guildObject.getJSONObject(Fields.REMINDERS.toString())
         } catch (e: JSONException) {
             return ArrayList()
@@ -210,17 +208,17 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         val users = reminderObj.getJSONArray(Fields.USERS.toString())
 
         return try {
-            val reminderUsers: MutableList<ReminderUser?> = ArrayList()
+            val reminderUsers: MutableList<ReminderUserKt> = ArrayList()
             for (userObj in users) {
                 val actualUser = userObj as JSONObject
                 val uid = actualUser.getLong(Fields.USER_ID.toString())
                 val reminders = actualUser.getJSONArray(Fields.USER_REMINDERS.toString())
                 val isBanned = actualUser.getBoolean(Fields.IS_BANNED.toString())
-                val reminderList: MutableList<Reminder> = ArrayList()
+                val reminderList: MutableList<ReminderKt> = ArrayList()
                 for ((i, reminder) in reminders.withIndex()) {
                     val actualObj = reminder as JSONObject
                     reminderList.add(
-                        Reminder(
+                        ReminderKt(
                             i,
                             actualObj.getString(Fields.REMINDER.toString()),
                             uid,
@@ -232,16 +230,16 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
                         )
                     )
                 }
-                reminderUsers.add(ReminderUser(uid, guild.idLong, reminderList, isBanned))
+                reminderUsers.add(ReminderUserKt(uid, guild.idLong, reminderList, isBanned))
             }
             reminderUsers
         } catch (e: NullPointerException) {
-            null
+            emptyList()
         }
     }
 
     fun guildHasReminders(): Boolean =
-        getAllGuildUsers()!!.isNotEmpty()
+        getAllGuildUsers().isNotEmpty()
 
     fun banChannel(cid: Long) {
         check(!channelIsBanned(cid)) { "This channel is already banned!" }

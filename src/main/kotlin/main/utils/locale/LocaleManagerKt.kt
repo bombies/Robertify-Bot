@@ -1,6 +1,8 @@
 package main.utils.locale
 
+import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
+import main.utils.json.locale.LocaleConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
 import org.slf4j.LoggerFactory
@@ -11,7 +13,7 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.system.exitProcess
 
-class LocaleManagerKt private constructor(val guild: Guild?, var locale: RobertifyLocaleKt) {
+class LocaleManagerKt private constructor(private val guild: Guild?, _locale: RobertifyLocaleKt) {
 
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
@@ -63,31 +65,31 @@ class LocaleManagerKt private constructor(val guild: Guild?, var locale: Roberti
         fun reloadLocales() {
             locales.clear()
             RobertifyLocaleKt.getAvailableLanguages()
-                .forEach { locale ->
-                    locales.put(locale, retrieveLocaleFile(locale))
-                }
-
-            // TODO: Reloading locale for all guilds through the ShardManager
+                .forEach { locale -> locales[locale] = retrieveLocaleFile(locale) }
         }
 
     }
 
-    private var localeFile: Map<String, String> = locales.computeIfAbsent(locale) {
-        retrieveLocaleFile(it)
-    }
+    var locale: RobertifyLocaleKt = _locale
+        set(value) {
+            if (value == field)
+                return
 
-    fun setLocale(locale: RobertifyLocaleKt) {
-        locales.putIfAbsent(locale, retrieveLocaleFile(locale))
+            locales.putIfAbsent(value, retrieveLocaleFile(value))
+            field = value
 
-        this.locale = locale
-        localeFile = retrieveLocaleFile()
+            if (guild != null)
+                LocaleConfigKt(guild).setLocale(value)
+        }
 
-        // TODO: LocaleConfig handling
-    }
+    private val localeFile: Map<String, String>
+        get() = locales.computeIfAbsent(locale) {
+            retrieveLocaleFile(it)
+        }
 
     fun getMessage(message: LocaleMessageKt): String {
-        return localeFile[message.name.lowercase()] ?:
-        throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
+        return localeFile[message.name.lowercase()]
+            ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
     }
 
     fun getMessage(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): String {
@@ -99,6 +101,4 @@ class LocaleManagerKt private constructor(val guild: Guild?, var locale: Roberti
         }
         return msg
     }
-
-    private fun retrieveLocaleFile(): Map<String, String> = Companion.retrieveLocaleFile(locale)
 }

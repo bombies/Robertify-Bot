@@ -5,8 +5,8 @@ import java.awt.Color
 
 enum class RobertifyThemeKt(
     val transparent: String,
-    val idleChannel: String,
-    val playingMusic: String,
+    val idleBanner: String,
+    val nowPlayingBanner: String,
     val emoji: Emoji,
     val color: Color
 ) {

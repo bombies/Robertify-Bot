@@ -2,7 +2,6 @@ package main.utils.json.logs
 
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.LocaleMessage
 import main.utils.locale.LocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission

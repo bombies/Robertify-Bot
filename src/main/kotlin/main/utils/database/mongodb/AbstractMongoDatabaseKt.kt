@@ -4,6 +4,9 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.*
 import main.constants.database.MongoDatabaseKt
+import main.utils.database.mongodb.cache.BotDBCacheKt
+import main.utils.database.mongodb.cache.FavouriteTracksCacheKt
+import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.utils.json.GenericJSONFieldKt
 import org.bson.BsonArray
 import org.bson.BsonObjectId
@@ -17,6 +20,17 @@ import org.slf4j.LoggerFactory
 abstract class AbstractMongoDatabaseKt {
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
+
+        fun initAllCaches() {
+            BotDBCacheKt.initCache()
+            GuildRedisCacheKt.initCache()
+            FavouriteTracksCacheKt.initCache()
+            updateAllCaches()
+        }
+
+        fun updateAllCaches() {
+
+        }
     }
 
     private val database: MongoDatabase
@@ -41,14 +55,6 @@ abstract class AbstractMongoDatabaseKt {
     }
 
     open fun init() {}
-
-    fun initAllCaches() {
-        //TODO: Implement cache initializations
-    }
-
-    fun updateAllCaches() {
-
-    }
 
     fun addDocument(doc: Document): BsonObjectId =
         collection.insertOne(doc).insertedId?.asObjectId()
@@ -177,10 +183,6 @@ abstract class AbstractMongoDatabaseKt {
     protected fun findDocument(key: String, value: String): Iterator<Document> =
         collection.find(Filters.eq(key, value)).iterator()
 
-    protected fun findDocument(key: String, value: Any): Iterator<Document> {
-        return collection.find(Filters.eq(key, value)).iterator()
-    }
-
     protected fun <T> findDocument(key: String, value: T): Iterator<Document> {
         return collection.find(Filters.eq(key, value)).iterator()
     }
@@ -194,10 +196,6 @@ abstract class AbstractMongoDatabaseKt {
     }
 
     protected fun findSpecificDocument(key: String, value: JSONObject): Document? {
-        return collection.find(Filters.eq(key, value)).iterator().next()
-    }
-
-    fun findSpecificDocument(key: String, value: Any): Document? {
         return collection.find(Filters.eq(key, value)).iterator().next()
     }
 

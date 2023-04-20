@@ -19,6 +19,26 @@ class SlashCommandManagerKt private constructor() {
     var devCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
         private set
 
+    val globalCommands: List<AbstractSlashCommandKt>
+        get() {
+            val abstractSlashCommands = ArrayList<AbstractSlashCommandKt>()
+            abstractSlashCommands.addAll(musicCommands)
+            abstractSlashCommands.addAll(managementCommands)
+            abstractSlashCommands.addAll(miscCommands)
+            abstractSlashCommands.addAll(utilityCommands)
+            return abstractSlashCommands.filter { !it.info.isGuild }
+        }
+
+    val guildCommands: List<AbstractSlashCommandKt>
+        get() {
+            val abstractSlashCommands = ArrayList<AbstractSlashCommandKt>()
+            abstractSlashCommands.addAll(musicCommands)
+            abstractSlashCommands.addAll(managementCommands)
+            abstractSlashCommands.addAll(miscCommands)
+            abstractSlashCommands.addAll(utilityCommands)
+            return abstractSlashCommands.filter { it.info.isGuild }
+        }
+
     init {
         addMusicCommands()
         addManagementCommands()
@@ -75,26 +95,8 @@ class SlashCommandManagerKt private constructor() {
     fun isDevCommand(command: String): Boolean =
         devCommands.any { it.info.name.equals(command, ignoreCase = true) }
 
-    fun getGlobalCommands(): List<AbstractSlashCommandKt> {
-        val abstractSlashCommands = ArrayList<AbstractSlashCommandKt>()
-        abstractSlashCommands.addAll(musicCommands)
-        abstractSlashCommands.addAll(managementCommands)
-        abstractSlashCommands.addAll(miscCommands)
-        abstractSlashCommands.addAll(utilityCommands)
-        return abstractSlashCommands.filter { !it.info.isGuild }
-    }
-
-    fun getGuildCommands(): List<AbstractSlashCommandKt> {
-        val abstractSlashCommands = ArrayList<AbstractSlashCommandKt>()
-        abstractSlashCommands.addAll(musicCommands)
-        abstractSlashCommands.addAll(managementCommands)
-        abstractSlashCommands.addAll(miscCommands)
-        abstractSlashCommands.addAll(utilityCommands)
-        return abstractSlashCommands.filter { it.info.isGuild }
-    }
-
     fun getCommand(name: String): AbstractSlashCommandKt? =
-        getGlobalCommands().find { it.info.name.equals(name, ignoreCase = true) }
+        globalCommands.find { it.info.name.equals(name, ignoreCase = true) }
 
     fun getDevCommand(name: String): AbstractSlashCommandKt? =
         devCommands.find { it.info.name.equals(name, ignoreCase = true) }

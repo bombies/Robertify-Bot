@@ -44,6 +44,13 @@ data class ResumableTrackKt(
             mapper.readValue(json)
     }
 
+    constructor(track: AudioTrack, requester: RequesterKt?) : this(
+        info = AudioTrackInfoWrapperKt(track.info),
+        requester = requester,
+        artworkURL = if (track is MirroringAudioTrack) track.artworkURL else null,
+        isrc = if (track is MirroringAudioTrack) track.isrc else null
+    )
+
     fun toAudioTrack(sourceManager: ResumeSourceManagerKt): AudioTrack =
         ResumeTrackKt(info, isrc, artworkURL, sourceManager)
 

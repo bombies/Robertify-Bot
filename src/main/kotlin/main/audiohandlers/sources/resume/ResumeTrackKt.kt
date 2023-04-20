@@ -5,8 +5,8 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
 
 data class ResumeTrackKt(
-    val info: AudioTrackInfo,
+    val audioTrackInfo: AudioTrackInfo,
     val isrc: String?,
-    val artworkURL: String?,
+    val artwork: String?,
     val sourceManager: MirroringAudioSourceManager
-) : MirroringAudioTrack(info, isrc, artworkURL, sourceManager)
+) : MirroringAudioTrack(audioTrackInfo, isrc, artwork, sourceManager)

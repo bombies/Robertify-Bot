@@ -1,12 +1,13 @@
 package main.utils.component.interactions.slashcommand
 
-import main.audiohandlers.RobertifyAudioManager
-import main.commands.RandomMessageManager
+import main.audiohandlers.RobertifyAudioManagerKt
+import main.utils.managers.RandomMessageManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
-import main.constants.BotConstants
+import main.constants.BotConstantsKt
+import main.constants.PermissionKt
 import main.constants.ToggleKt
 import main.main.ConfigKt
-import main.main.Robertify
+import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.AbstractInteractionKt
@@ -36,9 +37,9 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         fun loadAllCommands() {
             val slashCommandManager = SlashCommandManagerKt.ins
-            val commands = slashCommandManager.getGlobalCommands()
+            val commands = slashCommandManager.globalCommands
 
-            Robertify.getShardManager().shards.forEach { shard ->
+            RobertifyKt.shardManager.shards.forEach { shard ->
                 val commandListUpdateAction = shard.updateCommands()
 
                 // TODO: Integrate context commands
@@ -50,7 +51,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         fun loadAllCommands(guild: Guild) {
             val slashCommandManager = SlashCommandManagerKt.ins
-            val commands = slashCommandManager.getGuildCommands()
+            val commands = slashCommandManager.guildCommands
             val devCommands = slashCommandManager.devCommands
 
             val commandListUpdateAction = guild.updateCommands()
@@ -86,7 +87,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
 
         fun upsertCommand(command: AbstractSlashCommandKt) {
-            Robertify.getShardManager().shards.forEach { shard ->
+            RobertifyKt.shardManager.shards.forEach { shard ->
                 shard.upsertCommand(command.info.getCommandData()).queue()
             }
         }
@@ -98,8 +99,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 guild.updateCommands()
                     .addCommands(
                         SlashCommandManagerKt.ins
-                        .devCommands
-                        .map { it.info.getCommandData() }
+                            .devCommands
+                            .map { it.info.getCommandData() }
                     )
                     .queue(null, ErrorHandler()
                         .handle(ErrorResponse.MISSING_ACCESS) {
@@ -133,8 +134,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (info.isPrivate)
             return
 
-        // TODO: Change to Robertify Kotlin implementation
-        Robertify.getShardManager().shards.forEach { shard ->
+        RobertifyKt.shardManager.shards.forEach { shard ->
             shard.upsertCommand(info.getCommandData()).queue()
         }
     }
@@ -147,8 +147,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     fun unload() {
-        // TODO: Change to Robertify Kotlin implementation
-        Robertify.getShardManager().shards.forEach { shard ->
+        RobertifyKt.shardManager.shards.forEach { shard ->
             shard.retrieveCommands().queue { commands ->
                 val matchedCommand = commands.find { it.name == info.name } ?: return@queue
                 shard.deleteCommandById(matchedCommand.idLong).queue()
@@ -164,8 +163,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
     protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
         if (SlashCommandManagerKt.ins.isMusicCommand(this) && event.channel.type.isMessage)
-        // TODO: Change to RandomMessageManage Kotlin implementation
-            RandomMessageManager().randomlySendMessage(event.channel as GuildMessageChannel)
+            RandomMessageManagerKt().randomlySendMessage(event.channel as GuildMessageChannel)
     }
 
     protected fun checks(event: SlashCommandInteractionEvent): Boolean {
@@ -216,9 +214,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!djCheck(event)) return false
 
         if (SlashCommandManagerKt.ins.isMusicCommand(this) && event.isFromGuild) {
-            assert(event.guild != null)
-            val scheduler = RobertifyAudioManager.getInstance()
-                .getMusicManager(event.guild)
+            val scheduler = RobertifyAudioManagerKt.ins
+                .getMusicManager(event.guild!!)
                 .scheduler
             scheduler.announcementChannel = event.guildChannel
         }
@@ -328,13 +325,13 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected open fun djCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild!!
         if (info.djOnly
-            && !GeneralUtilsKt.hasPerms(guild, event.member, main.constants.Permission.ROBERTIFY_DJ)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_DJ)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    BotConstants.getInsufficientPermsMessage(guild, main.constants.Permission.ROBERTIFY_DJ)
+                    BotConstantsKt.getInsufficientPermsMessage(guild, PermissionKt.ROBERTIFY_DJ)
                 ).build()
             )
                 .setEphemeral(true)
@@ -355,13 +352,13 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected open fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild!!
         if (info.adminOnly
-            && !GeneralUtilsKt.hasPerms(guild, event.member, main.constants.Permission.ROBERTIFY_ADMIN)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_ADMIN)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    BotConstants.getInsufficientPermsMessage(guild, main.constants.Permission.ROBERTIFY_ADMIN)
+                    BotConstantsKt.getInsufficientPermsMessage(guild, PermissionKt.ROBERTIFY_ADMIN)
                 ).build()
             )
                 .setEphemeral(true)
@@ -417,7 +414,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         val config = RestrictedChannelsConfigKt(guild)
         if (!togglesConfig.getToggle(ToggleKt.RESTRICTED_TEXT_CHANNELS)) return true
         if (!config.isRestrictedChannel(event.channel.idLong, RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
-            && !GeneralUtilsKt.hasPerms(guild, event.member, main.constants.Permission.ROBERTIFY_ADMIN)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_ADMIN)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(

@@ -1,8 +1,8 @@
 package main.utils.json.toggles
 
-import main.commands.slashcommands.SlashCommandManager
+import main.commands.slashcommands.SlashCommandManagerKt
 import main.constants.ToggleKt
-import main.utils.component.interactions.AbstractSlashCommand
+import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.GuildDBCacheKt
 import main.utils.database.mongodb.databases.GuildDBKt
 import main.utils.json.AbstractGuildConfigKt
@@ -14,6 +14,64 @@ import org.json.JSONObject
 import java.util.*
 
 class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
+
+     companion object {
+         fun getDefaultToggleObject(): JSONObject {
+             val toggleObj = JSONObject()
+             for (toggle in ToggleKt.values()) try {
+                 getTogglesObject(toggleObj, toggle)
+             } catch (e: JSONException) {
+                 for (errToggles in ToggleKt.values()) when (errToggles) {
+                     ToggleKt.RESTRICTED_VOICE_CHANNELS, ToggleKt.RESTRICTED_TEXT_CHANNELS -> toggleObj.put(
+                         errToggles.toString(),
+                         false
+                     )
+
+                     else -> toggleObj.put(errToggles.toString(), true)
+                 }
+             }
+             return toggleObj
+         }
+
+         private fun getTogglesObject(toggleObj: JSONObject, toggle: ToggleKt) {
+             if (!toggleObj.has(toggle.toString())) when (toggle) {
+                 ToggleKt.RESTRICTED_VOICE_CHANNELS, ToggleKt.RESTRICTED_TEXT_CHANNELS ->
+                     toggleObj.put(toggle.toString(), false)
+
+                 else -> toggleObj.put(toggle.toString(), true)
+             }
+
+             if (!toggleObj.has(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())) {
+                 val djTogglesObj = JSONObject()
+                 for (musicCommand in SlashCommandManagerKt.ins.musicCommands) djTogglesObj.put(
+                     musicCommand.info.name.lowercase(
+                         Locale.getDefault()
+                     ), false
+                 )
+                 toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
+             } else {
+                 val djTogglesObj = toggleObj.getJSONObject(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())
+                 for (musicCommand in SlashCommandManagerKt.ins.musicCommands)
+                     if (!djTogglesObj.has(musicCommand.info.name))
+                         djTogglesObj.put(musicCommand.info.name, false)
+                 toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
+             }
+
+             if (!toggleObj.has(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString())) {
+                 val logObj = JSONObject()
+                 for (type in LogTypeKt.values()) logObj.put(type.name.lowercase(Locale.getDefault()), true)
+                 toggleObj.put(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString(), logObj)
+             } else {
+                 val logObj = toggleObj.getJSONObject(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString())
+                 for (type in LogTypeKt.values()) if (!logObj.has(type.name.lowercase(Locale.getDefault()))) logObj.put(
+                     type.name.lowercase(
+                         Locale.getDefault()
+                     ), true
+                 )
+                 toggleObj.put(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString(), logObj)
+             }
+         }
+     }
 
     fun getToggle(toggle: ToggleKt): Boolean {
         if (!guildHasInfo()) loadGuild()
@@ -50,16 +108,16 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
         return ret
     }
 
-    fun getDJToggle(cmd: AbstractSlashCommand): Boolean {
+    fun getDJToggle(cmd: AbstractSlashCommandKt): Boolean {
         val djToggles = getDJToggles()
-        return if (!djToggles.containsKey(cmd.name)) {
-            if (SlashCommandManager.getInstance().isMusicCommand(cmd)) {
+        return if (!djToggles.containsKey(cmd.info.name)) {
+            if (SlashCommandManagerKt.ins.isMusicCommand(cmd)) {
                 setDJToggle(cmd, false)
                 false
             } else {
-                throw NullPointerException("Invalid command passed! [Command: " + cmd.name + "]")
+                throw NullPointerException("Invalid command passed! [Command: " + cmd.info.name + "]")
             }
-        } else djToggles[cmd.name.lowercase(Locale.getDefault())]!!
+        } else djToggles[cmd.info.name.lowercase(Locale.getDefault())]!!
     }
 
     fun setToggle(toggle: ToggleKt, value: Boolean) {
@@ -68,11 +126,11 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
         cache.updateGuild(obj, guild.idLong)
     }
 
-    fun setDJToggle(command: AbstractSlashCommand, value: Boolean) {
+    fun setDJToggle(command: AbstractSlashCommandKt, value: Boolean) {
         val obj = getGuildObject()
         obj.getJSONObject(GuildDBKt.Field.TOGGLES_OBJECT.toString())
             .getJSONObject(GuildDBKt.Field.TOGGLES_DJ.toString())
-            .put(command.name, value)
+            .put(command.info.name, value)
         cache.updateGuild(obj, guild.idLong)
     }
 
@@ -93,8 +151,8 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
             .getBoolean(type.name.lowercase(Locale.getDefault()))
     }
 
-    fun isDJToggleSet(cmd: AbstractSlashCommand): Boolean =
-        getDJToggles().containsKey(cmd.name.lowercase(Locale.getDefault()))
+    fun isDJToggleSet(cmd: AbstractSlashCommandKt): Boolean =
+        getDJToggles().containsKey(cmd.info.name.lowercase(Locale.getDefault()))
 
 
     fun isDJToggleSet(cmd: String): Boolean =
@@ -130,61 +188,5 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
             }
         }
         cache.updateCache(guild.id, Document.parse(`object`.toString()))
-    }
-
-    fun getDefaultToggleObject(): JSONObject {
-        val toggleObj = JSONObject()
-        for (toggle in ToggleKt.values()) try {
-            getTogglesObject(toggleObj, toggle)
-        } catch (e: JSONException) {
-            for (errToggles in ToggleKt.values()) when (errToggles) {
-                ToggleKt.RESTRICTED_VOICE_CHANNELS, ToggleKt.RESTRICTED_TEXT_CHANNELS -> toggleObj.put(
-                    errToggles.toString(),
-                    false
-                )
-
-                else -> toggleObj.put(errToggles.toString(), true)
-            }
-        }
-        return toggleObj
-    }
-
-    private fun getTogglesObject(toggleObj: JSONObject, toggle: ToggleKt) {
-        if (!toggleObj.has(toggle.toString())) when (toggle) {
-            ToggleKt.RESTRICTED_VOICE_CHANNELS, ToggleKt.RESTRICTED_TEXT_CHANNELS ->
-                toggleObj.put(toggle.toString(), false)
-            else -> toggleObj.put(toggle.toString(), true)
-        }
-
-        if (!toggleObj.has(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())) {
-            val djTogglesObj = JSONObject()
-            for (musicCommand in SlashCommandManager.getInstance().musicCommands) djTogglesObj.put(
-                musicCommand.name.lowercase(
-                    Locale.getDefault()
-                ), false
-            )
-            toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
-        } else {
-            val djTogglesObj = toggleObj.getJSONObject(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())
-            // TODO: Use SlashCommandManager Kotlin implementation
-            for (musicCommand in SlashCommandManager.getInstance().musicCommands)
-                if (!djTogglesObj.has(musicCommand.name))
-                    djTogglesObj.put(musicCommand.name, false)
-            toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
-        }
-
-        if (!toggleObj.has(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString())) {
-            val logObj = JSONObject()
-            for (type in LogTypeKt.values()) logObj.put(type.name.lowercase(Locale.getDefault()), true)
-            toggleObj.put(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString(), logObj)
-        } else {
-            val logObj = toggleObj.getJSONObject(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString())
-            for (type in LogTypeKt.values()) if (!logObj.has(type.name.lowercase(Locale.getDefault()))) logObj.put(
-                type.name.lowercase(
-                    Locale.getDefault()
-                ), true
-            )
-            toggleObj.put(ToggleKt.TogglesConfigField.LOG_TOGGLES.toString(), logObj)
-        }
     }
 }
