@@ -1,7 +1,6 @@
 package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
-import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.link
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -18,10 +17,8 @@ import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Message.Attachment
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.lang.IllegalArgumentException
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.Path
@@ -121,6 +118,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             }
             "file" -> {
                 val file = event.getRequiredOption("tracks").asAttachment
+                handleLocalTrack(event, file)
             }
         }
     }
@@ -186,7 +184,6 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     }
                 }
 
-                val selfVoiceState = guild.selfMember.voiceState!!
                 val memberVoiceState = member.voiceState!!
 
                 try {
