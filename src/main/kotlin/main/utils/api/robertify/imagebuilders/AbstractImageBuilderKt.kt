@@ -1,6 +1,5 @@
 package main.utils.api.robertify.imagebuilders
 
-import main.constants.ENVKt
 import main.main.ConfigKt
 import main.utils.api.robertify.imagebuilders.models.ImageQueryFieldKt
 import me.duncte123.botcommons.web.WebUtils
@@ -17,11 +16,11 @@ import java.util.concurrent.TimeUnit
 abstract class AbstractImageBuilderKt protected constructor(imageType: ImageTypeKt) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+        private const val DEFAULT_TIMEOUT = 2L
 
         fun getRandomFileName(): String = "${UUID.randomUUID()}.png"
     }
 
-    private val DEFAULT_TIMEOUT = 2L
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
         .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
@@ -33,7 +32,7 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
     init {
         val segments = listOf("api", "images").toMutableList()
         segments.addAll(imageType.getSegments())
-        uri = URIBuilder(ConfigKt.get(ENVKt.ROBERTIFY_API_HOSTNAME))
+        uri = URIBuilder(ConfigKt.ROBERTIFY_API_HOSTNAME)
             .setPathSegments(segments)
     }
 

@@ -13,7 +13,7 @@ import java.util.function.Consumer
 abstract class RedisCacheKt protected constructor(cacheID: String) : AbstractJSONKt {
     
     private val jedis: JedisPooled = RedisDBKt.instance?.jedis ?: throw IllegalArgumentException("There was no connection to the Redis database!")
-    protected val cacheID = "$cacheID#${ConfigKt.get(ENVKt.MONGO_DATABASE_NAME)}#"
+    protected val cacheID = "$cacheID#${ConfigKt.MONGO_DATABASE_NAME}#"
 
     protected fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) {
         val newHash = HashMap<String, String>()

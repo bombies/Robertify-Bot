@@ -16,16 +16,16 @@ class RedisDBKt private constructor() {
             private set
     }
 
-    val jedis: JedisPooled = if (ConfigKt.get(ENVKt.REDIS_PASSWORD).isNotBlank())
+    val jedis: JedisPooled = if (ConfigKt.REDIS_PASSWORD.isNotBlank())
         JedisPooled(
-            ConfigKt.get(ENVKt.REDIS_HOSTNAME),
-            ConfigKt.getInt(ENVKt.REDIS_PORT),
+            ConfigKt.REDIS_HOSTNAME,
+            ConfigKt.REDIS_PORT.toInt(),
             null,
-            ConfigKt.get(ENVKt.REDIS_PASSWORD)
+            ConfigKt.REDIS_PASSWORD
         )
     else JedisPooled(
-        ConfigKt.get(ENVKt.REDIS_HOSTNAME),
-        ConfigKt.getInt(ENVKt.REDIS_PORT),
+        ConfigKt.REDIS_HOSTNAME,
+        ConfigKt.REDIS_PORT.toInt(),
     )
 
 

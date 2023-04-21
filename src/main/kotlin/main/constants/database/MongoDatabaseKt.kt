@@ -6,7 +6,7 @@ import main.main.ConfigKt
 enum class MongoDatabaseKt(val str: String) {
     MAIN("Learning0"),
 
-    ROBERTIFY_DATABASE(ConfigKt.get(ENVKt.MONGO_DATABASE_NAME)),
+    ROBERTIFY_DATABASE(ConfigKt.MONGO_DATABASE_NAME),
 
     // Collections
     ROBERTIFY_BOT_INFO("main"),
@@ -21,6 +21,6 @@ enum class MongoDatabaseKt(val str: String) {
 
     companion object {
         fun getConnectionString(db: String) =
-            "mongodb+srv://${ConfigKt[ENVKt.MONGO_USERNAME]}:${ConfigKt[ENVKt.MONGO_PASSWORD]}@${ConfigKt[ENVKt.MONGO_CLUSTER_NAME]}.${ConfigKt[ENVKt.MONGO_HOSTNAME]}/${db}?retryWrites=true&w=majority"
+            "mongodb+srv://${ConfigKt.MONGO_USERNAME}:${ConfigKt.MONGO_PASSWORD}@${ConfigKt.MONGO_CLUSTER_NAME}.${ConfigKt.MONGO_HOSTNAME}/${db}?retryWrites=true&w=majority"
     }
 }

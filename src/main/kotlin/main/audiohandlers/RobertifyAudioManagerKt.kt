@@ -48,12 +48,12 @@ class RobertifyAudioManagerKt {
         playerManager = DefaultAudioPlayerManager()
         spotifySourceManager = SpotifySourceManager(
             ConfigKt.providers,
-            ConfigKt[ENVKt.SPOTIFY_CLIENT_ID],
-            ConfigKt[ENVKt.SPOTIFY_CLIENT_SECRET],
+            ConfigKt.SPOTIFY_CLIENT_ID,
+            ConfigKt.SPOTIFY_CLIENT_SECRET,
             "us",
             playerManager
         )
-        deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt[ENVKt.DEEZER_ACCESS_TOKEN])
+        deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt.DEEZER_ACCESS_TOKEN)
         appleMusicSourceManager = AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager)
         resumeSourceManager = ResumeSourceManagerKt(playerManager)
 

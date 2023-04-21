@@ -11,7 +11,7 @@ import main.main.ConfigKt
 class MongoConnectionManagerKt {
 
     companion object {
-        private val CONNECTION_STRING = ConnectionString(MongoDatabaseKt.getConnectionString(ConfigKt[ENVKt.MONGO_DATABASE_NAME]))
+        private val CONNECTION_STRING = ConnectionString(MongoDatabaseKt.getConnectionString(ConfigKt.MONGO_DATABASE_NAME))
         private val CLIENT_SETTINGS = MongoClientSettings.builder()
             .applyConnectionString(CONNECTION_STRING)
             .build()
