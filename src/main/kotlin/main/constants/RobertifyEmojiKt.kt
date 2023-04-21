@@ -26,6 +26,8 @@ enum class RobertifyEmojiKt(val str: String) {
     FILTER_EMOJI("<:filter:983839047157940234>");
 
     override fun toString(): String = str.trim()
+    val emoji: Emoji
+        get() = Emoji.fromFormatted(str)
     fun getEmoji(): Emoji = Emoji.fromFormatted(str)
 
 }
