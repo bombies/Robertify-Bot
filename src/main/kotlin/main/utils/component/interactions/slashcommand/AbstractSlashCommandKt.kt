@@ -60,7 +60,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
             commands.forEach { commandListUpdateAction.addCommands(it.info.getCommandData()) }
 
-            if (guild.ownerIdLong == ConfigKt.ownerId)
+            if (guild.ownerIdLong == ConfigKt.OWNER_ID)
                 devCommands.forEach { commandListUpdateAction.addCommands(it.info.getCommandData()) }
 
             commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, null,
@@ -93,7 +93,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         }
 
         fun unloadAllCommands(guild: Guild) {
-            if (guild.ownerIdLong != ConfigKt.ownerId)
+            if (guild.ownerIdLong != ConfigKt.OWNER_ID)
                 guild.updateCommands().addCommands().queue()
             else
                 guild.updateCommands()
@@ -116,7 +116,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!info.isGuild && !info.isPrivate)
             return
 
-        if (info.isPrivate && guild.ownerIdLong != ConfigKt.ownerId)
+        if (info.isPrivate && guild.ownerIdLong != ConfigKt.OWNER_ID)
             return
 
         logger.debug("Loading command \"${info.name}\" in ${guild.name}")
@@ -293,7 +293,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     protected open fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
-        if (!ConfigKt.premiumBot) return true
+        if (!ConfigKt.PREMIUM_BOT) return true
         val guild = event.guild ?: return true
         if (!GuildConfigKt(guild).isPremium()) {
             event.replyEmbeds(

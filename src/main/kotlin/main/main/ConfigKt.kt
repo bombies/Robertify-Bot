@@ -7,8 +7,8 @@ import main.utils.GeneralUtilsKt
 import main.utils.lavalink.LavaNodeKt
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import java.io.File
-import java.nio.file.Path
 import java.util.*
 
 class ConfigKt {
@@ -51,12 +51,12 @@ class ConfigKt {
                     .toTypedArray()
             }
 
-        val shardCount: Int
+        val SHARD_COUNT: Int
             get() = getInt(ENVKt.SHARD_COUNT)
-        val botToken: String
+        val BOT_TOKEN: String
             get() = get(ENVKt.BOT_TOKEN)
 
-        val lavaNodes: List<LavaNodeKt>
+        val LAVA_NODES: List<LavaNodeKt>
             get() = try {
                 val ret = mutableListOf<LavaNodeKt>()
                 val jsonObject = getConfigJSON()
@@ -77,37 +77,108 @@ class ConfigKt {
                 emptyList()
             }
 
-        val youtubeEnabled: Boolean
+        val YOUTUBE_ENABLED: Boolean
             get() =
                 hasValue(ENVKt.YOUTUBE_ENABLED) && getBoolean(ENVKt.YOUTUBE_ENABLED)
 
-        val ownerId: Long
+        val OWNER_ID: Long
             get() = getLong(ENVKt.OWNER_ID)
 
-        val premiumBot: Boolean
+        val PREMIUM_BOT: Boolean
             get() = getBoolean(ENVKt.PREMIUM_BOT)
 
-        val loadCommands: Boolean
+        val LOAD_COMMANDS: Boolean
             get() = getBoolean(ENVKt.LOAD_COMMANDS)
 
-        val loadNeededCommands: Boolean
+        val LOAD_NEEDED_COMMANDS: Boolean
             get() = getBoolean(ENVKt.LOAD_NEEDED_COMMANDS)
 
-        val gatewayUrl: String
+        val GATEWAY_URL: String
             get() = get(ENVKt.GATEWAY_URL)
 
-        val hasGatewayUrl: Boolean
+        val HAS_GATEWAY_URL: Boolean
             get() = hasValue(ENVKt.GATEWAY_URL)
 
-        val environment: String
+        val ENVIRONMENT: String
             get() = get(ENVKt.ENVIRONMENT)
+
+        val BOT_NAME: String
+            get() = get(ENVKt.BOT_NAME)
+
+        val BOT_COLOR: Color
+            get() = Color.decode(get(ENVKt.BOT_COLOR))
+
+        val SUPPORT_SERVER: String
+            get() = get(ENVKt.BOT_SUPPORT_SERVER)
+
+        val ICON_URL: String
+            get() = get(ENVKt.ICON_URL)
+
+        val RANDOM_MESSAGE_CHANCE: Double
+            get() = get(ENVKt.RANDOM_MESSAGE_CHANCE).toDouble()
+
+        val MESSAGE_CONTENT_ENABLED: Boolean
+            get() = getBoolean(ENVKt.MESSAGE_CONTENT_INTENT_ENABLED)
+
+        val SPOTIFY_CLIENT_ID: String
+            get() = get(ENVKt.SPOTIFY_CLIENT_ID)
+
+        val SPOTIFY_CLIENT_SECRET: String
+            get() = get(ENVKt.SPOTIFY_CLIENT_SECRET)
+
+        val DEEZER_ACCESS_TOKEN: String
+            get() = get(ENVKt.DEEZER_ACCESS_TOKEN)
+
+        val GENIUS_API_KEY: String
+            get() = get(ENVKt.GENIUS_API_KEY)
+
+        val MONGO_USERNAME: String
+            get() = get(ENVKt.MONGO_USERNAME)
+
+        val MONGO_PASSWORD: String
+            get() = get(ENVKt.MONGO_PASSWORD)
+
+        val MONGO_HOSTNAME: String
+            get() = get(ENVKt.MONGO_HOSTNAME)
+
+        val MONGO_CLUSTER_NAME: String
+            get() = get(ENVKt.MONGO_CLUSTER_NAME)
+        
+        val MONGO_DATABASE_NAME: String
+            get() = get(ENVKt.MONGO_DATABASE_NAME)
+        
+        val REDIS_HOSTNAME: String
+            get() = get(ENVKt.REDIS_HOSTNAME)
+        
+        val REDIS_PORT: String
+            get() = get(ENVKt.REDIS_PORT)
+        
+        val REDIS_PASSWORD: String
+            get() = get(ENVKt.REDIS_PASSWORD)
+        
+        val TOP_GG_TOKEN: String
+            get() = get(ENVKt.TOP_GG_TOKEN)
+        
+        val VOTE_REMINDER_CHANCE: Double
+            get() = get(ENVKt.VOTE_REMINDER_CHANCE).toDouble()
+        
+        val ROBERTIFY_WEB_HOSTNAME: String
+            get() = get(ENVKt.ROBERTIFY_WEB_HOSTNAME)
+        
+        val ROBERTIFY_API_HOSTNAME: String
+            get() = get(ENVKt.ROBERTIFY_API_HOSTNAME)
+        
+        val ROBERTIFY_API_PASSWORD: String
+            get() = get(ENVKt.ROBERTIFY_API_PASSWORD)
+        
+        
 
         fun hasValue(value: ENVKt): Boolean {
             val valueString = get(value)
             return valueString.isNotEmpty() && valueString.isNotBlank()
         }
 
-        fun getSentryEnvironment(): String = when (environment.lowercase(Locale.getDefault())) {
+        fun getSentryEnvironment(): String = when (ENVIRONMENT.lowercase(Locale.getDefault())) {
             "dev", "development" -> {
                 "development"
             }
@@ -120,12 +191,12 @@ class ConfigKt {
                 "staging"
             }
 
-            else -> throw IllegalArgumentException("\"$environment\" isn't a valid environment!")
+            else -> throw IllegalArgumentException("\"$ENVIRONMENT\" isn't a valid environment!")
         }
 
-        fun isProdEnv(): Boolean = environment.equals("prod", ignoreCase = true)
-        fun isStagingEnv(): Boolean = environment.equals("staging", ignoreCase = true)
-        fun isDevEnv(): Boolean = environment.equals("dev", ignoreCase = true)
+        fun isProdEnv(): Boolean = ENVIRONMENT.equals("prod", ignoreCase = true)
+        fun isStagingEnv(): Boolean = ENVIRONMENT.equals("staging", ignoreCase = true)
+        fun isDevEnv(): Boolean = ENVIRONMENT.equals("dev", ignoreCase = true)
 
         fun getInt(key: ENVKt): Int = get(key, "-1").toInt()
         fun getLong(key: ENVKt): Long = get(key, "-1").toLong()

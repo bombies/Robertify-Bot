@@ -97,7 +97,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         val guild = event.guild
         val member = event.member!!
 
-        if (GeneralUtilsKt.isUrl(link) && !ConfigKt.youtubeEnabled) {
+        if (GeneralUtilsKt.isUrl(link) && !ConfigKt.YOUTUBE_ENABLED) {
             val linkDestination = GeneralUtilsKt.getLinkDestination(link)
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
                 event.hook.sendWithEmbed(guild) {
