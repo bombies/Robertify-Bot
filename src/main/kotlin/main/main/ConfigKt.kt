@@ -87,6 +87,9 @@ class ConfigKt {
         val PREMIUM_BOT: Boolean
             get() = getBoolean(ENVKt.PREMIUM_BOT)
 
+        val AUDIO_DIR: String
+            get() = get(ENVKt.AUDIO_DIR)
+
         val LOAD_COMMANDS: Boolean
             get() = getBoolean(ENVKt.LOAD_COMMANDS)
 

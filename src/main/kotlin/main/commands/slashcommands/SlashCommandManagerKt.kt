@@ -4,10 +4,16 @@ import main.commands.slashcommands.audio.DisconnectCommandKt
 import main.commands.slashcommands.audio.PlayCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.OptionMapping
+import java.lang.NullPointerException
 
 class SlashCommandManagerKt private constructor() {
     companion object {
         val ins = SlashCommandManagerKt()
+
+        fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
+            this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")
     }
 
     var musicCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()

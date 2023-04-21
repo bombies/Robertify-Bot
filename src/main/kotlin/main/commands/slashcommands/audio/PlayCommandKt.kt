@@ -1,9 +1,12 @@
 package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import dev.minn.jda.ktx.interactions.components.button
+import dev.minn.jda.ktx.interactions.components.link
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.commands.slashcommands.SlashCommandManagerKt.Companion.getRequiredOption
 import main.main.ConfigKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
@@ -12,8 +15,16 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
+import net.dv8tion.jda.api.entities.Message.Attachment
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.lang.IllegalArgumentException
+import java.nio.file.Files
+import java.nio.file.Paths
+import kotlin.io.path.Path
 
 class PlayCommandKt : AbstractSlashCommandKt(
     CommandKt(
@@ -27,6 +38,27 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     CommandOptionKt(
                         name = "tracks",
                         description = "The name/url of the track/album/playlist to play"
+                    )
+                )
+            ),
+            SubCommandKt(
+                name = "nexttracks",
+                description = "Add songs to the beginning of the queue! Links are accepted by Spotify, Deezer, SoundCloud, etc...",
+                options = listOf(
+                    CommandOptionKt(
+                        name = "tracks",
+                        description = "The name/url of the track/album/playlist to add to the top of your queue"
+                    )
+                )
+            ),
+            SubCommandKt(
+                name = "file",
+                description = "Play a local file.",
+                options = listOf(
+                    CommandOptionKt(
+                        type = OptionType.ATTACHMENT,
+                        name = "tracks",
+                        description = "The name/url of the tracks/album/playlist to play"
                     )
                 )
             )
@@ -73,17 +105,22 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
         when (commandPath[1]) {
             "tracks" -> {
-                var link = event.getOption("tracks")?.asString ?: run {
-                    logger.error("Somehow the \"tracks\" option for the \"play\" command was null. Did you forget to set the field as required and is the name correctly typed?")
-                    event.hook.sendWithEmbed(guild) { embed(RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR) }
-                        .queue()
-                    return
-                }
-
+                var link = event.getRequiredOption("tracks").asString
                 if (!GeneralUtilsKt.isUrl(link))
                     link = "${SpotifySourceManager.SEARCH_PREFIX}$link"
 
                 handlePlayTracks(event, link)
+            }
+            "nexttracks" -> {
+                var link = event.getRequiredOption("tracks").asString
+
+                if (!GeneralUtilsKt.isUrl(link))
+                    link = "${SpotifySourceManager.SEARCH_PREFIX}$link"
+
+                handlePlayTracks(event, link, true)
+            }
+            "file" -> {
+                val file = event.getRequiredOption("tracks").asAttachment
             }
         }
     }
@@ -122,6 +159,79 @@ class PlayCommandKt : AbstractSlashCommandKt(
                         )
                 }
             }
+        }
+    }
+
+    private fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
+        val guild = event.guild!!
+        val channel = event.channel.asGuildMessageChannel()
+        val member = event.member!!
+
+        when (file.fileExtension?.lowercase()) {
+            "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
+                if (!Files.exists(Path(ConfigKt.AUDIO_DIR))) {
+                    try {
+                        Files.createDirectory(Paths.get(ConfigKt.AUDIO_DIR))
+                    } catch(e: Exception) {
+                        event.hook.sendWithEmbed(guild) {
+                            embed(RobertifyLocaleMessageKt.PlayMessages.LOCAL_DIR_ERR)
+                        }
+                            .setActionRow(link(
+                                url = "https://robertify.me/support",
+                                label = "Support Server"
+                            ))
+                            .queue()
+                        logger.error("Could not create audio directory!", e)
+                        return
+                    }
+                }
+
+                val selfVoiceState = guild.selfMember.voiceState!!
+                val memberVoiceState = member.voiceState!!
+
+                try {
+                    val audioManager = RobertifyAudioManagerKt.ins
+                    val musicManager = audioManager.getMusicManager(guild)
+
+                    runBlocking {
+                        audioManager.joinAudioChannel(memberVoiceState.channel!!, musicManager)
+                    }
+
+                    event.hook.sendWithEmbed(guild) {
+                        embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
+                    }.queue { addingMsg ->
+                        file.proxy
+                            .downloadToFile(File("${ConfigKt.AUDIO_DIR}/${file.fileName}.${file.fileExtension}"))
+                            .whenComplete { file, err ->
+                                if (err != null) {
+                                    logger.error("Error occurred while downloading a file", err)
+                                    return@whenComplete
+                                }
+
+                                runBlocking {
+                                    audioManager.loadAndPlay(
+                                        trackUrl = file.path,
+                                        memberVoiceState = memberVoiceState,
+                                        messageChannel = channel,
+                                        botMessage = addingMsg
+                                    )
+                                }
+                            }
+                    }
+                } catch (e: IllegalArgumentException) {
+                    logger.error("Error when attempting to download track", e)
+                    event.hook.sendWithEmbed(guild) {
+                        embed(RobertifyLocaleMessageKt.PlayMessages.FILE_DOWNLOAD_ERR)
+                    }.setActionRow(link(
+                        url = "https://robertify.me/support",
+                        label = "Support Server"
+                    ))
+                        .queue()
+                }
+            }
+            else -> event.hook.sendWithEmbed(guild) {
+                embed(RobertifyLocaleMessageKt.PlayMessages.INVALID_FILE)
+            }.queue()
         }
     }
 }
