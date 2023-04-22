@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 data class SubCommandKt(
     val name: String,
     val description: String,
-    val options: List<CommandOptionKt>
+    val options: List<CommandOptionKt> = emptyList()
 ) {
 
     fun getSubcommandData(): SubcommandData {

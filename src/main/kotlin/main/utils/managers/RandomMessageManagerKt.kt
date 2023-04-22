@@ -16,7 +16,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 class RandomMessageManagerKt {
-    var chance: Double = ConfigKt[ENVKt.RANDOM_MESSAGE_CHANCE].toDouble()
+    var chance: Double = ConfigKt.RANDOM_MESSAGE_CHANCE
     val messages: List<String>
         get() = BotDBCacheKt.instance!!.getRandomMessages()
 

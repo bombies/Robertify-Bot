@@ -76,10 +76,10 @@ object RobertifyKt {
         logger.info("Building shard manager...")
         runBlocking {
             val lavakordShardManager = defaultShardWithLavakord(
-                token = ConfigKt.botToken,
+                token = ConfigKt.BOT_TOKEN,
                 intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
             ) {
-                setShardsTotal(ConfigKt.shardCount)
+                setShardsTotal(ConfigKt.SHARD_COUNT)
                 setBulkDeleteSplittingEnabled(false)
                 enableCache(CacheFlag.VOICE_STATE)
                 disableCache(
@@ -106,7 +106,7 @@ object RobertifyKt {
 
                 val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
 
-                if (ConfigKt[ENVKt.MESSAGE_CONTENT_INTENT_ENABLED].toBoolean())
+                if (ConfigKt.MESSAGE_CONTENT_ENABLED)
                     enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
                 else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
 
@@ -131,15 +131,15 @@ object RobertifyKt {
         ListenerKt(shardManager)
 
         // Setup lavakord
-        ConfigKt.lavaNodes.forEach { node ->
+        ConfigKt.LAVA_NODES.forEach { node ->
             lavakord.addNode(node.uri.toString(), node.password)
             logger.info("Registered lava node with address: ${node.uri}")
         }
 
-        if (ConfigKt.loadCommands)
+        if (ConfigKt.LOAD_COMMANDS)
             AbstractSlashCommandKt.loadAllCommands()
 
-        if (ConfigKt.loadNeededCommands) {
+        if (ConfigKt.LOAD_NEEDED_COMMANDS) {
             // TODO: Load needed commands
         }
 
@@ -154,10 +154,10 @@ object RobertifyKt {
     }
 
     fun initVoteSiteAPIs() {
-        if (ConfigKt[ENVKt.TOP_GG_TOKEN].isNotEmpty())
+        if (ConfigKt.TOP_GG_TOKEN.isNotEmpty())
             topGGAPI = DiscordBotListAPI.Builder()
-                .token(ConfigKt[ENVKt.TOP_GG_TOKEN])
-                .botId(getIdFromToken(ConfigKt.botToken))
+                .token(ConfigKt.TOP_GG_TOKEN)
+                .botId(getIdFromToken(ConfigKt.BOT_TOKEN))
                 .build()
     }
 

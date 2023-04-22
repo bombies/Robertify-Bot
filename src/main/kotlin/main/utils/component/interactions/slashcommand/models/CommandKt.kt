@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 data class CommandKt(
     val name: String,
-    val description: String = "",
+    val description: String,
     val options: List<CommandOptionKt> = listOf(),
     val subCommandGroups: List<SubCommandGroupKt> = listOf(),
     val subcommands: List<SubCommandKt> = listOf(),
