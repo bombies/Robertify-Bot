@@ -22,9 +22,9 @@ abstract class AbstractMongoDatabaseKt {
         private val log = LoggerFactory.getLogger(Companion::class.java)
 
         fun initAllCaches() {
-            BotDBCacheKt.initCache()
+            BotDBCacheKt.instance
+            FavouriteTracksCacheKt.instance
             GuildRedisCacheKt.initCache()
-            FavouriteTracksCacheKt.initCache()
             updateAllCaches()
         }
 

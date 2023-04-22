@@ -31,7 +31,7 @@ class ThemesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
 
     override fun update() {
         if (!guildHasInfo()) loadGuild()
-        val cacheArr = GuildDBCacheKt.ins!!.getCache()
+        val cacheArr = GuildDBCacheKt.ins.getCache()
         val obj = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDBKt.Field.GUILD_ID, guild.idLong))
         if (!obj.has(ThemesConfigFieldKt.THEME.toString())) {
             obj.put(ThemesConfigFieldKt.THEME.toString(), RobertifyThemeKt.GREEN.name.lowercase(Locale.getDefault()))

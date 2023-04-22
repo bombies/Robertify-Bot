@@ -169,7 +169,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
 
     override fun update() {
         if (!guildHasInfo()) loadGuild()
-        val cacheArr = GuildDBCacheKt.ins!!.getCache()
+        val cacheArr = GuildDBCacheKt.ins.getCache()
         val obj = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDBKt.Field.GUILD_ID, guild.idLong))
 
         for (code in PermissionKt.codes)

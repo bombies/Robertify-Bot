@@ -13,7 +13,7 @@ class GuildResumeManagerKt(private val guild: Guild) {
     }
 
     private val resumeCache: GuildResumeCacheKt = GuildResumeCacheKt(guild.id)
-    private val musicManager = RobertifyAudioManagerKt.ins.getMusicManager(guild)
+    private val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
     private val scheduler = musicManager.scheduler
     val hasSave: Boolean = resumeCache.hasTracks
 
@@ -47,7 +47,7 @@ class GuildResumeManagerKt(private val guild: Guild) {
 
         try {
             val loadedData = resumeCache.data!!
-            RobertifyAudioManagerKt.ins.loadAndResume(musicManager, loadedData)
+            RobertifyAudioManagerKt.loadAndResume(musicManager, loadedData)
         } catch (e: JsonProcessingException) {
             logger.error("Couldn't load resume data for guild with id ${guild.id}", e)
         }

@@ -1,6 +1,5 @@
 package main.main
 
-import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.GeneralUtilsKt
@@ -8,16 +7,13 @@ import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.guildconfig.GuildConfigKt
-import main.utils.json.locale.LocaleConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
@@ -28,14 +24,13 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class ListenerKt(private val shardManager: ShardManager) {
+class ListenerKt(shardManager: ShardManager) : ListenerController(shardManager) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
     init {
-        // Register listeners
         readyListener()
         guildReadyListener()
         guildJoinListener()
@@ -43,15 +38,15 @@ class ListenerKt(private val shardManager: ShardManager) {
     }
 
     private fun readyListener() =
-        shardManager.listener<ReadyEvent> { event ->
+        onEvent<ReadyEvent> { event ->
             val jda = event.jda
             logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
-            BotDBCacheKt.instance!!.lastStartup = System.currentTimeMillis()
+            BotDBCacheKt.instance.lastStartup = System.currentTimeMillis()
             RobertifyKt.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
         }
 
     private fun guildReadyListener() =
-        shardManager.listener<GuildReadyEvent> { event ->
+        onEvent<GuildReadyEvent> { event ->
             val guild = event.guild
             val requestChannelConfig = RequestChannelConfigKt(guild)
 
@@ -64,7 +59,7 @@ class ListenerKt(private val shardManager: ShardManager) {
         }
 
     private fun guildJoinListener() =
-        shardManager.listener<GuildJoinEvent> { event ->
+        onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
             val guildConfig = GuildConfigKt(guild)
             loadSlashCommands(guild)
@@ -75,10 +70,10 @@ class ListenerKt(private val shardManager: ShardManager) {
         }
 
     private fun guildLeaveListener() =
-        shardManager.listener<GuildLeaveEvent> { event ->
+        onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
             GuildConfigKt(guild).removeGuild()
-            RobertifyAudioManagerKt.ins.removeMusicManager(guild)
+            RobertifyAudioManagerKt.removeMusicManager(guild)
             logger.info("Left ${guild.name}")
 
             updateServerCount()
@@ -109,7 +104,7 @@ class ListenerKt(private val shardManager: ShardManager) {
     private fun updateServerCount() {
         val serverCount = shardManager.guilds.size
 
-        BotDBCacheKt.instance!!.setGuildCount(serverCount)
+        BotDBCacheKt.instance.setGuildCount(serverCount)
         if (RobertifyKt.topGGAPI != null)
             RobertifyKt.topGGAPI!!.setStats(serverCount)
     }

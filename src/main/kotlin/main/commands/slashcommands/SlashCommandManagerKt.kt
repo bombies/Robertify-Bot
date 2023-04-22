@@ -2,19 +2,24 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.DisconnectCommandKt
 import main.commands.slashcommands.audio.PlayCommandKt
+import main.commands.slashcommands.audio.QueueCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
+import net.dv8tion.jda.api.sharding.ShardManager
 import java.lang.NullPointerException
 
-class SlashCommandManagerKt private constructor() {
-    companion object {
-        val ins = SlashCommandManagerKt()
+object SlashCommandManagerKt {
 
-        fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
-            this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")
-    }
+    fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
+        this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")
+
+    fun ShardManager.registerCommand(command: AbstractSlashCommandKt) =
+        command.register(this)
+
+    fun ShardManager.registerCommands(commands: List<AbstractSlashCommandKt>) =
+        commands.forEach { it.register(this) }
 
     var musicCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
         private set
@@ -50,7 +55,8 @@ class SlashCommandManagerKt private constructor() {
     init {
         addMusicCommands(
             PlayCommandKt(),
-            DisconnectCommandKt()
+            DisconnectCommandKt(),
+            QueueCommandKt()
         )
         addManagementCommands()
         addMiscCommands()

@@ -18,14 +18,14 @@ import kotlin.random.Random
 class RandomMessageManagerKt {
     var chance: Double = ConfigKt.RANDOM_MESSAGE_CHANCE
     val messages: List<String>
-        get() = BotDBCacheKt.instance!!.getRandomMessages()
+        get() = BotDBCacheKt.instance.getRandomMessages()
 
     val hasMessages: Boolean
         get() = messages.isEmpty()
 
     fun getMessage(guild: Guild): MessageEmbed {
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
-        val messages = BotDBCacheKt.instance!!.getRandomMessages()
+        val messages = BotDBCacheKt.instance.getRandomMessages()
 
         if (messages.isEmpty())
             throw NullPointerException(localeManager.getMessage(RobertifyLocaleMessageKt.RandomMessages.NO_RANDOM_MESSAGES))
@@ -38,13 +38,13 @@ class RandomMessageManagerKt {
     }
 
     fun addMessage(message: String) =
-        BotDBCacheKt.instance!!.addRandomMessage(message)
+        BotDBCacheKt.instance.addRandomMessage(message)
 
     fun removeMessage(id: Int) =
-        BotDBCacheKt.instance!!.removeMessage(id)
+        BotDBCacheKt.instance.removeMessage(id)
 
     fun clearMessages() =
-        BotDBCacheKt.instance!!.clearMessages()
+        BotDBCacheKt.instance.clearMessages()
 
     fun randomlySendMessage(channel: GuildMessageChannel) {
         val guild = channel.guild

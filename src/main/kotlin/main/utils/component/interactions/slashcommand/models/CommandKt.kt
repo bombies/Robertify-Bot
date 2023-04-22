@@ -34,7 +34,7 @@ data class CommandKt(
 
     val checkPermission = _checkPermission
         get() = when {
-            isPrivate -> { event -> BotDBCacheKt.instance!!.isDeveloper(event.user.idLong) }
+            isPrivate -> { event -> BotDBCacheKt.instance.isDeveloper(event.user.idLong) }
             else -> field
         }
 

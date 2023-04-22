@@ -1,6 +1,5 @@
 package main.utils.pagination
 
-import dev.minn.jda.ktx.interactions.components.Paginator
 import dev.minn.jda.ktx.interactions.components.secondary
 import main.constants.MessageButtonKt
 import main.constants.RobertifyEmojiKt
@@ -15,7 +14,7 @@ class PaginationButtonGenerator(
     private val endEmoji: Emoji,
 ) {
     companion object {
-        val default = PaginationButtonGenerator(
+        val DEFAULT = PaginationButtonGenerator(
             RobertifyEmojiKt.PREVIOUS_EMOJI.emoji,
             RobertifyEmojiKt.REWIND_EMOJI.emoji,
             RobertifyEmojiKt.PLAY_EMOJI.emoji,

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
@@ -172,6 +173,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
         }
 
         inline fun SlashCommandInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
+            val embedUtils = getGuildUtils(guild)
+            return replyEmbeds(supplier(embedUtils))
+        }
+
+        inline fun ButtonInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }

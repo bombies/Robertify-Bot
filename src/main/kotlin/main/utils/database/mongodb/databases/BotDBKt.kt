@@ -1,5 +1,6 @@
 package main.utils.database.mongodb.databases
 
+import dev.minn.jda.ktx.util.SLF4J
 import main.constants.database.MongoDatabaseKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.DocumentBuilderKt
@@ -8,68 +9,58 @@ import main.utils.json.GenericJSONFieldKt
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 
-class BotDBKt private constructor() :
+object BotDBKt :
     AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_BOT_INFO) {
-    companion object {
-        private val log = LoggerFactory.getLogger(Companion::class.java)
-        private var INSTANCE: BotDBKt? = null
+    private val log by SLF4J
 
-        fun ins(): BotDBKt {
-            if (INSTANCE == null)
-                INSTANCE = BotDBKt()
-            return INSTANCE!!
-        }
+    fun update() {
+        log.debug("Updating Bot Info cache")
+        val cache = BotDBCacheKt.instance!!
+        for (obj in cache.getCache()) {
+            val jsonObject = obj as JSONObject
+            var changesMade = false
+            for (fields in Fields.values()) {
+                if (jsonObject.has(fields.toString())) continue
+                changesMade = true
+                when (fields) {
+                    Fields.LAST_BOOTED -> jsonObject.put(
+                        Fields.LAST_BOOTED.toString(),
+                        System.currentTimeMillis()
+                    )
 
-        fun update() {
-            log.debug("Updating Bot Info cache")
-            val cache = BotDBCacheKt.instance!!
-            for (obj in cache.getCache()) {
-                val jsonObject = obj as JSONObject
-                var changesMade = false
-                for (fields in Fields.values()) {
-                    if (jsonObject.has(fields.toString())) continue
-                    changesMade = true
-                    when (fields) {
-                        Fields.LAST_BOOTED -> jsonObject.put(
-                            Fields.LAST_BOOTED.toString(),
-                            System.currentTimeMillis()
-                        )
+                    Fields.REPORTS_OBJECT -> jsonObject.put(
+                        Fields.REPORTS_OBJECT.toString(), JSONObject()
+                            .put(Fields.SubFields.REPORTS_CATEGORY.toString(), -1L)
+                            .put(Fields.SubFields.REPORTS_CHANNEL.toString(), -1)
+                            .put(Fields.SubFields.REPORTS_BANNED_USERS.toString(), -1)
+                    )
 
-                        Fields.REPORTS_OBJECT -> jsonObject.put(
-                            Fields.REPORTS_OBJECT.toString(), JSONObject()
-                                .put(Fields.SubFields.REPORTS_CATEGORY.toString(), -1L)
-                                .put(Fields.SubFields.REPORTS_CHANNEL.toString(), -1)
-                                .put(Fields.SubFields.REPORTS_BANNED_USERS.toString(), -1)
-                        )
+                    Fields.SUGGESTIONS_OBJECT -> jsonObject.put(
+                        Fields.SUGGESTIONS_OBJECT.toString(), JSONObject()
+                            .put(Fields.SubFields.SUGGESTIONS_CATEGORY.toString(), -1L)
+                            .put(Fields.SubFields.SUGGESTIONS_PENDING_CHANNEL.toString(), -1L)
+                            .put(Fields.SubFields.SUGGESTIONS_ACCEPTED_CHANNEL.toString(), -1L)
+                            .put(Fields.SubFields.SUGGESTIONS_DENIED_CHANNEL.toString(), -1L)
+                            .put(Fields.SubFields.SUGGESTIONS_BANNED_USERS.toString(), -1L)
+                    )
 
-                        Fields.SUGGESTIONS_OBJECT -> jsonObject.put(
-                            Fields.SUGGESTIONS_OBJECT.toString(), JSONObject()
-                                .put(Fields.SubFields.SUGGESTIONS_CATEGORY.toString(), -1L)
-                                .put(Fields.SubFields.SUGGESTIONS_PENDING_CHANNEL.toString(), -1L)
-                                .put(Fields.SubFields.SUGGESTIONS_ACCEPTED_CHANNEL.toString(), -1L)
-                                .put(Fields.SubFields.SUGGESTIONS_DENIED_CHANNEL.toString(), -1L)
-                                .put(Fields.SubFields.SUGGESTIONS_BANNED_USERS.toString(), -1L)
-                        )
+                    Fields.DEVELOPERS_ARRAY -> jsonObject.put(
+                        Fields.DEVELOPERS_ARRAY.toString(),
+                        JSONArray()
+                    )
 
-                        Fields.DEVELOPERS_ARRAY -> jsonObject.put(
-                            Fields.DEVELOPERS_ARRAY.toString(),
-                            JSONArray()
-                        )
+                    Fields.RANDOM_MESSAGES -> jsonObject.put(
+                        Fields.RANDOM_MESSAGES.toString(),
+                        JSONArray()
+                    )
 
-                        Fields.RANDOM_MESSAGES -> jsonObject.put(
-                            Fields.RANDOM_MESSAGES.toString(),
-                            JSONArray()
-                        )
-
-                        Fields.LATEST_ALERT -> jsonObject.put(Fields.LATEST_ALERT.toString(), JSONObject())
-                        Fields.ALERT_VIEWERS -> jsonObject.put(Fields.ALERT_VIEWERS.toString(), JSONArray())
-                        else -> {}
-                    }
+                    Fields.LATEST_ALERT -> jsonObject.put(Fields.LATEST_ALERT.toString(), JSONObject())
+                    Fields.ALERT_VIEWERS -> jsonObject.put(Fields.ALERT_VIEWERS.toString(), JSONArray())
+                    else -> {}
                 }
-                if (changesMade) cache.updateCache(Document.parse(jsonObject.toString()))
             }
+            if (changesMade) cache.updateCache(Document.parse(jsonObject.toString()))
         }
     }
 

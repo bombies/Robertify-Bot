@@ -1,5 +1,6 @@
 package main.utils.database.mongodb.databases
 
+import com.mongodb.client.result.DeleteResult
 import main.constants.ENVKt
 import main.constants.RobertifyThemeKt
 import main.constants.ToggleKt
@@ -12,53 +13,42 @@ import main.utils.json.toggles.TogglesConfigKt
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 import java.util.*
 
-class GuildDBKt private constructor() :
+object GuildDBKt :
     AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_GUILDS) {
-    companion object {
-        private val log = LoggerFactory.getLogger(Companion::class.java)
-        var ins: GuildDBKt? = null
-            get() {
-                if (field == null)
-                    field = GuildDBKt()
-                return field
-            }
-            private set
 
-        fun getGuildDocument(gid: Long): Document {
-            return DocumentBuilderKt.create()
-                .addField(Field.GUILD_ID, gid)
-                .addField(Field.GUILD_PREFIX, ConfigKt[ENVKt.PREFIX])
-                .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
-                .addField(Field.BANNED_USERS_ARRAY, JSONArray())
-                .addField(
-                    Field.REQUEST_CHANNEL_OBJECT, JSONObject()
-                        .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
-                        .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
-                )
-                .addField(
-                    Field.PERMISSIONS_OBJECT, JSONObject()
-                        .put(Field.PERMISSIONS_DJ.toString(), JSONArray())
-                        .put(Field.PERMISSIONS_ADMIN.toString(), JSONArray())
-                        .put(Field.PERMISSIONS_USERS.toString(), JSONObject())
-                )
-                .addField(
-                    Field.RESTRICTED_CHANNELS_OBJECT, JSONObject()
-                        .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
-                        .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
-                )
-                .addField(Field.TOGGLES_OBJECT, TogglesConfigKt.getDefaultToggleObject())
-                .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
-                .addField(Field.THEME, RobertifyThemeKt.GREEN.name.lowercase(Locale.getDefault()))
-                .build()
-        }
+    fun getGuildDocument(gid: Long): Document {
+        return DocumentBuilderKt.create()
+            .addField(Field.GUILD_ID, gid)
+            .addField(Field.GUILD_PREFIX, ConfigKt[ENVKt.PREFIX])
+            .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
+            .addField(Field.BANNED_USERS_ARRAY, JSONArray())
+            .addField(
+                Field.REQUEST_CHANNEL_OBJECT, JSONObject()
+                    .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
+                    .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
+            )
+            .addField(
+                Field.PERMISSIONS_OBJECT, JSONObject()
+                    .put(Field.PERMISSIONS_DJ.toString(), JSONArray())
+                    .put(Field.PERMISSIONS_ADMIN.toString(), JSONArray())
+                    .put(Field.PERMISSIONS_USERS.toString(), JSONObject())
+            )
+            .addField(
+                Field.RESTRICTED_CHANNELS_OBJECT, JSONObject()
+                    .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
+                    .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
+            )
+            .addField(Field.TOGGLES_OBJECT, TogglesConfigKt.getDefaultToggleObject())
+            .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
+            .addField(Field.THEME, RobertifyThemeKt.GREEN.name.lowercase(Locale.getDefault()))
+            .build()
     }
 
     fun addGuild(gid: Long) = addDocument(getGuildDocument(gid))
 
-    fun removeGuild(gid: Long) = when (val doc = findSpecificDocument(Field.GUILD_ID, gid)) {
+    fun removeGuild(gid: Long): DeleteResult = when (val doc = findSpecificDocument(Field.GUILD_ID, gid)) {
         null -> throw NullPointerException("There is no guild with the ID $gid in the database already!")
         else -> removeDocument(doc)
     }

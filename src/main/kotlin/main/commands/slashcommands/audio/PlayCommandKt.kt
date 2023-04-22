@@ -5,7 +5,7 @@ import dev.minn.jda.ktx.interactions.components.link
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.commands.slashcommands.SlashCommandManagerKt.Companion.getRequiredOption
+import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.main.ConfigKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
@@ -67,10 +67,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
-    override val help: String
-        get() = "Plays a song"
-
-    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+    override suspend fun handle(event: SlashCommandInteractionEvent) {
         if (!checks(event)) return
         sendRandomMessage(event)
 
@@ -108,6 +105,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
                 handlePlayTracks(event, link)
             }
+
             "nexttracks" -> {
                 var link = event.getRequiredOption("tracks").asString
 
@@ -116,6 +114,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
                 handlePlayTracks(event, link, true)
             }
+
             "file" -> {
                 val file = event.getRequiredOption("tracks").asAttachment
                 handleLocalTrack(event, file)
@@ -123,6 +122,8 @@ class PlayCommandKt : AbstractSlashCommandKt(
         }
     }
 
+    override val help: String
+        get() = "Plays a song"
 
     private fun handlePlayTracks(
         event: SlashCommandInteractionEvent,
@@ -148,7 +149,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         }.queue { msg ->
             runBlocking {
                 launch {
-                    RobertifyAudioManagerKt.ins
+                    RobertifyAudioManagerKt
                         .loadAndPlay(
                             trackUrl = link,
                             memberVoiceState = member.voiceState!!,
@@ -170,14 +171,16 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 if (!Files.exists(Path(ConfigKt.AUDIO_DIR))) {
                     try {
                         Files.createDirectory(Paths.get(ConfigKt.AUDIO_DIR))
-                    } catch(e: Exception) {
+                    } catch (e: Exception) {
                         event.hook.sendWithEmbed(guild) {
                             embed(RobertifyLocaleMessageKt.PlayMessages.LOCAL_DIR_ERR)
                         }
-                            .setActionRow(link(
-                                url = "https://robertify.me/support",
-                                label = "Support Server"
-                            ))
+                            .setActionRow(
+                                link(
+                                    url = "https://robertify.me/support",
+                                    label = "Support Server"
+                                )
+                            )
                             .queue()
                         logger.error("Could not create audio directory!", e)
                         return
@@ -187,7 +190,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 val memberVoiceState = member.voiceState!!
 
                 try {
-                    val audioManager = RobertifyAudioManagerKt.ins
+                    val audioManager = RobertifyAudioManagerKt
                     val musicManager = audioManager.getMusicManager(guild)
 
                     runBlocking {
@@ -219,13 +222,16 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     logger.error("Error when attempting to download track", e)
                     event.hook.sendWithEmbed(guild) {
                         embed(RobertifyLocaleMessageKt.PlayMessages.FILE_DOWNLOAD_ERR)
-                    }.setActionRow(link(
-                        url = "https://robertify.me/support",
-                        label = "Support Server"
-                    ))
+                    }.setActionRow(
+                        link(
+                            url = "https://robertify.me/support",
+                            label = "Support Server"
+                        )
+                    )
                         .queue()
                 }
             }
+
             else -> event.hook.sendWithEmbed(guild) {
                 embed(RobertifyLocaleMessageKt.PlayMessages.INVALID_FILE)
             }.queue()

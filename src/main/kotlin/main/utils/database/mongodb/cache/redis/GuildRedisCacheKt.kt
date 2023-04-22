@@ -10,17 +10,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_GUILD", GuildDBKt.ins!!) {
+class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_GUILD", GuildDBKt) {
     
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
-        var ins: GuildRedisCacheKt? = null
-            get() {
-                if (field == null)
-                    field = GuildRedisCacheKt()
-                return field
-            }
-            private set
+        val ins: GuildRedisCacheKt by lazy { GuildRedisCacheKt() }
         
         fun initCache() {
             logger.debug("Instantiating new Guild cache!")

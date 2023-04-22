@@ -1,5 +1,7 @@
 package main.utils.component.interactions.slashcommand
 
+import dev.minn.jda.ktx.events.CoroutineEventListener
+import dev.minn.jda.ktx.events.listener
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.managers.RandomMessageManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
@@ -23,20 +25,22 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.requests.ErrorResponse
+import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
-abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt) : AbstractInteractionKt() {
+abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt) : AbstractInteractionKt {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
         fun loadAllCommands() {
-            val slashCommandManager = SlashCommandManagerKt.ins
+            val slashCommandManager = SlashCommandManagerKt
             val commands = slashCommandManager.globalCommands
 
             RobertifyKt.shardManager.shards.forEach { shard ->
@@ -50,7 +54,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         }
 
         fun loadAllCommands(guild: Guild) {
-            val slashCommandManager = SlashCommandManagerKt.ins
+            val slashCommandManager = SlashCommandManagerKt
             val commands = slashCommandManager.guildCommands
             val devCommands = slashCommandManager.devCommands
 
@@ -98,7 +102,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             else
                 guild.updateCommands()
                     .addCommands(
-                        SlashCommandManagerKt.ins
+                        SlashCommandManagerKt
                             .devCommands
                             .map { it.info.getCommandData() }
                     )
@@ -109,6 +113,19 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     )
         }
     }
+
+    fun register(shardManager: ShardManager) =
+        onEvent<SlashCommandInteractionEvent>(shardManager) {
+            handle(it)
+        }
+
+    private inline fun <reified T : GenericEvent> onEvent(
+        shardManager: ShardManager,
+        crossinline handler: suspend CoroutineEventListener.(event: T) -> Unit
+    ) =
+        shardManager.listener<T> { handler(it) }
+
+    abstract suspend fun handle(event: SlashCommandInteractionEvent)
 
     open val help = ""
 
@@ -164,7 +181,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
-        if (SlashCommandManagerKt.ins.isMusicCommand(this) && event.channel.type.isMessage)
+        if (SlashCommandManagerKt.isMusicCommand(this) && event.channel.type.isMessage)
             RandomMessageManagerKt().randomlySendMessage(event.channel as GuildMessageChannel)
     }
 
@@ -177,12 +194,12 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!botPermsCheck(event)) return false
         if (!premiumBotCheck(event)) return false
 
-        if (SlashCommandManagerKt.ins.isMusicCommand(this)) {
-            val botDB = BotDBCacheKt.instance!!
+        if (SlashCommandManagerKt.isMusicCommand(this)) {
+            val botDB = BotDBCacheKt.instance
             val latestAlert = botDB.getLatestAlert()?.left
             val user = event.user
             if (!botDB.userHasViewedAlert(user.idLong) && !latestAlert.isNullOrEmpty() && latestAlert.isNotBlank()
-                && SlashCommandManagerKt.ins.isMusicCommand(this)
+                && SlashCommandManagerKt.isMusicCommand(this)
             ) event.channel.asGuildMessageChannel().sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     event.guild,
@@ -215,8 +232,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!adminCheck(event)) return false
         if (!djCheck(event)) return false
 
-        if (SlashCommandManagerKt.ins.isMusicCommand(this) && event.isFromGuild) {
-            val scheduler = RobertifyAudioManagerKt.ins
+        if (SlashCommandManagerKt.isMusicCommand(this) && event.isFromGuild) {
+            val scheduler = RobertifyAudioManagerKt
                 .getMusicManager(event.guild!!)
                 .scheduler
             scheduler.announcementChannel = event.guildChannel
@@ -441,7 +458,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected open fun devCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!info.isPrivate) return true
-        if (!BotDBCacheKt.instance!!.isDeveloper(event.user.idLong)) {
+        if (!BotDBCacheKt.instance.isDeveloper(event.user.idLong)) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     event.guild,

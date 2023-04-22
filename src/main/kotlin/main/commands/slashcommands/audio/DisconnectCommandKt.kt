@@ -12,16 +12,13 @@ import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class DisconnectCommandKt : AbstractSlashCommandKt(CommandKt(
-    name = "disconnect",
-    description = "Disconnect the bot from the voice channel it's currently in",
-)) {
-
-    override val help: String
-        get() = "Forces the bot to stop playing music and leave the voice channel" +
-                " if already in one."
-
-    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+class DisconnectCommandKt : AbstractSlashCommandKt(
+    CommandKt(
+        name = "disconnect",
+        description = "Disconnect the bot from the voice channel it's currently in",
+    )
+) {
+    override suspend fun handle(event: SlashCommandInteractionEvent) {
         if (!checks(event)) return
 
         event.deferReply().queue()
@@ -50,7 +47,7 @@ class DisconnectCommandKt : AbstractSlashCommandKt(CommandKt(
 
         runBlocking {
             launch {
-                RobertifyAudioManagerKt.ins
+                RobertifyAudioManagerKt
                     .getMusicManager(guild)
                     .leave()
 
@@ -61,10 +58,17 @@ class DisconnectCommandKt : AbstractSlashCommandKt(CommandKt(
                 LogUtilsKt(guild)
                     .sendLog(
                         LogTypeKt.BOT_DISCONNECTED,
-                        "${event.user.asMention} ${LocaleManagerKt.getLocaleManager(guild).getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)}"
+                        "${event.user.asMention} ${
+                            LocaleManagerKt.getLocaleManager(guild)
+                                .getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)
+                        }"
                     )
             }
         }
     }
+
+    override val help: String
+        get() = "Forces the bot to stop playing music and leave the voice channel" +
+                " if already in one."
 
 }

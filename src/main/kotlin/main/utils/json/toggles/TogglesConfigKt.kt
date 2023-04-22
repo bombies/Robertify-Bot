@@ -43,7 +43,7 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
 
              if (!toggleObj.has(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())) {
                  val djTogglesObj = JSONObject()
-                 for (musicCommand in SlashCommandManagerKt.ins.musicCommands) djTogglesObj.put(
+                 for (musicCommand in SlashCommandManagerKt.musicCommands) djTogglesObj.put(
                      musicCommand.info.name.lowercase(
                          Locale.getDefault()
                      ), false
@@ -51,7 +51,7 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
                  toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
              } else {
                  val djTogglesObj = toggleObj.getJSONObject(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString())
-                 for (musicCommand in SlashCommandManagerKt.ins.musicCommands)
+                 for (musicCommand in SlashCommandManagerKt.musicCommands)
                      if (!djTogglesObj.has(musicCommand.info.name))
                          djTogglesObj.put(musicCommand.info.name, false)
                  toggleObj.put(ToggleKt.TogglesConfigField.DJ_TOGGLES.toString(), djTogglesObj)
@@ -111,7 +111,7 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
     fun getDJToggle(cmd: AbstractSlashCommandKt): Boolean {
         val djToggles = getDJToggles()
         return if (!djToggles.containsKey(cmd.info.name)) {
-            if (SlashCommandManagerKt.ins.isMusicCommand(cmd)) {
+            if (SlashCommandManagerKt.isMusicCommand(cmd)) {
                 setDJToggle(cmd, false)
                 false
             } else {
@@ -169,7 +169,7 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
 
     override fun update() {
         if (!guildHasInfo()) loadGuild()
-        val cacheArr = GuildDBCacheKt.ins!!.getCache()
+        val cacheArr = GuildDBCacheKt.ins.getCache()
         val `object` = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDBKt.Field.GUILD_ID, guild.idLong))
         for (toggle in ToggleKt.values()) {
             try {

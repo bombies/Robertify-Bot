@@ -6,11 +6,11 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import main.audiohandlers.loaders.MainAudioLoaderKt
+import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.loaders.AutoPlayLoaderKt
+import main.audiohandlers.loaders.MainAudioLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
 import main.audiohandlers.sources.resume.ResumeSourceManagerKt
-import main.constants.ENVKt
 import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
@@ -28,16 +28,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
-import org.slf4j.LoggerFactory
-import java.util.concurrent.ConcurrentSkipListMap
+import java.util.*
 
-class RobertifyAudioManagerKt {
-    companion object {
-        private val logger = LoggerFactory.getLogger(Companion::class.java)
-        val ins = RobertifyAudioManagerKt()
-    }
-
-    val musicManagers = ConcurrentSkipListMap<Long, GuildMusicManagerKt>()
+object RobertifyAudioManagerKt {
+    private val logger by SLF4J
+    val musicManagers: MutableMap<Long, GuildMusicManagerKt> = Collections.synchronizedMap(mutableMapOf())
     val playerManager: AudioPlayerManager
     val spotifySourceManager: SpotifySourceManager
     val deezerAudioSourceManager: DeezerAudioSourceManager

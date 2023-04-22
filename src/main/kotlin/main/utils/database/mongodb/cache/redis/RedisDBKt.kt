@@ -4,17 +4,7 @@ import main.constants.ENVKt
 import main.main.ConfigKt
 import redis.clients.jedis.JedisPooled
 
-class RedisDBKt private constructor() {
-
-    companion object {
-        var instance: RedisDBKt? = null
-            get() {
-                if (field == null)
-                    field = RedisDBKt()
-                return field
-            }
-            private set
-    }
+object RedisDBKt {
 
     val jedis: JedisPooled = if (ConfigKt.REDIS_PASSWORD.isNotBlank())
         JedisPooled(
@@ -27,6 +17,5 @@ class RedisDBKt private constructor() {
         ConfigKt.REDIS_HOSTNAME,
         ConfigKt.REDIS_PORT.toInt(),
     )
-
 
 }

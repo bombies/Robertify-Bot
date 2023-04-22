@@ -1,9 +1,6 @@
 package main.audiohandlers
 
 import dev.schlaubi.lavakord.audio.Link
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import main.main.RobertifyKt
 import main.utils.internal.delegates.SynchronizedProperty
 import main.utils.json.requestchannel.RequestChannelConfigKt
@@ -13,7 +10,7 @@ class GuildMusicManagerKt(val guild: Guild) {
     val link by SynchronizedProperty { RobertifyKt.lavakord.getLink(guild.id) }
     val player = link.player
     val scheduler = TrackSchedulerKt(guild, link)
-    val playerManager = RobertifyAudioManagerKt.ins.playerManager
+    val playerManager = RobertifyAudioManagerKt.playerManager
     var isForcePaused: Boolean = false
 
     suspend fun clear() {
@@ -43,7 +40,7 @@ class GuildMusicManagerKt(val guild: Guild) {
     suspend fun leave() {
         clear()
         scheduler.stop()
-        RobertifyAudioManagerKt.ins.removeMusicManager(guild)
+        RobertifyAudioManagerKt.removeMusicManager(guild)
     }
 
     suspend fun destroy() {

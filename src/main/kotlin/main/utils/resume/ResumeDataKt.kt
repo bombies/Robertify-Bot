@@ -1,17 +1,18 @@
 package main.utils.resume
 
-import com.fasterxml.jackson.module.kotlin.readValue
-import main.utils.internal.jackson.DefaultObjectMapper
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+@Serializable
 data class ResumeDataKt(val channel_id: String, val tracks: List<ResumableTrackKt>) {
 
     companion object {
-        private val mapper = DefaultObjectMapper()
-
         fun fromJSON(json: String): ResumeDataKt =
-            mapper.readValue(json)
+            Json.decodeFromString(json)
     }
 
     override fun toString(): String =
-        mapper.writeValueAsString(this)
+        Json.encodeToString(this)
 }

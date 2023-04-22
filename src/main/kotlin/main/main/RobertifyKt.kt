@@ -7,10 +7,11 @@ import kotlinx.coroutines.runBlocking
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
-import main.constants.ENVKt
+import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
+import main.utils.pagination.PaginationEventsKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -43,7 +44,7 @@ object RobertifyKt {
         Runtime.getRuntime().addShutdownHook(mainShutdownHook.newThread {
             logger.info("Destroying all players (If any left)")
             runBlocking {
-                RobertifyAudioManagerKt.ins.musicManagers
+                RobertifyAudioManagerKt.musicManagers
                     .values
                     .forEach { musicManager ->
                         if (musicManager.player.playingTrack != null)
@@ -69,7 +70,7 @@ object RobertifyKt {
         AbstractMongoDatabaseKt.initAllCaches()
         logger.info("Initialized all caches.")
 
-        GuildRedisCacheKt.ins!!.loadAllGuilds()
+        GuildRedisCacheKt.ins.loadAllGuilds()
         logger.info("All guilds have been loaded into cache.")
 
         // Build bot connection
@@ -112,23 +113,24 @@ object RobertifyKt {
 
                 enableIntents(enabledIntents)
                 disableIntents(disabledIntents)
-
-                val slashCommandManager = SlashCommandManagerKt.ins
-                slashCommandManager.guildCommands
-                    .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
-                    .forEach { cmd ->
-                        addEventListeners(cmd)
-                        logger.debug("Registered the \"${cmd.info.name}\" command.")
-                    }
             }
             shardManager = lavakordShardManager.shardManager
             lavakord = lavakordShardManager.lavakord
             logger.info("Successfully built shard manager")
+
+            val slashCommandManager = SlashCommandManagerKt
+            shardManager.registerCommands(
+                slashCommandManager.guildCommands
+                    .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+            )
+            logger.info("Registered all slash commands.")
+
         }
 
 
         // Initialize coroutine listeners
         ListenerKt(shardManager)
+        PaginationEventsKt(shardManager)
 
         // Setup lavakord
         ConfigKt.LAVA_NODES.forEach { node ->

@@ -4,17 +4,7 @@ import main.constants.database.MongoDatabaseKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.json.GenericJSONFieldKt
 
-class FavouriteTracksDBKt private constructor() : AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_FAVOURITE_TRACKS) {
-
-    companion object {
-        private var INSTANCE: FavouriteTracksDBKt? = null
-
-        fun ins(): FavouriteTracksDBKt {
-            if (INSTANCE == null)
-                INSTANCE = FavouriteTracksDBKt()
-            return INSTANCE!!
-        }
-    }
+object FavouriteTracksDBKt : AbstractMongoDatabaseKt(MongoDatabaseKt.ROBERTIFY_DATABASE, MongoDatabaseKt.ROBERTIFY_FAVOURITE_TRACKS) {
 
     enum class Field(private val str: String) : GenericJSONFieldKt {
         USER_ID("user_id"),

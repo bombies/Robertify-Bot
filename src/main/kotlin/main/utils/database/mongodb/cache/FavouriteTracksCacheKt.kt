@@ -10,16 +10,11 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 
-class FavouriteTracksCacheKt internal constructor() : AbstractMongoCacheKt(FavouriteTracksDBKt.ins()) {
+class FavouriteTracksCacheKt private constructor() : AbstractMongoCacheKt(FavouriteTracksDBKt) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
-        var instance: FavouriteTracksCacheKt? = null
-            private set
-
-        fun initCache() {
-            instance = FavouriteTracksCacheKt()
-        }
+        val instance: FavouriteTracksCacheKt by lazy { FavouriteTracksCacheKt() }
     }
 
     init {

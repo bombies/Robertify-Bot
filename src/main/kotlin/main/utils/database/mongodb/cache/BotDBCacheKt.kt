@@ -9,16 +9,11 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.function.Consumer
 
-class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt.ins()) {
+class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
 
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
-        var instance: BotDBCacheKt? = null
-            private set
-
-        fun initCache() {
-            instance = BotDBCacheKt()
-        }
+        val instance: BotDBCacheKt by lazy { BotDBCacheKt() }
     }
 
     init {

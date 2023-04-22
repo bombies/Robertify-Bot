@@ -11,12 +11,11 @@ abstract class AbstractGuildConfigKt protected constructor(private val guild: Gu
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         @JvmStatic
-        protected lateinit var cache: GuildRedisCacheKt
-            private set
+        protected val cache: GuildRedisCacheKt by lazy { GuildRedisCacheKt.ins }
 
         fun initCache() {
             logger.debug("Instantiating Abstract Guild cache")
-            cache = GuildRedisCacheKt.ins!!
+            cache
         }
     }
 

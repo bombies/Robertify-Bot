@@ -2,7 +2,7 @@ package main.utils.database.mongodb.cache
 
 import kotlinx.coroutines.*
 import main.utils.database.mongodb.databases.GuildDBKt
-import main.utils.database.mongodb.databases.GuildDBKt.Companion.getGuildDocument
+import main.utils.database.mongodb.databases.GuildDBKt.getGuildDocument
 import org.bson.Document
 import org.json.JSONException
 import org.json.JSONObject
@@ -12,21 +12,14 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
-class GuildDBCacheKt internal constructor() : AbstractMongoCacheKt(GuildDBKt.ins!!) {
-    
+class GuildDBCacheKt private constructor() : AbstractMongoCacheKt(GuildDBKt) {
+
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val executor = Executors.newSingleThreadScheduledExecutor()
         private val ExecutorServiceDispatcher = executor.asCoroutineDispatcher()
         private val scheduledUnloads = HashMap<Long, ScheduledFuture<*>>()
-
-        var ins: GuildDBCacheKt? = null
-            get() {
-                if (field == null)
-                    field = GuildDBCacheKt()
-                return field
-            }
-        private set
+        val ins: GuildDBCacheKt by lazy { GuildDBCacheKt() }
     }
     
     init {

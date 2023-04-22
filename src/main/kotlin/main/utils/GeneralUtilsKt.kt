@@ -150,7 +150,7 @@ class GeneralUtilsKt {
         }
 
         fun isDeveloper(uid: Long): Boolean {
-            return BotDBCacheKt.instance!!.isDeveloper(uid)
+            return BotDBCacheKt.instance.isDeveloper(uid)
         }
 
         fun isDeveloper(uid: String): Boolean {

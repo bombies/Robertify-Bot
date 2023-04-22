@@ -179,7 +179,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         return try {
             getTextChannel()!!.retrieveMessageById(getMessageID())
         } catch (e: InsufficientPermissionException) {
-            val channel: GuildMessageChannel? = RobertifyAudioManagerKt.ins
+            val channel: GuildMessageChannel? = RobertifyAudioManagerKt
                 .getMusicManager(guild)
                 .scheduler
                 .announcementChannel
@@ -198,7 +198,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         if (!isChannelSet()) return null
         return CompletableFuture.runAsync {
             val msgRequest: RestAction<Message> = getMessageRequest() ?: return@runAsync
-            val musicManager = RobertifyAudioManagerKt.ins.getMusicManager(guild)
+            val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
             val audioPlayer = musicManager.player
             val playingTrack: Track? = audioPlayer.playingTrack
             val queueHandler = musicManager.scheduler.queueHandler

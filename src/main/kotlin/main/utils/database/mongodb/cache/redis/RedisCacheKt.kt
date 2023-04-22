@@ -1,7 +1,6 @@
 package main.utils.database.mongodb.cache.redis
 
 import com.mongodb.client.MongoCollection
-import main.constants.ENVKt
 import main.main.ConfigKt
 import main.utils.json.AbstractJSONKt
 import org.bson.Document
@@ -12,7 +11,7 @@ import java.util.function.Consumer
 
 abstract class RedisCacheKt protected constructor(cacheID: String) : AbstractJSONKt {
     
-    private val jedis: JedisPooled = RedisDBKt.instance?.jedis ?: throw IllegalArgumentException("There was no connection to the Redis database!")
+    private val jedis: JedisPooled = RedisDBKt.jedis
     protected val cacheID = "$cacheID#${ConfigKt.MONGO_DATABASE_NAME}#"
 
     protected fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) {

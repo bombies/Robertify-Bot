@@ -17,8 +17,8 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private const val DEFAULT_TIMEOUT = 2L
-
-        fun getRandomFileName(): String = "${UUID.randomUUID()}.png"
+        val RANDOM_FILE_NAME: String
+            get() = "${UUID.randomUUID()}.png"
     }
 
     private val httpClient = OkHttpClient.Builder()

@@ -1,15 +1,18 @@
 package main.utils.resume
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import main.audiohandlers.models.RequesterKt
 import main.audiohandlers.sources.resume.ResumeSourceManagerKt
 import main.audiohandlers.sources.resume.ResumeTrackKt
-import main.utils.internal.jackson.DefaultObjectMapper
 import org.json.JSONArray
 import org.json.JSONObject
 
+@Serializable
 data class ResumableTrackKt(
     val info: AudioTrackInfoWrapperKt,
     val artworkURL: String?,
@@ -17,8 +20,6 @@ data class ResumableTrackKt(
     val requester: RequesterKt?
 ) {
     companion object {
-        val mapper = DefaultObjectMapper()
-
         fun Collection<Pair<AudioTrack, RequesterKt>>.toResumableTracks(): List<ResumableTrackKt> =
             this.map { trackPair ->
                 val track = trackPair.first
@@ -41,7 +42,7 @@ data class ResumableTrackKt(
         }
 
         fun fromJSON(json: String): ResumableTrackKt =
-            mapper.readValue(json)
+            Json.decodeFromString(json)
     }
 
     constructor(track: AudioTrack, requester: RequesterKt?) : this(
@@ -52,8 +53,8 @@ data class ResumableTrackKt(
     )
 
     fun toAudioTrack(sourceManager: ResumeSourceManagerKt): AudioTrack =
-        ResumeTrackKt(info, isrc, artworkURL, sourceManager)
+        ResumeTrackKt(info.toAudioTrackInfo(), isrc, artworkURL, sourceManager)
 
     override fun toString(): String =
-        mapper.writeValueAsString(this)
+        Json.encodeToString(this)
 }

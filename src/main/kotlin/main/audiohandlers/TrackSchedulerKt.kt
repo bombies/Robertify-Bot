@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
 class TrackSchedulerKt(private val guild: Guild, link: Link) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
-        private val audioManager = RobertifyAudioManagerKt.ins
+        private val audioManager = RobertifyAudioManagerKt
 
         fun Track.toAudioTrack(): AudioTrack {
             val trackInfo = AudioTrackInfo(title, author, length.inWholeMilliseconds, identifier, isStream, uri)
@@ -128,6 +128,8 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
     private fun trackStartEventHandler() =
         player.on<Event, TrackStartEvent> {
+            logger.info("Track started")
+
             val track = getTrack()
             disconnectManager.cancelDisconnect()
             queueHandler.lastPlayedTrackBuffer = track
@@ -171,7 +173,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
                     return@thenCompose announcementChannel!!.sendFiles(
                         FileUpload.fromData(
                             img,
-                            AbstractImageBuilderKt.getRandomFileName()
+                            AbstractImageBuilderKt.RANDOM_FILE_NAME
                         )
                     )
                         .submit()
@@ -294,7 +296,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
                     .replace("[\\[\\]\\s]".toRegex(), "")
 
                 audioManager.loadRecommendedTracks(
-                    musicManager = RobertifyAudioManagerKt.ins.getMusicManager(guild),
+                    musicManager = RobertifyAudioManagerKt.getMusicManager(guild),
                     channel = announcementChannel,
                     trackIds = pastSpotifyTracks
                 )
@@ -389,7 +391,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
         if (GuildConfigKt(guild).twentyFourSevenMode)
             return
 
-        RobertifyAudioManagerKt.ins
+        RobertifyAudioManagerKt
             .getMusicManager(guild)
             .leave()
 

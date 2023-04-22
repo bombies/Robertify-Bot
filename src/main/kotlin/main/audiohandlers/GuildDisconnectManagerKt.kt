@@ -42,7 +42,7 @@ class GuildDisconnectManagerKt(private val guild: Guild) {
         scheduledDisconnect = executorService.schedule({
             runBlocking {
                 launch {
-                    RobertifyAudioManagerKt.ins
+                    RobertifyAudioManagerKt
                         .getMusicManager(guild)
                         .scheduler
                         .disconnect(announceMsg)

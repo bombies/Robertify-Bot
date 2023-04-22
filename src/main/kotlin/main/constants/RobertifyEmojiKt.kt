@@ -28,6 +28,5 @@ enum class RobertifyEmojiKt(val str: String) {
     override fun toString(): String = str.trim()
     val emoji: Emoji
         get() = Emoji.fromFormatted(str)
-    fun getEmoji(): Emoji = Emoji.fromFormatted(str)
 
 }
