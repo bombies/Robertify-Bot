@@ -11,11 +11,11 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
 class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_GUILD", GuildDBKt) {
-    
+
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         val ins: GuildRedisCacheKt by lazy { GuildRedisCacheKt() }
-        
+
         fun initCache() {
             logger.debug("Instantiating new Guild cache!")
             AbstractGuildConfigKt.initCache()
@@ -95,7 +95,7 @@ class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_
             val handleRestrictedChannels: (arr: JSONArray) -> JSONArray = { arr ->
                 val newArr = JSONArray()
                 if (!arr.isEmpty && arr[0] is Long) {
-                    rtc.toList().forEach{ item: Any ->
+                    rtc.toList().forEach { item: Any ->
                         if (GeneralUtilsKt.stringIsID(item.toString()))
                             newArr.put(item.toString())
                     }
@@ -291,14 +291,21 @@ class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_
                 setex(gid, 3600, guildObj)
                 logger.debug("Loaded guild with ID: {}", gid)
             }
-        } catch (e: NullPointerException) {
-            if (scopedAttempt == 2) return
-            logger.debug(
-                "Guild with ID {} didn't exist in the database. Attempting to add and reload.",
-                gid
-            )
-            mongoDB.addDocument(GuildDBKt.getGuildDocument(gid.toLong()))
-            loadGuild(gid, ++scopedAttempt)
+        } catch (e: Exception) {
+            when (e) {
+                is NullPointerException,
+                is NoSuchElementException -> {
+                    if (scopedAttempt == 2) return
+                    logger.debug(
+                        "Guild with ID {} didn't exist in the database. Attempting to add and reload.",
+                        gid
+                    )
+                    mongoDB.addDocument(GuildDBKt.getGuildDocument(gid.toLong()))
+                    loadGuild(gid, ++scopedAttempt)
+                }
+
+                else -> throw e
+            }
         }
     }
 
@@ -319,5 +326,5 @@ class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_
     private fun getDB(): GuildDBKt {
         return mongoDB as GuildDBKt
     }
-    
+
 }
