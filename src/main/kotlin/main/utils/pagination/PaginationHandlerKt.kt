@@ -6,6 +6,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import main.audiohandlers.QueueHandlerKt
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.commands.slashcommands.audio.QueueCommandKt
 import main.constants.InteractionLimitsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
@@ -62,7 +63,7 @@ object PaginationHandlerKt {
             return@coroutineScope paginatedMessage.await()
         }
 
-    suspend fun paginateMessage(event: SlashCommandInteractionEvent, messagePages: List<MessagePageKt>) =
+    suspend fun paginateMessage(event: SlashCommandInteractionEvent, messagePages: List<MessagePageKt>): Message? =
         coroutineScope {
             val paginatedMessage = async {
                 var messageAction = event.hook.sendWithEmbed(event.guild) { messagePages[0].embed!! }
@@ -109,7 +110,7 @@ object PaginationHandlerKt {
             val sendFallbackEmbed: () -> Unit = {
                 val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
                 val queueHandler = musicManager.scheduler.queueHandler
-                val content: List<String> = /* TODO: Get queue content with QueueCommand */ listOf()
+                val content: List<String> = QueueCommandKt().getContent(guild, queueHandler)
 
                 val pages = messageLogic(event.guild!!, content)
                 launch { paginateMessage(event, pages) }

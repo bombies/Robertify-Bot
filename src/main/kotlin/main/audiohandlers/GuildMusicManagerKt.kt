@@ -10,8 +10,10 @@ class GuildMusicManagerKt(val guild: Guild) {
     val link by SynchronizedProperty { RobertifyKt.lavakord.getLink(guild.id) }
     val player = link.player
     val scheduler = TrackSchedulerKt(guild, link)
+    val voteSkipManager = GuildVoteSkipManagerKt()
     val playerManager = RobertifyAudioManagerKt.playerManager
-    var isForcePaused: Boolean = false
+    var isForcePaused = false
+
 
     suspend fun clear() {
         val queueHandler = scheduler.queueHandler

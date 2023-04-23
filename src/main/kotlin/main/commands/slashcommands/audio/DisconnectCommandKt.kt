@@ -19,8 +19,6 @@ class DisconnectCommandKt : AbstractSlashCommandKt(
     )
 ) {
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        if (!checks(event)) return
-
         event.deferReply().queue()
 
         val guild = event.guild!!

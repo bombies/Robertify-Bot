@@ -11,9 +11,10 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
-import net.dv8tion.jda.api.utils.messages.MessageCreateRequest
 
 class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null) {
 
@@ -172,6 +173,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
+        inline fun GuildMessageChannel.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
+            val embedUtils = getGuildUtils(guild)
+            return sendMessageEmbeds(supplier(embedUtils))
+        }
+
         inline fun SlashCommandInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
@@ -180,6 +186,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
         inline fun ButtonInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
+        }
+
+        inline fun Message.editEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageEditAction {
+            val embedUtils = getGuildUtils(guild)
+            return editMessageEmbeds(supplier(embedUtils))
         }
     }
 

@@ -68,9 +68,6 @@ class PlayCommandKt : AbstractSlashCommandKt(
     }
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        if (!checks(event)) return
-        sendRandomMessage(event)
-
         event.deferReply().queue()
         val guild = event.guild!!
         val member = event.member

@@ -24,6 +24,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
 import dev.schlaubi.lavakord.audio.*
 import dev.schlaubi.lavakord.audio.player.Track
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.models.RequesterKt
 import main.audiohandlers.sources.resume.ResumeTrackKt
 import main.constants.ToggleKt
@@ -93,10 +94,15 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
         trackStuckEventHandler()
     }
 
-    suspend fun queue(track: Track) = run {
+    fun queue(track: Track) = runBlocking {
+        logger.info("Attempting to queue ${track.title}. Queue size: ${queueHandler.size}")
         when {
-            player.playingTrack != null -> queueHandler.add(track)
+            player.playingTrack != null -> {
+                logger.info("A track is being played so ${track.title} has been added to the queue")
+                queueHandler.add(track)
+            }
             else -> {
+                logger.info("Now playing ${track.title}")
                 player.playTrack(track)
             }
         }
@@ -272,11 +278,12 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
             queueHandler.loadSavedQueue()
 
         val nextTrack = queueHandler.poll()
-        player.stopTrack()
 
-        if (nextTrack != null)
+        if (nextTrack != null) {
+            logger.info("Retrieved ${nextTrack.title} and attempting to play")
             player.playTrack(nextTrack)
-        else {
+
+        } else {
             if (lastTrack != null
                 && AutoPlayConfigKt(guild).status
                 && lastTrack.source.equals("spotify", true)
@@ -308,13 +315,17 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
     private fun trackEndEventHandler() =
         player.on<Event, TrackEndEvent> {
-            val track = getTrack()
+            logger.info("Track ended.\n" +
+                    "May start next: ${reason.mayStartNext}\n" +
+                    "End reason: ${reason.name}")
             val trackToUse = queueHandler.lastPlayedTrackBuffer
 
             if (queueHandler.isTrackRepeating) {
                 if (trackToUse == null) {
                     queueHandler.isTrackRepeating = false
                     nextTrack(null)
+                } else {
+                    player.playTrack(trackToUse.copy())
                 }
             } else if (reason.mayStartNext) {
                 if (trackToUse != null)

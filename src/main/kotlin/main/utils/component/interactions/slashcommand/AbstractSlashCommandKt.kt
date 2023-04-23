@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -114,10 +115,17 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         }
     }
 
-    fun register(shardManager: ShardManager) =
-        onEvent<SlashCommandInteractionEvent>(shardManager) {
-            handle(it)
+    fun register(shardManager: ShardManager)  {
+        onEvent<SlashCommandInteractionEvent>(shardManager) {event ->
+            if (!checks(event))
+                return@onEvent
+            handle(event)
         }
+
+        onEvent<ButtonInteractionEvent>(shardManager) {
+            onButtonInteraction(it)
+        }
+    }
 
     private inline fun <reified T : GenericEvent> onEvent(
         shardManager: ShardManager,
@@ -126,6 +134,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         shardManager.listener<T> { handler(it) }
 
     abstract suspend fun handle(event: SlashCommandInteractionEvent)
+
+    open suspend fun onButtonInteraction(event: ButtonInteractionEvent) {}
 
     open val help = ""
 
