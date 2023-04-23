@@ -38,7 +38,6 @@ abstract class AbstractMongoDatabaseKt {
         protected set
 
     constructor(db: MongoDatabaseKt, collection: MongoDatabaseKt) {
-        log.info("Connecting to $db/$collection")
         database = MongoConnectionManagerKt.connect(db).database()
 
         try {
