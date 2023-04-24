@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
+import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.system.exitProcess
@@ -18,8 +19,8 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
 
     companion object {
         private val log = LoggerFactory.getLogger(Companion::class.java)
-        private val localeManagers = emptyMap<Long, LocaleManagerKt>().toMutableMap()
-        private val locales = emptyMap<RobertifyLocaleKt, Map<String, String>>().toMutableMap()
+        private val localeManagers = Collections.synchronizedMap(emptyMap<Long, LocaleManagerKt>().toMutableMap())
+        private val locales = Collections.synchronizedMap(emptyMap<RobertifyLocaleKt, Map<String, String>>().toMutableMap())
 
         fun globalManager(): LocaleManagerKt = LocaleManagerKt(null, RobertifyLocaleKt.ENGLISH)
 

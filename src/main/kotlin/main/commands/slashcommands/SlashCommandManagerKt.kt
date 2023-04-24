@@ -1,9 +1,6 @@
 package main.commands.slashcommands
 
-import main.commands.slashcommands.audio.DisconnectCommandKt
-import main.commands.slashcommands.audio.PlayCommandKt
-import main.commands.slashcommands.audio.QueueCommandKt
-import main.commands.slashcommands.audio.SkipCommandKt
+import main.commands.slashcommands.audio.*
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -58,7 +55,8 @@ object SlashCommandManagerKt {
             PlayCommandKt(),
             DisconnectCommandKt(),
             QueueCommandKt(),
-            SkipCommandKt()
+            SkipCommandKt(),
+            NowPlayingCommandKt()
         )
         addManagementCommands()
         addMiscCommands()

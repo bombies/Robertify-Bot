@@ -74,7 +74,10 @@ class GeneralUtilsKt {
         fun String.isDiscordId(): Boolean =
             this.matches("^[0-9]{18}$".toRegex())
 
-        fun String.isUrl(): Boolean {
+        fun String?.isUrl(): Boolean {
+            if (this == null)
+                return false
+
             return try {
                 URI(this)
                 this.contains("://")
