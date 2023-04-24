@@ -32,7 +32,7 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
     init {
         val segments = listOf("api", "images").toMutableList()
         segments.addAll(imageType.getSegments())
-        uri = URIBuilder(ConfigKt.ROBERTIFY_API_HOSTNAME)
+        uri = URIBuilder(ConfigKt.ROBERTIFY_WEB_HOSTNAME)
             .setPathSegments(segments)
     }
 
@@ -45,10 +45,11 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
             ?.value
 
     open fun build(): InputStream? {
-        val url = uri.build().toURL()
+        val url = uri.build().toURL().toString()
 
+        logger.info(url)
         return try {
-            httpClient.newCall(webUtils.prepareGet(url.toString()).build())
+            httpClient.newCall(webUtils.prepareGet(url).build())
                 .execute()
                 .body()
                 ?.byteStream()

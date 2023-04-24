@@ -1,6 +1,7 @@
 package main.audiohandlers
 
 import dev.schlaubi.lavakord.audio.Link
+import main.commands.slashcommands.audio.SkipCommandKt
 import main.main.RobertifyKt
 import main.utils.internal.delegates.SynchronizedProperty
 import main.utils.json.requestchannel.RequestChannelConfigKt
@@ -27,21 +28,13 @@ class GuildMusicManagerKt(val guild: Guild) {
 
         player.filters.reset()
 
-        if (player.playingTrack != null)
-            player.stopTrack()
-
-        if (player.paused)
-            player.pause(false)
-
-        // TODO: Requester clearing
-        // TODO: Vote skip clearing
-
+        scheduler.clearRequesters()
+        SkipCommandKt().clearVoteSkipInfo(guild)
         RequestChannelConfigKt(guild).updateMessage()
     }
 
     suspend fun leave() {
         clear()
-        scheduler.stop()
         RobertifyAudioManagerKt.removeMusicManager(guild)
     }
 

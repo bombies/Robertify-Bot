@@ -162,16 +162,19 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
             if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
                 return@on
 
+            logger.info("Attempting to send now playing image")
+
             val lavaplayerTrack = track.toAudioTrack()
             RobertifyKt.shardManager.retrieveUserById(requester.id)
                 .submit()
                 .thenCompose { requesterObj ->
+                    val defaultBackgroundImage = ThemesConfigKt(
+                        guild
+                    ).theme.nowPlayingBanner
                     val img = NowPlayingImageBuilderKt(
                         artistName = track.author,
                         title = track.title,
-                        albumImage = if (lavaplayerTrack is MirroringAudioTrack) lavaplayerTrack.artworkURL else ThemesConfigKt(
-                            guild
-                        ).theme.nowPlayingBanner,
+                        albumImage = if (lavaplayerTrack is MirroringAudioTrack) lavaplayerTrack.artworkURL ?: defaultBackgroundImage else defaultBackgroundImage,
                         requesterName = "${requesterObj.name}#${requesterObj.discriminator}",
                         requesterAvatar = requesterObj.avatarUrl
                     ).build() ?: throw CompletionException(NullPointerException("The generated image was null!"))
@@ -199,7 +202,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
                     // Either building the image failed or the bot doesn't have enough
                     // permission to send images in a certain channel
-                    if (ex.cause is PermissionException || ex.cause is ImageBuilderExceptionKt) {
+                    if (ex is PermissionException || ex is ImageBuilderExceptionKt) {
                         sendNowPlayingEmbed(lavaplayerTrack.info, requesterMention)
                             ?.whenComplete embedCompletion@{ _, err ->
                                 if (err == null)
@@ -213,6 +216,8 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
                                                 logger.warn("I was not able to send a now playing message at all in ${guild.name}")
                                         }
                             }
+                    } else {
+                        logger.error("Unexpected error", ex)
                     }
                 }
         }
