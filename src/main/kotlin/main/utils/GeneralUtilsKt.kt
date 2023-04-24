@@ -76,41 +76,49 @@ class GeneralUtilsKt {
             return listToString(arr.toList())
         }
 
-        fun stringIsID(s: String): Boolean {
-            return s.matches("^[0-9]{18}$".toRegex())
-        }
+        fun String.isDiscordId(): Boolean =
+            this.matches("^[0-9]{18}$".toRegex())
 
-        fun isUrl(url: String?): Boolean {
-            if (url == null) return false
-
+        fun String.isUrl(): Boolean {
             return try {
-                URI(url)
-                url.contains("://")
+                URI(this)
+                this.contains("://")
             } catch (e: URISyntaxException) {
                 false
             }
         }
 
-        fun getLinkDestination(location: String): String {
-            val openConnection: (location: String) -> HttpURLConnection = {
-                URL(it).openConnection() as HttpURLConnection
+        fun String.toUrl(): URL? = if (this.isUrl())
+            URL(this)
+        else null
+
+        fun URL.getDestination(): String {
+            val openConnection: () -> HttpURLConnection = {
+                this.openConnection() as HttpURLConnection
             }
 
-            var con = openConnection(location)
+            var con = openConnection()
             con.instanceFollowRedirects = false
 
-            var mutableLocation: String
+            var mutableLocation = this.toString()
             while (con.responseCode / 100 == 3) {
                 mutableLocation = con.getHeaderField("location")
-                con = openConnection(mutableLocation)
+                con = openConnection()
 
                 if (con.responseCode / 100 == 2) {
                     mutableLocation = con.url.toString()
-                    con = openConnection(mutableLocation)
+                    con = openConnection()
                 }
             }
 
-            return location
+            return mutableLocation
+        }
+
+        fun getLinkDestination(location: String): String {
+            return if (location.isUrl()) URL(location).getDestination() else throw URISyntaxException(
+                location,
+                "Invalid URI!"
+            )
         }
 
         fun getDigitsOnly(s: String): String {
@@ -617,7 +625,7 @@ class GeneralUtilsKt {
 
         fun dmUser(uid: Long, embed: MessageEmbed) {
             RobertifyKt.shardManager.retrieveUserById(uid)
-                .queue { user -> dmUser(user, embed)}
+                .queue { user -> dmUser(user, embed) }
         }
 
 

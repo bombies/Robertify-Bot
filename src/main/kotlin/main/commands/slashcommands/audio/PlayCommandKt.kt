@@ -8,6 +8,10 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.main.ConfigKt
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.getDestination
+import main.utils.GeneralUtilsKt.Companion.isUrl
+import main.utils.GeneralUtilsKt.Companion.toUrl
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -19,6 +23,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.io.path.Path
@@ -39,12 +44,22 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 )
             ),
             SubCommandKt(
-                name = "nexttracks",
+                name = "next",
                 description = "Add songs to the beginning of the queue! Links are accepted by Spotify, Deezer, SoundCloud, etc...",
                 options = listOf(
                     CommandOptionKt(
                         name = "tracks",
                         description = "The name/url of the track/album/playlist to add to the top of your queue"
+                    )
+                )
+            ),
+            SubCommandKt(
+                name = "shuffled",
+                description = "Play a playlist/album shuffled right off the bat!",
+                options = listOf(
+                    CommandOptionKt(
+                        name = "tracks",
+                        description = "The playlist/album to play"
                     )
                 )
             ),
@@ -97,19 +112,72 @@ class PlayCommandKt : AbstractSlashCommandKt(
         when (commandPath[1]) {
             "tracks" -> {
                 var link = event.getRequiredOption("tracks").asString
-                if (!GeneralUtilsKt.isUrl(link))
+                if (!link.isUrl())
                     link = "${SpotifySourceManager.SEARCH_PREFIX}$link"
 
                 handlePlayTracks(event, link)
             }
 
-            "nexttracks" -> {
+            "next" -> {
                 var link = event.getRequiredOption("tracks").asString
 
-                if (!GeneralUtilsKt.isUrl(link))
+                if (!link.isUrl())
                     link = "${SpotifySourceManager.SEARCH_PREFIX}$link"
 
                 handlePlayTracks(event, link, true)
+            }
+
+            "shuffled" -> {
+                var link = event.getRequiredOption("tracks").asString
+                if (!link.isUrl()) {
+                    event.hook.sendWithEmbed(guild) {
+                        embed(RobertifyLocaleMessageKt.ShufflePlayMessages.INVALID_LINK)
+                    }
+                } else link = URL(link).getDestination()
+
+                when {
+                    link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=[a-zA-Z0-9]+)?".toRegex()) -> {
+                        event.hook.sendWithEmbed(guild) {
+                            embed(
+                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                Pair("{source}", "Spotify")
+                            )
+                        }.queue()
+                        return
+                    }
+
+                    link.contains("music.apple.com") && !link.matches("(https?://)?(www\\.)?music\\.apple\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)(/[a-zA-Z\\d\\-]+)?/(?<identifier>[a-zA-Z\\d\\-.]+)(\\?i=(?<identifier2>\\d+))?".toRegex()) -> {
+                        event.hook.sendWithEmbed(guild) {
+                            embed(
+                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                Pair("{source}", "Apple Music")
+                            )
+                        }.queue()
+                        return
+                    }
+
+                    link.contains("deezer.com") && !link.matches("(https?://)?(www\\.)?deezer\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)/(?<identifier>[0-9]+)".toRegex()) -> {
+                        event.hook.sendWithEmbed(guild) {
+                            embed(
+                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                Pair("{source}", "Deezer")
+                            )
+                        }.queue()
+                        return
+                    }
+
+                    link.contains("soundcloud.com") && !link.contains("sets") -> {
+                        event.hook.sendWithEmbed(guild) {
+                            embed(
+                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                Pair("{source}", "SoundCloud")
+                            )
+                        }.queue()
+                        return
+                    }
+                }
+
+                handlePlayTracks(event, link, shuffled = true)
             }
 
             "file" -> {
@@ -125,13 +193,14 @@ class PlayCommandKt : AbstractSlashCommandKt(
     private fun handlePlayTracks(
         event: SlashCommandInteractionEvent,
         link: String,
-        addToBeginning: Boolean = false
+        addToBeginning: Boolean = false,
+        shuffled: Boolean = false
     ) {
         val guild = event.guild
         val member = event.member!!
 
-        if (GeneralUtilsKt.isUrl(link) && !ConfigKt.YOUTUBE_ENABLED) {
-            val linkDestination = GeneralUtilsKt.getLinkDestination(link)
+        if (link.isUrl() && !ConfigKt.YOUTUBE_ENABLED) {
+            val linkDestination = link.toUrl()!!.getDestination()
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
                 event.hook.sendWithEmbed(guild) {
                     embed(RobertifyLocaleMessageKt.GeneralMessages.NO_YOUTUBE_SUPPORT)
@@ -151,7 +220,8 @@ class PlayCommandKt : AbstractSlashCommandKt(
                             trackUrl = link,
                             memberVoiceState = member.voiceState!!,
                             botMessage = msg,
-                            addToBeginning = addToBeginning
+                            addToBeginning = addToBeginning,
+                            shuffled = shuffled
                         )
                 }
             }

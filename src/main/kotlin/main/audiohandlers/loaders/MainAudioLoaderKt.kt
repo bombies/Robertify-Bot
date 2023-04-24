@@ -5,6 +5,7 @@ import dev.schlaubi.lavakord.Exception
 import dev.schlaubi.lavakord.audio.player.Player
 import dev.schlaubi.lavakord.rest.models.PartialTrack
 import dev.schlaubi.lavakord.rest.models.TrackResponse
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManagerKt
 import main.audiohandlers.models.RequesterKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -138,6 +139,13 @@ class MainAudioLoaderKt(
         if (loadPlaylistShuffled)
             mutableTracks.shuffle()
 
+
+        if (player.playingTrack == null) {
+            runBlocking {
+                player.playTrack(mutableTracks.removeFirst().toTrack())
+            }
+        }
+
         scheduler.announcementChannel = announcementChannel
 
         if (addToBeginning)
@@ -151,7 +159,7 @@ class MainAudioLoaderKt(
                 Pair("{playlist}", playlistInfo.name ?: "Unknown Playlist")
             )
 
-        tracks.forEach { track ->
+        mutableTracks.forEach { track ->
             if (sender != null)
                 scheduler.addRequester(sender.id, track.info.identifier)
 
