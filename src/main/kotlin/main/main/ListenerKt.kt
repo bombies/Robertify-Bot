@@ -6,6 +6,7 @@ import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
+import main.utils.events.AbstractEventControllerKt
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
@@ -24,13 +25,13 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class ListenerKt(shardManager: ShardManager) : ListenerController(shardManager) {
+class ListenerKt : AbstractEventControllerKt() {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
-    init {
+    override fun eventHandlerInvokers() {
         readyListener()
         guildReadyListener()
         guildJoinListener()

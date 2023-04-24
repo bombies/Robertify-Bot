@@ -1,26 +1,27 @@
 package main.utils.pagination
 
+import dev.minn.jda.ktx.util.SLF4J
 import main.constants.MessageButtonKt
-import main.main.ListenerController
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
+import main.utils.events.AbstractEventControllerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.pagination.pages.queue.QueuePageKt
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
-import net.dv8tion.jda.api.sharding.ShardManager
 import net.dv8tion.jda.api.utils.AttachedFile
 import java.net.ConnectException
 import java.net.SocketTimeoutException
-import java.util.Collections
+import java.util.*
 
-class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardManager) {
+class PaginationEventsKt : AbstractEventControllerKt() {
 
     companion object {
+        private val logger by SLF4J
         private val currentPage = Collections.synchronizedMap(mutableMapOf<Long, Int>())
     }
 
-    init {
+    override fun eventHandlerInvokers() {
         onRegularButtonClick()
         onQueueButtonClick()
     }
@@ -29,6 +30,7 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
+            logger.info(buttonId)
             if (!buttonId.startsWith(MessageButtonKt.PAGE_ID.toString()))
                 return@onEvent
 
@@ -111,6 +113,7 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
+            logger.info(buttonId)
             if (!buttonId.startsWith("queue:${MessageButtonKt.PAGE_ID}"))
                 return@onEvent
 
@@ -142,6 +145,7 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
                                 user = event.user,
                                 frontEnabled = currentPage[msg] != 0,
                                 previousEnabled = currentPage[msg] != 0,
+                                isQueue = true
                             )
                         ).queue()
                 }
@@ -164,7 +168,8 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
                                 frontEnabled = frontEnabled,
                                 previousEnabled = previousEnabled,
                                 nextEnabled = nextEnabled,
-                                endEnabled = endEnabled
+                                endEnabled = endEnabled,
+                                isQueue = true
                             )
                         ).queue()
                 } catch (e: Exception) {
@@ -208,8 +213,8 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
                     val queuePage = queuePages[currentPage[msg]!!]
                     handleButtonPress(
                         queuePage = queuePage,
-                        nextEnabled = currentPage[msg] == queuePages.size - 1,
-                        endEnabled = currentPage[msg] == queuePages.size - 1
+                        nextEnabled = currentPage[msg] != queuePages.size - 1,
+                        endEnabled = currentPage[msg] != queuePages.size - 1
                     )
                 }
 
@@ -220,8 +225,8 @@ class PaginationEventsKt(shardManager: ShardManager) : ListenerController(shardM
                     val queuePage = queuePages[queuePages.size - 1]
                     handleButtonPress(
                         queuePage = queuePage,
-                        nextEnabled = currentPage[msg] == queuePages.size - 1,
-                        endEnabled = currentPage[msg] == queuePages.size - 1
+                        nextEnabled = currentPage[msg] != queuePages.size - 1,
+                        endEnabled = currentPage[msg] != queuePages.size - 1
                     )
                 }
 

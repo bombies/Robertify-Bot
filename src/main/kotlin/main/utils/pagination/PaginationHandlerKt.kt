@@ -63,7 +63,11 @@ object PaginationHandlerKt {
             return@coroutineScope paginatedMessage.await()
         }
 
-    suspend fun paginateMessage(event: SlashCommandInteractionEvent, messagePages: List<MessagePageKt>): Message? =
+    suspend fun paginateMessage(
+        event: SlashCommandInteractionEvent,
+        messagePages: List<MessagePageKt>,
+        isQueue: Boolean = false
+    ): Message? =
         coroutineScope {
             val paginatedMessage = async {
                 var messageAction = event.hook.sendWithEmbed(event.guild) { messagePages[0].embed!! }
@@ -73,7 +77,8 @@ object PaginationHandlerKt {
                         paginator.getButtons(
                             user = event.user,
                             frontEnabled = false,
-                            previousEnabled = false
+                            previousEnabled = false,
+                            isQueue = isQueue
                         )
                     )
 
@@ -100,7 +105,7 @@ object PaginationHandlerKt {
             paginateQueueMessage(event, queuePages)
         } catch (e: ImageBuilderExceptionKt) {
             val defaultMessagePages = queuePages.map { page -> DefaultMessagePageKt(page.embed) }
-            paginateMessage(event, defaultMessagePages)
+            paginateMessage(event, defaultMessagePages, true)
         }
     }
 
@@ -130,7 +135,8 @@ object PaginationHandlerKt {
                         paginator.getButtons(
                             user = event.user,
                             frontEnabled = false,
-                            previousEnabled = false
+                            previousEnabled = false,
+                            isQueue = true
                         )
                     )
 
@@ -256,8 +262,7 @@ object PaginationHandlerKt {
     private fun messageLogic(guild: Guild, queueHandler: QueueHandlerKt, maxPerPage: Int = 10): List<QueuePageKt> {
         if (queueHandler.size <= maxPerPage) {
             val items = mutableListOf<QueueItemKt>()
-            for (i in 0 until queueHandler.size) {
-                val track = queueHandler.contents[i]
+            queueHandler.contents.forEachIndexed { i, track ->
                 items.add(
                     QueueItemKt(
                         trackIndex = i + 1,
@@ -278,15 +283,16 @@ object PaginationHandlerKt {
                 val page = QueuePageKt(guild, i + 1)
                 for (j in 0 until maxPerPage) {
                     if (lastIndex == queueHandler.size) break
-                    val track = trackList[lastIndex++]
+                    val track = trackList[lastIndex]
                     page.addItem(
                         QueueItemKt(
-                            trackIndex = i + 1,
+                            trackIndex = lastIndex + 1,
                             trackTitle = track.title,
                             artist = track.author,
                             duration = track.length.inWholeMilliseconds
                         )
                     )
+                    lastIndex++
                 }
                 messagePages.add(page)
             }

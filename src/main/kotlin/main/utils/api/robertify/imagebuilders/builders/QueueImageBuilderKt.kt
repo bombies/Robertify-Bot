@@ -20,7 +20,7 @@ data class QueueImageBuilderKt(
     private val obj = JSONObject()
 
     fun addTrack(index: Int, title: String, artist: String, duration: Long): QueueImageBuilderKt {
-        if (!obj.has(QueryFields.PAGE.toString()))
+        if (!obj.has(QueryFields.TRACKS.toString()))
             obj.put(QueryFields.TRACKS.toString(), JSONArray())
 
         val trackArr = obj.getJSONArray(QueryFields.TRACKS.toString())
@@ -38,6 +38,7 @@ data class QueueImageBuilderKt(
 
     override fun build(): InputStream? {
         require(obj.has(QueryFields.TRACKS.toString())) { "The track list must be provided before building the queue image!" }
+        obj.put(QueryFields.PAGE.toString(), page)
 
         val trackObj = obj.getJSONArray(QueryFields.TRACKS.toString())
         trackObj.forEach { obj ->

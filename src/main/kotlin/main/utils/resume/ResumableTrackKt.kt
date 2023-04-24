@@ -36,9 +36,10 @@ data class ResumableTrackKt(
                 ResumableTrackKt(info, artworkURL, isrc, requester)
             }
 
-        fun Collection<ResumableTrackKt>.string() {
+        fun Collection<ResumableTrackKt>.string(): String {
             val arr = JSONArray()
             this.forEach { track -> arr.put(JSONObject(track.toString())) }
+            return arr.toString()
         }
 
         fun fromJSON(json: String): ResumableTrackKt =

@@ -11,6 +11,8 @@ import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
+import main.utils.events.EventManager
+import main.utils.events.EventManager.registerEvents
 import main.utils.pagination.PaginationEventsKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
@@ -125,14 +127,11 @@ object RobertifyKt {
             )
             logger.info("Registered all slash commands.")
 
+            shardManager.registerEvents(EventManager.getRegisteredEvents())
+            logger.info("Registered all event controllers")
         }
 
-
-        // Initialize coroutine listeners
-        ListenerKt(shardManager)
-        PaginationEventsKt(shardManager)
-
-        // Setup lavakord
+        // Setup LavaKord
         ConfigKt.LAVA_NODES.forEach { node ->
             lavakord.addNode(node.uri.toString(), node.password)
             logger.info("Registered lava node with address: ${node.uri}")

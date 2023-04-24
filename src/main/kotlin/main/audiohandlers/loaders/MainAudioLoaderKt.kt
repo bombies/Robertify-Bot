@@ -1,5 +1,6 @@
 package main.audiohandlers.loaders
 
+import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import dev.schlaubi.lavakord.Exception
 import dev.schlaubi.lavakord.audio.player.Player
 import dev.schlaubi.lavakord.rest.models.PartialTrack
@@ -53,7 +54,8 @@ class MainAudioLoaderKt(
     private val guild = musicManager.guild
     private val scheduler = musicManager.scheduler
     private val queueHandler = scheduler.queueHandler
-    private val announcementChannel: GuildMessageChannel? = _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
+    private val announcementChannel: GuildMessageChannel? =
+        _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfigKt(guild)
 
     override suspend fun trackLoaded(player: Player, track: PartialTrack) {
@@ -96,9 +98,11 @@ class MainAudioLoaderKt(
                     deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == msg.channel.idLong }
                 )
         else {
-            requestChannelConfig.getTextChannel()
-                ?.sendMessageEmbeds(embed)
-                ?.queueWithAutoDelete()
+            if (requestChannelConfig.isChannelSet())
+                requestChannelConfig.getTextChannel()
+                    ?.sendMessageEmbeds(embed)
+                    ?.queueWithAutoDelete()
+            else logger.warn("${guild.name} | ${embed.description}")
         }
     }
 
@@ -185,7 +189,11 @@ class MainAudioLoaderKt(
 
     override suspend fun noMatches() {
         val embed = if (query.length < 4096)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND)
+            RobertifyEmbedUtilsKt.embedMessage(
+                guild,
+                RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND,
+                Pair("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))
+            )
                 .build()
         else RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND_ALT)
             .build()
