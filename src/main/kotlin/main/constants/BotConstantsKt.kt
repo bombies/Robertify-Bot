@@ -2,6 +2,7 @@ package main.constants
 
 import main.main.ConfigKt
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.asString
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
@@ -25,7 +26,7 @@ enum class BotConstantsKt(private val str: String) {
         fun getInsufficientPermsMessage(guild: Guild?, vararg permsNeeded: PermissionKt?): String {
             return LocaleManagerKt.getLocaleManager(guild).getMessage(
                 RobertifyLocaleMessageKt.GeneralMessages.INSUFFICIENT_PERMS,
-                Pair("{permissions}", GeneralUtilsKt.arrayToString(permsNeeded))
+                Pair("{permissions}", permsNeeded.asString())
             )
         }
 

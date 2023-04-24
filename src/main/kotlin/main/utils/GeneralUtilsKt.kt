@@ -46,35 +46,30 @@ class GeneralUtilsKt {
     companion object {
         val log: Logger = LoggerFactory.getLogger(Companion::class.java);
 
-        fun stringIsNum(s: String?): Boolean {
-            return when (s) {
-                null -> false
-                else -> s.matches("-?\\d+(\\.\\d+)?".toRegex())
-            }
+        fun String?.isNum() = when (this) {
+            null -> false
+            else -> this.matches("-?\\d+(\\.\\d+)?".toRegex())
         }
 
-        fun stringIsInt(s: String?): Boolean {
-            return when (s) {
-                null -> false
-                else -> s.matches("-?\\d+".toRegex())
-            }
+        fun String?.isInt() = when (this) {
+            null -> false
+            else -> this.matches("-?\\d+".toRegex())
         }
 
-        fun <T> listToString(list: List<T>): String {
+        fun<T> List<T>.asString(): String {
             val sb = StringBuilder()
-            list.forEachIndexed { i, elem ->
+            this.forEachIndexed { i, elem ->
                 sb.append(
                     if (elem is Permission) elem.getName()
                     else elem.toString()
                 )
-                    .append(if (i != list.size - 1) ", " else "")
+                    .append(if (i != size - 1) ", " else "")
             }
             return sb.toString()
         }
 
-        fun <T> arrayToString(arr: Array<T>): String {
-            return listToString(arr.toList())
-        }
+        fun <T> Array<T>.asString(): String =
+            toList().asString()
 
         fun String.isDiscordId(): Boolean =
             this.matches("^[0-9]{18}$".toRegex())
@@ -114,20 +109,11 @@ class GeneralUtilsKt {
             return mutableLocation
         }
 
-        fun getLinkDestination(location: String): String {
-            return if (location.isUrl()) URL(location).getDestination() else throw URISyntaxException(
-                location,
-                "Invalid URI!"
-            )
-        }
+        fun String.digits(): String =
+            this.replace("\\D".toRegex(), "")
 
-        fun getDigitsOnly(s: String): String {
-            return s.replace("\\D".toRegex(), "")
-        }
-
-        fun removeAllDigits(s: String): String {
-            return s.replace("\\d".toRegex(), "")
-        }
+        fun String.stripDigits(): String =
+            this.replace("\\d".toRegex(), "")
 
         fun hasPerms(guild: Guild, sender: Member?, vararg perms: PermissionKt): Boolean {
             if (sender == null)
@@ -257,15 +243,6 @@ class GeneralUtilsKt {
             }
         }
 
-        fun getJoinedString(args: List<String>): String {
-            val arg = StringBuilder()
-            args.forEachIndexed { i, item ->
-                arg.append(item)
-                    .append(if (i < args.size) " " else "")
-            }
-            return arg.toString()
-        }
-
         fun getTimeFromSeconds(time: Long, unit: TimeUnit): Long {
             return when (unit) {
                 TimeUnit.SECONDS -> ((time % 86400) % 3600) % 60
@@ -323,7 +300,7 @@ class GeneralUtilsKt {
             val timeDigits = timeUnparsed.substring(0, timeUnparsed.length - 1)
             val duration = timeUnparsed[timeUnparsed.length - 1]
             require(timeDigits.toInt() >= 0) { "The time cannot be negative!" }
-            val scheduledDuration: Long = if (stringIsInt(timeDigits)) when (duration) {
+            val scheduledDuration: Long = if (timeDigits.isInt()) when (duration) {
                 's' -> System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(
                     timeDigits.toInt().toLong()
                 )
@@ -353,7 +330,7 @@ class GeneralUtilsKt {
             val ret: String
             val timeDigits = timeUnparsed.substring(0, timeUnparsed.length - 1)
             val duration = timeUnparsed[timeUnparsed.length - 1]
-            ret = if (stringIsInt(timeDigits)) when (duration) {
+            ret = if (timeDigits.isInt()) when (duration) {
                 's' -> "$timeDigits seconds"
                 'm' -> "$timeDigits minutes"
                 'h' -> "$timeDigits hours"
@@ -411,6 +388,27 @@ class GeneralUtilsKt {
             writer.write(content)
             writer.close()
         }
+
+        fun File.setContent(content: String) {
+            if (!exists()) createNewFile()
+            val writer = FileWriter(path, false)
+            writer.write(content)
+            writer.close()
+        }
+
+        fun File.getContent(): String {
+            var ret: String? = null
+            try {
+                ret = String(Files.readAllBytes(Path.of(path)))
+            } catch (e: IOException) {
+                log.error("[FATAL ERROR] There was an error reading from the file!", e)
+            }
+            if (ret == null) throw NullPointerException()
+            return ret.replace("\t\n".toRegex(), "")
+        }
+
+        fun File.appendContent(content: String) =
+            setContent(getContent() + content)
 
         fun appendFileContent(file: File, content: String) {
             setFileContent(file, getFileContent(file.path) + content)
@@ -516,7 +514,7 @@ class GeneralUtilsKt {
                 parsedMentions.isEmpty() -> LocaleManagerKt.getLocaleManager(guild)
                     .getMessage(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_HERE)
 
-                else -> listToString(parsedMentions)
+                else -> parsedMentions.asString()
             }
         }
 
@@ -525,8 +523,6 @@ class GeneralUtilsKt {
 
         fun toMention(guild: Guild? = null, id: String, mentioner: Mentioner): String =
             listOfIDsToMentions(guild, listOf(id.toLong()), mentioner)
-
-        fun <T> equalsAny(obj: T, arr: Array<T>): Boolean = arr.contains(obj)
 
         fun getID(obj: JSONObject, field: String): Long = try {
             obj.getLong(field)
@@ -609,8 +605,18 @@ class GeneralUtilsKt {
             }
         }
 
-        fun dmUser(user: User, message: String) {
-            user.openPrivateChannel().queue { channel ->
+        fun User.dm(message: MessageEmbed) {
+            openPrivateChannel().queue { channel ->
+                channel.sendMessageEmbeds(message)
+                    .queue(null) {
+                        ErrorHandler()
+                            .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+                    }
+            }
+        }
+
+        fun User.dm(message: String) {
+            openPrivateChannel().queue { channel ->
                 channel.sendMessageEmbeds(RobertifyEmbedUtilsKt.embedMessage(message).build())
                     .queue(null) {
                         ErrorHandler()
@@ -619,17 +625,14 @@ class GeneralUtilsKt {
             }
         }
 
-        fun dmUser(uid: Long, message: String) {
-            // TODO: Retrieve user from ShardManager then DM them
-        }
-
         fun dmUser(uid: Long, embed: MessageEmbed) {
             RobertifyKt.shardManager.retrieveUserById(uid)
-                .queue { user -> dmUser(user, embed) }
+                .queue { it.dm(embed) }
         }
 
 
-        fun textIsRightToLeft(text: String?): Boolean =
-            text?.chars()?.anyMatch { it in 0x5d1..0x6ff } ?: false
+        fun String?.isRightToLeft(): Boolean =
+            this?.chars()?.anyMatch { it in 0x5d1..0x6ff } ?: false
+
     }
 }

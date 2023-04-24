@@ -1,6 +1,7 @@
 package main.utils.api.robertify.imagebuilders.builders
 
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.isRightToLeft
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.api.robertify.imagebuilders.ImageTypeKt
@@ -43,9 +44,9 @@ data class NowPlayingImageBuilderKt(
     }
 
     override fun build(): InputStream? {
-        if (GeneralUtilsKt.textIsRightToLeft(artistName) ||
-            GeneralUtilsKt.textIsRightToLeft(title) ||
-            GeneralUtilsKt.textIsRightToLeft(requesterName)
+        if (artistName.isRightToLeft() ||
+            artistName.isRightToLeft() ||
+            requesterName.isRightToLeft()
         )
             throw ImageBuilderExceptionKt("Some text has right to left characters which aren't supported!")
 

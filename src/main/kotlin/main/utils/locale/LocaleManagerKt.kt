@@ -2,6 +2,7 @@ package main.utils.locale
 
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.setContent
 import main.utils.json.locale.LocaleConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
@@ -56,7 +57,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
                     content.append(field.name.lowercase())
                         .append(": ")
                         .append("\"Fill me out\"")
-            GeneralUtilsKt.setFileContent(file, content.toString())
+            file.setContent(content.toString())
         }
 
         private fun createAllLocaleFiles() =

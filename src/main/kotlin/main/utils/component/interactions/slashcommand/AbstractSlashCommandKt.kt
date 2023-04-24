@@ -11,6 +11,7 @@ import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.asString
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -413,7 +414,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     RobertifyLocaleMessageKt.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS,
                     Pair(
                         "{permissions}",
-                        GeneralUtilsKt.listToString(info.botRequiredPermissions)
+                        info.botRequiredPermissions.asString()
                     )
                 ).build()
             )

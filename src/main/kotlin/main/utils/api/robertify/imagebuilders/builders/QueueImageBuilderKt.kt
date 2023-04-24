@@ -2,6 +2,7 @@ package main.utils.api.robertify.imagebuilders.builders
 
 import dev.schlaubi.lavakord.audio.player.Track
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.Companion.isRightToLeft
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.api.robertify.imagebuilders.ImageTypeKt
@@ -46,7 +47,7 @@ data class QueueImageBuilderKt(
                 val name = obj.getString(QueryFields.TRACK_NAME.toString())
                 val artist = obj.getString(QueryFields.TRACK_ARTIST.toString())
 
-                if (GeneralUtilsKt.textIsRightToLeft(name) || GeneralUtilsKt.textIsRightToLeft(artist))
+                if (name.isRightToLeft() || artist.isRightToLeft())
                     throw ImageBuilderExceptionKt("Some text has right to left characters which aren't supported!")
             }
         }
