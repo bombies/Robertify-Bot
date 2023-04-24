@@ -139,15 +139,14 @@ class MainAudioLoaderKt(
         if (loadPlaylistShuffled)
             mutableTracks.shuffle()
 
+        scheduler.announcementChannel = announcementChannel
 
         if (player.playingTrack == null) {
             runBlocking {
                 player.playTrack(mutableTracks.removeFirst().toTrack())
             }
         }
-
-        scheduler.announcementChannel = announcementChannel
-
+        
         if (addToBeginning)
             scheduler.addToBeginningOfQueue(mutableTracks.map { it.toTrack() })
 
