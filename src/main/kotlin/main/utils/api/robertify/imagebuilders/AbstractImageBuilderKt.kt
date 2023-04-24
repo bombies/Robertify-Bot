@@ -47,7 +47,6 @@ abstract class AbstractImageBuilderKt protected constructor(imageType: ImageType
     open fun build(): InputStream? {
         val url = uri.build().toURL().toString()
 
-        logger.info(url)
         return try {
             httpClient.newCall(webUtils.prepareGet(url).build())
                 .execute()
