@@ -5,10 +5,12 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.minn.jda.ktx.interactions.components.button
+import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.GuildMusicManagerKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilderKt
 import main.utils.json.themes.ThemesConfigKt
@@ -56,7 +58,7 @@ class SearchResultLoaderKt(
         }
 
         val selectionMenu = StringSelectionMenuBuilderKt(
-            _name = "",
+            _name = "searchresult:${searcher.id}:${query.lowercase().replace(" ", "%SPACE%")}",
             placeholder = localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_MENU_PLACEHOLDER),
             range = Pair(1, 1),
             _options = options
@@ -78,12 +80,12 @@ class SearchResultLoaderKt(
             ),
             components = listOf(
                 ActionRow.of(selectionMenu),
-                ActionRow.of(guild.jda.button(
-                    style = ButtonStyle.DANGER,
-                    label = localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_END_INTERACTION),
-                    user = searcher,
-                    listener = { /* TODO: End search interaction button listener */ }
-                ))
+                ActionRow.of(
+                    danger(
+                        label = localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_END_INTERACTION),
+                        id = "searchresult:end:${searcher.id}"
+                    )
+                )
             )
         ).queue()
     }

@@ -3,7 +3,6 @@ package main.utils.component.interactions.slashcommand
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.utils.managers.RandomMessageManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.constants.BotConstantsKt
 import main.constants.PermissionKt
@@ -13,6 +12,7 @@ import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.Companion.asString
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -22,15 +22,20 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.managers.RandomMessageManagerKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.exceptions.ErrorResponseException
+import net.dv8tion.jda.api.interactions.components.ComponentInteraction
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -116,8 +121,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         }
     }
 
-    fun register(shardManager: ShardManager)  {
-        onEvent<SlashCommandInteractionEvent>(shardManager) {event ->
+    fun register(shardManager: ShardManager) {
+        onEvent<SlashCommandInteractionEvent>(shardManager) { event ->
             if (!checks(event))
                 return@onEvent
             handle(event)
@@ -125,6 +130,10 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         onEvent<ButtonInteractionEvent>(shardManager) {
             onButtonInteraction(it)
+        }
+
+        onEvent<StringSelectInteractionEvent>(shardManager) {
+            onStringSelectInteraction(it)
         }
     }
 
@@ -137,6 +146,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     abstract suspend fun handle(event: SlashCommandInteractionEvent)
 
     open suspend fun onButtonInteraction(event: ButtonInteractionEvent) {}
+
+    open suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {}
 
     open val help = ""
 
@@ -194,6 +205,38 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
         if (SlashCommandManagerKt.isMusicCommand(this) && event.channel.type.isMessage)
             RandomMessageManagerKt().randomlySendMessage(event.channel as GuildMessageChannel)
+    }
+
+    protected fun audioChannelChecks(
+        memberVoiceState: GuildVoiceState,
+        selfVoiceState: GuildVoiceState,
+        checkIfNothingPlaying: Boolean = true,
+        selfChannelNeeded: Boolean = true,
+    ): MessageEmbed? {
+        val guild = selfVoiceState.guild
+
+        if (checkIfNothingPlaying && !selfVoiceState.inAudioChannel())
+            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
+                .build()
+
+        if (!memberVoiceState.inAudioChannel())
+            return RobertifyEmbedUtilsKt.embedMessage(
+                guild,
+                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+            ).build()
+
+        if (selfChannelNeeded && memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
+            return RobertifyEmbedUtilsKt.embedMessage(
+                guild, RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                Pair("{channel}", selfVoiceState.channel!!.asMention)
+            ).build()
+        else if (!selfChannelNeeded && selfVoiceState.inAudioChannel() && (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id))
+            return RobertifyEmbedUtilsKt.embedMessage(
+                guild,
+                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+            ).build()
+
+        return null
     }
 
     protected fun checks(event: SlashCommandInteractionEvent): Boolean {

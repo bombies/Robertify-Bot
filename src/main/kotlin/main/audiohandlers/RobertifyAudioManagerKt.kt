@@ -156,7 +156,7 @@ object RobertifyAudioManagerKt {
         ).loadItem()
     }
 
-    private fun loadSearchResults(
+    fun loadSearchResults(
         musicManager: GuildMusicManagerKt,
         searcher: User,
         botMessage: InteractionHook,

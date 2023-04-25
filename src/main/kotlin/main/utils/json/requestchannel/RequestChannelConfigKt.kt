@@ -144,6 +144,11 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         }
     }
 
+    fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
+        !isChannelSet() -> false
+        else -> getChannelID() == channel.idLong
+    }
+
     @Synchronized
     fun getChannelID(): Long {
         if (!isChannelSet()) throw IllegalArgumentException(
@@ -284,7 +289,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         ),
                         Pair(
                             "{volume}",
-                            ((audioPlayer.filters.volume * 100).toInt()).toString() ?: "Unknown"
+                            ((audioPlayer.filters.volume * 100).toInt()).toString()
                         )
                     )
                 )

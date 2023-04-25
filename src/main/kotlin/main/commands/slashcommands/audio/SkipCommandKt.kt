@@ -193,7 +193,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         return null
     }
 
-    private suspend fun skip(guild: Guild) {
+    private fun skip(guild: Guild) {
         val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
         val audioPlayer = musicManager.player
         val scheduler = musicManager.scheduler
@@ -214,28 +214,6 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         RequestChannelConfigKt(guild).updateMessage()
         clearVoteSkipInfo(guild)
-    }
-
-    private fun audioChannelChecks(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed? {
-        val guild = selfVoiceState.guild
-
-        if (!selfVoiceState.inAudioChannel())
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
-                .build()
-
-        if (!memberVoiceState.inAudioChannel())
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
-            ).build()
-
-        if (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild, RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
-                Pair("{channel}", selfVoiceState.channel!!.asMention)
-            ).build()
-
-        return null
     }
 
     private fun doVoteSkip(guild: Guild) {
