@@ -61,7 +61,8 @@ object SlashCommandManagerKt {
             StopCommandKt(),
             SearchCommandKt(),
             JumpCommandKt(),
-            JoinCommandKt()
+            JoinCommandKt(),
+            HistoryCommandKt()
         )
         addManagementCommands()
         addMiscCommands()

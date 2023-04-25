@@ -37,6 +37,7 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.math.ceil
+import kotlin.math.max
 
 object PaginationHandlerKt {
     private val messages = Collections.synchronizedMap(mutableMapOf<Long, List<MessagePageKt>>())
@@ -95,6 +96,12 @@ object PaginationHandlerKt {
             }
             return@coroutineScope paginatedMessage.await()
         }
+
+    suspend fun paginateMessage(event: SlashCommandInteractionEvent, content: List<String>, maxPerPage: Int = 10): Message? {
+        event.deferReply().queue()
+        val messagePages = messageLogic(event.guild!!, content, maxPerPage)
+        return paginateMessage(event, messagePages)
+    }
 
     suspend fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
         val guild = event.guild!!
