@@ -65,6 +65,7 @@ class ConfigKt {
                         if (obj is JSONObject) {
                             ret.add(
                                 LavaNodeKt(
+                                    name = obj.getString("name"),
                                     host = obj.getString("host"),
                                     port = obj.getString("port"),
                                     password = obj.getString("password")

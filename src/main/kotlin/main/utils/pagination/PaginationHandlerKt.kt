@@ -6,6 +6,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import main.audiohandlers.QueueHandlerKt
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.utils.author
+import main.audiohandlers.utils.length
+import main.audiohandlers.utils.title
 import main.commands.slashcommands.audio.QueueCommandKt
 import main.constants.InteractionLimitsKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -268,7 +271,7 @@ object PaginationHandlerKt {
                         trackIndex = i + 1,
                         trackTitle = track.title,
                         artist = track.author,
-                        duration = track.length.inWholeMilliseconds
+                        duration = track.length
                     )
                 )
             }
@@ -289,7 +292,7 @@ object PaginationHandlerKt {
                             trackIndex = lastIndex + 1,
                             trackTitle = track.title,
                             artist = track.author,
-                            duration = track.length.inWholeMilliseconds
+                            duration = track.length
                         )
                     )
                     lastIndex++

@@ -1,7 +1,9 @@
 package main.utils.api.robertify.imagebuilders.builders
 
-import dev.schlaubi.lavakord.audio.player.Track
-import main.utils.GeneralUtilsKt
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import main.audiohandlers.utils.author
+import main.audiohandlers.utils.length
+import main.audiohandlers.utils.title
 import main.utils.GeneralUtilsKt.Companion.isRightToLeft
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
@@ -34,8 +36,8 @@ data class QueueImageBuilderKt(
         return this
     }
 
-    fun addTrack(index: Int, track: Track): QueueImageBuilderKt =
-        addTrack(index, track.title, track.author, track.length.inWholeMilliseconds)
+    fun addTrack(index: Int, track: AudioTrack): QueueImageBuilderKt =
+        addTrack(index, track.title, track.author, track.length)
 
     override fun build(): InputStream? {
         require(obj.has(QueryFields.TRACKS.toString())) { "The track list must be provided before building the queue image!" }

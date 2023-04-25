@@ -3,7 +3,7 @@ package main.commands.slashcommands.audio
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.audiohandlers.TrackSchedulerKt.Companion.toAudioTrack
+import main.audiohandlers.utils.*
 import main.constants.ToggleKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.Companion.isUrl
@@ -87,14 +87,14 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                 val builder = NowPlayingImageBuilderKt(
                     title = track!!.title,
                     artistName = track.author,
-                    albumImage = if (track.toAudioTrack() is MirroringAudioTrack) (track.toAudioTrack() as MirroringAudioTrack).artworkURL
+                    albumImage = if (track is MirroringAudioTrack) track.artworkURL
                         ?: defaultImage else defaultImage
                 )
 
                 val image = if (!track.isStream)
                     builder.copy(
-                        duration = track.length.inWholeMilliseconds,
-                        currentTime = player.position,
+                        duration = track.length,
+                        currentTime = player.trackPosition,
                         isLiveStream = false
                     ).build()
                 else builder.copy(
@@ -155,7 +155,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         if (embed != null)
             return embed
 
-        val progress = player.position.toDouble() / track!!.length.inWholeMilliseconds
+        val progress = player.trackPosition.toDouble() / track!!.length
         val filters = player.filters
         val requester = musicManager.scheduler.findRequester(track.identifier)
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
@@ -185,13 +185,13 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                             GeneralUtilsKt.Companion.ProgressBar.DURATION
                         )
                     }" +
-                    "${if (track.isStream) "" else "`[${GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds)}]`"}\n\n" +
+                    "${if (track.isStream) "" else "`[${GeneralUtilsKt.formatTime(track.length)}]`"}\n\n" +
                     "${
                         if (track.isStream) localeManager.getMessage(RobertifyLocaleMessageKt.NowPlayingMessages.NP_LIVESTREAM) else localeManager.getMessage(
                             RobertifyLocaleMessageKt.NowPlayingMessages.NP_TIME_LEFT,
                             Pair(
                                 "{time}",
-                                GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds - player.position)
+                                GeneralUtilsKt.formatTime(track.length - player.trackPosition)
                             )
                         )
                     }\n" +
@@ -199,14 +199,14 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                         GeneralUtilsKt.progressBar(
                             guild,
                             channel,
-                            filters.volume?.toDouble() ?: 0.0,
+                            filters.volume.toDouble() ?: 0.0,
                             GeneralUtilsKt.Companion.ProgressBar.FILL
                         )
                     } 🔊"
         )
 
-        if (track.toAudioTrack() is MirroringAudioTrack)
-            embedBuilder.setImage((track.toAudioTrack() as MirroringAudioTrack).artworkURL)
+        if (track is MirroringAudioTrack)
+            embedBuilder.setImage(track.artworkURL)
 
         embedBuilder.setAuthor(
             localeManager.getMessage(RobertifyLocaleMessageKt.NowPlayingMessages.NP_AUTHOR),

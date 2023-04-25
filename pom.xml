@@ -275,11 +275,6 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
-            <groupId>dev.schlaubi.lavakord</groupId>
-            <artifactId>jda-java-jvm</artifactId>
-            <version>4.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-serialization-json</artifactId>
             <version>${serialization.version}</version>

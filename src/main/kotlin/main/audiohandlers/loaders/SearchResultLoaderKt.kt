@@ -1,18 +1,12 @@
 package main.audiohandlers.loaders
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.messages.send
-import dev.schlaubi.lavakord.Exception
-import dev.schlaubi.lavakord.audio.player.Player
-import dev.schlaubi.lavakord.rest.models.PartialTrack
-import dev.schlaubi.lavakord.rest.models.TrackResponse
 import main.audiohandlers.GuildMusicManagerKt
-import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
@@ -20,35 +14,30 @@ import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilde
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
-import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 
 class SearchResultLoaderKt(
-    musicManager: GuildMusicManagerKt,
+    override val musicManager: GuildMusicManagerKt,
     private val searcher: User,
     override val query: String,
     private val botMessage: InteractionHook
-) : AudioLoader(musicManager.link) {
+) : AudioLoader() {
     private val guild = musicManager.guild
 
-    override suspend fun trackLoaded(player: Player, track: PartialTrack) {
+    override fun trackLoaded(track: AudioTrack?) {
         throw UnsupportedOperationException("This operation is not supported in the search result loader")
     }
 
-    override suspend fun playlistLoaded(
-        player: Player,
-        tracks: List<PartialTrack>,
-        playlistInfo: TrackResponse.NullablePlaylistInfo
-    ) {
+    override fun onPlaylistLoad(playlist: AudioPlaylist) {
         throw UnsupportedOperationException("This operation is not supported in the search result loader")
     }
 
-    override suspend fun searchLoaded(player: Player, tracks: List<PartialTrack>) {
+    override fun onSearchResultLoad(results: AudioPlaylist) {
+        val tracks = results.tracks
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         val embedDesc = StringBuilder()
 
@@ -99,7 +88,7 @@ class SearchResultLoaderKt(
         ).queue()
     }
 
-    override suspend fun noMatches() {
+    override fun noMatches() {
         botMessage.editOriginalEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
@@ -110,7 +99,7 @@ class SearchResultLoaderKt(
             .queue()
     }
 
-    override suspend fun loadFailed(exception: Exception?) {
-        // TODO: Search result load fail handling
+    override fun loadFailed(exception: FriendlyException?) {
+        TODO("Not yet implemented")
     }
 }

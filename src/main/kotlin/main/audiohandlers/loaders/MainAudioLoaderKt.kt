@@ -1,10 +1,9 @@
 package main.audiohandlers.loaders
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
-import dev.schlaubi.lavakord.Exception
-import dev.schlaubi.lavakord.audio.player.Player
-import dev.schlaubi.lavakord.rest.models.PartialTrack
-import dev.schlaubi.lavakord.rest.models.TrackResponse
+import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
+import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManagerKt
 import main.audiohandlers.models.RequesterKt
@@ -26,7 +25,7 @@ import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
 class MainAudioLoaderKt(
-    private val musicManager: GuildMusicManagerKt,
+    override val musicManager: GuildMusicManagerKt,
     override val query: String,
     private val loadPlaylistShuffled: Boolean = false,
     private val addToBeginning: Boolean = false,
@@ -34,7 +33,7 @@ class MainAudioLoaderKt(
     private val botMsg: Message? = null,
     private val _announcementChannel: GuildMessageChannel? = null,
     private val sender: User? = null,
-) : AudioLoader(musicManager.link) {
+) : AudioLoader() {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
@@ -59,7 +58,7 @@ class MainAudioLoaderKt(
         _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfigKt(guild)
 
-    override suspend fun trackLoaded(player: Player, track: PartialTrack) {
+    override fun trackLoaded(track: AudioTrack) {
         sendTrackLoadedMessage(track)
 
         val trackInfo = track.info
@@ -75,8 +74,8 @@ class MainAudioLoaderKt(
         scheduler.announcementChannel = announcementChannel
 
         if (addToBeginning)
-            scheduler.addToBeginningOfQueue(track.toTrack())
-        else scheduler.queue(track.toTrack())
+            scheduler.addToBeginningOfQueue(track)
+        else scheduler.queue(track)
 
         val info = track.info
         LogUtilsKt(guild).sendLog(
@@ -107,7 +106,7 @@ class MainAudioLoaderKt(
         }
     }
 
-    private fun sendTrackLoadedMessage(track: PartialTrack) {
+    private fun sendTrackLoadedMessage(track: AudioTrack) {
         val embed = RobertifyEmbedUtilsKt.embedMessage(
             guild,
             RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_ADD,
@@ -118,22 +117,18 @@ class MainAudioLoaderKt(
         handleMessageUpdate(embed)
     }
 
-    override suspend fun playlistLoaded(
-        player: Player,
-        tracks: List<PartialTrack>,
-        playlistInfo: TrackResponse.NullablePlaylistInfo
-    ) {
-        val mutableTracks = tracks.toMutableList()
+    override fun onPlaylistLoad(playlist: AudioPlaylist) {
+        val mutableTracks = playlist.tracks.toMutableList()
         val embed = RobertifyEmbedUtilsKt.embedMessage(
             guild, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
-            Pair("{numTracks}", tracks.size.toString()),
-            Pair("{playlist}", playlistInfo.name ?: "Unknown Playlist")
+            Pair("{numTracks}", mutableTracks.size.toString()),
+            Pair("{playlist}", playlist.name ?: "Unknown Playlist")
         ).build()
 
         handleMessageUpdate(embed)
 
         if (!announceMsg)
-            tracks.forEach { track -> scheduler.unannouncedTracks.add(track.info.identifier) }
+            mutableTracks.forEach { track -> scheduler.unannouncedTracks.add(track.info.identifier) }
 
 
         if (loadPlaylistShuffled)
@@ -141,21 +136,15 @@ class MainAudioLoaderKt(
 
         scheduler.announcementChannel = announcementChannel
 
-        if (player.playingTrack == null) {
-            runBlocking {
-                player.playTrack(mutableTracks.removeFirst().toTrack())
-            }
-        }
-        
         if (addToBeginning)
-            scheduler.addToBeginningOfQueue(mutableTracks.map { it.toTrack() })
+            scheduler.addToBeginningOfQueue(mutableTracks.map { it })
 
         if (sender != null)
             LogUtilsKt(guild).sendLog(
                 LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                 Pair("{user}", sender.asMention),
-                Pair("{numTracks}", tracks.size.toString()),
-                Pair("{playlist}", playlistInfo.name ?: "Unknown Playlist")
+                Pair("{numTracks}", mutableTracks.size.toString()),
+                Pair("{playlist}", playlist.name ?: "Unknown Playlist")
             )
 
         mutableTracks.forEach { track ->
@@ -163,12 +152,12 @@ class MainAudioLoaderKt(
                 scheduler.addRequester(sender.id, track.info.identifier)
 
             if (!addToBeginning)
-                scheduler.queue(track.toTrack())
+                scheduler.queue(track)
         }
     }
 
-    override suspend fun searchLoaded(player: Player, tracks: List<PartialTrack>) {
-        val firstResult = tracks[0]
+    override fun onSearchResultLoad(results: AudioPlaylist) {
+        val firstResult = results.tracks.first()
         val trackInfo = firstResult.info
 
         if (!announceMsg) {
@@ -181,8 +170,8 @@ class MainAudioLoaderKt(
         scheduler.announcementChannel = announcementChannel
 
         if (addToBeginning)
-            scheduler.addToBeginningOfQueue(firstResult.toTrack())
-        else scheduler.queue(firstResult.toTrack())
+            scheduler.addToBeginningOfQueue(firstResult)
+        else scheduler.queue(firstResult)
 
         val info = firstResult.info
         if (sender != null)
@@ -194,7 +183,8 @@ class MainAudioLoaderKt(
             )
     }
 
-    override suspend fun noMatches() {
+
+    override fun noMatches() {
         val embed = if (query.length < 4096)
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
@@ -211,7 +201,7 @@ class MainAudioLoaderKt(
             scheduler.scheduleDisconnect(1, TimeUnit.SECONDS, false)
     }
 
-    override suspend fun loadFailed(exception: Exception?) {
+    override fun loadFailed(exception: FriendlyException?) {
         if (exception == null) {
             logger.warn("The loadFailed method was called while attempting to load tracks in ${guild.name} but the exception was null!")
             return
@@ -220,13 +210,13 @@ class MainAudioLoaderKt(
         if (musicManager.player.playingTrack == null)
             musicManager.leave()
 
-        if (!exception.message.contains("available") && !exception.message.contains("format"))
+        if (exception.message?.contains("available") != true && exception.message?.contains("format") != true)
             logger.error("Could not load tracks in ${guild.name}!", exception)
 
         val embed = RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            if (exception.message.contains("available") || exception.message.contains("format"))
-                exception.message
+            if (exception.message?.contains("available") == true || exception.message?.contains("format") == true)
+                exception.message!!
             else LocaleManagerKt.getLocaleManager(guild)
                 .getMessage(RobertifyLocaleMessageKt.AudioLoaderMessages.ERROR_LOADING_TRACK)
         ).build()

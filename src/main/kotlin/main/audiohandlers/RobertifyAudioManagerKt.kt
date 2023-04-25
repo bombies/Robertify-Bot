@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.minn.jda.ktx.util.SLF4J
-import dev.schlaubi.lavakord.audio.Link
+import lavalink.client.io.Link
 import main.audiohandlers.loaders.AutoPlayLoaderKt
 import main.audiohandlers.loaders.MainAudioLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
@@ -27,6 +27,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
 import java.util.*
 
@@ -34,10 +35,10 @@ object RobertifyAudioManagerKt {
     private val logger by SLF4J
     val musicManagers: MutableMap<Long, GuildMusicManagerKt> = Collections.synchronizedMap(mutableMapOf())
     val playerManager: AudioPlayerManager
-    val spotifySourceManager: SpotifySourceManager
-    val deezerAudioSourceManager: DeezerAudioSourceManager
-    val appleMusicSourceManager: AppleMusicSourceManager
-    val resumeSourceManager: ResumeSourceManagerKt
+    private val spotifySourceManager: SpotifySourceManager
+    private val deezerAudioSourceManager: DeezerAudioSourceManager
+    private val appleMusicSourceManager: AppleMusicSourceManager
+    private val resumeSourceManager: ResumeSourceManagerKt
 
     init {
         playerManager = DefaultAudioPlayerManager()
@@ -51,6 +52,13 @@ object RobertifyAudioManagerKt {
         deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt.DEEZER_ACCESS_TOKEN)
         appleMusicSourceManager = AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager)
         resumeSourceManager = ResumeSourceManagerKt(playerManager)
+
+        AudioSourceManagers.registerLocalSource(playerManager)
+        playerManager.registerSourceManager(resumeSourceManager)
+        playerManager.registerSourceManager(spotifySourceManager)
+        playerManager.registerSourceManager(deezerAudioSourceManager)
+        playerManager.registerSourceManager(appleMusicSourceManager)
+        AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
     fun getMusicManager(guild: Guild): GuildMusicManagerKt =
@@ -59,12 +67,12 @@ object RobertifyAudioManagerKt {
             GuildMusicManagerKt(guild)
         }
 
-    suspend fun removeMusicManager(guild: Guild) {
+    fun removeMusicManager(guild: Guild) {
         musicManagers[guild.idLong]?.destroy()
         musicManagers.remove(guild.idLong)
     }
 
-    suspend fun loadAndPlay(
+    fun loadAndPlay(
         trackUrl: String,
         memberVoiceState: GuildVoiceState,
         botMessage: Message? = null,
@@ -93,7 +101,7 @@ object RobertifyAudioManagerKt {
         }
     }
 
-    suspend fun loadAndResume(musicManager: GuildMusicManagerKt, data: ResumeDataKt) {
+    fun loadAndResume(musicManager: GuildMusicManagerKt, data: ResumeDataKt) {
         val channelId = data.channel_id
         val voiceChannel = RobertifyKt.shardManager.getVoiceChannelById(channelId)
 
@@ -109,7 +117,7 @@ object RobertifyAudioManagerKt {
         resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
     }
 
-    private suspend fun resumeTracks(
+    private fun resumeTracks(
         trackList: List<ResumableTrackKt>,
         announcementChannel: GuildMessageChannel?,
         musicManager: GuildMusicManagerKt
@@ -128,7 +136,7 @@ object RobertifyAudioManagerKt {
         ).loadItem()
     }
 
-    private suspend fun loadTrack(
+    private fun loadTrack(
         trackUrl: String,
         musicManager: GuildMusicManagerKt,
         user: User,
@@ -148,7 +156,7 @@ object RobertifyAudioManagerKt {
         ).loadItem()
     }
 
-    private suspend fun loadSearchResults(
+    private fun loadSearchResults(
         musicManager: GuildMusicManagerKt,
         searcher: User,
         botMessage: InteractionHook,
@@ -162,7 +170,7 @@ object RobertifyAudioManagerKt {
         ).loadItem()
     }
 
-    public suspend fun loadRecommendedTracks(
+    fun loadRecommendedTracks(
         musicManager: GuildMusicManagerKt,
         channel: GuildMessageChannel?,
         trackIds: String
@@ -175,7 +183,7 @@ object RobertifyAudioManagerKt {
             .loadItem()
     }
 
-    suspend fun joinAudioChannel(
+    fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManagerKt,
         messageChannel: GuildMessageChannel? = null
@@ -184,12 +192,12 @@ object RobertifyAudioManagerKt {
             require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
-                    musicManager.link.connectAudio(channel.idLong.toULong())
+                    musicManager.link.connect(channel)
                     musicManager.scheduler.scheduleDisconnect()
                 }
                 else -> {}
             }
-        } catch (e: dev.schlaubi.lavakord.InsufficientPermissionException) {
+        } catch (e: InsufficientPermissionException) {
             messageChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     messageChannel.guild,

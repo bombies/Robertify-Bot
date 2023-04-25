@@ -2,6 +2,7 @@ package main.commands.slashcommands.audio
 
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt

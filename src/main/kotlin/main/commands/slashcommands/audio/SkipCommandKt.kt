@@ -7,6 +7,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManagerKt
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.utils.author
+import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.PermissionKt
 import main.utils.GeneralUtilsKt
@@ -114,7 +116,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SkipMessages.SKIPPED).build()
     }
 
-    suspend fun handleSkip(skipper: User, musicManager: GuildMusicManagerKt, id: Int): MessageEmbed {
+    fun handleSkip(skipper: User, musicManager: GuildMusicManagerKt, id: Int): MessageEmbed {
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
 
@@ -132,7 +134,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         queueHandler.removeAll(songsToRemove)
         queueHandler.pushPastTrack(playingTrack)
-        scheduler.nextTrack(playingTrack, true, playingTrack.position.inWholeMilliseconds)
+        scheduler.nextTrack(playingTrack, true, playingTrack.position)
 
         RequestChannelConfigKt(guild).updateMessage()
         SkipCommandKt().clearVoteSkipInfo(guild)
@@ -208,7 +210,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         if (queueHandler.isTrackRepeating)
             queueHandler.isTrackRepeating = false
 
-        scheduler.nextTrack(playingTrack, true, audioPlayer.position)
+        scheduler.nextTrack(playingTrack, true, audioPlayer.trackPosition)
 
         RequestChannelConfigKt(guild).updateMessage()
         clearVoteSkipInfo(guild)

@@ -1,6 +1,5 @@
 package main.audiohandlers
 
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.utils.json.guildconfig.GuildConfigKt

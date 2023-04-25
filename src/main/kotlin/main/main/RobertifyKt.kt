@@ -1,8 +1,7 @@
 package main.main
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import dev.minn.jda.ktx.jdabuilder.defaultShardWithLavakord
-import dev.schlaubi.lavakord.LavaKord
+import dev.minn.jda.ktx.jdabuilder.defaultShard
 import kotlinx.coroutines.runBlocking
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
@@ -13,7 +12,6 @@ import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.utils.events.EventManager
 import main.utils.events.EventManager.registerEvents
-import main.utils.pagination.PaginationEventsKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -23,16 +21,13 @@ import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
+import java.util.Base64
 
 object RobertifyKt {
     private val logger = LoggerFactory.getLogger(RobertifyKt::class.java)
     val cronScheduler = StdSchedulerFactory.getDefaultScheduler()
     var topGGAPI: DiscordBotListAPI? = null
     lateinit var lavalink: JdaLavalink
-        private set
-    lateinit var lavakord: LavaKord
         private set
     lateinit var shardManager: ShardManager
         private set
@@ -68,6 +63,17 @@ object RobertifyKt {
             }
         })
 
+        // Setup LavaLink
+        lavalink = JdaLavalink(
+            getIdFromToken(ConfigKt.BOT_TOKEN),
+            ConfigKt.SHARD_COUNT,
+        ) { shardId -> shardManager.getShardById(shardId) }
+
+        ConfigKt.LAVA_NODES.forEach { node ->
+            lavalink.addNode(node.name, node.uri, node.password)
+            logger.info("Registered lava node with address: ${node.uri}")
+        }
+
         // Init caches
         AbstractMongoDatabaseKt.initAllCaches()
         logger.info("Initialized all caches.")
@@ -78,7 +84,7 @@ object RobertifyKt {
         // Build bot connection
         logger.info("Building shard manager...")
         runBlocking {
-            val lavakordShardManager = defaultShardWithLavakord(
+            shardManager = defaultShard(
                 token = ConfigKt.BOT_TOKEN,
                 intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
             ) {
@@ -94,6 +100,7 @@ object RobertifyKt {
                     CacheFlag.STICKER,
                     CacheFlag.SCHEDULED_EVENTS
                 )
+                setVoiceDispatchInterceptor(lavalink.voiceInterceptor)
                 setActivity(Activity.listening("Starting up..."))
 
                 val disabledIntents = mutableListOf(
@@ -116,8 +123,6 @@ object RobertifyKt {
                 enableIntents(enabledIntents)
                 disableIntents(disabledIntents)
             }
-            shardManager = lavakordShardManager.shardManager
-            lavakord = lavakordShardManager.lavakord
             logger.info("Successfully built shard manager")
 
             val slashCommandManager = SlashCommandManagerKt
@@ -129,12 +134,6 @@ object RobertifyKt {
 
             shardManager.registerEvents(EventManager.getRegisteredEvents())
             logger.info("Registered all event controllers")
-        }
-
-        // Setup LavaKord
-        ConfigKt.LAVA_NODES.forEach { node ->
-            lavakord.addNode(node.uri.toString(), node.password)
-            logger.info("Registered lava node with address: ${node.uri}")
         }
 
         if (ConfigKt.LOAD_COMMANDS)
@@ -162,9 +161,8 @@ object RobertifyKt {
                 .build()
     }
 
-    @OptIn(ExperimentalEncodingApi::class)
     private fun getIdFromToken(token: String) =
-        Base64.decode(token.split("\\.".toRegex())[0]).toString()
+        String(Base64.getDecoder().decode(token.split("\\.".toRegex())[0]))
 
     private fun List<AbstractSlashCommandKt>.merge(vararg lists: List<AbstractSlashCommandKt>): List<AbstractSlashCommandKt> =
         this + lists.reduce { acc, next -> acc + next }

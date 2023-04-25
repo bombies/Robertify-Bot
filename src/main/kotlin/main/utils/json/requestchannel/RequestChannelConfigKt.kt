@@ -1,11 +1,10 @@
 package main.utils.json.requestchannel
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
-import dev.schlaubi.lavakord.audio.player.Track
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.audiohandlers.TrackSchedulerKt.Companion.toAudioTrack
+import main.audiohandlers.utils.author
+import main.audiohandlers.utils.length
+import main.audiohandlers.utils.title
 import main.constants.RobertifyEmojiKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
@@ -24,7 +23,6 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
-import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
@@ -200,7 +198,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             val msgRequest: RestAction<Message> = getMessageRequest() ?: return@runAsync
             val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
             val audioPlayer = musicManager.player
-            val playingTrack: Track? = audioPlayer.playingTrack
+            val playingTrack = audioPlayer.playingTrack
             val queueHandler = musicManager.scheduler.queueHandler
             val queueAsList = ArrayList(queueHandler.contents)
 
@@ -262,7 +260,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
 
                         Pair(
                             "{duration}",
-                            GeneralUtilsKt.formatTime(playingTrack.length.inWholeMilliseconds)
+                            GeneralUtilsKt.formatTime(playingTrack.length)
                         )
                     )
                 )
@@ -273,8 +271,8 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         Pair("{requester}", requester)
                     )
                 )
-                val lavaplayerTrack = playingTrack.toAudioTrack()
-                if (lavaplayerTrack is MirroringAudioTrack) eb.setImage(lavaplayerTrack.artworkURL) else eb.setImage(
+                
+                if (playingTrack is MirroringAudioTrack) eb.setImage(playingTrack.artworkURL) else eb.setImage(
                     theme.nowPlayingBanner
                 )
                 eb.setFooter(
@@ -286,7 +284,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         ),
                         Pair(
                             "{volume}",
-                            ((audioPlayer.filters.volume?.times(100))?.toInt()).toString() ?: "Unknown"
+                            ((audioPlayer.filters.volume * 100).toInt()).toString() ?: "Unknown"
                         )
                     )
                 )
@@ -299,7 +297,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         10
                     )) nextTenSongs.append(index++).append(". → ").append(track.title)
                         .append(" - ").append(track.author)
-                        .append(" [").append(GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
+                        .append(" [").append(GeneralUtilsKt.formatTime(track.length))
                         .append("]\n")
                 } else {
                     if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
@@ -307,7 +305,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         for (track in queueAsList) nextTenSongs.append(
                             index++
                         ).append(". → ").append(track.title).append(" - ").append(track.author)
-                            .append(" [").append(GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
+                            .append(" [").append(GeneralUtilsKt.formatTime(track.length))
                             .append("]\n")
                     }
                 }

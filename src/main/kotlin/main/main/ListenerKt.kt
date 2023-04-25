@@ -62,7 +62,7 @@ class ListenerKt : AbstractEventControllerKt() {
     private fun guildJoinListener() =
         onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
-            val guildConfig = GuildConfigKt(guild)
+             GuildConfigKt(guild).addGuild()
             loadSlashCommands(guild)
             GeneralUtilsKt.setDefaultEmbed(guild)
             logger.info("Joined ${guild.name}")

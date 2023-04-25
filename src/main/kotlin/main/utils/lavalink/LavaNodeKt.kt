@@ -3,6 +3,7 @@ package main.utils.lavalink
 import java.net.URI
 
 data class LavaNodeKt(
+    val name: String = "Lava Node",
     private val host: String,
     private val port: String,
     val password: String
@@ -13,6 +14,6 @@ data class LavaNodeKt(
 
 
     override fun toString(): String =
-        "LavaNode{host='$host', port='$port', password='$password'}"
+        "LavaNode{name ='$name' ,host='$host', port='$port', password='$password'}"
 
 }

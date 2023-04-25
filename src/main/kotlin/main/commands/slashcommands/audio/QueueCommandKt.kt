@@ -2,6 +2,9 @@ package main.commands.slashcommands.audio
 
 import main.audiohandlers.QueueHandlerKt
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.utils.author
+import main.audiohandlers.utils.length
+import main.audiohandlers.utils.title
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -43,7 +46,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
                 Pair("{id}", (i + 1).toString()),
                 Pair("{title}", track.title),
                 Pair("{author}", track.author),
-                Pair("{duration}", GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
+                Pair("{duration}", GeneralUtilsKt.formatTime(track.length))
             ))
         }
         return content
@@ -72,7 +75,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
                 Pair("{id}", (i + 1).toString()),
                 Pair("{title}", track.title),
                 Pair("{author}", track.author),
-                Pair("{duration}", GeneralUtilsKt.formatTime(track.length.inWholeMilliseconds))
+                Pair("{duration}", GeneralUtilsKt.formatTime(track.length))
             ))
         }
         return content
