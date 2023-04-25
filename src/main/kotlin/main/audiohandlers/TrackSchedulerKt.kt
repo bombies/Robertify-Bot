@@ -40,6 +40,7 @@ import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class TrackSchedulerKt(private val guild: Guild, private val link: Link) : PlayerEventListenerAdapter() {
     companion object {
@@ -114,14 +115,11 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             return
 
         val requester = findRequester(track.identifier) ?: return
-
         val requesterMention = getRequesterAsMention(track)
 
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
             return
-
-        logger.debug("Attempting to send now playing image")
 
         RobertifyKt.shardManager.retrieveUserById(requester.id)
             .submit()
@@ -174,6 +172,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                                         if (stringErr != null)
                                             logger.warn("I was not able to send a now playing message at all in ${guild.name}")
                                     }
+                            else logger.error("Unexpected error", ex)
                         }
                 } else {
                     logger.error("Unexpected error", ex)

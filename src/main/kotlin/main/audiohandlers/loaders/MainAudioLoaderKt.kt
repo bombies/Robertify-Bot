@@ -63,7 +63,7 @@ class MainAudioLoaderKt(
 
         val trackInfo = track.info
 
-        if (!announceMsg)
+        if (announceMsg)
             scheduler.unannouncedTracks.add(trackInfo.identifier)
 
         val requester: RequesterKt? = if (sender != null) {
@@ -127,7 +127,7 @@ class MainAudioLoaderKt(
 
         handleMessageUpdate(embed)
 
-        if (!announceMsg)
+        if (announceMsg)
             mutableTracks.forEach { track -> scheduler.unannouncedTracks.add(track.info.identifier) }
 
 
@@ -160,9 +160,8 @@ class MainAudioLoaderKt(
         val firstResult = results.tracks.first()
         val trackInfo = firstResult.info
 
-        if (!announceMsg) {
+        if (announceMsg)
             scheduler.unannouncedTracks.add(trackInfo.identifier)
-        }
 
         if (sender != null)
             scheduler.addRequester(sender.id, trackInfo.identifier)

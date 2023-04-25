@@ -37,10 +37,12 @@ class GuildMusicManagerKt(val guild: Guild) {
 
     fun leave() {
         clear()
-        link.destroy()
+        RobertifyAudioManagerKt.removeMusicManager(guild)
     }
 
     fun destroy() {
+        player.removeListener(scheduler)
+
         if (link.state != Link.State.DESTROYED)
             link.destroy()
     }
