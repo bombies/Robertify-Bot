@@ -10,12 +10,12 @@ data class SubCommandKt(
 ) {
 
     fun getSubcommandData(): SubcommandData {
-        val subcommandData = SubcommandData(name, description)
+        val subcommandData = SubcommandData(name.lowercase(), description)
 
         options.forEach { option ->
             val optionData = OptionData(
                 option.type,
-                option.name,
+                option.name.lowercase(),
                 option.description,
                 option.required
             )

@@ -97,7 +97,11 @@ object PaginationHandlerKt {
             return@coroutineScope paginatedMessage.await()
         }
 
-    suspend fun paginateMessage(event: SlashCommandInteractionEvent, content: List<String>, maxPerPage: Int = 10): Message? {
+    suspend fun paginateMessage(
+        event: SlashCommandInteractionEvent,
+        content: List<String>,
+        maxPerPage: Int = 10
+    ): Message? {
         event.deferReply().queue()
         val messagePages = messageLogic(event.guild!!, content, maxPerPage)
         return paginateMessage(event, messagePages)
@@ -173,6 +177,16 @@ object PaginationHandlerKt {
 
             return@coroutineScope null
         }
+
+    fun paginateMenu(
+        event: SlashCommandInteractionEvent,
+        options: List<StringSelectMenuOptionKt>,
+        startingPage: Int = 0,
+        numberEachEntry: Boolean = true
+    ) {
+        val msg = menuLogic(event, options, startingPage, numberEachEntry)
+        paginateMenu(event.user, event.channel.asGuildMessageChannel(), msg, options)
+    }
 
     fun paginateMenu(user: User, msg: Message, options: List<StringSelectMenuOptionKt>) {
         val menuPages = menuLogic(msg.id, options)
@@ -309,6 +323,14 @@ object PaginationHandlerKt {
             return messagePages
         }
     }
+
+    private fun menuLogic(
+        event: SlashCommandInteractionEvent,
+        options: List<StringSelectMenuOptionKt>,
+        startingPage: Int,
+        numberEachEntry: Boolean
+    ): ReplyCallbackAction =
+        event.replyEmbeds(getPaginatedEmbed(event.guild!!, options, 25, startingPage, numberEachEntry))
 
     private fun menuLogic(msgId: String, options: List<StringSelectMenuOptionKt>): List<MenuPageKt> {
         val menuPages = mutableListOf<MenuPageKt>()

@@ -19,4 +19,6 @@ data class StringSelectMenuOptionKt(
             emoji = emoji,
             description = description
         )
+
+    override fun toString(): String = label
 }

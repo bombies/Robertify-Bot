@@ -11,14 +11,14 @@ data class SubCommandGroupKt(
 ) {
 
     fun build(): SubcommandGroupData {
-        val data = SubcommandGroupData(name, description)
+        val data = SubcommandGroupData(name.lowercase(), description)
         subCommands.forEach { command ->
-            val subcommandData = SubcommandData(command.name, command.description)
+            val subcommandData = SubcommandData(command.name.lowercase(), command.description)
 
             command.options.forEach { option ->
                 val optionData = OptionData(
                     option.type,
-                    option.name,
+                    option.name.lowercase(),
                     option.description,
                     option.required
                 )

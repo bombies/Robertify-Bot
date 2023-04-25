@@ -42,7 +42,7 @@ data class CommandKt(
         checkPermission?.invoke(event) ?: true
 
     fun getCommandData(): CommandData {
-        val commandData = Commands.slash(name, description)
+        val commandData = Commands.slash(name.lowercase(), description)
 
         // Adding subcommands
         if (subcommands.isNotEmpty() || subCommandGroups.isNotEmpty()) {
@@ -52,7 +52,7 @@ data class CommandKt(
             options.forEach { option ->
                 val optionData = OptionData(
                     option.type,
-                    option.name,
+                    option.name.lowercase(),
                     option.description,
                     option.required
                 )

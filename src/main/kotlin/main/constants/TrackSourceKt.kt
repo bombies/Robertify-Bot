@@ -7,7 +7,8 @@ enum class TrackSourceKt {
     SPOTIFY,
     DEEZER,
     YOUTUBE,
-    SOUNDCLOUD;
+    SOUNDCLOUD,
+    APPLE_MUSIC;
 
     companion object {
         fun parse(name: String): TrackSourceKt {
@@ -16,6 +17,7 @@ enum class TrackSourceKt {
                 "spotify" -> SPOTIFY
                 "deezer" -> DEEZER
                 "soundcloud" -> SOUNDCLOUD
+                "applemusic", "apple_music" -> APPLE_MUSIC
                 else -> throw NullPointerException("There is no such source")
             }
         }
