@@ -7,6 +7,7 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.minn.jda.ktx.util.SLF4J
+import dev.schlaubi.lavakord.audio.Link
 import main.audiohandlers.loaders.AutoPlayLoaderKt
 import main.audiohandlers.loaders.MainAudioLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
@@ -61,7 +62,10 @@ object RobertifyAudioManagerKt {
     }
 
     fun getMusicManager(guild: Guild): GuildMusicManagerKt =
-        musicManagers.computeIfAbsent(guild.idLong) { GuildMusicManagerKt(guild) }
+        musicManagers.computeIfAbsent(guild.idLong) {
+            logger.debug("Creating new music manager for ${guild.name}")
+            GuildMusicManagerKt(guild)
+        }
 
     suspend fun removeMusicManager(guild: Guild) {
         musicManagers[guild.idLong]?.destroy()
@@ -186,9 +190,14 @@ object RobertifyAudioManagerKt {
     ) {
         try {
             require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
-            musicManager.link.connectAudio(channel.idLong.toULong())
-            musicManager.scheduler.scheduleDisconnect()
-        } catch (e: InsufficientPermissionException) {
+            when (musicManager.link.state) {
+                Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
+                    musicManager.link.connectAudio(channel.idLong.toULong())
+                    musicManager.scheduler.scheduleDisconnect()
+                }
+                else -> {}
+            }
+        } catch (e: dev.schlaubi.lavakord.InsufficientPermissionException) {
             messageChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     messageChannel.guild,

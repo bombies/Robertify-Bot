@@ -23,6 +23,7 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
 import dev.schlaubi.lavakord.audio.*
+import dev.schlaubi.lavakord.audio.player.Player
 import dev.schlaubi.lavakord.audio.player.Track
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.models.RequesterKt
@@ -54,7 +55,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
 
-class TrackSchedulerKt(private val guild: Guild, link: Link) {
+class TrackSchedulerKt(private val guild: Guild, private val link: Link) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val audioManager = RobertifyAudioManagerKt
@@ -82,7 +83,8 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
     private val requesters = ArrayList<RequesterKt>()
     private var lastSentMsg: Message? = null
     val unannouncedTracks = emptyList<String>().toMutableList()
-    val player = link.player
+    val player: Player
+        get() = link.player
     val queueHandler = QueueHandlerKt()
     val disconnectManager = GuildDisconnectManagerKt(guild)
     var announcementChannel: GuildMessageChannel? = null
@@ -95,7 +97,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
     }
 
     fun queue(track: Track) = runBlocking {
-        logger.info("Attempting to queue ${track.title}. Queue size: ${queueHandler.size}")
+        logger.info("Attempting to queue ${track.title}. Queue size: ${queueHandler.size}. Playing track: ${player.playingTrack?.title ?: "none"}")
         when {
             player.playingTrack != null -> {
                 logger.info("A track is being played so ${track.title} has been added to the queue")
@@ -134,7 +136,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
     private fun trackStartEventHandler() =
         player.on<Event, TrackStartEvent> {
-            logger.info("Track started")
+            logger.debug("${link.state.name} | Track started (${getTrack().title}). Announcement channel: ${announcementChannel?.id ?: "undefined"}")
 
             val track = getTrack()
             disconnectManager.cancelDisconnect()
@@ -148,8 +150,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
             if (unannouncedTracks.contains(track.identifier)) {
                 unannouncedTracks.remove(track.identifier)
-                return@on
-            }
+            } else return@on
 
             if (announcementChannel == null)
                 return@on
@@ -162,7 +163,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
             if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
                 return@on
 
-            logger.info("Attempting to send now playing image")
+            logger.debug("Attempting to send now playing image")
 
             val lavaplayerTrack = track.toAudioTrack()
             RobertifyKt.shardManager.retrieveUserById(requester.id)
@@ -285,7 +286,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
         val nextTrack = queueHandler.poll()
 
         if (nextTrack != null) {
-            logger.info("Retrieved ${nextTrack.title} and attempting to play")
+            logger.debug("Retrieved ${nextTrack.title} and attempting to play")
             player.playTrack(nextTrack)
 
         } else {
@@ -320,7 +321,7 @@ class TrackSchedulerKt(private val guild: Guild, link: Link) {
 
     private fun trackEndEventHandler() =
         player.on<Event, TrackEndEvent> {
-            logger.info("Track ended.\n" +
+            logger.debug("Track ended.\n" +
                     "May start next: ${reason.mayStartNext}\n" +
                     "End reason: ${reason.name}")
             val trackToUse = queueHandler.lastPlayedTrackBuffer

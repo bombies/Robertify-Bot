@@ -16,7 +16,7 @@ class GuildMusicManagerKt(val guild: Guild) {
     var isForcePaused = false
 
 
-    suspend fun clear() {
+    fun clear() {
         val queueHandler = scheduler.queueHandler
 
         queueHandler.clear()
@@ -26,8 +26,6 @@ class GuildMusicManagerKt(val guild: Guild) {
         queueHandler.isTrackRepeating = false
         queueHandler.isQueueRepeating = false
 
-        player.filters.reset()
-
         scheduler.clearRequesters()
         SkipCommandKt().clearVoteSkipInfo(guild)
         RequestChannelConfigKt(guild).updateMessage()
@@ -35,7 +33,7 @@ class GuildMusicManagerKt(val guild: Guild) {
 
     suspend fun leave() {
         clear()
-        RobertifyAudioManagerKt.removeMusicManager(guild)
+        link.disconnectAudio()
     }
 
     suspend fun destroy() {
