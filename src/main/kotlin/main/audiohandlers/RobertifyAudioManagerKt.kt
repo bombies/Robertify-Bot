@@ -6,6 +6,7 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
+import dev.minn.jda.ktx.messages.send
 import dev.minn.jda.ktx.util.SLF4J
 import lavalink.client.io.Link
 import main.audiohandlers.loaders.AutoPlayLoaderKt
@@ -16,7 +17,10 @@ import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
+import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.resume.ResumableTrackKt
 import main.utils.resume.ResumableTrackKt.Companion.string
@@ -87,8 +91,7 @@ object RobertifyAudioManagerKt {
         val musicManager = getMusicManager(guild)
         val voiceChannel = memberVoiceState.channel!!
 
-        if (voiceChannel.members.isNotEmpty()) {
-            joinAudioChannel(voiceChannel, musicManager, messageChannel)
+        if (voiceChannel.members.isNotEmpty() && joinAudioChannel(voiceChannel, musicManager, messageChannel)) {
             loadTrack(
                 trackUrl = trackUrl,
                 musicManager = musicManager,
@@ -98,6 +101,14 @@ object RobertifyAudioManagerKt {
                 addToBeginning = addToBeginning,
                 shuffled = shuffled
             )
+        } else {
+            botMessage?.editMessageEmbeds(
+                RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS
+                ).build()
+            )
+                ?.queue()
         }
     }
 
@@ -113,8 +124,9 @@ object RobertifyAudioManagerKt {
         if (voiceChannel.members.isEmpty())
             return
 
-        joinAudioChannel(voiceChannel, musicManager)
-        resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
+        if (joinAudioChannel(voiceChannel, musicManager))
+            resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
+        else logger.warn("Could not resume tracks in ${musicManager.guild.name} because I couldn't join the voice channel!")
     }
 
     private fun resumeTracks(
@@ -183,19 +195,66 @@ object RobertifyAudioManagerKt {
             .loadItem()
     }
 
+    /**
+     * Join a specified audio channel if the bot has permission to.
+     *
+     * @param channel The channel to attempt to join.
+     * @param musicManager The music manager for the guild.
+     * @param messageChannel The message channel for any error messages.
+     * @return True if the bot successfully joined the channel and vice-versa.
+     */
     fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManagerKt,
         messageChannel: GuildMessageChannel? = null
-    ) {
+    ): Boolean {
         try {
             require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
+                    val guild = musicManager.guild
+                    if (TogglesConfigKt(guild).getToggle(ToggleKt.RESTRICTED_VOICE_CHANNELS)) {
+                        val restrictedChannelConfig = RestrictedChannelsConfigKt(guild)
+                        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+
+                        if (!restrictedChannelConfig.isRestrictedChannel(
+                                channel.idLong,
+                                RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL
+                            )
+                        ) {
+                            val embed = RobertifyEmbedUtilsKt.embedMessage(
+                                guild,
+                                localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.CANT_JOIN_CHANNEL) +
+                                        if (restrictedChannelConfig.getRestrictedChannels(RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
+                                                .isNotEmpty()
+                                        )
+                                            localeManager.getMessage(
+                                                RobertifyLocaleMessageKt.GeneralMessages.RESTRICTED_TO_JOIN,
+                                                Pair(
+                                                    "{channels}",
+                                                    restrictedChannelConfig.restrictedChannelsToString(
+                                                        RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL
+                                                    )
+                                                )
+                                            )
+                                        else
+                                            localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.NO_VOICE_CHANNEL)
+                            ).build()
+
+                            messageChannel?.sendWithEmbed(guild) { embed }?.queue()
+                            return false
+                        }
+                    }
+
                     musicManager.link.connect(channel)
                     musicManager.scheduler.scheduleDisconnect()
+                    return true
                 }
-                else -> {}
+
+                Link.State.CONNECTED, Link.State.CONNECTING -> return true
+                else -> {
+                    return false
+                }
             }
         } catch (e: InsufficientPermissionException) {
             messageChannel?.sendMessageEmbeds(
@@ -207,5 +266,6 @@ object RobertifyAudioManagerKt {
             )?.queue()
         }
 
+        return false
     }
 }

@@ -258,12 +258,6 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
                 try {
                     val audioManager = RobertifyAudioManagerKt
-                    val musicManager = audioManager.getMusicManager(guild)
-
-                    runBlocking {
-                        audioManager.joinAudioChannel(memberVoiceState.channel!!, musicManager)
-                    }
-
                     event.hook.sendWithEmbed(guild) {
                         embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
                     }.queue { addingMsg ->

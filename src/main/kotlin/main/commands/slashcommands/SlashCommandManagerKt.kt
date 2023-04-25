@@ -60,7 +60,8 @@ object SlashCommandManagerKt {
             ShuffleCommandKt(),
             StopCommandKt(),
             SearchCommandKt(),
-            JumpCommandKt()
+            JumpCommandKt(),
+            JoinCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
