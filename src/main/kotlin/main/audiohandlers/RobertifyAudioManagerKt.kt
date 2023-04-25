@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
-import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
 import java.util.*
 
@@ -52,13 +51,6 @@ object RobertifyAudioManagerKt {
         deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt.DEEZER_ACCESS_TOKEN)
         appleMusicSourceManager = AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager)
         resumeSourceManager = ResumeSourceManagerKt(playerManager)
-
-        AudioSourceManagers.registerLocalSource(playerManager)
-        playerManager.registerSourceManager(resumeSourceManager)
-        playerManager.registerSourceManager(spotifySourceManager)
-        playerManager.registerSourceManager(appleMusicSourceManager)
-        playerManager.registerSourceManager(deezerAudioSourceManager)
-        AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
     fun getMusicManager(guild: Guild): GuildMusicManagerKt =
