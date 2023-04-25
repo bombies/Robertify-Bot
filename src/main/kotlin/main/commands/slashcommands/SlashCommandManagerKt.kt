@@ -56,7 +56,8 @@ object SlashCommandManagerKt {
             DisconnectCommandKt(),
             QueueCommandKt(),
             SkipCommandKt(),
-            NowPlayingCommandKt()
+            NowPlayingCommandKt(),
+            ShuffleCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
