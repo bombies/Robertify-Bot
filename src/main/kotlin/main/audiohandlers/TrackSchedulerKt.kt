@@ -36,11 +36,9 @@ import net.dv8tion.jda.api.exceptions.PermissionException
 import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.utils.FileUpload
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 class TrackSchedulerKt(private val guild: Guild, private val link: Link) : PlayerEventListenerAdapter() {
     companion object {
@@ -340,7 +338,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         } else logger.error("There was an exception with playing the track.", exception)
     }
 
-    override fun onTrackStuck(player: IPlayer, track: AudioTrack, thresholdMs: Long) {
+    override fun onTrackStuck(player: IPlayer, track: AudioTrack?, thresholdMs: Long) {
         if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
             return
 
@@ -349,8 +347,8 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
                     RobertifyLocaleMessageKt.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
-                    Pair("{title}", track.title),
-                    Pair("{author}", track.author),
+                    Pair("{title}", track?.title ?: "Unknown Title"),
+                    Pair("{author}", track?.author ?: "Unknown Author"),
                 ).build()
             )?.queue { msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES) }
         } catch (_: InsufficientPermissionException) {

@@ -87,7 +87,6 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val audioChannelCheck = audioChannelChecks(
             memberVoiceState,
             selfVoiceState,
-            checkIfNothingPlaying = false,
             selfChannelNeeded = false
         )
 

@@ -210,12 +210,11 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected fun audioChannelChecks(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
-        checkIfNothingPlaying: Boolean = true,
         selfChannelNeeded: Boolean = true,
     ): MessageEmbed? {
         val guild = selfVoiceState.guild
 
-        if (checkIfNothingPlaying && !selfVoiceState.inAudioChannel())
+        if (selfChannelNeeded && !selfVoiceState.inAudioChannel())
             return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
                 .build()
 
