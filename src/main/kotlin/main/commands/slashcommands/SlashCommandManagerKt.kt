@@ -63,7 +63,8 @@ object SlashCommandManagerKt {
             JumpCommandKt(),
             JoinCommandKt(),
             HistoryCommandKt(),
-            FavouriteTracksCommandKt()
+            FavouriteTracksCommandKt(),
+            ClearQueueCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
