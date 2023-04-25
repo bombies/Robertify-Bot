@@ -172,6 +172,7 @@ class MainAudioLoaderKt(
             scheduler.addToBeginningOfQueue(firstResult)
         else scheduler.queue(firstResult)
 
+        sendTrackLoadedMessage(firstResult)
         val info = firstResult.info
         if (sender != null)
             LogUtilsKt(guild).sendLog(
@@ -181,7 +182,6 @@ class MainAudioLoaderKt(
                 Pair("{author}", info.author)
             )
     }
-
 
     override fun noMatches() {
         val embed = if (query.length < 4096)
