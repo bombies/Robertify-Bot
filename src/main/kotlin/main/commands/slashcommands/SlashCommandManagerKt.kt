@@ -69,7 +69,9 @@ object SlashCommandManagerKt {
             LoopCommandKt(),
             LyricsCommandKt(),
             MoveCommandKt(),
-            PauseCommandKt()
+            PauseCommandKt(),
+            PreviousTrackCommandKt(),
+            RemoveCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
