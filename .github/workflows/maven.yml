@@ -20,6 +20,7 @@ jobs:
     env:
       REDIS_HOSTNAME: localhost
       REDIS_PORT: 6379
+      MONGO_DATABASE_NAME: "RobertifyCI"
     services:
       # Label used to access the service container
       redis:
