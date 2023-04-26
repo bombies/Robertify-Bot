@@ -10,17 +10,34 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev", "fixes/**", "features/**", "rewrite/**" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    env:
+      REDIS_HOSTNAME: localhost
+      REDIS_PORT: 6379
+    services:
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
     steps:
     - uses: actions/checkout@v3
+    - name: Connect to Redis
+      run: docker run -d -e 'IP=127.0.0.1' -e 'STANDALONE=true' -e 'SENTINEL=true' -p '7000-7007:7000-7007' -p '5000-5002:5000-5002' grokzen/redis-cluster:latest
     - name: Set up JDK 19
       uses: actions/setup-java@v3
       with:
