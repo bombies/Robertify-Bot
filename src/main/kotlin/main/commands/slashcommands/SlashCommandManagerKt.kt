@@ -67,7 +67,8 @@ object SlashCommandManagerKt {
             ClearQueueCommandKt(),
             AutoPlayCommandKt(),
             LoopCommandKt(),
-            LyricsCommandKt()
+            LyricsCommandKt(),
+            MoveCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
