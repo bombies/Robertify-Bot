@@ -65,7 +65,8 @@ object SlashCommandManagerKt {
             HistoryCommandKt(),
             FavouriteTracksCommandKt(),
             ClearQueueCommandKt(),
-            AutoPlayCommandKt()
+            AutoPlayCommandKt(),
+            LoopCommandKt()
         )
         addManagementCommands()
         addMiscCommands()

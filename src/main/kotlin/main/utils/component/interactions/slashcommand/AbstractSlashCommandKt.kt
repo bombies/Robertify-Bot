@@ -232,7 +232,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         else if (!selfChannelNeeded && selfVoiceState.inAudioChannel() && (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id))
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL
             ).build()
 
         return null

@@ -30,7 +30,6 @@ class PaginationEventsKt : AbstractEventControllerKt() {
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
-            logger.info(buttonId)
             if (!buttonId.startsWith(MessageButtonKt.PAGE_ID.toString()))
                 return@onEvent
 
@@ -113,7 +112,6 @@ class PaginationEventsKt : AbstractEventControllerKt() {
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
-            logger.info(buttonId)
             if (!buttonId.startsWith("queue:${MessageButtonKt.PAGE_ID}"))
                 return@onEvent
 
