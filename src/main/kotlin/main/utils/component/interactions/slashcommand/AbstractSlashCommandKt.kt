@@ -211,6 +211,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         selfChannelNeeded: Boolean = true,
+        songMustBePlaying: Boolean = false,
     ): MessageEmbed? {
         val guild = selfVoiceState.guild
 
@@ -233,6 +234,15 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
                 RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL
+            ).build()
+
+        val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
+            .player
+            .playingTrack
+        if (songMustBePlaying && playingTrack == null)
+            return RobertifyEmbedUtilsKt.embedMessage(
+                guild,
+                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
             ).build()
 
         return null

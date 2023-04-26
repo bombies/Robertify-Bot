@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
@@ -15,6 +16,7 @@ import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 
 class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null) {
@@ -174,7 +176,12 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        inline fun GuildMessageChannel.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
+        inline fun InteractionHook.editEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): WebhookMessageEditAction<Message> {
+            val embedUtils = getGuildUtils(guild)
+            return editOriginalEmbeds(supplier(embedUtils))
+        }
+
+        inline fun MessageChannel.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(supplier(embedUtils))
         }
@@ -200,9 +207,15 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
         }
     }
 
-    fun embed(description: LocaleMessageKt, title: LocaleMessageKt, placeholders: Collection<Pair<String, String>> = listOf()): MessageEmbed =
-        embedMessageWithTitle(guild, title, description, *placeholders.toTypedArray()).build()
+    fun embed(description: LocaleMessageKt, title: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageEmbed =
+        embedMessageWithTitle(guild, title, description, *placeholders).build()
+
+    fun embed(title: LocaleMessageKt, description: String, vararg placeholders: Pair<String, String>): MessageEmbed =
+        embedMessageWithTitle(guild, title, description, *placeholders).build()
 
     fun embed(description: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageEmbed =
         embedMessage(guild, description, *placeholders).build()
+
+    fun embed(description: String): MessageEmbed =
+        embedMessage(guild, description).build()
 }
