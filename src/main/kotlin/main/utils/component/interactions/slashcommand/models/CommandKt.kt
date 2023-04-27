@@ -5,6 +5,7 @@ import main.utils.database.mongodb.cache.BotDBCacheKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
+import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
@@ -56,6 +57,35 @@ data class CommandKt(
                     option.description,
                     option.required
                 )
+
+                when (option.type) {
+                    OptionType.INTEGER -> {
+                        if (option.range != null)
+                            optionData.setRequiredRange(option.range.first.toLong(), option.range.second.toLong())
+                        else {
+                            if (option.max != null)
+                                optionData.setMaxValue(option.max.toLong())
+                            if (option.min != null)
+                                optionData.setMinValue(option.min.toLong())
+                        }
+
+                    }
+
+                    OptionType.STRING -> {
+                        if (option.maxLength != null)
+                            optionData.setMaxLength(option.maxLength)
+                    }
+
+                    OptionType.CHANNEL -> {
+                        if (option.channelTypes != null)
+                            optionData.setChannelTypes(option.channelTypes)
+                    }
+
+                    else -> {}
+                }
+
+                if (option.choices.isNotEmpty())
+                    optionData.setAutoComplete(option.autoComplete)
 
                 option.choices.forEach { choice -> optionData.addChoice(choice, choice) }
                 commandData.addOptions(optionData)
