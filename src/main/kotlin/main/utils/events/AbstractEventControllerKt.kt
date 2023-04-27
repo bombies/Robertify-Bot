@@ -14,7 +14,7 @@ abstract class AbstractEventControllerKt {
         eventHandlerInvokers()
     }
 
-    inline fun <reified T : GenericEvent> onEvent(
+    protected inline fun <reified T : GenericEvent> onEvent(
         crossinline handler: suspend CoroutineEventListener.(event: T) -> Unit
     ) =
         shardManager.listener<T> { handler(it) }
