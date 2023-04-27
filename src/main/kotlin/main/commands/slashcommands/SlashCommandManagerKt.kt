@@ -1,6 +1,7 @@
 package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
+import main.commands.slashcommands.audio.filters.*
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -75,7 +76,12 @@ object SlashCommandManagerKt {
             ResumeCommandKt(),
             RewindCommandKt(),
             SeekCommandKt(),
-            VolumeCommandKt()
+            VolumeCommandKt(),
+            EightDFilterKt(),
+            KaraokeFilterKt(),
+            NightcoreFilterKt(),
+            TremoloFilterKt(),
+            VibratoFilterKt()
         )
         addManagementCommands()
         addMiscCommands()

@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
-import main.utils.GeneralUtilsKt.Companion.isRightToLeft
+import main.utils.GeneralUtilsKt.isRightToLeft
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.api.robertify.imagebuilders.ImageTypeKt

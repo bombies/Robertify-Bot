@@ -2,6 +2,7 @@ package main.commands.slashcommands.audio
 
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
+import main.utils.GeneralUtilsKt.isNotNull
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt

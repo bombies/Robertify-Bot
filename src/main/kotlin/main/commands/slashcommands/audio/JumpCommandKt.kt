@@ -1,12 +1,11 @@
 package main.commands.slashcommands.audio
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import dev.minn.jda.ktx.util.SLF4J
 import lavalink.client.player.IPlayer
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.utils.GeneralUtilsKt.Companion.isInt
+import main.utils.GeneralUtilsKt.isInt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt

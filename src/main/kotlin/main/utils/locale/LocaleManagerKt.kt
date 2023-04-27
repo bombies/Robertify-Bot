@@ -2,7 +2,7 @@ package main.utils.locale
 
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.Companion.setContent
+import main.utils.GeneralUtilsKt.setContent
 import main.utils.json.locale.LocaleConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild

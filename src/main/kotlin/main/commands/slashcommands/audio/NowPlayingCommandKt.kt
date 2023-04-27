@@ -6,7 +6,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.*
 import main.constants.ToggleKt
 import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.Companion.isUrl
+import main.utils.GeneralUtilsKt.isUrl
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
@@ -182,7 +182,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                             guild,
                             channel,
                             progress,
-                            GeneralUtilsKt.Companion.ProgressBar.DURATION
+                            GeneralUtilsKt.ProgressBar.DURATION
                         )
                     }" +
                     "${if (track.isStream) "" else "`[${GeneralUtilsKt.formatTime(track.length)}]`"}\n\n" +
@@ -199,8 +199,8 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                         GeneralUtilsKt.progressBar(
                             guild,
                             channel,
-                            filters.volume.toDouble() ?: 0.0,
-                            GeneralUtilsKt.Companion.ProgressBar.FILL
+                            filters.volume.toDouble(),
+                            GeneralUtilsKt.ProgressBar.FILL
                         )
                     } 🔊"
         )

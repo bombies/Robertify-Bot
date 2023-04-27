@@ -2,7 +2,7 @@ package main.constants
 
 import main.main.ConfigKt
 import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.Companion.asString
+import main.utils.GeneralUtilsKt.asString
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt

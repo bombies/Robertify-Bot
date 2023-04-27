@@ -27,6 +27,20 @@ class AutoPlayLoaderKt(
     }
 
     override fun onPlaylistLoad(playlist: AudioPlaylist) {
+        if (channel != null) {
+            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            scheduler.announcementChannel = channel
+            channel.sendMessageEmbeds(
+                RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.AudioLoaderMessages.PLAYING_RECOMMENDED_TRACKS
+                )
+                    .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
+                    .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
+                    .build()
+            ).queueWithAutoDelete(5, TimeUnit.MINUTES)
+        }
+
         val self = guild.selfMember
         playlist.tracks.forEach { track ->
             scheduler.addRequester(self.id, track.info.identifier)
@@ -40,19 +54,6 @@ class AutoPlayLoaderKt(
         }
 
         RequestChannelConfigKt(guild).updateMessage()
-
-        if (channel != null) {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
-            channel.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild,
-                    RobertifyLocaleMessageKt.AudioLoaderMessages.PLAYING_RECOMMENDED_TRACKS
-                )
-                    .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
-                    .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
-                    .build()
-            ).queueWithAutoDelete(5, TimeUnit.MINUTES)
-        }
     }
 
     override fun onSearchResultLoad(results: AudioPlaylist) {

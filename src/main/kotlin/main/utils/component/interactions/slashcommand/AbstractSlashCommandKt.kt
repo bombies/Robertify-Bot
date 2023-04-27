@@ -10,9 +10,8 @@ import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.Companion.asString
+import main.utils.GeneralUtilsKt.asString
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -35,7 +34,6 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.exceptions.ErrorResponseException
-import net.dv8tion.jda.api.interactions.components.ComponentInteraction
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -120,8 +118,46 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     )
         }
 
-        fun MessageEmbed?.isNull(): Boolean = this == null
-        fun MessageEmbed?.isNotNull(): Boolean = this != null
+        fun audioChannelChecks(
+            memberVoiceState: GuildVoiceState,
+            selfVoiceState: GuildVoiceState,
+            selfChannelNeeded: Boolean = true,
+            songMustBePlaying: Boolean = false,
+        ): MessageEmbed? {
+            val guild = selfVoiceState.guild
+
+            if (selfChannelNeeded && !selfVoiceState.inAudioChannel())
+                return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
+                    .build()
+
+            if (!memberVoiceState.inAudioChannel())
+                return RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                ).build()
+
+            if (selfChannelNeeded && memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
+                return RobertifyEmbedUtilsKt.embedMessage(
+                    guild, RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                    Pair("{channel}", selfVoiceState.channel!!.asMention)
+                ).build()
+            else if (!selfChannelNeeded && selfVoiceState.inAudioChannel() && (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id))
+                return RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL
+                ).build()
+
+            val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
+                .player
+                .playingTrack
+            if (songMustBePlaying && playingTrack == null)
+                return RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                ).build()
+
+            return null
+        }
     }
 
     fun register(shardManager: ShardManager) {
@@ -208,47 +244,6 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
         if (SlashCommandManagerKt.isMusicCommand(this) && event.channel.type.isMessage)
             RandomMessageManagerKt().randomlySendMessage(event.channel as GuildMessageChannel)
-    }
-
-    protected fun audioChannelChecks(
-        memberVoiceState: GuildVoiceState,
-        selfVoiceState: GuildVoiceState,
-        selfChannelNeeded: Boolean = true,
-        songMustBePlaying: Boolean = false,
-    ): MessageEmbed? {
-        val guild = selfVoiceState.guild
-
-        if (selfChannelNeeded && !selfVoiceState.inAudioChannel())
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
-                .build()
-
-        if (!memberVoiceState.inAudioChannel())
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
-            ).build()
-
-        if (selfChannelNeeded && memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild, RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
-                Pair("{channel}", selfVoiceState.channel!!.asMention)
-            ).build()
-        else if (!selfChannelNeeded && selfVoiceState.inAudioChannel() && (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id))
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL
-            ).build()
-
-        val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
-            .player
-            .playingTrack
-        if (songMustBePlaying && playingTrack == null)
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
-            ).build()
-
-        return null
     }
 
     protected fun checks(event: SlashCommandInteractionEvent): Boolean {
@@ -509,7 +504,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                         "{channels}", GeneralUtilsKt.listOfIDsToMentions(
                             guild,
                             config.getRestrictedChannels(RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL),
-                            GeneralUtilsKt.Companion.Mentioner.CHANNEL
+                            GeneralUtilsKt.Mentioner.CHANNEL
                         )
                     )
                 ).build()

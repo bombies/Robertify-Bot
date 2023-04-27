@@ -5,6 +5,7 @@ import main.audiohandlers.utils.author
 import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
+import main.utils.GeneralUtilsKt.isNotNull
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt

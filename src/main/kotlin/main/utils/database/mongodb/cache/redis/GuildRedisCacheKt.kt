@@ -2,7 +2,7 @@ package main.utils.database.mongodb.cache.redis
 
 import main.constants.PermissionKt
 import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.Companion.isDiscordId
+import main.utils.GeneralUtilsKt.isDiscordId
 import main.utils.database.mongodb.databases.GuildDBKt
 import main.utils.json.AbstractGuildConfigKt
 import org.bson.Document

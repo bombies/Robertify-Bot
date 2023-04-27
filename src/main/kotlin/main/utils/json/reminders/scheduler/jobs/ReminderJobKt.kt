@@ -61,7 +61,7 @@ class ReminderJobKt : Job {
                 RobertifyLocaleMessageKt.ReminderMessages.REMINDER_SEND,
                 Pair(
                     "{user}",
-                    GeneralUtilsKt.toMention(guild, user, GeneralUtilsKt.Companion.Mentioner.USER)
+                    GeneralUtilsKt.toMention(guild, user, GeneralUtilsKt.Mentioner.USER)
                 )
             )
         )

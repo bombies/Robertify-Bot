@@ -421,7 +421,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                             GeneralUtilsKt.toMention(
                                 guild,
                                 voteSkipManager.startedBy!!,
-                                GeneralUtilsKt.Companion.Mentioner.USER
+                                GeneralUtilsKt.Mentioner.USER
                             )
                         ),
                         Pair("{neededVotes}", neededvotes.toString())

@@ -7,9 +7,9 @@ import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.main.ConfigKt
-import main.utils.GeneralUtilsKt.Companion.getDestination
-import main.utils.GeneralUtilsKt.Companion.isUrl
-import main.utils.GeneralUtilsKt.Companion.toUrl
+import main.utils.GeneralUtilsKt.getDestination
+import main.utils.GeneralUtilsKt.isUrl
+import main.utils.GeneralUtilsKt.toUrl
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt

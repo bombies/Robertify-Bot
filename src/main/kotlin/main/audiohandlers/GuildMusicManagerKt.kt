@@ -12,7 +12,6 @@ class GuildMusicManagerKt(val guild: Guild) {
     val player: LavalinkPlayer = link.player
     val scheduler = TrackSchedulerKt(guild, link)
     val voteSkipManager = GuildVoteSkipManagerKt()
-    val playerManager = RobertifyAudioManagerKt.playerManager
     var isForcePaused = false
 
     init {

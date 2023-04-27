@@ -56,17 +56,9 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
     var announcementChannel: GuildMessageChannel? = null
 
     fun queue(track: AudioTrack) = runBlocking {
-        logger.info("Attempting to queue ${track.info.title}. Queue size: ${queueHandler.size}. Playing track: ${player.playingTrack?.info?.title ?: "none"}")
         when {
-            player.playingTrack != null -> {
-                logger.info("A track is being played so ${track.info.title} has been added to the queue")
-                queueHandler.add(track)
-            }
-
-            else -> {
-                logger.info("Now playing ${track.info.title}")
-                player.playTrack(track)
-            }
+            player.playingTrack != null -> queueHandler.add(track)
+            else -> player.playTrack(track)
         }
     }
 
@@ -356,7 +348,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         nextTrack(track)
     }
 
-    suspend fun disconnect(announceMsg: Boolean = true) {
+    fun disconnect(announceMsg: Boolean = true) {
         val channel = guild.selfMember.voiceState?.channel ?: return
         if (GuildConfigKt(guild).twentyFourSevenMode)
             return
