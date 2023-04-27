@@ -68,7 +68,17 @@ data class CommandKt(
                             if (option.min != null)
                                 optionData.setMinValue(option.min.toLong())
                         }
+                    }
 
+                    OptionType.NUMBER -> {
+                        if (option.range != null)
+                            optionData.setRequiredRange(option.range.first.toDouble(), option.range.second.toDouble())
+                        else {
+                            if (option.max != null)
+                                optionData.setMaxValue(option.max.toDouble())
+                            if (option.min != null)
+                                optionData.setMinValue(option.min.toDouble())
+                        }
                     }
 
                     OptionType.STRING -> {
