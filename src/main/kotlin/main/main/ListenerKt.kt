@@ -51,7 +51,7 @@ class ListenerKt : AbstractEventControllerKt() {
             val guild = event.guild
             val requestChannelConfig = RequestChannelConfigKt(guild)
 
-            // TODO: Load needed guild commands
+            loadNeededSlashCommands(guild)
             rescheduleUnbans(guild)
             // TODO: Reschedule reminders
 

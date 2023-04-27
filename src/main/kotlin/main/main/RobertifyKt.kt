@@ -139,9 +139,8 @@ object RobertifyKt {
         if (ConfigKt.LOAD_COMMANDS)
             AbstractSlashCommandKt.loadAllCommands()
 
-        if (ConfigKt.LOAD_NEEDED_COMMANDS) {
-            // TODO: Load needed commands
-        }
+        if (ConfigKt.LOAD_NEEDED_COMMANDS)
+            loadNeededGlobalCommands()
 
         cronScheduler.start()
         initVoteSiteAPIs()
@@ -166,4 +165,8 @@ object RobertifyKt {
 
     private fun List<AbstractSlashCommandKt>.merge(vararg lists: List<AbstractSlashCommandKt>): List<AbstractSlashCommandKt> =
         this + lists.reduce { acc, next -> acc + next }
+
+    private fun loadNeededGlobalCommands() {
+
+    }
 }
