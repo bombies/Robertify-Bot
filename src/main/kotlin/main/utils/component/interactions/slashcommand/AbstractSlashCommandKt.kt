@@ -119,6 +119,9 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                         }
                     )
         }
+
+        fun MessageEmbed?.isNull(): Boolean = this == null
+        fun MessageEmbed?.isNotNull(): Boolean = this != null
     }
 
     fun register(shardManager: ShardManager) {

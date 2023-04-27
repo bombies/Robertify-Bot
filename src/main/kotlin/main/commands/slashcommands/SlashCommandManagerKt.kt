@@ -73,7 +73,8 @@ object SlashCommandManagerKt {
             PreviousTrackCommandKt(),
             RemoveCommandKt(),
             ResumeCommandKt(),
-            RewindCommandKt()
+            RewindCommandKt(),
+            SeekCommandKt()
         )
         addManagementCommands()
         addMiscCommands()
