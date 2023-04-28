@@ -127,7 +127,10 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             val guild = selfVoiceState.guild
 
             if (selfChannelNeeded && !selfVoiceState.inAudioChannel())
-                return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
+                return RobertifyEmbedUtilsKt.embedMessage(
+                    guild,
+                    RobertifyLocaleMessageKt.GeneralMessages.NO_VOICE_CHANNEL
+                )
                     .build()
 
             if (!memberVoiceState.inAudioChannel())
@@ -271,7 +274,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 .queue(
                     { msg: Message ->
                         val dedicatedChannelConfig = RequestChannelConfigKt(msg.guild)
-                        if (dedicatedChannelConfig.isChannelSet()) if (dedicatedChannelConfig.getChannelID() == msg.channel
+                        if (dedicatedChannelConfig.isChannelSet()) if (dedicatedChannelConfig.channelId == msg.channel
                                 .idLong
                         ) msg.delete().queueAfter(
                             10, TimeUnit.SECONDS, null,

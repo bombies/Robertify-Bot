@@ -26,8 +26,8 @@ class GuildMusicManagerKt(val guild: Guild) {
         queueHandler.clearPreviousTracks()
         player.filters.clear().commit()
 
-        queueHandler.isTrackRepeating = false
-        queueHandler.isQueueRepeating = false
+        queueHandler.trackRepeating = false
+        queueHandler.queueRepeating = false
 
         scheduler.clearRequesters()
         SkipCommandKt().clearVoteSkipInfo(guild)

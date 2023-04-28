@@ -80,15 +80,15 @@ class LoopCommandKt : AbstractSlashCommandKt(
                 RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
             ).build()
 
-        val embed = if (queueHandler.isTrackRepeating) {
-            queueHandler.isTrackRepeating = false
+        val embed = if (queueHandler.trackRepeating) {
+            queueHandler.trackRepeating = false
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
                 RobertifyLocaleMessageKt.LoopMessages.LOOP_STOP,
                 Pair("{title}", track.title)
             ).build()
         } else {
-            queueHandler.isTrackRepeating = true
+            queueHandler.trackRepeating = true
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
                 RobertifyLocaleMessageKt.LoopMessages.LOOP_START,
@@ -100,7 +100,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
             LogTypeKt.TRACK_LOOP,
             RobertifyLocaleMessageKt.LoopMessages.LOOP_STOP,
             Pair("{user}", looper.asMention),
-            Pair("{status}", if (queueHandler.isTrackRepeating) "looped" else "unlooped"),
+            Pair("{status}", if (queueHandler.trackRepeating) "looped" else "unlooped"),
             Pair("{title}", track.title),
             Pair("{author}", track.author)
         )
@@ -113,8 +113,8 @@ class LoopCommandKt : AbstractSlashCommandKt(
         val queueHandler = scheduler.queueHandler
         val guild = musicManager.guild
         val player = musicManager.player
-        val embed = if (queueHandler.isQueueRepeating) {
-            queueHandler.isQueueRepeating = false
+        val embed = if (queueHandler.queueRepeating) {
+            queueHandler.queueRepeating = false
             queueHandler.clearSavedQueue()
             RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_STOP).build()
         } else {
@@ -127,7 +127,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
                     RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_NOTHING)
                         .build()
                 else {
-                    queueHandler.isQueueRepeating = true
+                    queueHandler.queueRepeating = true
                     scheduler.addToBeginningOfQueue(thisTrack)
                     queueHandler.setSavedQueue(queueHandler.contents)
                     queueHandler.remove(thisTrack)
@@ -141,7 +141,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
             LogTypeKt.TRACK_LOOP,
             RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_LOG,
             Pair("{user}", looper.asMention),
-            Pair("{status}", if (queueHandler.isQueueRepeating) "looped" else "unlooped")
+            Pair("{status}", if (queueHandler.queueRepeating) "looped" else "unlooped")
         )
         return embed
     }

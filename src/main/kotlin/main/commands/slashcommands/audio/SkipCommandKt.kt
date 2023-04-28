@@ -93,7 +93,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         }
     }
 
-    suspend fun handleSkip(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    fun handleSkip(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
 
         val checksEmbed = audioChannelChecks(selfVoiceState, memberVoiceState)
@@ -207,8 +207,8 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         queueHandler.pushPastTrack(playingTrack)
 
-        if (queueHandler.isTrackRepeating)
-            queueHandler.isTrackRepeating = false
+        if (queueHandler.trackRepeating)
+            queueHandler.trackRepeating = false
 
         scheduler.nextTrack(playingTrack, true, audioPlayer.trackPosition)
 

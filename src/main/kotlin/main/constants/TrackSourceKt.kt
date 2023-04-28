@@ -8,7 +8,8 @@ enum class TrackSourceKt {
     DEEZER,
     YOUTUBE,
     SOUNDCLOUD,
-    APPLE_MUSIC;
+    APPLE_MUSIC,
+    RESUMED;
 
     companion object {
         fun parse(name: String): TrackSourceKt {

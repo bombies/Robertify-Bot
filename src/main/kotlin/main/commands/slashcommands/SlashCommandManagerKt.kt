@@ -2,6 +2,8 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.management.requestchannel.RequestChannelCommandKt
+import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.internal.delegates.ImmutableListGetDelegate
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -83,7 +85,10 @@ object SlashCommandManagerKt {
             TremoloFilterKt(),
             VibratoFilterKt()
         )
-        addManagementCommands()
+        addManagementCommands(
+            RequestChannelEditCommandKt(),
+            RequestChannelCommandKt()
+        )
         addMiscCommands()
         addUtilityCommands()
         addDevCommands()

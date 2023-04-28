@@ -28,7 +28,7 @@ class ShuffleCommandKt : AbstractSlashCommandKt(
         }.queue()
     }
 
-    private fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
+    fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
         val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
         val queueHandler = musicManager.scheduler.queueHandler
 

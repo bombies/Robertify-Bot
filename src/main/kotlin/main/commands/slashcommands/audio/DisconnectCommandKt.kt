@@ -3,6 +3,8 @@ package main.commands.slashcommands.audio
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -10,6 +12,9 @@ import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
+import net.dv8tion.jda.api.entities.GuildVoiceState
+import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class DisconnectCommandKt : AbstractSlashCommandKt(
@@ -19,50 +24,31 @@ class DisconnectCommandKt : AbstractSlashCommandKt(
     )
 ) {
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.deferReply().queue()
+        event.replyWithEmbed {
+            handleDisconnect(event.guild!!.selfMember.voiceState!!, event.member!!.voiceState!!)
+        }.queue()
+    }
 
-        val guild = event.guild!!
-        val selfVoiceState = guild.selfMember.voiceState!!
+    fun handleDisconnect(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+        val guild = selfVoiceState.guild
+        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, selfChannelNeeded = true)
+        if (acChecks != null) return acChecks
 
-        if (!selfVoiceState.inAudioChannel()) {
-            event.hook.sendWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.DisconnectMessages.NOT_IN_CHANNEL)
-            }.queue()
-            return
-        }
+        RobertifyAudioManagerKt
+            .getMusicManager(guild)
+            .leave()
 
-        val memberVoiceState = event.member!!.voiceState!!
+        LogUtilsKt(guild)
+            .sendLog(
+                LogTypeKt.BOT_DISCONNECTED,
+                "${memberVoiceState.member.asMention} ${
+                    LocaleManagerKt.getLocaleManager(guild)
+                        .getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)
+                }"
+            )
 
-        if (!memberVoiceState.inAudioChannel() || memberVoiceState.channel != selfVoiceState.channel) {
-            event.hook.sendWithEmbed(guild) {
-                embed(
-                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
-                    Pair("{channel}", selfVoiceState.channel!!.asMention)
-                )
-            }.queue()
-            return
-        }
-
-        runBlocking {
-            launch {
-                RobertifyAudioManagerKt
-                    .getMusicManager(guild)
-                    .leave()
-
-                event.hook.sendWithEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED)
-                }.queue()
-
-                LogUtilsKt(guild)
-                    .sendLog(
-                        LogTypeKt.BOT_DISCONNECTED,
-                        "${event.user.asMention} ${
-                            LocaleManagerKt.getLocaleManager(guild)
-                                .getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)
-                        }"
-                    )
-            }
-        }
+        return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED)
+            .build()
     }
 
     override val help: String

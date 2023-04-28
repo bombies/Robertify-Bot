@@ -45,7 +45,7 @@ class RewindCommandKt : AbstractSlashCommandKt(
         }.queue()
     }
 
-    private fun handleRewind(
+    fun handleRewind(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         time: Int? = null

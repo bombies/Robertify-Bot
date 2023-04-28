@@ -1,4 +1,4 @@
-package main.utils.events
+package main.events
 
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener

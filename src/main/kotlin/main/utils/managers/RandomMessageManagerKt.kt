@@ -52,7 +52,7 @@ class RandomMessageManagerKt {
             return
 
         val requestChannelConfig = RequestChannelConfigKt(guild)
-        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == channel.idLong)
+        if (requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == channel.idLong)
             return
 
         if (!hasMessages)

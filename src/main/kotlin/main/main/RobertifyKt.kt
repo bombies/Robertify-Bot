@@ -10,8 +10,8 @@ import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
-import main.utils.events.EventManager
-import main.utils.events.EventManager.registerEvents
+import main.events.EventManager
+import main.events.EventManager.registerEvents
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent

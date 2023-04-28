@@ -1,5 +1,6 @@
-package main.utils.events
+package main.events
 
+import main.commands.slashcommands.management.requestchannel.RequestChannelEventsKt
 import main.main.ListenerKt
 import main.utils.pagination.PaginationEventsKt
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -16,12 +17,13 @@ object EventManager {
     init {
         addEvents(
             ListenerKt(),
-            PaginationEventsKt()
+            PaginationEventsKt(),
+            RequestChannelEventsKt()
         )
     }
 
     private fun addEvents(vararg events: AbstractEventControllerKt) =
-        this.events.addAll(events.toList())
+        EventManager.events.addAll(events.toList())
 
     fun getRegisteredEvents(): List<AbstractEventControllerKt> =
         events.toList()

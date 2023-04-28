@@ -185,7 +185,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         }
     }
 
-    private fun handleAdd(guild: Guild, member: Member): MessageEmbed {
+    fun handleAdd(guild: Guild, member: Member): MessageEmbed {
         val config = FavouriteTracksCacheKt.instance
         val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
         val player = musicManager.player
@@ -197,11 +197,14 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         if (acChecks != null) return acChecks
 
         val id = playingTrack.identifier
+
+        logger.debug("source: ${playingTrack.source}")
         val source = when (playingTrack.source) {
             "spotify" -> TrackSourceKt.SPOTIFY
             "deezer" -> TrackSourceKt.DEEZER
             "applemusic" -> TrackSourceKt.APPLE_MUSIC
             "soundcloud" -> TrackSourceKt.SOUNDCLOUD
+            "resume" -> TrackSourceKt.RESUMED
             else -> run {
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
@@ -269,7 +272,8 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
                 TrackSourceKt.SPOTIFY -> "https://www.open.spotify.com/track/$id"
                 TrackSourceKt.APPLE_MUSIC -> "https://www.music.apple.com/us/song/$id"
                 TrackSourceKt.YOUTUBE,
-                TrackSourceKt.SOUNDCLOUD -> id
+                TrackSourceKt.SOUNDCLOUD,
+                TrackSourceKt.RESUMED -> id
             }
 
             audioManager.loadAndPlay(

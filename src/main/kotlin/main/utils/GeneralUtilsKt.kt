@@ -527,6 +527,12 @@ object GeneralUtilsKt {
     fun toMention(guild: Guild? = null, id: String, mentioner: Mentioner): String =
         listOfIDsToMentions(guild, listOf(id.toLong()), mentioner)
 
+    fun Long.toMention(mentioner: Mentioner, guild: Guild? = null): String =
+        listOfIDsToMentions(guild, listOf(this), mentioner)
+
+    fun String.toMention(mentioner: Mentioner, guild: Guild? = null): String =
+        listOfIDsToMentions(guild, listOf(this.toLong()), mentioner)
+
     fun getID(obj: JSONObject, field: String): Long = try {
         obj.getLong(field)
     } catch (e: JSONException) {

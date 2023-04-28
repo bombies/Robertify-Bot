@@ -9,8 +9,8 @@ class QueueHandlerKt {
     private val savedQueue = ConcurrentLinkedQueue<AudioTrack>()
     private val previousTracks = Stack<AudioTrack>()
     var lastPlayedTrackBuffer: AudioTrack? = null
-    var isTrackRepeating: Boolean = false
-    var isQueueRepeating: Boolean = false
+    var trackRepeating: Boolean = false
+    var queueRepeating: Boolean = false
 
     val size: Int
         get() = queue.size
@@ -35,7 +35,7 @@ class QueueHandlerKt {
     fun addAll(tracks: Collection<AudioTrack>): Boolean = queue.addAll(tracks)
 
     fun setSavedQueue(tracks: Collection<AudioTrack>) {
-        if (!isQueueRepeating)
+        if (!queueRepeating)
             return
         savedQueue.addAll(tracks)
     }

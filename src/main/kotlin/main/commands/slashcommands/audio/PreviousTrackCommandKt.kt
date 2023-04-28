@@ -23,18 +23,19 @@ class PreviousTrackCommandKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed { handlePrevious(event.guild!!, event.member!!.voiceState!!) }
+        event.replyWithEmbed { handlePrevious(event.guild!!.selfMember.voiceState!!, event.member!!.voiceState!!) }
             .queue()
     }
 
-    private fun handlePrevious(guild: Guild, memberVoiceState: GuildVoiceState): MessageEmbed {
+    fun handlePrevious(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+        val guild = selfVoiceState.guild
+        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
+        if (acChecks != null) return acChecks
+
         val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
         val player = musicManager.player
-        val selfVoiceState = guild.selfMember.voiceState!!
-        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
-        if (acChecks != null) return acChecks
 
         if (queueHandler.isPreviousTracksEmpty)
             return RobertifyEmbedUtilsKt.embedMessage(

@@ -168,7 +168,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
 
         fun getEphemeralState(channel: GuildMessageChannel, default: Boolean = false): Boolean {
             val dedicatedChannelConfig = RequestChannelConfigKt(channel.guild)
-            return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.getChannelID() == channel.idLong
+            return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.channelId == channel.idLong
         }
 
         inline fun InteractionHook.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): WebhookMessageCreateAction<Message> {

@@ -28,7 +28,7 @@ class StopCommandKt : AbstractSlashCommandKt(
         event.replyEmbeds(handleStop(event.member!!)).queue()
     }
 
-    private suspend fun handleStop(stopper: Member): MessageEmbed {
+    fun handleStop(stopper: Member): MessageEmbed {
         val guild = stopper.guild
         val selfVoiceState = guild.selfMember.voiceState!!
         val memberVoiceState = stopper.voiceState!!

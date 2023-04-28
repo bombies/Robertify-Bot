@@ -47,8 +47,8 @@ class AutoPlayLoaderKt(
             scheduler.queue(track)
         }
 
-        if (queueHandler.isQueueRepeating) {
-            queueHandler.isQueueRepeating = false
+        if (queueHandler.queueRepeating) {
+            queueHandler.queueRepeating = false
             queueHandler.clearPreviousTracks()
             queueHandler.clearSavedQueue()
         }

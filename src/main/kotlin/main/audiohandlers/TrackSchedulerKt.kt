@@ -88,10 +88,13 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
 
     override fun onTrackStart(player: IPlayer, track: AudioTrack) {
         logger.debug("${link.state.name} | AudioTrack started (${track.info.title}). Announcement channel: ${announcementChannel?.id ?: "undefined"}")
+        val requestChannelConfig = RequestChannelConfigKt(guild)
+        requestChannelConfig.updateMessage()
+
         disconnectManager.cancelDisconnect()
         queueHandler.lastPlayedTrackBuffer = track
 
-        if (queueHandler.isTrackRepeating)
+        if (queueHandler.trackRepeating)
             return
 
         if (!TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES))
@@ -106,9 +109,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
 
         val requester = findRequester(track.identifier) ?: return
         val requesterMention = getRequesterAsMention(track)
-
-        val requestChannelConfig = RequestChannelConfigKt(guild)
-        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == announcementChannel!!.idLong)
+        if (requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == announcementChannel!!.idLong)
             return
 
         RobertifyKt.shardManager.retrieveUserById(requester.id)
@@ -227,7 +228,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
     fun nextTrack(lastTrack: AudioTrack?, skipped: Boolean = false, skippedAt: Long? = null) {
         // TODO: Handle playtime updating
 
-        if (queueHandler.isEmpty && queueHandler.isQueueRepeating)
+        if (queueHandler.isEmpty && queueHandler.queueRepeating)
             queueHandler.loadSavedQueue()
 
         val nextTrack = queueHandler.poll()
@@ -262,8 +263,6 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                 )
             } else disconnectManager.scheduleDisconnect()
         }
-
-        RequestChannelConfigKt(guild).updateMessage()
     }
 
     override fun onTrackEnd(player: IPlayer, track: AudioTrack?, endReason: AudioTrackEndReason) {
@@ -274,9 +273,9 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         )
         val trackToUse = queueHandler.lastPlayedTrackBuffer
 
-        if (queueHandler.isTrackRepeating) {
+        if (queueHandler.trackRepeating) {
             if (trackToUse == null) {
-                queueHandler.isTrackRepeating = false
+                queueHandler.trackRepeating = false
                 nextTrack(null)
             } else {
                 player.playTrack(trackToUse.makeClone())
@@ -285,6 +284,8 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             if (trackToUse != null)
                 queueHandler.pushPastTrack(trackToUse)
             nextTrack(trackToUse)
+        } else {
+            RequestChannelConfigKt(guild).updateMessage()
         }
     }
 

@@ -5,7 +5,7 @@ import main.constants.MessageButtonKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
-import main.utils.events.AbstractEventControllerKt
+import main.events.AbstractEventControllerKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.pagination.pages.queue.QueuePageKt
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent

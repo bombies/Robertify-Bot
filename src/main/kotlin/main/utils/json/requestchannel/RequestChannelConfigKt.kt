@@ -48,7 +48,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             for (g: Guild in RobertifyKt.shardManager.guilds) {
                 val config = RequestChannelConfigKt(g)
                 if (!config.isChannelSet()) continue
-                val msgRequest: RestAction<Message> = config.getMessageRequest() ?: continue
+                val msgRequest: RestAction<Message> = config.messageRequest ?: continue
                 msgRequest.queue { msg: Message ->
                     config.buttonUpdateRequest(msg).queue(
                         null,
@@ -70,19 +70,78 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             for (g: Guild in RobertifyKt.shardManager.guilds) {
                 val config = RequestChannelConfigKt(g)
                 if (!config.isChannelSet()) continue
-                val channel: TextChannel = config.getTextChannel() ?: continue
+                val channel: TextChannel = config.textChannel ?: continue
                 config.channelTopicUpdateRequest(channel)?.queue()
             }
         }
     }
 
-    @Synchronized
-    fun setMessage(mid: Long) {
-        val obj: JSONObject = getGuildObject()
-        val dediChannelObj: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-        dediChannelObj.put(GuildDBKt.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), mid)
-        cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dediChannelObj)
-    }
+    var messageId: Long
+        get() {
+            if (!isChannelSet()) throw IllegalArgumentException(
+                RobertifyKt.shardManager.getGuildById(guild.idLong)
+                    ?.name + "(" + guild.idLong + ") doesn't have a channel set"
+            )
+            return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+                .getLong(GuildDBKt.Field.REQUEST_CHANNEL_MESSAGE_ID.toString())
+        }
+        set(value) {
+            val obj: JSONObject = getGuildObject()
+            val dediChannelObj: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+            dediChannelObj.put(GuildDBKt.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), value)
+            cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dediChannelObj)
+        }
+
+    var channelId: Long
+        get() {
+            if (!isChannelSet()) throw IllegalArgumentException(
+                RobertifyKt.shardManager.getGuildById(guild.idLong)
+                    ?.name + "(" + guild.idLong + ") doesn't have a channel set"
+            )
+            return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+                .getLong(GuildDBKt.Field.REQUEST_CHANNEL_ID.toString())
+        }
+        set(value) {
+            val obj: JSONObject = getGuildObject()
+            val dediChannelObject: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+            dediChannelObject.put(GuildDBKt.Field.REQUEST_CHANNEL_ID.toString(), value)
+            cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject)
+        }
+
+    var originalAnnouncementToggle: Boolean
+        get() {
+            return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+                .getBoolean(RequestChannelConfigFieldKt.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString())
+        }
+        set(value) {
+            val obj: JSONObject = getGuildObject()
+            val dedicatedChannelObj: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
+            dedicatedChannelObj.put(RequestChannelConfigFieldKt.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), value)
+            cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dedicatedChannelObj)
+        }
+
+    val textChannel: TextChannel?
+        get() = RobertifyKt.shardManager.getTextChannelById(channelId)
+
+    val config: ChannelConfig
+        get() = ChannelConfig(this)
+
+    val messageRequest: RestAction<Message>?
+        get() = try {
+            textChannel!!.retrieveMessageById(messageId)
+        } catch (e: InsufficientPermissionException) {
+            val channel: GuildMessageChannel? = RobertifyAudioManagerKt
+                .getMusicManager(guild)
+                .scheduler
+                .announcementChannel
+            channel?.sendMessageEmbeds(
+                RobertifyEmbedUtilsKt.embedMessage(
+                    channel.guild,
+                    "I don't have access to the requests channel anymore! I cannot update it."
+                ).build()
+            )?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+            null
+        }
 
     @Synchronized
     fun setChannelAndMessage(cid: Long, mid: Long) {
@@ -94,34 +153,12 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     }
 
     @Synchronized
-    fun setChannel(cid: Long) {
-        val obj: JSONObject = getGuildObject()
-        val dediChannelObject: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-        dediChannelObject.put(GuildDBKt.Field.REQUEST_CHANNEL_ID.toString(), cid)
-        cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject)
-    }
-
-    @Synchronized
-    fun setOriginalAnnouncementToggle(toggle: Boolean) {
-        val obj: JSONObject = getGuildObject()
-        val dedicatedChannelObj: JSONObject = obj.getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-        dedicatedChannelObj.put(RequestChannelConfigFieldKt.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), toggle)
-        cache.setField(guild.idLong, GuildDBKt.Field.REQUEST_CHANNEL_OBJECT, dedicatedChannelObj)
-    }
-
-    @Synchronized
-    fun getOriginalAnnouncementToggle(): Boolean {
-        return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-            .getBoolean(RequestChannelConfigFieldKt.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString())
-    }
-
-    @Synchronized
     fun removeChannel() {
         if (!isChannelSet())
             throw IllegalArgumentException(
                 "${RobertifyKt.shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
             )
-        val textChannel: TextChannel? = getTextChannel()
+
         textChannel?.delete()?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
 
         val obj: JSONObject = getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
@@ -146,61 +183,14 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
 
     fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
         !isChannelSet() -> false
-        else -> getChannelID() == channel.idLong
-    }
-
-    @Synchronized
-    fun getChannelID(): Long {
-        if (!isChannelSet()) throw IllegalArgumentException(
-            RobertifyKt.shardManager.getGuildById(guild.idLong)
-                ?.name + "(" + guild.idLong + ") doesn't have a channel set"
-        )
-        return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-            .getLong(GuildDBKt.Field.REQUEST_CHANNEL_ID.toString())
-    }
-
-    @Synchronized
-    fun getMessageID(): Long {
-        if (!isChannelSet()) throw IllegalArgumentException(
-            RobertifyKt.shardManager.getGuildById(guild.idLong)
-                ?.name + "(" + guild.idLong + ") doesn't have a channel set"
-        )
-        return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
-            .getLong(GuildDBKt.Field.REQUEST_CHANNEL_MESSAGE_ID.toString())
-    }
-
-    @Synchronized
-    fun getTextChannel(): TextChannel? {
-        return RobertifyKt.shardManager.getTextChannelById(getChannelID())
-    }
-
-    fun getConfig(): ChannelConfig =
-        ChannelConfig(this)
-
-    @Synchronized
-    fun getMessageRequest(): RestAction<Message>? {
-        return try {
-            getTextChannel()!!.retrieveMessageById(getMessageID())
-        } catch (e: InsufficientPermissionException) {
-            val channel: GuildMessageChannel? = RobertifyAudioManagerKt
-                .getMusicManager(guild)
-                .scheduler
-                .announcementChannel
-            channel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    channel.guild,
-                    "I don't have access to the requests channel anymore! I cannot update it."
-                ).build()
-            )?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
-            null
-        }
+        else -> channelId == channel.idLong
     }
 
     @Synchronized
     fun updateMessage(): CompletableFuture<Void?>? {
         if (!isChannelSet()) return null
         return CompletableFuture.runAsync {
-            val msgRequest: RestAction<Message> = getMessageRequest() ?: return@runAsync
+            val msgRequest: RestAction<Message> = messageRequest ?: return@runAsync
             val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
             val audioPlayer = musicManager.player
             val playingTrack = audioPlayer.playingTrack
@@ -276,7 +266,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         Pair("{requester}", requester)
                     )
                 )
-                
+
                 if (playingTrack is MirroringAudioTrack) eb.setImage(playingTrack.artworkURL) else eb.setImage(
                     theme.nowPlayingBanner
                 )
@@ -380,7 +370,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
 
     fun updateButtons(): CompletableFuture<Message>? {
         if (!isChannelSet()) return null
-        val msgRequest: RestAction<Message> = getMessageRequest() ?: return null
+        val msgRequest: RestAction<Message> = messageRequest ?: return null
         return msgRequest.submit()
             .thenCompose { msg: Message ->
                 buttonUpdateRequest(
@@ -390,7 +380,6 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     }
 
     fun buttonUpdateRequest(msg: Message): MessageEditAction {
-        val config = getConfig()
         val localeManager = LocaleManagerKt.getLocaleManager(msg.guild)
         val firstRow = ActionRow.of(
             RequestChannelButtonKt.firstRow.stream()
@@ -398,7 +387,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 .map { field ->
                     Button.of(
                         ButtonStyle.PRIMARY,
-                        field.id,
+                        field.id.toString(),
                         field.emoji
                     )
                 }
@@ -410,7 +399,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 .map { field: RequestChannelButtonKt ->
                     Button.of(
                         if ((field == RequestChannelButtonKt.DISCONNECT)) ButtonStyle.DANGER else ButtonStyle.SECONDARY,
-                        field.id,
+                        field.id.toString(),
                         field.emoji
                     )
                 }
@@ -418,30 +407,30 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         )
         val thirdRow: ActionRow = ActionRow.of(
             StringSelectionMenuBuilderKt(
-                _name = RequestChannelButtonKt.FILTERS.id,
+                _name = RequestChannelButtonKt.FILTERS.id.toString(),
                 placeholder = LocaleManagerKt.getLocaleManager(msg.guild)
                     .getMessage(RobertifyLocaleMessageKt.FilterMessages.FILTER_SELECT_PLACEHOLDER),
                 range = Pair(0, 5),
                 _options = listOf(
                     StringSelectMenuOptionKt(
                         localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.EIGHT_D),
-                        RequestChannelButtonKt.FILTERS.id + ":8d"
+                        "${RequestChannelButtonKt.FILTERS.id}:8d"
                     ),
                     StringSelectMenuOptionKt(
                         localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.KARAOKE),
-                        RequestChannelButtonKt.FILTERS.id + ":karaoke"
+                        "${RequestChannelButtonKt.FILTERS.id}:karaoke"
                     ),
                     StringSelectMenuOptionKt(
                         localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.NIGHTCORE),
-                        RequestChannelButtonKt.FILTERS.id + ":nightcore"
+                        "${RequestChannelButtonKt.FILTERS.id}:nightcore"
                     ),
                     StringSelectMenuOptionKt(
                         localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.TREMOLO),
-                        RequestChannelButtonKt.FILTERS.id + ":tremolo"
+                        "${RequestChannelButtonKt.FILTERS.id}:tremolo"
                     ),
                     StringSelectMenuOptionKt(
                         localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.VIBRATO),
-                        RequestChannelButtonKt.FILTERS.id + ":vibrato"
+                        "${RequestChannelButtonKt.FILTERS.id}:vibrato"
                     )
                 )
             ).build()
@@ -455,7 +444,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
 
     fun updateTopic(): CompletableFuture<Void?>? {
         if (!isChannelSet()) return null
-        val channel: TextChannel? = getTextChannel()
+        val channel: TextChannel? = textChannel
         return channelTopicUpdateRequest(channel)!!.submit()
     }
 
@@ -483,8 +472,8 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     fun cleanChannel() {
         if (!isChannelSet()) return
         if (!guild.selfMember.hasPermission(Permission.MESSAGE_HISTORY)) return
-        val channel = getTextChannel()!!
-        MessageHistory.getHistoryAfter((channel), getMessageID().toString())
+        val channel = textChannel!!
+        MessageHistory.getHistoryAfter((channel), messageId.toString())
             .queue { messages: MessageHistory ->
                 val validMessages: List<Message> =
                     messages.retrievedHistory

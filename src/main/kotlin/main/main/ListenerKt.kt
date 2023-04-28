@@ -6,7 +6,7 @@ import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
-import main.utils.events.AbstractEventControllerKt
+import main.events.AbstractEventControllerKt
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt

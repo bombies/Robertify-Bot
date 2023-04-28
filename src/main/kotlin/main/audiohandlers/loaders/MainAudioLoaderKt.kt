@@ -4,7 +4,6 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManagerKt
 import main.audiohandlers.models.RequesterKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -85,7 +84,7 @@ class MainAudioLoaderKt(
             Pair("{author}", info.author)
         )
 
-        if (queueHandler.isQueueRepeating)
+        if (queueHandler.queueRepeating)
             queueHandler.setSavedQueue(queueHandler.contents)
 
         requestChannelConfig.updateMessage()
@@ -95,11 +94,11 @@ class MainAudioLoaderKt(
         if (botMsg != null)
             botMsg.editMessageEmbeds(embed)
                 .queueWithAutoDelete(
-                    deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelID() == msg.channel.idLong }
+                    deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == msg.channel.idLong }
                 )
         else {
             if (requestChannelConfig.isChannelSet())
-                requestChannelConfig.getTextChannel()
+                requestChannelConfig.textChannel
                     ?.sendMessageEmbeds(embed)
                     ?.queueWithAutoDelete()
             else logger.warn("${guild.name} | ${embed.description}")

@@ -25,7 +25,7 @@ class PauseCommandKt : AbstractSlashCommandKt(
         event.replyWithEmbed { handlePause(memberVoiceState, selfVoiceState) }.queue()
     }
 
-    private fun handlePause(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
+    fun handlePause(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
 
