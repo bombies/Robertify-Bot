@@ -221,6 +221,9 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
     fun embed(description: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageEmbed =
         embedMessage(guild, description, *placeholders).build()
 
+    fun embedBuilder(description: LocaleMessageKt, vararg placeholders: Pair<String, String>): EmbedBuilder =
+        embedMessage(guild, description, *placeholders)
+
     fun embed(description: String): MessageEmbed =
         embedMessage(guild, description).build()
 }

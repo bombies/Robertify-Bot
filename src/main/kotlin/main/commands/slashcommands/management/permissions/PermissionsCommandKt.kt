@@ -177,7 +177,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             
                             ${
                                 if (usersForPerms[permission]!!.isEmpty() && rolesForPerms[permission]!!.isEmpty())
-                                    localeManager.getMessage(RobertifyLocaleMessageKt.PermissionsMessages.PERMISSIONS_NONE)
+                                    localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_HERE)
                                 else
                                     usersForPerms[permission]!!.joinToString(", ") +
                                             (if (usersForPerms[permission]!!.isNotEmpty()) "\n" else "") +
@@ -226,12 +226,12 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
             }.queue()
     }
 
-    private fun getRolesForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
+    fun getRolesForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
         return config.getRolesForPermission(permission)
             .map { id -> id.toMention(GeneralUtilsKt.Mentioner.ROLE) }
     }
 
-    private fun getUsersForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
+    fun getUsersForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
         return config.getUsersForPermission(permission)
             .map { id -> id.toMention(GeneralUtilsKt.Mentioner.USER) }
     }
