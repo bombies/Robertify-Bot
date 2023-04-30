@@ -4,7 +4,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import main.audiohandlers.GuildMusicManagerKt
-import main.audiohandlers.loaders.MainAudioLoaderKt.Companion.queueWithAutoDelete
+import main.audiohandlers.loaders.MainAudioLoaderKt.Companion.queueThenDelete
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
@@ -38,7 +38,7 @@ class AutoPlayLoaderKt(
                     .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
                     .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
                     .build()
-            ).queueWithAutoDelete(5, TimeUnit.MINUTES)
+            ).queueThenDelete(5, TimeUnit.MINUTES)
         }
 
         val self = guild.selfMember
@@ -67,7 +67,7 @@ class AutoPlayLoaderKt(
                 RobertifyLocaleMessageKt.AudioLoaderMessages.NO_SIMILAR_TRACKS
             ).build()
         )
-            ?.queueWithAutoDelete(5, TimeUnit.MINUTES) {
+            ?.queueThenDelete(5, TimeUnit.MINUTES) {
                 musicManager.scheduler.scheduleDisconnect(announceMsg = true)
             }
         throw FriendlyException("There were no similar tracks found!", FriendlyException.Severity.COMMON, NullPointerException())

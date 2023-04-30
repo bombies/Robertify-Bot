@@ -37,7 +37,7 @@ class MainAudioLoaderKt(
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
-        fun RestAction<Message>.queueWithAutoDelete(
+        fun RestAction<Message>.queueThenDelete(
             time: Long = 10,
             unit: TimeUnit = TimeUnit.SECONDS,
             deletePredicate: ((message: Message) -> Boolean)? = null,
@@ -93,14 +93,14 @@ class MainAudioLoaderKt(
     private fun handleMessageUpdate(embed: MessageEmbed) {
         if (botMsg != null)
             botMsg.editMessageEmbeds(embed)
-                .queueWithAutoDelete(
+                .queueThenDelete(
                     deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == msg.channel.idLong }
                 )
         else {
             if (requestChannelConfig.isChannelSet())
                 requestChannelConfig.textChannel
                     ?.sendMessageEmbeds(embed)
-                    ?.queueWithAutoDelete()
+                    ?.queueThenDelete()
             else logger.warn("${guild.name} | ${embed.description}")
         }
     }

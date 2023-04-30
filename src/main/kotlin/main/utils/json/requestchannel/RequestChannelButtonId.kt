@@ -1,4 +1,4 @@
-package main.commands.slashcommands.management.requestchannel
+package main.utils.json.requestchannel
 
 enum class RequestChannelButtonId(private val str: String) {
     IDENTIFIER("dedicated"),

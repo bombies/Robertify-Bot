@@ -1,6 +1,5 @@
 package main.utils.json.requestchannel
 
-import main.commands.slashcommands.management.requestchannel.RequestChannelButtonId
 import main.constants.RobertifyEmojiKt
 import net.dv8tion.jda.api.entities.emoji.Emoji
 
