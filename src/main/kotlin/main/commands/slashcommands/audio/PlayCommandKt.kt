@@ -72,7 +72,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 options = listOf(
                     CommandOptionKt(
                         type = OptionType.ATTACHMENT,
-                        name = "tracks",
+                        name = "file",
                         description = "The name/url of the tracks/album/playlist to play"
                     )
                 )
@@ -184,7 +184,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             }
 
             "file" -> {
-                val file = event.getRequiredOption("tracks").asAttachment
+                val file = event.getRequiredOption("file").asAttachment
                 handleLocalTrack(event, file)
             }
         }
