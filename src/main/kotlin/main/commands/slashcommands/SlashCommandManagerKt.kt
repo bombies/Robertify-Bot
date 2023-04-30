@@ -2,6 +2,8 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.management.bans.BanCommandKt
+import main.commands.slashcommands.management.bans.UnbanCommandKt
 import main.commands.slashcommands.management.permissions.ListDJCommandKt
 import main.commands.slashcommands.management.permissions.PermissionsCommandKt
 import main.commands.slashcommands.management.permissions.RemoveDJCommandKt
@@ -95,7 +97,9 @@ object SlashCommandManagerKt {
             PermissionsCommandKt(),
             ListDJCommandKt(),
             SetDJCommandKt(),
-            RemoveDJCommandKt()
+            RemoveDJCommandKt(),
+            BanCommandKt(),
+            UnbanCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()

@@ -12,6 +12,7 @@ import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.asString
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -304,6 +305,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         if (!adminCheck(event)) return false
         if (!djCheck(event)) return false
+        if (!predicateCheck(event)) return false
 
         if (SlashCommandManagerKt.isMusicCommand(this) && event.isFromGuild) {
             val scheduler = RobertifyAudioManagerKt
@@ -461,7 +463,22 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     protected open fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
-        if (info.checkPermission == null) return true
+        if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
+            return if (!event.isFromGuild)
+                true
+            else if (!GeneralUtilsKt.hasPerms(
+                    event.guild!!,
+                    event.member!!,
+                    *info.requiredPermissions.toTypedArray()
+                )
+            ) {
+                event.replyWithEmbed(event.guild!!) {
+                    embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, PermissionKt.ROBERTIFY_BAN))
+                }.setEphemeral(true)
+                    .queue()
+                false
+            } else true
+        }
         return if (GeneralUtilsKt.isDeveloper(event.id)) true else info.checkPermission!!.invoke(event)
     }
 
@@ -480,7 +497,6 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     )
                 ).build()
             )
-                .setEphemeral(RobertifyEmbedUtilsKt.getEphemeralState(event.channel.asGuildMessageChannel()))
                 .queue()
             return false
         }

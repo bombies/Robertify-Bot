@@ -5,6 +5,7 @@ import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
 import main.constants.TimeFormatKt
 import main.main.RobertifyKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.GenericJSONFieldKt
 import main.utils.json.permissions.PermissionsConfigKt
@@ -56,20 +57,8 @@ object GeneralUtilsKt {
         else -> this.matches("-?\\d+".toRegex())
     }
 
-    fun <T> List<T>.asString(): String {
-        val sb = StringBuilder()
-        this.forEachIndexed { i, elem ->
-            sb.append(
-                if (elem is Permission) elem.getName()
-                else elem.toString()
-            )
-                .append(if (i != size - 1) ", " else "")
-        }
-        return sb.toString()
-    }
-
-    fun <T> Array<T>.asString(): String =
-        toList().asString()
+    fun <T> Collection<T>.asString(transform: ((T) -> CharSequence)? = null): String =
+        this.joinToString(separator = ", ", transform = transform)
 
     fun String.isDiscordId(): Boolean =
         this.matches("^[0-9]{18}$".toRegex())
@@ -624,6 +613,17 @@ object GeneralUtilsKt {
         }
     }
 
+    fun User.dmEmbed(message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
+        openPrivateChannel().queue { channel ->
+            channel.sendWithEmbed {
+                embed(message, *placeholders)
+            }.queue(null) {
+                ErrorHandler()
+                    .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+            }
+        }
+    }
+
     fun User.dm(message: String) {
         openPrivateChannel().queue { channel ->
             channel.sendMessageEmbeds(RobertifyEmbedUtilsKt.embedMessage(message).build())
@@ -647,7 +647,7 @@ object GeneralUtilsKt {
 
     fun Any?.isNotNull(): Boolean = this != null
 
-    fun<A, B : LocaleMessageKt> Pair(first: A, second: B, localeManager: LocaleManagerKt): Pair<A, String> =
+    fun <A, B : LocaleMessageKt> Pair(first: A, second: B, localeManager: LocaleManagerKt): Pair<A, String> =
         Pair(first, localeManager.getMessage(second))
 
 }

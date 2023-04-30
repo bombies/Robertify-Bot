@@ -2,11 +2,11 @@ package main.main
 
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.RobertifyAudioManagerKt
+import main.events.AbstractEventControllerKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
-import main.events.AbstractEventControllerKt
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
@@ -20,7 +20,6 @@ import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
-import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -29,6 +28,65 @@ class ListenerKt : AbstractEventControllerKt() {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+
+        private fun rescheduleUnbans(guild: Guild) {
+            val guildConfig = GuildConfigKt(guild)
+            val banMap = guildConfig.getBannedUsersWithUnbanTimes()
+
+            banMap.forEach { (userId, unbanTime) ->
+
+                if (unbanTime != -1L) {
+                    if (unbanTime - System.currentTimeMillis() <= 0) {
+                        try {
+                            doUnban(userId, guild, guildConfig)
+                        } catch (e: IllegalArgumentException) {
+                            banMap.remove(userId)
+                        }
+                    } else {
+                        val scheduler = Executors.newSingleThreadScheduledExecutor()
+                        val task = Runnable { doUnban(userId, guild, guildConfig) }
+                        scheduler.schedule(task, guildConfig.getTimeUntilUnban(userId), TimeUnit.MILLISECONDS)
+                    }
+                }
+            }
+        }
+
+        fun scheduleUnban(guild: Guild, user: User) {
+            val guildConfig = GuildConfigKt(guild)
+            val scheduler = Executors.newSingleThreadScheduledExecutor()
+
+            val task = Runnable { doUnban(user.idLong, guild, guildConfig) }
+            scheduler.schedule(task, guildConfig.getTimeUntilUnban(user.idLong), TimeUnit.MILLISECONDS)
+
+        }
+
+        private fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfigKt = GuildConfigKt(guild)) {
+            if (!guildConfig.isBannedUser(userId))
+                return
+
+            guildConfig.unbanUser(userId)
+            sendUnbanMessage(userId, guild)
+        }
+
+        private fun sendUnbanMessage(userId: Long, guild: Guild) {
+            RobertifyKt.shardManager.retrieveUserById(userId).queue { user ->
+                user.openPrivateChannel().queue { channel ->
+                    channel.send(
+                        embeds = listOf(
+                            RobertifyEmbedUtilsKt.embedMessage(
+                                guild,
+                                RobertifyLocaleMessageKt.UnbanMessages.USER_UNBANNED,
+                                Pair("{server}", guild.name)
+                            ).build()
+                        )
+                    ).queue(null) {
+                        ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
+                            logger.warn("Was not able to send an unban message to ${user.asTag} (${user.idLong})")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun eventHandlerInvokers() {
@@ -108,64 +166,5 @@ class ListenerKt : AbstractEventControllerKt() {
         BotDBCacheKt.instance.setGuildCount(serverCount)
         if (RobertifyKt.topGGAPI != null)
             RobertifyKt.topGGAPI!!.setStats(serverCount)
-    }
-
-    private fun rescheduleUnbans(guild: Guild) {
-        val guildConfig = GuildConfigKt(guild)
-        val banMap = guildConfig.getBannedUsersWithUnbanTimes()
-
-        banMap.forEach { (userId, unbanTime) ->
-
-            if (unbanTime != -1L) {
-                if (unbanTime - System.currentTimeMillis() <= 0) {
-                    try {
-                        doUnban(userId, guild, guildConfig)
-                    } catch (e: IllegalArgumentException) {
-                        banMap.remove(userId)
-                    }
-                } else {
-                    val scheduler = Executors.newSingleThreadScheduledExecutor()
-                    val task = Runnable { doUnban(userId, guild, guildConfig) }
-                    scheduler.schedule(task, guildConfig.getTimeUntilUnban(userId), TimeUnit.MILLISECONDS)
-                }
-            }
-        }
-    }
-
-    private fun scheduleUnban(guild: Guild, user: User) {
-        val guildConfig = GuildConfigKt(guild)
-        val scheduler = Executors.newSingleThreadScheduledExecutor()
-
-        val task = Runnable { doUnban(user.idLong, guild, guildConfig) }
-        scheduler.schedule(task, guildConfig.getTimeUntilUnban(user.idLong), TimeUnit.MILLISECONDS)
-
-    }
-
-    private fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfigKt = GuildConfigKt(guild)) {
-        if (!guildConfig.isBannedUser(userId))
-            return
-
-        guildConfig.unbanUser(userId)
-        sendUnbanMessage(userId, guild)
-    }
-
-    private fun sendUnbanMessage(userId: Long, guild: Guild) {
-        shardManager.retrieveUserById(userId).queue { user ->
-            user.openPrivateChannel().queue { channel ->
-                channel.send(
-                    embeds = listOf(
-                        RobertifyEmbedUtilsKt.embedMessage(
-                            guild,
-                            RobertifyLocaleMessageKt.UnbanMessages.USER_UNBANNED,
-                            Pair("{server}", guild.name)
-                        ).build()
-                    )
-                ).queue(null) {
-                    ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
-                        logger.warn("Was not able to send an unban message to ${user.asTag} (${user.idLong})")
-                    }
-                }
-            }
-        }
     }
 }
