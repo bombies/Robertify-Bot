@@ -23,7 +23,7 @@ public class LogUtils {
     }
 
     public void sendLog(LogType type, String message) {
-        if (!config.channelIsSet())
+        if (!config.channelIsSet)
             return;
 
         if (!TogglesConfig.getConfig(guild).getLogToggle(type))
@@ -42,7 +42,7 @@ public class LogUtils {
     }
 
     public void sendLog(LogType type, LocaleMessage message) {
-        if (!config.channelIsSet())
+        if (!config.channelIsSet)
             return;
 
         if (!TogglesConfig.getConfig(guild).getLogToggle(type))
@@ -63,7 +63,7 @@ public class LogUtils {
 
     @SafeVarargs
     public final void sendLog(LogType type, LocaleMessage message, Pair<String, String>... placeholders) {
-        if (!config.channelIsSet())
+        if (!config.channelIsSet)
             return;
 
         if (!TogglesConfig.getConfig(guild).getLogToggle(type))
@@ -83,7 +83,7 @@ public class LogUtils {
     }
 
     public void createChannel() {
-        if (config.channelIsSet())
+        if (config.channelIsSet)
             config.removeChannel();
 
         guild.createTextChannel("robertify-logs")

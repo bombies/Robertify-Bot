@@ -139,7 +139,7 @@ public class SetLogChannelCommand extends AbstractSlashCommand implements IComma
 
         final var config = new LogConfig(guild);
 
-        if (config.channelIsSet()) {
+        if (config.channelIsSet) {
             TextChannel oldChannel = config.getChannel();
             config.removeChannel();
             oldChannel.delete().queue();

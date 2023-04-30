@@ -15,7 +15,7 @@ public class LogChannelEvents extends ListenerAdapter {
 
         LogConfig logConfig = new LogConfig(event.getGuild());
 
-        if (!logConfig.channelIsSet())
+        if (!logConfig.channelIsSet)
             return;
 
         if (event.getChannel().getIdLong() == logConfig.getChannelID())

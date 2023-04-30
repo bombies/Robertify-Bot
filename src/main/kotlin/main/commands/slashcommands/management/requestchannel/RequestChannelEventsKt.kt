@@ -46,7 +46,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
             val guild = event.guild
             val config = RequestChannelConfigKt(guild)
 
-            if (!config.isChannelSet() && config.channelId != event.channel.idLong)
+            if (!config.isChannelSet() || config.channelId != event.channel.idLong)
                 return@onEvent
 
             config.removeChannel()

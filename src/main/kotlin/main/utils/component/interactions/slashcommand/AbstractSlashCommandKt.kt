@@ -479,7 +479,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 false
             } else true
         }
-        return if (GeneralUtilsKt.isDeveloper(event.id)) true else info.checkPermission!!.invoke(event)
+        return if (GeneralUtilsKt.isDeveloper(event.id)) true else info.checkPermission?.invoke(event) ?: true
     }
 
     protected open fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {

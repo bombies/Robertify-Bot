@@ -83,7 +83,7 @@ public class GuildConfig extends AbstractGuildConfig {
     }
 
     @Deprecated
-    public boolean announcementChannelIsSet() {
+    public boolean announcementchannelIsSet {
         if (!guildHasInfo())
             loadGuild();
 

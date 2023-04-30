@@ -18,7 +18,7 @@ public class LogConfig extends AbstractGuildConfig {
     }
 
     public long getChannelID() {
-        if (!channelIsSet())
+        if (!channelIsSet)
             throw new NullPointerException("There is no channel for this guild! (ID="+gid+")");
 
         return getGuildObject().getLong(Field.LOG_CHANNEL.name().toLowerCase());
@@ -28,7 +28,7 @@ public class LogConfig extends AbstractGuildConfig {
         return Robertify.shardManager.getTextChannelById(getChannelID());
     }
 
-    public boolean channelIsSet() {
+    public boolean channelIsSet {
         JSONObject guildObject = getGuildObject();
 
         if (!guildObject.has(Field.LOG_CHANNEL.name().toLowerCase()))

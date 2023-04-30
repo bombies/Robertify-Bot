@@ -7,15 +7,16 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import java.time.Instant
 
 class LogUtilsKt(private val guild: Guild) {
     private val config: LogConfigKt = LogConfigKt(guild)
 
     fun sendLog(type: LogTypeKt, message: String) {
-        if (!config.channelIsSet()) return
+        if (!config.channelIsSet) return
         if (!TogglesConfigKt(guild).getLogToggle(type)) return
-        val channel = config.getChannel()
+        val channel = config.channel
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
@@ -27,10 +28,10 @@ class LogUtilsKt(private val guild: Guild) {
     }
 
     fun sendLog(type: LogTypeKt, message: LocaleMessageKt) {
-        if (!config.channelIsSet()) return
+        if (!config.channelIsSet) return
         if (!TogglesConfigKt(guild).getLogToggle(type)) return
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
-        val channel = config.getChannel()
+        val channel = config.channel
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
@@ -43,22 +44,24 @@ class LogUtilsKt(private val guild: Guild) {
 
     @SafeVarargs
     fun sendLog(type: LogTypeKt, message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
-        if (!config.channelIsSet()) return
+        if (!config.channelIsSet) return
         if (!TogglesConfigKt(guild).getLogToggle(type)) return
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
-        val channel = config.getChannel()
-        channel!!.sendMessageEmbeds(
-            EmbedBuilder()
-                .setTitle(type.emoji.formatted + " " + type.title)
-                .setColor(type.color)
-                .setDescription(localeManager.getMessage(message, *placeholders))
-                .setTimestamp(Instant.now())
-                .build()
-        ).queue()
+        val channel = config.channel
+        try {
+            channel!!.sendMessageEmbeds(
+                EmbedBuilder()
+                    .setTitle(type.emoji.formatted + " " + type.title)
+                    .setColor(type.color)
+                    .setDescription(localeManager.getMessage(message, *placeholders))
+                    .setTimestamp(Instant.now())
+                    .build()
+            ).queue()
+        } catch (_: InsufficientPermissionException) { }
     }
 
     fun createChannel() {
-        if (config.channelIsSet()) config.removeChannel()
+        if (config.channelIsSet) config.removeChannel()
         guild.createTextChannel("robertify-logs")
             .addPermissionOverride(guild.publicRole, emptyList(), listOf(Permission.VIEW_CHANNEL))
             .addPermissionOverride(
@@ -66,7 +69,7 @@ class LogUtilsKt(private val guild: Guild) {
                 listOf(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_SEND),
                 emptyList()
             )
-            .queue { channel: TextChannel -> config.setChannel(channel.idLong) }
+            .queue { channel: TextChannel -> config.channelId = channel.idLong }
     }
 
 }
