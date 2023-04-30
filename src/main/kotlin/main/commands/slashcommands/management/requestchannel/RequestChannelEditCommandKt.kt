@@ -126,8 +126,8 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                         config.updateMessage()
 
                     return@thenApply RequestChannelKt(
-                        channelId = config.messageId,
-                        messageId = config.channelId,
+                        channelId = config.channelId,
+                        messageId = config.messageId,
                         config = config.config.config
                     )
                 }.join()
