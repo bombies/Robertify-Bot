@@ -190,6 +190,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }
+        inline fun SlashCommandInteractionEvent.replyWithEmbeds(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> Collection<MessageEmbed>): ReplyCallbackAction {
+            val embedUtils = getGuildUtils(guild)
+            return replyEmbeds(supplier(embedUtils))
+        }
+
 
         inline fun ButtonInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)

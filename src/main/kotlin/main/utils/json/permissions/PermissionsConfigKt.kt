@@ -104,14 +104,8 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         return getRolesForPermission(PermissionKt.parse(code))
     }
 
-    fun getUsersForPermission(p: String): List<Long> {
-        if (!PermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
-            throw NullPointerException("There is no enum with the name \"$p\"")
-
-        val code = PermissionKt.values()
-            .firstOrNull { permission -> permission.name.equals(p, ignoreCase = true) }
-            ?.code ?: -1
-
+    fun getUsersForPermission(p: PermissionKt): List<Long> {
+        val code = p.code
         val ret: MutableList<Long> = ArrayList()
         return try {
             val obj = getGuildObject()
@@ -128,6 +122,12 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
             cache.updateCache(obj, GuildDBKt.Field.GUILD_ID, guild.idLong)
             ret
         }
+    }
+
+    fun getUsersForPermission(p: String): List<Long> {
+        if (!PermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
+            throw NullPointerException("There is no enum with the name \"$p\"")
+        return getUsersForPermission(PermissionKt.valueOf(p.uppercase()))
     }
 
     fun getPermissionsForRoles(rid: Long): List<Int> {

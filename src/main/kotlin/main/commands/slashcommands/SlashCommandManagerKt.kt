@@ -2,6 +2,7 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.management.permissions.PermissionsCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -87,7 +88,8 @@ object SlashCommandManagerKt {
         )
         addManagementCommands(
             RequestChannelEditCommandKt(),
-            RequestChannelCommandKt()
+            RequestChannelCommandKt(),
+            PermissionsCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()
