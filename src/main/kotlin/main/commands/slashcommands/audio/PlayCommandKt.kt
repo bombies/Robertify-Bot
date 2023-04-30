@@ -51,7 +51,8 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 options = listOf(
                     CommandOptionKt(
                         name = "tracks",
-                        description = "The name/url of the track/album/playlist to add to the top of your queue"
+                        description = "The name/url of the track/album/playlist to add to the top of your queue",
+                        autoComplete = true
                     )
                 )
             ),
