@@ -2,6 +2,7 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.management.LanguageCommandKt
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
 import main.commands.slashcommands.management.permissions.ListDJCommandKt
@@ -99,7 +100,8 @@ object SlashCommandManagerKt {
             SetDJCommandKt(),
             RemoveDJCommandKt(),
             BanCommandKt(),
-            UnbanCommandKt()
+            UnbanCommandKt(),
+            LanguageCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()

@@ -66,7 +66,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
 
         fun reloadLocales() {
             locales.clear()
-            RobertifyLocaleKt.getAvailableLanguages()
+            RobertifyLocaleKt.availableLanguages
                 .forEach { locale -> locales[locale] = retrieveLocaleFile(locale) }
         }
 

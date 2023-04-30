@@ -16,7 +16,9 @@ enum class RobertifyLocaleKt(
 
     companion object {
 
-        fun getAvailableLanguages(): List<RobertifyLocaleKt> = values().toList()
+        val availableLanguages: List<RobertifyLocaleKt>
+            get() = values().toList()
+
         fun parse(locale: String): RobertifyLocaleKt {
             return when (locale.uppercase()) {
                 "ENGLISH", "EN" -> ENGLISH
