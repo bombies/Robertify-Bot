@@ -1,5 +1,7 @@
 package main.main
 
+import com.adamratzman.spotify.SpotifyAppApi
+import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.jdabuilder.defaultShard
 import kotlinx.coroutines.runBlocking
@@ -31,9 +33,11 @@ object RobertifyKt {
         private set
     lateinit var shardManager: ShardManager
         private set
+    lateinit var spotifyApi: SpotifyAppApi
+        private set
 
     @JvmStatic
-    fun main(args: Array<String>) {
+    fun main(args: Array<String>) = runBlocking {
         // Setup graceful shutdown hooks
         val mainShutdownHook = ThreadFactoryBuilder()
             .setNameFormat("RobertifyShutdownHook")
@@ -83,58 +87,56 @@ object RobertifyKt {
 
         // Build bot connection
         logger.info("Building shard manager...")
-        runBlocking {
-            shardManager = defaultShard(
-                token = ConfigKt.BOT_TOKEN,
-                intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
-            ) {
-                setShardsTotal(ConfigKt.SHARD_COUNT)
-                setBulkDeleteSplittingEnabled(false)
-                enableCache(CacheFlag.VOICE_STATE)
-                disableCache(
-                    CacheFlag.ACTIVITY,
-                    CacheFlag.EMOJI,
-                    CacheFlag.CLIENT_STATUS,
-                    CacheFlag.ROLE_TAGS,
-                    CacheFlag.ONLINE_STATUS,
-                    CacheFlag.STICKER,
-                    CacheFlag.SCHEDULED_EVENTS
-                )
-                setVoiceDispatchInterceptor(lavalink.voiceInterceptor)
-                setActivity(Activity.listening("Starting up..."))
-
-                val disabledIntents = mutableListOf(
-                    GatewayIntent.DIRECT_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_MODERATION,
-                    GatewayIntent.GUILD_INVITES,
-                    GatewayIntent.GUILD_MEMBERS,
-                    GatewayIntent.GUILD_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                    GatewayIntent.SCHEDULED_EVENTS
-                )
-
-                val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
-
-                if (ConfigKt.MESSAGE_CONTENT_ENABLED)
-                    enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-                else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-
-                enableIntents(enabledIntents)
-                disableIntents(disabledIntents)
-            }
-            logger.info("Successfully built shard manager")
-
-            val slashCommandManager = SlashCommandManagerKt
-            shardManager.registerCommands(
-                slashCommandManager.guildCommands
-                    .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+        shardManager = defaultShard(
+            token = ConfigKt.BOT_TOKEN,
+            intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
+        ) {
+            setShardsTotal(ConfigKt.SHARD_COUNT)
+            setBulkDeleteSplittingEnabled(false)
+            enableCache(CacheFlag.VOICE_STATE)
+            disableCache(
+                CacheFlag.ACTIVITY,
+                CacheFlag.EMOJI,
+                CacheFlag.CLIENT_STATUS,
+                CacheFlag.ROLE_TAGS,
+                CacheFlag.ONLINE_STATUS,
+                CacheFlag.STICKER,
+                CacheFlag.SCHEDULED_EVENTS
             )
-            logger.info("Registered all slash commands.")
+            setVoiceDispatchInterceptor(lavalink.voiceInterceptor)
+            setActivity(Activity.listening("Starting up..."))
 
-            shardManager.registerEvents(EventManager.getRegisteredEvents())
-            logger.info("Registered all event controllers")
+            val disabledIntents = mutableListOf(
+                GatewayIntent.DIRECT_MESSAGE_TYPING,
+                GatewayIntent.GUILD_MODERATION,
+                GatewayIntent.GUILD_INVITES,
+                GatewayIntent.GUILD_MEMBERS,
+                GatewayIntent.GUILD_MESSAGE_TYPING,
+                GatewayIntent.GUILD_PRESENCES,
+                GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                GatewayIntent.SCHEDULED_EVENTS
+            )
+
+            val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
+
+            if (ConfigKt.MESSAGE_CONTENT_ENABLED)
+                enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+            else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+
+            enableIntents(enabledIntents)
+            disableIntents(disabledIntents)
         }
+        logger.info("Successfully built shard manager")
+
+        val slashCommandManager = SlashCommandManagerKt
+        shardManager.registerCommands(
+            slashCommandManager.guildCommands
+                .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+        )
+        logger.info("Registered all slash commands.")
+
+        shardManager.registerEvents(EventManager.getRegisteredEvents())
+        logger.info("Registered all event controllers")
 
         if (ConfigKt.LOAD_COMMANDS)
             AbstractSlashCommandKt.loadAllCommands()
@@ -144,6 +146,12 @@ object RobertifyKt {
 
         cronScheduler.start()
         initVoteSiteAPIs()
+
+        // Setup SpotifyAPI
+        spotifyApi = spotifyAppApi(
+            clientId = ConfigKt.SPOTIFY_CLIENT_ID,
+            clientSecret = ConfigKt.SPOTIFY_CLIENT_SECRET
+        ).build(true)
 
         // TODO: RobertifyAPI setup
 

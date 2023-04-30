@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
@@ -177,6 +178,12 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         onEvent<StringSelectInteractionEvent>(shardManager) {
             onStringSelectInteraction(it)
         }
+
+        onEvent<CommandAutoCompleteInteractionEvent>(shardManager) { event ->
+            if (event.name != info.name)
+                return@onEvent
+            onCommandAutoCompleteInteraction(event)
+        }
     }
 
     private inline fun <reified T : GenericEvent> onEvent(
@@ -190,6 +197,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     open suspend fun onButtonInteraction(event: ButtonInteractionEvent) {}
 
     open suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {}
+
+    open suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {}
 
     open val help = ""
 

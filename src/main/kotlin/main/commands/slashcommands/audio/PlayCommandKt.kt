@@ -7,6 +7,7 @@ import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.main.ConfigKt
+import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt.getDestination
 import main.utils.GeneralUtilsKt.isUrl
 import main.utils.GeneralUtilsKt.toUrl
@@ -17,7 +18,9 @@ import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Message.Attachment
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.Command.Choice
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -37,7 +40,8 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 options = listOf(
                     CommandOptionKt(
                         name = "tracks",
-                        description = "The name/url of the track/album/playlist to play"
+                        description = "The name/url of the track/album/playlist to play",
+                        autoComplete = true
                     )
                 )
             ),
@@ -295,5 +299,28 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 embed(RobertifyLocaleMessageKt.PlayMessages.INVALID_FILE)
             }.queue()
         }
+    }
+
+    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        if (event.focusedOption.name != "tracks" || (event.subcommandName != "tracks" && event.subcommandName != "next"))
+            return
+        val query = event.focusedOption.value
+
+        if (query.isBlank() || query.isEmpty())
+            return
+
+        // If the query seems to be a url, there's no need to load
+        // recommendations.
+        if (query.trim().matches("https?://[\\w\\W]*".toRegex()))
+            return
+
+        event.replyChoices(RobertifyKt.spotifyApi.search.searchTrack(query, limit = 25)
+            .mapNotNull { option ->
+                if (option == null) null else Choice(
+                    "${option.name} by ${option.artists.first().name} ${if (option.explicit) "[EXPLICIT]" else ""}",
+                    "https://open.spotify.com/track/${option.id}"
+                )
+            })
+            .queue()
     }
 }

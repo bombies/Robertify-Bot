@@ -17,7 +17,8 @@ data class SubCommandKt(
                 option.type,
                 option.name.lowercase(),
                 option.description,
-                option.required
+                option.required,
+                option.autoComplete
             )
 
             option.choices.forEach { choice -> optionData.addChoice(choice, choice) }
