@@ -12,9 +12,9 @@ class RestrictedChannelsConfigKt(private val guild: Guild) : AbstractGuildConfig
             ChannelType.VOICE_CHANNEL -> GuildDBKt.Field.RESTRICTED_CHANNELS_VOICE
             else -> throw IllegalArgumentException("Invalid type!")
         }
-        
+
         check(!isRestrictedChannel(channelID, type)) { "This is already a restricted voice channel!" }
-        
+
         val obj = getGuildObject()
         obj.getJSONObject(GuildDBKt.Field.RESTRICTED_CHANNELS_OBJECT.toString())
             .getJSONArray(configField.toString()).put(channelID)
@@ -28,9 +28,9 @@ class RestrictedChannelsConfigKt(private val guild: Guild) : AbstractGuildConfig
             ChannelType.VOICE_CHANNEL -> GuildDBKt.Field.RESTRICTED_CHANNELS_VOICE
             else -> throw IllegalArgumentException("Invalid type!")
         }
-        
+
         check(isRestrictedChannel(channelID, type)) { "This isn't a restricted channel!" }
-        
+
         try {
             val arr = obj.getJSONObject(GuildDBKt.Field.RESTRICTED_CHANNELS_OBJECT.toString())
                 .getJSONArray(configField.toString())
@@ -61,13 +61,10 @@ class RestrictedChannelsConfigKt(private val guild: Guild) : AbstractGuildConfig
     fun isRestrictedChannel(vcID: Long, type: ChannelType?): Boolean =
         getRestrictedChannels(type).contains(vcID)
 
-    fun restrictedChannelsToString(type: ChannelType?): String {
-        val channels = getRestrictedChannels(type)
-        val sb = StringBuilder()
-        for (channelID in channels) sb.append("<#").append(channelID).append(">")
-            .append(if (channelID == channels[channels.size - 1]) "" else ", ")
-        return sb.toString()
-    }
+    fun restrictedChannelsToString(type: ChannelType?): String =
+        getRestrictedChannels(type).joinToString(", ") { channel ->
+            "<#$channel>"
+        }
 
 
     enum class ChannelType(private val str: String) {

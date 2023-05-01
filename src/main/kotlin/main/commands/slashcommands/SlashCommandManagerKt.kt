@@ -4,6 +4,7 @@ import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
 import main.commands.slashcommands.management.LanguageCommandKt
 import main.commands.slashcommands.management.LogCommandKt
+import main.commands.slashcommands.management.RestrictedChannelsCommandKt
 import main.commands.slashcommands.management.SetLogChannelCommandKt
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
@@ -105,7 +106,8 @@ object SlashCommandManagerKt {
             UnbanCommandKt(),
             LanguageCommandKt(),
             LogCommandKt(),
-            SetLogChannelCommandKt()
+            SetLogChannelCommandKt(),
+            RestrictedChannelsCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()
