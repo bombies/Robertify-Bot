@@ -354,7 +354,6 @@ public enum RobertifyLocaleMessage {
         INVALID_TOGGLE,
         DJ_TOGGLE_INVALID_COMMAND,
         DJ_TOGGLED,
-        ALL_DJ_TOGGLED,
         LOG_TOGGLE_INVALID_TYPE,
         LOG_TOGGLED,
         SKIP_DJ_TOGGLE_PROMPT
