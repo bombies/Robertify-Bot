@@ -15,20 +15,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class TogglesConfig extends AbstractGuildConfig {
     private static final HashMap<Long, TogglesConfig> SINGLETON_MAP = new HashMap<>();
-    
+
     private final Guild guild;
     private final long gid;
-    
+
     private TogglesConfig(Guild guild) {
         super(guild);
         this.guild = guild;
         this.gid = guild.getIdLong();
     }
-    
+
     public static TogglesConfig getConfig(Guild guild) {
         return SINGLETON_MAP.computeIfAbsent(guild.getIdLong(), id -> new TogglesConfig(guild));
     }
@@ -72,7 +73,7 @@ public class TogglesConfig extends AbstractGuildConfig {
         for (final var key : obj.keySet())
             ret.put(key, true);
 
-        ret.replaceAll((k,v) -> obj.getBoolean(k));
+        ret.replaceAll((k, v) -> obj.getBoolean(k));
 
         return ret;
     }
@@ -85,7 +86,7 @@ public class TogglesConfig extends AbstractGuildConfig {
                 setDJToggle(cmd, false);
                 return false;
             } else {
-                throw new NullPointerException("Invalid command passed! [Command: "+cmd.getName()+"]");
+                throw new NullPointerException("Invalid command passed! [Command: " + cmd.getName() + "]");
             }
         }
 
@@ -101,7 +102,7 @@ public class TogglesConfig extends AbstractGuildConfig {
                 setDJToggle(cmd, false);
                 return false;
             } else {
-                throw new NullPointerException("Invalid command passed! [Command: "+cmd.getName()+"]");
+                throw new NullPointerException("Invalid command passed! [Command: " + cmd.getName() + "]");
             }
         }
 
@@ -119,6 +120,14 @@ public class TogglesConfig extends AbstractGuildConfig {
         obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
                 .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
+        getCache().updateGuild(obj, guild.getIdLong());
+    }
+
+    public void setDJToggle(Collection<AbstractSlashCommand> commands, boolean val) {
+        final var obj = getGuildObject();
+        final var djObj = obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString());
+        commands.forEach(command -> djObj.put(command.getName(), val));
         getCache().updateGuild(obj, guild.getIdLong());
     }
 
@@ -192,8 +201,9 @@ public class TogglesConfig extends AbstractGuildConfig {
             } catch (JSONException e) {
                 for (Toggles errToggles : Toggles.values())
                     switch (errToggles) {
-                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
-                                .put(errToggles.toString(), false);
+                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS ->
+                                object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                                        .put(errToggles.toString(), false);
                         default -> object.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
                                 .put(errToggles.toString(), true);
                     }
@@ -212,7 +222,8 @@ public class TogglesConfig extends AbstractGuildConfig {
             } catch (JSONException e) {
                 for (Toggles errToggles : Toggles.values())
                     switch (errToggles) {
-                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS -> toggleObj.put(errToggles.toString(), false);
+                        case RESTRICTED_VOICE_CHANNELS, RESTRICTED_TEXT_CHANNELS ->
+                                toggleObj.put(errToggles.toString(), false);
                         default -> toggleObj.put(errToggles.toString(), true);
                     }
             }
