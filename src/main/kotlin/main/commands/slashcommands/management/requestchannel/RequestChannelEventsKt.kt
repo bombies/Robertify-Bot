@@ -5,7 +5,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.audio.*
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.events.AbstractEventControllerKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -249,7 +249,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
     ): Boolean {
         val toggles = TogglesConfigKt(guild)
         if (toggles.isDJToggleSet(command) && toggles.getDJToggle(command))
-            return GeneralUtilsKt.hasPerms(guild, member, PermissionKt.ROBERTIFY_DJ)
+            return GeneralUtilsKt.hasPerms(guild, member, RobertifyPermissionKt.ROBERTIFY_DJ)
         return true
     }
 }

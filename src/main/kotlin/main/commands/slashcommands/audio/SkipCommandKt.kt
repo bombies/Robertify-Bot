@@ -10,7 +10,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
@@ -346,7 +346,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                         .queue()
                     updateVoteSkipMessage(guild)
                 } else {
-                    if (GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_DJ)) {
+                    if (GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_DJ)) {
                         doVoteSkip(guild)
                         event.replyWithEmbed(guild) {
                             embed(SkipMessages.DJ_SKIPPED)

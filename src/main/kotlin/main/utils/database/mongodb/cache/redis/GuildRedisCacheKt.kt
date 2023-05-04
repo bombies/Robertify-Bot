@@ -1,6 +1,6 @@
 package main.utils.database.mongodb.cache.redis
 
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.isDiscordId
 import main.utils.database.mongodb.databases.GuildDBKt
@@ -115,7 +115,7 @@ class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_
         }
         val permissionsObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
 
-        for (code in PermissionKt.codes) {
+        for (code in RobertifyPermissionKt.codes) {
             if (!permissionsObj.has(code.toString())) continue
             val codeArr = permissionsObj.getJSONArray(code.toString())
             if (codeArr.isEmpty) continue
@@ -202,7 +202,7 @@ class GuildRedisCacheKt private constructor() : DatabaseRedisCacheKt("ROBERTIFY_
             )
         }
         val permissionsObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
-        for (code in PermissionKt.codes) {
+        for (code in RobertifyPermissionKt.codes) {
             if (!permissionsObj.has(code.toString())) continue
             val codeArr = permissionsObj.getJSONArray(code.toString())
             if (codeArr.isEmpty) continue

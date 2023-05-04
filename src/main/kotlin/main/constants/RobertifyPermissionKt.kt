@@ -1,7 +1,7 @@
 package main.constants
 
 
-enum class PermissionKt(val code: Int) {
+enum class RobertifyPermissionKt(val code: Int) {
     ROBERTIFY_ADMIN(0),
     ROBERTIFY_DJ(1),
     ROBERTIFY_POLLS(2),
@@ -23,7 +23,7 @@ enum class PermissionKt(val code: Int) {
                 return ret
             }
 
-        fun parse(code: Int): PermissionKt {
+        fun parse(code: Int): RobertifyPermissionKt {
             return when (code) {
                 0 -> ROBERTIFY_ADMIN
                 1 -> ROBERTIFY_DJ

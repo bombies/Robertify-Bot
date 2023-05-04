@@ -1,6 +1,6 @@
 package main.utils.json.permissions
 
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.database.mongodb.cache.GuildDBCacheKt
 import main.utils.database.mongodb.databases.GuildDBKt
 import main.utils.json.AbstractGuildConfigKt
@@ -13,7 +13,7 @@ import java.io.IOException
 import java.util.*
 
 class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
-    fun addPermissionToUser(userID: Long, p: PermissionKt) {
+    fun addPermissionToUser(userID: Long, p: RobertifyPermissionKt) {
         var obj = getGuildObject()
         var usersObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
             .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
@@ -37,7 +37,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         cache.updateCache(obj, GuildDBKt.Field.GUILD_ID, guild.idLong)
     }
 
-    fun userHasPermission(userID: Long, p: PermissionKt): Boolean {
+    fun userHasPermission(userID: Long, p: RobertifyPermissionKt): Boolean {
         val userObj = getGuildObject()
             .getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
             .getJSONObject(PermissionConfigFieldKt.USER_PERMISSIONS.toString())
@@ -45,7 +45,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
             .contains(p.code)
     }
 
-    fun removePermissionFromUser(userID: Long, p: PermissionKt) {
+    fun removePermissionFromUser(userID: Long, p: RobertifyPermissionKt) {
         require(userHasPermission(userID, p)) { "User with id \"$userID\" doesn't have ${p.name}" }
         val obj = getGuildObject()
         val usersObj = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
@@ -57,7 +57,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     }
 
     @Throws(IllegalAccessException::class, IOException::class)
-    fun removeRoleFromPermission(rid: Long, p: PermissionKt) {
+    fun removeRoleFromPermission(rid: Long, p: RobertifyPermissionKt) {
         if (!getRolesForPermission(p).contains(rid)) throw IllegalAccessException("The role $rid doesn't have access to PermissionKt with code ${p.code}")
         val obj = getGuildObject()
         val permArr = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
@@ -67,7 +67,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     }
 
     @Throws(IllegalAccessException::class)
-    fun addRoleToPermission(rid: Long, p: PermissionKt) {
+    fun addRoleToPermission(rid: Long, p: RobertifyPermissionKt) {
         if (getRolesForPermission(p).contains(rid)) throw IllegalAccessException("The role $rid already has access to PermissionKt with code ${p.code}")
         val obj = getGuildObject()
         val permArr = obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
@@ -76,7 +76,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         cache.updateCache<Long>(obj, GuildDBKt.Field.GUILD_ID, guild.idLong)
     }
 
-    fun getRolesForPermission(p: PermissionKt): List<Long> {
+    fun getRolesForPermission(p: RobertifyPermissionKt): List<Long> {
         val ret: MutableList<Long> = ArrayList()
         val obj = getGuildObject()
             .getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
@@ -94,17 +94,17 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     }
 
     fun getRolesForPermission(p: String): List<Long> {
-        if (!PermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
+        if (!RobertifyPermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
             throw NullPointerException("There is no enum with the name \"$p\"")
 
-        val code = PermissionKt.values()
+        val code = RobertifyPermissionKt.values()
             .firstOrNull { permission -> permission.name.equals(p, ignoreCase = true) }
             ?.code ?: -1
 
-        return getRolesForPermission(PermissionKt.parse(code))
+        return getRolesForPermission(RobertifyPermissionKt.parse(code))
     }
 
-    fun getUsersForPermission(p: PermissionKt): List<Long> {
+    fun getUsersForPermission(p: RobertifyPermissionKt): List<Long> {
         val code = p.code
         val ret: MutableList<Long> = ArrayList()
         return try {
@@ -125,9 +125,9 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
     }
 
     fun getUsersForPermission(p: String): List<Long> {
-        if (!PermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
+        if (!RobertifyPermissionKt.permissions.contains(p.uppercase(Locale.getDefault())))
             throw NullPointerException("There is no enum with the name \"$p\"")
-        return getUsersForPermission(PermissionKt.valueOf(p.uppercase()))
+        return getUsersForPermission(RobertifyPermissionKt.valueOf(p.uppercase()))
     }
 
     fun getPermissionsForRoles(rid: Long): List<Int> {
@@ -172,7 +172,7 @@ class PermissionsConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guil
         val cacheArr = GuildDBCacheKt.ins.getCache()
         val obj = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDBKt.Field.GUILD_ID, guild.idLong))
 
-        for (code in PermissionKt.codes)
+        for (code in RobertifyPermissionKt.codes)
             if (!obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString()).has(code.toString())) {
                 obj.getJSONObject(GuildDBKt.Field.PERMISSIONS_OBJECT.toString())
                     .put(code.toString(), JSONArray())

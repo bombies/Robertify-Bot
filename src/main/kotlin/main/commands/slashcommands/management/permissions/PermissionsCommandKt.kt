@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.permissions
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.toMention
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
@@ -73,7 +73,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             CommandOptionKt(
                                 name = "permission",
                                 description = "The permission to add to the role.",
-                                choices = PermissionKt.permissions
+                                choices = RobertifyPermissionKt.permissions
                             )
                         )
                     ),
@@ -89,7 +89,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             CommandOptionKt(
                                 name = "permission",
                                 description = "The permission to add to the role.",
-                                choices = PermissionKt.permissions
+                                choices = RobertifyPermissionKt.permissions
                             )
                         )
                     )
@@ -111,7 +111,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             CommandOptionKt(
                                 name = "permission",
                                 description = "The permission to remove from the role.",
-                                choices = PermissionKt.permissions
+                                choices = RobertifyPermissionKt.permissions
                             )
                         )
                     ),
@@ -127,7 +127,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             CommandOptionKt(
                                 name = "permission",
                                 description = "The permission to remove from the role.",
-                                choices = PermissionKt.permissions
+                                choices = RobertifyPermissionKt.permissions
                             )
                         )
                     )
@@ -154,18 +154,18 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
 
         when (subCommandName) {
             "all" -> {
-                val rolesForPerms = mutableMapOf<PermissionKt, List<String>>()
-                PermissionKt.values().forEach { permission ->
+                val rolesForPerms = mutableMapOf<RobertifyPermissionKt, List<String>>()
+                RobertifyPermissionKt.values().forEach { permission ->
                     rolesForPerms[permission] = getRolesForPermission(permission, config)
                 }
 
-                val usersForPerms = mutableMapOf<PermissionKt, List<String>>()
-                PermissionKt.values().forEach { permission ->
+                val usersForPerms = mutableMapOf<RobertifyPermissionKt, List<String>>()
+                RobertifyPermissionKt.values().forEach { permission ->
                     usersForPerms[permission] = getUsersForPermission(permission, config)
                 }
 
                 event.replyWithEmbeds(guild) {
-                    PermissionKt.values().map { permission ->
+                    RobertifyPermissionKt.values().map { permission ->
                         embed(
                             """${
                                 localeManager.getMessage(
@@ -194,13 +194,13 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
 
             "role" -> {
                 val role = event.getRequiredOption("role").asRole
-                val perms = config.getPermissionsForRoles(role.idLong).map { PermissionKt.parse(it) }
+                val perms = config.getPermissionsForRoles(role.idLong).map { RobertifyPermissionKt.parse(it) }
                 displaySpecificMentionable(event, role, perms)
             }
 
             "user" -> {
                 val user = event.getRequiredOption("user").asUser
-                val perms = config.getPermissionsForUser(user.idLong).map { PermissionKt.parse(it) }
+                val perms = config.getPermissionsForUser(user.idLong).map { RobertifyPermissionKt.parse(it) }
                 displaySpecificMentionable(event, user, perms)
             }
         }
@@ -209,7 +209,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun displaySpecificMentionable(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
-        perms: List<PermissionKt>
+        perms: List<RobertifyPermissionKt>
     ) {
         val guild = event.guild!!
 
@@ -227,19 +227,19 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
             }.queue()
     }
 
-    fun getRolesForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
+    fun getRolesForPermission(permission: RobertifyPermissionKt, config: PermissionsConfigKt): List<String> {
         return config.getRolesForPermission(permission)
             .map { id -> id.toMention(GeneralUtilsKt.Mentioner.ROLE) }
     }
 
-    fun getUsersForPermission(permission: PermissionKt, config: PermissionsConfigKt): List<String> {
+    fun getUsersForPermission(permission: RobertifyPermissionKt, config: PermissionsConfigKt): List<String> {
         return config.getUsersForPermission(permission)
             .map { id -> id.toMention(GeneralUtilsKt.Mentioner.USER) }
     }
 
     private fun handleAdd(event: SlashCommandInteractionEvent, subCommandName: String) {
         val config = PermissionsConfigKt(event.guild!!)
-        val permission = PermissionKt.valueOf(event.getRequiredOption("permission").asString)
+        val permission = RobertifyPermissionKt.valueOf(event.getRequiredOption("permission").asString)
 
         when (subCommandName) {
             "role" -> {
@@ -266,7 +266,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun displayPermissionAdded(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
-        permission: PermissionKt
+        permission: RobertifyPermissionKt
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
@@ -281,7 +281,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun displayAlreadyHasPermission(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
-        permission: PermissionKt
+        permission: RobertifyPermissionKt
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
@@ -295,7 +295,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
 
     private fun handleRemove(event: SlashCommandInteractionEvent, subCommandName: String) {
         val config = PermissionsConfigKt(event.guild!!)
-        val permission = PermissionKt.valueOf(event.getRequiredOption("permission").asString)
+        val permission = RobertifyPermissionKt.valueOf(event.getRequiredOption("permission").asString)
 
         when (subCommandName) {
             "role" -> {
@@ -322,7 +322,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun displayPermissionRemoved(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
-        permission: PermissionKt
+        permission: RobertifyPermissionKt
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
@@ -337,7 +337,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun displayDoesntHavePermission(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
-        permission: PermissionKt
+        permission: RobertifyPermissionKt
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(

@@ -1,6 +1,6 @@
 package main.utils
 
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
 import main.constants.TimeFormatKt
@@ -108,7 +108,31 @@ object GeneralUtilsKt {
     fun String.stripDigits(): String =
         this.replace("\\d".toRegex(), "")
 
-    fun hasPerms(guild: Guild, sender: Member?, vararg perms: PermissionKt): Boolean {
+    fun Member?.hasPermissions(vararg perms: RobertifyPermissionKt): Boolean {
+        if (this == null) return false
+
+        if (hasPermission(Permission.ADMINISTRATOR) || isOwner)
+            return true
+
+        val config = PermissionsConfigKt(guild)
+        var pass = 0
+
+        roles.forEach { role ->
+            if (config.getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_ADMIN).contains(role.idLong))
+                return true
+            perms.forEach { perm ->
+                pass += if (config.getRolesForPermission(perm).contains(role.idLong)
+                    || config.getUsersForPermission(perm.name).contains(idLong)
+                )
+                    1
+                else 0
+            }
+        }
+
+        return pass >= perms.size
+    }
+
+    fun hasPerms(guild: Guild, sender: Member?, vararg perms: RobertifyPermissionKt): Boolean {
         if (sender == null)
             return false
 
@@ -122,7 +146,7 @@ object GeneralUtilsKt {
         var pass = 0
 
         roles.forEach { role ->
-            if (config.getRolesForPermission(PermissionKt.ROBERTIFY_ADMIN).contains(role.idLong))
+            if (config.getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_ADMIN).contains(role.idLong))
                 return true
             perms.forEach { perm ->
                 pass += if (config.getRolesForPermission(perm).contains(role.idLong)

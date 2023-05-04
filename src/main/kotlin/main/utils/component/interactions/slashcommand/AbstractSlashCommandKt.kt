@@ -5,12 +5,13 @@ import dev.minn.jda.ktx.events.listener
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.constants.BotConstantsKt
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.asString
+import main.utils.GeneralUtilsKt.hasPermissions
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.AbstractInteractionKt
@@ -422,13 +423,13 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         val toggles = TogglesConfigKt(guild)
 
         if ((info.djOnly || toggles.getDJToggle(this))
-            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_DJ)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_DJ)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    BotConstantsKt.getInsufficientPermsMessage(guild, PermissionKt.ROBERTIFY_DJ)
+                    BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_DJ)
                 ).build()
             )
                 .setEphemeral(true)
@@ -449,13 +450,13 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected open fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild!!
         if (info.adminOnly
-            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_ADMIN)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_ADMIN)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    BotConstantsKt.getInsufficientPermsMessage(guild, PermissionKt.ROBERTIFY_ADMIN)
+                    BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_ADMIN)
                 ).build()
             )
                 .setEphemeral(true)
@@ -469,14 +470,9 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
             return if (!event.isFromGuild)
                 true
-            else if (!GeneralUtilsKt.hasPerms(
-                    event.guild!!,
-                    event.member!!,
-                    *info.requiredPermissions.toTypedArray()
-                )
-            ) {
+            else if (!event.member!!.hasPermissions(*info.requiredPermissions.toTypedArray())) {
                 event.replyWithEmbed(event.guild!!) {
-                    embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, PermissionKt.ROBERTIFY_BAN))
+                    embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, *info.requiredPermissions.toTypedArray()))
                 }.setEphemeral(true)
                     .queue()
                 false
@@ -525,7 +521,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         val config = RestrictedChannelsConfigKt(guild)
         if (!togglesConfig.getToggle(ToggleKt.RESTRICTED_TEXT_CHANNELS)) return true
         if (!config.isRestrictedChannel(event.channel.idLong, RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
-            && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_ADMIN)
+            && !GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_ADMIN)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
             event.replyEmbeds(

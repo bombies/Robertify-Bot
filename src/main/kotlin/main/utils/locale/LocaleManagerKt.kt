@@ -29,6 +29,14 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
             }
         }
 
+        operator fun get(guild: Guild?): LocaleManagerKt {
+            if (guild == null)
+                return globalManager()
+            return localeManagers.computeIfAbsent(guild.idLong) {
+                LocaleManagerKt(guild, RobertifyLocaleKt.ENGLISH)
+            }
+        }
+
         private fun retrieveLocaleFile(locale: RobertifyLocaleKt): Map<String, String> {
             if (!GeneralUtilsKt.directoryExists("./locale")) {
                 GeneralUtilsKt.createDirectory("./locale")

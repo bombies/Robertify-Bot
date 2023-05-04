@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.permissions
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -43,7 +43,7 @@ class SetDJCommandKt : AbstractSlashCommandKt(
         return when {
             mentionable.asMention.startsWith("<@&") -> {
                 try {
-                    config.addRoleToPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
+                    config.addRoleToPermission(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ)
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
                         PermissionsMessages.DJ_SET,
@@ -54,21 +54,21 @@ class SetDJCommandKt : AbstractSlashCommandKt(
                         guild,
                         PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
-                        Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
+                        Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)
                     ).build()
                 }
             }
 
             mentionable.asMention.startsWith("<@") -> {
-                if (config.userHasPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ))
+                if (config.userHasPermission(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ))
                     return RobertifyEmbedUtilsKt.embedMessage(
                         guild,
                         PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
-                        Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
+                        Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)
                     ).build()
 
-                config.addPermissionToUser(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
+                config.addPermissionToUser(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ)
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
                     PermissionsMessages.DJ_SET,

@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.bans
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt.dmEmbed
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
@@ -27,7 +27,7 @@ class UnbanCommandKt : AbstractSlashCommandKt(
                 description = "The user to unban"
             )
         ),
-        _requiredPermissions = listOf(PermissionKt.ROBERTIFY_BAN)
+        _requiredPermissions = listOf(RobertifyPermissionKt.ROBERTIFY_BAN)
     )
 ) {
 

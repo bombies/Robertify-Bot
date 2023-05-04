@@ -1,6 +1,6 @@
 package main.commands.slashcommands.management.permissions
 
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -21,13 +21,13 @@ class ListDJCommandKt : AbstractSlashCommandKt(CommandKt(
         val config = PermissionsConfigKt(guild)
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
 
-        val roles = PermissionsCommandKt().getRolesForPermission(PermissionKt.ROBERTIFY_DJ, config)
-        val users = PermissionsCommandKt().getUsersForPermission(PermissionKt.ROBERTIFY_DJ, config)
+        val roles = PermissionsCommandKt().getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
+        val users = PermissionsCommandKt().getUsersForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
 
         event.replyWithEmbed(guild) {
             embedBuilder(
                 PermissionsMessages.PERMISSION_LIST,
-                Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
+                Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)
             )
                 .addField(
                     localeManager.getMessage(PermissionsMessages.PERMISSIONS_ROLES),

@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.permissions
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -41,7 +41,7 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
         return when {
             mentionable.asMention.startsWith("<@&") -> {
                 try {
-                    config.removeRoleFromPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
+                    config.removeRoleFromPermission(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ)
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
                         PermissionsMessages.DJ_REMOVED,
@@ -52,21 +52,21 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
                         guild,
                         PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
-                        Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
+                        Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)
                     ).build()
                 }
             }
 
             mentionable.asMention.startsWith("<@") -> {
-                if (!config.userHasPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ))
+                if (!config.userHasPermission(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ))
                     return RobertifyEmbedUtilsKt.embedMessage(
                         guild,
                         PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
-                        Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
+                        Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)
                     ).build()
 
-                config.removePermissionFromUser(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
+                config.removePermissionFromUser(mentionable.idLong, RobertifyPermissionKt.ROBERTIFY_DJ)
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
                     PermissionsMessages.DJ_REMOVED,

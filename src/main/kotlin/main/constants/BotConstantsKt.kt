@@ -21,7 +21,7 @@ enum class BotConstantsKt(private val str: String) {
     }
 
     companion object {
-        fun getInsufficientPermsMessage(guild: Guild?, vararg permsNeeded: PermissionKt?): String {
+        fun getInsufficientPermsMessage(guild: Guild?, vararg permsNeeded: RobertifyPermissionKt?): String {
             return LocaleManagerKt.getLocaleManager(guild).getMessage(
                 GeneralMessages.INSUFFICIENT_PERMS,
                 Pair("{permissions}", permsNeeded.mapNotNull { it?.name }.joinToString(", "))

@@ -1,6 +1,6 @@
 package main.utils.component.interactions.slashcommand.models
 
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -23,12 +23,12 @@ data class CommandKt(
     val isGuild: Boolean = false,
     val guildUseOnly: Boolean = true,
     private val _checkPermission: ((event: SlashCommandInteractionEvent) -> Boolean)? = null,
-    private val _requiredPermissions: List<PermissionKt> = listOf(),
+    private val _requiredPermissions: List<RobertifyPermissionKt> = listOf(),
 ) {
     val requiredPermissions = _requiredPermissions
         get() = when {
-            adminOnly -> listOf(PermissionKt.ROBERTIFY_ADMIN, *field.toTypedArray())
-            djOnly -> listOf(PermissionKt.ROBERTIFY_DJ, *field.toTypedArray())
+            adminOnly -> listOf(RobertifyPermissionKt.ROBERTIFY_ADMIN, *field.toTypedArray())
+            djOnly -> listOf(RobertifyPermissionKt.ROBERTIFY_DJ, *field.toTypedArray())
             else -> field
         }
 

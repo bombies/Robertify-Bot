@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.bans
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.constants.PermissionKt
+import main.constants.RobertifyPermissionKt
 import main.main.ListenerKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.dmEmbed
@@ -34,7 +34,7 @@ class BanCommandKt : AbstractSlashCommandKt(
                 required = false
             )
         ),
-        _requiredPermissions = listOf(PermissionKt.ROBERTIFY_BAN)
+        _requiredPermissions = listOf(RobertifyPermissionKt.ROBERTIFY_BAN)
     )
 ) {
 
@@ -60,7 +60,7 @@ class BanCommandKt : AbstractSlashCommandKt(
 
         val bannedUntil = if (duration != null) GeneralUtilsKt.getFutureTime(duration) else null
 
-        if (GeneralUtilsKt.hasPerms(guild, user, PermissionKt.ROBERTIFY_ADMIN))
+        if (GeneralUtilsKt.hasPerms(guild, user, RobertifyPermissionKt.ROBERTIFY_ADMIN))
             return RobertifyEmbedUtilsKt.embedMessage(guild, BanMessages.CANNOT_BAN_ADMIN)
                 .build()
 
