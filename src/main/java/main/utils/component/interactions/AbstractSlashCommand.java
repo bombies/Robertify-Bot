@@ -601,8 +601,6 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
         final Guild guild = event.getGuild();
         final var toggles = TogglesConfig.getConfig(guild);
 
-        logger.info("{} {} {}", toggles.getDJToggle(this), !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ), !GeneralUtils.isDeveloper(event.getUser().getIdLong()));
-
         if (
                 (command.isDjOnly() || toggles.getDJToggle(this))
                 && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)
