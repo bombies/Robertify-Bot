@@ -14,11 +14,13 @@ import main.audiohandlers.loaders.AutoPlayLoader;
 import main.audiohandlers.loaders.SearchResultLoader;
 import main.audiohandlers.sources.resume.ResumeSourceManager;
 import main.commands.prefixcommands.CommandContext;
+import main.commands.slashcommands.commands.management.TwentyFourSevenCommand;
 import main.constants.ENV;
 import main.constants.Toggles;
 import main.main.Config;
 import main.main.Robertify;
 import main.utils.RobertifyEmbedUtils;
+import main.utils.json.guildconfig.GuildConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
 import main.utils.locale.RobertifyLocaleMessage;
@@ -340,7 +342,7 @@ public class RobertifyAudioManager {
             return;
         }
 
-        if (voiceChannel.getMembers().size() == 0)
+        if (!new GuildConfig(musicManager.getGuild()).get247() && voiceChannel.getMembers().size() == 0)
             return;
 
         joinAudioChannel(voiceChannel, musicManager);
