@@ -79,15 +79,14 @@ public class TogglesConfig extends AbstractGuildConfig {
     }
 
     public boolean getDJToggle(AbstractSlashCommand cmd) {
+        if (!SlashCommandManager.getInstance().isMusicCommand(cmd))
+            return false;
+
         final var djToggles = getDJToggles();
 
         if (!djToggles.containsKey(cmd.getName())) {
-            if (SlashCommandManager.getInstance().isMusicCommand(cmd)) {
-                setDJToggle(cmd, false);
-                return false;
-            } else {
-                throw new NullPointerException("Invalid command passed! [Command: " + cmd.getName() + "]");
-            }
+            setDJToggle(cmd, false);
+            return false;
         }
 
         return djToggles.get(cmd.getName().toLowerCase());
