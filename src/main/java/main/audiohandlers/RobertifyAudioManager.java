@@ -429,7 +429,7 @@ public class RobertifyAudioManager {
     }
 
     public void joinAudioChannel(AudioChannel vc, GuildMusicManager musicManager) throws InsufficientPermissionException {
-        if (vc.getMembers().size() == 0)
+        if (!new GuildConfig(musicManager.getGuild()).get247() &&  vc.getMembers().size() == 0)
             throw new IllegalStateException("I can't join a voice channel with no one in it!");
 
         musicManager.getLink().connect(vc);
