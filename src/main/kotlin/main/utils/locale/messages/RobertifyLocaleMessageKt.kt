@@ -658,7 +658,8 @@ sealed class RobertifyLocaleMessageKt {
             TrackSchedulerMessages::class to TrackSchedulerMessages.values(),
             LanguageCommandMessages::class to LanguageCommandMessages.values(),
             HistoryMessages::class to HistoryMessages.values(),
-            SupportServerMessages::class to SupportServerMessages.values()
+            SupportServerMessages::class to SupportServerMessages.values(),
+            DuplicateMessages::class to DuplicateMessages.values()
         )
     }
 }

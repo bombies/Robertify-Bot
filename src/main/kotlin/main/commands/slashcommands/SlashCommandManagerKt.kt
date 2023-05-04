@@ -93,7 +93,8 @@ object SlashCommandManagerKt {
             KaraokeFilterKt(),
             NightcoreFilterKt(),
             TremoloFilterKt(),
-            VibratoFilterKt()
+            VibratoFilterKt(),
+            RemoveDuplicatesCommandKt()
         )
         addManagementCommands(
             RequestChannelEditCommandKt(),
