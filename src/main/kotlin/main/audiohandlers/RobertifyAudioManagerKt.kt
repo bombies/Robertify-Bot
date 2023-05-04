@@ -18,6 +18,7 @@ import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
@@ -121,7 +122,7 @@ object RobertifyAudioManagerKt {
             return
         }
 
-        if (voiceChannel.members.isEmpty())
+        if (!GuildConfigKt(musicManager.guild).twentyFourSevenMode && voiceChannel.members.isEmpty())
             return
 
         if (joinAudioChannel(voiceChannel, musicManager))
