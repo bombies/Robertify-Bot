@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.github.TopiSenpai.LavaSrc</groupId>
             <artifactId>lavasrc</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
