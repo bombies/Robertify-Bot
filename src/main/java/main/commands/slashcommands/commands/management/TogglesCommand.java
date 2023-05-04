@@ -219,7 +219,8 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                 }
                 case "dj" -> eb = handleDJToggles(guild, args);
                 case "logs", "log", "l" -> eb = handleLogToggles(guild, args);
-                default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
+                default ->
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
             }
             msg.replyEmbeds(eb.build()).queue();
         }
@@ -357,11 +358,11 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
 
     @Override
     public String getHelp(String prefix) {
-        return "Aliases: `"+GeneralUtils.listToString(getAliases())+"`\n" +
+        return "Aliases: `" + GeneralUtils.listToString(getAliases()) + "`\n" +
                 "Toggle specific features on or off!\n\n**__Usages__**\n" +
-                "`"+ prefix +"toggles`\n" +
-                "`"+ prefix +"toggles <toggle_name>`\n" +
-                 "`"+ prefix +"toggles dj <list|command>`\n";
+                "`" + prefix + "toggles`\n" +
+                "`" + prefix + "toggles <toggle_name>`\n" +
+                "`" + prefix + "toggles dj <list|command>`\n";
     }
 
     @Override
@@ -414,6 +415,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                                                         true
                                                                 )
                                                         )
+                                                ),
+                                                SubCommand.of(
+                                                        "switchall",
+                                                        "Switch all audio commands to be DJ-only."
+                                                ),
+                                                SubCommand.of(
+                                                        "switchnone",
+                                                        "Switch all audio commands to be non-DJ-only."
                                                 )
                                         )
                                 ),
@@ -437,6 +446,14 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                                                         LogType.toList()
                                                                 )
                                                         )
+                                                ),
+                                                SubCommand.of(
+                                                        "switchall",
+                                                        "Switch all logs to be enabled."
+                                                ),
+                                                SubCommand.of(
+                                                        "switchnone",
+                                                        "Switch all logs to be disabled."
                                                 )
                                         )
                                 )
@@ -462,7 +479,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
         final var config = TogglesConfig.getConfig(guild);
         final var path = event.getFullCommandName().split("\\s");
         final var localeManager = LocaleManager.getLocaleManager(guild);
-        
+
         EmbedBuilder eb = null;
         switch (path[1]) {
             case "list" -> {
@@ -637,7 +654,8 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                                 config.setDJToggle(skipCommand, true);
                         }
                     }
-                    default -> eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
+                    default ->
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.INVALID_TOGGLE);
                 }
             }
             case "dj" -> {
@@ -666,6 +684,22 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                             );
                         }
                     }
+                    case "switchall" -> {
+                        final var commandManager = SlashCommandManager.getInstance();
+                        final var musicCommands = commandManager.getMusicCommands();
+                        config.setDJToggle(musicCommands, true);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.ALL_DJ_TOGGLED,
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.ON_STATUS).toUpperCase())
+                        );
+                    }
+                    case "switchnone" -> {
+                        final var commandManager = SlashCommandManager.getInstance();
+                        final var musicCommands = commandManager.getMusicCommands();
+                        config.setDJToggle(musicCommands, false);
+                        eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.ALL_DJ_TOGGLED,
+                                Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS).toUpperCase())
+                        );
+                    }
                 }
             }
             case "logs" -> {
@@ -677,7 +711,7 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         try {
                             logType = LogType.valueOf(logTypeStr.toUpperCase());
                         } catch (IllegalArgumentException e) {
-                            eb =  RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLE_INVALID_TYPE, Pair.of("{logType}", logTypeStr));
+                            eb = RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.TogglesMessages.LOG_TOGGLE_INVALID_TYPE, Pair.of("{logType}", logTypeStr));
                             break;
                         }
 
@@ -738,9 +772,10 @@ public class TogglesCommand extends AbstractSlashCommand implements ICommand {
                         Pair.of("{status}", localeManager.getMessage(RobertifyLocaleMessage.GeneralMessages.OFF_STATUS))
                 ).build()).setEphemeral(true).queue();
             }
-            case "no" -> event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.OK).build())
-                    .setEphemeral(true)
-                    .queue();
+            case "no" ->
+                    event.replyEmbeds(RobertifyEmbedUtils.embedMessage(guild, RobertifyLocaleMessage.GeneralMessages.OK).build())
+                            .setEphemeral(true)
+                            .queue();
         }
 
         event.getMessage().editMessageComponents(

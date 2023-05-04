@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public class TogglesConfig extends AbstractGuildConfig {
@@ -118,6 +119,14 @@ public class TogglesConfig extends AbstractGuildConfig {
         obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
                 .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
                 .put(command.getName(), val);
+        getCache().updateGuild(obj, guild.getIdLong());
+    }
+
+    public void setDJToggle(Collection<AbstractSlashCommand> commands, boolean val) {
+        final var obj = getGuildObject();
+        final var djObj = obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+                .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString());
+        commands.forEach(command -> djObj.put(command.getName(), val));
         getCache().updateGuild(obj, guild.getIdLong());
     }
 
