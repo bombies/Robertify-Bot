@@ -1,6 +1,5 @@
 package main.utils.component.interactions;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import main.audiohandlers.RobertifyAudioManager;
@@ -17,8 +16,8 @@ import main.utils.RobertifyEmbedUtils;
 import main.utils.component.AbstractInteraction;
 import main.utils.component.InvalidBuilderException;
 import main.utils.database.mongodb.cache.BotBDCache;
-import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.guildconfig.GuildConfig;
+import main.utils.json.requestchannel.RequestChannelConfig;
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig;
 import main.utils.json.toggles.TogglesConfig;
 import main.utils.locale.LocaleManager;
@@ -595,10 +594,15 @@ public abstract class AbstractSlashCommand extends AbstractInteraction {
     protected boolean djCheck(SlashCommandInteractionEvent event) {
         if (command == null)
             buildCommand();
+        if (!event.isFromGuild())
+            return true;
 
+        assert event.getGuild() != null;
         final Guild guild = event.getGuild();
+        final var toggles = TogglesConfig.getConfig(guild);
+
         if (
-                command.isDjOnly()
+                (command.isDjOnly() || toggles.getDJToggle(this))
                 && !GeneralUtils.hasPerms(guild, event.getMember(), Permission.ROBERTIFY_DJ)
                 && !GeneralUtils.isDeveloper(event.getUser().getIdLong())
         ) {

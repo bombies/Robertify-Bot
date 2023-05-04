@@ -354,6 +354,7 @@ public enum RobertifyLocaleMessage {
         INVALID_TOGGLE,
         DJ_TOGGLE_INVALID_COMMAND,
         DJ_TOGGLED,
+        ALL_DJ_TOGGLED,
         LOG_TOGGLE_INVALID_TYPE,
         LOG_TOGGLED,
         SKIP_DJ_TOGGLE_PROMPT
@@ -566,6 +567,10 @@ public enum RobertifyLocaleMessage {
         HISTORY_EMBED_TITLE
     }
 
+    public enum DuplicateMessages implements LocaleMessage {
+        REMOVED_DUPLICATES
+    }
+
     public static HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> getMessageTypes() {
         final HashMap<Class<? extends LocaleMessage>, LocaleMessage[]> ret = new HashMap<>();
         ret.put(GeneralMessages.class, GeneralMessages.values());
@@ -617,6 +622,7 @@ public enum RobertifyLocaleMessage {
         ret.put(TrackSchedulerMessages.class, TrackSchedulerMessages.values());
         ret.put(LanguageCommandMessages.class, LanguageCommandMessages.values());
         ret.put(HistoryMessages.class, HistoryMessages.values());
+        ret.put(DuplicateMessages.class, DuplicateMessages.values());
         return ret;
     }
 }

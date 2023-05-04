@@ -314,6 +314,7 @@ toggled: "You have toggled {toggle} **{status}**"
 invalid_toggle: "Invalid toggle!"
 dj_toggle_invalid_command: "`{command}` is an invalid command!"
 dj_toggled: "You have toggled DJ only mode for the `{command}` command to: **{status}**"
+all_dj_toggled: "You have toggled DJ only mode for all commands to: **{status}**"
 log_toggle_invalid_type: "`{command}` is an invalid log type!"
 log_toggled: "You have toggled logs for the `{logType}` command to: **{status}**"
 skip_dj_toggle_prompt: "Would you like to turn off DJ only mode for the `skip` command?"
@@ -507,3 +508,6 @@ language_changed: "You have changed the language to: **{language}**"
 # HISTORY MESSAGES
 no_past_tracks: "There are no tracks in this server's history!"
 history_embed_title: "History"
+
+# DUPLICATE MESSAGES
+removed_duplicates: "You have removed all duplicate tracks from the queue. (If there are any)"
