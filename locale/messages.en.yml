@@ -508,3 +508,6 @@ language_changed: "You have changed the language to: **{language}**"
 # HISTORY MESSAGES
 no_past_tracks: "There are no tracks in this server's history!"
 history_embed_title: "History"
+
+# DUPLICATE MESSAGES
+removed_duplicates: "You have removed all duplicate tracks from the queue. (If there are any)"
