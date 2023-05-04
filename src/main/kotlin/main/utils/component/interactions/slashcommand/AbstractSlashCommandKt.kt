@@ -417,8 +417,11 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
      * False will be returned if and only if the command is DJ-only and the user is not a DJ.
      */
     protected open fun djCheck(event: SlashCommandInteractionEvent): Boolean {
+        if (!event.isFromGuild) return true
         val guild = event.guild!!
-        if (info.djOnly
+        val toggles = TogglesConfigKt(guild)
+
+        if ((info.djOnly || toggles.getDJToggle(this))
             && !GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_DJ)
             && !GeneralUtilsKt.isDeveloper(event.user.idLong)
         ) {
