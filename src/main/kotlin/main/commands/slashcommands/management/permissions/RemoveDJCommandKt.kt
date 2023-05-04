@@ -8,7 +8,8 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.permissions.PermissionsConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.PermissionsMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.IMentionable
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -43,13 +44,13 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
                     config.removeRoleFromPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.DJ_REMOVED,
+                        PermissionsMessages.DJ_REMOVED,
                         Pair("{mentionable}", mentionable.asMention)
                     ).build()
                 } catch (e: IllegalAccessException) {
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                        PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
                         Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
                     ).build()
@@ -60,7 +61,7 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
                 if (!config.userHasPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ))
                     return RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                        PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
                         Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
                     ).build()
@@ -68,13 +69,13 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
                 config.removePermissionFromUser(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.PermissionsMessages.DJ_REMOVED,
+                    PermissionsMessages.DJ_REMOVED,
                     Pair("{mentionable}", mentionable.asMention)
                 ).build()
             }
 
             else -> RobertifyEmbedUtilsKt
-                .embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS)
+                .embedMessage(guild, GeneralMessages.INVALID_ARGS)
                 .build()
         }
     }

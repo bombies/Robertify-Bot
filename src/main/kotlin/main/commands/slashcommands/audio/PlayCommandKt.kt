@@ -16,7 +16,10 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.FavouriteTracksMessages
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.PlayMessages
+import main.utils.locale.messages.ShufflePlayMessages
 import net.dv8tion.jda.api.entities.Message.Attachment
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -94,7 +97,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
         if (!memberVoiceState.inAudioChannel()) {
             event.hook.sendWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
+                embed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
             }
                 .queue()
             return
@@ -103,7 +106,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!! != selfVoiceState.channel) {
             event.hook.sendWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                    GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                     Pair("{channel}", selfVoiceState.channel!!.asMention)
                 )
             }
@@ -134,7 +137,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 var link = event.getRequiredOption("tracks").asString
                 if (!link.isUrl()) {
                     event.hook.sendWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.ShufflePlayMessages.INVALID_LINK)
+                        embed(ShufflePlayMessages.INVALID_LINK)
                     }
                 } else link = URL(link).getDestination()
 
@@ -142,7 +145,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=[a-zA-Z0-9]+)?".toRegex()) -> {
                         event.hook.sendWithEmbed(guild) {
                             embed(
-                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Spotify")
                             )
                         }.queue()
@@ -152,7 +155,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     link.contains("music.apple.com") && !link.matches("(https?://)?(www\\.)?music\\.apple\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)(/[a-zA-Z\\d\\-]+)?/(?<identifier>[a-zA-Z\\d\\-.]+)(\\?i=(?<identifier2>\\d+))?".toRegex()) -> {
                         event.hook.sendWithEmbed(guild) {
                             embed(
-                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Apple Music")
                             )
                         }.queue()
@@ -162,7 +165,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     link.contains("deezer.com") && !link.matches("(https?://)?(www\\.)?deezer\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)/(?<identifier>[0-9]+)".toRegex()) -> {
                         event.hook.sendWithEmbed(guild) {
                             embed(
-                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Deezer")
                             )
                         }.queue()
@@ -172,7 +175,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     link.contains("soundcloud.com") && !link.contains("sets") -> {
                         event.hook.sendWithEmbed(guild) {
                             embed(
-                                RobertifyLocaleMessageKt.ShufflePlayMessages.NOT_PLAYLIST,
+                                ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "SoundCloud")
                             )
                         }.queue()
@@ -206,7 +209,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             val linkDestination = link.toUrl()!!.getDestination()
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
                 event.hook.sendWithEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.GeneralMessages.NO_YOUTUBE_SUPPORT)
+                    embed(GeneralMessages.NO_YOUTUBE_SUPPORT)
                 }
                     .queue()
                 return
@@ -214,7 +217,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         }
 
         event.hook.sendWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
+            embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
         }.queue { msg ->
             runBlocking {
                 launch {
@@ -243,7 +246,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                         Files.createDirectory(Paths.get(ConfigKt.AUDIO_DIR))
                     } catch (e: Exception) {
                         event.hook.sendWithEmbed(guild) {
-                            embed(RobertifyLocaleMessageKt.PlayMessages.LOCAL_DIR_ERR)
+                            embed(PlayMessages.LOCAL_DIR_ERR)
                         }
                             .setActionRow(
                                 link(
@@ -262,7 +265,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 try {
                     val audioManager = RobertifyAudioManagerKt
                     event.hook.sendWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
+                        embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
                     }.queue { addingMsg ->
                         file.proxy
                             .downloadToFile(File("${ConfigKt.AUDIO_DIR}/${file.fileName}.${file.fileExtension}"))
@@ -285,7 +288,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 } catch (e: IllegalArgumentException) {
                     logger.error("Error when attempting to download track", e)
                     event.hook.sendWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.PlayMessages.FILE_DOWNLOAD_ERR)
+                        embed(PlayMessages.FILE_DOWNLOAD_ERR)
                     }.setActionRow(
                         link(
                             url = "https://robertify.me/support",
@@ -297,7 +300,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             }
 
             else -> event.hook.sendWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.PlayMessages.INVALID_FILE)
+                embed(PlayMessages.INVALID_FILE)
             }.queue()
         }
     }

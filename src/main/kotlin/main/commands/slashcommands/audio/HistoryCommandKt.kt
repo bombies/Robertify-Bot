@@ -4,7 +4,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.HistoryMessages
 import main.utils.pagination.PaginationHandlerKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -19,7 +19,7 @@ class HistoryCommandKt : AbstractSlashCommandKt(CommandKt(
         val queueHandler = scheduler.queueHandler
 
         if (queueHandler.isPreviousTracksEmpty)
-            event.replyWithEmbed(guild) { embed(RobertifyLocaleMessageKt.HistoryMessages.NO_PAST_TRACKS) }
+            event.replyWithEmbed(guild) { embed(HistoryMessages.NO_PAST_TRACKS) }
                 .queue()
         else {
             val content = QueueCommandKt().getPastContent(guild, queueHandler)

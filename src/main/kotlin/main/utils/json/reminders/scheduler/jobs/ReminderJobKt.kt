@@ -7,7 +7,7 @@ import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.reminders.RemindersConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.ReminderMessages
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import org.quartz.Job
@@ -58,7 +58,7 @@ class ReminderJobKt : Job {
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         channel.sendMessage(
             localeManager.getMessage(
-                RobertifyLocaleMessageKt.ReminderMessages.REMINDER_SEND,
+                ReminderMessages.REMINDER_SEND,
                 Pair(
                     "{user}",
                     GeneralUtilsKt.toMention(guild, user, GeneralUtilsKt.Mentioner.USER)
@@ -68,7 +68,7 @@ class ReminderJobKt : Job {
             .setEmbeds(
                 RobertifyEmbedUtilsKt.embedMessageWithTitle(
                     guild,
-                    localeManager.getMessage(RobertifyLocaleMessageKt.ReminderMessages.REMINDERS_EMBED_TITLE),
+                    localeManager.getMessage(ReminderMessages.REMINDERS_EMBED_TITLE),
                     reminder
                 )
                     .setTimestamp(Instant.now())
@@ -84,12 +84,12 @@ class ReminderJobKt : Job {
             user,
             RobertifyEmbedUtilsKt.embedMessageWithTitle(
                 guild,
-                localeManager.getMessage(RobertifyLocaleMessageKt.ReminderMessages.REMINDERS_EMBED_TITLE),
+                localeManager.getMessage(ReminderMessages.REMINDERS_EMBED_TITLE),
                 reminder
             )
                 .setFooter(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.ReminderMessages.REMINDER_FROM,
+                        ReminderMessages.REMINDER_FROM,
                         Pair("{server}", guild.name)
                     )
                 )

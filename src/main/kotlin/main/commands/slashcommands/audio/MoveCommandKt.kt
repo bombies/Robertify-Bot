@@ -14,7 +14,8 @@ import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.MoveMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -76,16 +77,16 @@ class MoveCommandKt : AbstractSlashCommandKt(
         position: Int
     ): MessageEmbed {
         if (queueHandler.isEmpty)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_IN_QUEUE)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.NOTHING_IN_QUEUE)
                 .build()
 
         val trackList = queueHandler.contents.toMutableList()
 
         if (id <= 0 || id > trackList.size)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.MoveMessages.INVALID_SONG_ID)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, MoveMessages.INVALID_SONG_ID)
                 .build()
         else if (position <= 0 || position > trackList.size)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.MoveMessages.INVALID_POSITION_ID)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, MoveMessages.INVALID_POSITION_ID)
                 .build()
 
         val prevList = trackList.toMutableList()
@@ -97,7 +98,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
             queueHandler.addAll(trackList)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.MoveMessages.COULDNT_MOVE,
+                MoveMessages.COULDNT_MOVE,
                 Pair("{id}", id.toString())
             ).build()
         }
@@ -107,7 +108,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
         val movedTrack = trackList[id - 1]
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_MOVE,
-            RobertifyLocaleMessageKt.MoveMessages.MOVED_LOG,
+            MoveMessages.MOVED_LOG,
             Pair("{user}", mover.asMention),
             Pair("{title}", movedTrack.title),
             Pair("{author}", movedTrack.author),
@@ -116,7 +117,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
 
         return RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.MoveMessages.MOVED,
+            MoveMessages.MOVED,
             Pair("{title}", movedTrack.title),
             Pair("{author}", movedTrack.author),
             Pair("{position}", position.toString())

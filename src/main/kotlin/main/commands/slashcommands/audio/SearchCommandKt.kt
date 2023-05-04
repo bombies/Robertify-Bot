@@ -8,7 +8,9 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.FavouriteTracksMessages
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.SearchMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -34,7 +36,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(event.channel.asGuildMessageChannel())) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
+                embed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
             }.queue()
             return
         }
@@ -43,7 +45,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         event.replyWithEmbed(guild) {
             embed(
-                RobertifyLocaleMessageKt.SearchMessages.LOOKING_FOR,
+                SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
             )
         }.queue { addingMsg ->
@@ -75,7 +77,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         if (event.user.id != id) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.NO_MENU_PERMS)
+                embed(GeneralMessages.NO_MENU_PERMS)
             }.setEphemeral(true)
                 .queue()
             return
@@ -99,7 +101,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         val trackQuery = event.selectedOptions.first().value
         event.replyWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
+            embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
 
@@ -123,7 +125,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
             "end" -> {
                 if (event.user.id != searcherId)
                     event.replyWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.GeneralMessages.NO_PERMS_END_INTERACTION)
+                        embed(GeneralMessages.NO_PERMS_END_INTERACTION)
                     }.setEphemeral(true)
                         .queue()
                 else event.message.delete().queue()

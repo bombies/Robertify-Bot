@@ -7,7 +7,7 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.LogChannelMessages
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -35,7 +35,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(channel)) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.LogChannelMessages.CANNOT_SET_LOG_CHANNEL)
+                embed(LogChannelMessages.CANNOT_SET_LOG_CHANNEL)
             }.setEphemeral(true)
                 .queue()
             return
@@ -50,7 +50,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
         config.channelId = channel.idLong
         event.replyWithEmbed(guild) {
             embed(
-                RobertifyLocaleMessageKt.LogChannelMessages.LOG_CHANNEL_SET,
+                LogChannelMessages.LOG_CHANNEL_SET,
                 Pair("{channel}", channel.asMention)
             )
         }.queue()

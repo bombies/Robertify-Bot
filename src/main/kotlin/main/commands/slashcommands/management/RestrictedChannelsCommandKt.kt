@@ -6,7 +6,6 @@ import main.constants.BotConstantsKt
 import main.constants.ToggleKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbeds
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -14,7 +13,7 @@ import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.RestrictedChannelMessages
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
@@ -86,7 +85,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
                 config.addChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
                 e.replyWithEmbed(e.guild!!) {
                     embed(
-                        RobertifyLocaleMessageKt.RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
+                        RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                         Pair("{channelId}", channel.id),
                         Pair("{channelType}", "text")
                     )
@@ -96,7 +95,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
                 config.addChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
                 e.replyWithEmbed(e.guild!!) {
                     embed(
-                        RobertifyLocaleMessageKt.RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
+                        RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                         Pair("{channelId}", channel.id),
                         Pair("{channelType}", "voice")
                     )
@@ -192,16 +191,16 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
 
         val embed = RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.RestrictedChannelMessages.LISTING_RESTRICTED_CHANNELS
+            RestrictedChannelMessages.LISTING_RESTRICTED_CHANNELS
         )
             .addField(
-                localeManager.getMessage(RobertifyLocaleMessageKt.RestrictedChannelMessages.RESTRICTED_CHANNELS_TC_EMBED_FIELD),
-                textChannels.ifEmpty { localeManager.getMessage(RobertifyLocaleMessageKt.RestrictedChannelMessages.NO_CHANNELS) },
+                localeManager.getMessage(RestrictedChannelMessages.RESTRICTED_CHANNELS_TC_EMBED_FIELD),
+                textChannels.ifEmpty { localeManager.getMessage(RestrictedChannelMessages.NO_CHANNELS) },
                 false
             )
             .addField(
-                localeManager.getMessage(RobertifyLocaleMessageKt.RestrictedChannelMessages.RESTRICTED_CHANNELS_VC_EMBED_FIELD),
-                voiceChannels.ifEmpty { localeManager.getMessage(RobertifyLocaleMessageKt.RestrictedChannelMessages.NO_CHANNELS) },
+                localeManager.getMessage(RestrictedChannelMessages.RESTRICTED_CHANNELS_VC_EMBED_FIELD),
+                voiceChannels.ifEmpty { localeManager.getMessage(RestrictedChannelMessages.NO_CHANNELS) },
                 false
             ).build()
 

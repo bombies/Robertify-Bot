@@ -11,10 +11,10 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.genius.GeniusAPIKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.LyricsMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import java.io.IOException
-import java.lang.IllegalArgumentException
 
 class LyricsCommandKt : AbstractSlashCommandKt(
     CommandKt(
@@ -65,7 +65,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
         }
 
         event.replyWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.LyricsMessages.LYRICS_SEARCHING, Pair("{query}", query))
+            embed(LyricsMessages.LYRICS_SEARCHING, Pair("{query}", query))
         }.queue { lookingMsg ->
             val geniusAPI = GeniusAPIKt()
             val songSearch = try {
@@ -77,14 +77,14 @@ class LyricsCommandKt : AbstractSlashCommandKt(
 
             if (songSearch.status == 403) {
                 lookingMsg.editEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.GeneralMessages.SELF_INSUFFICIENT_PERMS)
+                    embed(GeneralMessages.SELF_INSUFFICIENT_PERMS)
                 }.queue()
                 return@queue
             }
 
             if (songSearch.status == 404 || songSearch.hits.size == 0) {
                 lookingMsg.editEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
+                    embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
                 }.queue()
                 return@queue
             }
@@ -94,7 +94,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
 
             if (lyrics == null) {
                 lookingMsg.editEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
+                    embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
                 }.queue()
                 return@queue
             }
@@ -102,7 +102,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
             try {
                 lookingMsg.editEmbed(guild) {
                     embed(
-                        title = RobertifyLocaleMessageKt.LyricsMessages.LYRICS_EMBED_TITLE,
+                        title = LyricsMessages.LYRICS_EMBED_TITLE,
                         description = lyrics,
                         Pair("{title}", hit.title),
                         Pair("{author}", hit.artist.name)
@@ -112,7 +112,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
                 val chars = lyrics.length
                 lookingMsg.editEmbed(guild) {
                     embed(
-                        RobertifyLocaleMessageKt.LyricsMessages.LYRICS_EMBED_TITLE,
+                        LyricsMessages.LYRICS_EMBED_TITLE,
                         lyrics.substring(0, 4096),
                         Pair("{title}", hit.title),
                         Pair("{author}", hit.artist.name)

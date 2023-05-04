@@ -8,7 +8,8 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.ShuffleMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -33,7 +34,7 @@ class ShuffleCommandKt : AbstractSlashCommandKt(
         val queueHandler = musicManager.scheduler.queueHandler
 
         if (queueHandler.isEmpty)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.NOTHING_PLAYING)
                 .build()
 
         val trackList = queueHandler.contents.shuffled()
@@ -45,10 +46,10 @@ class ShuffleCommandKt : AbstractSlashCommandKt(
 
         LogUtilsKt(guild).sendLog(
             LogTypeKt.QUEUE_SHUFFLE,
-            RobertifyLocaleMessageKt.ShuffleMessages.SHUFFLED_LOG,
+            ShuffleMessages.SHUFFLED_LOG,
             Pair("{user}", shuffler.asMention)
         )
-        return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.ShuffleMessages.SHUFFLED).build()
+        return RobertifyEmbedUtilsKt.embedMessage(guild, ShuffleMessages.SHUFFLED).build()
     }
 
     override val help: String

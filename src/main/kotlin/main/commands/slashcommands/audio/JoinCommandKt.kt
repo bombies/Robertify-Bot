@@ -2,22 +2,18 @@ package main.commands.slashcommands.audio
 
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.constants.ToggleKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
-import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
-import main.utils.json.toggles.TogglesConfigKt
-import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.JoinMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
-import java.lang.IllegalStateException
 
 class JoinCommandKt : AbstractSlashCommandKt(
     CommandKt(
@@ -52,7 +48,7 @@ class JoinCommandKt : AbstractSlashCommandKt(
         if (!memberVoiceState.inAudioChannel())
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
             ).build()
 
         val channel = memberVoiceState.channel!!
@@ -62,30 +58,30 @@ class JoinCommandKt : AbstractSlashCommandKt(
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!!.id == selfVoiceState.channel!!.id)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.JoinMessages.ALREADY_JOINED,
+                JoinMessages.ALREADY_JOINED,
                 placeholderPair
             ).build()
 
         return try {
             RobertifyAudioManagerKt.joinAudioChannel(channel, musicManager, messageChannel)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.JoinMessages.JOINED, placeholderPair)
+            RobertifyEmbedUtilsKt.embedMessage(guild, JoinMessages.JOINED, placeholderPair)
                 .build()
         } catch (e: IllegalStateException) {
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.JoinMessages.CANT_JOIN,
+                JoinMessages.CANT_JOIN,
                 placeholderPair
             )
                 .build()
         } catch (e: InsufficientPermissionException) {
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
+                GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
                 placeholderPair
             ).build()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR).build()
         }
     }
 

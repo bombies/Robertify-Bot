@@ -7,7 +7,7 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.ClearQueueMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
@@ -28,7 +28,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
 
         if (queueHandler.isEmpty) {
             event.hook.sendWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.ClearQueueMessages.CQ_NOTHING_IN_QUEUE)
+                embed(ClearQueueMessages.CQ_NOTHING_IN_QUEUE)
             }.queue()
             return
         }
@@ -44,11 +44,11 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
         queueHandler.clear()
         LogUtilsKt(guild).sendLog(
             LogTypeKt.QUEUE_CLEAR,
-            "${event.user.asMention} ${localeManager.getMessage(RobertifyLocaleMessageKt.ClearQueueMessages.QUEUE_CLEARED_USER)}"
+            "${event.user.asMention} ${localeManager.getMessage(ClearQueueMessages.QUEUE_CLEARED_USER)}"
         )
 
         event.hook.sendWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.ClearQueueMessages.QUEUE_CLEAR)
+            embed(ClearQueueMessages.QUEUE_CLEAR)
         }.queue()
     }
 }

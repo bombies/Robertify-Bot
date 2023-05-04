@@ -8,7 +8,8 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.permissions.PermissionsConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.PermissionsMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.IMentionable
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -45,13 +46,13 @@ class SetDJCommandKt : AbstractSlashCommandKt(
                     config.addRoleToPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.DJ_SET,
+                        PermissionsMessages.DJ_SET,
                         Pair("{mentionable}", mentionable.asMention)
                     ).build()
                 } catch (e: IllegalAccessException) {
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                        PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
                         Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
                     ).build()
@@ -62,7 +63,7 @@ class SetDJCommandKt : AbstractSlashCommandKt(
                 if (config.userHasPermission(mentionable.idLong, PermissionKt.ROBERTIFY_DJ))
                     return RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                        PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                         Pair("{mentionable}", mentionable.asMention),
                         Pair("{permission}", PermissionKt.ROBERTIFY_DJ.name)
                     ).build()
@@ -70,13 +71,13 @@ class SetDJCommandKt : AbstractSlashCommandKt(
                 config.addPermissionToUser(mentionable.idLong, PermissionKt.ROBERTIFY_DJ)
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.PermissionsMessages.DJ_SET,
+                    PermissionsMessages.DJ_SET,
                     Pair("{mentionable}", mentionable.asMention)
                 ).build()
             }
 
             else -> RobertifyEmbedUtilsKt
-                .embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS)
+                .embedMessage(guild, GeneralMessages.INVALID_ARGS)
                 .build()
         }
     }

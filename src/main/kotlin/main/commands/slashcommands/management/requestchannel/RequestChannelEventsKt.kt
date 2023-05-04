@@ -16,7 +16,8 @@ import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelButtonId
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.json.toggles.TogglesConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.LoopMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Member
@@ -139,12 +140,12 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
 
                     logUtils.sendLog(
                         LogTypeKt.QUEUE_LOOP,
-                        RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_LOG,
+                        LoopMessages.QUEUE_LOOP_LOG,
                         Pair("{user}", member.asMention),
                         Pair("{status}", "looped")
                     )
 
-                    RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_START)
+                    RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.QUEUE_LOOP_START)
                         .build()
                 }
 
@@ -154,12 +155,12 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
 
                     logUtils.sendLog(
                         LogTypeKt.QUEUE_LOOP,
-                        RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_LOG,
+                        LoopMessages.QUEUE_LOOP_LOG,
                         Pair("{user}", member.asMention),
                         Pair("{status}", "unlooped")
                     )
 
-                    RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_STOP)
+                    RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.QUEUE_LOOP_STOP)
                         .build()
                 }
 
@@ -169,7 +170,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
 
                     logUtils.sendLog(
                         LogTypeKt.QUEUE_LOOP,
-                        RobertifyLocaleMessageKt.LoopMessages.LOOP_LOG,
+                        LoopMessages.LOOP_LOG,
                         Pair("{user}", member.asMention),
                         Pair("{status}", "looped"),
                         Pair("{title}", playingTrack.title),
@@ -178,7 +179,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
 
                     RobertifyEmbedUtilsKt.embedMessage(
                         guild,
-                        RobertifyLocaleMessageKt.LoopMessages.LOOP_START,
+                        LoopMessages.LOOP_START,
                         Pair("{title}", playingTrack.title)
                     )
                         .build()
@@ -237,7 +238,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
     ): MessageEmbed {
         val guild = memberVoiceState.guild
         if (!djCheck(command, guild, memberVoiceState.member))
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.DJ_BUTTON).build()
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.DJ_BUTTON).build()
         return logic(command)
     }
 

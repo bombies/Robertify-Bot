@@ -6,7 +6,6 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
-import dev.minn.jda.ktx.messages.send
 import dev.minn.jda.ktx.util.SLF4J
 import lavalink.client.io.Link
 import main.audiohandlers.loaders.AutoPlayLoaderKt
@@ -22,6 +21,7 @@ import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
+import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.resume.ResumableTrackKt
 import main.utils.resume.ResumableTrackKt.Companion.string
@@ -106,7 +106,7 @@ object RobertifyAudioManagerKt {
             botMessage?.editMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS
+                    GeneralMessages.INVALID_ARGS
                 ).build()
             )
                 ?.queue()
@@ -210,7 +210,7 @@ object RobertifyAudioManagerKt {
         messageChannel: GuildMessageChannel? = null
     ): Boolean {
         try {
-            require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
+            require(!GuildConfigKt(musicManager.guild).twentyFourSevenMode && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
                     val guild = musicManager.guild
@@ -225,12 +225,12 @@ object RobertifyAudioManagerKt {
                         ) {
                             val embed = RobertifyEmbedUtilsKt.embedMessage(
                                 guild,
-                                localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.CANT_JOIN_CHANNEL) +
+                                localeManager.getMessage(GeneralMessages.CANT_JOIN_CHANNEL) +
                                         if (restrictedChannelConfig.getRestrictedChannels(RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
                                                 .isNotEmpty()
                                         )
                                             localeManager.getMessage(
-                                                RobertifyLocaleMessageKt.GeneralMessages.RESTRICTED_TO_JOIN,
+                                                GeneralMessages.RESTRICTED_TO_JOIN,
                                                 Pair(
                                                     "{channels}",
                                                     restrictedChannelConfig.restrictedChannelsToString(
@@ -239,7 +239,7 @@ object RobertifyAudioManagerKt {
                                                 )
                                             )
                                         else
-                                            localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.NO_VOICE_CHANNEL)
+                                            localeManager.getMessage(GeneralMessages.NO_VOICE_CHANNEL)
                             ).build()
 
                             messageChannel?.sendWithEmbed(guild) { embed }?.queue()
@@ -261,7 +261,7 @@ object RobertifyAudioManagerKt {
             messageChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     messageChannel.guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
+                    GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
                     Pair("{channel}", channel.asMention)
                 ).build()
             )?.queue()

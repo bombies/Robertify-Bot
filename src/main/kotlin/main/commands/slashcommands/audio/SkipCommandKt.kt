@@ -22,7 +22,8 @@ import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.SkipMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -62,7 +63,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         if (!musicCommandDJCheck(event)) {
             if (!selfVoiceState.inAudioChannel()) {
                 event.hook.sendWithEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.GeneralMessages.VOICE_CHANNEL_NEEDED)
+                    embed(GeneralMessages.VOICE_CHANNEL_NEEDED)
                 }.setEphemeral(true)
                     .queue()
                 return
@@ -75,7 +76,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                         .queue()
                 } else {
                     event.hook.sendWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIP_STARTED)
+                        embed(SkipMessages.VOTE_SKIP_STARTED)
                     }.queue()
                 }
                 return
@@ -104,16 +105,16 @@ class SkipCommandKt : AbstractSlashCommandKt(
         val player = musicManager.player
 
         if (player.playingTrack == null)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SkipMessages.NOTHING_TO_SKIP)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, SkipMessages.NOTHING_TO_SKIP)
                 .build()
 
         skip(guild)
 
         LogUtilsKt(guild).sendLog(
-            LogTypeKt.TRACK_SKIP, RobertifyLocaleMessageKt.SkipMessages.SKIPPED_LOG,
+            LogTypeKt.TRACK_SKIP, SkipMessages.SKIPPED_LOG,
             Pair("{user}", memberVoiceState.member.asMention)
         )
-        return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SkipMessages.SKIPPED).build()
+        return RobertifyEmbedUtilsKt.embedMessage(guild, SkipMessages.SKIPPED).build()
     }
 
     fun handleSkip(skipper: User, musicManager: GuildMusicManagerKt, id: Int): MessageEmbed {
@@ -123,7 +124,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         if (id > queueHandler.size || id <= 0)
             return RobertifyEmbedUtilsKt.embedMessage(
                 musicManager.guild,
-                RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS
+                GeneralMessages.INVALID_ARGS
             ).build()
 
         val player = musicManager.player
@@ -156,13 +157,13 @@ class SkipCommandKt : AbstractSlashCommandKt(
         val player = musicManager.player
 
         if (player.playingTrack == null)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SkipMessages.NOTHING_TO_SKIP)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, SkipMessages.NOTHING_TO_SKIP)
                 .build()
 
         val neededVotes = getNeededVotes(guild)
         channel.sendWithEmbed(guild) {
             embed(
-                RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIP_STARTED_EMBED,
+                SkipMessages.VOTE_SKIP_STARTED_EMBED,
                 Pair("{user}", memberVoiceState.member.asMention),
                 Pair("{neededVotes}", neededVotes.toString())
             )
@@ -180,7 +181,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                 val starter = memberVoiceState.member
 
                 LogUtilsKt(guild).sendLog(
-                    LogTypeKt.TRACK_VOTE_SKIP, RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIP_STARTED_LOG,
+                    LogTypeKt.TRACK_VOTE_SKIP, SkipMessages.VOTE_SKIP_STARTED_LOG,
                     Pair("{user}", starter.asMention)
                 )
 
@@ -240,7 +241,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
                 msg.editEmbed(guild) {
                     embed(
-                        RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIPPED,
+                        SkipMessages.VOTE_SKIPPED,
                         Pair("{title}", track.title),
                         Pair("{author}", track.author)
                     )
@@ -249,7 +250,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     .queue()
 
                 LogUtilsKt(guild).sendLog(
-                    LogTypeKt.TRACK_SKIP, RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIPPED_LOG,
+                    LogTypeKt.TRACK_SKIP, SkipMessages.VOTE_SKIPPED_LOG,
                     Pair("{title}", track.title),
                     Pair("{author}", track.author)
                 )
@@ -268,7 +269,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
             guild.getTextChannelById(message.first)
                 ?.retrieveMessageById(message.second)
                 ?.queue { msg ->
-                    msg.editEmbed(guild) { embed(RobertifyLocaleMessageKt.SkipMessages.SKIPPED) }
+                    msg.editEmbed(guild) { embed(SkipMessages.SKIPPED) }
                         .queue { voteSkipManagerKt.voteSkipMessage = null }
                 }
         }
@@ -308,7 +309,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         if (!selfVoiceState.inAudioChannel()) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.BUTTON_NO_LONGER_VALID)
+                embed(GeneralMessages.BUTTON_NO_LONGER_VALID)
             }.setEphemeral(true)
                 .queue()
             return
@@ -316,7 +317,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         if (!memberVoiceState.inAudioChannel()) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
+                embed(GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
             }.setEphemeral(true)
                 .queue()
             return
@@ -324,7 +325,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         if (selfVoiceState.channel!!.id != memberVoiceState.channel!!.id) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
+                embed(GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
             }.setEphemeral(true)
                 .queue()
             return
@@ -339,7 +340,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     voteSkipManager.voteSkipCount--
 
                     event.replyWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.SkipMessages.SKIP_VOTE_REMOVED)
+                        embed(SkipMessages.SKIP_VOTE_REMOVED)
                     }
                         .setEphemeral(true)
                         .queue()
@@ -348,7 +349,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     if (GeneralUtilsKt.hasPerms(guild, event.member, PermissionKt.ROBERTIFY_DJ)) {
                         doVoteSkip(guild)
                         event.replyWithEmbed(guild) {
-                            embed(RobertifyLocaleMessageKt.SkipMessages.DJ_SKIPPED)
+                            embed(SkipMessages.DJ_SKIPPED)
                         }.setEphemeral(true)
                             .queue()
                         return
@@ -357,7 +358,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     voteSkipManager.addVoter(user.idLong)
                     voteSkipManager.voteSkipCount++
                     event.replyWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.SkipMessages.SKIP_VOTE_ADDED)
+                        embed(SkipMessages.SKIP_VOTE_ADDED)
                     }
                         .setEphemeral(true)
                         .queue()
@@ -368,7 +369,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
             "cancel" -> {
                 if (voteSkipManager.startedBy != user.idLong) {
                     event.replyWithEmbed(guild) {
-                        embed(RobertifyLocaleMessageKt.GeneralMessages.NO_PERMS_BUTTON)
+                        embed(GeneralMessages.NO_PERMS_BUTTON)
                     }.setEphemeral(true)
                         .queue()
                     return
@@ -392,7 +393,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                         clearVoteSkipInfo(guild)
                         msg.editEmbed(guild) {
                             embed(
-                                RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIP_CANCELLED,
+                                SkipMessages.VOTE_SKIP_CANCELLED,
                                 Pair("{title}", track.title),
                                 Pair("{author}", track.author)
                             )
@@ -415,7 +416,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                 val neededvotes = getNeededVotes(guild)
                 msg.editEmbed(guild) {
                     embed(
-                        RobertifyLocaleMessageKt.SkipMessages.VOTE_SKIP_STARTED_EMBED,
+                        SkipMessages.VOTE_SKIP_STARTED_EMBED,
                         Pair(
                             "{user}",
                             GeneralUtilsKt.toMention(

@@ -17,7 +17,8 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.NowPlayingMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -49,24 +50,24 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         val embed: MessageEmbed? = when {
             !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             !memberVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
             ).build()
 
             memberVoiceState.channel != selfVoiceState.channel ->
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                    GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                     Pair("{channel}", selfVoiceState.channel!!.asMention)
                 ).build()
 
             track == null -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             else -> null
@@ -129,24 +130,24 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         val embed: MessageEmbed? = when {
             !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             !memberVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
             ).build()
 
             memberVoiceState.channel != selfVoiceState.channel ->
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                    GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                     Pair("{channel}", selfVoiceState.channel!!.asMention)
                 ).build()
 
             track == null -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             else -> null
@@ -161,7 +162,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         val embedBuilder = RobertifyEmbedUtilsKt.embedMessageWithTitle(
             guild, localeManager.getMessage(
-                RobertifyLocaleMessageKt.NowPlayingMessages.NP_EMBED_TITLE,
+                NowPlayingMessages.NP_EMBED_TITLE,
                 Pair("{title}", track.title),
                 Pair("{author}", track.author)
             ),
@@ -169,7 +170,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                 if (TogglesConfigKt(guild).getToggle(ToggleKt.SHOW_REQUESTER) && requester != null) {
                     "\n\n${
                         localeManager.getMessage(
-                            RobertifyLocaleMessageKt.NowPlayingMessages.NP_REQUESTER,
+                            NowPlayingMessages.NP_REQUESTER,
                             Pair("{requester}", requester.toString())
                         )
                     }"
@@ -187,8 +188,8 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
                     }" +
                     "${if (track.isStream) "" else "`[${GeneralUtilsKt.formatTime(track.length)}]`"}\n\n" +
                     "${
-                        if (track.isStream) localeManager.getMessage(RobertifyLocaleMessageKt.NowPlayingMessages.NP_LIVESTREAM) else localeManager.getMessage(
-                            RobertifyLocaleMessageKt.NowPlayingMessages.NP_TIME_LEFT,
+                        if (track.isStream) localeManager.getMessage(NowPlayingMessages.NP_LIVESTREAM) else localeManager.getMessage(
+                            NowPlayingMessages.NP_TIME_LEFT,
                             Pair(
                                 "{time}",
                                 GeneralUtilsKt.formatTime(track.length - player.trackPosition)
@@ -209,7 +210,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
             embedBuilder.setImage(track.artworkURL)
 
         embedBuilder.setAuthor(
-            localeManager.getMessage(RobertifyLocaleMessageKt.NowPlayingMessages.NP_AUTHOR),
+            localeManager.getMessage(NowPlayingMessages.NP_AUTHOR),
             if (track.uri.isUrl()) track.uri else null,
             ThemesConfigKt(guild).theme.transparent
         )

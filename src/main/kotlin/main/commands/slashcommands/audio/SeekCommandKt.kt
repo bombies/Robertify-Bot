@@ -13,7 +13,7 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.SeekMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -70,11 +70,11 @@ class SeekCommandKt : AbstractSlashCommandKt(
         if (acChecks.isNotNull()) return acChecks!!
 
         if (minutes < 0 || minutes > 59)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SeekMessages.INVALID_MINUTES)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, SeekMessages.INVALID_MINUTES)
                 .build()
 
         if (seconds < 0 || seconds > 59)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SeekMessages.INVALID_SECONDS)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, SeekMessages.INVALID_SECONDS)
                 .build()
 
         val seekDuration =
@@ -86,7 +86,7 @@ class SeekCommandKt : AbstractSlashCommandKt(
         val playingTrack = player.playingTrack
 
         if (seekDuration > playingTrack.length)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.SeekMessages.POS_GT_DURATION)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, SeekMessages.POS_GT_DURATION)
                 .build()
 
         player.seekTo(seekDuration)
@@ -95,7 +95,7 @@ class SeekCommandKt : AbstractSlashCommandKt(
 
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_SEEK,
-            RobertifyLocaleMessageKt.SeekMessages.SOUGHT_LOG,
+            SeekMessages.SOUGHT_LOG,
             Pair("{user}", memberVoiceState.member.asMention),
             Pair("{time}", time),
             Pair("{title}", playingTrack.title),
@@ -103,7 +103,7 @@ class SeekCommandKt : AbstractSlashCommandKt(
         )
         return RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.SeekMessages.SOUGHT,
+            SeekMessages.SOUGHT,
             Pair("{time}", time),
             Pair("{title}", playingTrack.title),
             Pair("{author}", playingTrack.author)

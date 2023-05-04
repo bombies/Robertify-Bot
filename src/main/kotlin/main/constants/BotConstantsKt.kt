@@ -1,11 +1,9 @@
 package main.constants
 
 import main.main.ConfigKt
-import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.asString
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 
@@ -25,13 +23,13 @@ enum class BotConstantsKt(private val str: String) {
     companion object {
         fun getInsufficientPermsMessage(guild: Guild?, vararg permsNeeded: PermissionKt?): String {
             return LocaleManagerKt.getLocaleManager(guild).getMessage(
-                RobertifyLocaleMessageKt.GeneralMessages.INSUFFICIENT_PERMS,
+                GeneralMessages.INSUFFICIENT_PERMS,
                 Pair("{permissions}", permsNeeded.mapNotNull { it?.name }.joinToString(", "))
             )
         }
 
         fun getUnexpectedErrorEmbed(guild: Guild?): MessageEmbed {
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR)
                 .build()
         }
     }

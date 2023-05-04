@@ -11,7 +11,7 @@ import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.AudioLoaderMessages
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -78,7 +78,7 @@ class MainAudioLoaderKt(
 
         val info = track.info
         LogUtilsKt(guild).sendLog(
-            LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_ADD_LOG,
+            LogTypeKt.QUEUE_ADD, AudioLoaderMessages.QUEUE_ADD_LOG,
             Pair("{user}", sender?.asMention ?: requester.toString()),
             Pair("{title}", info.title),
             Pair("{author}", info.author)
@@ -108,7 +108,7 @@ class MainAudioLoaderKt(
     private fun sendTrackLoadedMessage(track: AudioTrack) {
         val embed = RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_ADD,
+            AudioLoaderMessages.QUEUE_ADD,
             Pair("{title}", track.info.title),
             Pair("{author}", track.info.author)
         ).build()
@@ -119,7 +119,7 @@ class MainAudioLoaderKt(
     override fun onPlaylistLoad(playlist: AudioPlaylist) {
         val mutableTracks = playlist.tracks.toMutableList()
         val embed = RobertifyEmbedUtilsKt.embedMessage(
-            guild, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
+            guild, AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
             Pair("{numTracks}", mutableTracks.size.toString()),
             Pair("{playlist}", playlist.name ?: "Unknown Playlist")
         ).build()
@@ -140,7 +140,7 @@ class MainAudioLoaderKt(
 
         if (sender != null)
             LogUtilsKt(guild).sendLog(
-                LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
+                LogTypeKt.QUEUE_ADD, AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                 Pair("{user}", sender.asMention),
                 Pair("{numTracks}", mutableTracks.size.toString()),
                 Pair("{playlist}", playlist.name ?: "Unknown Playlist")
@@ -175,7 +175,7 @@ class MainAudioLoaderKt(
         val info = firstResult.info
         if (sender != null)
             LogUtilsKt(guild).sendLog(
-                LogTypeKt.QUEUE_ADD, RobertifyLocaleMessageKt.AudioLoaderMessages.QUEUE_ADD_LOG,
+                LogTypeKt.QUEUE_ADD, AudioLoaderMessages.QUEUE_ADD_LOG,
                 Pair("{user}", sender.asMention),
                 Pair("{title}", info.title),
                 Pair("{author}", info.author)
@@ -186,11 +186,11 @@ class MainAudioLoaderKt(
         val embed = if (query.length < 4096)
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND,
+                AudioLoaderMessages.NO_TRACK_FOUND,
                 Pair("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))
             )
                 .build()
-        else RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND_ALT)
+        else RobertifyEmbedUtilsKt.embedMessage(guild, AudioLoaderMessages.NO_TRACK_FOUND_ALT)
             .build()
 
         handleMessageUpdate(embed)
@@ -216,7 +216,7 @@ class MainAudioLoaderKt(
             if (exception.message?.contains("available") == true || exception.message?.contains("format") == true)
                 exception.message!!
             else LocaleManagerKt.getLocaleManager(guild)
-                .getMessage(RobertifyLocaleMessageKt.AudioLoaderMessages.ERROR_LOADING_TRACK)
+                .getMessage(AudioLoaderMessages.ERROR_LOADING_TRACK)
         ).build()
 
         handleMessageUpdate(embed)

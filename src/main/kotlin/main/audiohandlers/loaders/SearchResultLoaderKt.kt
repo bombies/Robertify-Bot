@@ -4,23 +4,21 @@ import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import dev.minn.jda.ktx.interactions.components.button
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.GuildMusicManagerKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilderKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.AudioLoaderMessages
+import main.utils.locale.messages.SearchMessages
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.components.ActionRow
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 
 class SearchResultLoaderKt(
     override val musicManager: GuildMusicManagerKt,
@@ -59,7 +57,7 @@ class SearchResultLoaderKt(
 
         val selectionMenu = StringSelectionMenuBuilderKt(
             _name = "searchresult:${searcher.id}:${query.lowercase().replace(" ", "%SPACE%")}",
-            placeholder = localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_MENU_PLACEHOLDER),
+            placeholder = localeManager.getMessage(SearchMessages.SEARCH_MENU_PLACEHOLDER),
             range = Pair(1, 1),
             _options = options
         ).build()
@@ -69,20 +67,20 @@ class SearchResultLoaderKt(
                 RobertifyEmbedUtilsKt.embedMessage(guild, embedDesc.toString())
                     .setAuthor(
                         localeManager.getMessage(
-                            RobertifyLocaleMessageKt.SearchMessages.SEARCH_EMBED_AUTHOR,
+                            SearchMessages.SEARCH_EMBED_AUTHOR,
                             Pair("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))
                         ),
                         null,
                         ThemesConfigKt(guild).theme.transparent
                     )
-                    .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_EMBED_FOOTER))
+                    .setFooter(localeManager.getMessage(SearchMessages.SEARCH_EMBED_FOOTER))
                     .build()
             ),
             components = listOf(
                 ActionRow.of(selectionMenu),
                 ActionRow.of(
                     danger(
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.SearchMessages.SEARCH_END_INTERACTION),
+                        label = localeManager.getMessage(SearchMessages.SEARCH_END_INTERACTION),
                         id = "searchresult:end:${searcher.id}"
                     )
                 )
@@ -94,7 +92,7 @@ class SearchResultLoaderKt(
         botMessage.editOriginalEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.AudioLoaderMessages.NO_TRACK_FOUND,
+                AudioLoaderMessages.NO_TRACK_FOUND,
                 Pair("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))
             ).build()
         )

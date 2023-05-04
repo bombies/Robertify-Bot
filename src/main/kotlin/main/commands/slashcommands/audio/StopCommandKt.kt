@@ -8,7 +8,8 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.StopMessages
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -40,23 +41,23 @@ class StopCommandKt : AbstractSlashCommandKt(
         return when {
             !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             !memberVoiceState.inAudioChannel() -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
             ).build()
 
             memberVoiceState.channel!!.id != selfVoiceState.channel!!.id -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                 Pair("{channel}", selfVoiceState.channel!!.asMention)
             ).build()
 
             track == null -> RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
             else -> {
@@ -66,11 +67,11 @@ class StopCommandKt : AbstractSlashCommandKt(
 
                 LogUtilsKt(guild).sendLog(
                     LogTypeKt.PLAYER_STOP,
-                    RobertifyLocaleMessageKt.StopMessages.STOPPED_LOG,
+                    StopMessages.STOPPED_LOG,
                     Pair("{user}", stopper.asMention)
                 )
                 scheduler.scheduleDisconnect(announceMsg = true)
-                RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.StopMessages.STOPPED).build()
+                RobertifyEmbedUtilsKt.embedMessage(guild, StopMessages.STOPPED).build()
             }
         }
 

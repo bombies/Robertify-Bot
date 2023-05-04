@@ -8,7 +8,8 @@ import main.audiohandlers.loaders.MainAudioLoaderKt.Companion.queueThenDelete
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.AudioLoaderMessages
+import main.utils.locale.messages.AutoPlayMessages
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import java.util.concurrent.TimeUnit
 
@@ -33,10 +34,10 @@ class AutoPlayLoaderKt(
             channel.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.AudioLoaderMessages.PLAYING_RECOMMENDED_TRACKS
+                    AudioLoaderMessages.PLAYING_RECOMMENDED_TRACKS
                 )
-                    .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
-                    .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
+                    .setTitle(localeManager.getMessage(AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
+                    .setFooter(localeManager.getMessage(AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
                     .build()
             ).queueThenDelete(5, TimeUnit.MINUTES)
         }
@@ -64,7 +65,7 @@ class AutoPlayLoaderKt(
         channel?.sendMessageEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.AudioLoaderMessages.NO_SIMILAR_TRACKS
+                AudioLoaderMessages.NO_SIMILAR_TRACKS
             ).build()
         )
             ?.queueThenDelete(5, TimeUnit.MINUTES) {

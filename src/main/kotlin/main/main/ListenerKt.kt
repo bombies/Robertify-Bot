@@ -9,7 +9,7 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.UnbanMessages
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
@@ -75,7 +75,7 @@ class ListenerKt : AbstractEventControllerKt() {
                         embeds = listOf(
                             RobertifyEmbedUtilsKt.embedMessage(
                                 guild,
-                                RobertifyLocaleMessageKt.UnbanMessages.USER_UNBANNED,
+                                UnbanMessages.USER_UNBANNED,
                                 Pair("{server}", guild.name)
                             ).build()
                         )

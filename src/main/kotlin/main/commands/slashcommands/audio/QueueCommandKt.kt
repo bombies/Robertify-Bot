@@ -10,7 +10,8 @@ import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.QueueMessages
 import main.utils.pagination.PaginationHandlerKt
 import main.utils.pagination.pages.queue.QueueItemKt
 import net.dv8tion.jda.api.entities.Guild
@@ -29,7 +30,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
 
         if (queueHandler.isEmpty) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_IN_QUEUE)
+                embed(GeneralMessages.NOTHING_IN_QUEUE)
             }.queue()
             return
         }
@@ -42,7 +43,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
         val trackList = queueHandler.contents.toMutableList()
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         trackList.forEachIndexed { i, track ->
-            content.add(localeManager.getMessage(RobertifyLocaleMessageKt.QueueMessages.QUEUE_ENTRY,
+            content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),
                 Pair("{title}", track.title),
                 Pair("{author}", track.author),
@@ -56,7 +57,8 @@ class QueueCommandKt : AbstractSlashCommandKt(
         val content = mutableListOf<String>()
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         queueItems.forEach { track ->
-            content.add(localeManager.getMessage(RobertifyLocaleMessageKt.QueueMessages.QUEUE_ENTRY,
+            content.add(localeManager.getMessage(
+                QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", track.trackIndex.toString()),
                 Pair("{title}", track.trackTitle),
                 Pair("{author}", track.artist),
@@ -71,7 +73,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
         val trackList = queueHandler.previousTracksContents.toMutableList().reversed()
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
         trackList.forEachIndexed { i, track ->
-            content.add(localeManager.getMessage(RobertifyLocaleMessageKt.QueueMessages.QUEUE_ENTRY,
+            content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),
                 Pair("{title}", track.title),
                 Pair("{author}", track.author),

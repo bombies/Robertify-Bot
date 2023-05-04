@@ -8,6 +8,7 @@ import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
+import main.utils.locale.messages.RandomMessages
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -28,11 +29,11 @@ class RandomMessageManagerKt {
         val messages = BotDBCacheKt.instance.getRandomMessages()
 
         if (messages.isEmpty())
-            throw NullPointerException(localeManager.getMessage(RobertifyLocaleMessageKt.RandomMessages.NO_RANDOM_MESSAGES))
+            throw NullPointerException(localeManager.getMessage(RandomMessages.NO_RANDOM_MESSAGES))
 
         return RobertifyEmbedUtilsKt.embedMessage(guild, messages.get(Random.nextInt(messages.size)))
-            .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.RandomMessages.TIP_TITLE))
-            .setFooter(localeManager.getMessage(RobertifyLocaleMessageKt.RandomMessages.TIP_FOOTER))
+            .setTitle(localeManager.getMessage(RandomMessages.TIP_TITLE))
+            .setFooter(localeManager.getMessage(RandomMessages.TIP_FOOTER))
             .setTimestamp(Instant.now())
             .build()
     }

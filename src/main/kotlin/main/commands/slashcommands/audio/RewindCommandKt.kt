@@ -11,7 +11,8 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.JumpMessages
+import main.utils.locale.messages.RewindMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -58,7 +59,7 @@ class RewindCommandKt : AbstractSlashCommandKt(
         val playingTrack = player.playingTrack
 
         if (playingTrack.isStream)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.RewindMessages.CANT_REWIND_STREAM)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, RewindMessages.CANT_REWIND_STREAM)
                 .build()
 
         val logUtils = LogUtilsKt(guild)
@@ -67,18 +68,18 @@ class RewindCommandKt : AbstractSlashCommandKt(
             player.seekTo(0)
             logUtils.sendLog(
                 LogTypeKt.TRACK_REWIND,
-                RobertifyLocaleMessageKt.RewindMessages.REWIND_TO_BEGINNING_LOG,
+                RewindMessages.REWIND_TO_BEGINNING_LOG,
                 Pair("{user}", memberVoiceState.member.asMention),
                 Pair("{title}", playingTrack.title),
                 Pair("{author}", playingTrack.author)
             )
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.RewindMessages.REWIND_TO_BEGINNING)
+            RobertifyEmbedUtilsKt.embedMessage(guild, RewindMessages.REWIND_TO_BEGINNING)
                 .build()
         } else {
             if (time <= 0)
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.JumpMessages.JUMP_DURATION_NEG_ZERO
+                    JumpMessages.JUMP_DURATION_NEG_ZERO
                 ).build()
 
             val timeInMillis = time.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
@@ -86,13 +87,13 @@ class RewindCommandKt : AbstractSlashCommandKt(
             if (timeInMillis > player.trackPosition)
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.RewindMessages.DURATION_GT_CURRENT_TIME
+                    RewindMessages.DURATION_GT_CURRENT_TIME
                 ).build()
 
             player.seekTo(player.trackPosition - timeInMillis)
             logUtils.sendLog(
                 LogTypeKt.TRACK_REWIND,
-                RobertifyLocaleMessageKt.RewindMessages.REWOUND_BY_DURATION_LOG,
+                RewindMessages.REWOUND_BY_DURATION_LOG,
                 Pair("{user}", memberVoiceState.member.asMention),
                 Pair("{title}", playingTrack.title),
                 Pair("{author}", playingTrack.author),
@@ -100,7 +101,7 @@ class RewindCommandKt : AbstractSlashCommandKt(
             )
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.RewindMessages.REWOUND_BY_DURATION,
+                RewindMessages.REWOUND_BY_DURATION,
                 Pair("{duration}", time.toString())
             ).build()
         }

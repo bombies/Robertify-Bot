@@ -10,7 +10,7 @@ import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.RobertifyLocaleKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.LanguageCommandMessages
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
@@ -39,12 +39,12 @@ class LanguageCommandKt : AbstractSlashCommandKt(
         if (language == null) {
             event.replyWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.LanguageCommandMessages.LANGUAGE_EMBED_DESC,
+                    LanguageCommandMessages.LANGUAGE_EMBED_DESC,
                     Pair("{language}", "${localeManager.locale.name} ${localeManager.locale.flag}")
                 )
             }.setActionRow(StringSelectionMenuBuilderKt(
                 _name = "languagemenu",
-                placeholder = localeManager.getMessage(RobertifyLocaleMessageKt.LanguageCommandMessages.LANGUAGE_SELECT_MENU_PLACE_HOLDER),
+                placeholder = localeManager.getMessage(LanguageCommandMessages.LANGUAGE_SELECT_MENU_PLACE_HOLDER),
                 range = Pair(1, 1),
                 _options = RobertifyLocaleKt.availableLanguages.map { locale ->
                     StringSelectMenuOptionKt(
@@ -62,7 +62,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
             RequestChannelConfigKt(guild).updateAll()
             event.replyWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.LanguageCommandMessages.LANGUAGE_CHANGED,
+                    LanguageCommandMessages.LANGUAGE_CHANGED,
                     Pair("{language}", newLocale.localName)
                 )
             }.setEphemeral(true)
@@ -86,7 +86,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
 
         event.hook.sendWithEmbed(guild) {
             embed(
-                RobertifyLocaleMessageKt.LanguageCommandMessages.LANGUAGE_CHANGED,
+                LanguageCommandMessages.LANGUAGE_CHANGED,
                 Pair("{language}", newLocale.localName)
             )
         }.queue()

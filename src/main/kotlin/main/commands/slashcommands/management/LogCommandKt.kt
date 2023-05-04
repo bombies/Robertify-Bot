@@ -4,7 +4,7 @@ import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.LogChannelMessages
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -23,12 +23,12 @@ class LogCommandKt : AbstractSlashCommandKt(
         try {
             LogUtilsKt(guild).createChannel()
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP)
+                embed(LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP)
             }.setEphemeral(true)
                 .queue()
         } catch (e: IllegalArgumentException) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP)
+                embed(LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP)
             }
                 .setEphemeral(true)
                 .queue()

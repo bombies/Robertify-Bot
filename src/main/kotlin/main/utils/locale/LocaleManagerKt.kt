@@ -1,18 +1,15 @@
 package main.utils.locale
 
-import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.setContent
 import main.utils.json.locale.LocaleConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.RobertifyLocaleMessageKt.Companion.getMessageTypes
 import net.dv8tion.jda.api.entities.Guild
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.FileInputStream
 import java.util.*
-import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.system.exitProcess
 
 class LocaleManagerKt private constructor(private val guild: Guild?, _locale: RobertifyLocaleKt) {
@@ -53,7 +50,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
             val file = File("./locale/messages.${locale.code.lowercase()}.yml")
             val content = StringBuilder()
 
-            for (fieldSection in RobertifyLocaleMessageKt.getMessageTypes().values)
+            for (fieldSection in getMessageTypes().values)
                 for (field in fieldSection)
                     content.append(field.name.lowercase())
                         .append(": ")

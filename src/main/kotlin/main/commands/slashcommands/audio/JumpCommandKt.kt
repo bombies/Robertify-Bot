@@ -13,7 +13,8 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.JumpMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -68,7 +69,7 @@ class JumpCommandKt : AbstractSlashCommandKt(
         val track = player.playingTrack
             ?: return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
         return doJump(
@@ -92,14 +93,14 @@ class JumpCommandKt : AbstractSlashCommandKt(
         else run {
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.JumpMessages.JUMP_INVALID_DURATION
+                JumpMessages.JUMP_INVALID_DURATION
             ).build()
         }
 
         if (time <= 0)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.JumpMessages.JUMP_DURATION_NEG_ZERO
+                JumpMessages.JUMP_DURATION_NEG_ZERO
             ).build()
 
         time = time.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
@@ -107,20 +108,20 @@ class JumpCommandKt : AbstractSlashCommandKt(
         if (time > track.length - player.trackPosition)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.JumpMessages.JUMP_DURATION_GT_TIME_LEFT
+                JumpMessages.JUMP_DURATION_GT_TIME_LEFT
             ).build()
 
         player.seekTo(player.trackPosition + time)
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_JUMP,
-            RobertifyLocaleMessageKt.JumpMessages.JUMPED_LOG,
+            JumpMessages.JUMPED_LOG,
             Pair("{user}", jumper.asMention),
             Pair("{duration}", time.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString())
         )
 
         return RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.JumpMessages.JUMPED,
+            JumpMessages.JUMPED,
             Pair("{duration}", time.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds.toString())
         ).build()
     }

@@ -2,11 +2,11 @@ package main.utils.pagination
 
 import dev.minn.jda.ktx.util.SLF4J
 import main.constants.MessageButtonKt
+import main.events.AbstractEventControllerKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
-import main.events.AbstractEventControllerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
 import main.utils.pagination.pages.queue.QueuePageKt
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.utils.AttachedFile
@@ -103,7 +103,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                 }
 
                 else -> event.replyWithEmbed(event.guild) {
-                    embed(RobertifyLocaleMessageKt.GeneralMessages.NO_PERMS_BUTTON)
+                    embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }
         }
@@ -229,7 +229,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                 }
 
                 else -> event.replyWithEmbed(event.guild) {
-                    embed(RobertifyLocaleMessageKt.GeneralMessages.NO_PERMS_BUTTON)
+                    embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }
         }

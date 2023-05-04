@@ -6,7 +6,7 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.autoplay.AutoPlayConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -33,22 +33,22 @@ class AutoPlayCommandKt : AbstractSlashCommandKt(
             autoPlayConfig.status = false
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.GENERAL_TOGGLE_MESSAGE,
+                GeneralMessages.GENERAL_TOGGLE_MESSAGE,
                 Pair("{toggle}", "autoplay"),
                 Pair(
                     "{status}",
-                    localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.OFF_STATUS).uppercase()
+                    localeManager.getMessage(GeneralMessages.OFF_STATUS).uppercase()
                 )
             ).build()
         } else {
             autoPlayConfig.status = true
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.GENERAL_TOGGLE_MESSAGE,
+                GeneralMessages.GENERAL_TOGGLE_MESSAGE,
                 Pair("{toggle}", "autoplay"),
                 Pair(
                     "{status}",
-                    localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.ON_STATUS).uppercase()
+                    localeManager.getMessage(GeneralMessages.ON_STATUS).uppercase()
                 )
             ).build()
         }

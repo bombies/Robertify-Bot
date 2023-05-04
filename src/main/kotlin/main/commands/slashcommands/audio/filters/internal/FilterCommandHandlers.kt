@@ -9,6 +9,8 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt.Com
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManagerKt
+import main.utils.locale.messages.FilterMessages
+import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -53,18 +55,18 @@ internal inline fun handleGenericFilterToggle(
             LogTypeKt.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
                 localeManager.getMessage(
-                    RobertifyLocaleMessageKt.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
+                    FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
                     Pair("{filter}", filterName),
-                    GeneralUtilsKt.Pair("{status}", RobertifyLocaleMessageKt.GeneralMessages.OFF_STATUS, localeManager)
+                    GeneralUtilsKt.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
                 )
             }"
         )
 
         RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.FilterMessages.FILTER_TOGGLE_MESSAGE,
+            FilterMessages.FILTER_TOGGLE_MESSAGE,
             Pair("{filter}", filterName),
-            GeneralUtilsKt.Pair("{status}", RobertifyLocaleMessageKt.GeneralMessages.OFF_STATUS, localeManager)
+            GeneralUtilsKt.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
         ).build()
     } else {
         filterOn(filters)
@@ -72,18 +74,18 @@ internal inline fun handleGenericFilterToggle(
             LogTypeKt.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
                 localeManager.getMessage(
-                    RobertifyLocaleMessageKt.FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
+                    FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
                     Pair("{filter}", filterName),
-                    GeneralUtilsKt.Pair("{status}", RobertifyLocaleMessageKt.GeneralMessages.ON_STATUS, localeManager)
+                    GeneralUtilsKt.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
                 )
             }"
         )
 
         RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.FilterMessages.FILTER_TOGGLE_MESSAGE,
+            FilterMessages.FILTER_TOGGLE_MESSAGE,
             Pair("{filter}", filterName),
-            GeneralUtilsKt.Pair("{status}", RobertifyLocaleMessageKt.GeneralMessages.ON_STATUS, localeManager)
+            GeneralUtilsKt.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
         ).build()
     }
 }

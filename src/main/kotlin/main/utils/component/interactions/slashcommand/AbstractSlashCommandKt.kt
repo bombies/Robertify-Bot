@@ -21,7 +21,7 @@ import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
 import main.utils.managers.RandomMessageManagerKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
@@ -131,25 +131,25 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             if (selfChannelNeeded && !selfVoiceState.inAudioChannel())
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.NO_VOICE_CHANNEL
+                    GeneralMessages.NO_VOICE_CHANNEL
                 )
                     .build()
 
             if (!memberVoiceState.inAudioChannel())
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                    GeneralMessages.USER_VOICE_CHANNEL_NEEDED
                 ).build()
 
             if (selfChannelNeeded && memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
                 return RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                    guild, GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                     Pair("{channel}", selfVoiceState.channel!!.asMention)
                 ).build()
             else if (!selfChannelNeeded && selfVoiceState.inAudioChannel() && (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id))
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.SAME_VOICE_CHANNEL
+                    GeneralMessages.SAME_VOICE_CHANNEL
                 ).build()
 
             val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
@@ -158,7 +158,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             if (songMustBePlaying && playingTrack == null)
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                    GeneralMessages.NOTHING_PLAYING
                 ).build()
 
             return null
@@ -277,7 +277,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             ) event.channel.asGuildMessageChannel().sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     event.guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.UNREAD_ALERT_MENTION,
+                    GeneralMessages.UNREAD_ALERT_MENTION,
                     Pair("{user}", user.asMention)
                 ).build()
             )
@@ -330,7 +330,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (info.isGuild) return true
         if (!event.isFromGuild && info.guildUseOnly) {
             event.replyEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(RobertifyLocaleMessageKt.GeneralMessages.GUILD_COMMAND_ONLY).build()
+                RobertifyEmbedUtilsKt.embedMessage(GeneralMessages.GUILD_COMMAND_ONLY).build()
             )
                 .queue()
             return false
@@ -349,7 +349,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         event.replyEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.BANNED_FROM_COMMANDS
+                GeneralMessages.BANNED_FROM_COMMANDS
             ).build()
         )
             .setEphemeral(true)
@@ -391,15 +391,15 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessageWithTitle(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.PREMIUM_EMBED_TITLE,
-                    RobertifyLocaleMessageKt.GeneralMessages.PREMIUM_INSTANCE_NEEDED
+                    GeneralMessages.PREMIUM_EMBED_TITLE,
+                    GeneralMessages.PREMIUM_INSTANCE_NEEDED
                 ).build()
             )
                 .addActionRow(
                     Button.link(
                         "https://robertify.me/premium",
                         LocaleManagerKt.getLocaleManager(guild)
-                            .getMessage(RobertifyLocaleMessageKt.GeneralMessages.PREMIUM_UPGRADE_BUTTON)
+                            .getMessage(GeneralMessages.PREMIUM_UPGRADE_BUTTON)
                     )
                 )
                 .queue()
@@ -493,7 +493,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS,
+                    GeneralMessages.SELF_INSUFFICIENT_PERMS_ARGS,
                     Pair(
                         "{permissions}",
                         info.botRequiredPermissions.asString()
@@ -511,7 +511,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!guild.selfMember.hasPermission(event.guildChannel, Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(
                 LocaleManagerKt.getLocaleManager(guild)
-                    .getMessage(RobertifyLocaleMessageKt.GeneralMessages.NO_EMBED_PERMS)
+                    .getMessage(GeneralMessages.NO_EMBED_PERMS)
             )
                 .queue()
             return false
@@ -530,7 +530,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         ) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.GeneralMessages.CANT_BE_USED_IN_CHANNEL_ARGS,
+                    guild, GeneralMessages.CANT_BE_USED_IN_CHANNEL_ARGS,
                     Pair(
                         "{channels}", GeneralUtilsKt.listOfIDsToMentions(
                             guild,
@@ -554,7 +554,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     event.guild,
-                    RobertifyLocaleMessageKt.GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS
+                    GeneralMessages.INSUFFICIENT_PERMS_NO_ARGS
                 ).build()
             )
                 .setEphemeral(true)

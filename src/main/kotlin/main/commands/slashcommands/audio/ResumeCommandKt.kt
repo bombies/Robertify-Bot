@@ -7,7 +7,7 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.PauseMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -31,15 +31,15 @@ class ResumeCommandKt : AbstractSlashCommandKt(CommandKt(
             .player
 
         if (!player.isPaused)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.PauseMessages.PLAYER_NOT_PAUSED).build()
+            return RobertifyEmbedUtilsKt.embedMessage(guild, PauseMessages.PLAYER_NOT_PAUSED).build()
 
         player.isPaused = false
         LogUtilsKt(guild).sendLog(
             LogTypeKt.PLAYER_RESUME,
-            RobertifyLocaleMessageKt.PauseMessages.RESUMED_LOG,
+            PauseMessages.RESUMED_LOG,
             Pair("{user}", memberVoiceState.member.asMention)
         )
-        return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.PauseMessages.RESUMED).build()
+        return RobertifyEmbedUtilsKt.embedMessage(guild, PauseMessages.RESUMED).build()
     }
 
     override val help: String

@@ -7,7 +7,7 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.PauseMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -39,19 +39,19 @@ class PauseCommandKt : AbstractSlashCommandKt(
             musicManager.isForcePaused = false
             logUtils.sendLog(
                 LogTypeKt.PLAYER_RESUME,
-                RobertifyLocaleMessageKt.PauseMessages.RESUMED_LOG,
+                PauseMessages.RESUMED_LOG,
                 Pair("{user}", memberVoiceState.member.asMention)
             )
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.PauseMessages.RESUMED).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, PauseMessages.RESUMED).build()
         } else {
             player.isPaused = true
             musicManager.isForcePaused = true
             logUtils.sendLog(
                 LogTypeKt.PLAYER_PAUSE,
-                RobertifyLocaleMessageKt.PauseMessages.PAUSED_LOG,
+                PauseMessages.PAUSED_LOG,
                 Pair("{user}", memberVoiceState.member.asMention)
             )
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.PauseMessages.PAUSED).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, PauseMessages.PAUSED).build()
         }
     }
 

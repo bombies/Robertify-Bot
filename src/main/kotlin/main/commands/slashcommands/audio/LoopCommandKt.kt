@@ -12,7 +12,8 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.LoopMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
@@ -63,7 +64,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
         val guild = memberVoiceState.guild
 
         if (player.playingTrack == null)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.LOOP_NOTHING_PLAYING)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.LOOP_NOTHING_PLAYING)
                 .build()
 
         return null
@@ -77,28 +78,28 @@ class LoopCommandKt : AbstractSlashCommandKt(
         val track = player.playingTrack
             ?: return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING
+                GeneralMessages.NOTHING_PLAYING
             ).build()
 
         val embed = if (queueHandler.trackRepeating) {
             queueHandler.trackRepeating = false
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.LoopMessages.LOOP_STOP,
+                LoopMessages.LOOP_STOP,
                 Pair("{title}", track.title)
             ).build()
         } else {
             queueHandler.trackRepeating = true
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.LoopMessages.LOOP_START,
+                LoopMessages.LOOP_START,
                 Pair("{title}", track.title)
             ).build()
         }
 
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_LOOP,
-            RobertifyLocaleMessageKt.LoopMessages.LOOP_STOP,
+            LoopMessages.LOOP_STOP,
             Pair("{user}", looper.asMention),
             Pair("{status}", if (queueHandler.trackRepeating) "looped" else "unlooped"),
             Pair("{title}", track.title),
@@ -116,22 +117,22 @@ class LoopCommandKt : AbstractSlashCommandKt(
         val embed = if (queueHandler.queueRepeating) {
             queueHandler.queueRepeating = false
             queueHandler.clearSavedQueue()
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_STOP).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.QUEUE_LOOP_STOP).build()
         } else {
             if (player.playingTrack == null) {
-                RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_PLAYING)
+                RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.NOTHING_PLAYING)
                     .build()
             } else {
                 val thisTrack = player.playingTrack
                 if (queueHandler.isEmpty)
-                    RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_NOTHING)
+                    RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.QUEUE_LOOP_NOTHING)
                         .build()
                 else {
                     queueHandler.queueRepeating = true
                     scheduler.addToBeginningOfQueue(thisTrack)
                     queueHandler.setSavedQueue(queueHandler.contents)
                     queueHandler.remove(thisTrack)
-                    RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_START)
+                    RobertifyEmbedUtilsKt.embedMessage(guild, LoopMessages.QUEUE_LOOP_START)
                         .build()
                 }
             }
@@ -139,7 +140,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
 
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_LOOP,
-            RobertifyLocaleMessageKt.LoopMessages.QUEUE_LOOP_LOG,
+            LoopMessages.QUEUE_LOOP_LOG,
             Pair("{user}", looper.asMention),
             Pair("{status}", if (queueHandler.queueRepeating) "looped" else "unlooped")
         )

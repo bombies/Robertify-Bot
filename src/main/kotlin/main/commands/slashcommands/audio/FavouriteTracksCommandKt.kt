@@ -19,7 +19,8 @@ import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.database.mongodb.cache.FavouriteTracksCacheKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.FavouriteTracksMessages
+import main.utils.locale.messages.GeneralMessages
 import main.utils.pagination.PaginationHandlerKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Guild
@@ -101,7 +102,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
 
         if (tracks.isEmpty()) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.NO_FAV_TRACKS)
+                embed(FavouriteTracksMessages.NO_FAV_TRACKS)
             }
                 .setEphemeral(true)
                 .queue()
@@ -116,7 +117,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             list.add(
                 StringSelectMenuOptionKt(
                     label = localeManager.getMessage(
-                        RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_SELECT_MENU_OPTION,
+                        FavouriteTracksMessages.FT_SELECT_MENU_OPTION,
                         Pair("{title}", track.title.substring(0, track.title.length.coerceAtMost(75))),
                         Pair("{author}", track.author.substring(0, track.author.length.coerceAtMost(20)))
                     ),
@@ -137,34 +138,34 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         if (trackList.isEmpty())
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.FavouriteTracksMessages.NO_FAV_TRACKS
+                FavouriteTracksMessages.NO_FAV_TRACKS
             ).build()
 
         return try {
             config.clearTracks(user.idLong)
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.FavouriteTracksMessages.FAV_TRACKS_CLEARED
+                FavouriteTracksMessages.FAV_TRACKS_CLEARED
             ).build()
         } catch (e: NullPointerException) {
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.FavouriteTracksMessages.NO_FAV_TRACKS)
+            RobertifyEmbedUtilsKt.embedMessage(guild, FavouriteTracksMessages.NO_FAV_TRACKS)
                 .build()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR).build()
         }
     }
 
     private fun handleRemove(guild: Guild, user: User, id: Int): MessageEmbed {
         if (id <= 0)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.ID_GT_ZERO)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.ID_GT_ZERO)
                 .build()
 
         val config = FavouriteTracksCacheKt.instance
         val trackList = config.getTracks(user.idLong)
 
         if (id > trackList.size)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.ID_OUT_OF_BOUNDS)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.ID_OUT_OF_BOUNDS)
                 .build()
 
         return try {
@@ -172,16 +173,16 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             val trackRemoved = trackList.get(id - 1)
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.FavouriteTracksMessages.FAV_TRACK_REMOVED,
+                FavouriteTracksMessages.FAV_TRACK_REMOVED,
                 Pair("{title}", trackRemoved.title),
                 Pair("{author}", trackRemoved.author)
             ).build()
         } catch (e: NullPointerException) {
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.FavouriteTracksMessages.NO_FAV_TRACKS)
+            RobertifyEmbedUtilsKt.embedMessage(guild, FavouriteTracksMessages.NO_FAV_TRACKS)
                 .build()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR).build()
         }
     }
 
@@ -208,7 +209,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             else -> run {
                 return RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_INVALID_SOURCE
+                    FavouriteTracksMessages.FT_INVALID_SOURCE
                 ).build()
             }
         }
@@ -224,7 +225,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
 
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.FavouriteTracksMessages.FAV_TRACK_ADDED,
+                FavouriteTracksMessages.FAV_TRACK_ADDED,
                 Pair("{title}", playingTrack.title),
                 Pair("{author}", playingTrack.author)
             ).build()
@@ -232,7 +233,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             RobertifyEmbedUtilsKt.embedMessage(guild, e.message ?: "Invalid arguments!").build()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.UNEXPECTED_ERROR).build()
+            RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR).build()
         }
     }
 
@@ -259,13 +260,13 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         }
 
         event.replyWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
+            embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
 
         val messageChannel = event.channel.asGuildMessageChannel()
         messageChannel.sendWithEmbed(guild) {
-            embed(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
+            embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
         }.queue { addingMsg ->
             val url = when (source) {
                 TrackSourceKt.DEEZER -> "https://www.deezer.com/us/track/$id"
@@ -296,17 +297,17 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
                 .setColor(theme.color)
                 .setTitle(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_EMBED_TITLE,
+                        FavouriteTracksMessages.FT_EMBED_TITLE,
                         Pair("{user}", member.effectiveName)
                     )
                 )
                 .setFooter(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_EMBED_FOOTER,
+                        FavouriteTracksMessages.FT_EMBED_FOOTER,
                         Pair("{tracks}", tracks.size.toString())
                     )
                 )
-                .setDescription(localeManager.getMessage(RobertifyLocaleMessageKt.FavouriteTracksMessages.FT_EMBED_DESCRIPTION))
+                .setDescription(localeManager.getMessage(FavouriteTracksMessages.FT_EMBED_DESCRIPTION))
                 .setThumbnail(member.effectiveAvatarUrl)
         }
     }

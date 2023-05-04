@@ -8,8 +8,7 @@ import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
-import net.dv8tion.jda.api.entities.Guild
+import main.utils.locale.messages.PreviousTrackMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -40,7 +39,7 @@ class PreviousTrackCommandKt : AbstractSlashCommandKt(
         if (queueHandler.isPreviousTracksEmpty)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.PreviousTrackMessages.NO_PREV_TRACKS
+                PreviousTrackMessages.NO_PREV_TRACKS
             ).build()
 
         val currentTrack = player.playingTrack
@@ -52,12 +51,12 @@ class PreviousTrackCommandKt : AbstractSlashCommandKt(
 
         LogUtilsKt(guild).sendLog(
             LogTypeKt.TRACK_PREVIOUS,
-            RobertifyLocaleMessageKt.PreviousTrackMessages.PREV_TRACK_LOG,
+            PreviousTrackMessages.PREV_TRACK_LOG,
             Pair("{user}", memberVoiceState.member.asMention)
         )
         return RobertifyEmbedUtilsKt.embedMessage(
             guild,
-            RobertifyLocaleMessageKt.PreviousTrackMessages.PLAYING_PREV_TRACK
+            PreviousTrackMessages.PLAYING_PREV_TRACK
         ).build()
     }
 

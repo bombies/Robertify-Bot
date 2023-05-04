@@ -11,7 +11,8 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.guildconfig.GuildConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.BanMessages
+import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -40,7 +41,7 @@ class BanCommandKt : AbstractSlashCommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
             return event.replyWithEmbed(event.guild!!) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.INVALID_ARGS)
+                embed(GeneralMessages.INVALID_ARGS)
             }.setEphemeral(true)
                 .queue()
         }
@@ -54,22 +55,22 @@ class BanCommandKt : AbstractSlashCommandKt(
     private fun handleBan(user: Member, mod: Member, duration: String?): MessageEmbed {
         val guild = user.guild
         if (duration != null && !GeneralUtilsKt.isValidDuration(duration))
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.BanMessages.INVALID_BAN_DURATION)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, BanMessages.INVALID_BAN_DURATION)
                 .build()
 
         val bannedUntil = if (duration != null) GeneralUtilsKt.getFutureTime(duration) else null
 
         if (GeneralUtilsKt.hasPerms(guild, user, PermissionKt.ROBERTIFY_ADMIN))
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.BanMessages.CANNOT_BAN_ADMIN)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, BanMessages.CANNOT_BAN_ADMIN)
                 .build()
 
         if (GeneralUtilsKt.isDeveloper(user.idLong))
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.BanMessages.CANNOT_BAN_DEVELOPER)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, BanMessages.CANNOT_BAN_DEVELOPER)
                 .build()
 
         val config = GuildConfigKt(guild)
         if (config.isBannedUser(user.idLong))
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.BanMessages.USER_ALREADY_BANNED)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, BanMessages.USER_ALREADY_BANNED)
                 .build()
 
         return if (bannedUntil == null) {
@@ -82,13 +83,13 @@ class BanCommandKt : AbstractSlashCommandKt(
             )
 
             user.user.dmEmbed(
-                RobertifyLocaleMessageKt.BanMessages.USER_PERM_BANNED,
+                BanMessages.USER_PERM_BANNED,
                 Pair("{server}", guild.name)
             )
 
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.BanMessages.USER_PERM_BANNED_RESPONSE,
+                BanMessages.USER_PERM_BANNED_RESPONSE,
                 Pair("{user}", user.asMention)
             ).build()
         } else {
@@ -101,7 +102,7 @@ class BanCommandKt : AbstractSlashCommandKt(
             )
 
             user.user.dmEmbed(
-                RobertifyLocaleMessageKt.BanMessages.USER_TEMP_BANNED,
+                BanMessages.USER_TEMP_BANNED,
                 Pair("{duration}", GeneralUtilsKt.formatDuration(duration!!)),
                 Pair("{server}", guild.name)
             )
@@ -109,7 +110,7 @@ class BanCommandKt : AbstractSlashCommandKt(
             ListenerKt.scheduleUnban(guild, user.user)
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.BanMessages.USER_TEMP_BANNED_RESPONSE,
+                BanMessages.USER_TEMP_BANNED_RESPONSE,
                 Pair("{user}", user.asMention),
                 Pair("{duration}", GeneralUtilsKt.formatDuration(duration))
             ).build()

@@ -1,19 +1,15 @@
 package main.commands.slashcommands.audio
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.DisconnectMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -43,11 +39,11 @@ class DisconnectCommandKt : AbstractSlashCommandKt(
                 LogTypeKt.BOT_DISCONNECTED,
                 "${memberVoiceState.member.asMention} ${
                     LocaleManagerKt.getLocaleManager(guild)
-                        .getMessage(RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED_USER)
+                        .getMessage(DisconnectMessages.DISCONNECTED_USER)
                 }"
             )
 
-        return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.DisconnectMessages.DISCONNECTED)
+        return RobertifyEmbedUtilsKt.embedMessage(guild, DisconnectMessages.DISCONNECTED)
             .build()
     }
 

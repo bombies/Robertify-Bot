@@ -12,7 +12,8 @@ import main.utils.json.permissions.PermissionsConfigKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.PremiumMessages
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
@@ -504,7 +505,7 @@ object GeneralUtilsKt {
         val parsedMentions = mentions.map { id -> "<$mentionTag$id>" }
         return when {
             parsedMentions.isEmpty() -> LocaleManagerKt.getLocaleManager(guild)
-                .getMessage(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_HERE)
+                .getMessage(GeneralMessages.NOTHING_HERE)
 
             else -> parsedMentions.asString()
         }
@@ -536,8 +537,8 @@ object GeneralUtilsKt {
         event.replyEmbeds(
             RobertifyEmbedUtilsKt.embedMessageWithTitle(
                 guild,
-                RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
-                RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_DESC
+                PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
+                PremiumMessages.LOCKED_COMMAND_EMBED_DESC
             ).build()
         )
             .setEphemeral(true)
@@ -551,8 +552,8 @@ object GeneralUtilsKt {
         event.replyEmbeds(
             RobertifyEmbedUtilsKt.embedMessageWithTitle(
                 guild,
-                RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
-                RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_DESC
+                PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
+                PremiumMessages.LOCKED_COMMAND_EMBED_DESC
             ).build()
         )
             .setEphemeral(true)
@@ -567,8 +568,8 @@ object GeneralUtilsKt {
             .setEmbeds(
                 RobertifyEmbedUtilsKt.embedMessageWithTitle(
                     guild,
-                    RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
-                    RobertifyLocaleMessageKt.PremiumMessages.LOCKED_COMMAND_EMBED_DESC
+                    PremiumMessages.LOCKED_COMMAND_EMBED_TITLE,
+                    PremiumMessages.LOCKED_COMMAND_EMBED_DESC
 
                 ).build()
             )
@@ -576,7 +577,7 @@ object GeneralUtilsKt {
                 Button.link(
                     "https://robertify.me/premium",
                     LocaleManagerKt.getLocaleManager(guild)
-                        .getMessage(RobertifyLocaleMessageKt.GeneralMessages.PREMIUM_UPGRADE_BUTTON)
+                        .getMessage(GeneralMessages.PREMIUM_UPGRADE_BUTTON)
                 )
             )
             .queue()

@@ -13,7 +13,8 @@ import main.utils.component.interactions.slashcommand.models.SubCommandGroupKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.json.permissions.PermissionsConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.PermissionsMessages
 import net.dv8tion.jda.api.entities.IMentionable
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
@@ -168,7 +169,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                         embed(
                             """${
                                 localeManager.getMessage(
-                                    RobertifyLocaleMessageKt.PermissionsMessages.PERMISSION_LIST, Pair(
+                                    PermissionsMessages.PERMISSION_LIST, Pair(
                                         "{permission}",
                                         permission.name
                                     )
@@ -177,7 +178,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                             
                             ${
                                 if (usersForPerms[permission]!!.isEmpty() && rolesForPerms[permission]!!.isEmpty())
-                                    localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_HERE)
+                                    localeManager.getMessage(GeneralMessages.NOTHING_HERE)
                                 else
                                     usersForPerms[permission]!!.joinToString(", ") +
                                             (if (usersForPerms[permission]!!.isNotEmpty()) "\n" else "") +
@@ -214,12 +215,12 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
 
         if (perms.isEmpty())
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_PERMISSIONS_NONE)
+                embed(PermissionsMessages.MENTIONABLE_PERMISSIONS_NONE)
             }.queue()
         else
             event.replyWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_PERMISSIONS_LIST,
+                    PermissionsMessages.MENTIONABLE_PERMISSIONS_LIST,
                     Pair("{mentionable}", mentionable.asMention),
                     Pair("{permissions}", perms.joinToString(", ") { it.name })
                 )
@@ -269,7 +270,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
-                RobertifyLocaleMessageKt.PermissionsMessages.PERMISSION_ADDED,
+                PermissionsMessages.PERMISSION_ADDED,
                 Pair("{mentionable}", mentionable.asMention),
                 Pair("{permission}", permission.name)
             )
@@ -284,7 +285,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
-                RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
+                PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),
                 Pair("{permission}", permission.name)
             )
@@ -325,7 +326,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
-                RobertifyLocaleMessageKt.PermissionsMessages.PERMISSION_REMOVED,
+                PermissionsMessages.PERMISSION_REMOVED,
                 Pair("{mentionable}", mentionable.asMention),
                 Pair("{permission}", permission.name)
             )
@@ -340,7 +341,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     ) {
         event.replyWithEmbed(event.guild!!) {
             embed(
-                RobertifyLocaleMessageKt.PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
+                PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),
                 Pair("{permission}", permission.name)
             )

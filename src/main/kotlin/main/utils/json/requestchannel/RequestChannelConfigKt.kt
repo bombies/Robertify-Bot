@@ -15,6 +15,9 @@ import main.utils.database.mongodb.databases.GuildDBKt
 import main.utils.json.AbstractGuildConfigKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.locale.LocaleManagerKt
+import main.utils.locale.messages.DedicatedChannelMessages
+import main.utils.locale.messages.FilterMessages
+import main.utils.locale.messages.NowPlayingMessages
 import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
@@ -203,14 +206,14 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
 
             if (playingTrack == null) {
                 eb.setColor(theme.color)
-                eb.setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
+                eb.setTitle(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
                 eb.setImage(theme.idleBanner)
                 val scheduler = musicManager.scheduler
                 val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
                 try {
                     msgRequest.queue(
                         { msg: Message ->
-                            msg.editMessage(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                            msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
                                 .setEmbeds(eb.build())
                                 .queue(
                                     null,
@@ -243,7 +246,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 eb.setColor(theme.color)
                 eb.setTitle(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
+                        DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
                         Pair(
                             "{title}",
                             playingTrack.title
@@ -262,7 +265,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 val requester: String = musicManager.scheduler.getRequesterAsMention(playingTrack)
                 eb.setDescription(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
+                        NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
                         Pair("{requester}", requester)
                     )
                 )
@@ -272,7 +275,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                 )
                 eb.setFooter(
                     localeManager.getMessage(
-                        RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
+                        DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
                         Pair(
                             "{numSongs}",
                             queueAsList.size.toString()
@@ -295,7 +298,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                         .append(" [").append(GeneralUtilsKt.formatTime(track.length))
                         .append("]\n")
                 } else {
-                    if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
+                    if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
                         var index = 1
                         for (track in queueAsList) nextTenSongs.append(
                             index++
@@ -309,7 +312,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
                     { msg: Message ->
                         msg.editMessage(
                             localeManager.getMessage(
-                                RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
+                                DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
                                 Pair(
                                     "{songs}",
                                     nextTenSongs.toString()
@@ -331,13 +334,13 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     private fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
         sendErrorMessage(
             messageChannel,
-            RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
+            DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
         )
     }
 
     private fun sendErrorMessage(
         messageChannel: GuildMessageChannel?,
-        message: RobertifyLocaleMessageKt.DedicatedChannelMessages
+        message: DedicatedChannelMessages
     ) {
         messageChannel?.sendMessageEmbeds(
             RobertifyEmbedUtilsKt.embedMessage(
@@ -409,27 +412,27 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             StringSelectionMenuBuilderKt(
                 _name = RequestChannelButtonKt.FILTERS.id.toString(),
                 placeholder = LocaleManagerKt.getLocaleManager(msg.guild)
-                    .getMessage(RobertifyLocaleMessageKt.FilterMessages.FILTER_SELECT_PLACEHOLDER),
+                    .getMessage(FilterMessages.FILTER_SELECT_PLACEHOLDER),
                 range = Pair(0, 5),
                 _options = listOf(
                     StringSelectMenuOptionKt(
-                        localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.EIGHT_D),
+                        localeManager.getMessage(FilterMessages.EIGHT_D),
                         "${RequestChannelButtonKt.FILTERS.id}:8d"
                     ),
                     StringSelectMenuOptionKt(
-                        localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.KARAOKE),
+                        localeManager.getMessage(FilterMessages.KARAOKE),
                         "${RequestChannelButtonKt.FILTERS.id}:karaoke"
                     ),
                     StringSelectMenuOptionKt(
-                        localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.NIGHTCORE),
+                        localeManager.getMessage(FilterMessages.NIGHTCORE),
                         "${RequestChannelButtonKt.FILTERS.id}:nightcore"
                     ),
                     StringSelectMenuOptionKt(
-                        localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.TREMOLO),
+                        localeManager.getMessage(FilterMessages.TREMOLO),
                         "${RequestChannelButtonKt.FILTERS.id}:tremolo"
                     ),
                     StringSelectMenuOptionKt(
-                        localeManager.getMessage(RobertifyLocaleMessageKt.FilterMessages.VIBRATO),
+                        localeManager.getMessage(FilterMessages.VIBRATO),
                         "${RequestChannelButtonKt.FILTERS.id}:vibrato"
                     )
                 )
@@ -453,15 +456,15 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         if (channel == null) return null
         val localeManager = LocaleManagerKt.getLocaleManager(channel.guild)
         return channel.manager.setTopic(
-            (RobertifyEmojiKt.PREVIOUS_EMOJI.toString() + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +
-                    RobertifyEmojiKt.REWIND_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_REWIND) +
-                    RobertifyEmojiKt.PLAY_AND_PAUSE_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PLAY_AND_PAUSE) +
-                    RobertifyEmojiKt.STOP_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STOP) +
-                    RobertifyEmojiKt.END_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_END) +
-                    RobertifyEmojiKt.STAR_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STAR) +
-                    RobertifyEmojiKt.LOOP_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_LOOP) +
-                    RobertifyEmojiKt.SHUFFLE_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_SHUFFLE) +
-                    RobertifyEmojiKt.QUIT_EMOJI + " " + localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_QUIT))
+            (RobertifyEmojiKt.PREVIOUS_EMOJI.toString() + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PREVIOUS) +
+                    RobertifyEmojiKt.REWIND_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_REWIND) +
+                    RobertifyEmojiKt.PLAY_AND_PAUSE_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_PLAY_AND_PAUSE) +
+                    RobertifyEmojiKt.STOP_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STOP) +
+                    RobertifyEmojiKt.END_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_END) +
+                    RobertifyEmojiKt.STAR_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_STAR) +
+                    RobertifyEmojiKt.LOOP_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_LOOP) +
+                    RobertifyEmojiKt.SHUFFLE_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_SHUFFLE) +
+                    RobertifyEmojiKt.QUIT_EMOJI + " " + localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_TOPIC_QUIT))
         )
     }
 

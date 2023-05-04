@@ -23,7 +23,8 @@ import main.utils.json.requestchannel.RequestChannelKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.DedicatedChannelMessages
+import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -69,7 +70,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
 
         if (RequestChannelConfigKt(guild).isChannelSet()) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP)
+                embed(DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP)
             }.queue()
             return
         }
@@ -80,14 +81,14 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         try {
             event.hook.sendWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP,
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP,
                     Pair("{channel}", channel.channelId.toMention(GeneralUtilsKt.Mentioner.CHANNEL))
                 )
             }.queue()
         } catch (e: InsufficientPermissionException) {
             if (e.message?.contains("MESSAGE_HISTORY") == true)
                 event.hook.sendWithEmbed(guild) {
-                    embed(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2)
+                    embed(DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2)
                 }.queue()
             else logger.error("Unexpected error", e)
         }
@@ -110,11 +111,11 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
 
                     val embedBuilder = EmbedBuilder()
                     embedBuilder.setColor(theme.color)
-                        .setTitle(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
+                        .setTitle(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
                         .setImage(theme.idleBanner)
                     textChannelId.set(channel.idLong)
 
-                    return@thenCompose channel.sendMessage(localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                    return@thenCompose channel.sendMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
                         .setEmbeds(embedBuilder.build())
                         .submit()
                 }.thenApply { message ->
@@ -142,7 +143,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
 
         if (!config.isChannelSet()) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_NOT_SET)
+                embed(DedicatedChannelMessages.DEDICATED_CHANNEL_NOT_SET)
             }.queue()
             return
         }
@@ -155,61 +156,61 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             embeds = listOf(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_EDIT_EMBED
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_EDIT_EMBED
                 ).build()
             ),
             components = listOf(
                 ActionRow.of(
                     primary(
                         id = EDIT_BUTTON_ID.format("previous", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS),
                         emoji = RobertifyEmojiKt.PREVIOUS_EMOJI.emoji
                     ),
                     primary(
                         id = EDIT_BUTTON_ID.format("rewind", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND),
                         emoji = RobertifyEmojiKt.REWIND_EMOJI.emoji
                     ),
                     primary(
                         id = EDIT_BUTTON_ID.format("pnp", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE),
                         emoji = RobertifyEmojiKt.PLAY_AND_PAUSE_EMOJI.emoji
                     ),
                     primary(
                         id = EDIT_BUTTON_ID.format("stop", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_STOP),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_STOP),
                         emoji = RobertifyEmojiKt.STOP_EMOJI.emoji
                     ),
                     primary(
                         id = EDIT_BUTTON_ID.format("skip", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP),
                         emoji = RobertifyEmojiKt.END_EMOJI.emoji
                     ),
                 ),
                 ActionRow.of(
                     secondary(
                         id = EDIT_BUTTON_ID.format("favourite", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE),
                         emoji = RobertifyEmojiKt.STAR_EMOJI.emoji
                     ),
                     secondary(
                         id = EDIT_BUTTON_ID.format("loop", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP),
                         emoji = RobertifyEmojiKt.LOOP_EMOJI.emoji
                     ),
                     secondary(
                         id = EDIT_BUTTON_ID.format("shuffle", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE),
                         emoji = RobertifyEmojiKt.SHUFFLE_EMOJI.emoji
                     ),
                     secondary(
                         id = EDIT_BUTTON_ID.format("disconnect", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT),
                         emoji = RobertifyEmojiKt.QUIT_EMOJI.emoji
                     ),
                     secondary(
                         id = EDIT_BUTTON_ID.format("filters", user.id),
-                        label = localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS),
+                        label = localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS),
                         emoji = RobertifyEmojiKt.STAR_EMOJI.emoji
                     ),
                 )
@@ -225,7 +226,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val (_, buttonName, allowedUserId) = event.button.id!!.split(":")
         if (allowedUserId != event.user.id) {
             event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.NO_PERMS_BUTTON)
+                embed(GeneralMessages.NO_PERMS_BUTTON)
             }
                 .setEphemeral(true)
                 .queue()
@@ -244,61 +245,61 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             "previous" -> {
                 field = RequestChannelButtonKt.PREVIOUS
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS)
             }
 
             "rewind" -> {
                 field = RequestChannelButtonKt.REWIND
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND)
             }
 
             "pnp", "play_and_pause" -> {
                 field = RequestChannelButtonKt.PLAY_PAUSE
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE)
             }
 
             "stop" -> {
                 field = RequestChannelButtonKt.STOP
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_STOP)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_STOP)
             }
 
             "skip" -> {
                 field = RequestChannelButtonKt.SKIP
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP)
             }
 
             "favourite" -> {
                 field = RequestChannelButtonKt.FAVOURITE
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE)
             }
 
             "loop" -> {
                 field = RequestChannelButtonKt.LOOP
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP)
             }
 
             "shuffle" -> {
                 field = RequestChannelButtonKt.SHUFFLE
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE)
             }
 
             "disconnect" -> {
                 field = RequestChannelButtonKt.DISCONNECT
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT)
             }
 
             "filters" -> {
                 field = RequestChannelButtonKt.FILTERS
                 button =
-                    localeManager.getMessage(RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)
+                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)
             }
 
             else -> throw IllegalArgumentException("The button ID \"${event.button.id!!}\" doesn't map to a case to be handled!")
@@ -308,9 +309,9 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             subConfig.setState(field, false)
             event.hook.sendWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),
-                    Pair("{status}", localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.OFF_STATUS))
+                    Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
                 )
             }
                 .queueThenDelete(15, TimeUnit.SECONDS)
@@ -318,9 +319,9 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             subConfig.setState(field, true)
             event.hook.sendWithEmbed(guild) {
                 embed(
-                    RobertifyLocaleMessageKt.DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),
-                    Pair("{status}", localeManager.getMessage(RobertifyLocaleMessageKt.GeneralMessages.ON_STATUS))
+                    Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
                 )
             }.queueThenDelete(15, TimeUnit.SECONDS)
         }

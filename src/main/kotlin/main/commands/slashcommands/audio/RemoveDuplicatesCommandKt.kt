@@ -6,7 +6,7 @@ import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.messages.DuplicateMessages
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class RemoveDuplicatesCommandKt : AbstractSlashCommandKt(CommandKt(
@@ -22,7 +22,7 @@ class RemoveDuplicatesCommandKt : AbstractSlashCommandKt(CommandKt(
 
         if (queueHandler.isEmpty)
             return event.replyWithEmbed(guild) {
-                embed(RobertifyLocaleMessageKt.GeneralMessages.NOTHING_IN_QUEUE)
+                embed(GeneralMessages.NOTHING_IN_QUEUE)
             }.queue()
 
         event.deferReply().queue()

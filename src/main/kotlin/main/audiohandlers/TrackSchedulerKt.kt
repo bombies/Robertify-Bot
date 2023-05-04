@@ -25,7 +25,9 @@ import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.json.themes.ThemesConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.NowPlayingMessages
+import main.utils.locale.messages.TrackSchedulerMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -176,7 +178,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         return RobertifyEmbedUtilsKt.embedMessage(
             guild, "${
                 localeManager.getMessage(
-                    RobertifyLocaleMessageKt.NowPlayingMessages.NP_ANNOUNCEMENT_DESC,
+                    NowPlayingMessages.NP_ANNOUNCEMENT_DESC,
                     Pair("{title}", trackInfo.title),
                     Pair("{author}", trackInfo.author)
                 )
@@ -184,7 +186,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                 if (TogglesConfigKt(guild).getToggle(ToggleKt.SHOW_REQUESTER))
                     "\n\n${
                         localeManager.getMessage(
-                            RobertifyLocaleMessageKt.NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
+                            NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
                             Pair("{requester}", requesterMention)
                         )
                     }"
@@ -298,14 +300,14 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.COULD_NOT_FIND_SOURCE
+                    TrackSchedulerMessages.COULD_NOT_FIND_SOURCE
                 ).build()
             )
                 ?.queue(handleMessageCleanup)
         } else if (exception.message?.contains("copyright") == true) {
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.COPYRIGHT_TRACK,
+                    guild, TrackSchedulerMessages.COPYRIGHT_TRACK,
                     Pair("{title}", track?.title ?: "Unknown Track"),
                     Pair("{author}", track?.author ?: "Unknown Author")
                 ).build()
@@ -314,7 +316,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         } else if (exception.message?.contains("unavailable") == true) {
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
-                    guild, RobertifyLocaleMessageKt.TrackSchedulerMessages.UNAVAILABLE_TRACK,
+                    guild, TrackSchedulerMessages.UNAVAILABLE_TRACK,
                     Pair("{title}", track?.title ?: "Unknown Track"),
                     Pair("{author}", track?.author ?: "Unknown Author")
                 ).build()
@@ -324,7 +326,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.UNVIEWABLE_PLAYLIST
+                    TrackSchedulerMessages.UNVIEWABLE_PLAYLIST
                 ).build()
             )
                 ?.queue(handleMessageCleanup)
@@ -339,7 +341,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
+                    TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
                     Pair("{title}", track?.title ?: "Unknown Title"),
                     Pair("{author}", track?.author ?: "Unknown Author"),
                 ).build()
@@ -362,7 +364,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             announcementChannel?.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(
                     guild,
-                    RobertifyLocaleMessageKt.TrackSchedulerMessages.INACTIVITY_LEAVE,
+                    TrackSchedulerMessages.INACTIVITY_LEAVE,
                     Pair("{channel}", channel.asMention)
                 ).build()
             )?.queue { msg ->
@@ -393,6 +395,6 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
             "<@${requester.id}>"
         else
             LocaleManagerKt.getLocaleManager(guild)
-                .getMessage(RobertifyLocaleMessageKt.GeneralMessages.UNKNOWN_REQUESTER)
+                .getMessage(GeneralMessages.UNKNOWN_REQUESTER)
     }
 }

@@ -12,7 +12,8 @@ import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
-import main.utils.locale.messages.RobertifyLocaleMessageKt
+import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.RemoveMessages
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -53,13 +54,13 @@ class RemoveCommandKt : AbstractSlashCommandKt(
             .queueHandler
 
         if (queueHandler.isEmpty)
-            return RobertifyEmbedUtilsKt.embedMessage(guild, RobertifyLocaleMessageKt.GeneralMessages.NOTHING_IN_QUEUE)
+            return RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.NOTHING_IN_QUEUE)
                 .build()
 
         if (id <= 0 || id > queueHandler.size)
             return RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.RemoveMessages.REMOVE_INVALID_ID,
+                RemoveMessages.REMOVE_INVALID_ID,
                 Pair("{max}", queueHandler.size.toString())
             ).build()
 
@@ -69,13 +70,13 @@ class RemoveCommandKt : AbstractSlashCommandKt(
         return if (!queueHandler.remove(removedTrack))
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.RemoveMessages.COULDNT_REMOVE,
+                RemoveMessages.COULDNT_REMOVE,
                 Pair("{id}", id.toString())
             ).build()
         else {
             LogUtilsKt(guild).sendLog(
                 LogTypeKt.QUEUE_REMOVE,
-                RobertifyLocaleMessageKt.RemoveMessages.REMOVED_LOG,
+                RemoveMessages.REMOVED_LOG,
                 Pair("{user}", memberVoiceState.member.asMention),
                 Pair("{title}", removedTrack.title),
                 Pair("{author}", removedTrack.author)
@@ -84,7 +85,7 @@ class RemoveCommandKt : AbstractSlashCommandKt(
                 RequestChannelConfigKt(guild).updateMessage()
             RobertifyEmbedUtilsKt.embedMessage(
                 guild,
-                RobertifyLocaleMessageKt.RemoveMessages.REMOVED,
+                RemoveMessages.REMOVED,
                 Pair("{title}", removedTrack.title),
                 Pair("{author}", removedTrack.author)
             ).build()
