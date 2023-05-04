@@ -103,12 +103,12 @@
         <dependency>
             <groupId>com.github.walkyst</groupId>
             <artifactId>lavaplayer-fork</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.TopiSenpai.LavaSrc</groupId>
             <artifactId>lavasrc</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.2</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
@@ -138,22 +138,22 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry</artifactId>
-            <version>6.17.0</version>
+            <version>6.18.1</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.17.0</version>
+            <version>6.18.1</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-opentelemetry-core</artifactId>
-            <version>6.17.0</version>
+            <version>6.18.1</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-opentelemetry-agent</artifactId>
-            <version>6.17.0</version>
+            <version>6.18.1</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
@@ -222,7 +222,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.2</version>
+            <version>5.9.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
