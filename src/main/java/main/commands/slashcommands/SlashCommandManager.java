@@ -70,7 +70,8 @@ public class SlashCommandManager {
                 new TremoloFilter(),
                 new VibratoFilter(),
                 new StopCommand(),
-                new HistoryCommand()
+                new HistoryCommand(),
+                new RemoveDuplicatesCommand()
         );
 
         addManagementCommands(
