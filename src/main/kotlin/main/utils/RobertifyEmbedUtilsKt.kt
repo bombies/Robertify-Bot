@@ -192,7 +192,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        inline fun MessageChannel.sendWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
+        fun MessageChannel.sendWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }

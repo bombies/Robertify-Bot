@@ -15,6 +15,7 @@ import main.commands.slashcommands.management.requestchannel.RequestChannelComma
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.commands.slashcommands.util.AlertCommandKt
 import main.commands.slashcommands.util.BotInfoCommandKt
+import main.commands.slashcommands.util.HelpCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
@@ -77,7 +78,8 @@ object SlashCommandManagerKt {
 
     val utilityCommands: List<AbstractSlashCommandKt> = listOf(
         AlertCommandKt(),
-        BotInfoCommandKt()
+        BotInfoCommandKt(),
+        HelpCommandKt()
     )
 
     val devCommands: List<AbstractSlashCommandKt> = listOf()
