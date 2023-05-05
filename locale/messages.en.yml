@@ -511,3 +511,14 @@ history_embed_title: "History"
 
 # DUPLICATE MESSAGES
 removed_duplicates: "You have removed all duplicate tracks from the queue. (If there are any)"
+
+# SUGGESTION MESSAGES
+suggestion_modal_placeholder: "SUGGESTIONS MADE WILL BE FOR THE BOT ITSELF, NOT FOR THE SERVER THE BOT IS IN."
+suggestion_modal_label: "Suggestion"
+suggestion_modal_title: "Make a suggestion"
+suggestion_submitted: "You have successfully submitted your suggestion!"
+invalid_suggestion: "That is an invalid suggestion!"
+suggestion_user_banned: "You are banned from sending suggestions!"
+default_accept_reason: "Your suggestion has been accepted!"
+default_deny_reason: "Your suggestion has been denied!"
+feature_unavailable: "This feature is unavailable right now!"

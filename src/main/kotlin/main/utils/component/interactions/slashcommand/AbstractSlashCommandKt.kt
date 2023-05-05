@@ -31,6 +31,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.GenericEvent
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
@@ -186,6 +187,11 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 return@onEvent
             onCommandAutoCompleteInteraction(event)
         }
+
+        onEvent<ModalInteractionEvent>(shardManager) {
+            onModalInteraction(it)
+        }
+
     }
 
     private inline fun <reified T : GenericEvent> onEvent(
@@ -202,13 +208,15 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
     open suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {}
 
+    open suspend fun onModalInteraction(event: ModalInteractionEvent) {}
+
     open val help = ""
 
     fun loadCommand(guild: Guild) {
-        if (!info.isGuild && !info.isPrivate)
+        if (!info.isGuild && !info.developerOnly)
             return
 
-        if (info.isPrivate && guild.ownerIdLong != ConfigKt.OWNER_ID)
+        if (info.developerOnly && guild.ownerIdLong != ConfigKt.OWNER_ID)
             return
 
         logger.debug("Loading command \"${info.name}\" in ${guild.name}")
@@ -225,7 +233,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     fun loadCommand() {
         if (info.isGuild)
             return
-        if (info.isPrivate)
+        if (info.developerOnly)
             return
 
         RobertifyKt.shardManager.shards.forEach { shard ->
@@ -547,7 +555,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
     protected open fun devCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
-        if (!info.isPrivate) return true
+        if (!info.developerOnly) return true
         if (!BotDBCacheKt.instance.isDeveloper(event.user.idLong)) {
             event.replyEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(

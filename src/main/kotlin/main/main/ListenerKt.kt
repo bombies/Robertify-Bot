@@ -8,16 +8,10 @@ import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.guildconfig.GuildConfigKt
-import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.messages.UnbanMessages
-import main.utils.resume.GuildResumeManagerKt
-import net.dv8tion.jda.api.OnlineStatus
-import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
-import net.dv8tion.jda.api.events.guild.GuildReadyEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.slf4j.LoggerFactory
@@ -37,7 +31,9 @@ class ListenerKt : AbstractEventControllerKt() {
          * Load slash commands that NEED to be updated in a guild
          * @param g The guild to load the commands in
          */
-        internal fun loadNeededSlashCommands(guild: Guild) {}
+        internal fun loadNeededSlashCommands(guild: Guild) {
+            loadSlashCommands(guild)
+        }
 
         internal fun unloadCommands(guild: Guild, vararg commandNames: String) {
             if (commandNames.isEmpty())

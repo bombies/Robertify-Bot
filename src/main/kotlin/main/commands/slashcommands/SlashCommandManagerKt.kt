@@ -2,6 +2,7 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.dev.ManageSuggestionsCommandKt
 import main.commands.slashcommands.management.*
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
@@ -16,6 +17,7 @@ import main.commands.slashcommands.management.requestchannel.RequestChannelEditC
 import main.commands.slashcommands.util.AlertCommandKt
 import main.commands.slashcommands.util.BotInfoCommandKt
 import main.commands.slashcommands.util.HelpCommandKt
+import main.commands.slashcommands.util.suggestions.SuggestionCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
@@ -79,10 +81,13 @@ object SlashCommandManagerKt {
     val utilityCommands: List<AbstractSlashCommandKt> = listOf(
         AlertCommandKt(),
         BotInfoCommandKt(),
-        HelpCommandKt()
+        HelpCommandKt(),
+        SuggestionCommandKt()
     )
 
-    val devCommands: List<AbstractSlashCommandKt> = listOf()
+    val devCommands: List<AbstractSlashCommandKt> = listOf(
+        ManageSuggestionsCommandKt()
+    )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
         this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")

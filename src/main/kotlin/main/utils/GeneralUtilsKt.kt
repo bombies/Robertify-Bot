@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteract
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.requests.ErrorResponse
+import net.dv8tion.jda.api.requests.RestAction
 import org.apache.commons.lang3.time.DurationFormatUtils
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,6 +43,7 @@ import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 import java.util.regex.Pattern
 
 object GeneralUtilsKt {
@@ -674,5 +676,11 @@ object GeneralUtilsKt {
 
     fun <A, B : LocaleMessageKt> Pair(first: A, second: B, localeManager: LocaleManagerKt): Pair<A, String> =
         Pair(first, localeManager.getMessage(second))
+
+    fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration) =
+        queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS)
+
+    fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration, success: Consumer<in T>) =
+        queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success)
 
 }

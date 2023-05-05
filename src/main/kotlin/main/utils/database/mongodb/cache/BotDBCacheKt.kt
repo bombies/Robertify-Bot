@@ -44,7 +44,8 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
         set(value) {
             val obj: JSONObject = getDocument()
             val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
-            val alert = value.left; val time = value.right
+            val alert = value.left;
+            val time = value.right
             alertObj.put(
                 BotDBKt.Fields.SubFields.ALERT.toString(),
                 alert.replace("\\\\n".toRegex(), "\n").replace("\\\\t".toRegex(), "\t")
@@ -54,13 +55,57 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
             clearAlertViewers()
         }
 
+    val suggestionSetup: Boolean
+        get() = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString()) != -1L
+
+    val suggestionsCategoryId: Long
+        get() = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString())
+
+    var suggestionsPendingChannelId: Long
+        get() = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            .getLong(SuggestionsConfigField.PENDING_CHANNEL.toString())
+        set(value) {
+            if (!suggestionSetup)
+                throw IllegalAccessException("The suggestions category hasn't been setup!")
+
+            val obj = getDocument()
+            val suggestionObj = obj.getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            suggestionObj.put(SuggestionsConfigField.PENDING_CHANNEL.toString(), value)
+        }
+
+    var suggestionsAcceptedChannelId: Long
+        get() = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            .getLong(SuggestionsConfigField.ACCEPTED_CHANNEL.toString())
+        set(value) {
+            if (!suggestionSetup)
+                throw IllegalAccessException("The suggestions category hasn't been setup!")
+
+            val obj = getDocument()
+            val suggestionObj = obj.getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            suggestionObj.put(SuggestionsConfigField.ACCEPTED_CHANNEL.toString(), value)
+        }
+
+    var suggestionsDeniedChannelId: Long
+        get() = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            .getLong(SuggestionsConfigField.DENIED_CHANNEL.toString())
+        set(value) {
+            if (!suggestionSetup)
+                throw IllegalAccessException("The suggestions category hasn't been setup!")
+
+            val obj = getDocument()
+            val suggestionObj = obj.getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
+            suggestionObj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), value)
+        }
+
     fun initSuggestionChannels(
         categoryID: Long,
         pendingChannel: Long,
         acceptedChannel: Long,
         deniedChannel: Long
     ) {
-        check(!isSuggestionsSetup()) { "The channels have already been setup!" }
+        check(!suggestionSetup) { "The channels have already been setup!" }
 
         val obj = getDocument()
         val suggestionObj = obj.getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
@@ -81,26 +126,6 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
         suggestionObj.put(SuggestionsConfigField.ACCEPTED_CHANNEL.toString(), -1L)
         suggestionObj.put(SuggestionsConfigField.DENIED_CHANNEL.toString(), -1L)
         update(obj)
-    }
-
-    fun getSuggestionsCategoryID(): Long {
-        return getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
-            .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString())
-    }
-
-    fun getSuggestionsPendingChannelID(): Long {
-        return getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
-            .getLong(SuggestionsConfigField.PENDING_CHANNEL.toString())
-    }
-
-    fun getSuggestionsAcceptedChannelID(): Long {
-        return getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
-            .getLong(SuggestionsConfigField.ACCEPTED_CHANNEL.toString())
-    }
-
-    fun getSuggestionsDeniedChannelID(): Long {
-        return getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
-            .getLong(SuggestionsConfigField.DENIED_CHANNEL.toString())
     }
 
     fun banSuggestionsUser(id: Long) {
@@ -132,11 +157,6 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
         val array = getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
             .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString())
         return arrayHasObject(array, id)
-    }
-
-    fun isSuggestionsSetup(): Boolean {
-        return getDocument().getJSONObject(BotDBKt.Fields.SUGGESTIONS_OBJECT.toString())
-            .getLong(SuggestionsConfigField.SUGGESTIONS_CATEGORY.toString()) != -1L
     }
 
     fun initReportChannels(categoryID: Long, channelID: Long) {

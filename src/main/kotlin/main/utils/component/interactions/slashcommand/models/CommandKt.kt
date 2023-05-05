@@ -4,6 +4,7 @@ import main.constants.RobertifyPermissionKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -18,7 +19,7 @@ data class CommandKt(
     val djOnly: Boolean = false,
     val adminOnly: Boolean = false,
     val isPremium: Boolean = false,
-    val isPrivate: Boolean = false,
+    val developerOnly: Boolean = false,
     val botRequiredPermissions: List<Permission> = listOf(),
     val isGuild: Boolean = false,
     val guildUseOnly: Boolean = true,
@@ -34,7 +35,7 @@ data class CommandKt(
 
     val checkPermission = _checkPermission
         get() = when {
-            isPrivate -> { event -> BotDBCacheKt.instance.isDeveloper(event.user.idLong) }
+            developerOnly -> { event -> BotDBCacheKt.instance.isDeveloper(event.user.idLong) }
             else -> field
         }
 
@@ -102,6 +103,9 @@ data class CommandKt(
         }
 
         commandData.setGuildOnly(guildUseOnly)
+
+        if (developerOnly)
+            commandData.setDefaultPermissions(DefaultMemberPermissions.enabledFor(Permission.ADMINISTRATOR))
         return commandData
     }
 }
