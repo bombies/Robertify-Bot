@@ -38,7 +38,7 @@ class DisconnectCommandKt : AbstractSlashCommandKt(
             .sendLog(
                 LogTypeKt.BOT_DISCONNECTED,
                 "${memberVoiceState.member.asMention} ${
-                    LocaleManagerKt.getLocaleManager(guild)
+                    LocaleManagerKt[guild]
                         .getMessage(DisconnectMessages.DISCONNECTED_USER)
                 }"
             )

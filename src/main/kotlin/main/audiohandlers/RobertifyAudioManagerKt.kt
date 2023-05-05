@@ -218,7 +218,7 @@ object RobertifyAudioManagerKt {
                     val guild = musicManager.guild
                     if (TogglesConfigKt(guild).getToggle(ToggleKt.RESTRICTED_VOICE_CHANNELS)) {
                         val restrictedChannelConfig = RestrictedChannelsConfigKt(guild)
-                        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+                        val localeManager = LocaleManagerKt[guild]
 
                         if (!restrictedChannelConfig.isRestrictedChannel(
                                 channel.idLong,

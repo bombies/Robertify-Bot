@@ -30,7 +30,7 @@ class LogUtilsKt(private val guild: Guild) {
     fun sendLog(type: LogTypeKt, message: LocaleMessageKt) {
         if (!config.channelIsSet) return
         if (!TogglesConfigKt(guild).getLogToggle(type)) return
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val channel = config.channel
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
@@ -46,7 +46,7 @@ class LogUtilsKt(private val guild: Guild) {
     fun sendLog(type: LogTypeKt, message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
         if (!config.channelIsSet) return
         if (!TogglesConfigKt(guild).getLogToggle(type)) return
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val channel = config.channel
         try {
             channel!!.sendMessageEmbeds(

@@ -55,7 +55,7 @@ class ReminderJobKt : Job {
 
         if (!TogglesConfigKt(guild).getToggle(ToggleKt.REMINDERS)) return
 
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         channel.sendMessage(
             localeManager.getMessage(
                 ReminderMessages.REMINDER_SEND,
@@ -78,7 +78,7 @@ class ReminderJobKt : Job {
     }
 
     private fun dmReminder(guild: Guild, user: Long, reminder: String) {
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         GeneralUtilsKt.dmUser(
             user,

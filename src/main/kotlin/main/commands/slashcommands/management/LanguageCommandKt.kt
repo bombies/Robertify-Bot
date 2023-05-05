@@ -33,7 +33,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val language = event.getOption("language")?.asString
 
         if (language == null) {
@@ -81,7 +81,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
 
         val (_, locale) = event.selectedOptions.first().value.split(":")
         val newLocale = RobertifyLocaleKt.parse(locale)
-        LocaleManagerKt.getLocaleManager(guild).locale = newLocale
+        LocaleManagerKt[guild].locale = newLocale
         RequestChannelConfigKt(guild).updateAll()
 
         event.hook.sendWithEmbed(guild) {

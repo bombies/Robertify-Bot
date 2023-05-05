@@ -22,7 +22,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
         val guild = event.guild!!
         val musicManager = RobertifyAudioManagerKt[guild]
         val queueHandler = musicManager.scheduler.queueHandler
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         event.deferReply().queue()
 

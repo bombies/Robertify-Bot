@@ -38,7 +38,7 @@ class SearchResultLoaderKt(
 
     override fun onSearchResultLoad(results: AudioPlaylist) {
         val tracks = results.tracks
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val embedDesc = StringBuilder()
 
         val options = tracks.subList(0, tracks.size.coerceAtMost(10)).mapIndexed { i, track ->

@@ -184,7 +184,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
     private fun handleList(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RestrictedChannelsConfigKt(guild)
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         val textChannels = config.restrictedChannelsToString(RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
         val voiceChannels = config.restrictedChannelsToString(RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)

@@ -25,7 +25,7 @@ class RandomMessageManagerKt {
         get() = messages.isEmpty()
 
     fun getMessage(guild: Guild): MessageEmbed {
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val messages = BotDBCacheKt.instance.getRandomMessages()
 
         if (messages.isEmpty())

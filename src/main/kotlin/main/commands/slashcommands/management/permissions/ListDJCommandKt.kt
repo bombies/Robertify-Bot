@@ -19,7 +19,7 @@ class ListDJCommandKt : AbstractSlashCommandKt(CommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = PermissionsConfigKt(guild)
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         val roles = PermissionsCommandKt().getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
         val users = PermissionsCommandKt().getUsersForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)

@@ -159,7 +159,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         val progress = player.trackPosition.toDouble() / track!!.length
         val filters = player.filters
         val requester = musicManager.scheduler.findRequester(track.identifier)
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val embedBuilder = RobertifyEmbedUtilsKt.embedMessageWithTitle(
             guild, localeManager.getMessage(
                 NowPlayingMessages.NP_EMBED_TITLE,

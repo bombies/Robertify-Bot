@@ -528,7 +528,7 @@ object GeneralUtilsKt {
 
         val parsedMentions = mentions.map { id -> "<$mentionTag$id>" }
         return when {
-            parsedMentions.isEmpty() -> LocaleManagerKt.getLocaleManager(guild)
+            parsedMentions.isEmpty() -> LocaleManagerKt[guild]
                 .getMessage(GeneralMessages.NOTHING_HERE)
 
             else -> parsedMentions.asString()
@@ -600,7 +600,7 @@ object GeneralUtilsKt {
             .setActionRow(
                 Button.link(
                     "https://robertify.me/premium",
-                    LocaleManagerKt.getLocaleManager(guild)
+                    LocaleManagerKt[guild]
                         .getMessage(GeneralMessages.PREMIUM_UPGRADE_BUTTON)
                 )
             )

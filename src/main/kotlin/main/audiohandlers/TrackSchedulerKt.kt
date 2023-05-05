@@ -174,7 +174,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
     }
 
     private fun getNowPlayingEmbed(trackInfo: AudioTrackInfo, requesterMention: String): MessageEmbed {
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         return RobertifyEmbedUtilsKt.embedMessage(
             guild, "${
                 localeManager.getMessage(
@@ -394,7 +394,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
         return if (requester != null)
             "<@${requester.id}>"
         else
-            LocaleManagerKt.getLocaleManager(guild)
+            LocaleManagerKt[guild]
                 .getMessage(GeneralMessages.UNKNOWN_REQUESTER)
     }
 }

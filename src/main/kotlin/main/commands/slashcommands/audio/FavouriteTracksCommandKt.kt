@@ -111,7 +111,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         }
 
         val list = mutableListOf<StringSelectMenuOptionKt>()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         tracks.forEach { track ->
             list.add(

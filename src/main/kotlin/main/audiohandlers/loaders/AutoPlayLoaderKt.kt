@@ -29,7 +29,7 @@ class AutoPlayLoaderKt(
 
     override fun onPlaylistLoad(playlist: AudioPlaylist) {
         if (channel != null) {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             scheduler.announcementChannel = channel
             channel.sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(

@@ -201,7 +201,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
             val queueAsList = ArrayList(queueHandler.contents)
 
             val theme = ThemesConfigKt(guild).theme
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             val eb = EmbedBuilder()
 
             if (playingTrack == null) {

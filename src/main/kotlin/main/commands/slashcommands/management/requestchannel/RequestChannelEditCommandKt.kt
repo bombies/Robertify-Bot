@@ -103,7 +103,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                 .submit()
                 .thenCompose { channel ->
                     val theme = ThemesConfigKt(guild).theme
-                    val localeManager = LocaleManagerKt.getLocaleManager(guild)
+                    val localeManager = LocaleManagerKt[guild]
                     val manager = channel.manager
 
                     manager.setPosition(0).queue()
@@ -149,7 +149,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         }
 
         event.deferReply().queue()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val user = event.user
 
         event.hook.send(
@@ -235,7 +235,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
 
         event.deferReply().queue()
 
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val config = RequestChannelConfigKt(guild)
         val subConfig = config.config
         val field: RequestChannelButtonKt

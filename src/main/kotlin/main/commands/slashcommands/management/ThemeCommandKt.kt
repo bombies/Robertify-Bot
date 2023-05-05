@@ -97,7 +97,7 @@ class ThemeCommandKt : AbstractSlashCommandKt(
     }
 
     private fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         return StringSelectionMenuBuilderKt(
             _name = "menu:themes",
             placeholder = localeManager.getMessage(ThemeMessages.THEME_SELECT_MENU_PLACEHOLDER),

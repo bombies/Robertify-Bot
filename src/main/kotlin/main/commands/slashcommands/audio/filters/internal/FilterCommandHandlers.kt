@@ -47,7 +47,7 @@ internal inline fun handleGenericFilterToggle(
     val player = RobertifyAudioManagerKt[guild].player
     val filters = player.filters
     val logUtils = LogUtilsKt(guild)
-    val localeManager = LocaleManagerKt.getLocaleManager(guild)
+    val localeManager = LocaleManagerKt[guild]
 
     return if (filterPredicate(filters)) {
         filterOff(filters)

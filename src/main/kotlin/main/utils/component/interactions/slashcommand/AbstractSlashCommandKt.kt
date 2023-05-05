@@ -399,7 +399,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 .addActionRow(
                     Button.link(
                         "https://robertify.me/premium",
-                        LocaleManagerKt.getLocaleManager(guild)
+                        LocaleManagerKt[guild]
                             .getMessage(GeneralMessages.PREMIUM_UPGRADE_BUTTON)
                     )
                 )
@@ -506,7 +506,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         val guild = event.guild ?: return true
         if (!guild.selfMember.hasPermission(event.guildChannel, Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(
-                LocaleManagerKt.getLocaleManager(guild)
+                LocaleManagerKt[guild]
                     .getMessage(GeneralMessages.NO_EMBED_PERMS)
             )
                 .queue()

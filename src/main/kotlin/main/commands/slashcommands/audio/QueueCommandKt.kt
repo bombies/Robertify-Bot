@@ -41,7 +41,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
     fun getContent(guild: Guild, queueHandler: QueueHandlerKt): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.contents.toMutableList()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         trackList.forEachIndexed { i, track ->
             content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),
@@ -55,7 +55,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
 
     fun getContent(guild: Guild, queueItems: List<QueueItemKt>): List<String> {
         val content = mutableListOf<String>()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         queueItems.forEach { track ->
             content.add(localeManager.getMessage(
                 QueueMessages.QUEUE_ENTRY,
@@ -71,7 +71,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
     fun getPastContent(guild: Guild, queueHandler: QueueHandlerKt): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.previousTracksContents.toMutableList().reversed()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         trackList.forEachIndexed { i, track ->
             content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),

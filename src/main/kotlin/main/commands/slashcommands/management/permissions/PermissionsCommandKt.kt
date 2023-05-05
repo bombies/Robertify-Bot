@@ -150,7 +150,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
     private fun handleList(event: SlashCommandInteractionEvent, subCommandName: String) {
         val guild = event.guild!!
         val config = PermissionsConfigKt(guild)
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         when (subCommandName) {
             "all" -> {

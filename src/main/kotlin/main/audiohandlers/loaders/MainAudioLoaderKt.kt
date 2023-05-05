@@ -215,7 +215,7 @@ class MainAudioLoaderKt(
             guild,
             if (exception.message?.contains("available") == true || exception.message?.contains("format") == true)
                 exception.message!!
-            else LocaleManagerKt.getLocaleManager(guild)
+            else LocaleManagerKt[guild]
                 .getMessage(AudioLoaderMessages.ERROR_LOADING_TRACK)
         ).build()
 

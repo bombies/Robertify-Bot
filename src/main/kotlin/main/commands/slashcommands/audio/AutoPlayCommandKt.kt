@@ -26,7 +26,7 @@ class AutoPlayCommandKt : AbstractSlashCommandKt(
     }
 
     private fun handleAutoPlay(guild: Guild): MessageEmbed {
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
         val autoPlayConfig = AutoPlayConfigKt(guild)
 
         return if (autoPlayConfig.status) {

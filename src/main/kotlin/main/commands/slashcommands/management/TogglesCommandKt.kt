@@ -352,7 +352,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
         val musicCommands = SlashCommandManagerKt.musicCommands
         val config = TogglesConfigKt(guild)
         val description = mutableListOf<String>()
-        val localeManager = LocaleManagerKt.getLocaleManager(guild)
+        val localeManager = LocaleManagerKt[guild]
 
         description.add(
             """

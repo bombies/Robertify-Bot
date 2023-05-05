@@ -86,7 +86,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
 
         fun embedMessage(guild: Guild?, message: LocaleMessageKt): EmbedBuilder {
             if (guild == null) return embedMessage(message)
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setDescription(localeManager.getMessage(message))
         }
 
@@ -104,7 +104,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             message: LocaleMessageKt,
             vararg placeholders: Pair<String, String>
         ): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild)
                 .setDescription(localeManager.getMessage(message, *placeholders))
         }
@@ -114,19 +114,19 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
         }
 
         fun embedMessageWithTitle(guild: Guild?, title: LocaleMessageKt, message: LocaleMessageKt): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title))
                 .setDescription(localeManager.getMessage(message))
         }
 
         fun embedMessageWithTitle(guild: Guild?, title: String, message: LocaleMessageKt): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(title)
                 .setDescription(localeManager.getMessage(message))
         }
 
         fun embedMessageWithTitle(guild: Guild?, title: LocaleMessageKt, message: String): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title))
                 .setDescription(message)
         }
@@ -138,7 +138,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             message: LocaleMessageKt,
             vararg placeholders: Pair<String, String>
         ): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title))
                 .setDescription(localeManager.getMessage(message, *placeholders))
         }
@@ -150,7 +150,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             message: LocaleMessageKt,
             vararg placeholders: Pair<String, String>
         ): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(title)
                 .setDescription(localeManager.getMessage(message, *placeholders))
         }
@@ -162,7 +162,7 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             message: String,
             vararg placeholders: Pair<String, String>
         ): EmbedBuilder {
-            val localeManager = LocaleManagerKt.getLocaleManager(guild)
+            val localeManager = LocaleManagerKt[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title, *placeholders))
                 .setDescription(message)
         }
