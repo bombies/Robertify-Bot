@@ -135,7 +135,7 @@ object RobertifyKt {
         )
         logger.info("Registered all slash commands.")
 
-        shardManager.registerEvents(EventManager.getRegisteredEvents())
+        shardManager.registerEvents(EventManager.events)
         logger.info("Registered all event controllers")
 
         if (ConfigKt.LOAD_COMMANDS)
