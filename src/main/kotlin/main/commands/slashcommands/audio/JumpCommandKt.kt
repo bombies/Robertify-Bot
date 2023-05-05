@@ -7,7 +7,7 @@ import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.GeneralUtilsKt.isInt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -43,7 +43,7 @@ class JumpCommandKt : AbstractSlashCommandKt(
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
 
-        event.hook.sendWithEmbed {
+        event.hook.sendEmbed {
             handleJump(
                 selfVoiceState = selfVoiceState,
                 memberVoiceState = memberVoiceState,

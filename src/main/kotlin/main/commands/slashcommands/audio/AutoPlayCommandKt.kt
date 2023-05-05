@@ -1,7 +1,7 @@
 package main.commands.slashcommands.audio
 
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.autoplay.AutoPlayConfigKt
@@ -21,7 +21,7 @@ class AutoPlayCommandKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed(event.guild!!) { handleAutoPlay(event.guild!!) }
+        event.replyEmbed(event.guild!!) { handleAutoPlay(event.guild!!) }
             .queue()
     }
 

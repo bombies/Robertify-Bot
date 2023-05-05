@@ -6,7 +6,7 @@ import main.main.ListenerKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.dmEmbed
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -40,14 +40,14 @@ class BanCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
-            return event.replyWithEmbed(event.guild!!) {
+            return event.replyEmbed(event.guild!!) {
                 embed(GeneralMessages.INVALID_ARGS)
             }.setEphemeral(true)
                 .queue()
         }
         val duration = event.getOption("duration")?.asString
 
-        event.replyWithEmbed(event.guild!!) {
+        event.replyEmbed(event.guild!!) {
             handleBan(user, event.member!!, duration)
         }.queue()
     }

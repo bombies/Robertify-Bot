@@ -83,7 +83,8 @@ object SlashCommandManagerKt {
         SuggestionCommandKt(),
         SupportServerCommandKt(),
         UptimeCommandKt(),
-        VoteCommandKt()
+        VoteCommandKt(),
+        WebsiteCommandKt()
     )
 
     val devCommands: List<AbstractSlashCommandKt> = listOf(

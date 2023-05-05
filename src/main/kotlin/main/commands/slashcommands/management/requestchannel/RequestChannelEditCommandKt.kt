@@ -12,8 +12,8 @@ import main.constants.ToggleKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.toMention
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
@@ -69,7 +69,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (RequestChannelConfigKt(guild).isChannelSet()) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP)
             }.queue()
             return
@@ -79,7 +79,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val channel = createRequestChannel(guild).await()
 
         try {
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(
                     DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP,
                     Pair("{channel}", channel.channelId.toMention(GeneralUtilsKt.Mentioner.CHANNEL))
@@ -87,7 +87,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             }.queue()
         } catch (e: InsufficientPermissionException) {
             if (e.message?.contains("MESSAGE_HISTORY") == true)
-                event.hook.sendWithEmbed(guild) {
+                event.hook.sendEmbed(guild) {
                     embed(DedicatedChannelMessages.DEDICATED_CHANNEL_SETUP_2)
                 }.queue()
             else logger.error("Unexpected error", e)
@@ -142,7 +142,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val config = RequestChannelConfigKt(guild)
 
         if (!config.isChannelSet()) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(DedicatedChannelMessages.DEDICATED_CHANNEL_NOT_SET)
             }.queue()
             return
@@ -225,7 +225,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val (_, buttonName, allowedUserId) = event.button.id!!.split(":")
         if (allowedUserId != event.user.id) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.NO_PERMS_BUTTON)
             }
                 .setEphemeral(true)
@@ -307,7 +307,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
 
         if (subConfig.getState(field)) {
             subConfig.setState(field, false)
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(
                     DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),
@@ -317,7 +317,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                 .queueThenDelete(15, TimeUnit.SECONDS)
         } else {
             subConfig.setState(field, true)
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(
                     DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),

@@ -1,6 +1,6 @@
 package main.commands.slashcommands.management.logs
 
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogUtilsKt
@@ -22,12 +22,12 @@ class LogCommandKt : AbstractSlashCommandKt(
 
         try {
             LogUtilsKt(guild).createChannel()
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP)
             }.setEphemeral(true)
                 .queue()
         } catch (e: IllegalArgumentException) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP)
             }
                 .setEphemeral(true)

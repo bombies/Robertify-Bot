@@ -14,8 +14,8 @@ import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -62,7 +62,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
         if (!musicCommandDJCheck(event)) {
             if (!selfVoiceState.inAudioChannel()) {
-                event.hook.sendWithEmbed(guild) {
+                event.hook.sendEmbed(guild) {
                     embed(GeneralMessages.VOICE_CHANNEL_NEEDED)
                 }.setEphemeral(true)
                     .queue()
@@ -75,7 +75,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     event.hook.sendMessageEmbeds(embed)
                         .queue()
                 } else {
-                    event.hook.sendWithEmbed(guild) {
+                    event.hook.sendEmbed(guild) {
                         embed(SkipMessages.VOTE_SKIP_STARTED)
                     }.queue()
                 }
@@ -161,7 +161,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                 .build()
 
         val neededVotes = getNeededVotes(guild)
-        channel.sendWithEmbed(guild) {
+        channel.sendEmbed(guild) {
             embed(
                 SkipMessages.VOTE_SKIP_STARTED_EMBED,
                 Pair("{user}", memberVoiceState.member.asMention),
@@ -308,7 +308,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         val memberVoiceState = event.member!!.voiceState!!
 
         if (!selfVoiceState.inAudioChannel()) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.BUTTON_NO_LONGER_VALID)
             }.setEphemeral(true)
                 .queue()
@@ -316,7 +316,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         }
 
         if (!memberVoiceState.inAudioChannel()) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
             }.setEphemeral(true)
                 .queue()
@@ -324,7 +324,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         }
 
         if (selfVoiceState.channel!!.id != memberVoiceState.channel!!.id) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.SAME_VOICE_CHANNEL_BUTTON)
             }.setEphemeral(true)
                 .queue()
@@ -339,7 +339,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                     voteSkipManager.removeVoter(user.idLong)
                     voteSkipManager.voteSkipCount--
 
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(SkipMessages.SKIP_VOTE_REMOVED)
                     }
                         .setEphemeral(true)
@@ -348,7 +348,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                 } else {
                     if (GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_DJ)) {
                         doVoteSkip(guild)
-                        event.replyWithEmbed(guild) {
+                        event.replyEmbed(guild) {
                             embed(SkipMessages.DJ_SKIPPED)
                         }.setEphemeral(true)
                             .queue()
@@ -357,7 +357,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
                     voteSkipManager.addVoter(user.idLong)
                     voteSkipManager.voteSkipCount++
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(SkipMessages.SKIP_VOTE_ADDED)
                     }
                         .setEphemeral(true)
@@ -368,7 +368,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
 
             "cancel" -> {
                 if (voteSkipManager.startedBy != user.idLong) {
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(GeneralMessages.NO_PERMS_BUTTON)
                     }.setEphemeral(true)
                         .queue()

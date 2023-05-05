@@ -11,7 +11,7 @@ import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt.getDestination
 import main.utils.GeneralUtilsKt.isUrl
 import main.utils.GeneralUtilsKt.toUrl
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -96,7 +96,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         val selfVoiceState = guild.selfMember.voiceState!!
 
         if (!memberVoiceState.inAudioChannel()) {
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
             }
                 .queue()
@@ -104,7 +104,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         }
 
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!! != selfVoiceState.channel) {
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(
                     GeneralMessages.SAME_VOICE_CHANNEL_LOC,
                     Pair("{channel}", selfVoiceState.channel!!.asMention)
@@ -136,14 +136,14 @@ class PlayCommandKt : AbstractSlashCommandKt(
             "shuffled" -> {
                 var link = event.getRequiredOption("tracks").asString
                 if (!link.isUrl()) {
-                    event.hook.sendWithEmbed(guild) {
+                    event.hook.sendEmbed(guild) {
                         embed(ShufflePlayMessages.INVALID_LINK)
                     }
                 } else link = URL(link).getDestination()
 
                 when {
                     link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=[a-zA-Z0-9]+)?".toRegex()) -> {
-                        event.hook.sendWithEmbed(guild) {
+                        event.hook.sendEmbed(guild) {
                             embed(
                                 ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Spotify")
@@ -153,7 +153,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     }
 
                     link.contains("music.apple.com") && !link.matches("(https?://)?(www\\.)?music\\.apple\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)(/[a-zA-Z\\d\\-]+)?/(?<identifier>[a-zA-Z\\d\\-.]+)(\\?i=(?<identifier2>\\d+))?".toRegex()) -> {
-                        event.hook.sendWithEmbed(guild) {
+                        event.hook.sendEmbed(guild) {
                             embed(
                                 ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Apple Music")
@@ -163,7 +163,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     }
 
                     link.contains("deezer.com") && !link.matches("(https?://)?(www\\.)?deezer\\.com/(?<countrycode>[a-zA-Z]{2}/)?(?<type>album|playlist|artist)/(?<identifier>[0-9]+)".toRegex()) -> {
-                        event.hook.sendWithEmbed(guild) {
+                        event.hook.sendEmbed(guild) {
                             embed(
                                 ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "Deezer")
@@ -173,7 +173,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     }
 
                     link.contains("soundcloud.com") && !link.contains("sets") -> {
-                        event.hook.sendWithEmbed(guild) {
+                        event.hook.sendEmbed(guild) {
                             embed(
                                 ShufflePlayMessages.NOT_PLAYLIST,
                                 Pair("{source}", "SoundCloud")
@@ -208,7 +208,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         if (link.isUrl() && !ConfigKt.YOUTUBE_ENABLED) {
             val linkDestination = link.toUrl()!!.getDestination()
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
-                event.hook.sendWithEmbed(guild) {
+                event.hook.sendEmbed(guild) {
                     embed(GeneralMessages.NO_YOUTUBE_SUPPORT)
                 }
                     .queue()
@@ -216,7 +216,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             }
         }
 
-        event.hook.sendWithEmbed(guild) {
+        event.hook.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
         }.queue { msg ->
             runBlocking {
@@ -245,7 +245,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     try {
                         Files.createDirectory(Paths.get(ConfigKt.AUDIO_DIR))
                     } catch (e: Exception) {
-                        event.hook.sendWithEmbed(guild) {
+                        event.hook.sendEmbed(guild) {
                             embed(PlayMessages.LOCAL_DIR_ERR)
                         }
                             .setActionRow(
@@ -264,7 +264,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
                 try {
                     val audioManager = RobertifyAudioManagerKt
-                    event.hook.sendWithEmbed(guild) {
+                    event.hook.sendEmbed(guild) {
                         embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
                     }.queue { addingMsg ->
                         file.proxy
@@ -287,7 +287,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                     }
                 } catch (e: IllegalArgumentException) {
                     logger.error("Error when attempting to download track", e)
-                    event.hook.sendWithEmbed(guild) {
+                    event.hook.sendEmbed(guild) {
                         embed(PlayMessages.FILE_DOWNLOAD_ERR)
                     }.setActionRow(
                         link(
@@ -299,7 +299,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                 }
             }
 
-            else -> event.hook.sendWithEmbed(guild) {
+            else -> event.hook.sendEmbed(guild) {
                 embed(PlayMessages.INVALID_FILE)
             }.queue()
         }

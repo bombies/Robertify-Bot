@@ -4,7 +4,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.GeneralUtilsKt.isNotNull
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -34,7 +34,7 @@ class VolumeCommandKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed {
+        event.replyEmbed {
             handleVolumeChange(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,

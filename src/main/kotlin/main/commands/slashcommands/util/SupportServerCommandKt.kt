@@ -2,7 +2,7 @@ package main.commands.slashcommands.util
 
 import dev.minn.jda.ktx.interactions.components.link
 import main.constants.BotConstantsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.LocaleManagerKt
@@ -17,7 +17,7 @@ class SupportServerCommandKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed(event.guild, SupportServerMessages.JOIN_SUPPORT_SERVER)
+        event.replyEmbed(event.guild, SupportServerMessages.JOIN_SUPPORT_SERVER)
             .setEphemeral(true)
             .setActionRow(
                 link(

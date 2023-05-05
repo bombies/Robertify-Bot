@@ -2,7 +2,7 @@ package main.commands.slashcommands.audio.filters
 
 import lavalink.client.io.filters.Timescale
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -14,7 +14,7 @@ class NightcoreFilterKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed {
+        event.replyEmbed {
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Nightcore",

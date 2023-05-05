@@ -4,7 +4,7 @@ import main.commands.slashcommands.SlashCommandManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.RobertifyThemeKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilderKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -71,7 +71,7 @@ class HelpCommandKt : AbstractSlashCommandKt(
                 .queue()
         } else {
             val command = event.getRequiredOption("command").asString
-            event.replyWithEmbed { searchCommand(command, guild) }
+            event.replyEmbed { searchCommand(command, guild) }
                 .setEphemeral(true)
                 .queue()
         }
@@ -83,7 +83,7 @@ class HelpCommandKt : AbstractSlashCommandKt(
         val guild = event.guild
 
         if (event.componentId.split(":")[2] != event.user.id)
-            return event.replyWithEmbed(guild, GeneralMessages.NO_MENU_PERMS).queue()
+            return event.replyEmbed(guild, GeneralMessages.NO_MENU_PERMS).queue()
 
         when (event.selectedOptions.first().value) {
             "help:management" -> event.editMessageEmbeds(getHelpEmbed(guild, HelpType.MANAGEMENT)).queue()

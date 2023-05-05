@@ -1,7 +1,7 @@
 package main.commands.slashcommands.util
 
 import main.utils.GeneralUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -16,7 +16,7 @@ class UptimeCommandKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed(
+        event.replyEmbed(
             event.guild,
             GeneralUtilsKt.getDurationString(System.currentTimeMillis() - BotDBCacheKt.instance.lastStartup)
         )

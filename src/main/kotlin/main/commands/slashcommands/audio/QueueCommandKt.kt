@@ -6,7 +6,7 @@ import main.audiohandlers.utils.author
 import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
 import main.utils.GeneralUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.LocaleManagerKt
@@ -29,7 +29,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
         val queueHandler = musicManager.scheduler.queueHandler
 
         if (queueHandler.isEmpty) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.NOTHING_IN_QUEUE)
             }.queue()
             return

@@ -1,7 +1,7 @@
 package main.commands.slashcommands.util
 
 import dev.minn.jda.ktx.interactions.components.link
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.messages.GeneralMessages
@@ -14,7 +14,7 @@ class VoteCommandKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed(event.guild, GeneralMessages.VOTE_EMBED_DESC)
+        event.replyEmbed(event.guild, GeneralMessages.VOTE_EMBED_DESC)
             .setActionRow(
                 link(
                     url = "https://top.gg/bot/893558050504466482/vote",

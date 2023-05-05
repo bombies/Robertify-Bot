@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management
 
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilderKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -37,7 +37,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
         val language = event.getOption("language")?.asString
 
         if (language == null) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(
                     LanguageCommandMessages.LANGUAGE_EMBED_DESC,
                     Pair("{language}", "${localeManager.locale.name} ${localeManager.locale.flag}")
@@ -60,7 +60,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
             val newLocale = RobertifyLocaleKt.parse(language)
             localeManager.locale = newLocale
             RequestChannelConfigKt(guild).updateAll()
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(
                     LanguageCommandMessages.LANGUAGE_CHANGED,
                     Pair("{language}", newLocale.localName)
@@ -84,7 +84,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
         LocaleManagerKt[guild].locale = newLocale
         RequestChannelConfigKt(guild).updateAll()
 
-        event.hook.sendWithEmbed(guild) {
+        event.hook.sendEmbed(guild) {
             embed(
                 LanguageCommandMessages.LANGUAGE_CHANGED,
                 Pair("{language}", newLocale.localName)

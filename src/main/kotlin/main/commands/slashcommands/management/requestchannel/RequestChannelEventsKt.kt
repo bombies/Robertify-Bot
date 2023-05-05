@@ -9,7 +9,7 @@ import main.constants.RobertifyPermissionKt
 import main.events.AbstractEventControllerKt
 import main.utils.GeneralUtilsKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.json.logs.LogTypeKt
 import main.utils.json.logs.LogUtilsKt
@@ -68,7 +68,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
             val selfVoiceState = guild.selfMember.voiceState!!
             val memberVoiceState = event.member!!.voiceState!!
 
-            event.replyWithEmbed {
+            event.replyEmbed {
                 when (id) {
                     RequestChannelButtonId.REWIND.toString() -> handleRewind(selfVoiceState, memberVoiceState)
                     RequestChannelButtonId.PLAY_AND_PAUSE.toString() -> handlePlayAndPause(

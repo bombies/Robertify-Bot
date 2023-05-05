@@ -2,7 +2,7 @@ package main.commands.slashcommands.audio
 
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
@@ -20,7 +20,7 @@ class DisconnectCommandKt : AbstractSlashCommandKt(
     )
 ) {
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed {
+        event.replyEmbed {
             handleDisconnect(event.guild!!.selfMember.voiceState!!, event.member!!.voiceState!!)
         }.queue()
     }

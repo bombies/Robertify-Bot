@@ -9,8 +9,8 @@ import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.RobertifyThemeKt
 import main.constants.TrackSourceKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -82,15 +82,15 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         when (event.subcommandName) {
             "view" -> handleList(event)
-            "add" -> event.replyWithEmbed { handleAdd(event.guild!!, event.member!!) }.setEphemeral(true).queue()
+            "add" -> event.replyEmbed { handleAdd(event.guild!!, event.member!!) }.setEphemeral(true).queue()
             "remove" -> {
                 val id = event.getRequiredOption("id").asInt
-                event.replyWithEmbed { handleRemove(event.guild!!, event.user, id) }
+                event.replyEmbed { handleRemove(event.guild!!, event.user, id) }
                     .setEphemeral(true)
                     .queue()
             }
 
-            "clear" -> event.replyWithEmbed { handleClear(event.guild!!, event.user) }.setEphemeral(true).queue()
+            "clear" -> event.replyEmbed { handleClear(event.guild!!, event.user) }.setEphemeral(true).queue()
         }
     }
 
@@ -101,7 +101,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         val tracks = config.getTracks(member.idLong)
 
         if (tracks.isEmpty()) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(FavouriteTracksMessages.NO_FAV_TRACKS)
             }
                 .setEphemeral(true)
@@ -253,19 +253,19 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
 
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, selfChannelNeeded = false)
         if (acChecks != null) {
-            event.replyWithEmbed { acChecks }
+            event.replyEmbed { acChecks }
                 .setEphemeral(true)
                 .queue()
             return
         }
 
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
 
         val messageChannel = event.channel.asGuildMessageChannel()
-        messageChannel.sendWithEmbed(guild) {
+        messageChannel.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
         }.queue { addingMsg ->
             val url = when (source) {

@@ -1,7 +1,7 @@
 package main.commands.slashcommands.audio
 
 import main.audiohandlers.RobertifyAudioManagerKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
@@ -27,7 +27,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
         event.deferReply().queue()
 
         if (queueHandler.isEmpty) {
-            event.hook.sendWithEmbed(guild) {
+            event.hook.sendEmbed(guild) {
                 embed(ClearQueueMessages.CQ_NOTHING_IN_QUEUE)
             }.queue()
             return
@@ -37,7 +37,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
         val selfVoiceState = guild.selfMember.voiceState!!
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) {
-            event.hook.sendWithEmbed { acChecks }.queue()
+            event.hook.sendEmbed { acChecks }.queue()
             return
         }
 
@@ -47,7 +47,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
             "${event.user.asMention} ${localeManager.getMessage(ClearQueueMessages.QUEUE_CLEARED_USER)}"
         )
 
-        event.hook.sendWithEmbed(guild) {
+        event.hook.sendEmbed(guild) {
             embed(ClearQueueMessages.QUEUE_CLEAR)
         }.queue()
     }

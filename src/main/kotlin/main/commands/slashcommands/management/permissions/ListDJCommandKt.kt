@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.permissions
 
 import main.constants.RobertifyPermissionKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.permissions.PermissionsConfigKt
@@ -24,7 +24,7 @@ class ListDJCommandKt : AbstractSlashCommandKt(CommandKt(
         val roles = PermissionsCommandKt().getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
         val users = PermissionsCommandKt().getUsersForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
 
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embedBuilder(
                 PermissionsMessages.PERMISSION_LIST,
                 Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)

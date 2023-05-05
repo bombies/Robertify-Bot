@@ -3,7 +3,7 @@ package main.commands.slashcommands.management.permissions
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.RobertifyPermissionKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -31,7 +31,7 @@ class RemoveDJCommandKt : AbstractSlashCommandKt(CommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val mentionable = event.getRequiredOption("target").asMentionable
-        event.replyWithEmbed { handleRemoveDJ(event.guild!!, mentionable) }
+        event.replyEmbed { handleRemoveDJ(event.guild!!, mentionable) }
             .queue()
     }
 

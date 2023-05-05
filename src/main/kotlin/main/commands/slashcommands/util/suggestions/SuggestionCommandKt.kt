@@ -8,11 +8,10 @@ import dev.minn.jda.ktx.messages.EmbedBuilder
 import dev.minn.jda.ktx.util.SLF4J
 import main.utils.GeneralUtilsKt.digits
 import main.utils.GeneralUtilsKt.dm
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
-import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.GeneralMessages
@@ -66,20 +65,20 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
     private fun handleSuggestionModal(event: ModalInteractionEvent) {
         val guild = event.guild
         val suggestion = event.getValue("suggestion:suggestion_field")?.asString
-            ?: return event.replyWithEmbed(guild, SuggestionMessages.INVALID_SUGGESTION).queue()
+            ?: return event.replyEmbed(guild, SuggestionMessages.INVALID_SUGGESTION).queue()
 
         val config = BotDBCacheKt.instance
         val pendingChannel = event.jda.shardManager!!.getTextChannelById(config.suggestionsPendingChannelId)
 
         if (!config.suggestionSetup) {
             logger.warn("The suggestion channels aren't setup!")
-            return event.replyWithEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+            return event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
                 .setEphemeral(true)
                 .queue()
         }
 
         if (config.userIsSuggestionBanned(event.user.idLong))
-            return event.replyWithEmbed(guild, SuggestionMessages.SUGGESTION_USER_BANNED)
+            return event.replyEmbed(guild, SuggestionMessages.SUGGESTION_USER_BANNED)
                 .setEphemeral(true)
                 .queue()
 
@@ -91,7 +90,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
             suggestion = suggestion
         )
 
-        pendingChannel!!.sendWithEmbed { embed }
+        pendingChannel!!.sendEmbed { embed }
             .setActionRow(
                 success(
                     id = "suggestion_button:accept",
@@ -104,7 +103,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
             )
             .queue()
 
-        return event.replyWithEmbed(guild, SuggestionMessages.SUGGESTION_SUBMITTED)
+        return event.replyEmbed(guild, SuggestionMessages.SUGGESTION_SUBMITTED)
             .setEphemeral(true)
             .queue()
     }
@@ -131,7 +130,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                     val acceptedChannel = shardManager.getTextChannelById(config.suggestionsAcceptedChannelId)
                     if (acceptedChannel == null) {
                         logger.warn("The accepted suggestion channel isn't setup!")
-                        return@queue event.replyWithEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+                        return@queue event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
                             .setEphemeral(true)
                             .queue()
                     }
@@ -165,7 +164,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                         ).build()
                     )
 
-                    event.hook.sendWithEmbed(guild, "Successfully accepted the suggestion!")
+                    event.hook.sendEmbed(guild, "Successfully accepted the suggestion!")
                         .queue()
                 }
 
@@ -173,7 +172,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                     val deniedChannel = shardManager.getTextChannelById(config.suggestionsDeniedChannelId)
                     if (deniedChannel == null) {
                         logger.warn("The denied suggestion channel isn't setup!")
-                        return@queue event.replyWithEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+                        return@queue event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
                             .setEphemeral(true)
                             .queue()
                     }
@@ -208,7 +207,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                         ).build()
                     )
 
-                    event.hook.sendWithEmbed(guild, "Successfully denied the suggestion!")
+                    event.hook.sendEmbed(guild, "Successfully denied the suggestion!")
                         .queue()
                 }
             }
@@ -221,7 +220,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
         val config = BotDBCacheKt.instance
         val guild = event.guild
         if (!config.isDeveloper(event.user.idLong))
-            return event.replyWithEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
+            return event.replyEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
                 .setEphemeral(true)
                 .queue()
 

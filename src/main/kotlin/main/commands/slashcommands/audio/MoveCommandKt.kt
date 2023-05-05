@@ -6,8 +6,8 @@ import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -47,7 +47,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
         val selfVoiceState = guild.selfMember.voiceState!!
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) {
-            event.replyWithEmbed { acChecks }.setEphemeral(true).queue()
+            event.replyEmbed { acChecks }.setEphemeral(true).queue()
             return
         }
 
@@ -58,7 +58,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
         val id = event.getRequiredOption("id").asInt
         val pos = event.getRequiredOption("position").asInt
 
-        event.hook.sendWithEmbed {
+        event.hook.sendEmbed {
             handleMove(
                 guild = guild,
                 mover = event.user,

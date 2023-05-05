@@ -4,7 +4,7 @@ import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt.dmEmbed
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -33,13 +33,13 @@ class UnbanCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
-            return event.replyWithEmbed(event.guild!!) {
+            return event.replyEmbed(event.guild!!) {
                 embed(GeneralMessages.INVALID_ARGS)
             }.setEphemeral(true)
                 .queue()
         }
 
-        event.replyWithEmbed { handleUnban(user) }.queue()
+        event.replyEmbed { handleUnban(user) }.queue()
     }
 
     private fun handleUnban(user: Member): MessageEmbed {

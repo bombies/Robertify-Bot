@@ -5,7 +5,7 @@ import main.audiohandlers.utils.author
 import main.audiohandlers.utils.isStream
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -37,7 +37,7 @@ class RewindCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-        event.hook.sendWithEmbed {
+        event.hook.sendEmbed {
             handleRewind(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,

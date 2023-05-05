@@ -3,7 +3,7 @@ package main.utils.pagination
 import dev.minn.jda.ktx.util.SLF4J
 import main.constants.MessageButtonKt
 import main.events.AbstractEventControllerKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.locale.messages.GeneralMessages
@@ -107,7 +107,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                         .queue()
                 }
 
-                else -> event.replyWithEmbed(event.guild) {
+                else -> event.replyEmbed(event.guild) {
                     embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }
@@ -233,7 +233,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                     )
                 }
 
-                else -> event.replyWithEmbed(event.guild) {
+                else -> event.replyEmbed(event.guild) {
                     embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }

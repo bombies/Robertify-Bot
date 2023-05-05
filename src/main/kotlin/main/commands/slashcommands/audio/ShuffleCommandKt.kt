@@ -2,7 +2,7 @@ package main.commands.slashcommands.audio
 
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
@@ -24,7 +24,7 @@ class ShuffleCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-        event.hook.sendWithEmbed(event.guild!!) {
+        event.hook.sendEmbed(event.guild!!) {
             handleShuffle(event.guild!!, event.user)
         }.queue()
     }

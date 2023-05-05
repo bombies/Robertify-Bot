@@ -16,13 +16,12 @@ import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.GeneralMessages
-import main.utils.locale.messages.RobertifyLocaleMessageKt
 import main.utils.resume.ResumableTrackKt
 import main.utils.resume.ResumableTrackKt.Companion.string
 import main.utils.resume.ResumeDataKt
@@ -244,7 +243,7 @@ object RobertifyAudioManagerKt {
                                             localeManager.getMessage(GeneralMessages.NO_VOICE_CHANNEL)
                             ).build()
 
-                            messageChannel?.sendWithEmbed(guild) { embed }?.queue()
+                            messageChannel?.sendEmbed(guild) { embed }?.queue()
                             return false
                         }
                     }

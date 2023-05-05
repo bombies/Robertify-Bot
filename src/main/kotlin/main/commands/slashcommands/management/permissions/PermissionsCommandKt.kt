@@ -4,8 +4,8 @@ import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.RobertifyPermissionKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.toMention
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbeds
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbeds
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -164,7 +164,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                     usersForPerms[permission] = getUsersForPermission(permission, config)
                 }
 
-                event.replyWithEmbeds(guild) {
+                event.replyEmbeds(guild) {
                     RobertifyPermissionKt.values().map { permission ->
                         embed(
                             """${
@@ -214,11 +214,11 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (perms.isEmpty())
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(PermissionsMessages.MENTIONABLE_PERMISSIONS_NONE)
             }.queue()
         else
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(
                     PermissionsMessages.MENTIONABLE_PERMISSIONS_LIST,
                     Pair("{mentionable}", mentionable.asMention),
@@ -268,7 +268,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyWithEmbed(event.guild!!) {
+        event.replyEmbed(event.guild!!) {
             embed(
                 PermissionsMessages.PERMISSION_ADDED,
                 Pair("{mentionable}", mentionable.asMention),
@@ -283,7 +283,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyWithEmbed(event.guild!!) {
+        event.replyEmbed(event.guild!!) {
             embed(
                 PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),
@@ -324,7 +324,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyWithEmbed(event.guild!!) {
+        event.replyEmbed(event.guild!!) {
             embed(
                 PermissionsMessages.PERMISSION_REMOVED,
                 Pair("{mentionable}", mentionable.asMention),
@@ -339,7 +339,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyWithEmbed(event.guild!!) {
+        event.replyEmbed(event.guild!!) {
             embed(
                 PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),

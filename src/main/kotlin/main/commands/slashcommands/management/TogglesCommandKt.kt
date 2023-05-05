@@ -17,8 +17,8 @@ import main.utils.json.logs.LogTypeKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.addField
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.TogglesMessages
 import main.utils.pagination.PaginationHandlerKt
@@ -109,10 +109,10 @@ class TogglesCommandKt : AbstractSlashCommandKt(
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (primaryCommand) {
-            "list" -> event.replyWithEmbed { handleGeneralToggleList(guild) }.queue()
-            "switch" -> event.replyWithEmbed { handleGeneralSwitch(event) }.queue()
+            "list" -> event.replyEmbed { handleGeneralToggleList(guild) }.queue()
+            "switch" -> event.replyEmbed { handleGeneralSwitch(event) }.queue()
             "dj" -> handleDJ(event)
-            "logs" -> event.replyWithEmbed { handleLog(event) }.queue()
+            "logs" -> event.replyEmbed { handleLog(event) }.queue()
             else -> throw IllegalAccessException("Something went wrong. Primary command: $primaryCommand")
         }
     }
@@ -197,7 +197,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                     onDisabled = { _, config ->
                         val skipCommand = SkipCommandKt()
                         if (config.getDJToggle(skipCommand))
-                            event.channel.sendWithEmbed(guild, TogglesMessages.SKIP_DJ_TOGGLE_PROMPT)
+                            event.channel.sendEmbed(guild, TogglesMessages.SKIP_DJ_TOGGLE_PROMPT)
                                 .setActionRow(
                                     success(
                                         id = "toggledjskip:yes:${event.user.id}",
@@ -223,7 +223,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val split = event.componentId.split(":")
         if (event.user.id != split[2])
-            return event.replyWithEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
+            return event.replyEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
                 .setEphemeral(true)
                 .queue()
 
@@ -236,7 +236,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                 val localeManager = LocaleManagerKt[guild]
 
                 config.setDJToggle(skipCommand, false)
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     TogglesMessages.DJ_TOGGLED,
                     Pair("{command}", "skip"),
@@ -247,7 +247,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
             }
 
             "no" -> {
-                event.replyWithEmbed(guild, GeneralMessages.OK).setEphemeral(true).queue()
+                event.replyEmbed(guild, GeneralMessages.OK).setEphemeral(true).queue()
             }
         }
 
@@ -293,13 +293,13 @@ class TogglesCommandKt : AbstractSlashCommandKt(
 
         when (secondaryCommand) {
             "list" -> return displayDJToggles(event)
-            "switch" -> event.replyWithEmbed { handleDJSwitch(guild, event.getRequiredOption("toggle").asString) }
+            "switch" -> event.replyEmbed { handleDJSwitch(guild, event.getRequiredOption("toggle").asString) }
                 .queue()
 
             "switchall" -> {
                 val musicCommands = SlashCommandManagerKt.musicCommands
                 TogglesConfigKt(guild).setDJToggle(musicCommands, true)
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     TogglesMessages.ALL_DJ_TOGGLED,
                     Pair("{status}", LocaleManagerKt[guild].getMessage(GeneralMessages.ON_STATUS).uppercase())
@@ -309,7 +309,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
             "switchnone" -> {
                 val musicCommands = SlashCommandManagerKt.musicCommands
                 TogglesConfigKt(guild).setDJToggle(musicCommands, false)
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     TogglesMessages.ALL_DJ_TOGGLED,
                     Pair("{status}", LocaleManagerKt[guild].getMessage(GeneralMessages.OFF_STATUS).uppercase())

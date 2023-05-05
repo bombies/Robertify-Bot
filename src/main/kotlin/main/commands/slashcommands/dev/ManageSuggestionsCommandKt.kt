@@ -1,14 +1,14 @@
 package main.commands.slashcommands.dev
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
 import main.utils.component.interactions.slashcommand.models.SubCommandGroupKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
 import main.utils.GeneralUtilsKt.queueAfter
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -94,7 +94,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (!config.suggestionSetup)
-            return event.replyWithEmbed(guild, "The suggestions category must be setup before changing these channels!")
+            return event.replyEmbed(guild, "The suggestions category must be setup before changing these channels!")
                 .setEphemeral(true)
                 .queue()
 
@@ -106,17 +106,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         when (secondaryCommand) {
             "accepted" -> {
                 if (channel.idLong == currentAccepted)
-                    return event.replyWithEmbed(guild, "That is already the accepted channel!")
+                    return event.replyEmbed(guild, "That is already the accepted channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentPending || channel.idLong == currentDenied)
-                    return event.replyWithEmbed(guild, "You may not set the accepted channel to that channel!")
+                    return event.replyEmbed(guild, "You may not set the accepted channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsAcceptedChannelId = channel.idLong
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     "You have successfully set the accepted suggestions channel to ${channel.asMention}"
                 )
@@ -126,17 +126,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
 
             "denied" -> {
                 if (channel.idLong == currentDenied)
-                    return event.replyWithEmbed(guild, "That is already the denied channel!")
+                    return event.replyEmbed(guild, "That is already the denied channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentAccepted || channel.idLong == currentPending)
-                    return event.replyWithEmbed(guild, "You may not set the denied channel to that channel!")
+                    return event.replyEmbed(guild, "You may not set the denied channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsDeniedChannelId = channel.idLong
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     "You have successfully set the denied suggestions channel to ${channel.asMention}"
                 )
@@ -146,17 +146,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
 
             "pending" -> {
                 if (channel.idLong == currentPending)
-                    return event.replyWithEmbed(guild, "That is already the pending channel!")
+                    return event.replyEmbed(guild, "That is already the pending channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentAccepted || channel.idLong == currentDenied)
-                    return event.replyWithEmbed(guild, "You may not set the pending channel to that channel!")
+                    return event.replyEmbed(guild, "You may not set the pending channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsPendingChannelId = channel.idLong
-                event.replyWithEmbed(
+                event.replyEmbed(
                     guild,
                     "You have successfully set the pending suggestions channel to ${channel.asMention}"
                 )
@@ -173,7 +173,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         event.deferReply(true).queue()
 
         if (config.suggestionSetup)
-            return event.replyWithEmbed(guild, "The suggestions channels have already been setup!")
+            return event.replyEmbed(guild, "The suggestions channels have already been setup!")
                 .setEphemeral(true)
                 .queue()
 
@@ -201,7 +201,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
                                             acceptedChannel = acceptedChannel.idLong,
                                             deniedChannel = deniedChannel.idLong
                                         )
-                                        event.hook.sendWithEmbed(guild, "Successfully setup the suggestion channels")
+                                        event.hook.sendEmbed(guild, "Successfully setup the suggestion channels")
                                             .queue()
                                     }
                             }
@@ -212,7 +212,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
     private fun handleReset(event: SlashCommandInteractionEvent) {
         val config = BotDBCacheKt.instance
         config.resetSuggestionsConfig()
-        event.replyWithEmbed(event.guild!!, "Successfully reset the suggestions config")
+        event.replyEmbed(event.guild!!, "Successfully reset the suggestions config")
             .setEphemeral(true)
             .queue()
     }

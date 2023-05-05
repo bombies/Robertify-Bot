@@ -2,7 +2,7 @@ package main.commands.slashcommands.audio
 
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.json.logs.LogTypeKt
@@ -20,7 +20,7 @@ class ResumeCommandKt : AbstractSlashCommandKt(CommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
-        event.replyWithEmbed { handleResume(memberVoiceState, selfVoiceState) }.queue()
+        event.replyEmbed { handleResume(memberVoiceState, selfVoiceState) }.queue()
     }
 
     private fun handleResume(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {

@@ -3,7 +3,7 @@ package main.commands.slashcommands.audio
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -35,7 +35,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(event.channel.asGuildMessageChannel())) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
             }.queue()
             return
@@ -43,7 +43,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         val query = event.getRequiredOption("query").asString
 
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embed(
                 SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
@@ -76,7 +76,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (event.user.id != id) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(GeneralMessages.NO_MENU_PERMS)
             }.setEphemeral(true)
                 .queue()
@@ -100,7 +100,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         }
 
         val trackQuery = event.selectedOptions.first().value
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
@@ -124,7 +124,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         when (id.lowercase()) {
             "end" -> {
                 if (event.user.id != searcherId)
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(GeneralMessages.NO_PERMS_END_INTERACTION)
                     }.setEphemeral(true)
                         .queue()

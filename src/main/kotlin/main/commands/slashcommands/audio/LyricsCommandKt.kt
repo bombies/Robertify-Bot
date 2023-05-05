@@ -5,8 +5,8 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -49,7 +49,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
                     songMustBePlaying = true
                 )
                 if (acChecks != null) {
-                    event.replyWithEmbed { acChecks }
+                    event.replyEmbed { acChecks }
                         .setEphemeral(true)
                         .queue()
                     return
@@ -64,7 +64,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
             else -> event.getOption("song")!!.asString
         }
 
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embed(LyricsMessages.LYRICS_SEARCHING, Pair("{query}", query))
         }.queue { lookingMsg ->
             val geniusAPI = GeniusAPIKt()
@@ -121,7 +121,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
 
                 var i = 4096
                 do {
-                    event.channel.sendWithEmbed(guild) {
+                    event.channel.sendEmbed(guild) {
                         embed(lyrics.substring(i, chars.coerceAtMost(i + 4096)))
                     }.queue()
 

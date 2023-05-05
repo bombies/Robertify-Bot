@@ -13,7 +13,7 @@ import main.audiohandlers.utils.title
 import main.commands.slashcommands.audio.QueueCommandKt
 import main.constants.InteractionLimitsKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
@@ -38,7 +38,6 @@ import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.max
 
 object PaginationHandlerKt {
     private val logger by SLF4J
@@ -76,7 +75,7 @@ object PaginationHandlerKt {
     ): Message? =
         coroutineScope {
             val paginatedMessage = async {
-                var messageAction = event.hook.sendWithEmbed(event.guild) { messagePages[0].embed!! }
+                var messageAction = event.hook.sendEmbed(event.guild) { messagePages[0].embed!! }
 
                 if (messagePages.size > 1)
                     messageAction = messageAction.addComponents(

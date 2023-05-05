@@ -13,7 +13,7 @@ import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.asString
 import main.utils.GeneralUtilsKt.hasPermissions
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -481,7 +481,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             if (!event.isFromGuild)
                 true
             else if (!event.member!!.hasPermissions(*info.requiredPermissions.toTypedArray())) {
-                event.replyWithEmbed(event.guild!!) {
+                event.replyEmbed(event.guild!!) {
                     embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, *info.requiredPermissions.toTypedArray()))
                 }.setEphemeral(true)
                     .queue()

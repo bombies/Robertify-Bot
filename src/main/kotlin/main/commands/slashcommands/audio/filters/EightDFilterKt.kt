@@ -2,7 +2,7 @@ package main.commands.slashcommands.audio.filters
 
 import lavalink.client.io.filters.Rotation
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import net.dv8tion.jda.api.entities.GuildVoiceState
@@ -18,7 +18,7 @@ class EightDFilterKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyWithEmbed { handle8DToggle(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!) }
+        event.replyEmbed { handle8DToggle(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!) }
             .queue()
     }
 

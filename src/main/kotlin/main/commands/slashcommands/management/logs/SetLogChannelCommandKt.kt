@@ -1,7 +1,7 @@
 package main.commands.slashcommands.management.logs
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -34,7 +34,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
 
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(channel)) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(LogChannelMessages.CANNOT_SET_LOG_CHANNEL)
             }.setEphemeral(true)
                 .queue()
@@ -48,7 +48,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
         }
 
         config.channelId = channel.idLong
-        event.replyWithEmbed(guild) {
+        event.replyEmbed(guild) {
             embed(
                 LogChannelMessages.LOG_CHANNEL_SET,
                 Pair("{channel}", channel.asMention)

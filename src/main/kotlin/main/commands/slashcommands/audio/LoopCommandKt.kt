@@ -6,7 +6,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.SubCommandKt
@@ -41,15 +41,15 @@ class LoopCommandKt : AbstractSlashCommandKt(
         val musicManager = RobertifyAudioManagerKt[guild]
         val checksEmbed = checks(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!, musicManager.player)
         if (checksEmbed != null) {
-            event.replyWithEmbed { checksEmbed }
+            event.replyEmbed { checksEmbed }
                 .setEphemeral(true)
                 .queue()
             return
         }
 
         when (event.subcommandName) {
-            "track" -> event.replyWithEmbed { handleRepeat(musicManager, event.user) }.queue()
-            "queue" -> event.replyWithEmbed { handleQueueRepeat(musicManager, event.user) }.queue()
+            "track" -> event.replyEmbed { handleRepeat(musicManager, event.user) }.queue()
+            "queue" -> event.replyEmbed { handleQueueRepeat(musicManager, event.user) }.queue()
         }
     }
 

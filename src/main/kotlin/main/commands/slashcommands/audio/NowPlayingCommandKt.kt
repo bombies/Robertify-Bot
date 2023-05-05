@@ -8,7 +8,7 @@ import main.constants.ToggleKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.isUrl
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilderKt
 import main.utils.api.robertify.imagebuilders.ImageBuilderExceptionKt
 import main.utils.api.robertify.imagebuilders.builders.NowPlayingImageBuilderKt
@@ -74,11 +74,11 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         }
 
         if (embed != null) {
-            event.hook.sendWithEmbed(guild) { embed }
+            event.hook.sendEmbed(guild) { embed }
                 .queue()
         } else {
             val sendBackupEmbed: () -> Unit = {
-                event.hook.sendWithEmbed(guild) {
+                event.hook.sendEmbed(guild) {
                     getNowPlayingEmbed(guild, event.channel.asGuildMessageChannel(), selfVoiceState, memberVoiceState)
                 }.queue()
             }

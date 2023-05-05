@@ -7,7 +7,7 @@ import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.GeneralUtilsKt.isNotNull
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -47,7 +47,7 @@ class SeekCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-        event.hook.sendWithEmbed {
+        event.hook.sendEmbed {
             handleSeek(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,

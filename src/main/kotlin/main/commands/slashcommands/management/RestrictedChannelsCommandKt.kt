@@ -5,7 +5,7 @@ import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.BotConstantsKt
 import main.constants.ToggleKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -83,7 +83,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
             event = event,
             mutateTextChannel = { e, config, channel ->
                 config.addChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
-                e.replyWithEmbed(e.guild!!) {
+                e.replyEmbed(e.guild!!) {
                     embed(
                         RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                         Pair("{channelId}", channel.id),
@@ -93,7 +93,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
             },
             mutateAudioChannel = { e, config, channel ->
                 config.addChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
-                e.replyWithEmbed(e.guild!!) {
+                e.replyEmbed(e.guild!!) {
                     embed(
                         RestrictedChannelMessages.RESTRICTED_CHANNEL_ADDED,
                         Pair("{channelId}", channel.id),
@@ -109,13 +109,13 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
             event = event,
             mutateTextChannel = { e, config, channel ->
                 config.removeChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.TEXT_CHANNEL)
-                e.replyWithEmbed(e.guild!!) {
+                e.replyEmbed(e.guild!!) {
                     embed("You have successfully removed ${channel.asMention} as a restricted text channel!")
                 }.queue()
             },
             mutateAudioChannel = { e, config, channel ->
                 config.removeChannel(channel.idLong, RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
-                e.replyWithEmbed(e.guild!!) {
+                e.replyEmbed(e.guild!!) {
                     embed("You have successfully removed ${channel.asMention} as a restricted text channel!")
                 }.queue()
             }
@@ -135,7 +135,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
         try {
             if (channel.type.isAudio) {
                 if (!togglesConfig.getToggle(ToggleKt.RESTRICTED_VOICE_CHANNELS)) {
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(
                             """
                         This feature is toggled **OFF**
@@ -149,7 +149,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
                 mutateAudioChannel(event, config, channel.asAudioChannel())
             } else {
                 if (!togglesConfig.getToggle(ToggleKt.RESTRICTED_TEXT_CHANNELS)) {
-                    event.replyWithEmbed(guild) {
+                    event.replyEmbed(guild) {
                         embed(
                             """
                         This feature is toggled **OFF**
@@ -163,18 +163,18 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
                 mutateTextChannel(event, config, channel.asTextChannel())
             }
         } catch (e: IllegalStateException) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(e.message!!)
             }.setEphemeral(true)
                 .queue()
         } catch (e: NullPointerException) {
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 embed(e.message!!)
             }.setEphemeral(true)
                 .queue()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            event.replyWithEmbed(guild) {
+            event.replyEmbed(guild) {
                 BotConstantsKt.getUnexpectedErrorEmbed(guild)
             }.setEphemeral(true)
                 .queue()
@@ -204,7 +204,7 @@ class RestrictedChannelsCommandKt : AbstractSlashCommandKt(
                 false
             ).build()
 
-        event.replyWithEmbed { embed }.queue()
+        event.replyEmbed { embed }.queue()
     }
 
     override val help: String

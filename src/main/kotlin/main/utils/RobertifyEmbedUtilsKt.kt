@@ -9,9 +9,6 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.interactions.InteractionHook
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
@@ -19,8 +16,6 @@ import net.dv8tion.jda.api.requests.restaction.MessageEditAction
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
-import java.awt.Button
-import java.awt.Color
 
 class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null) {
 
@@ -174,17 +169,17 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.channelId == channel.idLong
         }
 
-        inline fun InteractionHook.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): WebhookMessageCreateAction<Message> {
+        inline fun InteractionHook.sendEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): WebhookMessageCreateAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        fun InteractionHook.sendWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): WebhookMessageCreateAction<Message> {
+        fun InteractionHook.sendEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): WebhookMessageCreateAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        fun InteractionHook.sendWithEmbed(guild: Guild? = null, message: String): WebhookMessageCreateAction<Message> {
+        fun InteractionHook.sendEmbed(guild: Guild? = null, message: String): WebhookMessageCreateAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message))
         }
@@ -194,32 +189,32 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return editOriginalEmbeds(supplier(embedUtils))
         }
 
-        inline fun MessageChannel.sendWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
+        inline fun MessageChannel.sendEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        fun MessageChannel.sendWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
+        fun MessageChannel.sendEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        inline fun IReplyCallback.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
+        inline fun IReplyCallback.replyEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }
 
-        inline fun IReplyCallback.replyWithEmbeds(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> Collection<MessageEmbed>): ReplyCallbackAction {
+        inline fun IReplyCallback.replyEmbeds(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> Collection<MessageEmbed>): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }
 
-        fun IReplyCallback.replyWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        fun IReplyCallback.replyWithEmbed(guild: Guild? = null, message: String): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(guild: Guild? = null, message: String): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message))
         }

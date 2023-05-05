@@ -3,7 +3,7 @@ package main.commands.slashcommands.audio
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.locale.messages.GeneralMessages
@@ -28,7 +28,7 @@ class JoinCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-        event.hook.sendWithEmbed {
+        event.hook.sendEmbed {
             handleJoin(
                 event.guild!!,
                 event.channel.asGuildMessageChannel(),

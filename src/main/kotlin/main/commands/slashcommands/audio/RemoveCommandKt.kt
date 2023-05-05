@@ -5,7 +5,7 @@ import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
 import main.utils.component.interactions.slashcommand.models.CommandOptionKt
@@ -37,7 +37,7 @@ class RemoveCommandKt : AbstractSlashCommandKt(
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
         val id = event.getRequiredOption("id").asInt
-        event.replyWithEmbed { handleRemove(memberVoiceState, selfVoiceState, id) }.queue()
+        event.replyEmbed { handleRemove(memberVoiceState, selfVoiceState, id) }.queue()
     }
 
     private fun handleRemove(

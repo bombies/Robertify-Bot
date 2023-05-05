@@ -5,7 +5,7 @@ import main.constants.RobertifyEmojiKt
 import main.constants.RobertifyThemeKt
 import main.constants.TimeFormatKt
 import main.main.RobertifyKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendWithEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.GenericJSONFieldKt
 import main.utils.json.permissions.PermissionsConfigKt
@@ -642,7 +642,7 @@ object GeneralUtilsKt {
 
     fun User.dmEmbed(message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
         openPrivateChannel().queue { channel ->
-            channel.sendWithEmbed {
+            channel.sendEmbed {
                 embed(message, *placeholders)
             }.queue(null) {
                 ErrorHandler()
