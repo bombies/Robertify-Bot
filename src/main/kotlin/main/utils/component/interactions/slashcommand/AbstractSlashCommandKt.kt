@@ -271,7 +271,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         if (SlashCommandManagerKt.isMusicCommand(this)) {
             val botDB = BotDBCacheKt.instance
-            val latestAlert = botDB.getLatestAlert()?.left
+            val latestAlert = botDB.latestAlert.left
             val user = event.user
             if (!botDB.userHasViewedAlert(user.idLong) && !latestAlert.isNullOrEmpty() && latestAlert.isNotBlank()
                 && SlashCommandManagerKt.isMusicCommand(this)

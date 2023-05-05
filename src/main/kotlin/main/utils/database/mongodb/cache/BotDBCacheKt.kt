@@ -29,6 +29,31 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
             update(document)
         }
 
+    var latestAlert: Pair<String, Long>
+        get() {
+            val obj: JSONObject = getDocument()
+            val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
+            return try {
+                val alert = alertObj.getString(BotDBKt.Fields.SubFields.ALERT.toString())
+                val alertTime = alertObj.getLong(BotDBKt.Fields.SubFields.ALERT_TIME.toString())
+                Pair.of(alert, alertTime)
+            } catch (e: JSONException) {
+                Pair.of("", 0L)
+            }
+        }
+        set(value) {
+            val obj: JSONObject = getDocument()
+            val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
+            val alert = value.left; val time = value.right
+            alertObj.put(
+                BotDBKt.Fields.SubFields.ALERT.toString(),
+                alert.replace("\\\\n".toRegex(), "\n").replace("\\\\t".toRegex(), "\t")
+            )
+            alertObj.put(BotDBKt.Fields.SubFields.ALERT_TIME.toString(), time)
+            update(obj)
+            clearAlertViewers()
+        }
+
     fun initSuggestionChannels(
         categoryID: Long,
         pendingChannel: Long,
@@ -224,30 +249,6 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
         val arr = obj.getJSONArray(BotDBKt.Fields.RANDOM_MESSAGES.toString())
         arr.clear()
         update(obj)
-    }
-
-    fun setLatestAlert(alert: String) {
-        val obj: JSONObject = getDocument()
-        val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
-        alertObj.put(
-            BotDBKt.Fields.SubFields.ALERT.toString(),
-            alert.replace("\\\\n".toRegex(), "\n").replace("\\\\t".toRegex(), "\t")
-        )
-        alertObj.put(BotDBKt.Fields.SubFields.ALERT_TIME.toString(), System.currentTimeMillis())
-        update(obj)
-        clearAlertViewers()
-    }
-
-    fun getLatestAlert(): Pair<String, Long>? {
-        val obj: JSONObject = getDocument()
-        val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
-        return try {
-            val alert = alertObj.getString(BotDBKt.Fields.SubFields.ALERT.toString())
-            val alertTime = alertObj.getLong(BotDBKt.Fields.SubFields.ALERT_TIME.toString())
-            Pair.of(alert, alertTime)
-        } catch (e: JSONException) {
-            Pair.of("", 0L)
-        }
     }
 
     fun addAlertViewer(id: Long) {

@@ -290,7 +290,7 @@ object GeneralUtilsKt {
                 + second + if (second > 1) " seconds" else if (second == 0L) " seconds" else " second")
     }
 
-    fun formatDate(date: Long, style: TimeFormatKt): String? {
+    fun formatDate(date: Long, style: TimeFormatKt): String {
         return when (style) {
             TimeFormatKt.DD_MMMM_YYYY, TimeFormatKt.MM_DD_YYYY, TimeFormatKt.DD_MMMM_YYYY_ZZZZ, TimeFormatKt.DD_M_YYYY_HH_MM_SS, TimeFormatKt.E_DD_MMM_YYYY_HH_MM_SS_Z -> SimpleDateFormat(
                 style.toString()
