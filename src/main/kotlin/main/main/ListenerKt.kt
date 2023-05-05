@@ -29,7 +29,29 @@ class ListenerKt : AbstractEventControllerKt() {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
-        private fun rescheduleUnbans(guild: Guild) {
+        internal fun loadSlashCommands(guild: Guild) {
+            AbstractSlashCommandKt.loadAllCommands(guild)
+        }
+
+        /**
+         * Load slash commands that NEED to be updated in a guild
+         * @param g The guild to load the commands in
+         */
+        internal fun loadNeededSlashCommands(guild: Guild) {}
+
+        internal fun unloadCommands(guild: Guild, vararg commandNames: String) {
+            if (commandNames.isEmpty())
+                return
+
+            val safeCommandNames = commandNames.map { it.lowercase() }
+            guild.retrieveCommands().queue { commands ->
+                commands
+                    .filter { safeCommandNames.contains(it.name.lowercase()) }
+                    .forEach { command -> guild.deleteCommandById(command.idLong).queue() }
+            }
+        }
+
+        internal fun rescheduleUnbans(guild: Guild) {
             val guildConfig = GuildConfigKt(guild)
             val banMap = guildConfig.getBannedUsersWithUnbanTimes()
 
@@ -90,37 +112,14 @@ class ListenerKt : AbstractEventControllerKt() {
     }
 
     override fun eventHandlerInvokers() {
-        readyListener()
-        guildReadyListener()
         guildJoinListener()
         guildLeaveListener()
     }
 
-    private fun readyListener() =
-        onEvent<ReadyEvent> { event ->
-            val jda = event.jda
-            logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
-            BotDBCacheKt.instance.lastStartup = System.currentTimeMillis()
-            RobertifyKt.shardManager.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
-        }
-
-    private fun guildReadyListener() =
-        onEvent<GuildReadyEvent> { event ->
-            val guild = event.guild
-            val requestChannelConfig = RequestChannelConfigKt(guild)
-
-            loadNeededSlashCommands(guild)
-            rescheduleUnbans(guild)
-            // TODO: Reschedule reminders
-
-            requestChannelConfig.updateMessage()
-            GuildResumeManagerKt(guild).loadTracks()
-        }
-
     private fun guildJoinListener() =
         onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
-             GuildConfigKt(guild).addGuild()
+            GuildConfigKt(guild).addGuild()
             loadSlashCommands(guild)
             GeneralUtilsKt.setDefaultEmbed(guild)
             logger.info("Joined ${guild.name}")
@@ -137,28 +136,6 @@ class ListenerKt : AbstractEventControllerKt() {
 
             updateServerCount()
         }
-
-    fun loadSlashCommands(guild: Guild) {
-        AbstractSlashCommandKt.loadAllCommands(guild)
-    }
-
-    /**
-     * Load slash commands that NEED to be updated in a guild
-     * @param g The guild to load the commands in
-     */
-    fun loadNeededSlashCommands(guild: Guild) {}
-
-    fun unloadCommands(guild: Guild, vararg commandNames: String) {
-        if (commandNames.isEmpty())
-            return
-
-        val safeCommandNames = commandNames.map { it.lowercase() }
-        guild.retrieveCommands().queue { commands ->
-            commands
-                .filter { safeCommandNames.contains(it.name.lowercase()) }
-                .forEach { command -> guild.deleteCommandById(command.idLong).queue() }
-        }
-    }
 
     private fun updateServerCount() {
         val serverCount = shardManager.guilds.size

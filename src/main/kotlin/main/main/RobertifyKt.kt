@@ -3,8 +3,9 @@ package main.main
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.jdabuilder.defaultShard
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
@@ -14,8 +15,16 @@ import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.events.EventManager
 import main.events.EventManager.registerEvents
+import main.main.ListenerKt.Companion.loadNeededSlashCommands
+import main.main.ListenerKt.Companion.rescheduleUnbans
+import main.utils.database.mongodb.cache.BotDBCacheKt
+import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.resume.GuildResumeManagerKt
+import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent
+import net.dv8tion.jda.api.events.session.ReadyEvent
+import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.ShardManager
 import net.dv8tion.jda.api.utils.cache.CacheFlag
@@ -24,6 +33,11 @@ import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
 import java.util.Base64
+import java.util.concurrent.CancellationException
+import java.util.concurrent.Executors
+import java.util.concurrent.ForkJoinPool
+import kotlin.concurrent.thread
+import kotlin.time.Duration.Companion.minutes
 
 object RobertifyKt {
     private val logger = LoggerFactory.getLogger(RobertifyKt::class.java)
@@ -35,6 +49,10 @@ object RobertifyKt {
         private set
     lateinit var spotifyApi: SpotifyAppApi
         private set
+
+    private val pool = Executors.newScheduledThreadPool(ForkJoinPool.getCommonPoolParallelism().coerceAtLeast(2)) {
+        thread(start = false, name = "Event-Worker-Thread", isDaemon = true, block = it::run)
+    }
 
     @JvmStatic
     fun main(args: Array<String>) = runBlocking {
@@ -85,13 +103,35 @@ object RobertifyKt {
         GuildRedisCacheKt.ins.loadAllGuilds()
         logger.info("All guilds have been loaded into cache.")
 
+        // Setup custom coroutine event manager
+        val dispatcher = pool.asCoroutineDispatcher()
+        val supervisor = SupervisorJob()
+        val handler = CoroutineExceptionHandler { _, throwable ->
+            if (throwable !is CancellationException)
+                logger.error("Uncaught exception in coroutine event worker", throwable)
+            if (throwable is Error) {
+                supervisor.cancel()
+                throw throwable
+            }
+        }
+        val context = dispatcher + supervisor + handler
+        val scope = CoroutineScope(context)
+        val coroutineEventManager = CoroutineEventManager(scope, 1.minutes)
+        coroutineEventManager.handleShardReady()
+        coroutineEventManager.handleGuildReady()
+        coroutineEventManager.listener<ShutdownEvent> {
+            supervisor.cancel()
+        }
+
         // Build bot connection
         logger.info("Building shard manager...")
         shardManager = defaultShard(
             token = ConfigKt.BOT_TOKEN,
             intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
+            enableCoroutines = false
         ) {
             setShardsTotal(ConfigKt.SHARD_COUNT)
+            setEventManagerProvider { coroutineEventManager }
             setBulkDeleteSplittingEnabled(false)
             enableCache(CacheFlag.VOICE_STATE)
             disableCache(
@@ -158,6 +198,25 @@ object RobertifyKt {
         // TODO: Sentry setup
 
         // TODO: Ktor setup
+    }
+
+    private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
+        val jda = event.jda
+        logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
+        BotDBCacheKt.instance.lastStartup = System.currentTimeMillis()
+        jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
+    }
+
+    private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
+        val guild = event.guild
+        val requestChannelConfig = RequestChannelConfigKt(guild)
+
+        loadNeededSlashCommands(guild)
+        rescheduleUnbans(guild)
+        // TODO: Reschedule reminders
+
+        requestChannelConfig.updateMessage()
+        GuildResumeManagerKt(guild).loadTracks()
     }
 
     private fun initVoteSiteAPIs() {
