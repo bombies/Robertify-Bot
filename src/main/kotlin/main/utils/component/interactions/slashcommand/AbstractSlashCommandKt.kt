@@ -263,6 +263,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     protected fun checks(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!guildCheck(event)) return false
+        if (!event.isFromGuild) return true
         if (!botEmbedCheck(event)) return false
         if (!banCheck(event)) return false
         if (!restrictedChannelCheck(event)) return false
@@ -308,7 +309,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!djCheck(event)) return false
         if (!predicateCheck(event)) return false
 
-        if (SlashCommandManagerKt.isMusicCommand(this) && event.isFromGuild) {
+        if (SlashCommandManagerKt.isMusicCommand(this)) {
             val scheduler = RobertifyAudioManagerKt
                 .getMusicManager(event.guild!!)
                 .scheduler
@@ -448,6 +449,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
      * False will be returned if and only if the command is admin-only and the user is not an admin.
      */
     protected open fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
+        if (!event.isFromGuild) return true
         val guild = event.guild!!
         if (info.adminOnly
             && !GeneralUtilsKt.hasPerms(guild, event.member, RobertifyPermissionKt.ROBERTIFY_ADMIN)
