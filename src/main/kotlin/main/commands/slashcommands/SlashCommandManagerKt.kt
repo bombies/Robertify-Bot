@@ -109,7 +109,8 @@ object SlashCommandManagerKt {
             SetLogChannelCommandKt(),
             RestrictedChannelsCommandKt(),
             ThemeCommandKt(),
-            TogglesCommandKt()
+            TogglesCommandKt(),
+            TwentyFourSevenCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()

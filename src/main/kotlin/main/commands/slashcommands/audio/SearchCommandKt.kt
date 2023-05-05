@@ -64,7 +64,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         botMSg: InteractionHook,
         query: String
     ) {
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         RobertifyAudioManagerKt.loadSearchResults(musicManager, requester, botMSg, query)
     }
 

@@ -15,7 +15,7 @@ class HistoryCommandKt : AbstractSlashCommandKt(CommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val scheduler = RobertifyAudioManagerKt.getMusicManager(guild).scheduler
+        val scheduler = RobertifyAudioManagerKt[guild].scheduler
         val queueHandler = scheduler.queueHandler
 
         if (queueHandler.isPreviousTracksEmpty)

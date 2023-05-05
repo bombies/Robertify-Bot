@@ -38,7 +38,7 @@ class LoopCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val checksEmbed = checks(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!, musicManager.player)
         if (checksEmbed != null) {
             event.replyWithEmbed { checksEmbed }

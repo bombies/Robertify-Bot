@@ -64,7 +64,7 @@ class JumpCommandKt : AbstractSlashCommandKt(
         if (channelChecks != null) return channelChecks
 
         val guild = selfVoiceState.guild
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val track = player.playingTrack
             ?: return RobertifyEmbedUtilsKt.embedMessage(

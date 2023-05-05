@@ -43,7 +43,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = guild.selfMember.voiceState!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val track = player.playingTrack
 
@@ -123,7 +123,7 @@ class NowPlayingCommandKt : AbstractSlashCommandKt(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed {
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val track = player.playingTrack
 

@@ -52,7 +52,7 @@ class JoinCommandKt : AbstractSlashCommandKt(
             ).build()
 
         val channel = memberVoiceState.channel!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val placeholderPair = Pair("{channel}", channel.asMention)
 
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!!.id == selfVoiceState.channel!!.id)

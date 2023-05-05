@@ -55,7 +55,7 @@ class RewindCommandKt : AbstractSlashCommandKt(
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
 
-        val player = RobertifyAudioManagerKt.getMusicManager(guild).player
+        val player = RobertifyAudioManagerKt[guild].player
         val playingTrack = player.playingTrack
 
         if (playingTrack.isStream)

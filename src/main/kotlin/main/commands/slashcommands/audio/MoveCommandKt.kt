@@ -52,7 +52,7 @@ class MoveCommandKt : AbstractSlashCommandKt(
         }
 
         event.deferReply().queue()
-        val queueHandler = RobertifyAudioManagerKt.getMusicManager(guild)
+        val queueHandler = RobertifyAudioManagerKt[guild]
             .scheduler
             .queueHandler
         val id = event.getRequiredOption("id").asInt

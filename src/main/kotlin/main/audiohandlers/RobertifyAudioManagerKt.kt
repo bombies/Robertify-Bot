@@ -66,11 +66,13 @@ object RobertifyAudioManagerKt {
         AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
-    fun getMusicManager(guild: Guild): GuildMusicManagerKt =
+    operator fun get(guild: Guild): GuildMusicManagerKt =
         musicManagers.computeIfAbsent(guild.idLong) {
             logger.debug("Creating new music manager for ${guild.name}")
             GuildMusicManagerKt(guild)
         }
+
+    fun getMusicManager(guild: Guild): GuildMusicManagerKt = get(guild)
 
     fun removeMusicManager(guild: Guild) {
         musicManagers[guild.idLong]?.destroy()

@@ -30,7 +30,7 @@ class PauseCommandKt : AbstractSlashCommandKt(
         if (acChecks != null) return acChecks
 
         val guild = selfVoiceState.guild
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val logUtils = LogUtilsKt(guild)
 

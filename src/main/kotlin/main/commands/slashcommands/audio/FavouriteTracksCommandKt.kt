@@ -188,7 +188,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
 
     fun handleAdd(guild: Guild, member: Member): MessageEmbed {
         val config = FavouriteTracksCacheKt.instance
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val playingTrack = player.playingTrack
         val memberVoiceState = member.voiceState!!

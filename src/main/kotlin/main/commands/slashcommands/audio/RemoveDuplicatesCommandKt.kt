@@ -16,7 +16,7 @@ class RemoveDuplicatesCommandKt : AbstractSlashCommandKt(CommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val queueHandler = RobertifyAudioManagerKt.getMusicManager(guild)
+        val queueHandler = RobertifyAudioManagerKt[guild]
             .scheduler
             .queueHandler
 

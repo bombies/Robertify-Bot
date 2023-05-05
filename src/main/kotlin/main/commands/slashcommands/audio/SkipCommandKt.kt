@@ -87,7 +87,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
             event.hook.sendMessageEmbeds(handleSkip(selfVoiceState, memberVoiceState))
                 .queue()
         } else {
-            val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+            val musicManager = RobertifyAudioManagerKt[guild]
             val tracksToSkip = event.getRequiredOption("to").asLong.toInt()
             event.hook.sendMessageEmbeds(handleSkip(event.user, musicManager, tracksToSkip))
                 .queue()
@@ -101,7 +101,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         if (checksEmbed != null)
             return checksEmbed
 
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
 
         if (player.playingTrack == null)
@@ -153,7 +153,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         if (checksEmbed != null)
             return checksEmbed
 
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
 
         if (player.playingTrack == null)
@@ -195,7 +195,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
     }
 
     private fun skip(guild: Guild) {
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val audioPlayer = musicManager.player
         val scheduler = musicManager.scheduler
         val playingTrack = audioPlayer.playingTrack
@@ -218,7 +218,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
     }
 
     private fun doVoteSkip(guild: Guild) {
-        val voteSkipManager = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManager = RobertifyAudioManagerKt[guild].voteSkipManager
         if (!voteSkipManager.isVoteSkipActive)
             throw IllegalStateException("Can't do a vote skip when there's none active!")
         guild.getTextChannelById(voteSkipManager.voteSkipMessage!!.first)
@@ -231,7 +231,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                 }
 
                 voteSkipManager.voteSkipMessage = null
-                val track = RobertifyAudioManagerKt.getMusicManager(guild)
+                val track = RobertifyAudioManagerKt[guild]
                     .player
                     .playingTrack!!
 
@@ -258,7 +258,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
     }
 
     fun clearVoteSkipInfo(guild: Guild) {
-        val voteSkipManagerKt = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManagerKt = RobertifyAudioManagerKt[guild].voteSkipManager
         voteSkipManagerKt.clearVoters()
         voteSkipManagerKt.startedBy = null
         voteSkipManagerKt.isVoteSkipActive = false
@@ -276,13 +276,13 @@ class SkipCommandKt : AbstractSlashCommandKt(
     }
 
     private fun incrementVoteSkip(guild: Guild) {
-        val voteSkipManager = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManager = RobertifyAudioManagerKt[guild].voteSkipManager
         check(voteSkipManager.isVoteSkipActive) { "Can't increment vote skips since ${guild.name} (${guild.id}) doesn't have any active vote skips!" }
         voteSkipManager.voteSkipCount++
     }
 
     private fun decrementVoteSkip(guild: Guild) {
-        val voteSkipManager = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManager = RobertifyAudioManagerKt[guild].voteSkipManager
         check(voteSkipManager.isVoteSkipActive) { "Can't increment vote skips since ${guild.name} (${guild.id}) doesn't have any active vote skips!" }
         voteSkipManager.voteSkipCount--
     }
@@ -332,7 +332,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
         }
 
         val user = memberVoiceState.member.user
-        val voteSkipManager = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManager = RobertifyAudioManagerKt[guild].voteSkipManager
         when (voteType) {
             "upvote" -> {
                 if (voteSkipManager.userAlreadyVoted(user.idLong)) {
@@ -385,7 +385,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
                             return@whenComplete
                         }
 
-                        val track = RobertifyAudioManagerKt.getMusicManager(guild)
+                        val track = RobertifyAudioManagerKt[guild]
                             .player
                             .playingTrack!!
 
@@ -404,7 +404,7 @@ class SkipCommandKt : AbstractSlashCommandKt(
     }
 
     private fun updateVoteSkipMessage(guild: Guild) {
-        val voteSkipManager = RobertifyAudioManagerKt.getMusicManager(guild).voteSkipManager
+        val voteSkipManager = RobertifyAudioManagerKt[guild].voteSkipManager
         if (!voteSkipManager.isVoteSkipActive)
             return
 

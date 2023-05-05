@@ -194,7 +194,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         if (!isChannelSet()) return null
         return CompletableFuture.runAsync {
             val msgRequest: RestAction<Message> = messageRequest ?: return@runAsync
-            val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+            val musicManager = RobertifyAudioManagerKt[guild]
             val audioPlayer = musicManager.player
             val playingTrack = audioPlayer.playingTrack
             val queueHandler = musicManager.scheduler.queueHandler

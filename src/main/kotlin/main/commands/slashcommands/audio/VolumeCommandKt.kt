@@ -56,7 +56,7 @@ class VolumeCommandKt : AbstractSlashCommandKt(
             return RobertifyEmbedUtilsKt.embedMessage(guild, VolumeMessages.INVALID_VOLUME)
                 .build()
 
-        val player = RobertifyAudioManagerKt.getMusicManager(guild).player
+        val player = RobertifyAudioManagerKt[guild].player
         player.filters.setVolume(volume / 100.0.toFloat()).commit()
 
         RequestChannelConfigKt(guild).updateMessage()

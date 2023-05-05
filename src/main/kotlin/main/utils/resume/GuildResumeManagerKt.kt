@@ -12,7 +12,7 @@ class GuildResumeManagerKt(private val guild: Guild) {
     }
 
     private val resumeCache: GuildResumeCacheKt = GuildResumeCacheKt(guild.id)
-    private val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+    private val musicManager = RobertifyAudioManagerKt[guild]
     private val scheduler = musicManager.scheduler
     val hasSave: Boolean = resumeCache.hasTracks
 

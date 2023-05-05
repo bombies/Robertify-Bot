@@ -82,7 +82,7 @@ class SeekCommandKt : AbstractSlashCommandKt(
                 DurationUnit.SECONDS
             ).inWholeMilliseconds
 
-        val player = RobertifyAudioManagerKt.getMusicManager(guild).player
+        val player = RobertifyAudioManagerKt[guild].player
         val playingTrack = player.playingTrack
 
         if (seekDuration > playingTrack.length)

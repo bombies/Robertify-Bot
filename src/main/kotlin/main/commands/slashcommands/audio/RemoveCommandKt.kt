@@ -49,7 +49,7 @@ class RemoveCommandKt : AbstractSlashCommandKt(
         if (acChecks != null) return acChecks
 
         val guild = selfVoiceState.guild
-        val queueHandler = RobertifyAudioManagerKt.getMusicManager(guild)
+        val queueHandler = RobertifyAudioManagerKt[guild]
             .scheduler
             .queueHandler
 

@@ -126,7 +126,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
             memberVoiceState
         ) {
             val guild = selfVoiceState.guild
-            val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+            val musicManager = RobertifyAudioManagerKt[guild]
             val scheduler = musicManager.scheduler
             val queueHandler = scheduler.queueHandler
             val playingTrack = musicManager.player.playingTrack

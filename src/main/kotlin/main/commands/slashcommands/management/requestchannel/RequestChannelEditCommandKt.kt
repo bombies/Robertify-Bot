@@ -123,7 +123,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                     config.buttonUpdateRequest(message).queue()
                     config.originalAnnouncementToggle = TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES)
 
-                    if (RobertifyAudioManagerKt.getMusicManager(guild).player.playingTrack != null)
+                    if (RobertifyAudioManagerKt[guild].player.playingTrack != null)
                         config.updateMessage()
 
                     return@thenApply RequestChannelKt(

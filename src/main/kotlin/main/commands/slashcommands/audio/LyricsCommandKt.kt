@@ -55,7 +55,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
                     return
                 }
 
-                val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
+                val playingTrack = RobertifyAudioManagerKt[guild]
                     .player
                     .playingTrack
                 "${playingTrack.title} by ${playingTrack.author}"

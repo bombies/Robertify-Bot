@@ -31,7 +31,7 @@ class PreviousTrackCommandKt : AbstractSlashCommandKt(
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
 
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
         val player = musicManager.player

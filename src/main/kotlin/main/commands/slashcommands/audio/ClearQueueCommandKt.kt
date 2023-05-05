@@ -20,7 +20,7 @@ class ClearQueueCommandKt : AbstractSlashCommandKt(CommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val queueHandler = musicManager.scheduler.queueHandler
         val localeManager = LocaleManagerKt.getLocaleManager(guild)
 

@@ -33,7 +33,7 @@ class StopCommandKt : AbstractSlashCommandKt(
         val guild = stopper.guild
         val selfVoiceState = guild.selfMember.voiceState!!
         val memberVoiceState = stopper.voiceState!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val player = musicManager.player
         val scheduler = musicManager.scheduler
         val track = player.playingTrack

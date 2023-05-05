@@ -259,7 +259,7 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
                     .replace("[\\[\\]\\s]".toRegex(), "")
 
                 audioManager.loadRecommendedTracks(
-                    musicManager = RobertifyAudioManagerKt.getMusicManager(guild),
+                    musicManager = RobertifyAudioManagerKt[guild],
                     channel = announcementChannel,
                     trackIds = pastSpotifyTracks
                 )

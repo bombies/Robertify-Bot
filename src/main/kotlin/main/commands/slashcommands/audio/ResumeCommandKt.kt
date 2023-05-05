@@ -27,7 +27,7 @@ class ResumeCommandKt : AbstractSlashCommandKt(CommandKt(
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
         val guild = selfVoiceState.guild
-        val player = RobertifyAudioManagerKt.getMusicManager(guild)
+        val player = RobertifyAudioManagerKt[guild]
             .player
 
         if (!player.isPaused)

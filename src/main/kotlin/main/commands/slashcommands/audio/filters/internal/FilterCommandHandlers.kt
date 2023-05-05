@@ -44,7 +44,7 @@ internal inline fun handleGenericFilterToggle(
     if (acChecks.isNotNull()) return acChecks!!
 
     val guild = selfVoiceState.guild
-    val player = RobertifyAudioManagerKt.getMusicManager(guild).player
+    val player = RobertifyAudioManagerKt[guild].player
     val filters = player.filters
     val logUtils = LogUtilsKt(guild)
     val localeManager = LocaleManagerKt.getLocaleManager(guild)

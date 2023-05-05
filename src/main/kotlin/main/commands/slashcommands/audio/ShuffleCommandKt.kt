@@ -30,7 +30,7 @@ class ShuffleCommandKt : AbstractSlashCommandKt(
     }
 
     fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val queueHandler = musicManager.scheduler.queueHandler
 
         if (queueHandler.isEmpty)

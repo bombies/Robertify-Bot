@@ -111,7 +111,7 @@ object PaginationHandlerKt {
 
     suspend fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
         val guild = event.guild!!
-        val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+        val musicManager = RobertifyAudioManagerKt[guild]
         val queueHandler = musicManager.scheduler.queueHandler
 
         event.deferReply().queue()
@@ -129,7 +129,7 @@ object PaginationHandlerKt {
         coroutineScope {
             val guild = event.guild!!
             val sendFallbackEmbed: () -> Unit = {
-                val musicManager = RobertifyAudioManagerKt.getMusicManager(guild)
+                val musicManager = RobertifyAudioManagerKt[guild]
                 val queueHandler = musicManager.scheduler.queueHandler
                 val content: List<String> = QueueCommandKt().getContent(guild, queueHandler)
 

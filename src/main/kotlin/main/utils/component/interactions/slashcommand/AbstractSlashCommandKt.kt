@@ -153,7 +153,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     GeneralMessages.SAME_VOICE_CHANNEL
                 ).build()
 
-            val playingTrack = RobertifyAudioManagerKt.getMusicManager(guild)
+            val playingTrack = RobertifyAudioManagerKt[guild]
                 .player
                 .playingTrack
             if (songMustBePlaying && playingTrack == null)
