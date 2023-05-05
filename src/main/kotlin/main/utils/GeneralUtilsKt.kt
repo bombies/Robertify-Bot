@@ -170,15 +170,6 @@ object GeneralUtilsKt {
         return isDeveloper(uid.toLong())
     }
 
-    // TODO: Implement user retrieval from shard manager
-    fun retrieveUser(id: Long): User? {
-        return null
-    }
-
-    fun retrieveUser(id: String): User? {
-        return retrieveUser(id.toLong())
-    }
-
     enum class ProgressBar {
         DURATION,
         FILL

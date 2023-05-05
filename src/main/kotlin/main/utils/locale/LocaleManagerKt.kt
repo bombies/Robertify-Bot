@@ -94,12 +94,13 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
             retrieveLocaleFile(it)
         }
 
-    fun getMessage(message: LocaleMessageKt): String {
-        return localeFile[message.name.lowercase()]
+    operator fun get(message: LocaleMessageKt): String =
+        localeFile[message.name.lowercase()]
             ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
-    }
 
-    fun getMessage(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): String {
+    fun getMessage(message: LocaleMessageKt): String = get(message)
+
+    operator fun get(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): String {
         var msg = localeFile[message.name.lowercase()]
             ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
 
@@ -109,4 +110,7 @@ class LocaleManagerKt private constructor(private val guild: Guild?, _locale: Ro
 
         return msg
     }
+
+    fun getMessage(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): String =
+        get(message, *placeholders)
 }

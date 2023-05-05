@@ -72,7 +72,6 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
             .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, uid))
             .getJSONArray(Fields.USER_REMINDERS.toString())
 
-        // TODO: Change ReminderScheduler to Kotlin implementation
         val reminderScheduler = ReminderSchedulerKt(guild)
 
         for (i in 0 until userReminders.length())

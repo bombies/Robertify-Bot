@@ -29,7 +29,7 @@ class ListenerKt : AbstractEventControllerKt() {
 
         /**
          * Load slash commands that NEED to be updated in a guild
-         * @param g The guild to load the commands in
+         * @param guild The guild to load the commands in
          */
         internal fun loadNeededSlashCommands(guild: Guild) {
             loadSlashCommands(guild)
@@ -107,12 +107,7 @@ class ListenerKt : AbstractEventControllerKt() {
         }
     }
 
-    override fun eventHandlerInvokers() {
-        guildJoinListener()
-        guildLeaveListener()
-    }
-
-    private fun guildJoinListener() =
+    private val guildJoinListener =
         onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
             GuildConfigKt(guild).addGuild()
@@ -123,7 +118,7 @@ class ListenerKt : AbstractEventControllerKt() {
             updateServerCount()
         }
 
-    private fun guildLeaveListener() =
+    private val guildLeaveListener =
         onEvent<GuildLeaveEvent> { event ->
             val guild = event.guild
             GuildConfigKt(guild).removeGuild()
@@ -134,7 +129,7 @@ class ListenerKt : AbstractEventControllerKt() {
         }
 
     private fun updateServerCount() {
-        val serverCount = shardManager.guilds.size
+        val serverCount = RobertifyKt.shardManager.guilds.size
 
         BotDBCacheKt.instance.setGuildCount(serverCount)
         if (RobertifyKt.topGGAPI != null)

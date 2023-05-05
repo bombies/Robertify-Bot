@@ -21,12 +21,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
         private val currentPage = Collections.synchronizedMap(mutableMapOf<Long, Int>())
     }
 
-    override fun eventHandlerInvokers() {
-        onRegularButtonClick()
-        onQueueButtonClick()
-    }
-
-    private fun onRegularButtonClick() =
+    private val onRegularButtonClick =
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
@@ -113,7 +108,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
             }
         }
 
-    private fun onQueueButtonClick() =
+    private val onQueueButtonClick =
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent

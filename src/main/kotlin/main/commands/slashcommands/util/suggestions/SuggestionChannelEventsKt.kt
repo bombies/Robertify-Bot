@@ -7,12 +7,7 @@ import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent
 
 class SuggestionChannelEventsKt : AbstractEventControllerKt() {
 
-    override fun eventHandlerInvokers() {
-        handleCategoryDeletion()
-        handleChannelDeletion()
-    }
-
-    private fun handleCategoryDeletion() =
+    private val handleCategoryDeletion =
         onEvent<ChannelDeleteEvent> { event ->
             if (event.channelType != ChannelType.CATEGORY) return@onEvent
             val category = event.channel.asCategory()
@@ -34,7 +29,7 @@ class SuggestionChannelEventsKt : AbstractEventControllerKt() {
             config.resetSuggestionsConfig()
         }
 
-    private fun handleChannelDeletion() =
+    private val handleChannelDeletion =
         onEvent<ChannelDeleteEvent> { event ->
             if (event.channelType != ChannelType.TEXT) return@onEvent
             val channel = event.channel.asTextChannel()

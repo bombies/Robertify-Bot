@@ -14,7 +14,6 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.events.EventManager
-import main.events.EventManager.registerEvents
 import main.main.ListenerKt.Companion.loadNeededSlashCommands
 import main.main.ListenerKt.Companion.rescheduleUnbans
 import main.utils.database.mongodb.cache.BotDBCacheKt
@@ -127,7 +126,7 @@ object RobertifyKt {
         logger.info("Building shard manager...")
         shardManager = defaultShard(
             token = ConfigKt.BOT_TOKEN,
-            intents = listOf(GatewayIntent.GUILD_VOICE_STATES),
+            intents = listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
             enableCoroutines = false
         ) {
             setShardsTotal(ConfigKt.SHARD_COUNT)
@@ -173,10 +172,11 @@ object RobertifyKt {
             slashCommandManager.guildCommands
                 .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
         )
+
         logger.info("Registered all slash commands.")
 
-        shardManager.registerEvents(EventManager.events)
-        logger.info("Registered all event controllers")
+        EventManager.registeredEvents
+        logger.info("Registered all event controllers.")
 
         if (ConfigKt.LOAD_COMMANDS)
             AbstractSlashCommandKt.loadAllCommands()

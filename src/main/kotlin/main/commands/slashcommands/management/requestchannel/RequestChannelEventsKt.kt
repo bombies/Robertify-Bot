@@ -34,12 +34,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
         val logger by SLF4J
     }
 
-    override fun eventHandlerInvokers() {
-        handleChannelDelete()
-        handleButtonClick()
-    }
-
-    private fun handleChannelDelete() =
+    private val handleChannelDelete =
         onEvent<ChannelDeleteEvent> { event ->
             if (!event.isFromType(ChannelType.TEXT))
                 return@onEvent
@@ -53,7 +48,7 @@ class RequestChannelEventsKt : AbstractEventControllerKt() {
             config.removeChannel()
         }
 
-    private fun handleButtonClick() =
+    private val handleButtonClick =
         onEvent<ButtonInteractionEvent> { event ->
             if (!event.isFromGuild || event.button.id?.startsWith(RequestChannelButtonId.IDENTIFIER.toString()) != true)
                 return@onEvent
