@@ -40,7 +40,7 @@ class GeniusSongSearchKt(private val gla: GeniusAPIKt, query: String, page: Int 
             val request = Request.Builder()
                 .url(uri.toURL())
                 .get()
-                .addHeader("User-Agent", BotConstantsKt.USER_AGENT.toString())
+                .addHeader("User-Agent", BotConstantsKt.USER_AGENT)
                 .addHeader("Content-Type","application/json")
                 .addHeader("Accept","application/json")
                 .addHeader("x-rapidapi-host", "genius.p.rapidapi.com")
