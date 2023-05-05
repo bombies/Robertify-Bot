@@ -73,7 +73,7 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
         }
     }
 
-    fun getToggle(toggle: ToggleKt): Boolean {
+    operator fun get(toggle: ToggleKt): Boolean {
         if (!guildHasInfo()) loadGuild()
         return try {
             getTogglesObject().getBoolean(toggle.toString())
@@ -88,6 +88,8 @@ class TogglesConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
             }
         }
     }
+
+    fun getToggle(toggle: ToggleKt): Boolean = get(toggle)
 
     fun getDJToggles(): HashMap<String, Boolean> {
         val ret = HashMap<String, Boolean>()

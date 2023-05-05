@@ -467,8 +467,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     protected open fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
-        if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
-            return if (!event.isFromGuild)
+        return if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
+            if (!event.isFromGuild)
                 true
             else if (!event.member!!.hasPermissions(*info.requiredPermissions.toTypedArray())) {
                 event.replyWithEmbed(event.guild!!) {
@@ -477,8 +477,8 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                     .queue()
                 false
             } else true
-        }
-        return if (GeneralUtilsKt.isDeveloper(event.id)) true else info.checkPermission?.invoke(event) ?: true
+        } else
+            if (GeneralUtilsKt.isDeveloper(event.id)) true else info.checkPermission?.invoke(event) ?: true
     }
 
     protected open fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {

@@ -192,6 +192,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
+        inline fun MessageChannel.sendWithEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
+            val embedUtils = getGuildUtils(guild)
+            return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
+        }
+
         inline fun SlashCommandInteractionEvent.replyWithEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
@@ -229,6 +234,16 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
         inline fun Message.editEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageEditAction {
             val embedUtils = getGuildUtils(guild)
             return editMessageEmbeds(supplier(embedUtils))
+        }
+
+        fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessageKt, value: LocaleMessageKt, inline: Boolean = false): EmbedBuilder {
+            val localeManager = LocaleManagerKt[guild]
+            return addField(localeManager.getMessage(name), localeManager.getMessage(value), inline)
+        }
+
+        fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessageKt, value: String, inline: Boolean = false): EmbedBuilder {
+            val localeManager = LocaleManagerKt[guild]
+            return addField(localeManager.getMessage(name), value, inline)
         }
     }
 

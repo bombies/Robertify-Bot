@@ -5,6 +5,8 @@ import main.commands.slashcommands.audio.filters.*
 import main.commands.slashcommands.management.*
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
+import main.commands.slashcommands.management.logs.LogCommandKt
+import main.commands.slashcommands.management.logs.SetLogChannelCommandKt
 import main.commands.slashcommands.management.permissions.ListDJCommandKt
 import main.commands.slashcommands.management.permissions.PermissionsCommandKt
 import main.commands.slashcommands.management.permissions.RemoveDJCommandKt
@@ -106,7 +108,8 @@ object SlashCommandManagerKt {
             LogCommandKt(),
             SetLogChannelCommandKt(),
             RestrictedChannelsCommandKt(),
-            ThemeCommandKt()
+            ThemeCommandKt(),
+            TogglesCommandKt()
         )
         addMiscCommands()
         addUtilityCommands()

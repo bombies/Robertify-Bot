@@ -1,4 +1,4 @@
-package main.commands.slashcommands.management
+package main.commands.slashcommands.management.logs
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed

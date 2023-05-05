@@ -17,5 +17,6 @@ enum class TogglesMessages : LocaleMessageKt {
     DJ_TOGGLED,
     LOG_TOGGLE_INVALID_TYPE,
     LOG_TOGGLED,
-    SKIP_DJ_TOGGLE_PROMPT
+    SKIP_DJ_TOGGLE_PROMPT,
+    ALL_DJ_TOGGLED
 }

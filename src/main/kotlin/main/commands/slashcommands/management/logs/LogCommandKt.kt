@@ -1,4 +1,4 @@
-package main.commands.slashcommands.management
+package main.commands.slashcommands.management.logs
 
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyWithEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt

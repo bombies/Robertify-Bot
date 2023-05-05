@@ -1,6 +1,7 @@
 package main.utils.pagination
 
 import dev.minn.jda.ktx.interactions.components.StringSelectMenu
+import dev.minn.jda.ktx.util.SLF4J
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -40,6 +41,7 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 object PaginationHandlerKt {
+    private val logger by SLF4J
     private val messages = Collections.synchronizedMap(mutableMapOf<Long, List<MessagePageKt>>())
     private val paginator = PaginationButtonGenerator.DEFAULT
     var embedStyle: () -> EmbedBuilder = { EmbedBuilder() }
@@ -263,12 +265,11 @@ object PaginationHandlerKt {
     }
 
     private fun messageLogic(guild: Guild, content: List<String>, maxPerPage: Int = 10): List<DefaultMessagePageKt> {
-        if (content.size < maxPerPage) {
+        if (content.size <= maxPerPage) {
             return listOf(DefaultMessagePageKt(guild, content))
         } else {
             val messagePages = mutableListOf<DefaultMessagePageKt>()
             val pagesRequired = ceil(content.size.toDouble() / maxPerPage.toDouble()).toInt()
-
             var lastIndex = 0
             for (i in 0 until pagesRequired) {
                 val embedBuilder = RobertifyEmbedUtilsKt.embedMessage(guild, "\t")

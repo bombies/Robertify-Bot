@@ -30,6 +30,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
         onEvent<ButtonInteractionEvent> { event ->
             val button = event.button
             val buttonId = button.id ?: return@onEvent
+
             if (!buttonId.startsWith(MessageButtonKt.PAGE_ID.toString()))
                 return@onEvent
 
@@ -53,7 +54,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                         return@onEvent
 
                     currentPage[msg] = 0
-                    event.editMessageEmbeds(messagePages[0].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -61,11 +62,12 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                                 previousEnabled = currentPage[msg] != 0,
                             )
                         )
+                        .queue()
                 }
 
                 "${MessageButtonKt.PREVIOUS}${event.user.id}" -> {
                     currentPage[msg] = currentPage[msg]!!.minus(1)
-                    event.editMessageEmbeds(messagePages[0].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -73,18 +75,20 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                                 previousEnabled = currentPage[msg] != 0,
                             )
                         )
+                        .queue()
                 }
 
                 "${MessageButtonKt.NEXT}${event.user.id}" -> {
                     currentPage[msg] = currentPage[msg]!!.plus(1)
-                    event.editMessageEmbeds(messagePages[0].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
-                                nextEnabled = currentPage[msg] == messagePages.size - 1,
-                                endEnabled = currentPage[msg] == messagePages.size - 1,
+                                nextEnabled = currentPage[msg] != messagePages.size - 1,
+                                endEnabled = currentPage[msg] != messagePages.size - 1,
                             )
                         )
+                        .queue()
                 }
 
                 "${MessageButtonKt.END}${event.user.id}" -> {
@@ -92,14 +96,15 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                         return@onEvent
 
                     currentPage[msg] = messagePages.size - 1
-                    event.editMessageEmbeds(messagePages[0].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
-                                nextEnabled = currentPage[msg] == messagePages.size - 1,
-                                endEnabled = currentPage[msg] == messagePages.size - 1,
+                                nextEnabled = currentPage[msg] != messagePages.size - 1,
+                                endEnabled = currentPage[msg] != messagePages.size - 1,
                             )
                         )
+                        .queue()
                 }
 
                 else -> event.replyWithEmbed(event.guild) {
