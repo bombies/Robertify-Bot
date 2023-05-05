@@ -14,13 +14,68 @@ import main.commands.slashcommands.management.permissions.SetDJCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
-import main.utils.internal.delegates.ImmutableListGetDelegate
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
 import net.dv8tion.jda.api.sharding.ShardManager
-import java.lang.NullPointerException
 
 object SlashCommandManagerKt {
+
+    val musicCommands: List<AbstractSlashCommandKt> = listOf(
+        PlayCommandKt(),
+        DisconnectCommandKt(),
+        QueueCommandKt(),
+        SkipCommandKt(),
+        NowPlayingCommandKt(),
+        ShuffleCommandKt(),
+        StopCommandKt(),
+        SearchCommandKt(),
+        JumpCommandKt(),
+        JoinCommandKt(),
+        HistoryCommandKt(),
+        FavouriteTracksCommandKt(),
+        ClearQueueCommandKt(),
+        AutoPlayCommandKt(),
+        LoopCommandKt(),
+        LyricsCommandKt(),
+        MoveCommandKt(),
+        PauseCommandKt(),
+        PreviousTrackCommandKt(),
+        RemoveCommandKt(),
+        ResumeCommandKt(),
+        RewindCommandKt(),
+        SeekCommandKt(),
+        VolumeCommandKt(),
+        EightDFilterKt(),
+        KaraokeFilterKt(),
+        NightcoreFilterKt(),
+        TremoloFilterKt(),
+        VibratoFilterKt(),
+        RemoveDuplicatesCommandKt()
+    )
+
+    val managementCommands: List<AbstractSlashCommandKt> = listOf(
+        RequestChannelEditCommandKt(),
+        RequestChannelCommandKt(),
+        PermissionsCommandKt(),
+        ListDJCommandKt(),
+        SetDJCommandKt(),
+        RemoveDJCommandKt(),
+        BanCommandKt(),
+        UnbanCommandKt(),
+        LanguageCommandKt(),
+        LogCommandKt(),
+        SetLogChannelCommandKt(),
+        RestrictedChannelsCommandKt(),
+        ThemeCommandKt(),
+        TogglesCommandKt(),
+        TwentyFourSevenCommandKt()
+    )
+
+    val miscCommands: List<AbstractSlashCommandKt> = listOf()
+
+    val utilityCommands: List<AbstractSlashCommandKt> = listOf()
+
+    val devCommands: List<AbstractSlashCommandKt> = listOf()
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
         this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")
@@ -30,17 +85,6 @@ object SlashCommandManagerKt {
 
     fun ShardManager.registerCommands(commands: List<AbstractSlashCommandKt>) =
         commands.forEach { it.register(this) }
-
-    var musicCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
-        private set
-    var managementCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
-        private set
-    var miscCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
-        private set
-    var utilityCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
-        private set
-    var devCommands: List<AbstractSlashCommandKt> by ImmutableListGetDelegate()
-        private set
 
     val globalCommands: List<AbstractSlashCommandKt>
         get() {
@@ -61,91 +105,6 @@ object SlashCommandManagerKt {
             abstractSlashCommands.addAll(utilityCommands)
             return abstractSlashCommands.filter { it.info.isGuild }
         }
-
-    init {
-        addMusicCommands(
-            PlayCommandKt(),
-            DisconnectCommandKt(),
-            QueueCommandKt(),
-            SkipCommandKt(),
-            NowPlayingCommandKt(),
-            ShuffleCommandKt(),
-            StopCommandKt(),
-            SearchCommandKt(),
-            JumpCommandKt(),
-            JoinCommandKt(),
-            HistoryCommandKt(),
-            FavouriteTracksCommandKt(),
-            ClearQueueCommandKt(),
-            AutoPlayCommandKt(),
-            LoopCommandKt(),
-            LyricsCommandKt(),
-            MoveCommandKt(),
-            PauseCommandKt(),
-            PreviousTrackCommandKt(),
-            RemoveCommandKt(),
-            ResumeCommandKt(),
-            RewindCommandKt(),
-            SeekCommandKt(),
-            VolumeCommandKt(),
-            EightDFilterKt(),
-            KaraokeFilterKt(),
-            NightcoreFilterKt(),
-            TremoloFilterKt(),
-            VibratoFilterKt(),
-            RemoveDuplicatesCommandKt()
-        )
-        addManagementCommands(
-            RequestChannelEditCommandKt(),
-            RequestChannelCommandKt(),
-            PermissionsCommandKt(),
-            ListDJCommandKt(),
-            SetDJCommandKt(),
-            RemoveDJCommandKt(),
-            BanCommandKt(),
-            UnbanCommandKt(),
-            LanguageCommandKt(),
-            LogCommandKt(),
-            SetLogChannelCommandKt(),
-            RestrictedChannelsCommandKt(),
-            ThemeCommandKt(),
-            TogglesCommandKt(),
-            TwentyFourSevenCommandKt()
-        )
-        addMiscCommands()
-        addUtilityCommands()
-        addDevCommands()
-    }
-
-    private fun addMusicCommands(vararg commands: AbstractSlashCommandKt) {
-        val newList = musicCommands.toMutableList()
-        newList.addAll(commands.toList())
-        musicCommands = newList
-    }
-
-    private fun addManagementCommands(vararg commands: AbstractSlashCommandKt) {
-        val newList = managementCommands.toMutableList()
-        newList.addAll(commands.toList())
-        managementCommands = newList
-    }
-
-    private fun addMiscCommands(vararg commands: AbstractSlashCommandKt) {
-        val newList = miscCommands.toMutableList()
-        newList.addAll(commands.toList())
-        miscCommands = newList
-    }
-
-    private fun addUtilityCommands(vararg commands: AbstractSlashCommandKt) {
-        val newList = utilityCommands.toMutableList()
-        newList.addAll(commands.toList())
-        utilityCommands = newList
-    }
-
-    private fun addDevCommands(vararg commands: AbstractSlashCommandKt) {
-        val newList = devCommands.toMutableList()
-        newList.addAll(commands.toList())
-        devCommands = newList
-    }
 
     fun isMusicCommand(command: AbstractSlashCommandKt): Boolean =
         musicCommands.any { it.info.name.equals(command.info.name, ignoreCase = true) }
