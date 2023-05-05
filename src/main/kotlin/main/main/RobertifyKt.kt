@@ -160,7 +160,7 @@ object RobertifyKt {
         // TODO: Ktor setup
     }
 
-    fun initVoteSiteAPIs() {
+    private fun initVoteSiteAPIs() {
         if (ConfigKt.TOP_GG_TOKEN.isNotEmpty())
             topGGAPI = DiscordBotListAPI.Builder()
                 .token(ConfigKt.TOP_GG_TOKEN)
