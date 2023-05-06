@@ -8,6 +8,8 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -112,7 +114,7 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         minus(Pair(uid, id))
 
     operator fun minus(uid: Long) {
-        if (!userHasReminders(uid))
+        if (!userHasReminders(uid) || get(uid).isNullOrEmpty())
             throw NullPointerException("This user doesn't have any reminders in this guild!")
 
         val guildObj = getGuildObject()
@@ -198,9 +200,9 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         return getUser(uid)!!.isBanned
     }
 
-    fun userHasReminders(uid: Long): Boolean =
-        if (!userExists(uid)) false else getReminders(uid) != null
-
+    fun userHasReminders(uid: Long): Boolean {
+        return if (!userExists(uid)) false else getReminders(uid) != null
+    }
 
     operator fun get(uid: Long): List<ReminderKt>? =
         Collections.unmodifiableList(getUser(uid)!!.reminders)

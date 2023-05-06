@@ -48,7 +48,7 @@ class ReminderJobKt : Job {
             return
         }
 
-        if (!remindersConfig.channelIsBanned(channel.idLong)) {
+        if (remindersConfig.channelIsBanned(channel.idLong)) {
             dmReminder(guild, user, reminder)
             return
         }

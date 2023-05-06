@@ -390,7 +390,7 @@ poll_ended: "**{question}** [ENDED]\n\n"
 
 # REMINDER MESSAGES
 reminders_embed_title: "Reminders"
-cannot_set_banned_reminder_channel: "You cannot ser the reminder channel to {channel} as it is banned!"
+cannot_set_banned_reminder_channel: "You cannot set the reminder channel to {channel} as it is banned!"
 reminder_invalid_time_format: "Invalid time format!\n\n**Correct Format**: `00:00AM/PM` **__OR__** `00:00` *(24-hour format)*"
 reminder_added: "Successfully added your reminder!"
 no_reminders: "You do not have any reminders!"

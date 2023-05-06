@@ -7,7 +7,7 @@ data class ReminderKt(
     val reminder: String,
     val userId: Long,
     val channelId: Long,
-    private val reminderTime: Long,
+    val reminderTime: Long,
     private val _timezone: String?
 ) {
     val hour: Int = ((reminderTime / 1000) / 60 / 60 % 24).toInt()
