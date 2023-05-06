@@ -1,7 +1,6 @@
 package main.utils.json.reminders.scheduler
 
 import main.main.RobertifyKt
-import main.utils.json.reminders.scheduler.jobs.ReminderJobKt
 import net.dv8tion.jda.api.entities.Guild
 import org.quartz.CronScheduleBuilder
 import org.quartz.JobBuilder.newJob

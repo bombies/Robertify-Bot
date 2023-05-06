@@ -68,6 +68,7 @@ data class CommandKt(
                             if (option.min != null)
                                 optionData.setMinValue(option.min.toLong())
                         }
+                        optionData.setAutoComplete(option.autoComplete)
                     }
 
                     OptionType.NUMBER -> {
@@ -79,11 +80,13 @@ data class CommandKt(
                             if (option.min != null)
                                 optionData.setMinValue(option.min.toDouble())
                         }
+                        optionData.setAutoComplete(option.autoComplete)
                     }
 
                     OptionType.STRING -> {
                         if (option.maxLength != null)
                             optionData.setMaxLength(option.maxLength)
+                        optionData.setAutoComplete(option.autoComplete)
                     }
 
                     OptionType.CHANNEL -> {
@@ -93,10 +96,6 @@ data class CommandKt(
 
                     else -> {}
                 }
-
-                if (option.choices.isNotEmpty())
-                    optionData.setAutoComplete(option.autoComplete)
-
                 option.choices.forEach { choice -> optionData.addChoice(choice, choice) }
                 commandData.addOptions(optionData)
             }

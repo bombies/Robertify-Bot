@@ -15,6 +15,7 @@ import main.commands.slashcommands.management.permissions.SetDJCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelCommandKt
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.commands.slashcommands.misc.polls.PollCommandKt
+import main.commands.slashcommands.misc.reminders.RemindersCommandKt
 import main.commands.slashcommands.util.*
 import main.commands.slashcommands.util.suggestions.SuggestionCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
@@ -76,7 +77,8 @@ object SlashCommandManagerKt {
     )
 
     val miscCommands: List<AbstractSlashCommandKt> = listOf(
-        PollCommandKt()
+        PollCommandKt(),
+        RemindersCommandKt()
     )
 
     val utilityCommands: List<AbstractSlashCommandKt> = listOf(

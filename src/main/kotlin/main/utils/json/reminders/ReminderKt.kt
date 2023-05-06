@@ -8,13 +8,11 @@ data class ReminderKt(
     val userId: Long,
     val channelId: Long,
     private val reminderTime: Long,
-    private val timezone: String?
+    private val _timezone: String?
 ) {
     val hour: Int = ((reminderTime / 1000) / 60 / 60 % 24).toInt()
     val minute: Int = ((reminderTime/ 1000) / 60 % 60).toInt()
-
-    fun getTimeZone(): TimeZone =
-        if (timezone == null) TimeZone.getDefault() else TimeZone.getTimeZone(timezone)
+    val timezone: TimeZone = if (_timezone == null) TimeZone.getDefault() else TimeZone.getTimeZone(_timezone)
 
     override fun toString(): String = reminder
 }

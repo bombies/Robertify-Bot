@@ -8,8 +8,30 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
+
+    companion object {
+        val validTimeZones = listOf(
+            "UTC",
+            "EST",
+            "CST",
+            "MST",
+            "PST",
+            "GMT",
+            "BST",
+            "CET",
+            "EET",
+            "IST",
+            "JST",
+            "NZST",
+            "AEST",
+            "ACST",
+            "AWST"
+        )
+    }
 
     init {
         if (!getGuildObject().has(Fields.REMINDERS.toString()))
@@ -29,6 +51,28 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         cache.updateGuild(guildObject)
     }
 
+    operator fun plus(reminder: ReminderKt) {
+        if (!userExists(reminder.userId)) addUser(reminder.userId)
+        val guildObj = getGuildObject()
+        val userArr = guildObj.getJSONObject(Fields.REMINDERS.toString())
+            .getJSONArray(Fields.USERS.toString())
+        val userReminders = userArr
+            .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, reminder.userId))
+            .getJSONArray(Fields.USER_REMINDERS.toString())
+        val reminderObj = JSONObject()
+            .put(Fields.REMINDER.toString(), reminder)
+            .put(Fields.REMINDER_CHANNEL.toString(), reminder.channelId)
+            .put(
+                Fields.REMINDER_TIME.toString(),
+                reminder.hour.toDuration(DurationUnit.HOURS).inWholeMilliseconds + reminder.minute.toDuration(
+                    DurationUnit.MINUTES
+                ).inWholeMilliseconds
+            )
+        reminderObj.put(Fields.REMINDER_TIMEZONE.toString(), reminder.timezone.getDisplayName(false, TimeZone.SHORT))
+        userReminders.put(reminderObj)
+        cache.updateGuild(guildObj)
+    }
+
     fun addReminder(uid: Long, reminder: String, channelID: Long, reminderTime: Long, timeZone: String?) {
         if (!userExists(uid)) addUser(uid)
         val guildObj = getGuildObject()
@@ -46,7 +90,10 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         cache.updateGuild(guildObj)
     }
 
-    fun removeReminder(uid: Long, id: Int) {
+    operator fun minus(terms: Pair<Long, Int>) {
+        val uid = terms.first
+        val id = terms.second
+
         if (!userHasReminders(uid))
             throw NullPointerException("This user doesn't have any reminders in this guild!")
 
@@ -61,7 +108,10 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         cache.updateGuild(guildObj)
     }
 
-    fun clearReminders(uid: Long) {
+    fun removeReminder(uid: Long, id: Int) =
+        minus(Pair(uid, id))
+
+    operator fun minus(uid: Long) {
         if (!userHasReminders(uid))
             throw NullPointerException("This user doesn't have any reminders in this guild!")
 
@@ -79,6 +129,9 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         userReminders.clear()
         cache.updateGuild(guildObj)
     }
+
+    fun clearReminders(uid: Long) =
+        minus(uid)
 
     fun removeAllReminderChannels(uid: Long) {
         if (!userExists(uid))
@@ -149,8 +202,11 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         if (!userExists(uid)) false else getReminders(uid) != null
 
 
-    fun getReminders(uid: Long): List<ReminderKt>? =
+    operator fun get(uid: Long): List<ReminderKt>? =
         Collections.unmodifiableList(getUser(uid)!!.reminders)
+
+    fun getReminders(uid: Long): List<ReminderKt>? =
+        get(uid)
 
 
     fun getUser(uid: Long): ReminderUserKt? {
@@ -191,6 +247,8 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
             }
             ReminderUserKt(uid, guild.idLong, ret, isBanned)
         } catch (e: NullPointerException) {
+            null
+        } catch (e: IllegalStateException) {
             null
         }
     }

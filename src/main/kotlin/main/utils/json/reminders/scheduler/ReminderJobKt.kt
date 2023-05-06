@@ -1,4 +1,4 @@
-package main.utils.json.reminders.scheduler.jobs
+package main.utils.json.reminders.scheduler
 
 import main.constants.ToggleKt
 import main.main.RobertifyKt
