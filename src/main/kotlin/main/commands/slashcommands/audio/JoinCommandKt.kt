@@ -3,6 +3,8 @@ package main.commands.slashcommands.audio
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
+import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -27,61 +29,37 @@ class JoinCommandKt : AbstractSlashCommandKt(
     }
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.deferReply().queue()
-        event.hook.sendEmbed {
-            handleJoin(
-                event.guild!!,
-                event.channel.asGuildMessageChannel(),
-                event.member!!.voiceState!!,
-                event.guild!!.selfMember.voiceState!!
-            )
-        }
-            .queue()
+        handleJoin(event)
     }
 
     private fun handleJoin(
-        guild: Guild,
-        messageChannel: GuildMessageChannel,
-        memberVoiceState: GuildVoiceState,
-        selfVoiceState: GuildVoiceState
-    ): MessageEmbed {
+        event: SlashCommandInteractionEvent
+    ) {
+        val guild = event.guild!!
+        val memberVoiceState = event.member!!.voiceState!!
+        val selfVoiceState = guild.selfMember.voiceState!!
+
         if (!memberVoiceState.inAudioChannel())
-            return RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
-            ).build()
+            return event.replyEmbed(guild, GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
+                .setEphemeral(true)
+                .queue()
 
         val channel = memberVoiceState.channel!!
         val musicManager = RobertifyAudioManagerKt[guild]
         val placeholderPair = Pair("{channel}", channel.asMention)
 
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!!.id == selfVoiceState.channel!!.id)
-            return RobertifyEmbedUtilsKt.embedMessage(
+            return event.replyEmbed(
                 guild,
                 JoinMessages.ALREADY_JOINED,
                 placeholderPair
-            ).build()
+            ).setEphemeral(true)
+                .queue()
 
-        return try {
-            RobertifyAudioManagerKt.joinAudioChannel(channel, musicManager, messageChannel)
-            RobertifyEmbedUtilsKt.embedMessage(guild, JoinMessages.JOINED, placeholderPair)
-                .build()
-        } catch (e: IllegalStateException) {
-            RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                JoinMessages.CANT_JOIN,
-                placeholderPair
-            )
-                .build()
-        } catch (e: InsufficientPermissionException) {
-            RobertifyEmbedUtilsKt.embedMessage(
-                guild,
-                GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
-                placeholderPair
-            ).build()
-        } catch (e: Exception) {
-            logger.error("Unexpected error", e)
-            RobertifyEmbedUtilsKt.embedMessage(guild, GeneralMessages.UNEXPECTED_ERROR).build()
+        event.replyEmbed(guild, JoinMessages.ATTEMPTING_TO_JOIN, placeholderPair).queue { message ->
+            if (RobertifyAudioManagerKt.joinAudioChannel(channel, musicManager, hookMessage = message)) {
+                message.editEmbed(guild, JoinMessages.JOINED, placeholderPair).queue()
+            }
         }
     }
 

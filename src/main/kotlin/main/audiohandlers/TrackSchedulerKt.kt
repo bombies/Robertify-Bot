@@ -11,8 +11,10 @@ import lavalink.client.player.LavalinkPlayer
 import lavalink.client.player.event.PlayerEventListenerAdapter
 import main.audiohandlers.models.RequesterKt
 import main.audiohandlers.utils.author
+import main.audiohandlers.utils.length
 import main.audiohandlers.utils.source
 import main.audiohandlers.utils.title
+import main.commands.slashcommands.misc.PlaytimeCommandKt
 import main.constants.ToggleKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
@@ -228,7 +230,17 @@ class TrackSchedulerKt(private val guild: Guild, private val link: Link) : Playe
     }
 
     fun nextTrack(lastTrack: AudioTrack?, skipped: Boolean = false, skippedAt: Long? = null) {
-        // TODO: Handle playtime updating
+        val playtime = PlaytimeCommandKt.playtime
+        if (lastTrack != null) {
+            if (!skipped)
+                playtime[guild.idLong] = if (playtime.containsKey(guild.idLong))
+                    playtime[guild.idLong]!! + lastTrack.length
+                else lastTrack.length
+            else
+                playtime[guild.idLong] = if (playtime.containsKey(guild.idLong))
+                    playtime[guild.idLong]!! + (skippedAt ?: 0)
+                else skippedAt ?: 0
+        }
 
         if (queueHandler.isEmpty && queueHandler.queueRepeating)
             queueHandler.loadSavedQueue()

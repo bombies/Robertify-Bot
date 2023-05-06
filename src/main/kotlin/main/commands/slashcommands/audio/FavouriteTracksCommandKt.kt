@@ -280,7 +280,6 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             audioManager.loadAndPlay(
                 trackUrl = url,
                 memberVoiceState = memberVoiceState,
-                messageChannel = messageChannel,
                 botMessage = addingMsg
             )
         }

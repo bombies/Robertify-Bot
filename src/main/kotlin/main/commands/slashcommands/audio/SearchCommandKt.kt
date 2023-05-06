@@ -107,7 +107,6 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         RobertifyAudioManagerKt.loadAndPlay(
             trackUrl = trackQuery,
-            messageChannel = event.channel.asGuildMessageChannel(),
             memberVoiceState = memberVoiceState,
             botMessage = event.message
         )

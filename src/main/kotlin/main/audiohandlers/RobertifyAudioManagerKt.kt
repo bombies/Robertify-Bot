@@ -16,6 +16,7 @@ import main.constants.ToggleKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
+import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
@@ -82,7 +83,6 @@ object RobertifyAudioManagerKt {
         trackUrl: String,
         memberVoiceState: GuildVoiceState,
         botMessage: Message? = null,
-        messageChannel: GuildMessageChannel? = null,
         addToBeginning: Boolean = false,
         shuffled: Boolean = false
     ) {
@@ -93,7 +93,7 @@ object RobertifyAudioManagerKt {
         val musicManager = getMusicManager(guild)
         val voiceChannel = memberVoiceState.channel!!
 
-        if (voiceChannel.members.isNotEmpty() && joinAudioChannel(voiceChannel, musicManager, messageChannel)) {
+        if (voiceChannel.members.isNotEmpty() && joinAudioChannel(voiceChannel, musicManager, botMessage)) {
             loadTrack(
                 trackUrl = trackUrl,
                 musicManager = musicManager,
@@ -103,14 +103,6 @@ object RobertifyAudioManagerKt {
                 addToBeginning = addToBeginning,
                 shuffled = shuffled
             )
-        } else {
-            botMessage?.editMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    guild,
-                    GeneralMessages.INVALID_ARGS
-                ).build()
-            )
-                ?.queue()
         }
     }
 
@@ -202,13 +194,14 @@ object RobertifyAudioManagerKt {
      *
      * @param channel The channel to attempt to join.
      * @param musicManager The music manager for the guild.
-     * @param messageChannel The message channel for any error messages.
+     * @param message The message to edit for any error messages.
      * @return True if the bot successfully joined the channel and vice-versa.
      */
     fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManagerKt,
-        messageChannel: GuildMessageChannel? = null
+        message: Message? = null,
+        hookMessage: InteractionHook? = null
     ): Boolean {
         try {
             require(!GuildConfigKt(musicManager.guild).twentyFourSevenMode && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
@@ -226,24 +219,32 @@ object RobertifyAudioManagerKt {
                         ) {
                             val embed = RobertifyEmbedUtilsKt.embedMessage(
                                 guild,
-                                localeManager.getMessage(GeneralMessages.CANT_JOIN_CHANNEL) +
-                                        if (restrictedChannelConfig.getRestrictedChannels(RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL)
-                                                .isNotEmpty()
-                                        )
-                                            localeManager.getMessage(
-                                                GeneralMessages.RESTRICTED_TO_JOIN,
-                                                Pair(
-                                                    "{channels}",
-                                                    restrictedChannelConfig.restrictedChannelsToString(
-                                                        RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL
-                                                    )
+                                """
+                                    ${localeManager[GeneralMessages.CANT_JOIN_CHANNEL]}
+                                    
+                                    ${
+                                    localeManager[
+                                        GeneralMessages.RESTRICTED_TO_JOIN,
+                                        Pair(
+                                            "{channels}",
+                                            if (restrictedChannelConfig.getRestrictedChannels(
+                                                    RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL
                                                 )
+                                                    .isNotEmpty()
                                             )
-                                        else
-                                            localeManager.getMessage(GeneralMessages.NO_VOICE_CHANNEL)
+                                                restrictedChannelConfig.restrictedChannelsToString(
+                                                    RestrictedChannelsConfigKt.ChannelType.VOICE_CHANNEL
+                                                )
+                                            else localeManager[GeneralMessages.NOTHING_HERE]
+                                        )
+                                    ]
+                                }
+                                """.trimIndent()
                             ).build()
 
-                            messageChannel?.sendEmbed(guild) { embed }?.queue()
+                            if (message != null)
+                                message.editEmbed(guild) { embed }.queue()
+                            else hookMessage?.editEmbed(guild) { embed }?.queue()
                             return false
                         }
                     }
@@ -259,13 +260,14 @@ object RobertifyAudioManagerKt {
                 }
             }
         } catch (e: InsufficientPermissionException) {
-            messageChannel?.sendMessageEmbeds(
-                RobertifyEmbedUtilsKt.embedMessage(
-                    messageChannel.guild,
-                    GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
-                    Pair("{channel}", channel.asMention)
-                ).build()
-            )?.queue()
+            val embed = RobertifyEmbedUtilsKt.embedMessage(
+                channel.guild,
+                GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
+                Pair("{channel}", channel.asMention)
+            ).build()
+            if (message != null)
+                message.editMessageEmbeds(embed).queue()
+            else hookMessage?.editEmbed{ embed }?.queue()
         }
 
         return false

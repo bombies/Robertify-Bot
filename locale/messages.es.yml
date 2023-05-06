@@ -419,4 +419,5 @@ default_accept_reason: "¡Tu sugerencia ha sido aceptada!"
 default_deny_reason: "¡Tu sugerencia ha sido denegada!"
 feature_unavailable: "¡Esta función no está disponible en este momento!"
 reminder_insufficient_permissions: "No tengo suficientes permisos para enviar su recordatorio en: {channel}"
-reminder_user_insufficient_permissions: "No tienes suficientes permisos para enviar tu recordatorio en: {channel}"
+reminder_user_insufficient_permissions: "No tienes suficientes permisos para enviar tu recordatorio en: {channel}"\
+attempting_to_join: "Intentando unirse a {channel}..."

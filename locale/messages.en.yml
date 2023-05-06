@@ -526,3 +526,4 @@ feature_unavailable: "This feature is unavailable right now!"
 # OTHER MESSAGES I'M TOO LAZY TO ORGANIZE
 reminder_insufficient_permissions: "I do not have enough permissions to send your reminder in: {channel}"
 reminder_user_insufficient_permissions: "You do not have enough permissions to send your reminder in: {channel}"
+attempting_to_join: "Attempting to join {channel}..."

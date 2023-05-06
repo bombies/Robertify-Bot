@@ -189,6 +189,11 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return editOriginalEmbeds(supplier(embedUtils))
         }
 
+        fun InteractionHook.editEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): WebhookMessageEditAction<Message> {
+            val embedUtils = getGuildUtils(guild)
+            return editOriginalEmbeds(embedUtils.embed(message, *placeholders))
+        }
+
         inline fun MessageChannel.sendEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(supplier(embedUtils))

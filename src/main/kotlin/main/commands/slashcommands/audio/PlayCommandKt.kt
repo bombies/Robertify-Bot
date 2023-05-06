@@ -236,7 +236,6 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
     private fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
         val guild = event.guild!!
-        val channel = event.channel.asGuildMessageChannel()
         val member = event.member!!
 
         when (file.fileExtension?.lowercase()) {
@@ -279,7 +278,6 @@ class PlayCommandKt : AbstractSlashCommandKt(
                                     audioManager.loadAndPlay(
                                         trackUrl = file.path,
                                         memberVoiceState = memberVoiceState,
-                                        messageChannel = channel,
                                         botMessage = addingMsg
                                     )
                                 }

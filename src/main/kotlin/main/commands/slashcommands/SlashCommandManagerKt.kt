@@ -16,6 +16,7 @@ import main.commands.slashcommands.management.requestchannel.RequestChannelComma
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.commands.slashcommands.misc.EightBallCommandKt
 import main.commands.slashcommands.misc.PingCommandKt
+import main.commands.slashcommands.misc.PlaytimeCommandKt
 import main.commands.slashcommands.misc.polls.PollCommandKt
 import main.commands.slashcommands.misc.reminders.RemindersCommandKt
 import main.commands.slashcommands.util.*
@@ -82,7 +83,8 @@ object SlashCommandManagerKt {
         PollCommandKt(),
         RemindersCommandKt(),
         EightBallCommandKt(),
-        PingCommandKt()
+        PingCommandKt(),
+        PlaytimeCommandKt()
     )
 
     val utilityCommands: List<AbstractSlashCommandKt> = listOf(
