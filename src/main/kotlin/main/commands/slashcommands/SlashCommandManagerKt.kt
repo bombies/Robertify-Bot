@@ -2,6 +2,7 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
+import main.commands.slashcommands.dev.EvalCommandKt
 import main.commands.slashcommands.dev.ManageSuggestionsCommandKt
 import main.commands.slashcommands.management.*
 import main.commands.slashcommands.management.bans.BanCommandKt
@@ -99,7 +100,8 @@ object SlashCommandManagerKt {
     )
 
     val devCommands: List<AbstractSlashCommandKt> = listOf(
-        ManageSuggestionsCommandKt()
+        ManageSuggestionsCommandKt(),
+        EvalCommandKt()
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
