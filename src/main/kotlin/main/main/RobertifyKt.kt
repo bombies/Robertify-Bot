@@ -18,8 +18,10 @@ import main.events.EventManager
 import main.main.ListenerKt.Companion.loadNeededSlashCommands
 import main.main.ListenerKt.Companion.rescheduleUnbans
 import main.utils.database.mongodb.cache.BotDBCacheKt
+import main.utils.json.locale.LocaleConfigKt
 import main.utils.json.reminders.RemindersConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
+import main.utils.locale.LocaleManagerKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
@@ -33,6 +35,7 @@ import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.reader.ReaderException
 import java.util.Base64
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executors
@@ -212,6 +215,14 @@ object RobertifyKt {
     private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
         val guild = event.guild
         val requestChannelConfig = RequestChannelConfigKt(guild)
+        launch {
+            val locale = LocaleConfigKt(guild).locale
+            try {
+                LocaleManagerKt[guild].locale = locale
+            } catch (e: ReaderException) {
+                logger.error("I couldn't set the locale for ${guild.name}")
+            }
+        }
 
         loadNeededSlashCommands(guild)
         rescheduleUnbans(guild)

@@ -41,17 +41,18 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val localeManager = LocaleManagerKt[event.guild]
 
+        val textFieldPlaceholder = localeManager[SuggestionMessages.SUGGESTION_MODAL_PLACEHOLDER]
         val suggestion = TextInput(
             id = "suggestion:suggestion_field",
-            label = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_LABEL),
-            placeholder = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_PLACEHOLDER),
+            label = localeManager[SuggestionMessages.SUGGESTION_MODAL_LABEL],
+            placeholder = textFieldPlaceholder.substring(0, textFieldPlaceholder.length.coerceAtMost(100)),
             style = TextInputStyle.PARAGRAPH,
         )
 
         event.replyModal(
             Modal(
                 id = "suggestion:modal",
-                title = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_TITLE),
+                title = localeManager[SuggestionMessages.SUGGESTION_MODAL_TITLE],
                 components = listOf(ActionRow.of(suggestion))
             )
         ).queue()
