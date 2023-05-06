@@ -10,6 +10,7 @@ import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
+import main.commands.slashcommands.misc.reminders.RemindersCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
@@ -17,6 +18,7 @@ import main.events.EventManager
 import main.main.ListenerKt.Companion.loadNeededSlashCommands
 import main.main.ListenerKt.Companion.rescheduleUnbans
 import main.utils.database.mongodb.cache.BotDBCacheKt
+import main.utils.json.reminders.RemindersConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.resume.GuildResumeManagerKt
 import net.dv8tion.jda.api.OnlineStatus
@@ -213,7 +215,7 @@ object RobertifyKt {
 
         loadNeededSlashCommands(guild)
         rescheduleUnbans(guild)
-        // TODO: Reschedule reminders
+        RemindersConfigKt(guild).scheduleReminders()
 
         requestChannelConfig.updateMessage()
         GuildResumeManagerKt(guild).loadTracks()

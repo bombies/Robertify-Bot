@@ -1,5 +1,9 @@
 package main.utils.json.reminders
 
+import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import main.utils.json.AbstractGuildConfigKt
 import main.utils.json.GenericJSONFieldKt
 import main.utils.json.reminders.scheduler.ReminderSchedulerKt
@@ -16,6 +20,8 @@ import kotlin.time.toDuration
 class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
 
     companion object {
+        val logger by SLF4J
+
         val validTimeZones = listOf(
             "UTC",
             "EST",
@@ -355,6 +361,65 @@ class RemindersConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild)
         return userArr
             .getJSONObject(getIndexOfObjectInArray(userArr, Fields.USER_ID, uid))
             .getJSONArray(Fields.USER_REMINDERS.toString())
+    }
+
+    suspend fun scheduleReminders() = coroutineScope {
+        launch {
+            logger.debug("Attempting to schedule guild reminders for ${guild.name}")
+            val scheduler = ReminderSchedulerKt(guild)
+
+            if (!guildHasReminders()) {
+                logger.debug("${guild.name} didn't have any reminders to schedule.")
+                return@launch
+            }
+
+            val allGuildUsers = getAllGuildUsers()
+            allGuildUsers.forEach { user ->
+                val reminders = user.reminders
+
+                logger.debug("Attempting to schedule reminder(s) for ${user.id} in ${guild.name}")
+                reminders.forEach { reminder ->
+                    logger.debug(
+                        """
+                        Scheduling reminder with information:
+                        User Id: ${user.id}
+                        Channel Id: ${reminder.channelId}
+                        Hour: ${reminder.hour}
+                        Minute: ${reminder.minute}
+                        Reminder: ${reminder.reminder}
+                        Reminder Id: ${reminder.id}
+                    """.trimIndent()
+                    )
+                    scheduler.scheduleReminder(
+                        user = user.id,
+                        destination = reminder.channelId,
+                        hour = reminder.hour,
+                        minute = reminder.minute,
+                        reminder = reminder.reminder,
+                        reminderId = reminder.id,
+                        timeZone = reminder.timezone.id
+                    )
+                }
+                logger.debug("Scheduled all ${reminders.size} reminder(s) for ${user.id} in ${guild.name}")
+            }
+        }
+    }
+
+    suspend fun unscheduleReminders() = coroutineScope {
+        launch {
+            val scheduler = ReminderSchedulerKt(guild)
+
+            if (!guildHasReminders())
+                return@launch
+
+            val allUsers = getAllGuildUsers()
+            allUsers.forEach { user ->
+                val reminders = user.reminders
+                reminders.forEach { reminder ->
+                    scheduler.removeReminder(user.id, reminder.id)
+                }
+            }
+        }
     }
 
     override fun update() {
