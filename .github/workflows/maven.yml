@@ -39,12 +39,16 @@ jobs:
         REDIS_PORT: 6379
         MONGO_DATABASE_NAME: "RobertifyCI"
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        KTOR_API_PORT: ${{ secrets.KTOR_API_PORT }}
+        KTOR_API_SECRET_KEY: ${{ secrets.KTOR_API_SECRET_KEY }}
       run: |
         touch .env
         echo REDIS_HOSTNAME="$REDIS_HOSTNAME" >> .env
         echo REDIS_PORT="$REDIS_PORT" >> .env
         echo MONGO_DATABASE_NAME="$MONGO_DATABASE_NAME" >> .env
         echo BOT_TOKEN="$BOT_TOKEN" >> .env
+        echo KTOR_API_PORT="$KTOR_API_PORT" >> .env
+        echo KTOR_API_SECRET_KEY="$KTOR_API_SECRET_KEY" >> .env
       shell: bash
     - name: Set up JDK 19
       uses: actions/setup-java@v3
