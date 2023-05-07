@@ -679,4 +679,10 @@ object GeneralUtilsKt {
 
     fun <T> List<T>.coerceAtLeast(min: Int): List<T> =
         this.subList(0, this.size.coerceAtLeast(min))
+
+    fun String.coerceAtMost(max: Int): String =
+        this.substring(0, this.length.coerceAtMost(max))
+
+    fun String.coerceAtLeast(min: Int): String =
+        this.substring(0, this.length.coerceAtLeast(min))
 }

@@ -6,5 +6,6 @@ enum class RemoveMessages : LocaleMessageKt {
     REMOVE_INVALID_ID,
     REMOVED,
     REMOVED_LOG,
-    COULDNT_REMOVE
+    COULDNT_REMOVE,
+    COULDNT_REMOVE_NAME
 }

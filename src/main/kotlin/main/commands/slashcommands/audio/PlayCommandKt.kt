@@ -9,6 +9,7 @@ import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.InteractionLimitsKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
+import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.GeneralUtilsKt.getDestination
 import main.utils.GeneralUtilsKt.isUrl
 import main.utils.GeneralUtilsKt.toUrl
@@ -319,9 +320,10 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
         event.replyChoices(RobertifyKt.spotifyApi.search.searchTrack(query, limit = 25)
             .mapNotNull { option ->
-                val name = "${option?.name} by ${option?.artists?.first()?.name} ${if (option?.explicit == true) "[EXPLICIT]" else ""}"
                 if (option == null) null else Choice(
-                    name.substring(0, name.length.coerceAtMost(InteractionLimitsKt.COMMAND_OPTION_CHOICE_LENGTH)),
+                    "${option.name} by ${option.artists.first().name} ${if (option.explicit) "[EXPLICIT]" else ""}".coerceAtMost(
+                        InteractionLimitsKt.COMMAND_OPTION_CHOICE_LENGTH
+                    ),
                     "https://open.spotify.com/track/${option.id}"
                 )
             })
