@@ -38,14 +38,17 @@ class RandomMessageManagerKt {
             .build()
     }
 
-    fun addMessage(message: String) =
-        BotDBCacheKt.instance.addRandomMessage(message)
+    operator fun plus(message: String) = BotDBCacheKt.instance.addRandomMessage(message)
 
-    fun removeMessage(id: Int) =
-        BotDBCacheKt.instance.removeMessage(id)
+    fun addMessage(message: String) = plus(message)
 
-    fun clearMessages() =
-        BotDBCacheKt.instance.clearMessages()
+    operator fun minus(id: Int) = BotDBCacheKt.instance.removeMessage(id)
+
+    fun removeMessage(id: Int): String = minus(id)
+
+    operator fun unaryMinus() = BotDBCacheKt.instance.clearMessages()
+
+    fun clearMessages() = unaryMinus()
 
     fun randomlySendMessage(channel: GuildMessageChannel) {
         val guild = channel.guild

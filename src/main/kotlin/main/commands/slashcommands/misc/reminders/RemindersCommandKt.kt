@@ -560,7 +560,7 @@ class RemindersCommandKt : AbstractSlashCommandKt(
             Command.Choice(
                 reminder.reminder.substring(
                     0,
-                    reminder.reminder.length.coerceAtMost(99)
+                    reminder.reminder.length.coerceAtMost(100)
                 ), reminder.id.toLong() + 1
             )
         })

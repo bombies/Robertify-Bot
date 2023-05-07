@@ -2,10 +2,7 @@ package main.commands.slashcommands
 
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
-import main.commands.slashcommands.dev.EvalCommandKt
-import main.commands.slashcommands.dev.ManageSuggestionsCommandKt
-import main.commands.slashcommands.dev.NodeInfoCommandKt
-import main.commands.slashcommands.dev.ShardInfoCommandKt
+import main.commands.slashcommands.dev.*
 import main.commands.slashcommands.management.*
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
@@ -25,8 +22,10 @@ import main.commands.slashcommands.misc.reminders.RemindersCommandKt
 import main.commands.slashcommands.util.*
 import main.commands.slashcommands.util.suggestions.SuggestionCommandKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
+import net.dv8tion.jda.api.interactions.modals.ModalMapping
 import net.dv8tion.jda.api.sharding.ShardManager
 
 object SlashCommandManagerKt {
@@ -105,11 +104,15 @@ object SlashCommandManagerKt {
         ManageSuggestionsCommandKt(),
         EvalCommandKt(),
         ShardInfoCommandKt(),
-        NodeInfoCommandKt()
+        NodeInfoCommandKt(),
+        RandomMessageCommandKt()
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
-        this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required!")
+        this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required?")
+
+    fun ModalInteractionEvent.getRequiredValue(id: String): ModalMapping =
+        this.getValue(id) ?: throw NullPointerException("Invalid value \"$id\". Are you sure that value is required?")
 
     fun ShardManager.registerCommand(command: AbstractSlashCommandKt) =
         command.register(this)

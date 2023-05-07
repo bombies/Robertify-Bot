@@ -251,7 +251,7 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val config = EightBallConfigKt(guild)
         val responses = config.responses
         val results = responses.filter { it.lowercase().contains(event.focusedOption.value.lowercase()) }
-            .mapIndexed { i, response -> Choice(response, (i + 1).toLong()) }
+            .mapIndexed { i, response -> Choice(response.substring(0, response.length.coerceAtMost(100)), (i + 1).toLong()) }
 
         event.replyChoices(results).queue()
     }

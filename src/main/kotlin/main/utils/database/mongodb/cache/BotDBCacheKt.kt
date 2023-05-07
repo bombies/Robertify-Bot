@@ -256,12 +256,13 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
         return ret
     }
 
-    fun removeMessage(id: Int) {
+    fun removeMessage(id: Int): String {
         val obj: JSONObject = getDocument()
         val arr = obj.getJSONArray(BotDBKt.Fields.RANDOM_MESSAGES.toString())
         if (id < 0 || id > arr.length() - 1) throw IndexOutOfBoundsException("The ID passed exceeds the bounds of the array!")
-        arr.remove(id)
+        val removedVal = arr.remove(id).toString()
         update(obj)
+        return removedVal
     }
 
     fun clearMessages() {

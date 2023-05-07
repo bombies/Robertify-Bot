@@ -318,8 +318,9 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
         event.replyChoices(RobertifyKt.spotifyApi.search.searchTrack(query, limit = 25)
             .mapNotNull { option ->
+                val name = "${option?.name} by ${option?.artists?.first()?.name} ${if (option?.explicit == true) "[EXPLICIT]" else ""}"
                 if (option == null) null else Choice(
-                    "${option.name} by ${option.artists.first().name} ${if (option.explicit) "[EXPLICIT]" else ""}",
+                    name.substring(0, name.length.coerceAtMost(100)),
                     "https://open.spotify.com/track/${option.id}"
                 )
             })
