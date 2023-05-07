@@ -106,7 +106,8 @@ object SlashCommandManagerKt {
         ShardInfoCommandKt(),
         NodeInfoCommandKt(),
         RandomMessageCommandKt(),
-        ReloadConfigCommandKt()
+        ReloadConfigCommandKt(),
+        ResetPremiumFeaturesCommandKt()
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =

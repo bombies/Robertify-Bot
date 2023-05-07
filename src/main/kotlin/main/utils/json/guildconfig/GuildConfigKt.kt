@@ -55,8 +55,8 @@ class GuildConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
         cache.setField(guild.idLong, GuildDBKt.Field.GUILD_PREFIX, prefix)
     }
 
-    fun setManyFields(builder: ConfigBuilder) {
-        cache.setFields(guild.idLong, builder.build())
+    fun setManyFields(builder: ConfigBuilder.() -> ConfigBuilder) {
+        cache.setFields(guild.idLong, builder(ConfigBuilder()).build())
     }
 
     fun getBannedUsers(): List<BannedUser> {
