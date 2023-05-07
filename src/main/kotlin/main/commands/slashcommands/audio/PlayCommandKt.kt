@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
+import main.constants.InteractionLimitsKt
 import main.main.ConfigKt
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt.getDestination
@@ -320,7 +321,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
             .mapNotNull { option ->
                 val name = "${option?.name} by ${option?.artists?.first()?.name} ${if (option?.explicit == true) "[EXPLICIT]" else ""}"
                 if (option == null) null else Choice(
-                    name.substring(0, name.length.coerceAtMost(100)),
+                    name.substring(0, name.length.coerceAtMost(InteractionLimitsKt.COMMAND_OPTION_CHOICE_LENGTH)),
                     "https://open.spotify.com/track/${option.id}"
                 )
             })

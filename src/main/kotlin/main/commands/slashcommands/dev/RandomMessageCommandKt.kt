@@ -4,6 +4,8 @@ import dev.minn.jda.ktx.interactions.components.Modal
 import dev.minn.jda.ktx.interactions.components.TextInput
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredValue
+import main.constants.InteractionLimitsKt
+import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -139,8 +141,9 @@ class RandomMessageCommandKt : AbstractSlashCommandKt(
         val randomMessageManager = RandomMessageManagerKt()
         val choices = randomMessageManager.messages.mapIndexed { i, msg ->
             Choice(msg.substring(0, msg.length.coerceAtMost(100)), i.toLong() + 1)
-        }
+        }.coerceAtMost(InteractionLimitsKt.AUTO_COMPLETE_CHOICES)
 
-        event.replyChoices(choices).queue()
+        event.replyChoices(choices)
+            .queue()
     }
 }

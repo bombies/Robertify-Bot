@@ -674,4 +674,9 @@ object GeneralUtilsKt {
     fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration, success: Consumer<in T>) =
         queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success)
 
+    fun <T> List<T>.coerceAtMost(max: Int): List<T> =
+        this.subList(0, this.size.coerceAtMost(max))
+
+    fun <T> List<T>.coerceAtLeast(min: Int): List<T> =
+        this.subList(0, this.size.coerceAtLeast(min))
 }

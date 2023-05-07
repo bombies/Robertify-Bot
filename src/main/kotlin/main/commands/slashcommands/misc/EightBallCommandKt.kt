@@ -2,7 +2,9 @@ package main.commands.slashcommands.misc
 
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.BotConstantsKt
+import main.constants.InteractionLimitsKt
 import main.constants.RobertifyPermissionKt
+import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.GeneralUtilsKt.hasPermissions
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
@@ -251,7 +253,14 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val config = EightBallConfigKt(guild)
         val responses = config.responses
         val results = responses.filter { it.lowercase().contains(event.focusedOption.value.lowercase()) }
-            .mapIndexed { i, response -> Choice(response.substring(0, response.length.coerceAtMost(100)), (i + 1).toLong()) }
+            .mapIndexed { i, response ->
+                Choice(
+                    response.substring(
+                        0,
+                        response.length.coerceAtMost(InteractionLimitsKt.COMMAND_OPTION_CHOICE_LENGTH)
+                    ), (i + 1).toLong()
+                )
+            }.coerceAtMost(25)
 
         event.replyChoices(results).queue()
     }

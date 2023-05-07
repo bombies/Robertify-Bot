@@ -239,7 +239,7 @@ object PaginationHandlerKt {
             _name = "menuPage:${user.id}",
             placeholder = "Select an option",
             range = Pair(1, 1),
-            _options = options.subList(0, options.size.coerceAtMost(InteractionLimitsKt.SELECTION_MENU))
+            _options = options.subList(0, options.size.coerceAtMost(InteractionLimitsKt.SELECT_MENU_CHOICES))
         ).build()
 
     fun getPaginatedEmbed(
@@ -335,20 +335,20 @@ object PaginationHandlerKt {
     private fun menuLogic(msgId: String, options: List<StringSelectMenuOptionKt>): List<MenuPageKt> {
         val menuPages = mutableListOf<MenuPageKt>()
 
-        if (options.size <= InteractionLimitsKt.SELECTION_MENU) {
+        if (options.size <= InteractionLimitsKt.SELECT_MENU_CHOICES) {
             val page = MenuPageKt()
             options.forEach { page.addOption(it) }
             menuPages.add(page)
         } else {
-            val pagesRequired = ceil(options.size.toDouble() / InteractionLimitsKt.SELECTION_MENU.toDouble()).toInt()
+            val pagesRequired = ceil(options.size.toDouble() / InteractionLimitsKt.SELECT_MENU_CHOICES.toDouble()).toInt()
             val pageControllers = 1 + ceil(((pagesRequired - 1) * 4) / 2.0).toInt()
             val actualPagesRequired =
-                ceil((options.size + pageControllers).toDouble() / InteractionLimitsKt.SELECTION_MENU).toInt()
+                ceil((options.size + pageControllers).toDouble() / InteractionLimitsKt.SELECT_MENU_CHOICES).toInt()
 
             var lastIndex = 0
             for (i in 0 until actualPagesRequired) {
                 val tempPage = MenuPageKt()
-                for (j in 0 until InteractionLimitsKt.SELECTION_MENU) {
+                for (j in 0 until InteractionLimitsKt.SELECT_MENU_CHOICES) {
                     if (lastIndex == options.size) break
 
                     if (j == 0 && i != 0) {
@@ -361,7 +361,7 @@ object PaginationHandlerKt {
                         continue
                     }
 
-                    if (j == InteractionLimitsKt.SELECTION_MENU - 1) {
+                    if (j == InteractionLimitsKt.SELECT_MENU_CHOICES - 1) {
                         tempPage.addOption(
                             StringSelectMenuOptionKt(
                                 label = "Next Page",

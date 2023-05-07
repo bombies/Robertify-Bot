@@ -5,8 +5,10 @@ import dev.minn.jda.ktx.interactions.components.success
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.commands.slashcommands.audio.SkipCommandKt
+import main.constants.InteractionLimitsKt
 import main.constants.RobertifyEmojiKt
 import main.constants.ToggleKt
+import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -24,8 +26,10 @@ import main.utils.locale.messages.TogglesMessages
 import main.utils.pagination.PaginationHandlerKt
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.Command.Choice
 import net.dv8tion.jda.api.interactions.components.ActionRow
 
 class TogglesCommandKt : AbstractSlashCommandKt(
@@ -65,7 +69,8 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                         options = listOf(
                             CommandOptionKt(
                                 name = "toggle",
-                                description = "The DJ toggle to switch."
+                                description = "The DJ toggle to switch.",
+                                autoComplete = true
                             )
                         )
                     ),
@@ -456,5 +461,21 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                 Pair("{status}", LocaleManagerKt[guild].getMessage(GeneralMessages.ON_STATUS).uppercase())
             ).build()
         }
+    }
+
+    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        if (event.name != "toggles" && event.subcommandGroup != "dj" && event.focusedOption.name != "toggle")
+            return
+
+        val focusedValue = event.focusedOption.value
+        if (focusedValue.isEmpty())
+            return event.replyChoices().queue()
+
+        val musicCommands = SlashCommandManagerKt.musicCommands
+            .filter { it.info.name.lowercase().contains(event.focusedOption.value.lowercase()) }
+            .map { it.info.name }
+            .coerceAtMost(InteractionLimitsKt.AUTO_COMPLETE_CHOICES)
+
+        event.replyChoiceStrings(musicCommands).queue()
     }
 }

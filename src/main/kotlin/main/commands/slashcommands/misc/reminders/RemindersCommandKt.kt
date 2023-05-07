@@ -3,9 +3,11 @@ package main.commands.slashcommands.misc.reminders
 import dev.minn.jda.ktx.util.SLF4J
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.BotConstantsKt
+import main.constants.InteractionLimitsKt
 import main.constants.RobertifyPermissionKt
 import main.constants.ToggleKt
 import main.utils.GeneralUtilsKt
+import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.GeneralUtilsKt.digits
 import main.utils.GeneralUtilsKt.hasPermissions
 import main.utils.GeneralUtilsKt.stripDigits
@@ -560,10 +562,10 @@ class RemindersCommandKt : AbstractSlashCommandKt(
             Command.Choice(
                 reminder.reminder.substring(
                     0,
-                    reminder.reminder.length.coerceAtMost(100)
+                    reminder.reminder.length.coerceAtMost(InteractionLimitsKt.COMMAND_OPTION_CHOICE_LENGTH)
                 ), reminder.id.toLong() + 1
             )
-        })
+        }.coerceAtMost(25))
             .queue()
     }
 
