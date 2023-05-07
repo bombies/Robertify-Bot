@@ -1,5 +1,6 @@
 package api.routes.themes
 
+import api.TEST_SERVER_ID
 import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
@@ -75,7 +76,7 @@ class ThemesKtTest {
                     append(HttpHeaders.Authorization, "Bearer ${accessTokenDto.access_token}")
                 }
                 contentType(ContentType.Application.Json)
-                setBody(ThemeDto("304828928223084546", "green"))
+                setBody(ThemeDto(TEST_SERVER_ID, "green"))
             }.apply {
                 assertEquals(HttpStatusCode.NotFound, status)
             }
