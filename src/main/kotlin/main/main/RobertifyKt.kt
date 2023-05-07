@@ -232,7 +232,7 @@ object RobertifyKt {
         GuildResumeManagerKt(guild).loadTracks()
     }
 
-    private fun initVoteSiteAPIs() {
+    fun initVoteSiteAPIs() {
         if (ConfigKt.TOP_GG_TOKEN.isNotEmpty())
             topGGAPI = DiscordBotListAPI.Builder()
                 .token(ConfigKt.TOP_GG_TOKEN)
