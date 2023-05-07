@@ -422,3 +422,5 @@ reminder_insufficient_permissions: "No tengo suficientes permisos para enviar su
 reminder_user_insufficient_permissions: "No tienes suficientes permisos para enviar tu recordatorio en: {channel}"
 attempting_to_join: "Intentando unirse a {channel}..."
 couldnt_remove_name: "No pude eliminar la pista con el nombre `{name}` de la cola. ¡No existe!"
+queue_search_nothing_found: "No pude encontrar ninguna pista para la consulta: `{title} por {author}`"
+queue_search_item_found: "**Título:** `{title}`\n**Autor:** `{author}`\n**Duración:** `{duration}`\n**Posición en la cola**: `{position}`\n**Solicitado por**: {requester}"

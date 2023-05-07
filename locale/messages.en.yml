@@ -528,3 +528,5 @@ reminder_insufficient_permissions: "I do not have enough permissions to send you
 reminder_user_insufficient_permissions: "You do not have enough permissions to send your reminder in: {channel}"
 attempting_to_join: "Attempting to join {channel}..."
 couldnt_remove_name: "I could not remove track with name `{name}` from the queue. It doesn't exist!"
+queue_search_nothing_found: "I couldn't find any track for the query: `{title} by {author}`"
+queue_search_item_found: "**Title:** `{title}` \n**Author:** `{author}` \n**Duration:** `{duration}` \n**Position in Queue**: `{position}` \n**Requested By**: {requester}"

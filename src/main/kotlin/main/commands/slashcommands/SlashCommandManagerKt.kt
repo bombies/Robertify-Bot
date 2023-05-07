@@ -60,7 +60,8 @@ object SlashCommandManagerKt {
         NightcoreFilterKt(),
         TremoloFilterKt(),
         VibratoFilterKt(),
-        RemoveDuplicatesCommandKt()
+        RemoveDuplicatesCommandKt(),
+        SearchQueueCommand()
     )
 
     val managementCommands: List<AbstractSlashCommandKt> = listOf(
