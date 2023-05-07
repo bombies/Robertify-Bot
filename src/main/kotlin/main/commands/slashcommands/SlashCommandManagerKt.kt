@@ -108,7 +108,8 @@ object SlashCommandManagerKt {
         RandomMessageCommandKt(),
         ReloadConfigCommandKt(),
         ResetPremiumFeaturesCommandKt(),
-        SendAlertCommandKt()
+        SendAlertCommandKt(),
+        UpdateCommandKt()
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
