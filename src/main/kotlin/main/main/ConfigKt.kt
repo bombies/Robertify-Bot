@@ -32,7 +32,7 @@ class ConfigKt {
          * @param defaultValue The value to return if the key specified doesn't have a value.
          * @return The string attached to the key
          */
-        fun get(key: ENVKt, defaultValue: String?): String {
+        operator fun get(key: ENVKt, defaultValue: String?): String {
             return dotenv[key.toString().uppercase(Locale.getDefault()), defaultValue]
         }
 
@@ -174,7 +174,12 @@ class ConfigKt {
         
         val ROBERTIFY_API_PASSWORD: String
             get() = get(ENVKt.ROBERTIFY_API_PASSWORD)
-        
+
+        val KTOR_API_KEY: String
+            get() = get(ENVKt.KTOR_API_SECRET_KEY)
+
+        val KTOR_API_PORT: Int
+            get() = get(ENVKt.KTOR_API_PORT, "8080").toInt()
         
 
         fun hasValue(value: ENVKt): Boolean {

@@ -90,7 +90,7 @@ class ThemeCommandKt : AbstractSlashCommandKt(
             .queue()
     }
 
-    private fun updateTheme(guild: Guild, theme: RobertifyThemeKt) {
+    fun updateTheme(guild: Guild, theme: RobertifyThemeKt) {
         ThemesConfigKt(guild).theme = theme
         GeneralUtilsKt.setDefaultEmbed(guild)
         RequestChannelConfigKt(guild).updateMessage()

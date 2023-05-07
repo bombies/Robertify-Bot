@@ -49,8 +49,8 @@ enum class ENVKt(private val str: String) {
     ROBERTIFY_WEB_HOSTNAME("robertify_web_hostname"),
     ROBERTIFY_API_PASSWORD("robertify_api_master_password"),
     SENTRY_DSN("sentry_dsn"),
-    SPRING_API_SECRET_KEY("spring_api_secret_key"),
-    SPRING_API_PORT("spring_api_port");
+    KTOR_API_SECRET_KEY("ktor_api_secret_key"),
+    KTOR_API_PORT("ktor_api_port");
 
     override fun toString(): String {
         return str

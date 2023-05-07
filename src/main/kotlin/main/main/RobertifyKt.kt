@@ -1,5 +1,6 @@
 package main.main
 
+import api.RobertifyKtorApi
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
@@ -202,7 +203,7 @@ object RobertifyKt {
 
         // TODO: Sentry setup
 
-        // TODO: Ktor setup
+        RobertifyKtorApi.start()
     }
 
     private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
