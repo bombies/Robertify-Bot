@@ -2,7 +2,6 @@ package main.utils.database.mongodb.cache
 
 import main.utils.database.mongodb.databases.BotDBKt
 import main.utils.json.GenericJSONFieldKt
-import net.dv8tion.jda.internal.utils.tuple.Pair
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,16 +35,16 @@ class BotDBCacheKt private constructor() : AbstractMongoCacheKt(BotDBKt) {
             return try {
                 val alert = alertObj.getString(BotDBKt.Fields.SubFields.ALERT.toString())
                 val alertTime = alertObj.getLong(BotDBKt.Fields.SubFields.ALERT_TIME.toString())
-                Pair.of(alert, alertTime)
+                Pair(alert, alertTime)
             } catch (e: JSONException) {
-                Pair.of("", 0L)
+                Pair("", 0L)
             }
         }
         set(value) {
             val obj: JSONObject = getDocument()
             val alertObj = obj.getJSONObject(BotDBKt.Fields.LATEST_ALERT.toString())
-            val alert = value.left;
-            val time = value.right
+            val alert = value.first;
+            val time = value.second
             alertObj.put(
                 BotDBKt.Fields.SubFields.ALERT.toString(),
                 alert.replace("\\\\n".toRegex(), "\n").replace("\\\\t".toRegex(), "\t")

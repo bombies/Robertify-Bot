@@ -280,9 +280,9 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
         if (SlashCommandManagerKt.isMusicCommand(this)) {
             val botDB = BotDBCacheKt.instance
-            val latestAlert = botDB.latestAlert.left
+            val latestAlert = botDB.latestAlert.first
             val user = event.user
-            if (!botDB.userHasViewedAlert(user.idLong) && !latestAlert.isNullOrEmpty() && latestAlert.isNotBlank()
+            if (!botDB.userHasViewedAlert(user.idLong) && latestAlert.isNotEmpty() && latestAlert.isNotBlank()
                 && SlashCommandManagerKt.isMusicCommand(this)
             ) event.channel.asGuildMessageChannel().sendMessageEmbeds(
                 RobertifyEmbedUtilsKt.embedMessage(

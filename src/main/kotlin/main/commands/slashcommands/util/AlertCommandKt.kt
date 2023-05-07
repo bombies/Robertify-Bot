@@ -25,21 +25,21 @@ class AlertCommandKt : AbstractSlashCommandKt(
         val latestAlert = botDb.latestAlert
         val localeManager = LocaleManagerKt[guild]
 
-        if (latestAlert.left.isNotEmpty() && latestAlert.left.isNotBlank())
+        if (latestAlert.first.isNotEmpty() && latestAlert.first.isNotBlank())
             botDb.addAlertViewer(user.idLong)
 
         event.replyEmbeds(
             RobertifyEmbedUtilsKt.embedMessageWithTitle(
                 guild, AlertMessages.ALERT_EMBED_TITLE,
-                if (latestAlert.left.isEmpty() || latestAlert.left.isBlank())
+                if (latestAlert.first.isEmpty() || latestAlert.first.isBlank())
                     localeManager.getMessage(AlertMessages.NO_ALERT)
-                else latestAlert.left
+                else latestAlert.first
             )
                 .setFooter(
                     localeManager.getMessage(
                         AlertMessages.ALERT_EMBED_FOOTER,
                         Pair("{number}", botDb.getPosOfAlertViewer(user.idLong).toString()),
-                        Pair("{alertDate}", GeneralUtilsKt.formatDate(latestAlert.right, TimeFormatKt.DD_MMMM_YYYY))
+                        Pair("{alertDate}", GeneralUtilsKt.formatDate(latestAlert.second, TimeFormatKt.DD_MMMM_YYYY))
                     )
                 )
                 .build()
