@@ -2,6 +2,7 @@ package main.commands.slashcommands.management
 
 import main.constants.RobertifyPermissionKt
 import main.constants.RobertifyThemeKt
+import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.hasPermissions
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
+import net.dv8tion.jda.api.sharding.ShardManager
 
 class ThemeCommandKt : AbstractSlashCommandKt(
     CommandKt(
@@ -90,10 +92,10 @@ class ThemeCommandKt : AbstractSlashCommandKt(
             .queue()
     }
 
-    fun updateTheme(guild: Guild, theme: RobertifyThemeKt) {
+    fun updateTheme(guild: Guild, theme: RobertifyThemeKt, shardManager: ShardManager = RobertifyKt.shardManager) {
         ThemesConfigKt(guild).theme = theme
         GeneralUtilsKt.setDefaultEmbed(guild)
-        RequestChannelConfigKt(guild).updateMessage()
+        RequestChannelConfigKt(guild, shardManager).updateMessage()
     }
 
     private fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {

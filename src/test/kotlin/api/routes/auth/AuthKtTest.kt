@@ -1,5 +1,6 @@
 package api.routes.auth
 
+import api.defaultTestApplication
 import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
@@ -18,11 +19,7 @@ import kotlin.test.assertFailsWith
 class AuthKtTest {
 
     @Test
-    fun testPostAuthLogin() = testApplication {
-        application {
-            module()
-        }
-
+    fun testPostAuthLogin() = defaultTestApplication {
         val client = createClient {
             install(ContentNegotiation) {
                 json()

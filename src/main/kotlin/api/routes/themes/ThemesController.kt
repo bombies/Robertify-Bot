@@ -46,7 +46,7 @@ fun Routing.themes() {
                 )
             )
 
-            ThemeCommandKt().updateTheme(guild, RobertifyThemeKt.parse(themeDto.theme))
+            ThemeCommandKt().updateTheme(guild, RobertifyThemeKt.parse(themeDto.theme), shardManager)
             call.respond(HttpStatusCode.OK, OkResponse(
                 message = "Successfully set the theme for ${guild.name} to ${themeDto.theme.uppercase()}"
             ))

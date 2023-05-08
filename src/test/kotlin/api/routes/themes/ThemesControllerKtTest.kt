@@ -65,7 +65,7 @@ class ThemesControllerKtTest {
                 contentType(ContentType.Application.Json)
                 setBody(ThemeDto(TEST_SERVER_ID, "green"))
             }.apply {
-                assertEquals(HttpStatusCode.NotFound, status)
+                assertEquals(HttpStatusCode.OK, status)
             }
         }
     }

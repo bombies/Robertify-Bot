@@ -9,11 +9,7 @@ import kotlin.test.*
 class ApiTests {
 
     @Test
-    fun testRoot() = testApplication {
-        application {
-            module()
-        }
-
+    fun testRoot() = defaultTestApplication {
         client.get("/").apply {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals("Welcome to the API!", bodyAsText())
