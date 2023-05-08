@@ -3,14 +3,12 @@ package api.routes.themes
 import api.TEST_SERVER_ID
 import api.createClient
 import api.defaultTestApplication
-import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
 import api.routes.themes.dto.ThemeDto
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.server.testing.*
 import main.main.ConfigKt
 import kotlin.test.Test
 import kotlin.test.assertEquals

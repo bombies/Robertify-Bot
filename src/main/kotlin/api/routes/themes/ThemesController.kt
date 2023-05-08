@@ -1,17 +1,12 @@
 package api.routes.themes
 
-import api.models.response.ExceptionResponse
-import api.models.response.OkResponse
 import api.plugins.routeWithJwt
 import api.routes.themes.dto.ThemeDto
-import api.utils.GuildUtils
-import io.ktor.http.*
+import api.utils.respond
 import io.ktor.server.application.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import main.commands.slashcommands.management.ThemeCommandKt
 import main.constants.RobertifyThemeKt
 import main.utils.GeneralUtilsKt.isDiscordId
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -34,22 +29,12 @@ fun Routing.themes() {
     }
 
     val shardManager: ShardManager by inject()
+    val server = ThemesService(shardManager)
 
     routeWithJwt("/themes") {
         post {
             val themeDto = call.receive<ThemeDto>()
-            val guild = GuildUtils(shardManager).getGuild(themeDto.server_id) ?:
-            return@post call.respond(HttpStatusCode.NotFound,
-                ExceptionResponse(
-                    reason = "There was no guild with id: ${themeDto.server_id}",
-                    status = HttpStatusCode.NotFound
-                )
-            )
-
-            ThemeCommandKt().updateTheme(guild, RobertifyThemeKt.parse(themeDto.theme), shardManager)
-            call.respond(HttpStatusCode.OK, OkResponse(
-                message = "Successfully set the theme for ${guild.name} to ${themeDto.theme.uppercase()}"
-            ))
+            call.respond(server.updateTheme(themeDto))
         }
     }
 }
