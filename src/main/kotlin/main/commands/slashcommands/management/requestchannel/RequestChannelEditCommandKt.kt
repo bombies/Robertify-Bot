@@ -131,9 +131,6 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                             config.updateMessage()
                     }
                     catch (_ : UninitializedPropertyAccessException) {}
-                    catch (_ : IOException) {
-                        logger.warn("IOException thrown. Is config.yml missing?")
-                    }
 
                     return@thenApply RequestChannelKt(
                         channelId = config.channelId,
