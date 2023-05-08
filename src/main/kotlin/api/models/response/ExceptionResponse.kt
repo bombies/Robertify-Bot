@@ -1,10 +1,12 @@
 package api.models.response
 
 import io.ktor.http.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
+@SerialName("exception")
 data class ExceptionResponse(
     override val message: String,
     override val status: Int,

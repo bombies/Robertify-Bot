@@ -1,9 +1,10 @@
 package api.plugins
 
 import api.models.response.ExceptionResponse
-import dev.minn.jda.ktx.util.SLF4J
+import api.utils.respond
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
@@ -21,6 +22,13 @@ fun Application.configureExceptionHandling() {
                     status = HttpStatusCode.BadRequest
                 )
             )
+        }
+
+        exception<BadRequestException> { call, cause  ->
+            call.respond(ExceptionResponse(
+                reason = "Invalid request! Ensure the body is accurate before sending another request!",
+                status = HttpStatusCode.BadRequest
+            ))
         }
 
         exception<Exception> { call, cause ->
