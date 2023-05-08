@@ -2,6 +2,7 @@ package main.main
 
 import io.github.cdimascio.dotenv.Dotenv
 import lombok.SneakyThrows
+import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
 import main.constants.ENVKt
 import main.utils.GeneralUtilsKt
 import main.utils.lavalink.LavaNodeKt
@@ -9,6 +10,7 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.io.File
+import java.io.IOException
 import java.util.*
 
 class ConfigKt {
@@ -45,10 +47,14 @@ class ConfigKt {
 
         val providers: Array<String>
             get() {
-                val config = getConfigJSON()
-                val providers = config.getJSONArray("providers")
-                return providers.map { obj: Any -> obj.toString() }
-                    .toTypedArray()
+                return try {
+                    val config = getConfigJSON()
+                    val providers = config.getJSONArray("providers")
+                    providers.map { obj: Any -> obj.toString() }.toTypedArray()
+                } catch (e: IOException) {
+                    logger.warn("IOException thrown. Is config.yml missing?")
+                    arrayOf()
+                }
             }
 
         val SHARD_COUNT: Int
