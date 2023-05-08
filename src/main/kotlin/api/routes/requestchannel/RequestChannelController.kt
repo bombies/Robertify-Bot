@@ -4,14 +4,23 @@ import api.plugins.routeWithJwt
 import api.routes.requestchannel.dto.CreateRequestChannelDto
 import api.utils.respond
 import io.ktor.server.application.*
+import io.ktor.server.plugins.requestvalidation.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import main.utils.GeneralUtilsKt.isDiscordId
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.koin.ktor.ext.inject
 
 fun Routing.requestChannel() {
-    val shardManager: ShardManager by inject()
+    install(RequestValidation) {
+        validate<CreateRequestChannelDto> { dto ->
+            if (!dto.server_id.isDiscordId())
+                ValidationResult.Invalid("The server id must be a valid Discord id!")
+            ValidationResult.Valid
+        }
+    }
 
+    val shardManager: ShardManager by inject()
     val service = RequestChannelService(shardManager)
 
     routeWithJwt("/reqchannel") {
