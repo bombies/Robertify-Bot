@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.sharding.ShardManager
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
@@ -128,8 +129,11 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                     try {
                         if (RobertifyAudioManagerKt[guild].player.playingTrack != null)
                             config.updateMessage()
-                    } catch (_ : UninitializedPropertyAccessException) {}
-
+                    }
+                    catch (_ : UninitializedPropertyAccessException) {}
+                    catch (_ : IOException) {
+                        logger.warn("IOException thrown. Is config.yml missing?")
+                    }
 
                     return@thenApply RequestChannelKt(
                         channelId = config.channelId,
