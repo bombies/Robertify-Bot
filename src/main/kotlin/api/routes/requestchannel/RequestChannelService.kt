@@ -8,7 +8,6 @@ import api.routes.requestchannel.dto.CreateRequestChannelDto
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
 import api.routes.requestchannel.responses.RequestChannelCreationResponse
-import api.utils.GuildUtils
 import io.ktor.http.*
 import io.ktor.util.logging.*
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt

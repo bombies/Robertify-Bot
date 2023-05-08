@@ -21,12 +21,12 @@ fun Routing.requestChannel() {
             call.respond(service.createChannel(dto))
         }
 
-        post("button") {
+        patch("button") {
             val dto = call.receive<ToggleRequestChannelButtonDto>()
             call.respond(service.toggleButton(dto))
         }
 
-        post("buttons") {
+        patch("buttons") {
             val dto = call.receive<ToggleRequestChannelButtonsDto>()
             call.respond(service.toggleButtons(dto))
         }
