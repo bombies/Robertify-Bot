@@ -1,38 +1,25 @@
 package api.routes.themes
 
 import api.TEST_SERVER_ID
+import api.createClient
+import api.defaultTestApplication
 import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
 import api.routes.themes.dto.ThemeDto
-import api.utils.testModule
 import io.ktor.client.call.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import main.main.ConfigKt
-import main.main.RobertifyKt
-import org.koin.ktor.plugin.Koin
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class ThemesKtTest {
+class ThemesControllerKtTest {
 
     @Test
-    fun testPostTheme() = testApplication {
-        application {
-            module(true)
-        }
-
-        val client = createClient {
-            install(ContentNegotiation) {
-                json()
-            }
-        }
+    fun testPostTheme() = defaultTestApplication {
+        val client = createClient()
 
         // Test no auth
         client.post("/themes") {

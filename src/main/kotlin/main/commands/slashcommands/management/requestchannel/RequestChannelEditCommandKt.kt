@@ -9,6 +9,7 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.audiohandlers.loaders.MainAudioLoaderKt.Companion.queueThenDelete
 import main.constants.RobertifyEmojiKt
 import main.constants.ToggleKt
+import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.toMention
 import main.utils.RobertifyEmbedUtilsKt
@@ -31,6 +32,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
+import net.dv8tion.jda.api.sharding.ShardManager
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
@@ -94,9 +96,9 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         }
     }
 
-    private suspend fun createRequestChannel(guild: Guild): Deferred<RequestChannelKt> = withContext(threadContext) {
+    suspend fun createRequestChannel(guild: Guild, shardManager: ShardManager = RobertifyKt.shardManager): Deferred<RequestChannelKt> = withContext(threadContext) {
         val job = async {
-            val config = RequestChannelConfigKt(guild)
+            val config = RequestChannelConfigKt(guild, shardManager)
 
             val textChannelId = AtomicLong()
             return@async guild.createTextChannel("robertify-requests")
@@ -123,8 +125,11 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                     config.buttonUpdateRequest(message).queue()
                     config.originalAnnouncementToggle = TogglesConfigKt(guild).getToggle(ToggleKt.ANNOUNCE_MESSAGES)
 
-                    if (RobertifyAudioManagerKt[guild].player.playingTrack != null)
-                        config.updateMessage()
+                    try {
+                        if (RobertifyAudioManagerKt[guild].player.playingTrack != null)
+                            config.updateMessage()
+                    } catch (_ : UninitializedPropertyAccessException) {}
+
 
                     return@thenApply RequestChannelKt(
                         channelId = config.channelId,
@@ -135,6 +140,10 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         }
 
         return@withContext job
+    }
+
+    fun deleteRequestChannel(guild: Guild, shardManager: ShardManager = RobertifyKt.shardManager) {
+        RequestChannelConfigKt(guild, shardManager).removeChannel()
     }
 
     private fun handleEdit(event: SlashCommandInteractionEvent) {

@@ -2,11 +2,13 @@ package api.models.response
 
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class ExceptionResponse(
-    val reason: String,
-    val status: Int,
-) {
-    constructor(reason: String, status: HttpStatusCode): this(reason, status.value)
+    override val message: String,
+    override val status: Int,
+    override val data: JsonElement?
+) : GenericResponse {
+    constructor(reason: String, status: HttpStatusCode, data: JsonElement? = null): this(reason, status.value, data)
 }

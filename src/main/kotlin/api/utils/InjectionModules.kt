@@ -10,7 +10,7 @@ val prodModule = module {
     single<ShardManager> { RobertifyKt.shardManager }
 }
 
-val testShardManager by lazy {
+private val testShardManager by lazy {
     defaultShard(
         token = ConfigKt.BOT_TOKEN,
         enableCoroutines = false

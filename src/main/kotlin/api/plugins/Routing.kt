@@ -1,6 +1,7 @@
 package api.plugins
 
 import api.routes.auth.auth
+import api.routes.requestchannel.requestChannel
 import api.routes.themes.themes
 import io.ktor.server.application.*
 import io.ktor.server.response.*
@@ -13,5 +14,6 @@ fun Application.configureRouting() {
         }
         auth()
         themes()
+        requestChannel()
     }
 }

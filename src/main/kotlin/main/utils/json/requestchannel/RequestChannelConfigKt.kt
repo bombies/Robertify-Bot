@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager
 import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.requests.RestAction
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction
+import net.dv8tion.jda.api.sharding.ShardManager
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -42,7 +43,7 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(guild) {
+class RequestChannelConfigKt(private val guild: Guild, private val shardManager: ShardManager = RobertifyKt.shardManager) : AbstractGuildConfigKt(guild) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
@@ -82,7 +83,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     var messageId: Long
         get() {
             if (!isChannelSet()) throw IllegalArgumentException(
-                RobertifyKt.shardManager.getGuildById(guild.idLong)
+                shardManager.getGuildById(guild.idLong)
                     ?.name + "(" + guild.idLong + ") doesn't have a channel set"
             )
             return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
@@ -98,7 +99,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     var channelId: Long
         get() {
             if (!isChannelSet()) throw IllegalArgumentException(
-                RobertifyKt.shardManager.getGuildById(guild.idLong)
+                shardManager.getGuildById(guild.idLong)
                     ?.name + "(" + guild.idLong + ") doesn't have a channel set"
             )
             return getGuildObject().getJSONObject(GuildDBKt.Field.REQUEST_CHANNEL_OBJECT.toString())
@@ -124,7 +125,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
         }
 
     val textChannel: TextChannel?
-        get() = RobertifyKt.shardManager.getTextChannelById(channelId)
+        get() = shardManager.getTextChannelById(channelId)
 
     val config: ChannelConfig
         get() = ChannelConfig(this)
@@ -159,7 +160,7 @@ class RequestChannelConfigKt(private val guild: Guild) : AbstractGuildConfigKt(g
     fun removeChannel() {
         if (!isChannelSet())
             throw IllegalArgumentException(
-                "${RobertifyKt.shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
+                "${shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
             )
 
         textChannel?.delete()?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
