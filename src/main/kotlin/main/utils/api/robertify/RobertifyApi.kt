@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import main.main.ConfigKt
 import org.json.JSONObject
-import java.net.ConnectException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.hours
