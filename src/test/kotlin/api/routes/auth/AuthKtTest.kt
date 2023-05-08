@@ -1,15 +1,15 @@
 package api.routes.auth
 
 import api.defaultTestApplication
-import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
+import api.routes.themes.dto.ThemeDto
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.testing.*
+import kotlinx.coroutines.runBlocking
 import main.main.ConfigKt
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.Test
@@ -32,7 +32,9 @@ class AuthKtTest {
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
             assertDoesNotThrow {
-                body<AccessTokenDto>()
+                runBlocking {
+                    body<AccessTokenDto>()
+                }
             }
         }
 
@@ -44,6 +46,14 @@ class AuthKtTest {
             assertFailsWith<NoTransformationFoundException> {
                 body<AccessTokenDto>()
             }
+        }
+
+        // Test no auth
+        client.post("/themes") {
+            contentType(ContentType.Application.Json)
+            setBody(ThemeDto("000000000000000000", "green"))
+        }.apply {
+            assertEquals(HttpStatusCode.Unauthorized, status)
         }
     }
 }

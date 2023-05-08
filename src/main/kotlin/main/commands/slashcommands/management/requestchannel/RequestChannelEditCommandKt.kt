@@ -28,12 +28,14 @@ import main.utils.locale.messages.DedicatedChannelMessages
 import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.sharding.ShardManager
 import java.io.IOException
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
@@ -97,7 +99,10 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         }
     }
 
-    suspend fun createRequestChannel(guild: Guild, shardManager: ShardManager = RobertifyKt.shardManager): Deferred<RequestChannelKt> = withContext(threadContext) {
+    suspend fun createRequestChannel(
+        guild: Guild,
+        shardManager: ShardManager = RobertifyKt.shardManager
+    ): Deferred<RequestChannelKt> = withContext(threadContext) {
         val job = async {
             val config = RequestChannelConfigKt(guild, shardManager)
 
@@ -129,8 +134,8 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                     try {
                         if (RobertifyAudioManagerKt[guild].player.playingTrack != null)
                             config.updateMessage()
+                    } catch (_: UninitializedPropertyAccessException) {
                     }
-                    catch (_ : UninitializedPropertyAccessException) {}
 
                     return@thenApply RequestChannelKt(
                         channelId = config.channelId,
@@ -247,7 +252,12 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         handleChannelButtonToggle(guild, buttonName, event)
     }
 
-    fun handleChannelButtonToggle(guild: Guild, buttonName: String, event: ButtonInteractionEvent? = null, shardManager: ShardManager = RobertifyKt.shardManager) {
+    fun handleChannelButtonToggle(
+        guild: Guild,
+        buttonName: String,
+        event: ButtonInteractionEvent? = null,
+        shardManager: ShardManager = RobertifyKt.shardManager
+    ): CompletableFuture<Message>? {
         val localeManager = LocaleManagerKt[guild]
         val config = RequestChannelConfigKt(guild, shardManager)
         val subConfig = config.config
@@ -338,7 +348,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
             }?.queueThenDelete(15, TimeUnit.SECONDS)
         }
 
-        config.updateButtons()
+        return config.updateButtons()
     }
 
 }

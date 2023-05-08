@@ -52,15 +52,14 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
                 status = HttpStatusCode.BadRequest
             )
 
-        RequestChannelEditCommandKt().handleChannelButtonToggle(guild, dto.button.lowercase(), shardManager = shardManager)
+        RequestChannelEditCommandKt()
+            .handleChannelButtonToggle(guild, dto.button.lowercase(), shardManager = shardManager)
+            ?.join()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
     }
 
     suspend fun toggleButtons(dto: ToggleRequestChannelButtonsDto): GenericResponse {
-        val guild = guildUtils.getGuild(dto.server_id) ?: return ExceptionResponse(
-            reason = "There was no guild with id: ${dto.server_id}",
-            status = HttpStatusCode.NotFound
-        )
+        val guild = guildUtils.getGuild(dto.server_id) ?: return noGuild(dto.server_id)
 
         val config = RequestChannelConfigKt(guild, shardManager)
         if (!config.isChannelSet())
@@ -70,7 +69,9 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
             )
 
         dto.buttons.forEach { button ->
-            RequestChannelEditCommandKt().handleChannelButtonToggle(guild, button.lowercase(), shardManager = shardManager)
+            RequestChannelEditCommandKt()
+                .handleChannelButtonToggle(guild, button.lowercase(), shardManager = shardManager)
+                ?.join()
         }
 
         return OkResponse("Successfully toggled the ${dto.buttons.joinToString(", ")} buttons in ${guild.name}")
