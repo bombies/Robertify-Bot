@@ -1,5 +1,6 @@
 package api.plugins
 
+import api.models.response.ExceptionResponse
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import io.ktor.http.*
@@ -34,7 +35,10 @@ fun Application.configureAuthentication() {
             }
 
             challenge { _, _ ->
-                call.respond(HttpStatusCode.Unauthorized, "Unauthorized!")
+                call.respond(ExceptionResponse(
+                    reason = "Unauthorized",
+                    status = HttpStatusCode.Unauthorized
+                ))
             }
         }
     }
