@@ -12,12 +12,14 @@ import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
 import main.commands.slashcommands.misc.reminders.RemindersCommandKt
+import main.constants.ENVKt
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
 import main.events.EventManager
 import main.main.ListenerKt.Companion.loadNeededSlashCommands
 import main.main.ListenerKt.Companion.rescheduleUnbans
+import main.utils.api.robertify.RobertifyApi
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.locale.LocaleConfigKt
 import main.utils.json.reminders.RemindersConfigKt
@@ -53,6 +55,8 @@ object RobertifyKt {
     lateinit var shardManager: ShardManager
         private set
     lateinit var spotifyApi: SpotifyAppApi
+        private set
+    lateinit var externalApi: RobertifyApi
         private set
 
     private val pool = Executors.newScheduledThreadPool(ForkJoinPool.getCommonPoolParallelism().coerceAtLeast(2)) {
@@ -199,11 +203,12 @@ object RobertifyKt {
             clientSecret = ConfigKt.SPOTIFY_CLIENT_SECRET
         ).build(true)
 
-        // TODO: RobertifyAPI setup
+        if (ConfigKt.hasValue(ENVKt.ROBERTIFY_API_PASSWORD))
+            externalApi = RobertifyApi()
 
         // TODO: Sentry setup
 
-        RobertifyKtorApi.start()
+            RobertifyKtorApi.start()
     }
 
     private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->

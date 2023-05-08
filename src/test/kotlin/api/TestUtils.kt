@@ -24,38 +24,6 @@ fun ApplicationTestBuilder.createClientWithToken(token: String) =
         append(HttpHeaders.Authorization, "Bearer $token")
     })
 
-suspend fun HttpClient.postWithToken(path: String, token: String, block: HttpRequestBuilder.() -> Unit) =
-    post(path) {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer $token")
-        }
-        block()
-    }
-
-suspend fun HttpClient.deleteWithToken(path: String, token: String, block: HttpRequestBuilder.() -> Unit) =
-    delete(path) {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer $token")
-        }
-        block()
-    }
-
-suspend fun HttpClient.getWithToken(path: String, token: String, block: HttpRequestBuilder.() -> Unit) =
-    get(path) {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer $token")
-        }
-        block()
-    }
-
-suspend fun HttpClient.patchWithToken(path: String, token: String, block: HttpRequestBuilder.() -> Unit) =
-    patch(path) {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer $token")
-        }
-        block()
-    }
-
 inline fun defaultTestApplication(crossinline handle: suspend ApplicationTestBuilder.() -> Unit) = testApplication {
     application {
         module(true)

@@ -3,11 +3,11 @@ package api.routes.locale
 import api.TEST_SERVER_ID
 import api.createClient
 import api.defaultTestApplication
-import api.postWithToken
 import io.ktor.client.request.*
 import io.ktor.http.*
 import extensions.authorization.Authorized
 import extensions.authorization.AuthorizedRouteExtension
+import main.utils.api.robertify.postWithToken
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -15,7 +15,8 @@ import kotlin.test.assertEquals
 class LocaleControllerKtTest {
     private val accessToken = AuthorizedRouteExtension.ACCESS_TOKEN
 
-    @Test fun testLocalePostRoute() = defaultTestApplication {
+    @Test
+    fun testLocalePostRoute() = defaultTestApplication {
         val client = createClient()
 
         client.postWithToken("/locale", accessToken) {

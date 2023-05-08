@@ -292,6 +292,12 @@
             <artifactId>koin-ktor</artifactId>
             <version>${koin.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-cio-jvm</artifactId>
+            <version>2.3.0</version>
+            <scope>implementation</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
