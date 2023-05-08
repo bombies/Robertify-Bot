@@ -37,7 +37,11 @@ jobs:
       env:
         REDIS_HOSTNAME: localhost
         REDIS_PORT: 6379
-        MONGO_DATABASE_NAME: "RobertifyCI"
+        MONGO_DATABASE_NAME: "${{ secrets.MONGO_DATABASE_NAME }}"
+        MONGO_USERNAME: "${{ secrets.MONGO_USERNAME }}"
+        MONGO_PASSWORD: "${{ secrets.MONGO_PASSWORD }}"
+        MONGO_HOSTNAME: "${{ secrets.MONGO_HOSTNAME }}"
+        MONGO_CLUSTER_NAME: "${{ secrets.MONGO_CLUSTER_NAME }}"
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         KTOR_API_PORT: ${{ secrets.KTOR_API_PORT }}
         KTOR_API_SECRET_KEY: ${{ secrets.KTOR_API_SECRET_KEY }}
@@ -46,6 +50,10 @@ jobs:
         echo REDIS_HOSTNAME="$REDIS_HOSTNAME" >> .env
         echo REDIS_PORT="$REDIS_PORT" >> .env
         echo MONGO_DATABASE_NAME="$MONGO_DATABASE_NAME" >> .env
+        echo MONGO_USERNAME="$MONGO_USERNAME" >> .env
+        echo MONGO_PASSWORD="$MONGO_PASSWORD" >> .env
+        echo MONGO_HOSTNAME="$MONGO_HOSTNAME" >> .env
+        echo MONGO_CLUSTER_NAME="$MONGO_CLUSTER_NAME" >> .env
         echo BOT_TOKEN="$BOT_TOKEN" >> .env
         echo KTOR_API_PORT="$KTOR_API_PORT" >> .env
         echo KTOR_API_SECRET_KEY="$KTOR_API_SECRET_KEY" >> .env
