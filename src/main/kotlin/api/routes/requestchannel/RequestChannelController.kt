@@ -2,6 +2,8 @@ package api.routes.requestchannel
 
 import api.plugins.routeWithJwt
 import api.routes.requestchannel.dto.CreateRequestChannelDto
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
 import api.utils.respond
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -20,11 +22,13 @@ fun Routing.requestChannel() {
         }
 
         post("button") {
-
+            val dto = call.receive<ToggleRequestChannelButtonDto>()
+            call.respond(service.toggleButton(dto))
         }
 
         post("buttons") {
-
+            val dto = call.receive<ToggleRequestChannelButtonsDto>()
+            call.respond(service.toggleButtons(dto))
         }
 
         delete("{id}") {

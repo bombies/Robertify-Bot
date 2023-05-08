@@ -244,9 +244,12 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         }
 
         event.deferReply().queue()
+        handleChannelButtonToggle(guild, buttonName, event)
+    }
 
+    fun handleChannelButtonToggle(guild: Guild, buttonName: String, event: ButtonInteractionEvent? = null, shardManager: ShardManager = RobertifyKt.shardManager) {
         val localeManager = LocaleManagerKt[guild]
-        val config = RequestChannelConfigKt(guild)
+        val config = RequestChannelConfigKt(guild, shardManager)
         val subConfig = config.config
         val field: RequestChannelButtonKt
         val button: String
@@ -312,28 +315,27 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
                     localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)
             }
 
-            else -> throw IllegalArgumentException("The button ID \"${event.button.id!!}\" doesn't map to a case to be handled!")
+            else -> throw IllegalArgumentException("The button ID \"${event?.button?.id!!}\" doesn't map to a case to be handled!")
         }
 
         if (subConfig.getState(field)) {
             subConfig.setState(field, false)
-            event.hook.sendEmbed(guild) {
+            event?.hook?.sendEmbed(guild) {
                 embed(
                     DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),
                     Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
                 )
-            }
-                .queueThenDelete(15, TimeUnit.SECONDS)
+            }?.queueThenDelete(15, TimeUnit.SECONDS)
         } else {
             subConfig.setState(field, true)
-            event.hook.sendEmbed(guild) {
+            event?.hook?.sendEmbed(guild) {
                 embed(
                     DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
                     Pair("{button}", button),
                     Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
                 )
-            }.queueThenDelete(15, TimeUnit.SECONDS)
+            }?.queueThenDelete(15, TimeUnit.SECONDS)
         }
 
         config.updateButtons()

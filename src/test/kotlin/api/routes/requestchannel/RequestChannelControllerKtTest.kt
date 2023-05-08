@@ -7,6 +7,8 @@ import api.module
 import api.routes.auth.models.AccessTokenDto
 import api.routes.auth.models.LoginDto
 import api.routes.requestchannel.dto.CreateRequestChannelDto
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto
+import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.request.request
@@ -36,6 +38,37 @@ class RequestChannelControllerKtTest {
                 }
                 contentType(ContentType.Application.Json)
                 setBody(CreateRequestChannelDto(TEST_SERVER_ID))
+            }.apply {
+                assertEquals(HttpStatusCode.OK, status)
+            }
+
+            // Toggle some buttons
+            client.post("/reqchannel/button") {
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer ${accessTokenDto.access_token}")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(ToggleRequestChannelButtonDto(TEST_SERVER_ID, "pnp"))
+            }.apply {
+                assertEquals(HttpStatusCode.OK, status)
+            }
+
+            client.post("/reqchannel/button") {
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer ${accessTokenDto.access_token}")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(ToggleRequestChannelButtonDto(TEST_SERVER_ID, "invalidbutton"))
+            }.apply {
+                assertEquals(HttpStatusCode.BadRequest, status)
+            }
+
+            client.post("/reqchannel/buttons") {
+                headers {
+                    append(HttpHeaders.Authorization, "Bearer ${accessTokenDto.access_token}")
+                }
+                contentType(ContentType.Application.Json)
+                setBody(ToggleRequestChannelButtonsDto(TEST_SERVER_ID, listOf("pnp", "skip", "shuffle")))
             }.apply {
                 assertEquals(HttpStatusCode.OK, status)
             }
