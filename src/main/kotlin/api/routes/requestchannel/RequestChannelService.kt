@@ -3,6 +3,7 @@ package api.routes.requestchannel
 import api.models.response.ExceptionResponse
 import api.models.response.GenericResponse
 import api.models.response.OkResponse
+import api.models.service.AbstractGuildService
 import api.routes.requestchannel.dto.CreateRequestChannelDto
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonDto
 import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
@@ -15,20 +16,14 @@ import main.utils.json.requestchannel.RequestChannelConfigKt
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.sharding.ShardManager
 
-class RequestChannelService(private val shardManager: ShardManager) {
+class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(shardManager) {
 
     companion object {
         private val logger = KtorSimpleLogger("RequestChannelService")
     }
 
-
-    private val guildUtils = GuildUtils(shardManager)
-
     suspend fun createChannel(createChannelDto: CreateRequestChannelDto): GenericResponse {
-        val guild = guildUtils.getGuild(createChannelDto.server_id) ?: return ExceptionResponse(
-            reason = "There was no guild with id: ${createChannelDto.server_id}",
-            status = HttpStatusCode.NotFound
-        )
+        val guild = guildUtils.getGuild(createChannelDto.server_id) ?: return noGuild(createChannelDto.server_id)
 
         return try {
             val channel = RequestChannelEditCommandKt().createRequestChannel(guild, shardManager).await()
@@ -48,10 +43,7 @@ class RequestChannelService(private val shardManager: ShardManager) {
     }
 
     suspend fun toggleButton(dto: ToggleRequestChannelButtonDto): GenericResponse {
-        val guild = guildUtils.getGuild(dto.server_id) ?: return ExceptionResponse(
-            reason = "There was no guild with id: ${dto.server_id}",
-            status = HttpStatusCode.NotFound
-        )
+        val guild = guildUtils.getGuild(dto.server_id) ?: return noGuild(dto.server_id)
 
         val config = RequestChannelConfigKt(guild, shardManager)
         if (!config.isChannelSet())
@@ -85,10 +77,7 @@ class RequestChannelService(private val shardManager: ShardManager) {
     }
 
     suspend fun deleteChannel(id: String): GenericResponse {
-        val guild = guildUtils.getGuild(id) ?: return ExceptionResponse(
-            reason = "There was no guild with id: $id",
-            status = HttpStatusCode.NotFound
-        )
+        val guild = guildUtils.getGuild(id) ?: return noGuild(id)
 
         return try {
             RequestChannelEditCommandKt().deleteRequestChannel(guild, shardManager)

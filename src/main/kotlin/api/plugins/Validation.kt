@@ -1,5 +1,6 @@
 package api.plugins
 
+import api.routes.locale.validateLocaleDto
 import api.routes.requestchannel.dto.*
 import api.routes.themes.dto.validateThemeDto
 import io.ktor.server.application.*
@@ -11,5 +12,6 @@ fun Application.configureValidation() {
         validateCreateRequestChannelDto()
         validateToggleRequestChannelButtonDto()
         validateToggleRequestChannelButtonsDto()
+        validateLocaleDto()
     }
 }

@@ -1,6 +1,7 @@
 package api.plugins
 
 import api.routes.auth.auth
+import api.routes.locale.locale
 import api.routes.requestchannel.requestChannel
 import api.routes.themes.themes
 import io.ktor.server.application.*
@@ -15,5 +16,6 @@ fun Application.configureRouting() {
         auth()
         themes()
         requestChannel()
+        locale()
     }
 }

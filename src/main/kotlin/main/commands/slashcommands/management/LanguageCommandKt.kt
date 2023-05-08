@@ -1,5 +1,6 @@
 package main.commands.slashcommands.management
 
+import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOptionKt
@@ -11,9 +12,11 @@ import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.RobertifyLocaleKt
 import main.utils.locale.messages.LanguageCommandMessages
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
+import net.dv8tion.jda.api.sharding.ShardManager
 
 class LanguageCommandKt : AbstractSlashCommandKt(
     CommandKt(
@@ -80,9 +83,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
         event.deferReply(true).queue()
 
         val (_, locale) = event.selectedOptions.first().value.split(":")
-        val newLocale = RobertifyLocaleKt.parse(locale)
-        LocaleManagerKt[guild].locale = newLocale
-        RequestChannelConfigKt(guild).updateAll()
+        val newLocale = setLocale(guild, locale)
 
         event.hook.sendEmbed(guild) {
             embed(
@@ -90,5 +91,12 @@ class LanguageCommandKt : AbstractSlashCommandKt(
                 Pair("{language}", newLocale.localName)
             )
         }.queue()
+    }
+
+    fun setLocale(guild: Guild, locale: String, shardManager: ShardManager = RobertifyKt.shardManager): RobertifyLocaleKt {
+        val newLocale = RobertifyLocaleKt.parse(locale)
+        LocaleManagerKt[guild].locale = newLocale
+        RequestChannelConfigKt(guild, shardManager).updateAll()
+        return newLocale
     }
 }
