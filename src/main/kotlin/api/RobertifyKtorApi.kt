@@ -24,5 +24,6 @@ fun Application.module(test: Boolean = false) {
     configureSerialization()
     configureAuthentication()
     configureExceptionHandling()
+    configureValidation()
     configureRouting()
 }
