@@ -7,6 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import extensions.authorization.Authorized
 import extensions.authorization.AuthorizedRouteExtension
+import io.ktor.client.statement.*
 import main.utils.api.robertify.postWithToken
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,39 +20,56 @@ class LocaleControllerKtTest {
     fun testLocalePostRoute() = defaultTestApplication {
         val client = createClient()
 
-        client.postWithToken("/locale", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(LocaleDto(TEST_SERVER_ID, "spanish"))
-        }.apply {
-            assertEquals(HttpStatusCode.OK, status)
+        client.postWithToken<HttpResponse>(
+            path = "/locale",
+            token = accessToken,
+            block = {
+                setBody(LocaleDto(TEST_SERVER_ID, "spanish"))
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.OK, this!!.status)
         }
 
-        client.postWithToken("/locale", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(LocaleDto(TEST_SERVER_ID, "en"))
-        }.apply {
-            assertEquals(HttpStatusCode.OK, status)
+        client.postWithToken<HttpResponse>(
+            path = "/locale",
+            token = accessToken,
+            block = {
+                setBody(LocaleDto(TEST_SERVER_ID, "en"))
+
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.OK, this!!.status)
         }
 
-        client.postWithToken("/locale", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(LocaleDto("000000000000000000", "en"))
-        }.apply {
-            assertEquals(HttpStatusCode.NotFound, status)
+        client.postWithToken<HttpResponse>(
+            path = "/locale",
+            token = accessToken,
+            block = {
+                setBody(LocaleDto("000000000000000000", "en"))
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.NotFound, this!!.status)
         }
 
-        client.postWithToken("/locale", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(LocaleDto("invalid_id", "en"))
-        }.apply {
-            assertEquals(HttpStatusCode.BadRequest, status)
+        client.postWithToken<HttpResponse>(
+            path = "/locale",
+            token = accessToken,
+            block = {
+                setBody(LocaleDto("invalid_id", "en"))
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.BadRequest, this!!.status)
         }
 
-        client.postWithToken("/locale", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(LocaleDto("000000000000000000", "invalid_locale"))
-        }.apply {
-            assertEquals(HttpStatusCode.BadRequest, status)
+        client.postWithToken<HttpResponse>(
+            path = "/locale",
+            token = accessToken,
+            block = {
+                setBody(LocaleDto("000000000000000000", "invalid_locale"))
+
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.BadRequest, this!!.status)
         }
     }
 }

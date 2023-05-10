@@ -31,11 +31,14 @@ class RequestChannelControllerKtTest {
         val client = createClient()
 
         // Create the channel
-        client.postWithToken("/reqchannel", accessToken) {
-            contentType(ContentType.Application.Json)
-            setBody(CreateRequestChannelDto(TEST_SERVER_ID))
-        }.apply {
-            assertEquals(HttpStatusCode.OK, status)
+        client.postWithToken<HttpResponse>(
+            path = "/reqchannel",
+            token = accessToken,
+            block = {
+                setBody(CreateRequestChannelDto(TEST_SERVER_ID))
+            }
+        ).apply {
+            assertEquals(HttpStatusCode.OK, this!!.status)
         }
     }
 
@@ -46,7 +49,6 @@ class RequestChannelControllerKtTest {
 
         // Toggle some buttons
         client.patchWithToken("/reqchannel/button", accessToken) {
-            contentType(ContentType.Application.Json)
             setBody(ToggleRequestChannelButtonDto(TEST_SERVER_ID, "pnp"))
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
