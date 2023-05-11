@@ -110,7 +110,7 @@ class ConfigKt {
             get() = hasValue(ENVKt.GATEWAY_URL)
 
         val ENVIRONMENT: String
-            get() = get(ENVKt.ENVIRONMENT)
+            get() = get(ENVKt.ENVIRONMENT, "dev")
 
         val BOT_NAME: String
             get() = get(ENVKt.BOT_NAME)
@@ -186,7 +186,9 @@ class ConfigKt {
 
         val KTOR_API_PORT: Int
             get() = get(ENVKt.KTOR_API_PORT, "8080").toInt()
-        
+
+        val SENTRY_DSN: String
+            get() = get(ENVKt.SENTRY_DSN, "")
 
         fun hasValue(value: ENVKt): Boolean {
             val valueString = get(value)

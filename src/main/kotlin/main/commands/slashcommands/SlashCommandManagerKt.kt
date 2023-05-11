@@ -3,6 +3,7 @@ package main.commands.slashcommands
 import main.commands.slashcommands.audio.*
 import main.commands.slashcommands.audio.filters.*
 import main.commands.slashcommands.dev.*
+import main.commands.slashcommands.dev.test.TestSentryCommand
 import main.commands.slashcommands.management.*
 import main.commands.slashcommands.management.bans.BanCommandKt
 import main.commands.slashcommands.management.bans.UnbanCommandKt
@@ -111,7 +112,8 @@ object SlashCommandManagerKt {
         ResetPremiumFeaturesCommandKt(),
         SendAlertCommandKt(),
         UpdateCommandKt(),
-        PostCommandInfoCommand()
+        PostCommandInfoCommand(),
+        TestSentryCommand()
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =

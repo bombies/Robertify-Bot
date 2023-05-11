@@ -6,6 +6,7 @@ import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.jdabuilder.defaultShard
+import io.sentry.Sentry
 import kotlinx.coroutines.*
 import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
@@ -65,6 +66,12 @@ object RobertifyKt {
 
     @JvmStatic
     fun main(args: Array<String>) = runBlocking {
+        if (ConfigKt.hasValue(ENVKt.SENTRY_DSN))
+            Sentry.init { options ->
+                options.dsn = ConfigKt.SENTRY_DSN
+                options.environment = ConfigKt.ENVIRONMENT
+            }
+
         // Setup graceful shutdown hooks
         val mainShutdownHook = ThreadFactoryBuilder()
             .setNameFormat("RobertifyShutdownHook")
@@ -206,9 +213,7 @@ object RobertifyKt {
         if (ConfigKt.hasValue(ENVKt.ROBERTIFY_API_PASSWORD))
             externalApi = RobertifyApi()
 
-        // TODO: Sentry setup
-
-            RobertifyKtorApi.start()
+        RobertifyKtorApi.start()
     }
 
     private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->

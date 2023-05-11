@@ -69,7 +69,7 @@ suspend fun <T> HttpClient.handleGenericMethodWithError(
     when (it) {
         is ResponseException -> if (errorHandler != null) errorHandler(it) else throw it
         is ConnectException -> {
-            logger.error("I couldn't connect to the API!")
+            logger.error("I couldn't make a request because the connection doesn't exist!")
             null
         }
 
