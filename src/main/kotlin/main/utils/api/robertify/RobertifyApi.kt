@@ -65,11 +65,11 @@ class RobertifyApi {
     }
 
     private suspend fun getAccessToken(): String {
-        val dto = client.get("/auth/login") {
+        val dto = client.post("/auth/login") {
             contentType(ContentType.Application.Json)
             setBody(LoginDto("bombies", ConfigKt.ROBERTIFY_API_PASSWORD))
         }.body<AccessTokenDto>()
-        return "Bearer ${dto.access_token}"
+        return dto.access_token
     }
 
     suspend fun postCommandInfo(commandInfo: JSONObject) =

@@ -44,8 +44,9 @@ suspend inline fun <reified T> HttpClient.postWithToken(
 ) = handleGenericMethodWithError(
     block = {
         val token = flowToken.single()
+
         val response = post(path) {
-            io.ktor.http.headers {
+            headers {
                 append(HttpHeaders.Authorization, "Bearer $token")
             }
             contentType(contentType)

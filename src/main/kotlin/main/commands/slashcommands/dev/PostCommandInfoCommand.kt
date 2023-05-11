@@ -55,14 +55,14 @@ class PostCommandInfoCommand : AbstractSlashCommandKt(
                 val err = JSONObject(response.bodyAsText()).getString("message")
                 event.hook.sendEmbed(
                     guild,
-                    "There was an issue attempting to post commands! Check console for more information.\n\nError Message:\n```$err```\nError Code:\n```${response.status.value}```"
+                    "There was an issue attempting to post commands! Check console for more information.\n\nError Message:\n```$err```\nError Code:`${response.status.value}`"
                 )
                     .queue()
                 logger.error("There was an error when trying to POST commands: $err")
             } catch (e: JSONException) {
                 event.hook.sendEmbed(
                     guild,
-                    "There was an issue attempting to post commands! Check console for more information.\n\nError Code:\n```${response.status.value}```"
+                    "There was an issue attempting to post commands! Check console for more information.\n\nError Code:`${response.status.value}`"
                 )
                     .queue()
                 logger.error(response.bodyAsText())
