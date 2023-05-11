@@ -228,7 +228,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val split = event.componentId.split(":")
         if (event.user.id != split[2])
-            return event.replyEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
+            return event.replyEmbed(GeneralMessages.NO_PERMS_BUTTON)
                 .setEphemeral(true)
                 .queue()
 
@@ -242,7 +242,6 @@ class TogglesCommandKt : AbstractSlashCommandKt(
 
                 config.setDJToggle(skipCommand, false)
                 event.replyEmbed(
-                    guild,
                     TogglesMessages.DJ_TOGGLED,
                     Pair("{command}", "skip"),
                     Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
@@ -252,7 +251,7 @@ class TogglesCommandKt : AbstractSlashCommandKt(
             }
 
             "no" -> {
-                event.replyEmbed(guild, GeneralMessages.OK).setEphemeral(true).queue()
+                event.replyEmbed(GeneralMessages.OK).setEphemeral(true).queue()
             }
         }
 
@@ -305,7 +304,6 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                 val musicCommands = SlashCommandManagerKt.musicCommands
                 TogglesConfigKt(guild).setDJToggle(musicCommands, true)
                 event.replyEmbed(
-                    guild,
                     TogglesMessages.ALL_DJ_TOGGLED,
                     Pair("{status}", LocaleManagerKt[guild].getMessage(GeneralMessages.ON_STATUS).uppercase())
                 ).queue()
@@ -315,7 +313,6 @@ class TogglesCommandKt : AbstractSlashCommandKt(
                 val musicCommands = SlashCommandManagerKt.musicCommands
                 TogglesConfigKt(guild).setDJToggle(musicCommands, false)
                 event.replyEmbed(
-                    guild,
                     TogglesMessages.ALL_DJ_TOGGLED,
                     Pair("{status}", LocaleManagerKt[guild].getMessage(GeneralMessages.OFF_STATUS).uppercase())
                 ).queue()

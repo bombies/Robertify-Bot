@@ -35,7 +35,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(event.channel.asGuildMessageChannel())) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
             }.queue()
             return
@@ -43,7 +43,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
 
         val query = event.getRequiredOption("query").asString
 
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embed(
                 SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
@@ -76,7 +76,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (event.user.id != id) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(GeneralMessages.NO_MENU_PERMS)
             }.setEphemeral(true)
                 .queue()
@@ -100,7 +100,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         }
 
         val trackQuery = event.selectedOptions.first().value
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
@@ -123,7 +123,7 @@ class SearchCommandKt : AbstractSlashCommandKt(
         when (id.lowercase()) {
             "end" -> {
                 if (event.user.id != searcherId)
-                    event.replyEmbed(guild) {
+                    event.replyEmbed {
                         embed(GeneralMessages.NO_PERMS_END_INTERACTION)
                     }.setEphemeral(true)
                         .queue()

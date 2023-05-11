@@ -44,7 +44,7 @@ class ThemeCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (choice == null) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(
                     title = ThemeMessages.THEME_EMBED_TITLE,
                     description = ThemeMessages.THEME_EMBED_DESC
@@ -55,7 +55,6 @@ class ThemeCommandKt : AbstractSlashCommandKt(
             val theme = RobertifyThemeKt.parse(choice.asString)
             updateTheme(guild, theme)
             event.replyEmbed(
-                guild,
                 ThemeMessages.THEME_SET,
                 Pair("{theme}", theme.name.replace("_", " "))
             ).setEphemeral(true)
@@ -69,14 +68,13 @@ class ThemeCommandKt : AbstractSlashCommandKt(
 
         if (!event.member!!.hasPermissions(RobertifyPermissionKt.ROBERTIFY_THEME))
             return event.replyEmbed(
-                guild,
                 GeneralMessages.INSUFFICIENT_PERMS,
                 Pair("{permissions}", RobertifyPermissionKt.ROBERTIFY_THEME.name)
             ).setEphemeral(true)
                 .queue()
 
         if (event.componentId.split(":")[2] != event.user.id)
-            return event.replyEmbed(guild, GeneralMessages.NO_MENU_PERMS)
+            return event.replyEmbed(GeneralMessages.NO_MENU_PERMS)
                 .setEphemeral(true)
                 .queue()
 
@@ -84,7 +82,7 @@ class ThemeCommandKt : AbstractSlashCommandKt(
         val theme = RobertifyThemeKt.parse(optionSelected.value.split(":")[1].lowercase())
         updateTheme(guild, theme)
 
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embedBuilder(ThemeMessages.THEME_SET, Pair("{theme}", theme.name.replace("_", " ")))
                 .setImage(theme.transparent)
                 .build()

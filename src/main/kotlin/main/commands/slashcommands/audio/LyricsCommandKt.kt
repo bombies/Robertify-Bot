@@ -64,7 +64,7 @@ class LyricsCommandKt : AbstractSlashCommandKt(
             else -> event.getOption("song")!!.asString
         }
 
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embed(LyricsMessages.LYRICS_SEARCHING, Pair("{query}", query))
         }.queue { lookingMsg ->
             val geniusAPI = GeniusAPIKt()

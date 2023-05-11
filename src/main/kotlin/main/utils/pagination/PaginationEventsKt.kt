@@ -102,7 +102,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                         .queue()
                 }
 
-                else -> event.replyEmbed(event.guild) {
+                else -> event.replyEmbed {
                     embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }
@@ -228,7 +228,7 @@ class PaginationEventsKt : AbstractEventControllerKt() {
                     )
                 }
 
-                else -> event.replyEmbed(event.guild) {
+                else -> event.replyEmbed {
                     embed(GeneralMessages.NO_PERMS_BUTTON)
                 }.setEphemeral(true).queue()
             }

@@ -40,7 +40,7 @@ class SearchQueueCommand : AbstractSlashCommandKt(
         val queueHandler = scheduler.queueHandler
 
         if (queueHandler.isEmpty)
-            return event.replyEmbed(guild, GeneralMessages.NOTHING_IN_QUEUE).queue()
+            return event.replyEmbed(GeneralMessages.NOTHING_IN_QUEUE).queue()
 
         val titleQuery = event.getRequiredOption("title").asString
         val authorQuery = event.getRequiredOption("author").asString
@@ -48,7 +48,6 @@ class SearchQueueCommand : AbstractSlashCommandKt(
             it.title.lowercase().startsWith(titleQuery.lowercase().trim()) && it.author.lowercase()
                 .contains(authorQuery.lowercase().trim())
         } ?: return event.replyEmbed(
-            guild,
             SearchQueueMessages.QUEUE_SEARCH_NOTHING_FOUND,
             Pair("{title}", titleQuery),
             Pair("{author}", authorQuery)

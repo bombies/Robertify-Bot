@@ -43,7 +43,7 @@ class NodeInfoCommandKt : AbstractSlashCommandKt(CommandKt(
                 """.trimIndent()
             }
         }```"
-        event.replyEmbed(event.guild, desc).setEphemeral(true).queue()
+        event.replyEmbed(desc).setEphemeral(true).queue()
     }
 
 }

@@ -29,7 +29,7 @@ class QueueCommandKt : AbstractSlashCommandKt(
         val queueHandler = musicManager.scheduler.queueHandler
 
         if (queueHandler.isEmpty) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(GeneralMessages.NOTHING_IN_QUEUE)
             }.queue()
             return

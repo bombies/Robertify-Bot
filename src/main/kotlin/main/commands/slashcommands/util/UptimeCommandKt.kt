@@ -17,7 +17,6 @@ class UptimeCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed(
-            event.guild,
             GeneralUtilsKt.getDurationString(System.currentTimeMillis() - BotDBCacheKt.instance.lastStartup)
         )
             .queue()

@@ -48,7 +48,7 @@ class SendAlertCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val alert = event.getRequiredValue("send_alert:alert").asString
         cachedAlert = alert
-        event.replyEmbed(guild, "Are you sure you want to send out this alert?\n\n${alert.replace("\\n", "\n")}")
+        event.replyEmbed("Are you sure you want to send out this alert?\n\n${alert.replace("\\n", "\n")}")
             .setActionRow(
                 success(
                     id = "sendalert:yes",
@@ -75,12 +75,12 @@ class SendAlertCommandKt : AbstractSlashCommandKt(
         when (action) {
             "yes" -> {
                 BotDBCacheKt.instance.latestAlert = Pair(cachedAlert!!, System.currentTimeMillis())
-                event.replyEmbed(guild, "You have sent out a new alert!")
+                event.replyEmbed("You have sent out a new alert!")
                     .queue()
             }
 
             "no" -> {
-                event.replyEmbed(guild, "Okay! I will not send out that alert.")
+                event.replyEmbed("Okay! I will not send out that alert.")
                     .queue()
             }
 

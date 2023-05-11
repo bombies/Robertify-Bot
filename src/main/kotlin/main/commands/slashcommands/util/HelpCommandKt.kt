@@ -83,7 +83,7 @@ class HelpCommandKt : AbstractSlashCommandKt(
         val guild = event.guild
 
         if (event.componentId.split(":")[2] != event.user.id)
-            return event.replyEmbed(guild, GeneralMessages.NO_MENU_PERMS).queue()
+            return event.replyEmbed(GeneralMessages.NO_MENU_PERMS).queue()
 
         when (event.selectedOptions.first().value) {
             "help:management" -> event.editMessageEmbeds(getHelpEmbed(guild, HelpType.MANAGEMENT)).queue()

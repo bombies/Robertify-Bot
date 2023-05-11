@@ -101,7 +101,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
         val tracks = config.getTracks(member.idLong)
 
         if (tracks.isEmpty()) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(FavouriteTracksMessages.NO_FAV_TRACKS)
             }
                 .setEphemeral(true)
@@ -259,7 +259,7 @@ class FavouriteTracksCommandKt : AbstractSlashCommandKt(
             return
         }
 
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()

@@ -21,7 +21,7 @@ class RemoveDuplicatesCommandKt : AbstractSlashCommandKt(CommandKt(
             .queueHandler
 
         if (queueHandler.isEmpty)
-            return event.replyEmbed(guild) {
+            return event.replyEmbed {
                 embed(GeneralMessages.NOTHING_IN_QUEUE)
             }.queue()
 

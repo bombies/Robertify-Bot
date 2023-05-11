@@ -89,7 +89,6 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermissionKt.ROBERTIFY_8BALL))
             return event.replyEmbed(
-                guild,
                 BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_8BALL)
             ).setEphemeral(true).queue()
 
@@ -97,12 +96,12 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val response = event.getRequiredOption("response").asString
 
         if (config.responses.map { it.lowercase() }.contains(response.lowercase()))
-            return event.replyEmbed(guild, EightBallMessages.ALREADY_A_RESPONSE).setEphemeral(true).queue()
+            return event.replyEmbed(EightBallMessages.ALREADY_A_RESPONSE).setEphemeral(true).queue()
 
         // Add the response
         config + response
 
-        event.replyEmbed(guild, EightBallMessages.ADDED_RESPONSE, Pair("{response}", response)).setEphemeral(true)
+        event.replyEmbed(EightBallMessages.ADDED_RESPONSE, Pair("{response}", response)).setEphemeral(true)
             .queue()
     }
 
@@ -111,7 +110,6 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermissionKt.ROBERTIFY_8BALL))
             return event.replyEmbed(
-                guild,
                 BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_8BALL)
             ).setEphemeral(true).queue()
 
@@ -119,10 +117,9 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val id = event.getRequiredOption("id").asInt - 1
 
         if (id < 0 || id >= config.responses.size)
-            return event.replyEmbed(guild, EightBallMessages.NOT_A_RESPONSE).setEphemeral(true).queue()
+            return event.replyEmbed(EightBallMessages.NOT_A_RESPONSE).setEphemeral(true).queue()
 
         event.replyEmbed(
-            guild,
             EightBallMessages.REMOVED_RESPONSE,
             // Remove the response
             Pair("{response}", config - id)
@@ -136,14 +133,13 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermissionKt.ROBERTIFY_8BALL))
             return event.replyEmbed(
-                guild,
                 BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_8BALL)
             ).setEphemeral(true).queue()
 
         // Clear responses
         -EightBallConfigKt(guild)
 
-        event.replyEmbed(guild, EightBallMessages.CLEARED_RESPONSES)
+        event.replyEmbed(EightBallMessages.CLEARED_RESPONSES)
             .setEphemeral(true)
             .queue()
     }
@@ -153,7 +149,6 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermissionKt.ROBERTIFY_8BALL))
             return event.replyEmbed(
-                guild,
                 BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_8BALL)
             ).setEphemeral(true).queue()
 
@@ -161,14 +156,14 @@ class EightBallCommandKt : AbstractSlashCommandKt(
         val responses = config.responses
 
         if (responses.isEmpty())
-            return event.replyEmbed(guild, EightBallMessages.NO_CUSTOM_RESPONSES)
+            return event.replyEmbed(EightBallMessages.NO_CUSTOM_RESPONSES)
                 .setEphemeral(true)
                 .queue()
 
         val display = responses.mapIndexed { i, response ->
             "*$i* → $response"
         }.joinToString("\n")
-        event.replyEmbed(guild, EightBallMessages.LIST_OF_RESPONSES, Pair("{responses}", display))
+        event.replyEmbed(EightBallMessages.LIST_OF_RESPONSES, Pair("{responses}", display))
             .setEphemeral(true)
             .queue()
     }
@@ -240,7 +235,7 @@ class EightBallCommandKt : AbstractSlashCommandKt(
             )
         ).build()
 
-        event.replyEmbed(guild) { embed }.queue()
+        event.replyEmbed { embed }.queue()
     }
 
     override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {

@@ -22,12 +22,12 @@ class LogCommandKt : AbstractSlashCommandKt(
 
         try {
             LogUtilsKt(guild).createChannel()
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(LogChannelMessages.LOG_CHANNEL_SUCCESSFUL_SETUP)
             }.setEphemeral(true)
                 .queue()
         } catch (e: IllegalArgumentException) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(LogChannelMessages.LOG_CHANNEL_ALREADY_SETUP)
             }
                 .setEphemeral(true)

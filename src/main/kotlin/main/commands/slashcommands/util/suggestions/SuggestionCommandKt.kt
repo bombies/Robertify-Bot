@@ -66,20 +66,20 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
     private fun handleSuggestionModal(event: ModalInteractionEvent) {
         val guild = event.guild
         val suggestion = event.getValue("suggestion:suggestion_field")?.asString
-            ?: return event.replyEmbed(guild, SuggestionMessages.INVALID_SUGGESTION).queue()
+            ?: return event.replyEmbed(SuggestionMessages.INVALID_SUGGESTION).queue()
 
         val config = BotDBCacheKt.instance
         val pendingChannel = event.jda.shardManager!!.getTextChannelById(config.suggestionsPendingChannelId)
 
         if (!config.suggestionSetup) {
             logger.warn("The suggestion channels aren't setup!")
-            return event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+            return event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
                 .setEphemeral(true)
                 .queue()
         }
 
         if (config.userIsSuggestionBanned(event.user.idLong))
-            return event.replyEmbed(guild, SuggestionMessages.SUGGESTION_USER_BANNED)
+            return event.replyEmbed(SuggestionMessages.SUGGESTION_USER_BANNED)
                 .setEphemeral(true)
                 .queue()
 
@@ -104,7 +104,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
             )
             .queue()
 
-        return event.replyEmbed(guild, SuggestionMessages.SUGGESTION_SUBMITTED)
+        return event.replyEmbed(SuggestionMessages.SUGGESTION_SUBMITTED)
             .setEphemeral(true)
             .queue()
     }
@@ -131,7 +131,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                     val acceptedChannel = shardManager.getTextChannelById(config.suggestionsAcceptedChannelId)
                     if (acceptedChannel == null) {
                         logger.warn("The accepted suggestion channel isn't setup!")
-                        return@queue event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+                        return@queue event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
                             .setEphemeral(true)
                             .queue()
                     }
@@ -173,7 +173,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
                     val deniedChannel = shardManager.getTextChannelById(config.suggestionsDeniedChannelId)
                     if (deniedChannel == null) {
                         logger.warn("The denied suggestion channel isn't setup!")
-                        return@queue event.replyEmbed(guild, GeneralMessages.FEATURE_UNAVAILABLE)
+                        return@queue event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
                             .setEphemeral(true)
                             .queue()
                     }
@@ -221,7 +221,7 @@ class SuggestionCommandKt : AbstractSlashCommandKt(
         val config = BotDBCacheKt.instance
         val guild = event.guild
         if (!config.isDeveloper(event.user.idLong))
-            return event.replyEmbed(guild, GeneralMessages.NO_PERMS_BUTTON)
+            return event.replyEmbed(GeneralMessages.NO_PERMS_BUTTON)
                 .setEphemeral(true)
                 .queue()
 

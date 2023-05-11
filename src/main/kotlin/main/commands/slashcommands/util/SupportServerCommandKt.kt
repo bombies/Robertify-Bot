@@ -17,7 +17,7 @@ class SupportServerCommandKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed(event.guild, SupportServerMessages.JOIN_SUPPORT_SERVER)
+        event.replyEmbed(SupportServerMessages.JOIN_SUPPORT_SERVER)
             .setEphemeral(true)
             .setActionRow(
                 link(

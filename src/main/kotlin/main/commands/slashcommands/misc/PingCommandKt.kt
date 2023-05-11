@@ -14,7 +14,7 @@ class PingCommandKt : AbstractSlashCommandKt(CommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.jda.restPing.queue { ping ->
-            event.replyEmbed(event.guild, """
+            event.replyEmbed("""
                 🏓 **Pong!**
                 
                 REST Ping: **${ping}ms**

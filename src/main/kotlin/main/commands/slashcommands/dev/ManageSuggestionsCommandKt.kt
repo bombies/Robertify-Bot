@@ -94,7 +94,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (!config.suggestionSetup)
-            return event.replyEmbed(guild, "The suggestions category must be setup before changing these channels!")
+            return event.replyEmbed("The suggestions category must be setup before changing these channels!")
                 .setEphemeral(true)
                 .queue()
 
@@ -106,18 +106,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         when (secondaryCommand) {
             "accepted" -> {
                 if (channel.idLong == currentAccepted)
-                    return event.replyEmbed(guild, "That is already the accepted channel!")
+                    return event.replyEmbed("That is already the accepted channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentPending || channel.idLong == currentDenied)
-                    return event.replyEmbed(guild, "You may not set the accepted channel to that channel!")
+                    return event.replyEmbed("You may not set the accepted channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsAcceptedChannelId = channel.idLong
                 event.replyEmbed(
-                    guild,
                     "You have successfully set the accepted suggestions channel to ${channel.asMention}"
                 )
                     .setEphemeral(true)
@@ -126,18 +125,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
 
             "denied" -> {
                 if (channel.idLong == currentDenied)
-                    return event.replyEmbed(guild, "That is already the denied channel!")
+                    return event.replyEmbed("That is already the denied channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentAccepted || channel.idLong == currentPending)
-                    return event.replyEmbed(guild, "You may not set the denied channel to that channel!")
+                    return event.replyEmbed("You may not set the denied channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsDeniedChannelId = channel.idLong
                 event.replyEmbed(
-                    guild,
                     "You have successfully set the denied suggestions channel to ${channel.asMention}"
                 )
                     .setEphemeral(true)
@@ -146,18 +144,17 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
 
             "pending" -> {
                 if (channel.idLong == currentPending)
-                    return event.replyEmbed(guild, "That is already the pending channel!")
+                    return event.replyEmbed("That is already the pending channel!")
                         .setEphemeral(true)
                         .queue()
 
                 if (channel.idLong == currentAccepted || channel.idLong == currentDenied)
-                    return event.replyEmbed(guild, "You may not set the pending channel to that channel!")
+                    return event.replyEmbed("You may not set the pending channel to that channel!")
                         .setEphemeral(true)
                         .queue()
 
                 config.suggestionsPendingChannelId = channel.idLong
                 event.replyEmbed(
-                    guild,
                     "You have successfully set the pending suggestions channel to ${channel.asMention}"
                 )
                     .setEphemeral(true)
@@ -173,7 +170,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
         event.deferReply(true).queue()
 
         if (config.suggestionSetup)
-            return event.replyEmbed(guild, "The suggestions channels have already been setup!")
+            return event.replyEmbed("The suggestions channels have already been setup!")
                 .setEphemeral(true)
                 .queue()
 
@@ -212,7 +209,7 @@ class ManageSuggestionsCommandKt : AbstractSlashCommandKt(
     private fun handleReset(event: SlashCommandInteractionEvent) {
         val config = BotDBCacheKt.instance
         config.resetSuggestionsConfig()
-        event.replyEmbed(event.guild!!, "Successfully reset the suggestions config")
+        event.replyEmbed("Successfully reset the suggestions config")
             .setEphemeral(true)
             .queue()
     }

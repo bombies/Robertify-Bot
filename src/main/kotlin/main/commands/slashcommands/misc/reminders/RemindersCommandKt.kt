@@ -204,7 +204,7 @@ class RemindersCommandKt : AbstractSlashCommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         if (!TogglesConfigKt(guild)[ToggleKt.REMINDERS])
-            return event.replyEmbed(guild, GeneralMessages.DISABLED_FEATURE).queue()
+            return event.replyEmbed(GeneralMessages.DISABLED_FEATURE).queue()
 
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
@@ -230,7 +230,6 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val channelId = channel?.idLong ?: -1L
         if (config.channelIsBanned(channelId))
             return event.replyEmbed(
-                guild,
                 ReminderMessages.CANNOT_SET_BANNED_REMINDER_CHANNEL,
                 Pair("{channel}", channelId.toMention(GeneralUtilsKt.Mentioner.CHANNEL))
             )
@@ -243,14 +242,12 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         if (channel != null) {
             if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND))
                 return event.replyEmbed(
-                    guild,
                     ReminderMessages.REMINDER_INSUFFICIENT_PERMISSIONS,
                     Pair("{channel}", channel.asMention)
                 ).setEphemeral(true).queue()
 
             if (!member.hasPermission(channel, Permission.MESSAGE_SEND))
                 return event.replyEmbed(
-                    guild,
                     ReminderMessages.REMINDER_INSUFFICIENT_USER_PERMISSIONS,
                     Pair("{channel}", channel.asMention)
                 ).setEphemeral(true).queue()
@@ -278,7 +275,7 @@ class RemindersCommandKt : AbstractSlashCommandKt(
                 reminderId = config[member.idLong]!!.size - 1,
                 timeZone = timeZone
             )
-        event.replyEmbed(guild, ReminderMessages.REMINDER_ADDED).setEphemeral(true).queue()
+        event.replyEmbed(ReminderMessages.REMINDER_ADDED).setEphemeral(true).queue()
     }
 
     private fun handleRemove(event: SlashCommandInteractionEvent) {
@@ -288,13 +285,13 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val reminders = config[member.idLong]
 
         if (reminders.isNullOrEmpty())
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS)
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS)
                 .setEphemeral(true)
                 .queue()
 
         val id = event.getRequiredOption("id").asInt - 1
         if (id < 0 || id >= reminders.size)
-            return event.replyEmbed(guild, ReminderMessages.INVALID_REMINDER_ID)
+            return event.replyEmbed(ReminderMessages.INVALID_REMINDER_ID)
                 .setEphemeral(true)
                 .queue()
 
@@ -302,7 +299,7 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         config - Pair(member.idLong, id)
 
         ReminderSchedulerKt(guild).removeReminder(member.idLong, id)
-        event.replyEmbed(guild, ReminderMessages.REMINDER_REMOVED, Pair("{reminder}", reminders[id].reminder))
+        event.replyEmbed(ReminderMessages.REMINDER_REMOVED, Pair("{reminder}", reminders[id].reminder))
             .setEphemeral(true)
             .queue()
     }
@@ -313,11 +310,11 @@ class RemindersCommandKt : AbstractSlashCommandKt(
 
         return try {
             config - event.user.idLong
-            event.replyEmbed(guild, ReminderMessages.REMINDERS_CLEARED).setEphemeral(true).queue()
+            event.replyEmbed(ReminderMessages.REMINDERS_CLEARED).setEphemeral(true).queue()
         } catch (e: NullPointerException) {
-            event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
         } catch (e: Exception) {
-            event.replyEmbed(guild, GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
+            event.replyEmbed(GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
         }
     }
 
@@ -327,18 +324,18 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val config = RemindersConfigKt(guild)
 
         if (!config.userHasReminders(user.idLong))
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
         val reminders = config[user.idLong]
         if (reminders.isNullOrEmpty())
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
         val listString = reminders.mapIndexed { i, reminder ->
             val nextTimeStamp = getNextUnixTimestamp(reminder)
             "**${i + 1}.** - ${reminder.reminder} <t:$nextTimeStamp:t> (<t:$nextTimeStamp:R>)"
         }.joinToString("\n")
 
-        event.replyEmbed(guild, listString).setEphemeral(true).queue()
+        event.replyEmbed(listString).setEphemeral(true).queue()
     }
 
     private fun handleEdit(event: SlashCommandInteractionEvent) {
@@ -358,25 +355,25 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val user = event.member!!
 
         if (!config.userHasReminders(user.idLong))
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
         try {
             val reminders = config.getReminders(user.idLong)
             if (reminders.isNullOrEmpty())
-                return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+                return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
             if (id < 0 || id > reminders.size)
-                return event.replyEmbed(guild, ReminderMessages.NO_REMINDER_WITH_ID).setEphemeral(true).queue()
+                return event.replyEmbed(ReminderMessages.NO_REMINDER_WITH_ID).setEphemeral(true).queue()
 
             val selfMember = guild.selfMember
 
             if (channel != null) {
                 if (!selfMember.hasPermission(channel, Permission.MESSAGE_SEND))
-                    return event.replyEmbed(guild, ReminderMessages.REMINDER_INSUFFICIENT_PERMISSIONS)
+                    return event.replyEmbed(ReminderMessages.REMINDER_INSUFFICIENT_PERMISSIONS)
                         .setEphemeral(true)
                         .queue()
                 if (!user.hasPermission(channel, Permission.MESSAGE_SEND))
-                    return event.replyEmbed(guild, ReminderMessages.REMINDER_INSUFFICIENT_USER_PERMISSIONS)
+                    return event.replyEmbed(ReminderMessages.REMINDER_INSUFFICIENT_USER_PERMISSIONS)
                         .setEphemeral(true)
                         .queue()
             }
@@ -397,18 +394,17 @@ class RemindersCommandKt : AbstractSlashCommandKt(
                 )
 
             return if (channel == null)
-                event.replyEmbed(guild, ReminderMessages.REMINDER_CHANNEL_REMOVED, Pair("{id}", (id + 1).toString()))
+                event.replyEmbed(ReminderMessages.REMINDER_CHANNEL_REMOVED, Pair("{id}", (id + 1).toString()))
                     .setEphemeral(true)
                     .queue()
             else event.replyEmbed(
-                guild,
                 ReminderMessages.REMINDER_CHANNEL_CHANGED,
                 Pair("{id}", (id + 1).toString()),
                 Pair("{channel}", channel.asMention)
             ).setEphemeral(true).queue()
         } catch (e: Exception) {
             logger.error("Unexpected error", e)
-            return event.replyEmbed(guild, GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
+            return event.replyEmbed(GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
         }
     }
 
@@ -422,14 +418,14 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val (timeInMillis, hour, minute) = handleTimeParsing(event, time) ?: return
 
         if (!config.userHasReminders(user.idLong))
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
         val reminders = config[user.idLong]
         if (reminders.isNullOrEmpty())
-            return event.replyEmbed(guild, ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.NO_REMINDERS).setEphemeral(true).queue()
 
         if (id < 0 || id >= reminders.size)
-            return event.replyEmbed(guild, ReminderMessages.INVALID_REMINDER_ID).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.INVALID_REMINDER_ID).setEphemeral(true).queue()
 
         return try {
             config.editReminderTime(user.idLong, id, timeInMillis)
@@ -445,7 +441,6 @@ class RemindersCommandKt : AbstractSlashCommandKt(
                     timeZone = reminder.timezone.id
                 )
             event.replyEmbed(
-                guild,
                 ReminderMessages.REMINDER_TIME_CHANGED,
                 Pair("{time}", time),
                 Pair("{id}", (id + 1).toString())
@@ -454,7 +449,7 @@ class RemindersCommandKt : AbstractSlashCommandKt(
                 .queue()
         } catch (e: Exception) {
             logger.error("An unexpected error occurred", e)
-            event.replyEmbed(guild, GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
+            event.replyEmbed(GeneralMessages.UNEXPECTED_ERROR).setEphemeral(true).queue()
         }
     }
 
@@ -472,10 +467,10 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val config = RemindersConfigKt(guild)
 
         if (config.channelIsBanned(channel.idLong))
-            return event.replyEmbed(guild, ReminderMessages.REMINDER_CHANNEL_ALREADY_BANNED).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.REMINDER_CHANNEL_ALREADY_BANNED).setEphemeral(true).queue()
 
         config.banChannel(channel.idLong)
-        event.replyEmbed(guild, BanMessages.USER_PERM_BANNED_RESPONSE, Pair("{user}", channel.asMention))
+        event.replyEmbed(BanMessages.USER_PERM_BANNED_RESPONSE, Pair("{user}", channel.asMention))
             .setEphemeral(true)
             .queue()
     }
@@ -486,10 +481,10 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val config = RemindersConfigKt(guild)
 
         if (config.userIsBanned(user.idLong))
-            return event.replyEmbed(guild, BanMessages.USER_ALREADY_BANNED).setEphemeral(true).queue()
+            return event.replyEmbed(BanMessages.USER_ALREADY_BANNED).setEphemeral(true).queue()
 
         config.banUser(user.idLong)
-        event.replyEmbed(guild, BanMessages.USER_PERM_BANNED_RESPONSE, Pair("{user}", user.asMention))
+        event.replyEmbed(BanMessages.USER_PERM_BANNED_RESPONSE, Pair("{user}", user.asMention))
             .setEphemeral(true)
             .queue()
     }
@@ -508,10 +503,10 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val config = RemindersConfigKt(guild)
 
         if (!config.channelIsBanned(channel.idLong))
-            return event.replyEmbed(guild, ReminderMessages.REMINDER_CHANNEL_NOT_BANNED).setEphemeral(true).queue()
+            return event.replyEmbed(ReminderMessages.REMINDER_CHANNEL_NOT_BANNED).setEphemeral(true).queue()
 
         config.unbanChannel(channel.idLong)
-        event.replyEmbed(guild, UnbanMessages.USER_UNBANNED_RESPONSE, Pair("{user}", channel.asMention))
+        event.replyEmbed(UnbanMessages.USER_UNBANNED_RESPONSE, Pair("{user}", channel.asMention))
             .setEphemeral(true)
             .queue()
     }
@@ -522,10 +517,10 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val config = RemindersConfigKt(guild)
 
         if (!config.userIsBanned(user.idLong))
-            return event.replyEmbed(guild, UnbanMessages.USER_NOT_BANNED).setEphemeral(true).queue()
+            return event.replyEmbed(UnbanMessages.USER_NOT_BANNED).setEphemeral(true).queue()
 
         config.unbanUser(user.idLong)
-        event.replyEmbed(guild, UnbanMessages.USER_UNBANNED_RESPONSE, Pair("{user}", user.asMention))
+        event.replyEmbed(UnbanMessages.USER_UNBANNED_RESPONSE, Pair("{user}", user.asMention))
             .setEphemeral(true)
             .queue()
     }
@@ -539,7 +534,6 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermissionKt.ROBERTIFY_ADMIN))
             return event.replyEmbed(
-                guild,
                 BotConstantsKt.getInsufficientPermsMessage(guild, RobertifyPermissionKt.ROBERTIFY_ADMIN)
             ).setEphemeral(true).queue()
 
@@ -579,13 +573,13 @@ class RemindersCommandKt : AbstractSlashCommandKt(
         } catch (e: IllegalArgumentException) {
             when {
                 e.message?.contains("minute") == true ->
-                    event.replyEmbed(guild, GeneralMessages.INVALID_MINUTE).setEphemeral(true).queue()
+                    event.replyEmbed(GeneralMessages.INVALID_MINUTE).setEphemeral(true).queue()
 
                 e.message?.contains("hour") == true ->
-                    event.replyEmbed(guild, GeneralMessages.INVALID_HOUR).setEphemeral(true).queue()
+                    event.replyEmbed(GeneralMessages.INVALID_HOUR).setEphemeral(true).queue()
 
                 e.message?.contains("time") == true ->
-                    event.replyEmbed(guild, ReminderMessages.REMINDER_INVALID_TIME_FORMAT).setEphemeral(true)
+                    event.replyEmbed(ReminderMessages.REMINDER_INVALID_TIME_FORMAT).setEphemeral(true)
                         .queue()
 
                 else -> throw e

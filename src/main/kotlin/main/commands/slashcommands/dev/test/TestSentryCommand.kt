@@ -14,7 +14,7 @@ class TestSentryCommand : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed(message = "Crashing! Check Sentry to see if the error was pushed.")
+        event.replyEmbed("Crashing! Check Sentry to see if the error was pushed.")
             .setEphemeral(true)
             .queue()
         throw RuntimeException("Forced exception!")

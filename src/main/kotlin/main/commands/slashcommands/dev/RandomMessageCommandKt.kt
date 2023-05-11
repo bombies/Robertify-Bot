@@ -80,29 +80,27 @@ class RandomMessageCommandKt : AbstractSlashCommandKt(
     }
 
     private fun handleRemove(event: SlashCommandInteractionEvent) {
-        val guild = event.guild!!
         val randomMessageManager = RandomMessageManagerKt()
         val id = event.getRequiredOption("id").asInt - 1
 
         try {
             val removed = randomMessageManager - id
-            event.replyEmbed(guild, "Successfully removed random message:\n\n$removed")
+            event.replyEmbed("Successfully removed random message:\n\n$removed")
                 .setEphemeral(true)
                 .queue()
         } catch (e: IndexOutOfBoundsException) {
-            event.replyEmbed(guild, e.message ?: "Index out of bounds")
+            event.replyEmbed(e.message ?: "Index out of bounds")
                 .setEphemeral(true)
                 .queue()
         }
     }
 
     private fun handleList(event: SlashCommandInteractionEvent) {
-        val guild = event.guild!!
         val randomMessageManager = RandomMessageManagerKt()
         val messages = randomMessageManager.messages
 
         if (messages.isEmpty())
-            return event.replyEmbed(guild, "There are no random messages")
+            return event.replyEmbed("There are no random messages")
                 .setEphemeral(true)
                 .queue()
 
@@ -110,13 +108,12 @@ class RandomMessageCommandKt : AbstractSlashCommandKt(
             "**$i**:\n```$message```"
         }.joinToString("\n")
 
-        event.replyEmbed(guild, desc).setEphemeral(true).queue()
+        event.replyEmbed(desc).setEphemeral(true).queue()
     }
 
     private fun handleClear(event: SlashCommandInteractionEvent) {
-        val guild = event.guild!!
         -RandomMessageManagerKt()
-        event.replyEmbed(guild, "Successfully cleared all messages!")
+        event.replyEmbed("Successfully cleared all messages!")
             .setEphemeral(true)
             .queue()
     }
@@ -125,13 +122,12 @@ class RandomMessageCommandKt : AbstractSlashCommandKt(
         if (!event.modalId.startsWith("random_message:")) return
         val (_, modalType) = event.modalId.split(":")
         val randomMessageManager = RandomMessageManagerKt()
-        val guild = event.guild!!
 
         when (modalType) {
             "new" -> {
                 val message = event.getRequiredValue("random_message_modal:new_message").asString
                 randomMessageManager + message
-                event.replyEmbed(guild, "Added a new random message:\n\n$message").setEphemeral(true).queue()
+                event.replyEmbed("Added a new random message:\n\n$message").setEphemeral(true).queue()
             }
         }
     }

@@ -97,7 +97,7 @@ class PollCommandKt : AbstractSlashCommandKt(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         if (!TogglesConfigKt(guild)[ToggleKt.POLLS])
-            return event.replyEmbed(guild, GeneralMessages.DISABLED_FEATURE)
+            return event.replyEmbed(GeneralMessages.DISABLED_FEATURE)
                 .setEphemeral(true)
                 .queue()
 
@@ -120,7 +120,6 @@ class PollCommandKt : AbstractSlashCommandKt(
                 duration.set(GeneralUtilsKt.getStaticTime(durationStr))
             } catch (e: Exception) {
                 return event.replyEmbed(
-                    guild,
                     e.message ?: localeManager.getMessage(GeneralMessages.UNEXPECTED_ERROR)
                 )
                     .setEphemeral(true)
@@ -173,7 +172,7 @@ class PollCommandKt : AbstractSlashCommandKt(
                 if (endPoll.get())
                     doPollEnd(msg, event.user, question, choices, duration.get())
 
-                event.replyEmbed(guild, PollMessages.POLL_SENT)
+                event.replyEmbed(PollMessages.POLL_SENT)
                     .setEphemeral(true)
                     .queue()
 

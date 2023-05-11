@@ -24,7 +24,7 @@ class ListDJCommandKt : AbstractSlashCommandKt(CommandKt(
         val roles = PermissionsCommandKt().getRolesForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
         val users = PermissionsCommandKt().getUsersForPermission(RobertifyPermissionKt.ROBERTIFY_DJ, config)
 
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embedBuilder(
                 PermissionsMessages.PERMISSION_LIST,
                 Pair("{permission}", RobertifyPermissionKt.ROBERTIFY_DJ.name)

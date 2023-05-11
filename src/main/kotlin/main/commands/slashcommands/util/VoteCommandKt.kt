@@ -14,7 +14,7 @@ class VoteCommandKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed(event.guild, GeneralMessages.VOTE_EMBED_DESC)
+        event.replyEmbed(GeneralMessages.VOTE_EMBED_DESC)
             .setActionRow(
                 link(
                     url = "https://top.gg/bot/893558050504466482/vote",

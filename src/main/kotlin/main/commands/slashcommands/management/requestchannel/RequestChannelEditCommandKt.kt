@@ -74,7 +74,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
 
         if (RequestChannelConfigKt(guild).isChannelSet()) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(DedicatedChannelMessages.DEDICATED_CHANNEL_ALREADY_SETUP)
             }.queue()
             return
@@ -157,7 +157,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val config = RequestChannelConfigKt(guild)
 
         if (!config.isChannelSet()) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(DedicatedChannelMessages.DEDICATED_CHANNEL_NOT_SET)
             }.queue()
             return
@@ -240,7 +240,7 @@ class RequestChannelEditCommandKt : AbstractSlashCommandKt(
         val guild = event.guild!!
         val (_, buttonName, allowedUserId) = event.button.id!!.split(":")
         if (allowedUserId != event.user.id) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(GeneralMessages.NO_PERMS_BUTTON)
             }
                 .setEphemeral(true)

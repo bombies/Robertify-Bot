@@ -481,7 +481,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
             if (!event.isFromGuild)
                 true
             else if (!event.member!!.hasPermissions(*info.requiredPermissions.toTypedArray())) {
-                event.replyEmbed(event.guild!!) {
+                event.replyEmbed {
                     embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, *info.requiredPermissions.toTypedArray()))
                 }.setEphemeral(true)
                     .queue()

@@ -40,7 +40,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
         val language = event.getOption("language")?.asString
 
         if (language == null) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(
                     LanguageCommandMessages.LANGUAGE_EMBED_DESC,
                     Pair("{language}", "${localeManager.locale.name} ${localeManager.locale.flag}")
@@ -63,7 +63,7 @@ class LanguageCommandKt : AbstractSlashCommandKt(
             val newLocale = RobertifyLocaleKt.parse(language)
             localeManager.locale = newLocale
             RequestChannelConfigKt(guild).updateAll()
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(
                     LanguageCommandMessages.LANGUAGE_CHANGED,
                     Pair("{language}", newLocale.localName)

@@ -40,7 +40,7 @@ class JoinCommandKt : AbstractSlashCommandKt(
         val selfVoiceState = guild.selfMember.voiceState!!
 
         if (!memberVoiceState.inAudioChannel())
-            return event.replyEmbed(guild, GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
+            return event.replyEmbed(GeneralMessages.USER_VOICE_CHANNEL_NEEDED)
                 .setEphemeral(true)
                 .queue()
 
@@ -50,13 +50,12 @@ class JoinCommandKt : AbstractSlashCommandKt(
 
         if (selfVoiceState.inAudioChannel() && memberVoiceState.channel!!.id == selfVoiceState.channel!!.id)
             return event.replyEmbed(
-                guild,
                 JoinMessages.ALREADY_JOINED,
                 placeholderPair
             ).setEphemeral(true)
                 .queue()
 
-        event.replyEmbed(guild, JoinMessages.ATTEMPTING_TO_JOIN, placeholderPair).queue { message ->
+        event.replyEmbed(JoinMessages.ATTEMPTING_TO_JOIN, placeholderPair).queue { message ->
             if (RobertifyAudioManagerKt.joinAudioChannel(channel, musicManager, hookMessage = message)) {
                 message.editEmbed(guild, JoinMessages.JOINED, placeholderPair).queue()
             }

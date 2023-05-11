@@ -16,7 +16,7 @@ class WebsiteCommandKt : AbstractSlashCommandKt(CommandKt(
 )) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed(event.guild, GeneralMessages.WEBSITE_EMBED_DESC)
+        event.replyEmbed(GeneralMessages.WEBSITE_EMBED_DESC)
             .setActionRow(
                 link(
                     url = "https://robertify.me",

@@ -164,7 +164,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
                     usersForPerms[permission] = getUsersForPermission(permission, config)
                 }
 
-                event.replyEmbeds(guild) {
+                event.replyEmbeds {
                     RobertifyPermissionKt.values().map { permission ->
                         embed(
                             """${
@@ -211,14 +211,12 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         perms: List<RobertifyPermissionKt>
     ) {
-        val guild = event.guild!!
-
         if (perms.isEmpty())
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(PermissionsMessages.MENTIONABLE_PERMISSIONS_NONE)
             }.queue()
         else
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(
                     PermissionsMessages.MENTIONABLE_PERMISSIONS_LIST,
                     Pair("{mentionable}", mentionable.asMention),
@@ -268,7 +266,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyEmbed(event.guild!!) {
+        event.replyEmbed {
             embed(
                 PermissionsMessages.PERMISSION_ADDED,
                 Pair("{mentionable}", mentionable.asMention),
@@ -283,7 +281,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyEmbed(event.guild!!) {
+        event.replyEmbed {
             embed(
                 PermissionsMessages.MENTIONABLE_ALREADY_HAS_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),
@@ -324,7 +322,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyEmbed(event.guild!!) {
+        event.replyEmbed {
             embed(
                 PermissionsMessages.PERMISSION_REMOVED,
                 Pair("{mentionable}", mentionable.asMention),
@@ -339,7 +337,7 @@ class PermissionsCommandKt : AbstractSlashCommandKt(
         mentionable: IMentionable,
         permission: RobertifyPermissionKt
     ) {
-        event.replyEmbed(event.guild!!) {
+        event.replyEmbed {
             embed(
                 PermissionsMessages.MENTIONABLE_NEVER_HAD_PERMISSION,
                 Pair("{mentionable}", mentionable.asMention),

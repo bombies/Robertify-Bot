@@ -21,7 +21,7 @@ class AutoPlayCommandKt : AbstractSlashCommandKt(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed(event.guild!!) { handleAutoPlay(event.guild!!) }
+        event.replyEmbed { handleAutoPlay(event.guild!!) }
             .queue()
     }
 

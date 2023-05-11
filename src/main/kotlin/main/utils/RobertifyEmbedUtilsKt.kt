@@ -1,5 +1,6 @@
 package main.utils
 
+import dev.minn.jda.ktx.messages.send
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.LocaleMessageKt
@@ -204,27 +205,35 @@ class RobertifyEmbedUtilsKt private constructor(private val guild: Guild? = null
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        inline fun IReplyCallback.replyEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
+        inline fun GuildMessageChannel.sendEmbed(supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageCreateAction {
+            return this.sendEmbed(guild, supplier)
+        }
+
+        fun GuildMessageChannel.sendEmbed(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): MessageCreateAction {
+            return this.sendEmbed(guild, message, *placeholders)
+        }
+
+        inline fun IReplyCallback.replyEmbed(supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }
 
-        inline fun IReplyCallback.replyEmbeds(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> Collection<MessageEmbed>): ReplyCallbackAction {
+        inline fun IReplyCallback.replyEmbeds(supplier: RobertifyEmbedUtilsKt.() -> Collection<MessageEmbed>): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(supplier(embedUtils))
         }
 
-        fun IReplyCallback.replyEmbed(guild: Guild? = null, message: LocaleMessageKt, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(message: LocaleMessageKt, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        fun IReplyCallback.replyEmbed(guild: Guild? = null, message: String): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(message: String): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message))
         }
 
-        inline fun Message.editEmbed(guild: Guild? = null, supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageEditAction {
+        inline fun Message.editEmbed(supplier: RobertifyEmbedUtilsKt.() -> MessageEmbed): MessageEditAction {
             val embedUtils = getGuildUtils(guild)
             return editMessageEmbeds(supplier(embedUtils))
         }

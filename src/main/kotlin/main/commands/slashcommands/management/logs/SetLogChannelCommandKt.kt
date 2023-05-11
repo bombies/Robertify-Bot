@@ -34,7 +34,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
 
         val requestChannelConfig = RequestChannelConfigKt(guild)
         if (requestChannelConfig.isRequestChannel(channel)) {
-            event.replyEmbed(guild) {
+            event.replyEmbed {
                 embed(LogChannelMessages.CANNOT_SET_LOG_CHANNEL)
             }.setEphemeral(true)
                 .queue()
@@ -48,7 +48,7 @@ class SetLogChannelCommandKt : AbstractSlashCommandKt(
         }
 
         config.channelId = channel.idLong
-        event.replyEmbed(guild) {
+        event.replyEmbed {
             embed(
                 LogChannelMessages.LOG_CHANNEL_SET,
                 Pair("{channel}", channel.asMention)

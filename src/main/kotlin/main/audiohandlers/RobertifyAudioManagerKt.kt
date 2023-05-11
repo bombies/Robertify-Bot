@@ -243,7 +243,7 @@ object RobertifyAudioManagerKt {
                             ).build()
 
                             if (message != null)
-                                message.editEmbed(guild) { embed }.queue()
+                                message.editEmbed { embed }.queue()
                             else hookMessage?.editEmbed(guild) { embed }?.queue()
                             return false
                         }

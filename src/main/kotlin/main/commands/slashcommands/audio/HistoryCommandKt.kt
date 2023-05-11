@@ -19,7 +19,7 @@ class HistoryCommandKt : AbstractSlashCommandKt(CommandKt(
         val queueHandler = scheduler.queueHandler
 
         if (queueHandler.isPreviousTracksEmpty)
-            event.replyEmbed(guild) { embed(HistoryMessages.NO_PAST_TRACKS) }
+            event.replyEmbed { embed(HistoryMessages.NO_PAST_TRACKS) }
                 .queue()
         else {
             val content = QueueCommandKt().getPastContent(guild, queueHandler)

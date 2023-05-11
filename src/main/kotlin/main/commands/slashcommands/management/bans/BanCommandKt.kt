@@ -40,14 +40,14 @@ class BanCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
-            return event.replyEmbed(event.guild!!) {
+            return event.replyEmbed {
                 embed(GeneralMessages.INVALID_ARGS)
             }.setEphemeral(true)
                 .queue()
         }
         val duration = event.getOption("duration")?.asString
 
-        event.replyEmbed(event.guild!!) {
+        event.replyEmbed {
             handleBan(user, event.member!!, duration)
         }.queue()
     }

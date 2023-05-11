@@ -33,7 +33,7 @@ class UnbanCommandKt : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
-            return event.replyEmbed(event.guild!!) {
+            return event.replyEmbed {
                 embed(GeneralMessages.INVALID_ARGS)
             }.setEphemeral(true)
                 .queue()
