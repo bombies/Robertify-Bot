@@ -1,11 +1,11 @@
 package main.utils.database.mongodb.databases
 
 import com.mongodb.client.result.DeleteResult
-import main.constants.ENVKt
+import main.constants.ENV
 import main.constants.RobertifyThemeKt
 import main.constants.ToggleKt
 import main.constants.database.MongoDatabaseKt
-import main.main.ConfigKt
+import main.main.Config
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.DocumentBuilderKt
 import main.utils.json.GenericJSONFieldKt
@@ -21,7 +21,7 @@ object GuildDBKt :
     fun getGuildDocument(gid: Long): Document {
         return DocumentBuilderKt.create()
             .addField(Field.GUILD_ID, gid)
-            .addField(Field.GUILD_PREFIX, ConfigKt[ENVKt.PREFIX])
+            .addField(Field.GUILD_PREFIX, Config[ENV.PREFIX])
             .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
             .addField(Field.BANNED_USERS_ARRAY, JSONArray())
             .addField(

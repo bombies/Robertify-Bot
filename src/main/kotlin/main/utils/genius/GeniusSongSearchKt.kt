@@ -2,7 +2,7 @@ package main.utils.genius
 
 import dev.minn.jda.ktx.util.SLF4J
 import main.constants.BotConstantsKt
-import main.main.ConfigKt
+import main.main.Config
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -44,7 +44,7 @@ class GeniusSongSearchKt(private val gla: GeniusAPIKt, query: String, page: Int 
                 .addHeader("Content-Type","application/json")
                 .addHeader("Accept","application/json")
                 .addHeader("x-rapidapi-host", "genius.p.rapidapi.com")
-                .addHeader("x-rapidapi-key", ConfigKt.GENIUS_API_KEY)
+                .addHeader("x-rapidapi-key", Config.GENIUS_API_KEY)
                 .build();
 
             val result = try {

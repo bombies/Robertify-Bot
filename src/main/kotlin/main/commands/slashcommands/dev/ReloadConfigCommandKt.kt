@@ -1,9 +1,8 @@
 package main.commands.slashcommands.dev
 
 import dev.minn.jda.ktx.util.SLF4J
-import main.main.ConfigKt
+import main.main.Config
 import main.main.RobertifyKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
@@ -26,10 +25,10 @@ class ReloadConfigCommandKt : AbstractSlashCommandKt(CommandKt(
         event.deferReply(true).queue()
 
         try {
-            ConfigKt.reload()
+            Config.reload()
             LocaleManagerKt.reloadLocales()
             RobertifyKt.initVoteSiteAPIs()
-            RandomMessageManagerKt.chance = ConfigKt.RANDOM_MESSAGE_CHANCE
+            RandomMessageManagerKt.chance = Config.RANDOM_MESSAGE_CHANCE
 
             event.hook.sendEmbed(guild, "Successfully reloaded all configs!")
                 .queue()

@@ -4,14 +4,13 @@ import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClients
 import com.mongodb.client.MongoDatabase
-import main.constants.ENVKt
 import main.constants.database.MongoDatabaseKt
-import main.main.ConfigKt
+import main.main.Config
 
 class MongoConnectionManagerKt {
 
     companion object {
-        private val CONNECTION_STRING = ConnectionString(MongoDatabaseKt.getConnectionString(ConfigKt.MONGO_DATABASE_NAME))
+        private val CONNECTION_STRING = ConnectionString(MongoDatabaseKt.getConnectionString(Config.MONGO_DATABASE_NAME))
         private val CLIENT_SETTINGS = MongoClientSettings.builder()
             .applyConnectionString(CONNECTION_STRING)
             .build()

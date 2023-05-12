@@ -1,7 +1,7 @@
 package main.constants
 
 
-enum class ENVKt(private val str: String) {
+enum class ENV(private val str: String) {
     ENVIRONMENT("environment"),
     GATEWAY_URL("gateway_url"),
     BOT_TOKEN("bot_token"),
@@ -37,6 +37,10 @@ enum class ENVKt(private val str: String) {
     POSTGRES_PASSWORD("postgres_password"),
     POSTGRES_HOST("postgres_host"),
     POSTGRES_PORT("postgres_port"),
+    INFLUX_HOST("influx_host"),
+    INFLUX_PORT("influx_port"),
+    INFLUX_TOKEN("influx_token"),
+    INFLUX_ORG_ID("influx_org_id"),
     REDIS_HOSTNAME("redis_hostname"),
     REDIS_PORT("redis_port"),
     REDIS_PASSWORD("redis_password"),

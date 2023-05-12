@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.cache.redis
 
 import com.mongodb.client.MongoCollection
-import main.main.ConfigKt
+import main.main.Config
 import main.utils.json.AbstractJSONKt
 import org.bson.Document
 import org.json.JSONArray
@@ -12,7 +12,7 @@ import java.util.function.Consumer
 abstract class RedisCacheKt protected constructor(cacheID: String) : AbstractJSONKt {
     
     private val jedis: JedisPooled = RedisDBKt.jedis
-    protected val cacheID = "$cacheID#${ConfigKt.MONGO_DATABASE_NAME}#"
+    protected val cacheID = "$cacheID#${Config.MONGO_DATABASE_NAME}#"
 
     protected fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) {
         val newHash = HashMap<String, String>()

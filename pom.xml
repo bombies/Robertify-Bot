@@ -292,7 +292,16 @@
             <artifactId>koin-ktor</artifactId>
             <version>${koin.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.influxdb</groupId>
+            <artifactId>influxdb-client-kotlin</artifactId>
+            <version>6.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.influxdb</groupId>
+            <artifactId>flux-dsl</artifactId>
+            <version>6.8.0</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

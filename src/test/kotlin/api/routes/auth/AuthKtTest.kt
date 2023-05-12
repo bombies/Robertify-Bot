@@ -10,7 +10,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
-import main.main.ConfigKt
+import main.main.Config
 import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,7 +28,7 @@ class AuthKtTest {
 
         client.post("/auth/login") {
             contentType(ContentType.Application.Json)
-            setBody(LoginDto("user", ConfigKt.KTOR_API_KEY))
+            setBody(LoginDto("user", Config.KTOR_API_KEY))
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
             assertDoesNotThrow {

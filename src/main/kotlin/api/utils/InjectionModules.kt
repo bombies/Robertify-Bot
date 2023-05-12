@@ -1,7 +1,7 @@
 package api.utils
 
 import dev.minn.jda.ktx.jdabuilder.defaultShard
-import main.main.ConfigKt
+import main.main.Config
 import main.main.RobertifyKt
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.koin.dsl.module
@@ -12,7 +12,7 @@ val prodModule = module {
 
 private val testShardManager by lazy {
     defaultShard(
-        token = ConfigKt.BOT_TOKEN,
+        token = Config.BOT_TOKEN,
         enableCoroutines = false
     )
 }

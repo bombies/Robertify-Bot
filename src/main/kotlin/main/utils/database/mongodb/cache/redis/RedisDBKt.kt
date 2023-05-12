@@ -1,21 +1,20 @@
 package main.utils.database.mongodb.cache.redis
 
-import main.constants.ENVKt
-import main.main.ConfigKt
+import main.main.Config
 import redis.clients.jedis.JedisPooled
 
 object RedisDBKt {
 
-    val jedis: JedisPooled = if (ConfigKt.REDIS_PASSWORD.isNotBlank())
+    val jedis: JedisPooled = if (Config.REDIS_PASSWORD.isNotBlank())
         JedisPooled(
-            ConfigKt.REDIS_HOSTNAME,
-            ConfigKt.REDIS_PORT.toInt(),
+            Config.REDIS_HOSTNAME,
+            Config.REDIS_PORT.toInt(),
             null,
-            ConfigKt.REDIS_PASSWORD
+            Config.REDIS_PASSWORD
         )
     else JedisPooled(
-        ConfigKt.REDIS_HOSTNAME,
-        ConfigKt.REDIS_PORT.toInt(),
+        Config.REDIS_HOSTNAME,
+        Config.REDIS_PORT.toInt(),
     )
 
 }

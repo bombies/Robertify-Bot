@@ -10,12 +10,12 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.server.routing.*
 import io.ktor.util.*
-import main.main.ConfigKt
+import main.main.Config
 
 const val JWT_AUTH = "auth-jwt"
 
 fun Application.configureAuthentication() {
-    val secret = ConfigKt.KTOR_API_KEY
+    val secret = Config.KTOR_API_KEY
     val myRealm = "global_access"
 
     install(Authentication) {

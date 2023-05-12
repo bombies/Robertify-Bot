@@ -8,7 +8,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import main.main.ConfigKt
+import main.main.Config
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ExtensionContext.Store
@@ -30,7 +30,7 @@ class AuthorizedRouteExtension : BeforeAllCallback {
                 val client = createClient()
                 val dto = client.post("/auth/login") {
                     contentType(ContentType.Application.Json)
-                    setBody(LoginDto("user", ConfigKt.KTOR_API_KEY))
+                    setBody(LoginDto("user", Config.KTOR_API_KEY))
                 }.body<AccessTokenDto>()
                 ACCESS_TOKEN = dto.access_token
                 getStore(context).put("ACCESS_TOKEN", dto.access_token)

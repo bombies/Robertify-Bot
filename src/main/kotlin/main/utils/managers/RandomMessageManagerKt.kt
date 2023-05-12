@@ -1,15 +1,13 @@
 package main.utils.managers
 
-import main.constants.ENVKt
 import main.constants.ToggleKt
-import main.main.ConfigKt
+import main.main.Config
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
 import main.utils.json.toggles.TogglesConfigKt
 import main.utils.locale.LocaleManagerKt
 import main.utils.locale.messages.RandomMessages
-import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
@@ -19,7 +17,7 @@ import kotlin.random.Random
 class RandomMessageManagerKt {
 
     companion object {
-        var chance: Double = ConfigKt.RANDOM_MESSAGE_CHANCE
+        var chance: Double = Config.RANDOM_MESSAGE_CHANCE
     }
 
     val messages: List<String>

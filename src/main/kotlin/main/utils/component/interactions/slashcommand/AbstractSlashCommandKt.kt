@@ -7,7 +7,7 @@ import main.commands.slashcommands.SlashCommandManagerKt
 import main.constants.BotConstantsKt
 import main.constants.RobertifyPermissionKt
 import main.constants.ToggleKt
-import main.main.ConfigKt
+import main.main.Config
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt
 import main.utils.GeneralUtilsKt.asString
@@ -16,6 +16,7 @@ import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
 import main.utils.component.AbstractInteractionKt
 import main.utils.component.interactions.slashcommand.models.CommandKt
+import main.utils.database.influxdb.databases.commands.CommandInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCacheKt
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.requestchannel.RequestChannelConfigKt
@@ -73,7 +74,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
             commands.forEach { commandListUpdateAction.addCommands(it.info.getCommandData()) }
 
-            if (guild.ownerIdLong == ConfigKt.OWNER_ID)
+            if (guild.ownerIdLong == Config.OWNER_ID)
                 devCommands.forEach { commandListUpdateAction.addCommands(it.info.getCommandData()) }
 
             commandListUpdateAction.queueAfter(1, TimeUnit.SECONDS, null,
@@ -106,7 +107,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         }
 
         fun unloadAllCommands(guild: Guild) {
-            if (guild.ownerIdLong != ConfigKt.OWNER_ID)
+            if (guild.ownerIdLong != Config.OWNER_ID)
                 guild.updateCommands().addCommands().queue()
             else
                 guild.updateCommands()
@@ -169,9 +170,18 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
 
     fun register(shardManager: ShardManager) {
         onEvent<SlashCommandInteractionEvent>(shardManager) { event ->
-            if (!checks(event))
+            val checks = checks(event)
+            if (!checks)
                 return@onEvent
+
             handle(event)
+
+            if (!SlashCommandManagerKt.isDevCommand(this@AbstractSlashCommandKt))
+                CommandInfluxDatabase.recordCommand(
+                    guild = event.guild,
+                    command = this@AbstractSlashCommandKt,
+                    executor = event.user
+                )
         }
 
         onEvent<ButtonInteractionEvent>(shardManager) {
@@ -216,7 +226,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
         if (!info.isGuild && !info.developerOnly)
             return
 
-        if (info.developerOnly && guild.ownerIdLong != ConfigKt.OWNER_ID)
+        if (info.developerOnly && guild.ownerIdLong != Config.OWNER_ID)
             return
 
         logger.debug("Loading command \"${info.name}\" in ${guild.name}")
@@ -395,7 +405,7 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
     }
 
     protected open fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
-        if (!ConfigKt.PREMIUM_BOT) return true
+        if (!Config.PREMIUM_BOT) return true
         val guild = event.guild ?: return true
         if (!GuildConfigKt(guild).isPremium()) {
             event.replyEmbeds(
@@ -482,7 +492,12 @@ abstract class AbstractSlashCommandKt protected constructor(val info: CommandKt)
                 true
             else if (!event.member!!.hasPermissions(*info.requiredPermissions.toTypedArray())) {
                 event.replyEmbed {
-                    embed(BotConstantsKt.getInsufficientPermsMessage(event.guild, *info.requiredPermissions.toTypedArray()))
+                    embed(
+                        BotConstantsKt.getInsufficientPermsMessage(
+                            event.guild,
+                            *info.requiredPermissions.toTypedArray()
+                        )
+                    )
                 }.setEphemeral(true)
                     .queue()
                 false

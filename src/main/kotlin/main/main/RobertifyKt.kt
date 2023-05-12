@@ -12,8 +12,7 @@ import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.registerCommands
-import main.commands.slashcommands.misc.reminders.RemindersCommandKt
-import main.constants.ENVKt
+import main.constants.ENV
 import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
 import main.utils.database.mongodb.AbstractMongoDatabaseKt
 import main.utils.database.mongodb.cache.redis.GuildRedisCacheKt
@@ -66,10 +65,10 @@ object RobertifyKt {
 
     @JvmStatic
     fun main(args: Array<String>) = runBlocking {
-        if (ConfigKt.hasValue(ENVKt.SENTRY_DSN))
+        if (Config.hasValue(ENV.SENTRY_DSN))
             Sentry.init { options ->
-                options.dsn = ConfigKt.SENTRY_DSN
-                options.environment = ConfigKt.ENVIRONMENT
+                options.dsn = Config.SENTRY_DSN
+                options.environment = Config.ENVIRONMENT
             }
 
         // Setup graceful shutdown hooks
@@ -103,11 +102,11 @@ object RobertifyKt {
 
         // Setup LavaLink
         lavalink = JdaLavalink(
-            getIdFromToken(ConfigKt.BOT_TOKEN),
-            ConfigKt.SHARD_COUNT,
+            getIdFromToken(Config.BOT_TOKEN),
+            Config.SHARD_COUNT,
         ) { shardId -> shardManager.getShardById(shardId) }
 
-        ConfigKt.LAVA_NODES.forEach { node ->
+        Config.LAVA_NODES.forEach { node ->
             lavalink.addNode(node.name, node.uri, node.password)
             logger.info("Registered lava node with address: ${node.uri}")
         }
@@ -142,11 +141,11 @@ object RobertifyKt {
         // Build bot connection
         logger.info("Building shard manager...")
         shardManager = defaultShard(
-            token = ConfigKt.BOT_TOKEN,
+            token = Config.BOT_TOKEN,
             intents = listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
             enableCoroutines = false
         ) {
-            setShardsTotal(ConfigKt.SHARD_COUNT)
+            setShardsTotal(Config.SHARD_COUNT)
             setEventManagerProvider { coroutineEventManager }
             setBulkDeleteSplittingEnabled(false)
             enableCache(CacheFlag.VOICE_STATE)
@@ -175,7 +174,7 @@ object RobertifyKt {
 
             val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
 
-            if (ConfigKt.MESSAGE_CONTENT_ENABLED)
+            if (Config.MESSAGE_CONTENT_ENABLED)
                 enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
             else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
 
@@ -195,10 +194,10 @@ object RobertifyKt {
         EventManager.registeredEvents
         logger.info("Registered all event controllers.")
 
-        if (ConfigKt.LOAD_COMMANDS)
+        if (Config.LOAD_COMMANDS)
             AbstractSlashCommandKt.loadAllCommands()
 
-        if (ConfigKt.LOAD_NEEDED_COMMANDS)
+        if (Config.LOAD_NEEDED_COMMANDS)
             loadNeededGlobalCommands()
 
         cronScheduler.start()
@@ -206,11 +205,11 @@ object RobertifyKt {
 
         // Setup SpotifyAPI
         spotifyApi = spotifyAppApi(
-            clientId = ConfigKt.SPOTIFY_CLIENT_ID,
-            clientSecret = ConfigKt.SPOTIFY_CLIENT_SECRET
+            clientId = Config.SPOTIFY_CLIENT_ID,
+            clientSecret = Config.SPOTIFY_CLIENT_SECRET
         ).build(true)
 
-        if (ConfigKt.hasValue(ENVKt.ROBERTIFY_API_PASSWORD))
+        if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
             externalApi = RobertifyApi()
 
         RobertifyKtorApi.start()
@@ -244,10 +243,10 @@ object RobertifyKt {
     }
 
     fun initVoteSiteAPIs() {
-        if (ConfigKt.TOP_GG_TOKEN.isNotEmpty())
+        if (Config.TOP_GG_TOKEN.isNotEmpty())
             topGGAPI = DiscordBotListAPI.Builder()
-                .token(ConfigKt.TOP_GG_TOKEN)
-                .botId(getIdFromToken(ConfigKt.BOT_TOKEN))
+                .token(Config.TOP_GG_TOKEN)
+                .botId(getIdFromToken(Config.BOT_TOKEN))
                 .build()
     }
 

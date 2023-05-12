@@ -4,14 +4,14 @@ import api.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import main.main.ConfigKt
+import main.main.Config
 
 object RobertifyKtorApi {
 
     fun start() {
         embeddedServer(
             Netty,
-            port = ConfigKt.KTOR_API_PORT,
+            port = Config.KTOR_API_PORT,
             host = "0.0.0.0",
             module = Application::module
         ).start(wait = true)

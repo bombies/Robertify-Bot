@@ -13,11 +13,10 @@ import main.audiohandlers.loaders.MainAudioLoaderKt
 import main.audiohandlers.loaders.SearchResultLoaderKt
 import main.audiohandlers.sources.resume.ResumeSourceManagerKt
 import main.constants.ToggleKt
-import main.main.ConfigKt
+import main.main.Config
 import main.main.RobertifyKt
 import main.utils.RobertifyEmbedUtilsKt
 import main.utils.RobertifyEmbedUtilsKt.Companion.editEmbed
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
 import main.utils.json.guildconfig.GuildConfigKt
 import main.utils.json.restrictedchannels.RestrictedChannelsConfigKt
 import main.utils.json.toggles.TogglesConfigKt
@@ -48,14 +47,14 @@ object RobertifyAudioManagerKt {
     init {
         playerManager = DefaultAudioPlayerManager()
         spotifySourceManager = SpotifySourceManager(
-            ConfigKt.providers,
-            ConfigKt.SPOTIFY_CLIENT_ID,
-            ConfigKt.SPOTIFY_CLIENT_SECRET,
+            Config.providers,
+            Config.SPOTIFY_CLIENT_ID,
+            Config.SPOTIFY_CLIENT_SECRET,
             "us",
             playerManager
         )
-        deezerAudioSourceManager = DeezerAudioSourceManager(ConfigKt.DEEZER_ACCESS_TOKEN)
-        appleMusicSourceManager = AppleMusicSourceManager(ConfigKt.providers, null, "us", playerManager)
+        deezerAudioSourceManager = DeezerAudioSourceManager(Config.DEEZER_ACCESS_TOKEN)
+        appleMusicSourceManager = AppleMusicSourceManager(Config.providers, null, "us", playerManager)
         resumeSourceManager = ResumeSourceManagerKt(playerManager)
 
         AudioSourceManagers.registerLocalSource(playerManager)

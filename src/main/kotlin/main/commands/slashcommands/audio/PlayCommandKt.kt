@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManagerKt
 import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
 import main.constants.InteractionLimitsKt
-import main.main.ConfigKt
+import main.main.Config
 import main.main.RobertifyKt
 import main.utils.GeneralUtilsKt.coerceAtMost
 import main.utils.GeneralUtilsKt.getDestination
@@ -207,7 +207,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
         val guild = event.guild
         val member = event.member!!
 
-        if (link.isUrl() && !ConfigKt.YOUTUBE_ENABLED) {
+        if (link.isUrl() && !Config.YOUTUBE_ENABLED) {
             val linkDestination = link.toUrl()!!.getDestination()
             if (linkDestination.contains("youtube.com") || linkDestination.contains("youtu.be")) {
                 event.hook.sendEmbed(guild) {
@@ -242,9 +242,9 @@ class PlayCommandKt : AbstractSlashCommandKt(
 
         when (file.fileExtension?.lowercase()) {
             "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
-                if (!Files.exists(Path(ConfigKt.AUDIO_DIR))) {
+                if (!Files.exists(Path(Config.AUDIO_DIR))) {
                     try {
-                        Files.createDirectory(Paths.get(ConfigKt.AUDIO_DIR))
+                        Files.createDirectory(Paths.get(Config.AUDIO_DIR))
                     } catch (e: Exception) {
                         event.hook.sendEmbed(guild) {
                             embed(PlayMessages.LOCAL_DIR_ERR)
@@ -269,7 +269,7 @@ class PlayCommandKt : AbstractSlashCommandKt(
                         embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
                     }.queue { addingMsg ->
                         file.proxy
-                            .downloadToFile(File("${ConfigKt.AUDIO_DIR}/${file.fileName}.${file.fileExtension}"))
+                            .downloadToFile(File("${Config.AUDIO_DIR}/${file.fileName}.${file.fileExtension}"))
                             .whenComplete { file, err ->
                                 if (err != null) {
                                     logger.error("Error occurred while downloading a file", err)

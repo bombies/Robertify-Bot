@@ -9,7 +9,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import main.main.ConfigKt
+import main.main.Config
 import java.util.*
 import kotlin.time.Duration.Companion.hours
 
@@ -23,7 +23,7 @@ fun Routing.auth() {
                     .withClaim("username", loginDto.username)
                     .withIssuedAt(Date())
                     .withExpiresAt(Date(System.currentTimeMillis() + 1.hours.inWholeMilliseconds))
-                    .sign(Algorithm.HMAC256(ConfigKt.KTOR_API_KEY))
+                    .sign(Algorithm.HMAC256(Config.KTOR_API_KEY))
                 val tokenDto = AccessTokenDto(token)
                 call.respond(tokenDto)
             } else call.respondText("Invalid password!", status = HttpStatusCode.Unauthorized)
@@ -32,4 +32,4 @@ fun Routing.auth() {
 }
 
 private fun login(loginDto: LoginDto): Boolean =
-    loginDto.password == ConfigKt.KTOR_API_KEY
+    loginDto.password == Config.KTOR_API_KEY

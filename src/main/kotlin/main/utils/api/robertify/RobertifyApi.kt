@@ -14,7 +14,7 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import main.main.ConfigKt
+import main.main.Config
 import org.json.JSONObject
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -27,25 +27,11 @@ class RobertifyApi {
         private val logger by SLF4J
         private val TOKEN_REFRESH_INTERVAL = 12.hours.inWholeMilliseconds
         private val DEFAULT_TIMEOUT = 5.seconds.inWholeMilliseconds
-        private val HOST_NAME = ConfigKt.ROBERTIFY_API_HOSTNAME
+        private val HOST_NAME = Config.ROBERTIFY_API_HOSTNAME
         private val executorService = Executors.newSingleThreadScheduledExecutor()
     }
 
-    private val client = HttpClient(CIO) {
-        install(HttpTimeout) {
-            requestTimeoutMillis = DEFAULT_TIMEOUT
-            connectTimeoutMillis = DEFAULT_TIMEOUT
-            socketTimeoutMillis = DEFAULT_TIMEOUT
-        }
-
-        install(ContentNegotiation) {
-            json()
-        }
-
-        defaultRequest {
-            url(HOST_NAME)
-        }
-    }
+    private val client = httpClient(HOST_NAME, DEFAULT_TIMEOUT)
 
     private var accessToken: Flow<String> = flow {
         emit(getAccessToken())
@@ -67,7 +53,7 @@ class RobertifyApi {
     private suspend fun getAccessToken(): String {
         val dto = client.post("/auth/login") {
             contentType(ContentType.Application.Json)
-            setBody(LoginDto("bombies", ConfigKt.ROBERTIFY_API_PASSWORD))
+            setBody(LoginDto("bombies", Config.ROBERTIFY_API_PASSWORD))
         }.body<AccessTokenDto>()
         return dto.access_token
     }
