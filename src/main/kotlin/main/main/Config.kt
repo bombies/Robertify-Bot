@@ -1,7 +1,6 @@
 package main.main
 
 import io.github.cdimascio.dotenv.Dotenv
-import lombok.SneakyThrows
 import main.constants.ENV
 import main.utils.GeneralUtils
 import main.utils.lavalink.LavaNode
@@ -230,7 +229,6 @@ class Config {
         fun getLong(key: ENV): Long = get(key, "-1").toLong()
         fun getBoolean(key: ENV): Boolean = get(key, "false").toBoolean()
 
-        @SneakyThrows
         private fun getConfigJSON(): JSONObject {
             val file = File("./json/config.json")
             if (!file.exists()) {

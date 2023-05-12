@@ -19,10 +19,10 @@
         <ktor.version>2.3.0</ktor.version>
         <koin.version>3.4.0</koin.version>
         <mockk.version>1.13.5</mockk.version>
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <serialization.version>1.5.0</serialization.version>
         <maven.compiler.target>17</maven.compiler.target>
-        <main.class>main.main.Robertify</main.class>
+        <main.class>main.main.RobertifyKt</main.class>
     </properties>
 
     <repositories>
@@ -61,12 +61,6 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.duncte123</groupId>
@@ -112,11 +106,6 @@
             <groupId>com.github.TopiSenpai.LavaSrc</groupId>
             <artifactId>lavasrc</artifactId>
             <version>3.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sedmelluq</groupId>
-            <artifactId>lavaplayer-ext-youtube-rotator</artifactId>
-            <version>0.2.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.bombies</groupId>
@@ -190,17 +179,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>1.8.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib-jdk8</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit</artifactId>
-            <version>${kotlin.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

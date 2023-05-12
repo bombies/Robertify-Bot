@@ -63,8 +63,7 @@ object Robertify {
         thread(start = false, name = "Event-Worker-Thread", isDaemon = true, block = it::run)
     }
 
-    @JvmStatic
-    fun main(args: Array<String>) = runBlocking {
+    fun main() = runBlocking {
         if (Config.hasValue(ENV.SENTRY_DSN))
             Sentry.init { options ->
                 options.dsn = Config.SENTRY_DSN
@@ -260,3 +259,5 @@ object Robertify {
 
     }
 }
+
+fun main(args: Array<String>) = Robertify.main()
