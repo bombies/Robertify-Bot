@@ -14,6 +14,5 @@ class ApiTests {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals("Welcome to the API!", bodyAsText())
         }
-
     }
 }

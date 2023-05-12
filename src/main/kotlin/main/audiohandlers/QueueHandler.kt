@@ -22,7 +22,7 @@ class QueueHandler {
         get() = queue.toList()
 
     val previousTracksContents: List<AudioTrack>
-        get() = previousTracks.toList()
+        get() = previousTracks.toList().reversed()
 
     val isEmpty: Boolean
         get() = queue.isEmpty()
