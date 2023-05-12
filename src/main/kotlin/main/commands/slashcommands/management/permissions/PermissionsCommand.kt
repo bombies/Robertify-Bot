@@ -7,7 +7,7 @@ import main.utils.GeneralUtils.toMention
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbeds
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommandGroup
 import main.utils.component.interactions.slashcommand.models.SubCommand
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class PermissionsCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "permissions",
         description = "Manage the permissions for roles and users.",
         adminOnly = true,

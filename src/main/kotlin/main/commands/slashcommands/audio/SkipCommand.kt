@@ -17,7 +17,7 @@ import main.utils.RobertifyEmbedUtils.Companion.editEmbed
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -35,7 +35,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.math.ceil
 
 class SkipCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "skip",
         description = "Skip the song currently being played.",
         options = listOf(

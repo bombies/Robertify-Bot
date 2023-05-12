@@ -9,7 +9,7 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
@@ -28,7 +28,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class PollCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "polls",
         description = "Poll your community.",
         options = listOf(

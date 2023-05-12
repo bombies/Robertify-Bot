@@ -5,7 +5,7 @@ import main.constants.RobertifyTheme
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.themes.ThemesConfig
 import main.utils.locale.LocaleManager
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.time.Instant
 
 class BotInfoCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "botinfo",
         description = "View some cool information about Robertify.",
         guildUseOnly = false

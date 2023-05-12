@@ -5,12 +5,12 @@ import main.main.Config
 import main.main.Robertify
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.LocaleManager
 import main.utils.managers.RandomMessageManager
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class ReloadConfigCommand : AbstractSlashCommand(Command(
+class ReloadConfigCommand : AbstractSlashCommand(SlashCommand(
     name = "reload",
     description = "Reload all config files.",
     developerOnly = true

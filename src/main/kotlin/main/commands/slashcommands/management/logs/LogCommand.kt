@@ -2,14 +2,14 @@ package main.commands.slashcommands.management.logs
 
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.messages.LogChannelMessages
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class LogCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "setuplogs",
         description = "Setup the log channel for all Robertify player events.",
         adminOnly = true,

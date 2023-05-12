@@ -3,7 +3,7 @@ package main.commands.slashcommands.dev
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommandGroup
 import main.utils.component.interactions.slashcommand.models.SubCommand
@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.time.Duration.Companion.seconds
 
 class ManageSuggestionsCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "suggestions",
         description = "Manage suggestions",
         developerOnly = true,

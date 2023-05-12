@@ -8,7 +8,7 @@ import main.utils.GeneralUtils.dmEmbed
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.guildconfig.GuildConfig
 import main.utils.locale.messages.BanMessages
@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class BanCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "ban",
         description = "Ban a user from using the bot.",
         options = listOf(

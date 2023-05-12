@@ -5,13 +5,13 @@ import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils.Companion.editEmbed
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.JoinMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class JoinCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "join",
         description = "Force the bot to join the audio channel you're currently in"
     )

@@ -3,7 +3,7 @@ package main.commands.slashcommands.audio
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.autoplay.AutoPlayConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class AutoPlayCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "autoplay",
         description = "Play recommended tracks at the end of your queue",
         isPremium = false,

@@ -4,7 +4,7 @@ import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManager
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class DisconnectCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "disconnect",
         description = "Disconnect the bot from the voice channel it's currently in",
     )

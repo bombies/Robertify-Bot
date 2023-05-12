@@ -3,14 +3,14 @@ package main.commands.slashcommands.audio
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.ClearQueueMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class ClearQueueCommand : AbstractSlashCommand(Command(
+class ClearQueueCommand : AbstractSlashCommand(SlashCommand(
     name = "clear",
     description = "Clear the queue of all its contents."
 )) {

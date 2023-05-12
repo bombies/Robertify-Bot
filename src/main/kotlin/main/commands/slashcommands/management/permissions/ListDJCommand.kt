@@ -3,14 +3,14 @@ package main.commands.slashcommands.management.permissions
 import main.constants.RobertifyPermission
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.permissions.PermissionsConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.PermissionsMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class ListDJCommand : AbstractSlashCommand(Command(
+class ListDJCommand : AbstractSlashCommand(SlashCommand(
     name = "listdj",
     description = "List all DJ users and roles in this server.",
     adminOnly = true

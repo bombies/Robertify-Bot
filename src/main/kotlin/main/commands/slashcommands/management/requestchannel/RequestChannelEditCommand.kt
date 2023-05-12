@@ -16,7 +16,7 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.json.requestchannel.RequestChannelButton
 import main.utils.json.requestchannel.RequestChannelConfig
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
 class RequestChannelEditCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "requestchannel",
         description = "Configure the request channel for your server.",
         adminOnly = true,

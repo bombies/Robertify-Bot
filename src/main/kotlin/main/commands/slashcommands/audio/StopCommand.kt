@@ -5,7 +5,7 @@ import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.messages.GeneralMessages
@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class StopCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "stop",
         description = "Stop the music and clear the queue."
     )

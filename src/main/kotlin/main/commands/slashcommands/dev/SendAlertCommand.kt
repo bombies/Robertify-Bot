@@ -5,7 +5,7 @@ import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
 import main.commands.slashcommands.SlashCommandManager.getRequiredValue
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -14,7 +14,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 
 class SendAlertCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "sendalert",
         description = "Send an alert to all users",
         developerOnly = true

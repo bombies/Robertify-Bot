@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
-data class Command(
+data class SlashCommand(
     val name: String,
     val description: String,
     val options: List<CommandOption> = listOf(),

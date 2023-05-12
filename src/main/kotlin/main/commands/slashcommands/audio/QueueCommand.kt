@@ -8,7 +8,7 @@ import main.audiohandlers.utils.title
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.QueueMessages
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class QueueCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
     name = "queue",
     description = "See all queued songs"
 )

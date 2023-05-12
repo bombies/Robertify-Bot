@@ -5,7 +5,7 @@ import main.constants.RobertifyPermission
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.permissions.PermissionsConfig
 import main.utils.locale.messages.GeneralMessages
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
-class RemoveDJCommand : AbstractSlashCommand(Command(
+class RemoveDJCommand : AbstractSlashCommand(SlashCommand(
     name = "removedj",
     description = "Remove a user or role as a DJ in this server.",
     options = listOf(

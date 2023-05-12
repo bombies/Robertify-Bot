@@ -3,7 +3,7 @@ package main.commands.slashcommands.dev
 import dev.minn.jda.ktx.util.SLF4J
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.SubCommandGroup
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
@@ -11,7 +11,7 @@ import main.utils.json.requestchannel.RequestChannelConfig
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class UpdateCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "update",
         description = "Bring certain things up to date on the bot.",
         developerOnly = true,

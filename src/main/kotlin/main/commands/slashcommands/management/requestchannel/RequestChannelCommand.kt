@@ -1,12 +1,12 @@
 package main.commands.slashcommands.management.requestchannel
 
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class RequestChannelCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "setup",
         description = "Create the easy-to-use request channel.",
         adminOnly = true,

@@ -3,11 +3,11 @@ package main.commands.slashcommands.util
 import dev.minn.jda.ktx.interactions.components.link
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class VoteCommand : AbstractSlashCommand(Command(
+class VoteCommand : AbstractSlashCommand(SlashCommand(
     name = "vote",
     description = "Want to support us? Help spread our reach by voting for us!",
     guildUseOnly = false

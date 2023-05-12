@@ -9,7 +9,7 @@ import main.utils.GeneralUtils.isInt
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -25,7 +25,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class JumpCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "jump",
         description = "Skip the playing song by a given number of seconds",
         options = listOf(

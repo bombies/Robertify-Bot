@@ -13,7 +13,7 @@ import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.database.mongodb.cache.FavouriteTracksCache
@@ -32,7 +32,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class FavouriteTracksCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "favouritetracks",
         description = "Interact with your favourite tracks using this command.",
         subcommands = listOf(

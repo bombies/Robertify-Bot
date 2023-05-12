@@ -4,7 +4,7 @@ import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.messages.PauseMessages
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class PauseCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "pause",
         description = "Pause the song being currently played."
     )

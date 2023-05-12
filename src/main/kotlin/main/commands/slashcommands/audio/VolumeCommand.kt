@@ -6,7 +6,7 @@ import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class VolumeCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "volume",
         description = "Adjust the global volume of the bot",
         options = listOf(

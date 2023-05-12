@@ -11,7 +11,7 @@ import main.utils.GeneralUtils.dm
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
@@ -27,7 +27,7 @@ import java.awt.Color
 import java.time.Instant
 
 class SuggestionCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "suggest",
         description = "Suggest a feature you'd like to see in the bot.",
         guildUseOnly = false

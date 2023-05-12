@@ -7,14 +7,14 @@ import main.commands.slashcommands.SlashCommandManager
 import main.main.Robertify
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
 class PostCommandInfoCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "postcommandinfo",
         description = "Post all command info to the Robertify API!",
         developerOnly = true

@@ -4,12 +4,12 @@ import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.messages.DuplicateMessages
 import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class RemoveDuplicatesCommand : AbstractSlashCommand(Command(
+class RemoveDuplicatesCommand : AbstractSlashCommand(SlashCommand(
     name = "removedupes",
     description = "Remove all duplicate tracks in the queue."
 )) {

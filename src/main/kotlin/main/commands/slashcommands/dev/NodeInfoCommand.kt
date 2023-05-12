@@ -4,11 +4,11 @@ import main.main.Robertify
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import kotlin.math.roundToInt
 
-class NodeInfoCommand : AbstractSlashCommand(Command(
+class NodeInfoCommand : AbstractSlashCommand(SlashCommand(
     name = "nodeinfo",
     description = "Count all the voice channels Robertify is currenly playing music in",
     developerOnly = true

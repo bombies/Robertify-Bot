@@ -11,11 +11,11 @@ import main.utils.api.robertify.post
 
 private val logger by SLF4J
 
-private val HOST_NAME = "${Config.INFLUX_HOST}${if (Config.INFLUX_PORT.isNotEmpty()) ":${Config.INFLUX_PORT}" else ""}/api/v2"
+private val HOST_NAME = "${Config.INFLUX_HOST}${if (Config.INFLUX_PORT.isNotEmpty()) ":${Config.INFLUX_PORT}" else ""}"
 
 suspend fun createBucket(bucketName: String) =
     httpClient(HOST_NAME).post<HttpResponse>(
-        path = "/buckets",
+        path = "/api/v2/buckets",
         block = {
             headers {
                 set(HttpHeaders.Authorization, "Token ${Config.INFLUX_TOKEN}")

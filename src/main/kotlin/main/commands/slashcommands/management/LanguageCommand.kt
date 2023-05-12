@@ -6,7 +6,7 @@ import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.sharding.ShardManager
 
 class LanguageCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "language",
         description = "Change the bot's language.",
         options = listOf(

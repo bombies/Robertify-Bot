@@ -8,7 +8,7 @@ import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class LoopCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "loop",
         description = "Replay the current song being played.",
         subcommands = listOf(

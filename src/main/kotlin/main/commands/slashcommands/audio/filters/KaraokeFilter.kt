@@ -4,10 +4,10 @@ import lavalink.client.io.filters.Karaoke
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class KaraokeFilter : AbstractSlashCommand(Command(
+class KaraokeFilter : AbstractSlashCommand(SlashCommand(
     name = "karaoke",
     description = "Toggle the Karaoke filter.",
     isPremium = true

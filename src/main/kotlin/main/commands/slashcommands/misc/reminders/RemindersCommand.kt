@@ -14,10 +14,10 @@ import main.utils.GeneralUtils.stripDigits
 import main.utils.GeneralUtils.toMention
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
 import main.utils.component.interactions.slashcommand.models.CommandOption
-import main.utils.component.interactions.slashcommand.models.SubCommandGroup
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.SubCommand
+import main.utils.component.interactions.slashcommand.models.SubCommandGroup
 import main.utils.json.reminders.Reminder
 import main.utils.json.reminders.RemindersConfig
 import main.utils.json.reminders.scheduler.ReminderScheduler
@@ -33,12 +33,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.Command
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import java.time.LocalDate
-import kotlin.IllegalArgumentException
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class RemindersCommand : AbstractSlashCommand(
-    main.utils.component.interactions.slashcommand.models.Command(
+    SlashCommand(
         name = "reminders",
         description = "Set your reminders.",
         subcommands = listOf(
@@ -561,7 +560,6 @@ class RemindersCommand : AbstractSlashCommand(
     }
 
     private fun handleTimeParsing(event: SlashCommandInteractionEvent, time: String): List<Long>? {
-        val guild = event.guild!!
         return try {
             val timeInMillis = timeToMillis(time)
             val hour = extractTime(time, DurationUnit.HOURS)

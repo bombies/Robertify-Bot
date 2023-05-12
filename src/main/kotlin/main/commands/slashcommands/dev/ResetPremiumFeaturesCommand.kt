@@ -5,13 +5,13 @@ import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.api.robertify.models.RobertifyPremium
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class ResetPremiumFeaturesCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "resetpremiumfeatures",
         description = "Reset premium features for a specific guild or all guilds.",
         developerOnly = true,

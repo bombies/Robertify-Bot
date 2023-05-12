@@ -7,7 +7,7 @@ import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -21,7 +21,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class RewindCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "rewind",
         description = "Rewind the song by the seconds provided or all the way to the beginning.",
         options = listOf(

@@ -9,7 +9,7 @@ import main.utils.GeneralUtils.hasPermissions
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.json.eightball.EightBallConfig
@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.random.Random
 
 class EightBallCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "8ball",
         description = "Curious of your fate?",
         subcommands = listOf(

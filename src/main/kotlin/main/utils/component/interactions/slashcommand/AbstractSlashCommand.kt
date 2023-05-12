@@ -15,7 +15,7 @@ import main.utils.GeneralUtils.hasPermissions
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.GenericInteraction
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.influxdb.databases.commands.CommandInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.guildconfig.GuildConfig
@@ -45,7 +45,7 @@ import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
-abstract class AbstractSlashCommand protected constructor(val info: Command) : GenericInteraction {
+abstract class AbstractSlashCommand protected constructor(val info: SlashCommand) : GenericInteraction {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 

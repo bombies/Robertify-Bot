@@ -11,7 +11,7 @@ import main.constants.Toggle
 import main.utils.GeneralUtils.coerceAtMost
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommandGroup
 import main.utils.component.interactions.slashcommand.models.SubCommand
@@ -32,7 +32,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.interactions.components.ActionRow
 
 class TogglesCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "toggles",
         description = "Toggle specific features on or off.",
         adminOnly = true,

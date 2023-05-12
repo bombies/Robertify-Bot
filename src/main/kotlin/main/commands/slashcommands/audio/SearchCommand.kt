@@ -5,7 +5,7 @@ import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.messages.FavouriteTracksMessages
@@ -19,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.interactions.InteractionHook
 
 class SearchCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "search",
         description = "Search and browse for a specific track.",
         options = listOf(

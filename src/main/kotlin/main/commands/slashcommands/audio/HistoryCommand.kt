@@ -3,12 +3,12 @@ package main.commands.slashcommands.audio
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.messages.HistoryMessages
 import main.utils.pagination.PaginationHandler
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class HistoryCommand : AbstractSlashCommand(Command(
+class HistoryCommand : AbstractSlashCommand(SlashCommand(
     name = "history",
     description = "See all the songs that have been played in your current listening session"
 )) {

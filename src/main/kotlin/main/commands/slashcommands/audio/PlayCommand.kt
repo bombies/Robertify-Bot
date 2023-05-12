@@ -15,7 +15,7 @@ import main.utils.GeneralUtils.isUrl
 import main.utils.GeneralUtils.toUrl
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.locale.messages.FavouriteTracksMessages
@@ -35,7 +35,7 @@ import java.nio.file.Paths
 import kotlin.io.path.Path
 
 class PlayCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "play",
         description = "Play a song! Links are accepted by Spotify, Deezer, SoundCloud, etc...",
         subcommands = listOf(

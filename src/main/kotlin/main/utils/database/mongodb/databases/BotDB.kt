@@ -1,7 +1,7 @@
 package main.utils.database.mongodb.databases
 
 import dev.minn.jda.ktx.util.SLF4J
-import main.constants.database.MongoDatabase
+import main.constants.database.RobertifyMongoDatabase
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.DocumentBuilder
 import main.utils.database.mongodb.cache.BotDBCache
@@ -11,7 +11,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 object BotDB :
-    AbstractMongoDatabase(MongoDatabase.ROBERTIFY_DATABASE, MongoDatabase.ROBERTIFY_BOT_INFO) {
+    AbstractMongoDatabase(RobertifyMongoDatabase.ROBERTIFY_DATABASE, RobertifyMongoDatabase.ROBERTIFY_BOT_INFO) {
     private val log by SLF4J
 
     fun update() {

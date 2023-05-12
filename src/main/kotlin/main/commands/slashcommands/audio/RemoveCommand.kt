@@ -9,7 +9,7 @@ import main.utils.GeneralUtils.coerceAtMost
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.json.logs.LogType
@@ -25,7 +25,7 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class RemoveCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "remove",
         description = "Remove a song from the queue.",
         subcommands = listOf(

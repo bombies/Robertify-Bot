@@ -3,7 +3,7 @@ package main.commands.slashcommands.management
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.guildconfig.GuildConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class TwentyFourSevenCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "247",
         description = "Toggle whether the bot is supposed to stay in voice channels 24/7 or not.",
         isPremium = true

@@ -7,7 +7,7 @@ import main.constants.Toggle
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class RestrictedChannelsCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "restrictedchannels",
         description = "Configure which channels Robertify can interact with.",
         subcommands = listOf(

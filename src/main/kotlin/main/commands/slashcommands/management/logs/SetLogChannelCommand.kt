@@ -3,7 +3,7 @@ package main.commands.slashcommands.management.logs
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogConfig
 import main.utils.json.requestchannel.RequestChannelConfig
@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
 class SetLogChannelCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "setlogchannel",
         description = "Set a specific channel to be the channel where Robertify logs should be sent.",
         options = listOf(

@@ -4,7 +4,7 @@ import com.mongodb.client.result.DeleteResult
 import main.constants.ENV
 import main.constants.RobertifyTheme
 import main.constants.Toggle
-import main.constants.database.MongoDatabase
+import main.constants.database.RobertifyMongoDatabase
 import main.main.Config
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.DocumentBuilder
@@ -16,7 +16,7 @@ import org.json.JSONObject
 import java.util.*
 
 object GuildDB :
-    AbstractMongoDatabase(MongoDatabase.ROBERTIFY_DATABASE, MongoDatabase.ROBERTIFY_GUILDS) {
+    AbstractMongoDatabase(RobertifyMongoDatabase.ROBERTIFY_DATABASE, RobertifyMongoDatabase.ROBERTIFY_GUILDS) {
 
     fun getGuildDocument(gid: Long): Document {
         return DocumentBuilder.create()

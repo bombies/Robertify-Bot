@@ -2,13 +2,13 @@ package main.commands.slashcommands.dev
 
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import kotlin.math.roundToInt
 
 class ShardInfoCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "shardinfo",
         description = "Get the information about all shards related to the bot.",
         developerOnly = true

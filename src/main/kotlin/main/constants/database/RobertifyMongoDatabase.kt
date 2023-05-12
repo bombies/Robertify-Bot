@@ -2,7 +2,7 @@ package main.constants.database
 
 import main.main.Config
 
-enum class MongoDatabase(val str: String) {
+enum class RobertifyMongoDatabase(val str: String) {
     MAIN("Learning0"),
 
     ROBERTIFY_DATABASE(Config.MONGO_DATABASE_NAME),

@@ -8,7 +8,7 @@ import main.constants.InteractionLimits
 import main.utils.GeneralUtils.coerceAtMost
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.managers.RandomMessageManager
@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 
 class RandomMessageCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "randommessage",
         description = "Configure the random messages for the bot.",
         developerOnly = true,

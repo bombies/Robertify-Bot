@@ -1,10 +1,10 @@
 package main.utils.database.mongodb.databases
 
-import main.constants.database.MongoDatabase
+import main.constants.database.RobertifyMongoDatabase
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.json.GenericJSONField
 
-object FavouriteTracksDB : AbstractMongoDatabase(MongoDatabase.ROBERTIFY_DATABASE, MongoDatabase.ROBERTIFY_FAVOURITE_TRACKS) {
+object FavouriteTracksDB : AbstractMongoDatabase(RobertifyMongoDatabase.ROBERTIFY_DATABASE, RobertifyMongoDatabase.ROBERTIFY_FAVOURITE_TRACKS) {
 
     enum class Field(private val str: String) : GenericJSONField {
         USER_ID("user_id"),

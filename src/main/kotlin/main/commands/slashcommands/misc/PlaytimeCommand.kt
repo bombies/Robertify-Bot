@@ -7,7 +7,7 @@ import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.PlaytimeMessages
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 class PlaytimeCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "playtime",
         description = "See how long the bot has played music in this guild since its last startup."
     )

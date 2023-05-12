@@ -13,7 +13,7 @@ import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
 import main.utils.api.robertify.imagebuilders.ImageBuilderException
 import main.utils.api.robertify.imagebuilders.builders.NowPlayingImageBuilder
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.themes.ThemesConfig
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
@@ -27,7 +27,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.FileUpload
 
 class NowPlayingCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "nowplaying",
         description = "See the song that is currently being played."
     )

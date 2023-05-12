@@ -2,11 +2,11 @@ package main.commands.slashcommands.misc
 
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import kotlin.math.roundToInt
 
-class PingCommand : AbstractSlashCommand(Command(
+class PingCommand : AbstractSlashCommand(SlashCommand(
     name = "ping",
     description = "Check the ping of the bot to Discord's servers.",
     guildUseOnly = false

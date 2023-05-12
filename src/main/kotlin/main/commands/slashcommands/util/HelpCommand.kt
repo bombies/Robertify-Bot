@@ -8,7 +8,7 @@ import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.themes.ThemesConfig
 import main.utils.locale.LocaleManager
@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionE
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu
 
 class HelpCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "help",
         description = "See all the commands the bot has to offer to you.",
         options = listOf(

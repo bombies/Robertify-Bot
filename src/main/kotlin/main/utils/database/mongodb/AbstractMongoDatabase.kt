@@ -3,7 +3,8 @@ package main.utils.database.mongodb
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.*
-import main.constants.database.MongoDatabase
+import dev.minn.jda.ktx.util.SLF4J
+import main.constants.database.RobertifyMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.database.mongodb.cache.FavouriteTracksCache
 import main.utils.database.mongodb.cache.redis.GuildRedisCache
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory
 
 abstract class AbstractMongoDatabase {
     companion object {
-        private val log = LoggerFactory.getLogger(Companion::class.java)
+        private val log by SLF4J
 
         fun initAllCaches() {
             BotDBCache.instance
@@ -37,7 +38,7 @@ abstract class AbstractMongoDatabase {
      var collection: MongoCollection<Document>
         protected set
 
-    constructor(db: main.constants.database.MongoDatabase, collection: main.constants.database.MongoDatabase) {
+    constructor(db: RobertifyMongoDatabase, collection: RobertifyMongoDatabase) {
         database = MongoConnectionManager.connect(db).database()
 
         try {

@@ -6,7 +6,7 @@ import main.main.Robertify
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import me.duncte123.botcommons.web.WebUtils
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -16,7 +16,7 @@ import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 
 class EvalCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "eval",
         description = "Spooky scary evals...",
         developerOnly = true,

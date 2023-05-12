@@ -4,13 +4,13 @@ import dev.minn.jda.ktx.interactions.components.link
 import main.constants.BotConstants
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.SupportServerMessages
 import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class SupportServerCommand : AbstractSlashCommand(Command(
+class SupportServerCommand : AbstractSlashCommand(SlashCommand(
     name = "support",
     description = "Need help? Use this command to join our support server.",
     guildUseOnly = false

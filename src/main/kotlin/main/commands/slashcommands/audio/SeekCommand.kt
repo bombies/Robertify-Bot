@@ -9,7 +9,7 @@ import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -22,7 +22,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class SeekCommand : AbstractSlashCommand(
-    Command(
+    SlashCommand(
         name = "seek",
         description = "Jump to a specific position in the current song",
         options = listOf(
