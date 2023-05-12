@@ -1,17 +1,16 @@
 package main.commands.slashcommands.audio.filters.internal
 
 import lavalink.client.io.filters.Filters
-import main.audiohandlers.RobertifyAudioManagerKt
-import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.isNotNull
-import main.utils.RobertifyEmbedUtilsKt
-import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt.Companion.audioChannelChecks
-import main.utils.json.logs.LogTypeKt
+import main.audiohandlers.RobertifyAudioManager
+import main.utils.GeneralUtils
+import main.utils.GeneralUtils.isNotNull
+import main.utils.RobertifyEmbedUtils
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand.Companion.audioChannelChecks
+import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
-import main.utils.locale.LocaleManagerKt
+import main.utils.locale.LocaleManager
 import main.utils.locale.messages.FilterMessages
 import main.utils.locale.messages.GeneralMessages
-import main.utils.locale.messages.RobertifyLocaleMessageKt
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
@@ -44,48 +43,48 @@ internal inline fun handleGenericFilterToggle(
     if (acChecks.isNotNull()) return acChecks!!
 
     val guild = selfVoiceState.guild
-    val player = RobertifyAudioManagerKt[guild].player
+    val player = RobertifyAudioManager[guild].player
     val filters = player.filters
     val logUtils = LogUtilsKt(guild)
-    val localeManager = LocaleManagerKt[guild]
+    val localeManager = LocaleManager[guild]
 
     return if (filterPredicate(filters)) {
         filterOff(filters)
         logUtils.sendLog(
-            LogTypeKt.FILTER_TOGGLE,
+            LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
                 localeManager.getMessage(
                     FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
                     Pair("{filter}", filterName),
-                    GeneralUtilsKt.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
+                    GeneralUtils.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
                 )
             }"
         )
 
-        RobertifyEmbedUtilsKt.embedMessage(
+        RobertifyEmbedUtils.embedMessage(
             guild,
             FilterMessages.FILTER_TOGGLE_MESSAGE,
             Pair("{filter}", filterName),
-            GeneralUtilsKt.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
+            GeneralUtils.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
         ).build()
     } else {
         filterOn(filters)
         logUtils.sendLog(
-            LogTypeKt.FILTER_TOGGLE,
+            LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
                 localeManager.getMessage(
                     FilterMessages.FILTER_TOGGLE_LOG_MESSAGE,
                     Pair("{filter}", filterName),
-                    GeneralUtilsKt.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
+                    GeneralUtils.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
                 )
             }"
         )
 
-        RobertifyEmbedUtilsKt.embedMessage(
+        RobertifyEmbedUtils.embedMessage(
             guild,
             FilterMessages.FILTER_TOGGLE_MESSAGE,
             Pair("{filter}", filterName),
-            GeneralUtilsKt.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
+            GeneralUtils.Pair("{status}", GeneralMessages.ON_STATUS, localeManager)
         ).build()
     }
 }

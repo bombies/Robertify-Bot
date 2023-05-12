@@ -1,0 +1,31 @@
+package main.commands.slashcommands.audio.filters
+
+import lavalink.client.io.filters.Karaoke
+import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.component.interactions.slashcommand.models.Command
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+
+class KaraokeFilter : AbstractSlashCommand(Command(
+    name = "karaoke",
+    description = "Toggle the Karaoke filter.",
+    isPremium = true
+)) {
+
+    override suspend fun handle(event: SlashCommandInteractionEvent) {
+        event.replyEmbed {
+            handleGenericFilterToggle(
+                memberVoiceState = event.member!!.voiceState!!,
+                selfVoiceState = event.guild!!.selfMember.voiceState!!,
+                filterName = "Karaoke",
+                filterPredicate = { karaoke != null },
+                filterOn = { setKaraoke(Karaoke()).commit() },
+                filterOff = { setKaraoke(null).commit() }
+            )
+        }.queue()
+    }
+
+    override val help: String
+        get() = "Toggle the Karaoke filter."
+}

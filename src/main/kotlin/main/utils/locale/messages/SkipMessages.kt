@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class SkipMessages : LocaleMessageKt {
+enum class SkipMessages : LocaleMessage {
     VOTE_SKIP_STARTED,
     VOTE_SKIP_CANCELLED,
     VOTE_SKIP_STARTED_LOG,

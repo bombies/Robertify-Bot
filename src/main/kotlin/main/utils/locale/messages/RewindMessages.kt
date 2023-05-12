@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class RewindMessages : LocaleMessageKt {
+enum class RewindMessages : LocaleMessage {
     INVALID_DURATION,
     CANT_REWIND_STREAM,
     REWIND_TO_BEGINNING,

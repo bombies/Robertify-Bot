@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class ShuffleMessages : LocaleMessageKt {
+enum class ShuffleMessages : LocaleMessage {
     SHUFFLED,
     SHUFFLED_LOG
 }

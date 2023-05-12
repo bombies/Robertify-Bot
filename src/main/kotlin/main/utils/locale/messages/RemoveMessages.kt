@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class RemoveMessages : LocaleMessageKt {
+enum class RemoveMessages : LocaleMessage {
     REMOVE_INVALID_ID,
     REMOVED,
     REMOVED_LOG,

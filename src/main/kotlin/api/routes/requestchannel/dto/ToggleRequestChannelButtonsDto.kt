@@ -2,7 +2,7 @@ package api.routes.requestchannel.dto
 
 import io.ktor.server.plugins.requestvalidation.*
 import kotlinx.serialization.Serializable
-import main.utils.GeneralUtilsKt.isDiscordId
+import main.utils.GeneralUtils.isDiscordId
 
 @Serializable
 data class ToggleRequestChannelButtonsDto(

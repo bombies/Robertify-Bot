@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class LoopMessages : LocaleMessageKt {
+enum class LoopMessages : LocaleMessage {
     LOOP_NOTHING_PLAYING,
     LOOP_STOP,
     LOOP_START,

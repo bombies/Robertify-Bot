@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class GeneralMessages : LocaleMessageKt {
+enum class GeneralMessages : LocaleMessage {
     ON_STATUS,
     OFF_STATUS,
     INVALID_ARGS,

@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class TogglesMessages : LocaleMessageKt {
+enum class TogglesMessages : LocaleMessage {
     TOGGLES_EMBED_TITLE,
     TOGGLES_EMBED_TOGGLE_ID_FIELD,
     TOGGLES_MESSAGES_EMBED_FEATURE_FIELD,

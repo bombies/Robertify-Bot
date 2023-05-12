@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class ShufflePlayMessages : LocaleMessageKt {
+enum class ShufflePlayMessages : LocaleMessage {
     MISSING_LINK,
     INVALID_LINK,
     NOT_PLAYLIST,

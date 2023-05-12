@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class TrackSchedulerMessages : LocaleMessageKt {
+enum class TrackSchedulerMessages : LocaleMessage {
     TRACK_COULD_NOT_BE_PLAYED,
     COULD_NOT_FIND_SOURCE,
     COPYRIGHT_TRACK,

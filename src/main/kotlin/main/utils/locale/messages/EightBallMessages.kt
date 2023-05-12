@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class EightBallMessages : LocaleMessageKt {
+enum class EightBallMessages : LocaleMessage {
     MUST_PROVIDE_SOMETHING_TO_RESPOND_TO,
     PROVIDE_INDEX_TO_REMOVE,
     INVALID_INDEX_INTEGER,

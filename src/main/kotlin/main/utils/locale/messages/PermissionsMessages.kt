@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class PermissionsMessages : LocaleMessageKt {
+enum class PermissionsMessages : LocaleMessage {
     PERMISSIONS_NONE,
     MENTIONABLE_PERMISSIONS_NONE,
     PERMISSIONS_LIST,

@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class SearchMessages : LocaleMessageKt {
+enum class SearchMessages : LocaleMessage {
     MUST_PROVIDE_QUERY,
     LOOKING_FOR,
     SEARCH_MENU_PLACEHOLDER,

@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class JumpMessages : LocaleMessageKt {
+enum class JumpMessages : LocaleMessage {
     JUMP_MISSING_AMOUNT,
     JUMP_INVALID_DURATION,
     JUMP_DURATION_NEG_ZERO,

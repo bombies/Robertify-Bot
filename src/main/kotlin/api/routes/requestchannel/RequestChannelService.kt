@@ -10,8 +10,8 @@ import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
 import api.routes.requestchannel.responses.RequestChannelCreationResponse
 import io.ktor.http.*
 import io.ktor.util.logging.*
-import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommandKt
-import main.utils.json.requestchannel.RequestChannelConfigKt
+import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommand
+import main.utils.json.requestchannel.RequestChannelConfig
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.sharding.ShardManager
 
@@ -25,7 +25,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
         val guild = guildUtils.getGuild(createChannelDto.server_id) ?: return noGuild(createChannelDto.server_id)
 
         return try {
-            val channel = RequestChannelEditCommandKt().createRequestChannel(guild, shardManager).await()
+            val channel = RequestChannelEditCommand().createRequestChannel(guild, shardManager).await()
             OkResponse(
                 message = "Success",
                 data = RequestChannelCreationResponse(
@@ -44,14 +44,14 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
     suspend fun toggleButton(dto: ToggleRequestChannelButtonDto): GenericResponse {
         val guild = guildUtils.getGuild(dto.server_id) ?: return noGuild(dto.server_id)
 
-        val config = RequestChannelConfigKt(guild, shardManager)
+        val config = RequestChannelConfig(guild, shardManager)
         if (!config.isChannelSet())
             return ExceptionResponse(
                 reason = "The request channel is hasn't been setup for ${guild.name}",
                 status = HttpStatusCode.BadRequest
             )
 
-        RequestChannelEditCommandKt()
+        RequestChannelEditCommand()
             .handleChannelButtonToggle(guild, dto.button.lowercase(), shardManager = shardManager)
             ?.join()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
@@ -60,7 +60,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
     suspend fun toggleButtons(dto: ToggleRequestChannelButtonsDto): GenericResponse {
         val guild = guildUtils.getGuild(dto.server_id) ?: return noGuild(dto.server_id)
 
-        val config = RequestChannelConfigKt(guild, shardManager)
+        val config = RequestChannelConfig(guild, shardManager)
         if (!config.isChannelSet())
             return ExceptionResponse(
                 reason = "The request channel is hasn't been setup for ${guild.name}",
@@ -68,7 +68,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
             )
 
         dto.buttons.forEach { button ->
-            RequestChannelEditCommandKt()
+            RequestChannelEditCommand()
                 .handleChannelButtonToggle(guild, button.lowercase(), shardManager = shardManager)
                 ?.join()
         }
@@ -80,7 +80,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
         val guild = guildUtils.getGuild(id) ?: return noGuild(id)
 
         return try {
-            RequestChannelEditCommandKt().deleteRequestChannel(guild, shardManager)
+            RequestChannelEditCommand().deleteRequestChannel(guild, shardManager)
             OkResponse(message = "Successfully deleted request channel for ${guild.name}!")
         } catch (e: InsufficientPermissionException) {
             ExceptionResponse(

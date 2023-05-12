@@ -1,11 +1,11 @@
 package main.events
 
 import dev.minn.jda.ktx.util.SLF4J
-import main.commands.slashcommands.management.requestchannel.RequestChannelEventsKt
-import main.commands.slashcommands.misc.polls.PollEventsKt
-import main.commands.slashcommands.util.suggestions.SuggestionChannelEventsKt
-import main.main.ListenerKt
-import main.utils.pagination.PaginationEventsKt
+import main.commands.slashcommands.management.requestchannel.RequestChannelEvents
+import main.commands.slashcommands.misc.polls.PollEvents
+import main.commands.slashcommands.util.suggestions.SuggestionChannelEvents
+import main.main.Listener
+import main.utils.pagination.PaginationEvents
 
 object EventManager {
 
@@ -16,11 +16,11 @@ object EventManager {
      */
     val registeredEvents by lazy {
         listOf(
-            ListenerKt(),
-            PaginationEventsKt(),
-            RequestChannelEventsKt(),
-            SuggestionChannelEventsKt(),
-            PollEventsKt()
+            Listener(),
+            PaginationEvents(),
+            RequestChannelEvents(),
+            SuggestionChannelEvents(),
+            PollEvents()
         )
     }
 }

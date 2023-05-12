@@ -21,7 +21,7 @@
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <serialization.version>1.5.0</serialization.version>
         <maven.compiler.target>19</maven.compiler.target>
-        <main.class>main.main.RobertifyKt</main.class>
+        <main.class>main.main.Robertify</main.class>
     </properties>
 
     <repositories>

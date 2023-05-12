@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class RestrictedChannelMessages : LocaleMessageKt {
+enum class RestrictedChannelMessages : LocaleMessage {
     MISSING_RESTRICTED_CHANNEL,
     INVALID_RESTRICTED_CHANNEL_ID,
     RESTRICTED_CHANNELS_TOGGLED_OFF,

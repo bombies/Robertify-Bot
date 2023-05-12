@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class PlaytimeMessages : LocaleMessageKt {
+enum class PlaytimeMessages : LocaleMessage {
     LISTENED_TO,
     LAST_BOOTED
 }

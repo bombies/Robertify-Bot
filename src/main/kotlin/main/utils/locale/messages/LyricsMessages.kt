@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class LyricsMessages : LocaleMessageKt {
+enum class LyricsMessages : LocaleMessage {
     LYRICS_SOURCE_NOT_SUPPORTED,
     LYRICS_SEARCHING,
     LYRICS_NOW_SEARCHING,

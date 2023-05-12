@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class SeekMessages : LocaleMessageKt {
+enum class SeekMessages : LocaleMessage {
     INVALID_MINUTES,
     INVALID_SECONDS,
     POS_GT_DURATION,

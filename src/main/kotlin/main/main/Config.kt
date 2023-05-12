@@ -3,8 +3,8 @@ package main.main
 import io.github.cdimascio.dotenv.Dotenv
 import lombok.SneakyThrows
 import main.constants.ENV
-import main.utils.GeneralUtilsKt
-import main.utils.lavalink.LavaNodeKt
+import main.utils.GeneralUtils
+import main.utils.lavalink.LavaNode
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.awt.Color
@@ -61,15 +61,15 @@ class Config {
         val BOT_TOKEN: String
             get() = get(ENV.BOT_TOKEN)
 
-        val LAVA_NODES: List<LavaNodeKt>
+        val LAVA_NODES: List<LavaNode>
             get() = try {
-                val ret = mutableListOf<LavaNodeKt>()
+                val ret = mutableListOf<LavaNode>()
                 val jsonObject = getConfigJSON()
                 jsonObject.getJSONArray("nodes")
                     .forEach { obj ->
                         if (obj is JSONObject) {
                             ret.add(
-                                LavaNodeKt(
+                                LavaNode(
                                     name = obj.getString("name"),
                                     host = obj.getString("host"),
                                     port = obj.getString("port"),
@@ -237,7 +237,7 @@ class Config {
                 file.createNewFile()
                 logger.warn("config.json didn't exist, so I created one.")
             }
-            return JSONObject(GeneralUtilsKt.getFileContent(file.path))
+            return JSONObject(GeneralUtils.getFileContent(file.path))
         }
     }
 }

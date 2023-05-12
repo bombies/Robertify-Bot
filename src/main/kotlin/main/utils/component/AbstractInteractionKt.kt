@@ -1,3 +1,0 @@
-package main.utils.component
-
-interface AbstractInteractionKt

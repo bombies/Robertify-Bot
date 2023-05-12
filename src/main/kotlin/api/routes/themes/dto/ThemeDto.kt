@@ -2,8 +2,8 @@ package api.routes.themes.dto
 
 import io.ktor.server.plugins.requestvalidation.*
 import kotlinx.serialization.Serializable
-import main.constants.RobertifyThemeKt
-import main.utils.GeneralUtilsKt.isDiscordId
+import main.constants.RobertifyTheme
+import main.utils.GeneralUtils.isDiscordId
 
 @Serializable
 data class ThemeDto(
@@ -17,7 +17,7 @@ fun RequestValidationConfig.validateThemeDto() {
             return@validate ValidationResult.Invalid("The server id must be a valid Discord id!")
 
         try {
-            RobertifyThemeKt.parse(themeDto.theme)
+            RobertifyTheme.parse(themeDto.theme)
             ValidationResult.Valid
         } catch (e: IllegalArgumentException) {
             ValidationResult.Invalid("${themeDto.theme} is an invalid theme!")

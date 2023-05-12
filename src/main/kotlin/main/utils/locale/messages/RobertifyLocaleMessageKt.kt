@@ -1,12 +1,12 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 import kotlin.reflect.KClass
 
 class RobertifyLocaleMessageKt {
 
     companion object {
-        fun getMessageTypes(): Map<KClass<out LocaleMessageKt>, Array<out LocaleMessageKt>> = mapOf(
+        fun getMessageTypes(): Map<KClass<out LocaleMessage>, Array<out LocaleMessage>> = mapOf(
             GeneralMessages::class to GeneralMessages.values(),
             RandomMessages::class to RandomMessages.values(),
             FilterMessages::class to FilterMessages.values(),

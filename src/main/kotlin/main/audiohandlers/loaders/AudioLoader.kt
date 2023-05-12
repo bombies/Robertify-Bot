@@ -3,17 +3,17 @@ package main.audiohandlers.loaders
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
-import main.audiohandlers.GuildMusicManagerKt
-import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.GuildMusicManager
+import main.audiohandlers.RobertifyAudioManager
 
 abstract class AudioLoader : AudioLoadResultHandler {
     companion object {
         private val playerManager: AudioPlayerManager
-            get() = RobertifyAudioManagerKt.playerManager
+            get() = RobertifyAudioManager.playerManager
     }
 
     abstract val query: String
-    abstract val musicManager: GuildMusicManagerKt
+    abstract val musicManager: GuildMusicManager
 
     fun loadItem() {
         playerManager.loadItemOrdered(musicManager, query, this)

@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class HelpMessages : LocaleMessageKt {
+enum class HelpMessages : LocaleMessage {
     HELP_MANAGEMENT_OPTION,
     HELP_MANAGEMENT_OPTION_DESC,
     HELP_MUSIC_OPTION,

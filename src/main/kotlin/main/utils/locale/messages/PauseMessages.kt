@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class PauseMessages : LocaleMessageKt {
+enum class PauseMessages : LocaleMessage {
     PAUSED,
     PAUSED_LOG,
     RESUMED,

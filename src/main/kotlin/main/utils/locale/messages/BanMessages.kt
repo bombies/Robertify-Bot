@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class BanMessages : LocaleMessageKt {
+enum class BanMessages : LocaleMessage {
     BAN_INVALID_USER,
     BAN_INVALID_USER_DETAILED,
     INVALID_BAN_DURATION,

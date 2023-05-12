@@ -1,9 +1,8 @@
 package main.utils.database.influxdb.databases.commands
 
 import com.influxdb.query.FluxRecord
-import com.influxdb.query.dsl.functions.restriction.Restrictions
 import kotlinx.coroutines.channels.Channel
-import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.influxdb.AbstractInfluxDatabase
 import main.utils.database.influxdb.InfluxDatabase
 import net.dv8tion.jda.api.entities.Guild
@@ -14,7 +13,7 @@ object CommandInfluxDatabase : AbstractInfluxDatabase(InfluxDatabase.COMMAND_STA
 
     suspend fun recordCommand(
         guild: Guild?,
-        command: AbstractSlashCommandKt,
+        command: AbstractSlashCommand,
         executor: User
     ) {
         writeMeasurement(
@@ -28,7 +27,7 @@ object CommandInfluxDatabase : AbstractInfluxDatabase(InfluxDatabase.COMMAND_STA
     }
 
     suspend fun getRecordedCommands(
-        command: AbstractSlashCommandKt,
+        command: AbstractSlashCommand,
         guild: Guild? = null,
         executor: User? = null
     ): Channel<FluxRecord>? {

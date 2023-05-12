@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class NowPlayingMessages : LocaleMessageKt {
+enum class NowPlayingMessages : LocaleMessage {
     NP_LOFI_TITLE,
     NP_EMBED_TITLE,
     NP_REQUESTER,

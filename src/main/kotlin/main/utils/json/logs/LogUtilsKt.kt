@@ -1,8 +1,8 @@
 package main.utils.json.logs
 
-import main.utils.json.toggles.TogglesConfigKt
-import main.utils.locale.LocaleManagerKt
-import main.utils.locale.LocaleMessageKt
+import main.utils.json.toggles.TogglesConfig
+import main.utils.locale.LocaleManager
+import main.utils.locale.LocaleMessage
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
@@ -11,11 +11,11 @@ import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import java.time.Instant
 
 class LogUtilsKt(private val guild: Guild) {
-    private val config: LogConfigKt = LogConfigKt(guild)
+    private val config: LogConfig = LogConfig(guild)
 
-    fun sendLog(type: LogTypeKt, message: String) {
+    fun sendLog(type: LogType, message: String) {
         if (!config.channelIsSet) return
-        if (!TogglesConfigKt(guild).getLogToggle(type)) return
+        if (!TogglesConfig(guild).getLogToggle(type)) return
         val channel = config.channel
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
@@ -27,10 +27,10 @@ class LogUtilsKt(private val guild: Guild) {
         ).queue()
     }
 
-    fun sendLog(type: LogTypeKt, message: LocaleMessageKt) {
+    fun sendLog(type: LogType, message: LocaleMessage) {
         if (!config.channelIsSet) return
-        if (!TogglesConfigKt(guild).getLogToggle(type)) return
-        val localeManager = LocaleManagerKt[guild]
+        if (!TogglesConfig(guild).getLogToggle(type)) return
+        val localeManager = LocaleManager[guild]
         val channel = config.channel
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
@@ -43,10 +43,10 @@ class LogUtilsKt(private val guild: Guild) {
     }
 
     @SafeVarargs
-    fun sendLog(type: LogTypeKt, message: LocaleMessageKt, vararg placeholders: Pair<String, String>) {
+    fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
         if (!config.channelIsSet) return
-        if (!TogglesConfigKt(guild).getLogToggle(type)) return
-        val localeManager = LocaleManagerKt[guild]
+        if (!TogglesConfig(guild).getLogToggle(type)) return
+        val localeManager = LocaleManager[guild]
         val channel = config.channel
         try {
             channel!!.sendMessageEmbeds(

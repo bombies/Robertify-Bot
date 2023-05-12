@@ -2,8 +2,8 @@ package api.routes.locale
 
 import io.ktor.server.plugins.requestvalidation.*
 import kotlinx.serialization.Serializable
-import main.utils.GeneralUtilsKt.isDiscordId
-import main.utils.locale.RobertifyLocaleKt
+import main.utils.GeneralUtils.isDiscordId
+import main.utils.locale.RobertifyLocale
 
 @Serializable
 data class LocaleDto(
@@ -17,7 +17,7 @@ fun RequestValidationConfig.validateLocaleDto() {
             return@validate ValidationResult.Invalid("The server id must be a valid Discord id!")
 
         try {
-            RobertifyLocaleKt.parse(dto.locale.lowercase())
+            RobertifyLocale.parse(dto.locale.lowercase())
             ValidationResult.Valid
         } catch (e: IllegalArgumentException) {
             ValidationResult.Invalid("${dto.locale} is an invalid locale!")

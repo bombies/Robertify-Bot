@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class PollMessages : LocaleMessageKt {
+enum class PollMessages : LocaleMessage {
     POLL_ENDS_AT,
     POLL_BY,
     POLL_SENT,

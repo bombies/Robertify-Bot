@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class AudioLoaderMessages : LocaleMessageKt {
+enum class AudioLoaderMessages : LocaleMessage {
     QUEUE_ADD,
     QUEUE_PLAYLIST_ADD,
     QUEUE_ADD_LOG,

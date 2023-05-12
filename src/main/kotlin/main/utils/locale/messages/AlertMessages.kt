@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class AlertMessages : LocaleMessageKt {
+enum class AlertMessages : LocaleMessage {
     ALERT_EMBED_TITLE,
     NO_ALERT,
     ALERT_EMBED_FOOTER

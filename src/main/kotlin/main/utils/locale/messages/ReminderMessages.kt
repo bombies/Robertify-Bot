@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class ReminderMessages : LocaleMessageKt {
+enum class ReminderMessages : LocaleMessage {
     REMINDERS_EMBED_TITLE,
     CANNOT_SET_BANNED_REMINDER_CHANNEL,
     REMINDER_INVALID_TIME_FORMAT,

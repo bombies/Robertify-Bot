@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class BotInfoMessages : LocaleMessageKt {
+enum class BotInfoMessages : LocaleMessage {
     BOT_INFO_DEVELOPERS,
     BOT_INFO_ABOUT_ME_LABEL,
     BOT_INFO_ABOUT_ME_VALUE,

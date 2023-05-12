@@ -1,12 +1,12 @@
 package main.commands.slashcommands.dev.test
 
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
-import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
-import main.utils.component.interactions.slashcommand.models.CommandKt
+import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.component.interactions.slashcommand.models.Command
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class TestSentryCommand : AbstractSlashCommandKt(
-    CommandKt(
+class TestSentryCommand : AbstractSlashCommand(
+    Command(
         name = "testsentry",
         description = "Test if Sentry is correctly capturing events",
         developerOnly = true

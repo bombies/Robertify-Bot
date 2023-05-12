@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class DedicatedChannelMessages : LocaleMessageKt {
+enum class DedicatedChannelMessages : LocaleMessage {
     DEDICATED_CHANNEL_SETUP,
     DEDICATED_CHANNEL_SETUP_2,
     DEDICATED_CHANNEL_ALREADY_SETUP,

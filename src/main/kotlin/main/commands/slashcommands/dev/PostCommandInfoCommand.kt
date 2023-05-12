@@ -3,18 +3,18 @@ package main.commands.slashcommands.dev
 import dev.minn.jda.ktx.util.SLF4J
 import io.ktor.client.statement.*
 import io.ktor.http.*
-import main.commands.slashcommands.SlashCommandManagerKt
-import main.main.RobertifyKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.sendEmbed
-import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
-import main.utils.component.interactions.slashcommand.models.CommandKt
+import main.commands.slashcommands.SlashCommandManager
+import main.main.Robertify
+import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.component.interactions.slashcommand.models.Command
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-class PostCommandInfoCommand : AbstractSlashCommandKt(
-    CommandKt(
+class PostCommandInfoCommand : AbstractSlashCommand(
+    Command(
         name = "postcommandinfo",
         description = "Post all command info to the Robertify API!",
         developerOnly = true
@@ -26,7 +26,7 @@ class PostCommandInfoCommand : AbstractSlashCommandKt(
     }
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        val commandManager = SlashCommandManagerKt
+        val commandManager = SlashCommandManager
         val commands = commandManager.globalCommands
 
         val body = JSONObject()
@@ -46,7 +46,7 @@ class PostCommandInfoCommand : AbstractSlashCommandKt(
         event.deferReply(true).queue()
 
         val guild = event.guild
-        val response = RobertifyKt.externalApi.postCommandInfo(body)
+        val response = Robertify.externalApi.postCommandInfo(body)
         if (response != null && response.status == HttpStatusCode.Created)
             event.hook.sendEmbed(guild, "Posted!")
                 .queue()

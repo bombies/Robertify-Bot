@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class ThemeMessages : LocaleMessageKt {
+enum class ThemeMessages : LocaleMessage {
     THEME_SET,
     THEME_EMBED_TITLE,
     THEME_EMBED_DESC,

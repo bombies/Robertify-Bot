@@ -1,8 +1,8 @@
 package main.utils.locale.messages
 
-import main.utils.locale.LocaleMessageKt
+import main.utils.locale.LocaleMessage
 
-enum class FavouriteTracksMessages : LocaleMessageKt {
+enum class FavouriteTracksMessages : LocaleMessage {
     FT_MISSING_ID,
     FT_INVALID_ID,
     FT_INVALID_SOURCE,

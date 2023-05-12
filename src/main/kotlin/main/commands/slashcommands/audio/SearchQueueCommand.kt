@@ -1,32 +1,31 @@
 package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
-import main.audiohandlers.RobertifyAudioManagerKt
+import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.title
-import main.commands.slashcommands.SlashCommandManagerKt.getRequiredOption
-import main.utils.GeneralUtilsKt
-import main.utils.GeneralUtilsKt.toMention
-import main.utils.RobertifyEmbedUtilsKt
-import main.utils.RobertifyEmbedUtilsKt.Companion.replyEmbed
-import main.utils.component.interactions.slashcommand.AbstractSlashCommandKt
-import main.utils.component.interactions.slashcommand.models.CommandKt
-import main.utils.component.interactions.slashcommand.models.CommandOptionKt
-import main.utils.locale.LocaleManagerKt
+import main.commands.slashcommands.SlashCommandManager.getRequiredOption
+import main.utils.GeneralUtils
+import main.utils.RobertifyEmbedUtils
+import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.component.interactions.slashcommand.models.Command
+import main.utils.component.interactions.slashcommand.models.CommandOption
+import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
 import main.utils.locale.messages.SearchQueueMessages
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class SearchQueueCommand : AbstractSlashCommandKt(
-    CommandKt(
+class SearchQueueCommand : AbstractSlashCommand(
+    Command(
         name = "searchqueue",
         description = "Search your queue for a specific track and all of the current information.",
         options = listOf(
-            CommandOptionKt(
+            CommandOption(
                 name = "title",
                 description = "The track's title to search for."
             ),
-            CommandOptionKt(
+            CommandOption(
                 name = "author",
                 description = "The track's author to search for."
             ),
@@ -36,7 +35,7 @@ class SearchQueueCommand : AbstractSlashCommandKt(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        val scheduler = RobertifyAudioManagerKt[guild].scheduler
+        val scheduler = RobertifyAudioManager[guild].scheduler
         val queueHandler = scheduler.queueHandler
 
         if (queueHandler.isEmpty)
@@ -53,17 +52,17 @@ class SearchQueueCommand : AbstractSlashCommandKt(
             Pair("{author}", authorQuery)
         ).queue()
 
-        val embedBuilder = RobertifyEmbedUtilsKt.embedMessage(
+        val embedBuilder = RobertifyEmbedUtils.embedMessage(
             guild,
             SearchQueueMessages.QUEUE_SEARCH_ITEM_FOUND,
             Pair("{title}", result.title),
             Pair("{author}", result.author),
-            Pair("{duration}", GeneralUtilsKt.formatTime(result.duration)),
+            Pair("{duration}", GeneralUtils.formatTime(result.duration)),
             Pair("{position}", (queueHandler.contents.indexOf(result) + 1).toString()),
             Pair(
                 "{requester}",
                 scheduler.findRequester(result.identifier)?.toString()
-                    ?: LocaleManagerKt[guild][GeneralMessages.UNKNOWN_REQUESTER]
+                    ?: LocaleManager[guild][GeneralMessages.UNKNOWN_REQUESTER]
             )
         )
 
