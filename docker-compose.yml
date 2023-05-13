@@ -1,0 +1,10 @@
+version: "2.2"
+
+services:
+  robertify:
+    env_file:
+      - .env
+    image: bombies/robertify:6.0.0-PRE_ALPHA-1
+    build:
+      context: .
+      dockerfile: Dockerfile
