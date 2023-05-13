@@ -144,7 +144,7 @@ class PlayCommand : AbstractSlashCommand(
                 } else link = URL(link).getDestination()
 
                 when {
-                    link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=[a-zA-Z0-9]+)?".toRegex()) -> {
+                    link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=.+)?".toRegex()) -> {
                         event.hook.sendEmbed(guild) {
                             embed(
                                 ShufflePlayMessages.NOT_PLAYLIST,
