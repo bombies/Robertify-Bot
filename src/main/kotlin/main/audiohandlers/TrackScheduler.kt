@@ -4,6 +4,7 @@ import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import lavalink.client.io.Link
 import lavalink.client.player.IPlayer
@@ -21,6 +22,8 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
 import main.utils.api.robertify.imagebuilders.ImageBuilderException
 import main.utils.api.robertify.imagebuilders.builders.NowPlayingImageBuilder
+import main.utils.database.influxdb.databases.tracks.TrackInfluxDatabase
+import main.utils.internal.coroutines.RobertifyCoroutineScope
 import main.utils.json.autoplay.AutoPlayConfig
 import main.utils.json.guildconfig.GuildConfig
 import main.utils.json.requestchannel.RequestChannelConfig
@@ -92,6 +95,18 @@ class TrackScheduler(private val guild: Guild, private val link: Link) : PlayerE
 
     override fun onTrackStart(player: IPlayer, track: AudioTrack) {
         logger.debug("${link.state.name} | AudioTrack started (${track.info.title}). Announcement channel: ${announcementChannel?.id ?: "undefined"}")
+        val requester = findRequester(track.identifier)
+
+        if (requester?.id != guild.selfMember.id)
+            RobertifyCoroutineScope.launch {
+                TrackInfluxDatabase.recordTrack(
+                    title = track.title,
+                    author = track.author,
+                    guild = guild,
+                    requester = requester
+                )
+            }
+
         val requestChannelConfig = RequestChannelConfig(guild)
         requestChannelConfig.updateMessage()
 
@@ -111,7 +126,8 @@ class TrackScheduler(private val guild: Guild, private val link: Link) : PlayerE
         if (announcementChannel == null)
             return
 
-        val requester = findRequester(track.identifier) ?: return
+        if (requester == null)
+            return
         val requesterMention = getRequesterAsMention(track)
         if (requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == announcementChannel!!.idLong)
             return
