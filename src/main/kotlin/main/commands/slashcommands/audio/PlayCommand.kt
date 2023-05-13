@@ -311,12 +311,12 @@ class PlayCommand : AbstractSlashCommand(
         val query = event.focusedOption.value
 
         if (query.isBlank() || query.isEmpty())
-            return
+            return event.replyChoices().queue()
 
         // If the query seems to be a url, there's no need to load
         // recommendations.
         if (query.trim().matches("https?://[\\w\\W]*".toRegex()))
-            return
+            return event.replyChoices().queue()
 
         event.replyChoices(Robertify.spotifyApi.search.searchTrack(query, limit = 25)
             .mapNotNull { option ->
