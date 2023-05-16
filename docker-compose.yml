@@ -2,9 +2,16 @@ version: "2.2"
 
 services:
   robertify:
-    env_file:
-      - .env
+    network_mode: "host"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     image: bombies/robertify:6.0.0-PRE_ALPHA-1
+    volumes:
+      - ./.env:/opt/robertify/.env
+      - ./json/config.json:/opt/robertify/json/config.json
+    ports:
+      - '8080:8080'
+      - '6379:6379'
     build:
       context: .
       dockerfile: Dockerfile
