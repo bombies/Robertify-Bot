@@ -10,6 +10,7 @@ enum class RobertifyMongoDatabase(val str: String) {
     // Collections
     ROBERTIFY_BOT_INFO("main"),
     ROBERTIFY_GUILDS("guilds"),
+    ROBERTIFY_PLAYLISTS("playlists"),
     ROBERTIFY_PERMISSIONS("permissions"),
     ROBERTIFY_TEST("test"),
     ROBERTIFY_STATS("statistics"),

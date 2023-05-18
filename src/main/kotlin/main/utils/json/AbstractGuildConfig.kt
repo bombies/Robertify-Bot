@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 
-abstract class AbstractGuildConfig protected constructor(private val guild: Guild) : AbstractJSON {
+abstract class AbstractGuildConfig protected constructor(private val guild: Guild) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)

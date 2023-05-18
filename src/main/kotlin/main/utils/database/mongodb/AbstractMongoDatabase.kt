@@ -38,7 +38,7 @@ abstract class AbstractMongoDatabase {
      var collection: MongoCollection<Document>
         protected set
 
-    constructor(db: RobertifyMongoDatabase, collection: RobertifyMongoDatabase) {
+    constructor(db: RobertifyMongoDatabase = RobertifyMongoDatabase.ROBERTIFY_DATABASE, collection: RobertifyMongoDatabase) {
         database = MongoConnectionManager.connect(db).database()
 
         try {
@@ -229,10 +229,10 @@ abstract class AbstractMongoDatabase {
     }
 
     protected fun <T> getDocuments(key: String, value: T): String {
-        return getDocuments(key, value, false) ?: throw NullPointerException("Couldn't find any documents where they key ($key) matches the value (${value.toString()})")
+        return getDocuments(key, value, false)
     }
 
-    protected fun <T> getDocuments(key: String, value: T, indented: Boolean): String? {
+    protected fun <T> getDocuments(key: String, value: T, indented: Boolean): String {
         val doc: Iterator<Document> = when (value) {
             is String -> findDocument(key, value)
             is Document -> findDocument(key, value)
