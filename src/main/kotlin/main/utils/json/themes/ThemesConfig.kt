@@ -4,6 +4,7 @@ import main.constants.RobertifyTheme
 import main.utils.database.mongodb.cache.GuildDBCache
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
+import main.utils.json.getIndexOfObjectInArray
 import net.dv8tion.jda.api.entities.Guild
 import org.bson.Document
 import org.json.JSONException

@@ -4,6 +4,8 @@ import main.constants.RobertifyPermission
 import main.utils.database.mongodb.cache.GuildDBCache
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
+import main.utils.json.getIndexOfObjectInArray
+import main.utils.json.remove
 import net.dv8tion.jda.api.entities.Guild
 import org.bson.Document
 import org.json.JSONArray
@@ -51,7 +53,7 @@ class PermissionsConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         val usersObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
             .getJSONObject(PermissionConfigField.USER_PERMISSIONS.toString())
         val array = usersObj.getJSONArray(userID.toString())
-        array.remove(getIndexOfObjectInArray(array, p.code))
+        array.remove(p.code)
         usersObj.put(userID.toString(), array)
         cache.updateCache(obj, GuildDB.Field.GUILD_ID, guild.idLong)
     }

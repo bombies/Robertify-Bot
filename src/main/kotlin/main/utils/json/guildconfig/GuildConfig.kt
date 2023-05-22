@@ -5,6 +5,7 @@ import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.autoplay.AutoPlayConfig
 import main.utils.json.reminders.RemindersConfig
+import main.utils.json.remove
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONArray
 import org.json.JSONObject
@@ -104,7 +105,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         require(isBannedUser(uid)) { "This user isn't banned!" }
         val guildObj = cache.getGuildInfo(guild.idLong) ?: return
         val bannedUsers = guildObj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString())
-        bannedUsers.remove(getIndexOfObjectInArray(bannedUsers, GuildDB.Field.BANNED_USER, uid))
+        bannedUsers.remove(GuildDB.Field.BANNED_USER, uid)
         cache.updateGuild(guildObj)
     }
 

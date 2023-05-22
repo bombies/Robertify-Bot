@@ -2,6 +2,7 @@ package main.utils.json.restrictedchannels
 
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
+import main.utils.json.getIndexOfObjectInArray
 import net.dv8tion.jda.api.entities.Guild
 
 class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(guild) {

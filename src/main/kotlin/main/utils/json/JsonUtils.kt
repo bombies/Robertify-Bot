@@ -65,6 +65,20 @@ fun getIndexOfObjectInArray(array: JSONArray, id: ObjectId): Int {
     return -1
 }
 
+fun JSONArray.has(obj: Any): Boolean =
+    any { it.equals(obj) }
+
+fun JSONArray.has(field: GenericJSONField, obj: Any) =
+    any { if (it is JSONObject) it.get(field.toString()).equals(obj) else false }
+
+fun JSONArray.indexOf(field: GenericJSONField, `object`: Any): Int {
+    check(has(field, `object`)) { "There was no such object found in the array!" }
+    for (i in 0 until length())
+        if (get(i) is JSONObject && getJSONObject(i).get(field.toString()).equals(`object`))
+            return i
+    return -1
+}
+
 fun JSONArray.remove(field: GenericJSONField, value: Any) {
     check(arrayHasObject(this, field, value)) { "There was no such object found in the array!" }
 
@@ -75,4 +89,9 @@ fun JSONArray.remove(field: GenericJSONField, value: Any) {
         .forEach {
             remove(it.first)
         }
+}
+
+fun JSONArray.remove(obj: Any): Int {
+    check(has(obj)) { "There was no such object found in the array!" }
+    return indexOf(obj)
 }

@@ -5,6 +5,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.GenericJSONField
+import main.utils.json.getIndexOfObjectInArray
 import main.utils.json.reminders.scheduler.ReminderScheduler
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONArray
