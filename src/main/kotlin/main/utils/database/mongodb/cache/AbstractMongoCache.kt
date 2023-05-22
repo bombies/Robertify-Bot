@@ -3,13 +3,13 @@ package main.utils.database.mongodb.cache
 import com.mongodb.client.MongoCollection
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.databases.GuildDB
-import main.utils.json.AbstractJSON
 import main.utils.json.GenericJSONField
+import main.utils.json.getIndexOfObjectInArray
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
 
-abstract class AbstractMongoCache protected constructor(val mongoDB: AbstractMongoDatabase) : AbstractJSON, AbstractMongoDatabase(mongoDB) {
+abstract class AbstractMongoCache protected constructor(val mongoDB: AbstractMongoDatabase) : AbstractMongoDatabase(mongoDB) {
     private var cache: JSONObject?
 
     init {

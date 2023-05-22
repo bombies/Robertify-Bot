@@ -2,14 +2,13 @@ package main.utils.database.mongodb.cache.redis
 
 import com.mongodb.client.MongoCollection
 import main.main.Config
-import main.utils.json.AbstractJSON
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
 import redis.clients.jedis.JedisPooled
 import java.util.function.Consumer
 
-abstract class RedisCache protected constructor(cacheID: String) : AbstractJSON {
+abstract class RedisCache protected constructor(cacheID: String) {
     
     private val jedis: JedisPooled = RedisDB.jedis
     protected val cacheID = "$cacheID#${Config.MONGO_DATABASE_NAME}#"

@@ -3,6 +3,7 @@ package main.utils.database.mongodb.cache
 import kotlinx.coroutines.*
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.database.mongodb.databases.GuildDB.getGuildDocument
+import main.utils.json.getIndexOfObjectInArray
 import org.bson.Document
 import org.json.JSONException
 import org.json.JSONObject

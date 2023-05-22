@@ -3,6 +3,7 @@ package main.utils.database.mongodb.cache
 import main.constants.TrackSource
 import main.utils.database.mongodb.DocumentBuilder
 import main.utils.database.mongodb.databases.FavouriteTracksDB
+import main.utils.json.getIndexOfObjectInArray
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONException

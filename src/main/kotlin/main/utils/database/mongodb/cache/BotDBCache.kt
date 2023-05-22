@@ -2,6 +2,8 @@ package main.utils.database.mongodb.cache
 
 import main.utils.database.mongodb.databases.BotDB
 import main.utils.json.GenericJSONField
+import main.utils.json.getIndexOfObjectInArray
+import main.utils.json.has
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -155,7 +157,7 @@ class BotDBCache private constructor() : AbstractMongoCache(BotDB) {
     fun userIsSuggestionBanned(id: Long): Boolean {
         val array = getDocument().getJSONObject(BotDB.Fields.SUGGESTIONS_OBJECT.toString())
             .getJSONArray(SuggestionsConfigField.BANNED_USERS.toString())
-        return arrayHasObject(array, id)
+        return array.has(id)
     }
 
     fun initReportChannels(categoryID: Long, channelID: Long) {
@@ -188,10 +190,8 @@ class BotDBCache private constructor() : AbstractMongoCache(BotDB) {
     }
 
     fun isUserReportsBanned(id: Long): Boolean {
-        return arrayHasObject(
-            getDocument().getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
-                .getJSONArray(ReportsConfigField.BANNED_USERS.toString()), id
-        )
+        return getDocument().getJSONObject(BotDB.Fields.REPORTS_OBJECT.toString())
+            .getJSONArray(ReportsConfigField.BANNED_USERS.toString()).has(id)
     }
 
     fun banReportsUser(id: Long) {
@@ -228,7 +228,9 @@ class BotDBCache private constructor() : AbstractMongoCache(BotDB) {
     }
 
     fun isDeveloper(developer: Long): Boolean {
-        return arrayHasObject(getDocument().getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString()), developer)
+        return getDocument()
+            .getJSONArray(BotDB.Fields.DEVELOPERS_ARRAY.toString())
+            .has(developer)
     }
 
     fun getDevelopers(): List<Long> {
@@ -282,7 +284,7 @@ class BotDBCache private constructor() : AbstractMongoCache(BotDB) {
     fun userHasViewedAlert(id: Long): Boolean {
         val obj: JSONObject = getDocument()
         val viewerArr = obj.getJSONArray(BotDB.Fields.ALERT_VIEWERS.toString())
-        return arrayHasObject(viewerArr, id)
+        return viewerArr.has(id)
     }
 
     fun getAlertViewerCount(): Int {
