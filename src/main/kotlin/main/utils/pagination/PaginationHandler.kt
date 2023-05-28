@@ -108,6 +108,13 @@ object PaginationHandler {
         return paginateMessage(event, messagePages)
     }
 
+    suspend fun paginateMessage(
+        event: SlashCommandInteractionEvent,
+        imageBuilder: AbstractImageBuilder
+    ) {
+        event.deferReply().queue()
+    }
+
     suspend fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
@@ -124,7 +131,7 @@ object PaginationHandler {
         }
     }
 
-    suspend fun paginateQueueMessage(event: SlashCommandInteractionEvent, queuePages: List<QueuePage>) =
+    private suspend fun paginateQueueMessage(event: SlashCommandInteractionEvent, queuePages: List<QueuePage>) =
         coroutineScope {
             val guild = event.guild!!
             val sendFallbackEmbed: () -> Unit = {
@@ -177,6 +184,14 @@ object PaginationHandler {
             }
 
             return@coroutineScope null
+        }
+
+    private suspend fun paginateImageMessage(
+        event: SlashCommandInteractionEvent,
+        imageBuilder: AbstractImageBuilder
+    ) =
+        coroutineScope {
+
         }
 
     fun paginateMenu(

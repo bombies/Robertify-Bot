@@ -45,6 +45,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import java.util.regex.Pattern
+import javax.imageio.ImageIO
 
 object GeneralUtils {
 
@@ -79,7 +80,7 @@ object GeneralUtils {
     }
 
     fun String.toUrl(): URL? = if (this.isUrl())
-        URL(this)
+        URI(this).toURL()
     else null
 
     fun URL.getDestination(): String {
@@ -680,9 +681,20 @@ object GeneralUtils {
     fun <T> List<T>.coerceAtLeast(min: Int): List<T> =
         this.subList(0, this.size.coerceAtLeast(min))
 
-    fun String.coerceAtMost(max: Int): String =
-        this.substring(0, this.length.coerceAtMost(max))
+    fun String.coerceAtMost(max: Int): String {
+        val addEllipse = length > max
+        val newString = this.substring(0, this.length.coerceAtMost(if (addEllipse) max + 3 else max))
+
+        return if (addEllipse)
+            newString.replaceRange(47..49, "...")
+        else newString
+    }
 
     fun String.coerceAtLeast(min: Int): String =
         this.substring(0, this.length.coerceAtLeast(min))
+
+    fun String.isImageUrl(): Boolean {
+        if (!isUrl()) return false
+        return ImageIO.read(toUrl()) != null
+    }
 }

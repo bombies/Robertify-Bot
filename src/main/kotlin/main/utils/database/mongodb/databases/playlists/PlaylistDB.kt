@@ -9,6 +9,7 @@ import main.utils.json.GenericJSONField
 import main.utils.json.put
 import main.utils.json.remove
 import org.bson.Document
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
@@ -26,7 +27,7 @@ object PlaylistDB : AbstractMongoDatabase(collection = RobertifyMongoDatabase.RO
             .addField(Fields.TITLE, name)
             .addField(Fields.DESCRIPTION, description ?: "")
             .addField(Fields.ARTWORK_URL, artworkUrl ?: "")
-            .addField(Fields.TRACK_DATE_ADDED, System.currentTimeMillis())
+            .addField(Fields.TRACKS, JSONArray())
             .build()
         addDocument(playlistDocument)
     }
