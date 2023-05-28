@@ -3,6 +3,7 @@ package main.utils.pagination.pages.queue
 import main.commands.slashcommands.audio.QueueCommand
 import main.utils.RobertifyEmbedUtils
 import main.utils.api.robertify.imagebuilders.builders.QueueImageBuilder
+import main.utils.pagination.pages.AbstractImagePage
 import main.utils.pagination.pages.MessagePage
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.MessageEmbed
@@ -12,7 +13,7 @@ class QueuePage(
     private val guild: Guild,
     val pageNumber: Int,
     private val _queueItems: MutableList<QueueItem> = mutableListOf()
-) : MessagePage {
+) : AbstractImagePage() {
     override val embed: MessageEmbed
         get() {
             val content = QueueCommand().getContent(guild, queueItems)
@@ -24,7 +25,7 @@ class QueuePage(
     val queueItems
         get() = _queueItems.toList()
 
-    val image: InputStream?
+    override val image: InputStream?
         get() {
             val builder = QueueImageBuilder(guild, pageNumber)
             queueItems.forEach { item ->

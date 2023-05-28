@@ -10,7 +10,7 @@ import java.io.InputStream
 
 class PlaylistsPage(
     private val guild: Guild,
-    private val _playlists: MutableList<PlaylistModel> = mutableListOf(),
+    private val _playlists: List<PlaylistModel> = mutableListOf(),
     pageNumber: Int
 ) : AbstractImagePage() {
     override val embed: MessageEmbed

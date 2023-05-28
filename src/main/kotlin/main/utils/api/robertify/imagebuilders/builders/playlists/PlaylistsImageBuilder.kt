@@ -20,12 +20,13 @@ class PlaylistsImageBuilder(
         require(playlists.isNotEmpty()) { "The list of playlists must not be empty!" }
 
         val arr = JSONArray()
-        playlists.forEach { playlist ->
+        playlists.forEachIndexed { i, playlist ->
             arr.put(
                 JSONObject()
                     .put(QueryFields.PLAYLIST_TITLE.toString(), playlist.title)
                     .put(QueryFields.PLAYLIST_TRACK_COUNT.toString(), playlist.tracks.size)
                     .put(QueryFields.PLAYLIST_ARTWORK_URL.toString(), playlist.artwork_url)
+                    .put(QueryFields.PLAYLIST_INDEX.toString(), i)
             )
         }
 
@@ -41,6 +42,7 @@ class PlaylistsImageBuilder(
         PLAYLIST_TITLE,
         PLAYLIST_ARTWORK_URL,
         PLAYLIST_TRACK_COUNT,
+        PLAYLIST_INDEX,
         THEME;
 
         override fun toString(): String =

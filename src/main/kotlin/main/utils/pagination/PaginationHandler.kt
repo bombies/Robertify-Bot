@@ -2,6 +2,7 @@ package main.utils.pagination
 
 import dev.minn.jda.ktx.interactions.components.StringSelectMenu
 import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -18,9 +19,15 @@ import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
 import main.utils.api.robertify.imagebuilders.ImageBuilderException
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
+import main.utils.database.mongodb.databases.playlists.PlaylistDB
+import main.utils.database.mongodb.databases.playlists.PlaylistModel
+import main.utils.database.mongodb.databases.playlists.PlaylistTrack
+import main.utils.pagination.pages.AbstractImagePage
 import main.utils.pagination.pages.DefaultMessagePage
 import main.utils.pagination.pages.MenuPage
 import main.utils.pagination.pages.MessagePage
+import main.utils.pagination.pages.playlists.PlaylistPage
+import main.utils.pagination.pages.playlists.PlaylistsPage
 import main.utils.pagination.pages.queue.QueueItem
 import main.utils.pagination.pages.queue.QueuePage
 import net.dv8tion.jda.api.EmbedBuilder
@@ -108,11 +115,52 @@ object PaginationHandler {
         return paginateMessage(event, messagePages)
     }
 
-    suspend fun paginateMessage(
+    suspend fun paginatePlaylists(
         event: SlashCommandInteractionEvent,
-        imageBuilder: AbstractImageBuilder
-    ) {
+    ): Message? {
         event.deferReply().queue()
+
+        val guild = event.guild!!
+        val user = event.user
+        val maxPerPage = 10
+        val playlists = PlaylistDB.findPlaylistForUser(user.id).chunked(maxPerPage)
+        require(playlists.isNotEmpty()) { "This user has no playlists to display!" }
+
+        val pages = playlists.mapIndexed { i, chunkedPlaylists ->
+            PlaylistsPage(
+                guild = guild,
+                _playlists = chunkedPlaylists,
+                pageNumber = i
+            )
+        }
+
+        return paginateImageMessage(event, pages).await()
+    }
+
+    suspend fun paginatePlaylist(
+        event: SlashCommandInteractionEvent,
+        playlist: PlaylistModel,
+        maxTracksPerPage: Int
+    ): Message? {
+        event.deferReply().queue()
+
+        val guild = event.guild!!
+        val trackIndexes = mutableMapOf<PlaylistTrack, Int>()
+        playlist.tracks.forEachIndexed { index, playlistTrack -> trackIndexes[playlistTrack] = index }
+        val chunkedTracks = playlist.tracks.chunked(maxTracksPerPage)
+        val pages = chunkedTracks.mapIndexed { i, tracks ->
+            PlaylistPage(
+                title = playlist.title,
+                artworkUrl = playlist.artwork_url,
+                description = playlist.description,
+                guild = guild,
+                tracks = tracks,
+                trackIndexes = trackIndexes,
+                pageNumber = i
+            )
+        }
+
+        return paginateImageMessage(event, pages).await();
     }
 
     suspend fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
@@ -124,57 +172,60 @@ object PaginationHandler {
         val queuePages = messageLogic(guild, queueHandler, maxPerPage)
 
         return try {
-            paginateQueueMessage(event, queuePages)
+            paginateQueueMessage(event, queuePages).await()
         } catch (e: ImageBuilderException) {
             val defaultMessagePages = queuePages.map { page -> DefaultMessagePage(page.embed) }
             paginateMessage(event, defaultMessagePages, true)
         }
     }
 
-    private suspend fun paginateQueueMessage(event: SlashCommandInteractionEvent, queuePages: List<QueuePage>) =
+    private suspend fun paginateQueueMessage(
+        event: SlashCommandInteractionEvent,
+        queuePages: List<QueuePage>
+    ) = paginateImageMessage(event, queuePages, true);
+
+    private suspend fun paginateImageMessage(
+        event: SlashCommandInteractionEvent,
+        pages: List<AbstractImagePage>,
+        isQueue: Boolean = false,
+    ): Deferred<Message?> =
         coroutineScope {
             val guild = event.guild!!
-            val sendFallbackEmbed: () -> Unit = {
-                val musicManager = RobertifyAudioManager[guild]
-                val queueHandler = musicManager.scheduler.queueHandler
-                val content: List<String> = QueueCommand().getContent(guild, queueHandler)
-
-                val pages = messageLogic(event.guild!!, content)
-                launch { paginateMessage(event, pages) }
+            val sendFallbackEmbed: () -> Deferred<Message?> = {
+                async { paginateMessage(event, pages) }
             }
 
             try {
-                val image = queuePages[0].image ?: run {
-                    sendFallbackEmbed()
-                    return@coroutineScope null
+                val image = pages[0].image ?: run {
+                    return@coroutineScope sendFallbackEmbed()
                 }
 
                 var messageAction = event.hook
                     .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.RANDOM_FILE_NAME))
 
-                if (queuePages.size > 1)
+                if (pages.size > 1)
                     messageAction = messageAction.addComponents(
                         paginator.getButtons(
                             user = event.user,
                             frontEnabled = false,
                             previousEnabled = false,
-                            isQueue = true
+                            isQueue = isQueue
                         )
                     )
 
                 val deferredMsg = async {
                     return@async messageAction.submit()
                         .thenApply { msg ->
-                            if (queuePages.size > 1) {
-                                messages[msg.idLong] = queuePages
+                            if (pages.size > 1) {
+                                messages[msg.idLong] = pages
                                 return@thenApply msg
                             } else return@thenApply null
                         }.join()
                 }
 
-                return@coroutineScope deferredMsg.await()
+                return@coroutineScope deferredMsg
             } catch (e: Exception) {
-                when (e) {
+                return@coroutineScope when (e) {
                     is SocketTimeoutException,
                     is ConnectException,
                     is ImageBuilderException -> sendFallbackEmbed()
@@ -182,16 +233,6 @@ object PaginationHandler {
                     else -> throw e
                 }
             }
-
-            return@coroutineScope null
-        }
-
-    private suspend fun paginateImageMessage(
-        event: SlashCommandInteractionEvent,
-        imageBuilder: AbstractImageBuilder
-    ) =
-        coroutineScope {
-
         }
 
     fun paginateMenu(
