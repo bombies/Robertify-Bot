@@ -18,7 +18,7 @@ class QueuePage(
         get() {
             val content = QueueCommand().getContent(guild, queueItems)
             return RobertifyEmbedUtils.embedMessage(guild, "\t" +
-                    "${content.map { str -> "$str\n" }}"
+                    content.joinToString { str -> "$str\n" }
             ).build()
         }
 

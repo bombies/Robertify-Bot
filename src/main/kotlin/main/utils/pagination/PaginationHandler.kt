@@ -13,6 +13,7 @@ import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
 import main.commands.slashcommands.audio.QueueCommand
 import main.constants.InteractionLimits
+import main.utils.GeneralUtils.coerceAtMost
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
@@ -346,8 +347,8 @@ object PaginationHandler {
                 items.add(
                     QueueItem(
                         trackIndex = i + 1,
-                        trackTitle = track.title,
-                        artist = track.author,
+                        trackTitle = track.title.coerceAtMost(30),
+                        artist = track.author.coerceAtMost(30),
                         duration = track.length
                     )
                 )
