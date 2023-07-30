@@ -8,10 +8,12 @@ import main.utils.locale.messages.HistoryMessages
 import main.utils.pagination.PaginationHandler
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class HistoryCommand : AbstractSlashCommand(SlashCommand(
-    name = "history",
-    description = "See all the songs that have been played in your current listening session"
-)) {
+class HistoryCommand : AbstractSlashCommand(
+    SlashCommand(
+        name = "history",
+        description = "See all the songs that have been played in your current listening session"
+    )
+) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
@@ -22,7 +24,7 @@ class HistoryCommand : AbstractSlashCommand(SlashCommand(
             event.replyEmbed { embed(HistoryMessages.NO_PAST_TRACKS) }
                 .queue()
         else {
-            val content = QueueCommand().getPastContent(guild, queueHandler)
+            val content = QueueCommand().getPastContent(guild, queueHandler).reversed()
             PaginationHandler.paginateMessage(event, content)
         }
     }
