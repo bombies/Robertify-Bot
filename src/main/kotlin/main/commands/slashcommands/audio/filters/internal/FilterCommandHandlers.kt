@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters.internal
 
 import dev.schlaubi.lavakord.audio.player.Filters
+import dev.schlaubi.lavakord.audio.player.applyFilters
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isNotNull
@@ -15,12 +16,12 @@ import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-internal inline fun handleGenericFilterToggle(
+internal suspend inline fun handleGenericFilterToggle(
     event: SlashCommandInteractionEvent,
     filterName: String,
     filterPredicate: Filters.() -> Boolean,
-    filterOn: Filters.() -> Unit,
-    filterOff: Filters.() -> Unit
+    noinline filterOn: Filters.() -> Unit,
+    noinline filterOff: Filters.() -> Unit
 ): MessageEmbed =
     handleGenericFilterToggle(
         memberVoiceState = event.member!!.voiceState!!,
@@ -31,13 +32,13 @@ internal inline fun handleGenericFilterToggle(
         filterOff
     )
 
-internal inline fun handleGenericFilterToggle(
+internal suspend inline fun handleGenericFilterToggle(
     memberVoiceState: GuildVoiceState,
     selfVoiceState: GuildVoiceState,
     filterName: String,
     filterPredicate: Filters.() -> Boolean,
-    filterOn: Filters.() -> Unit,
-    filterOff: Filters.() -> Unit
+    noinline filterOn: Filters.() -> Unit,
+    noinline filterOff: Filters.() -> Unit
 ): MessageEmbed {
     val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
     if (acChecks.isNotNull()) return acChecks!!
@@ -49,7 +50,7 @@ internal inline fun handleGenericFilterToggle(
     val localeManager = LocaleManager[guild]
 
     return if (filterPredicate(filters)) {
-        filterOff(filters)
+        player.applyFilters(filterOff)
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
@@ -68,7 +69,7 @@ internal inline fun handleGenericFilterToggle(
             GeneralUtils.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
         ).build()
     } else {
-        filterOn(filters)
+        player.applyFilters(filterOn)
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${

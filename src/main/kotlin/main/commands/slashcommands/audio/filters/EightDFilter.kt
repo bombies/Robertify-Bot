@@ -22,7 +22,7 @@ class EightDFilter : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
+    private suspend fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
         handleGenericFilterToggle(
             memberVoiceState = memberVoiceState,
             selfVoiceState = selfVoiceState,
