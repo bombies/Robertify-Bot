@@ -83,8 +83,8 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     suspend fun addToBeginningOfQueue(track: Track) = run {
         when {
-            player.playingTrack != null -> player.playTrack(track)
-            else -> queueHandler.addToBeginning(track)
+            player.playingTrack != null -> queueHandler.addToBeginning(track)
+            else -> player.playTrack(track)
         }
     }
 
