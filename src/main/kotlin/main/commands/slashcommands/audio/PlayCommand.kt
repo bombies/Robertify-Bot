@@ -2,6 +2,7 @@ package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import dev.minn.jda.ktx.interactions.components.link
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
@@ -12,6 +13,7 @@ import main.main.Robertify
 import main.utils.GeneralUtils.coerceAtMost
 import main.utils.GeneralUtils.getDestination
 import main.utils.GeneralUtils.isUrl
+import main.utils.GeneralUtils.queueCoroutine
 import main.utils.GeneralUtils.toUrl
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -198,7 +200,7 @@ class PlayCommand : AbstractSlashCommand(
     override val help: String
         get() = "Plays a song"
 
-    private fun handlePlayTracks(
+    private suspend fun handlePlayTracks(
         event: SlashCommandInteractionEvent,
         link: String,
         addToBeginning: Boolean = false,
@@ -220,8 +222,8 @@ class PlayCommand : AbstractSlashCommand(
 
         event.hook.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
-        }.queue { msg ->
-            runBlocking {
+        }.queueCoroutine { msg ->
+            coroutineScope {
                 launch {
                     RobertifyAudioManager
                         .loadAndPlay(

@@ -74,6 +74,13 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         }
     }
 
+    suspend fun queue(tracks: Collection<Track>) {
+        val mutableTracks = tracks.toMutableList()
+        if (player.playingTrack == null)
+            player.playTrack(mutableTracks.removeFirst())
+        queueHandler.addAll(mutableTracks)
+    }
+
     suspend fun addToBeginningOfQueue(track: Track) = run {
         when {
             player.playingTrack != null -> player.playTrack(track)
@@ -84,8 +91,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
     suspend fun addToBeginningOfQueue(tracks: Collection<Track>) {
         val mutableTracks = tracks.toMutableList()
         if (player.playingTrack == null) {
-            player.playTrack(mutableTracks[0])
-            mutableTracks.removeAt(0)
+            player.playTrack(mutableTracks.removeFirst())
         }
 
         queueHandler.addToBeginning(mutableTracks)
@@ -413,7 +419,10 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
                     channel = announcementChannel,
                     trackIds = pastSpotifyTracks
                 )
-            } else disconnectManager.scheduleDisconnect()
+            } else {
+                player.stopTrack()
+                disconnectManager.scheduleDisconnect()
+            }
         }
     }
 
@@ -452,6 +461,9 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     fun addRequester(userId: String, trackId: String) =
         requesters.add(Requester(userId, trackId))
+
+    fun addRequesters(requesters: Map<String, String>) =
+        requesters.forEach { (userId, trackId) -> addRequester(userId, trackId) }
 
     fun clearRequesters() = requesters.clear()
 

@@ -1,5 +1,6 @@
 package main.utils.component.interactions.slashcommand
 
+import com.influxdb.exceptions.InfluxException
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
 import kotlinx.coroutines.coroutineScope
@@ -180,12 +181,17 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
 
             coroutineScope {
                 launch {
-                    if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand))
-                        CommandInfluxDatabase.recordCommand(
-                            guild = event.guild,
-                            command = this@AbstractSlashCommand,
-                            executor = event.user
-                        )
+                    if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand)) {
+                        try {
+                            CommandInfluxDatabase.recordCommand(
+                                guild = event.guild,
+                                command = this@AbstractSlashCommand,
+                                executor = event.user
+                            )
+                        } catch (e: InfluxException) {
+                            logger.warn("Could not record the ${this@AbstractSlashCommand.info.name} command in InfluxDB. Reason: ${e.message ?: "Unknown"}")
+                        }
+                    }
                 }
             }
         }

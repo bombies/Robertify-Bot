@@ -115,24 +115,21 @@ class MainAudioLoader(
 
         scheduler.announcementChannel = announcementChannel
 
-        if (addToBeginning)
-            scheduler.addToBeginningOfQueue(mutableTracks.map { it })
+        if (sender != null) {
+            mutableTracks.forEach { track -> scheduler.addRequester(sender.id, track.info.identifier) }
 
-        if (sender != null)
             LogUtilsKt(guild).sendLog(
                 LogType.QUEUE_ADD, AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                 Pair("{user}", sender.asMention),
                 Pair("{numTracks}", mutableTracks.size.toString()),
                 Pair("{playlist}", playlist.info.name)
             )
-
-        mutableTracks.forEach { track ->
-            if (sender != null)
-                scheduler.addRequester(sender.id, track.info.identifier)
-
-            if (!addToBeginning)
-                scheduler.queue(track)
         }
+
+        if (addToBeginning)
+            scheduler.addToBeginningOfQueue(mutableTracks)
+        else
+            scheduler.queue(mutableTracks)
     }
 
     override suspend fun onSearchResultLoad(results: List<Track>) {

@@ -46,19 +46,15 @@ class AutoPlayLoader(
         }
 
         val self = guild.selfMember
-        logger.info(playlist.tracks.size.toString())
+        val mutableTracks = playlist.tracks.toMutableList()
 
+        mutableTracks.forEach { track ->
+            scheduler.unannouncedTracks.add(track.identifier)
+            scheduler.addRequester(self.id, track.info.identifier)
+        }
 
-        scheduler.unannouncedTracks.add(playlist.tracks.first().identifier)
-        scheduler.player.playTrack(playlist.tracks.first())
-
-        playlist.tracks
-            .subList(1, playlist.tracks.lastIndex)
-            .forEach { track ->
-                scheduler.unannouncedTracks.add(track.identifier)
-                scheduler.addRequester(self.id, track.info.identifier)
-                scheduler.queue(track)
-            }
+        scheduler.player.playTrack(mutableTracks.removeFirst())
+        queueHandler.addAll(mutableTracks)
 
         if (queueHandler.queueRepeating) {
             queueHandler.queueRepeating = false
