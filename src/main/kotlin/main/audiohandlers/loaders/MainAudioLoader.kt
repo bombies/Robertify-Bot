@@ -8,6 +8,7 @@ import dev.minn.jda.ktx.coroutines.await
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.models.Requester
 import main.main.Robertify
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.requests.RestAction
 import org.slf4j.LoggerFactory
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.seconds
@@ -40,6 +42,7 @@ class MainAudioLoader(
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+        private val executorService = Executors.newSingleThreadScheduledExecutor()
 
         suspend fun RestAction<Message>.queueThenDelete(
             context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
@@ -50,13 +53,12 @@ class MainAudioLoader(
         ) {
             val message = this.await();
             if (deletePredicate == null || deletePredicate(message)) {
-                coroutineScope {
-                    launch(context) {
-                        delay(unit.toMillis(time))
+                executorService.schedule({
+                    runBlocking(context) {
                         message.delete().await()
                         onSuccess?.invoke(message)
                     }
-                }
+                }, time, unit)
             }
         }
     }

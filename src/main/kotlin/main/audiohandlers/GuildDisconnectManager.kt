@@ -16,8 +16,7 @@ class GuildDisconnectManager(private val guild: Guild) {
     }
 
     private val executorService = Executors.newSingleThreadScheduledExecutor()
-    private val coroutineExecutorDispatcher = executorService.asCoroutineDispatcher()
-    private var scheduledDisconnect: Job? = null
+    private var scheduledDisconnect: ScheduledFuture<*>? = null
 
     /**
      * Schedule the bot to disconnect according to your time requirements.
@@ -39,9 +38,8 @@ class GuildDisconnectManager(private val guild: Guild) {
         cancelDisconnect()
         logger.debug("${guild.name} | Cleared any previously scheduled disconnects")
 
-        val job = withContext(coroutineExecutorDispatcher) {
-            launch {
-                delay(duration)
+        val job = executorService.schedule({
+            runBlocking {
                 RobertifyAudioManager
                     .getMusicManager(guild)
                     .scheduler
@@ -49,7 +47,7 @@ class GuildDisconnectManager(private val guild: Guild) {
                 logger.debug("${guild.name} | Bot disconnected.")
                 scheduledDisconnect = null
             }
-        }
+        }, duration.inWholeMilliseconds, TimeUnit.MILLISECONDS)
 
         scheduledDisconnect = job
         logger.debug("${guild.name} | successfully scheduled bot disconnect.")
@@ -63,7 +61,7 @@ class GuildDisconnectManager(private val guild: Guild) {
     fun cancelDisconnect() {
         if (disconnectScheduled()) {
             logger.debug("${guild.name} | Cancelling disconnect.")
-            scheduledDisconnect!!.cancel()
+            scheduledDisconnect!!.cancel(false)
             scheduledDisconnect = null
         }
     }

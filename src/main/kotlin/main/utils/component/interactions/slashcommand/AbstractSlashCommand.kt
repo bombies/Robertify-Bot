@@ -2,6 +2,8 @@ package main.utils.component.interactions.slashcommand
 
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager
 import main.constants.BotConstants
@@ -176,12 +178,16 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
 
             handle(event)
 
-            if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand))
-                CommandInfluxDatabase.recordCommand(
-                    guild = event.guild,
-                    command = this@AbstractSlashCommand,
-                    executor = event.user
-                )
+            coroutineScope {
+                launch {
+                    if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand))
+                        CommandInfluxDatabase.recordCommand(
+                            guild = event.guild,
+                            command = this@AbstractSlashCommand,
+                            executor = event.user
+                        )
+                }
+            }
         }
 
         onEvent<ButtonInteractionEvent>(shardManager) {

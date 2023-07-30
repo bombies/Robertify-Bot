@@ -4,6 +4,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
+import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
@@ -13,6 +14,7 @@ import main.utils.locale.messages.StopMessages
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import kotlin.time.Duration.Companion.seconds
 
 class StopCommand : AbstractSlashCommand(
     SlashCommand(
@@ -26,7 +28,8 @@ class StopCommand : AbstractSlashCommand(
     }
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbeds(handleStop(event.member!!)).queue()
+        event.deferReply().queue()
+        event.hook.sendEmbed(event.guild) { handleStop(event.member!!) }.queue()
     }
 
     suspend fun handleStop(stopper: Member): MessageEmbed {
@@ -70,11 +73,11 @@ class StopCommand : AbstractSlashCommand(
                     StopMessages.STOPPED_LOG,
                     Pair("{user}", stopper.asMention)
                 )
+
                 scheduler.scheduleDisconnect(announceMsg = true)
-                RobertifyEmbedUtils.embedMessage(guild, StopMessages.STOPPED).build()
+                return RobertifyEmbedUtils.embedMessage(guild, StopMessages.STOPPED).build()
             }
         }
-
     }
 
     override val help: String
