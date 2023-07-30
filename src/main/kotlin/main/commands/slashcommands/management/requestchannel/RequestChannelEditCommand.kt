@@ -251,7 +251,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         handleChannelButtonToggle(guild, buttonName, event)
     }
 
-    fun handleChannelButtonToggle(
+    suspend fun handleChannelButtonToggle(
         guild: Guild,
         buttonName: String,
         event: ButtonInteractionEvent? = null,
@@ -335,7 +335,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                     Pair("{button}", button),
                     Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
                 )
-            }?.queueThenDelete(15, TimeUnit.SECONDS)
+            }?.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
         } else {
             subConfig.setState(field, true)
             event?.hook?.sendEmbed(guild) {
@@ -344,7 +344,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                     Pair("{button}", button),
                     Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
                 )
-            }?.queueThenDelete(15, TimeUnit.SECONDS)
+            }?.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
         }
 
         return config.updateButtons()

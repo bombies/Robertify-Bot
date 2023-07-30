@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio.filters.internal
 
-import lavalink.client.io.filters.Filters
+import dev.schlaubi.lavakord.audio.player.Filters
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isNotNull

@@ -1,17 +1,19 @@
 package main.commands.slashcommands.audio.filters
 
-import lavalink.client.io.filters.Timescale
+import dev.schlaubi.lavakord.audio.player.timescale
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class NightcoreFilter : AbstractSlashCommand(SlashCommand(
-    name = "nightcore",
-    description = "Toggle the Nightcore filter.",
-    isPremium = true
-)) {
+class NightcoreFilter : AbstractSlashCommand(
+    SlashCommand(
+        name = "nightcore",
+        description = "Toggle the Nightcore filter.",
+        isPremium = true
+    )
+) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
@@ -19,8 +21,8 @@ class NightcoreFilter : AbstractSlashCommand(SlashCommand(
                 event = event,
                 filterName = "Nightcore",
                 filterPredicate = { timescale != null },
-                filterOn = { setTimescale(Timescale().setPitch(1.5F)).commit() },
-                filterOff = { setTimescale(null).commit() }
+                filterOn = { timescale { pitch = 1.5 } },
+                filterOff = { unsetTimescale() }
             )
         }.queue()
     }

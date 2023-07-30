@@ -88,14 +88,14 @@ class NowPlayingCommand : AbstractSlashCommand(
                 val builder = NowPlayingImageBuilder(
                     title = track!!.title,
                     artistName = track.author,
-                    albumImage = if (track is MirroringAudioTrack) track.artworkURL
-                        ?: defaultImage else defaultImage
+                    albumImage = track.artworkUrl
+                        ?: defaultImage
                 )
 
                 val image = if (!track.isStream)
                     builder.copy(
                         duration = track.length,
-                        currentTime = player.trackPosition,
+                        currentTime = player.position,
                         isLiveStream = false
                     ).build()
                 else builder.copy(
@@ -156,7 +156,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         if (embed != null)
             return embed
 
-        val progress = player.trackPosition.toDouble() / track!!.length
+        val progress = player.position.toDouble() / track!!.length
         val filters = player.filters
         val requester = musicManager.scheduler.findRequester(track.identifier)
         val localeManager = LocaleManager[guild]
@@ -192,7 +192,7 @@ class NowPlayingCommand : AbstractSlashCommand(
                             NowPlayingMessages.NP_TIME_LEFT,
                             Pair(
                                 "{time}",
-                                GeneralUtils.formatTime(track.length - player.trackPosition)
+                                GeneralUtils.formatTime(track.length - player.position)
                             )
                         )
                     }\n" +
@@ -200,14 +200,14 @@ class NowPlayingCommand : AbstractSlashCommand(
                         GeneralUtils.progressBar(
                             guild,
                             channel,
-                            filters.volume.toDouble(),
+                            filters.volume?.toDouble() ?: 0.0,
                             GeneralUtils.ProgressBar.FILL
                         )
                     } 🔊"
         )
 
-        if (track is MirroringAudioTrack)
-            embedBuilder.setImage(track.artworkURL)
+        if (track.artworkUrl != null)
+            embedBuilder.setImage(track.artworkUrl)
 
         embedBuilder.setAuthor(
             localeManager.getMessage(NowPlayingMessages.NP_AUTHOR),

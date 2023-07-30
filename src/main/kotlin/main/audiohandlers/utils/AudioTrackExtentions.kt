@@ -1,21 +1,31 @@
 package main.audiohandlers.utils
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.schlaubi.lavakord.plugins.lavasrc.lavaSrcInfo
 
-val AudioTrack.title: String
+val Track.identifier: String
+    get() = info.identifier
+
+val Track.title: String
     get() = info.title
 
-val AudioTrack.author: String
+val Track.author: String
     get() = info.author
 
-val AudioTrack.length: Long
+val Track.length: Long
     get() = info.length
 
-val AudioTrack.isStream: Boolean
+val Track.isStream: Boolean
     get() = info.isStream
 
-val AudioTrack.uri: String
+val Track.uri: String?
     get() = info.uri
 
-val AudioTrack.source: String
-    get() = sourceManager.sourceName
+val Track.source: String
+    get() = info.sourceName
+
+val Track.artworkUrl: String?
+    get() = info.artworkUrl ?: lavaSrcInfo.artistArtworkUrl
+
+val Track.isrc: String?
+    get() = info.isrc

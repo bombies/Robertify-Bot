@@ -7,11 +7,10 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
 import dev.minn.jda.ktx.util.SLF4J
-import lavalink.client.io.Link
+import dev.schlaubi.lavakord.audio.Link
 import main.audiohandlers.loaders.AutoPlayLoader
 import main.audiohandlers.loaders.MainAudioLoader
 import main.audiohandlers.loaders.SearchResultLoader
-import main.audiohandlers.sources.resume.ResumeSourceManager
 import main.constants.Toggle
 import main.main.Config
 import main.main.Robertify
@@ -22,9 +21,9 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
-import main.utils.resume.ResumableTrack
-import main.utils.resume.ResumableTrack.Companion.string
-import main.utils.resume.ResumeData
+//import main.utils.resume.ResumableTrack
+//import main.utils.resume.ResumableTrack.Companion.string
+//import main.utils.resume.ResumeData
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Message
@@ -42,7 +41,7 @@ object RobertifyAudioManager {
     private val spotifySourceManager: SpotifySourceManager
     private val deezerAudioSourceManager: DeezerAudioSourceManager
     private val appleMusicSourceManager: AppleMusicSourceManager
-    private val resumeSourceManager: ResumeSourceManager
+//    private val resumeSourceManager: ResumeSourceManager
 
     init {
         playerManager = DefaultAudioPlayerManager()
@@ -55,10 +54,10 @@ object RobertifyAudioManager {
         )
         deezerAudioSourceManager = DeezerAudioSourceManager(Config.DEEZER_ACCESS_TOKEN)
         appleMusicSourceManager = AppleMusicSourceManager(Config.providers, null, "us", playerManager)
-        resumeSourceManager = ResumeSourceManager(playerManager)
+//        resumeSourceManager = ResumeSourceManager(playerManager)
 
         AudioSourceManagers.registerLocalSource(playerManager)
-        playerManager.registerSourceManager(resumeSourceManager)
+//        playerManager.registerSourceManager(resumeSourceManager)
         playerManager.registerSourceManager(spotifySourceManager)
         playerManager.registerSourceManager(deezerAudioSourceManager)
         playerManager.registerSourceManager(appleMusicSourceManager)
@@ -73,12 +72,12 @@ object RobertifyAudioManager {
 
     fun getMusicManager(guild: Guild): GuildMusicManager = get(guild)
 
-    fun removeMusicManager(guild: Guild) {
+    suspend fun removeMusicManager(guild: Guild) {
         musicManagers[guild.idLong]?.destroy()
         musicManagers.remove(guild.idLong)
     }
 
-    fun loadAndPlay(
+    suspend fun loadAndPlay(
         trackUrl: String,
         memberVoiceState: GuildVoiceState,
         botMessage: Message? = null,
@@ -105,43 +104,43 @@ object RobertifyAudioManager {
         }
     }
 
-    fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
-        val channelId = data.channel_id
-        val voiceChannel = Robertify.shardManager.getVoiceChannelById(channelId)
+//    suspend fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
+//        val channelId = data.channel_id
+//        val voiceChannel = Robertify.shardManager.getVoiceChannelById(channelId)
+//
+//        if (voiceChannel == null) {
+//            logger.warn("There was resume data for ${musicManager.guild.name} but the voice channel is invalid! Data: $data")
+//            return
+//        }
+//
+//        if (!GuildConfig(musicManager.guild).twentyFourSevenMode && voiceChannel.members.isEmpty())
+//            return
+//
+//        if (joinAudioChannel(voiceChannel, musicManager))
+//            resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
+//        else logger.warn("Could not resume tracks in ${musicManager.guild.name} because I couldn't join the voice channel!")
+//    }
+//
+//    private suspend fun resumeTracks(
+//        trackList: List<ResumableTrack>,
+//        announcementChannel: GuildMessageChannel?,
+//        musicManager: GuildMusicManager
+//    ) {
+//        trackList.forEach { track ->
+//            val requester = track.requester
+//            if (requester != null)
+//                musicManager.scheduler.addRequester(requester.id, requester.trackId)
+//        }
+//
+//        val trackUrl = ResumeSourceManager.SEARCH_PREFIX + trackList.string()
+//        MainAudioLoader(
+//            musicManager = musicManager,
+//            query = trackUrl,
+//            _announcementChannel = announcementChannel
+//        ).loadItem()
+//    }
 
-        if (voiceChannel == null) {
-            logger.warn("There was resume data for ${musicManager.guild.name} but the voice channel is invalid! Data: $data")
-            return
-        }
-
-        if (!GuildConfig(musicManager.guild).twentyFourSevenMode && voiceChannel.members.isEmpty())
-            return
-
-        if (joinAudioChannel(voiceChannel, musicManager))
-            resumeTracks(data.tracks, musicManager.scheduler.announcementChannel, musicManager)
-        else logger.warn("Could not resume tracks in ${musicManager.guild.name} because I couldn't join the voice channel!")
-    }
-
-    private fun resumeTracks(
-        trackList: List<ResumableTrack>,
-        announcementChannel: GuildMessageChannel?,
-        musicManager: GuildMusicManager
-    ) {
-        trackList.forEach { track ->
-            val requester = track.requester
-            if (requester != null)
-                musicManager.scheduler.addRequester(requester.id, requester.trackId)
-        }
-
-        val trackUrl = ResumeSourceManager.SEARCH_PREFIX + trackList.string()
-        MainAudioLoader(
-            musicManager = musicManager,
-            query = trackUrl,
-            _announcementChannel = announcementChannel
-        ).loadItem()
-    }
-
-    private fun loadTrack(
+    private suspend fun loadTrack(
         trackUrl: String,
         musicManager: GuildMusicManager,
         user: User,
@@ -161,7 +160,7 @@ object RobertifyAudioManager {
         ).loadItem()
     }
 
-    fun loadSearchResults(
+    suspend fun loadSearchResults(
         musicManager: GuildMusicManager,
         searcher: User,
         botMessage: InteractionHook,
@@ -175,7 +174,7 @@ object RobertifyAudioManager {
         ).loadItem()
     }
 
-    fun loadRecommendedTracks(
+    suspend fun loadRecommendedTracks(
         musicManager: GuildMusicManager,
         channel: GuildMessageChannel?,
         trackIds: String
@@ -183,7 +182,7 @@ object RobertifyAudioManager {
         AutoPlayLoader(
             musicManager,
             channel,
-            "${SpotifySourceManager.RECOMMENDATIONS_PREFIX}seed_tracks=${trackIds}&limit=${30}"
+            "${SpotifySourceManager.RECOMMENDATIONS_PREFIX}seed_tracks=${trackIds}&limit=${10}"
         )
             .loadItem()
     }
@@ -196,7 +195,7 @@ object RobertifyAudioManager {
      * @param message The message to edit for any error messages.
      * @return True if the bot successfully joined the channel and vice-versa.
      */
-    fun joinAudioChannel(
+    suspend fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManager,
         message: Message? = null,
@@ -248,7 +247,7 @@ object RobertifyAudioManager {
                         }
                     }
 
-                    musicManager.link.connect(channel)
+                    musicManager.link.connectAudio(channel.idLong.toULong())
                     musicManager.scheduler.scheduleDisconnect()
                     return true
                 }

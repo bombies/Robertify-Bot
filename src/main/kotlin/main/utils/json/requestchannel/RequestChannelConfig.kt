@@ -2,6 +2,7 @@ package main.utils.json.requestchannel
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import main.audiohandlers.RobertifyAudioManager
+import main.audiohandlers.utils.artworkUrl
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
@@ -42,7 +43,8 @@ import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-class RequestChannelConfig(private val guild: Guild, private val shardManager: ShardManager = Robertify.shardManager) : AbstractGuildConfig(guild) {
+class RequestChannelConfig(private val guild: Guild, private val shardManager: ShardManager = Robertify.shardManager) :
+    AbstractGuildConfig(guild) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
@@ -270,9 +272,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                     )
                 )
 
-                if (playingTrack is MirroringAudioTrack) eb.setImage(playingTrack.artworkURL) else eb.setImage(
-                    theme.nowPlayingBanner
-                )
+                eb.setImage(playingTrack.artworkUrl ?: theme.nowPlayingBanner)
                 eb.setFooter(
                     localeManager.getMessage(
                         DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
@@ -282,7 +282,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                         ),
                         Pair(
                             "{volume}",
-                            ((audioPlayer.filters.volume * 100).toInt()).toString()
+                            ((audioPlayer.filters.volume?.times(100) ?: 0).toInt()).toString()
                         )
                     )
                 )

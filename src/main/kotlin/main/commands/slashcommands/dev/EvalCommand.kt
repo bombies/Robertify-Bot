@@ -69,7 +69,7 @@ class EvalCommand : AbstractSlashCommand(
             engine.put("shards", event.jda.shardManager!!)
             engine.put("guild", event.guild!!)
             engine.put("member", event.member!!)
-            engine.put("link", Robertify.lavalink)
+            engine.put("link", Robertify.lavaKord)
             engine.put("requester", WebUtils.ins)
             engine.put("http", OkHttpClient())
             // TODO: Add RobertifyAPI

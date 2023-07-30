@@ -94,7 +94,7 @@ class SkipCommand : AbstractSlashCommand(
         }
     }
 
-    fun handleSkip(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    suspend fun handleSkip(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
 
         val checksEmbed = audioChannelChecks(selfVoiceState, memberVoiceState)
@@ -117,7 +117,7 @@ class SkipCommand : AbstractSlashCommand(
         return RobertifyEmbedUtils.embedMessage(guild, SkipMessages.SKIPPED).build()
     }
 
-    fun handleSkip(skipper: User, musicManager: GuildMusicManager, id: Int): MessageEmbed {
+    suspend fun handleSkip(skipper: User, musicManager: GuildMusicManager, id: Int): MessageEmbed {
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
 
@@ -135,7 +135,7 @@ class SkipCommand : AbstractSlashCommand(
 
         queueHandler.removeAll(songsToRemove)
         queueHandler.pushPastTrack(playingTrack)
-        scheduler.nextTrack(playingTrack, true, playingTrack.position)
+        scheduler.nextTrack(playingTrack, true, player.position)
 
         RequestChannelConfig(guild).updateMessage()
         SkipCommand().clearVoteSkipInfo(guild)
@@ -194,7 +194,7 @@ class SkipCommand : AbstractSlashCommand(
         return null
     }
 
-    private fun skip(guild: Guild) {
+    private suspend fun skip(guild: Guild) {
         val musicManager = RobertifyAudioManager[guild]
         val audioPlayer = musicManager.player
         val scheduler = musicManager.scheduler
@@ -211,7 +211,7 @@ class SkipCommand : AbstractSlashCommand(
         if (queueHandler.trackRepeating)
             queueHandler.trackRepeating = false
 
-        scheduler.nextTrack(playingTrack, true, audioPlayer.trackPosition)
+        scheduler.nextTrack(playingTrack, true, audioPlayer.position)
 
         RequestChannelConfig(guild).updateMessage()
         clearVoteSkipInfo(guild)

@@ -8,6 +8,7 @@ import main.audiohandlers.utils.title
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.constants.RobertifyTheme
 import main.constants.TrackSource
+import main.utils.GeneralUtils.queueCoroutine
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
@@ -197,7 +198,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) return acChecks
 
-        val id = playingTrack.identifier
+        val id = playingTrack!!.info.identifier
 
         logger.debug("source: ${playingTrack.source}")
         val source = when (playingTrack.source) {
@@ -267,7 +268,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         val messageChannel = event.channel.asGuildMessageChannel()
         messageChannel.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
-        }.queue { addingMsg ->
+        }.queueCoroutine { addingMsg ->
             val url = when (source) {
                 TrackSource.DEEZER -> "https://www.deezer.com/us/track/$id"
                 TrackSource.SPOTIFY -> "https://www.open.spotify.com/track/$id"

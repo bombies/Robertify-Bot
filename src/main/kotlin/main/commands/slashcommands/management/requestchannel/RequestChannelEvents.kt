@@ -85,7 +85,7 @@ class RequestChannelEvents : AbstractEventController() {
             }
         }
 
-    private fun handleRewind(
+    private suspend fun handleRewind(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -94,7 +94,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleRewind(memberVoiceState, selfVoiceState) }
 
-    private fun handlePlayAndPause(
+    private suspend fun handlePlayAndPause(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -103,7 +103,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handlePause(memberVoiceState, selfVoiceState) }
 
-    private fun handleSkip(
+    private suspend fun handleSkip(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -168,14 +168,14 @@ class RequestChannelEvents : AbstractEventController() {
                         LoopMessages.LOOP_LOG,
                         Pair("{user}", member.asMention),
                         Pair("{status}", "looped"),
-                        Pair("{title}", playingTrack.title),
-                        Pair("{author}", playingTrack.author)
+                        Pair("{title}", playingTrack?.title ?: "Unknown"),
+                        Pair("{author}", playingTrack?.author ?: "Unknown")
                     )
 
                     RobertifyEmbedUtils.embedMessage(
                         guild,
                         LoopMessages.LOOP_START,
-                        Pair("{title}", playingTrack.title)
+                        Pair("{title}", playingTrack?.title ?: "Unknown")
                     )
                         .build()
                 }
@@ -191,7 +191,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleShuffle(memberVoiceState.guild, memberVoiceState.member.user) }
 
-    private fun handleDisconnect(
+    private suspend fun handleDisconnect(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -200,7 +200,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleDisconnect(selfVoiceState, memberVoiceState) }
 
-    private fun handleStop(
+    private suspend fun handleStop(
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
         handleGenericCommand(
@@ -208,7 +208,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleStop(memberVoiceState.member) }
 
-    private fun handlePrevious(
+    private suspend fun handlePrevious(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =

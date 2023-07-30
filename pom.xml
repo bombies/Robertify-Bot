@@ -27,6 +27,15 @@
 
     <repositories>
         <repository>
+            <id>mavenCentral</id>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>arbjergDev-snapshots</id>
+            <name>Lavalink Repository</name>
+            <url>https://maven.arbjerg.dev/snapshots</url>
+        </repository>
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -41,31 +50,38 @@
             <url>https://m2.dv8tion.net/releases</url>
         </repository>
         <repository>
-            <id>jfrog-duncte123</id>
-            <name>jfrog-duncte123</name>
-            <url>https://duncte123.jfrog.io/artifactory/maven</url>
-        </repository>
-        <repository>
             <id>central</id>
             <name>bintray</name>
             <url>https://jcenter.bintray.com</url>
         </repository>
         <repository>
-            <id>mavenCentral</id>
-            <url>https://repo1.maven.org/maven2/</url>
+            <id>jfrog-duncte123</id>
+            <name>jfrog-duncte123</name>
+            <url>https://duncte123.jfrog.io/artifactory/maven</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
+            <groupId>dev.schlaubi.lavakord</groupId>
+            <artifactId>jda-jvm</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.schlaubi.lavakord</groupId>
+            <artifactId>core-jvm</artifactId>
+            <version>5.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>dev.schlaubi.lavakord</groupId>
+            <artifactId>lavasrc-jvm</artifactId>
+            <version>5.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
-        </dependency>
-        <dependency>
-            <groupId>me.duncte123</groupId>
-            <artifactId>botCommons</artifactId>
-            <version>2.3.11</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -108,9 +124,9 @@
             <version>3.2.2</version>
         </dependency>
         <dependency>
-            <groupId>com.github.bombies</groupId>
-            <artifactId>Robertify-Lavalink-Client</artifactId>
-            <version>4.0.1</version>
+            <groupId>me.duncte123</groupId>
+            <artifactId>botCommons</artifactId>
+            <version>2.3.11</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -184,7 +200,7 @@
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-coroutines-core</artifactId>
-            <version>1.6.4</version>
+            <version>1.7.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.bombies</groupId>
@@ -201,6 +217,12 @@
             <artifactId>kotlinx-serialization-json</artifactId>
             <version>${serialization.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-core-jvm</artifactId>
+            <version>${serialization.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-server-core-jvm</artifactId>
@@ -302,7 +324,7 @@
                 <exclusions>
                     <exclusion>
                         <groupId>dev.schlaubi.lavakord</groupId>
-                        <artifactId>jda-java-jvm</artifactId>
+                        <artifactId>jda-jvm</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>net.dv8tion</groupId>
@@ -321,16 +343,6 @@
                     <exclusion>
                         <groupId>club.minnced</groupId>
                         <artifactId>opus-java</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.bombies</groupId>
-                <artifactId>Robertify-Lavalink-Client</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.github.walkyst</groupId>
-                        <artifactId>lavaplayer-fork</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

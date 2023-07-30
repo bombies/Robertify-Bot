@@ -2,8 +2,7 @@ package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import main.audiohandlers.RobertifyAudioManager
-import main.audiohandlers.utils.author
-import main.audiohandlers.utils.title
+import main.audiohandlers.utils.*
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
@@ -57,7 +56,7 @@ class SearchQueueCommand : AbstractSlashCommand(
             SearchQueueMessages.QUEUE_SEARCH_ITEM_FOUND,
             Pair("{title}", result.title),
             Pair("{author}", result.author),
-            Pair("{duration}", GeneralUtils.formatTime(result.duration)),
+            Pair("{duration}", GeneralUtils.formatTime(result.length)),
             Pair("{position}", (queueHandler.contents.indexOf(result) + 1).toString()),
             Pair(
                 "{requester}",
@@ -66,8 +65,8 @@ class SearchQueueCommand : AbstractSlashCommand(
             )
         )
 
-        if (result is MirroringAudioTrack)
-            embedBuilder.setThumbnail(result.artworkURL)
+        if (result.artworkUrl != null)
+            embedBuilder.setThumbnail(result.artworkUrl)
 
         event.replyEmbed { embedBuilder.build() }.queue()
     }

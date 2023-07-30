@@ -25,7 +25,7 @@ class DisconnectCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    fun handleDisconnect(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    suspend fun handleDisconnect(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, selfChannelNeeded = true)
         if (acChecks != null) return acChecks

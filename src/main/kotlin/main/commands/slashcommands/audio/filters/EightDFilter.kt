@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio.filters
 
-import lavalink.client.io.filters.Rotation
+import dev.schlaubi.lavakord.audio.player.rotation
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -28,8 +28,12 @@ class EightDFilter : AbstractSlashCommand(
             selfVoiceState = selfVoiceState,
             filterName = "8D",
             filterPredicate = { rotation != null },
-            filterOn = { setRotation(Rotation().setFrequency(0.05F)).commit() },
-            filterOff = { setRotation(null).commit() }
+            filterOn = {
+                rotation {
+                    rotationHz = 0.05
+                }
+            },
+            filterOff = { unsetRotation() }
         )
 
     override val help: String

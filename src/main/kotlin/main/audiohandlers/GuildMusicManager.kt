@@ -1,22 +1,17 @@
 package main.audiohandlers
 
-import lavalink.client.io.Link
-import lavalink.client.player.LavalinkPlayer
+import dev.schlaubi.lavakord.audio.Link
 import main.commands.slashcommands.audio.SkipCommand
 import main.main.Robertify
 import main.utils.json.requestchannel.RequestChannelConfig
 import net.dv8tion.jda.api.entities.Guild
 
 class GuildMusicManager(val guild: Guild) {
-    val link = Robertify.lavalink.getLink(guild)
-    val player: LavalinkPlayer = link.player
+    val link: Link = Robertify.lavaKord.getLink(guild.id)
+    val player = link.player
     val scheduler = TrackScheduler(guild, link)
     val voteSkipManager = GuildVoteSkipManager()
     var isForcePaused = false
-
-    init {
-        player.addListener(scheduler)
-    }
 
     fun clear() {
         val queueHandler = scheduler.queueHandler
@@ -24,7 +19,7 @@ class GuildMusicManager(val guild: Guild) {
         queueHandler.clear()
         queueHandler.clearSavedQueue()
         queueHandler.clearPreviousTracks()
-        player.filters.clear().commit()
+        player.filters.reset()
 
         queueHandler.trackRepeating = false
         queueHandler.queueRepeating = false
@@ -34,14 +29,12 @@ class GuildMusicManager(val guild: Guild) {
         RequestChannelConfig(guild).updateMessage()
     }
 
-    fun leave() {
+    suspend fun leave() {
         clear()
         RobertifyAudioManager.removeMusicManager(guild)
     }
 
-    fun destroy() {
-        player.removeListener(scheduler)
-
+    suspend fun destroy() {
         if (link.state != Link.State.DESTROYED)
             link.destroy()
     }

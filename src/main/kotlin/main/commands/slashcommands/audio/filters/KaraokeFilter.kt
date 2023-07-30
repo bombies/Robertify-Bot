@@ -1,17 +1,19 @@
 package main.commands.slashcommands.audio.filters
 
-import lavalink.client.io.filters.Karaoke
+import dev.schlaubi.lavakord.audio.player.karaoke
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class KaraokeFilter : AbstractSlashCommand(SlashCommand(
-    name = "karaoke",
-    description = "Toggle the Karaoke filter.",
-    isPremium = true
-)) {
+class KaraokeFilter : AbstractSlashCommand(
+    SlashCommand(
+        name = "karaoke",
+        description = "Toggle the Karaoke filter.",
+        isPremium = true
+    )
+) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
@@ -20,8 +22,8 @@ class KaraokeFilter : AbstractSlashCommand(SlashCommand(
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,
                 filterName = "Karaoke",
                 filterPredicate = { karaoke != null },
-                filterOn = { setKaraoke(Karaoke()).commit() },
-                filterOff = { setKaraoke(null).commit() }
+                filterOn = { karaoke {} },
+                filterOff = { unsetKaraoke() }
             )
         }.queue()
     }

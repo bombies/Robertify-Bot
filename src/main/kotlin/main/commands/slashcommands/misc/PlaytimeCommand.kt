@@ -34,9 +34,13 @@ class PlaytimeCommand : AbstractSlashCommand(
     private fun handlePlaytime(guild: Guild): MessageEmbed {
         val player = RobertifyAudioManager[guild].player
 
-        val time: Long = (if (playtime[guild.idLong] == null) 0
-        else playtime[guild.idLong]!!) + (if (player.playingTrack == null) 0
-        else player.playingTrack.length)
+        val time: Long = (
+                    if (playtime[guild.idLong] == null) 0
+                    else playtime[guild.idLong]!!
+                ) + (
+                    if (player.playingTrack == null) 0
+                    else player.playingTrack?.length ?: 0
+                )
 
         return RobertifyEmbedUtils.embedMessage(
             guild,

@@ -2,6 +2,7 @@ package main.commands.slashcommands.audio
 
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.RobertifyAudioManager
+import main.utils.GeneralUtils.queueCoroutine
 import main.utils.RobertifyEmbedUtils.Companion.editEmbed
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -25,7 +26,7 @@ class JoinCommand : AbstractSlashCommand(
         handleJoin(event)
     }
 
-    private fun handleJoin(
+    private suspend fun handleJoin(
         event: SlashCommandInteractionEvent
     ) {
         val guild = event.guild!!
@@ -48,7 +49,7 @@ class JoinCommand : AbstractSlashCommand(
             ).setEphemeral(true)
                 .queue()
 
-        event.replyEmbed(JoinMessages.ATTEMPTING_TO_JOIN, placeholderPair).queue { message ->
+        event.replyEmbed(JoinMessages.ATTEMPTING_TO_JOIN, placeholderPair).queueCoroutine { message ->
             if (RobertifyAudioManager.joinAudioChannel(channel, musicManager, hookMessage = message)) {
                 message.editEmbed(guild, JoinMessages.JOINED, placeholderPair).queue()
             }

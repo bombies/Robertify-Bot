@@ -11,6 +11,7 @@ import java.io.InputStream
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.util.UUID
+import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
 
 abstract class AbstractImageBuilder protected constructor(imageType: ImageType) {
@@ -50,11 +51,13 @@ abstract class AbstractImageBuilder protected constructor(imageType: ImageType) 
         return try {
             httpClient.newCall(webUtils.prepareGet(url).build())
                 .execute()
-                .body()
+                .body
                 ?.byteStream()
         } catch (e: SocketTimeoutException) {
             throw ImageBuilderException(cause = e)
         } catch (e: ConnectException) {
+            throw ImageBuilderException(cause = e)
+        } catch (e: CompletionException) {
             throw ImageBuilderException(cause = e)
         } catch (e: IOException) {
             logger.error("Unexpected error", e)

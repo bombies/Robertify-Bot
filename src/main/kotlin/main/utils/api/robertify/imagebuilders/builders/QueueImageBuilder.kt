@@ -1,6 +1,6 @@
 package main.utils.api.robertify.imagebuilders.builders
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Track
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.length
 import main.audiohandlers.utils.title
@@ -36,7 +36,7 @@ data class QueueImageBuilder(
         return this
     }
 
-    fun addTrack(index: Int, track: AudioTrack): QueueImageBuilder =
+    fun addTrack(index: Int, track: Track): QueueImageBuilder =
         addTrack(index, track.title, track.author, track.length)
 
     override fun build(): InputStream? {

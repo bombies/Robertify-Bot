@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio
 
-import lavalink.client.player.IPlayer
+import dev.schlaubi.lavakord.audio.player.Player
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
@@ -39,7 +39,8 @@ class LoopCommand : AbstractSlashCommand(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
-        val checksEmbed = checks(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!, musicManager.player)
+        val checksEmbed =
+            checks(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!, musicManager.player)
         if (checksEmbed != null) {
             event.replyEmbed { checksEmbed }
                 .setEphemeral(true)
@@ -56,7 +57,7 @@ class LoopCommand : AbstractSlashCommand(
     private fun checks(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
-        player: IPlayer
+        player: Player
     ): MessageEmbed? {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) return acChecks
@@ -109,7 +110,7 @@ class LoopCommand : AbstractSlashCommand(
         return embed
     }
 
-    private fun handleQueueRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
+    private suspend fun handleQueueRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
         val guild = musicManager.guild
@@ -123,7 +124,7 @@ class LoopCommand : AbstractSlashCommand(
                 RobertifyEmbedUtils.embedMessage(guild, GeneralMessages.NOTHING_PLAYING)
                     .build()
             } else {
-                val thisTrack = player.playingTrack
+                val thisTrack = player.playingTrack!!
                 if (queueHandler.isEmpty)
                     RobertifyEmbedUtils.embedMessage(guild, LoopMessages.QUEUE_LOOP_NOTHING)
                         .build()

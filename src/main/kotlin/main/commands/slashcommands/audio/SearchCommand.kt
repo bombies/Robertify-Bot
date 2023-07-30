@@ -3,6 +3,7 @@ package main.commands.slashcommands.audio
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
+import main.utils.GeneralUtils.queueCoroutine
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -48,7 +49,7 @@ class SearchCommand : AbstractSlashCommand(
                 SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
             )
-        }.queue { addingMsg ->
+        }.queueCoroutine { addingMsg ->
             getSearchResult(
                 guild,
                 event.user,
@@ -58,7 +59,7 @@ class SearchCommand : AbstractSlashCommand(
         }
     }
 
-    private fun getSearchResult(
+    private suspend fun getSearchResult(
         guild: Guild,
         requester: User,
         botMSg: InteractionHook,
@@ -129,6 +130,7 @@ class SearchCommand : AbstractSlashCommand(
                         .queue()
                 else event.message.delete().queue()
             }
+
             else -> throw IllegalArgumentException("The gods have blessed us with an impossible exception. (ID=$id)")
         }
     }

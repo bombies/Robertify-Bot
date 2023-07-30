@@ -1,10 +1,13 @@
 package main.audiohandlers.loaders
 
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Playlist
+import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
+import main.audiohandlers.utils.identifier
 import main.utils.RobertifyEmbedUtils
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
@@ -17,17 +20,17 @@ class AutoPlayLoader(
     override val musicManager: GuildMusicManager,
     private val channel: GuildMessageChannel?,
     override val query: String
-) : AudioLoader() {
+) : AudioLoader(musicManager.guild) {
+
+    companion object {
+        private val logger by SLF4J
+    }
 
     private val scheduler = musicManager.scheduler
     private val queueHandler = scheduler.queueHandler
     private val guild = musicManager.guild
 
-    override fun trackLoaded(track: AudioTrack) {
-        throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
-    }
-
-    override fun onPlaylistLoad(playlist: AudioPlaylist) {
+    override suspend fun onPlaylistLoad(playlist: Playlist) {
         if (channel != null) {
             val localeManager = LocaleManager[guild]
             scheduler.announcementChannel = channel
@@ -39,14 +42,23 @@ class AutoPlayLoader(
                     .setTitle(localeManager.getMessage(AutoPlayMessages.AUTO_PLAY_EMBED_TITLE))
                     .setFooter(localeManager.getMessage(AutoPlayMessages.AUTO_PLAY_EMBED_FOOTER))
                     .build()
-            ).queueThenDelete(5, TimeUnit.MINUTES)
+            ).queueThenDelete(time = 5, unit = TimeUnit.MINUTES)
         }
 
         val self = guild.selfMember
-        playlist.tracks.forEach { track ->
-            scheduler.addRequester(self.id, track.info.identifier)
-            scheduler.queue(track)
-        }
+        logger.info(playlist.tracks.size.toString())
+
+
+        scheduler.unannouncedTracks.add(playlist.tracks.first().identifier)
+        scheduler.player.playTrack(playlist.tracks.first())
+
+        playlist.tracks
+            .subList(1, playlist.tracks.lastIndex)
+            .forEach { track ->
+                scheduler.unannouncedTracks.add(track.identifier)
+                scheduler.addRequester(self.id, track.info.identifier)
+                scheduler.queue(track)
+            }
 
         if (queueHandler.queueRepeating) {
             queueHandler.queueRepeating = false
@@ -57,25 +69,40 @@ class AutoPlayLoader(
         RequestChannelConfig(guild).updateMessage()
     }
 
-    override fun onSearchResultLoad(results: AudioPlaylist) {
+    override suspend fun onSearchResultLoad(results: List<Track>) {
         throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
     }
 
-    override fun noMatches() {
+    override suspend fun onTrackLoad(result: Track) {
+        throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
+    }
+
+    override suspend fun onNoMatches() {
         channel?.sendMessageEmbeds(
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 AudioLoaderMessages.NO_SIMILAR_TRACKS
             ).build()
         )
-            ?.queueThenDelete(5, TimeUnit.MINUTES) {
+            ?.queueThenDelete(time = 5, unit = TimeUnit.MINUTES) {
                 musicManager.scheduler.scheduleDisconnect(announceMsg = true)
             }
-        throw FriendlyException("There were no similar tracks found!", FriendlyException.Severity.COMMON, NullPointerException())
     }
 
-    override fun loadFailed(exception: FriendlyException?) {
-        if (exception != null)
-            throw Exception(exception.cause)
+    override suspend fun onException(exception: dev.arbjerg.lavalink.protocol.v4.Exception) {
+        channel?.sendMessageEmbeds(
+            RobertifyEmbedUtils.embedMessage(
+                guild,
+                AudioLoaderMessages.NO_SIMILAR_TRACKS
+            ).build()
+        )
+            ?.queueThenDelete(time = 5, unit = TimeUnit.MINUTES) {
+                musicManager.scheduler.scheduleDisconnect(announceMsg = true)
+            }
+        throw FriendlyException(
+            "There were no similar tracks found!",
+            FriendlyException.Severity.COMMON,
+            NullPointerException()
+        )
     }
 }

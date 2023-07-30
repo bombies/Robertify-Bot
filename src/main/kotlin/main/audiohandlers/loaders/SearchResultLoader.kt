@@ -1,9 +1,9 @@
 package main.audiohandlers.loaders
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Exception
+import dev.arbjerg.lavalink.protocol.v4.Playlist
+import dev.arbjerg.lavalink.protocol.v4.Track
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.GuildMusicManager
@@ -25,23 +25,18 @@ class SearchResultLoader(
     private val searcher: User,
     override val query: String,
     private val botMessage: InteractionHook
-) : AudioLoader() {
+) : AudioLoader(musicManager.guild) {
     private val guild = musicManager.guild
 
-    override fun trackLoaded(track: AudioTrack?) {
+    override suspend fun onPlaylistLoad(playlist: Playlist) {
         throw UnsupportedOperationException("This operation is not supported in the search result loader")
     }
 
-    override fun onPlaylistLoad(playlist: AudioPlaylist) {
-        throw UnsupportedOperationException("This operation is not supported in the search result loader")
-    }
-
-    override fun onSearchResultLoad(results: AudioPlaylist) {
-        val tracks = results.tracks
+    override suspend fun onSearchResultLoad(results: List<Track>) {
         val localeManager = LocaleManager[guild]
         val embedDesc = StringBuilder()
 
-        val options = tracks.subList(0, tracks.size.coerceAtMost(10)).mapIndexed { i, track ->
+        val options = results.subList(0, results.size.coerceAtMost(10)).mapIndexed { i, track ->
             val info = track.info
             val label = "${info.title} by ${info.author}"
             val safeLabel = label.substring(0, label.length.coerceAtMost(100))
@@ -88,7 +83,11 @@ class SearchResultLoader(
         ).queue()
     }
 
-    override fun noMatches() {
+    override suspend fun onTrackLoad(result: Track) {
+        throw UnsupportedOperationException("This operation is not supported in the search result loader")
+    }
+
+    override suspend fun onNoMatches() {
         botMessage.editOriginalEmbeds(
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -99,7 +98,7 @@ class SearchResultLoader(
             .queue()
     }
 
-    override fun loadFailed(exception: FriendlyException?) {
+    override suspend fun onException(exception: Exception) {
         TODO("Not yet implemented")
     }
 }

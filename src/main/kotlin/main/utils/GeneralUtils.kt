@@ -1,5 +1,7 @@
 package main.utils
 
+import dev.minn.jda.ktx.coroutines.await
+import kotlinx.coroutines.*
 import main.constants.RobertifyPermission
 import main.constants.RobertifyEmoji
 import main.constants.RobertifyTheme
@@ -42,10 +44,15 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.util.concurrent.CancellationException
+import java.util.concurrent.Executors
+import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import java.util.regex.Pattern
 import javax.imageio.ImageIO
+import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
 
 object GeneralUtils {
 
@@ -675,6 +682,18 @@ object GeneralUtils {
     fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration, success: Consumer<in T>) =
         queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success)
 
+    suspend fun <T> RestAction<T>.queueCoroutine(
+        context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
+        duration: kotlin.time.Duration = kotlin.time.Duration.ZERO,
+        onSuccess: (suspend (item: T) -> Unit)? = null
+    ) {
+        withContext(context) {
+            kotlinx.coroutines.delay(duration)
+            val item = await()
+            onSuccess?.invoke(item)
+        }
+    }
+
     fun <T> List<T>.coerceAtMost(max: Int): List<T> =
         this.subList(0, this.size.coerceAtMost(max))
 
@@ -683,10 +702,10 @@ object GeneralUtils {
 
     fun String.coerceAtMost(max: Int): String {
         val addEllipse = length > max
-        val newString = this.substring(0, this.length.coerceAtMost(if (addEllipse) max + 3 else max))
+        val newString = this.substring(0, this.length.coerceAtMost(if (addEllipse) max - 3 else max))
 
         return if (addEllipse)
-            newString.replaceRange(47..49, "...")
+            newString.replaceRange(newString.length - 3..<newString.length, "...")
         else newString
     }
 
@@ -696,5 +715,29 @@ object GeneralUtils {
     fun String.isImageUrl(): Boolean {
         if (!isUrl()) return false
         return ImageIO.read(toUrl()) != null
+    }
+
+    private val pool = Executors.newScheduledThreadPool(ForkJoinPool.getCommonPoolParallelism().coerceAtLeast(2)) {
+        thread(start = false, name = "Event-Worker-Thread", isDaemon = true, block = it::run)
+    }
+
+    data class CoroutineContextComponents(
+        val dispatcher: ExecutorCoroutineDispatcher,
+        val supervisor: CompletableJob,
+        val handler: CoroutineExceptionHandler
+    )
+
+    fun generateHandleCoroutineContextComponents(): CoroutineContextComponents {
+        val dispatcher = pool.asCoroutineDispatcher()
+        val supervisor = SupervisorJob()
+        val handler = CoroutineExceptionHandler { _, throwable ->
+            if (throwable !is CancellationException)
+                log.error("Uncaught exception in coroutine event worker", throwable)
+            if (throwable is Error) {
+                supervisor.cancel()
+                throw throwable
+            }
+        }
+        return CoroutineContextComponents(dispatcher, supervisor, handler)
     }
 }

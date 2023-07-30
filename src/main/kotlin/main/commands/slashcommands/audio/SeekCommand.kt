@@ -58,7 +58,7 @@ class SeekCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private fun handleSeek(
+    private suspend fun handleSeek(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         hours: Int,
@@ -83,7 +83,7 @@ class SeekCommand : AbstractSlashCommand(
             ).inWholeMilliseconds
 
         val player = RobertifyAudioManager[guild].player
-        val playingTrack = player.playingTrack
+        val playingTrack = player.playingTrack!!
 
         if (seekDuration > playingTrack.length)
             return RobertifyEmbedUtils.embedMessage(guild, SeekMessages.POS_GT_DURATION)

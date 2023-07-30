@@ -1,11 +1,16 @@
 package main.audiohandlers.loaders
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Exception
+import dev.arbjerg.lavalink.protocol.v4.Playlist
+import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.minn.jda.ktx.coroutines.await
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.models.Requester
+import main.main.Robertify
 import main.utils.RobertifyEmbedUtils
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -16,12 +21,11 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
-import net.dv8tion.jda.api.exceptions.ErrorHandler
-import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.requests.RestAction
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
+import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 
 class MainAudioLoader(
     override val musicManager: GuildMusicManager,
@@ -30,22 +34,29 @@ class MainAudioLoader(
     private val addToBeginning: Boolean = false,
     private val announceMsg: Boolean = true,
     private val botMsg: Message? = null,
-    private val _announcementChannel: GuildMessageChannel? = null,
+    _announcementChannel: GuildMessageChannel? = null,
     private val sender: User? = null,
-) : AudioLoader() {
+) : AudioLoader(musicManager.guild) {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
-        fun RestAction<Message>.queueThenDelete(
+        suspend fun RestAction<Message>.queueThenDelete(
+            context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
             time: Long = 10,
             unit: TimeUnit = TimeUnit.SECONDS,
             deletePredicate: ((message: Message) -> Boolean)? = null,
-            onSuccess: Consumer<Void>? = null
+            onSuccess: (suspend (message: Message) -> Unit)? = null
         ) {
-            this.queue { msg ->
-                if (deletePredicate == null || deletePredicate(msg))
-                    msg.delete().queueAfter(time, unit, onSuccess, ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE))
+            val message = this.await();
+            if (deletePredicate == null || deletePredicate(message)) {
+                coroutineScope {
+                    launch(context) {
+                        delay(unit.toMillis(time))
+                        message.delete().await()
+                        onSuccess?.invoke(message)
+                    }
+                }
             }
         }
     }
@@ -57,40 +68,7 @@ class MainAudioLoader(
         _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfig(guild)
 
-    override fun trackLoaded(track: AudioTrack) {
-        sendTrackLoadedMessage(track)
-
-        val trackInfo = track.info
-
-        if (announceMsg)
-            scheduler.unannouncedTracks.add(trackInfo.identifier)
-
-        val requester: Requester? = if (sender != null) {
-            scheduler.addRequester(sender.id, trackInfo.identifier)
-            Requester(sender.id, trackInfo.identifier)
-        } else scheduler.findRequester(trackInfo.identifier)
-
-        scheduler.announcementChannel = announcementChannel
-
-        if (addToBeginning)
-            scheduler.addToBeginningOfQueue(track)
-        else scheduler.queue(track)
-
-        val info = track.info
-        LogUtilsKt(guild).sendLog(
-            LogType.QUEUE_ADD, AudioLoaderMessages.QUEUE_ADD_LOG,
-            Pair("{user}", sender?.asMention ?: requester.toString()),
-            Pair("{title}", info.title),
-            Pair("{author}", info.author)
-        )
-
-        if (queueHandler.queueRepeating)
-            queueHandler.setSavedQueue(queueHandler.contents)
-
-        requestChannelConfig.updateMessage()
-    }
-
-    private fun handleMessageUpdate(embed: MessageEmbed) {
+    private suspend fun handleMessageUpdate(embed: MessageEmbed) {
         if (botMsg != null)
             botMsg.editMessageEmbeds(embed)
                 .queueThenDelete(
@@ -105,7 +83,7 @@ class MainAudioLoader(
         }
     }
 
-    private fun sendTrackLoadedMessage(track: AudioTrack) {
+    private suspend fun sendTrackLoadedMessage(track: Track) {
         val embed = RobertifyEmbedUtils.embedMessage(
             guild,
             AudioLoaderMessages.QUEUE_ADD,
@@ -116,12 +94,12 @@ class MainAudioLoader(
         handleMessageUpdate(embed)
     }
 
-    override fun onPlaylistLoad(playlist: AudioPlaylist) {
+    override suspend fun onPlaylistLoad(playlist: Playlist) {
         val mutableTracks = playlist.tracks.toMutableList()
         val embed = RobertifyEmbedUtils.embedMessage(
             guild, AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
             Pair("{numTracks}", mutableTracks.size.toString()),
-            Pair("{playlist}", playlist.name ?: "Unknown Playlist")
+            Pair("{playlist}", playlist.info.name)
         ).build()
 
         handleMessageUpdate(embed)
@@ -143,7 +121,7 @@ class MainAudioLoader(
                 LogType.QUEUE_ADD, AudioLoaderMessages.QUEUE_PLAYLIST_ADD,
                 Pair("{user}", sender.asMention),
                 Pair("{numTracks}", mutableTracks.size.toString()),
-                Pair("{playlist}", playlist.name ?: "Unknown Playlist")
+                Pair("{playlist}", playlist.info.name)
             )
 
         mutableTracks.forEach { track ->
@@ -155,8 +133,8 @@ class MainAudioLoader(
         }
     }
 
-    override fun onSearchResultLoad(results: AudioPlaylist) {
-        val firstResult = results.tracks.first()
+    override suspend fun onSearchResultLoad(results: List<Track>) {
+        val firstResult = results.first()
         val trackInfo = firstResult.info
 
         if (announceMsg)
@@ -182,7 +160,39 @@ class MainAudioLoader(
             )
     }
 
-    override fun noMatches() {
+    override suspend fun onTrackLoad(result: Track) {
+        sendTrackLoadedMessage(result)
+
+        val trackInfo = result.info
+
+        if (announceMsg)
+            scheduler.unannouncedTracks.add(trackInfo.identifier)
+
+        val requester: Requester? = if (sender != null) {
+            scheduler.addRequester(sender.id, trackInfo.identifier)
+            Requester(sender.id, trackInfo.identifier)
+        } else scheduler.findRequester(trackInfo.identifier)
+
+        scheduler.announcementChannel = announcementChannel
+
+        if (addToBeginning)
+            scheduler.addToBeginningOfQueue(result)
+        else scheduler.queue(result)
+
+        LogUtilsKt(guild).sendLog(
+            LogType.QUEUE_ADD, AudioLoaderMessages.QUEUE_ADD_LOG,
+            Pair("{user}", sender?.asMention ?: requester.toString()),
+            Pair("{title}", trackInfo.title),
+            Pair("{author}", trackInfo.author)
+        )
+
+        if (queueHandler.queueRepeating)
+            queueHandler.setSavedQueue(queueHandler.contents)
+
+        requestChannelConfig.updateMessage()
+    }
+
+    override suspend fun onNoMatches() {
         val embed = if (query.length < 4096)
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -196,15 +206,10 @@ class MainAudioLoader(
         handleMessageUpdate(embed)
 
         if (queueHandler.isEmpty && musicManager.player.playingTrack == null)
-            scheduler.scheduleDisconnect(1, TimeUnit.SECONDS, false)
+            scheduler.scheduleDisconnect(1.seconds, false)
     }
 
-    override fun loadFailed(exception: FriendlyException?) {
-        if (exception == null) {
-            logger.warn("The loadFailed method was called while attempting to load tracks in ${guild.name} but the exception was null!")
-            return
-        }
-
+    override suspend fun onException(exception: Exception) {
         if (musicManager.player.playingTrack == null)
             musicManager.leave()
 

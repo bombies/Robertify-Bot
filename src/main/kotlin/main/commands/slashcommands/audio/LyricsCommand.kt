@@ -57,7 +57,7 @@ class LyricsCommand : AbstractSlashCommand(
 
                 val playingTrack = RobertifyAudioManager[guild]
                     .player
-                    .playingTrack
+                    .playingTrack!!
                 "${playingTrack.title} by ${playingTrack.author}"
             }
 

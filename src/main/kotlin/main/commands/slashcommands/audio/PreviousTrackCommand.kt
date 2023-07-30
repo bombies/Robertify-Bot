@@ -26,7 +26,7 @@ class PreviousTrackCommand : AbstractSlashCommand(
             .queue()
     }
 
-    fun handlePrevious(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    suspend fun handlePrevious(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
@@ -42,10 +42,10 @@ class PreviousTrackCommand : AbstractSlashCommand(
                 PreviousTrackMessages.NO_PREV_TRACKS
             ).build()
 
-        val currentTrack = player.playingTrack
+        val currentTrack = player.playingTrack!!
         queueHandler.addToBeginning(currentTrack)
         player.stopTrack()
-        player.playTrack(queueHandler.popPreviousTrack())
+        player.playTrack(queueHandler.popPreviousTrack()!!)
 
         RequestChannelConfig(guild).updateMessage()
 

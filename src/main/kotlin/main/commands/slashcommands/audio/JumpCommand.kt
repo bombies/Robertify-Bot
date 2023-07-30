@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import lavalink.client.player.IPlayer
+import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.schlaubi.lavakord.audio.player.Player
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
@@ -54,7 +55,7 @@ class JumpCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleJump(
+    private suspend fun handleJump(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         input: String
@@ -81,12 +82,12 @@ class JumpCommand : AbstractSlashCommand(
         )
     }
 
-    private fun doJump(
+    private suspend fun doJump(
         guild: Guild,
         jumper: User,
         input: String,
-        player: IPlayer,
-        track: AudioTrack
+        player: Player,
+        track: Track
     ): MessageEmbed {
         var time = if (input.isInt())
             input.toLong()
@@ -105,13 +106,13 @@ class JumpCommand : AbstractSlashCommand(
 
         time = time.toDuration(DurationUnit.SECONDS).inWholeMilliseconds
 
-        if (time > track.length - player.trackPosition)
+        if (time > track.length - player.position)
             return RobertifyEmbedUtils.embedMessage(
                 guild,
                 JumpMessages.JUMP_DURATION_GT_TIME_LEFT
             ).build()
 
-        player.seekTo(player.trackPosition + time)
+        player.seekTo(player.position + time)
         LogUtilsKt(guild).sendLog(
             LogType.TRACK_JUMP,
             JumpMessages.JUMPED_LOG,

@@ -75,7 +75,7 @@ class PlaylistCommand : AbstractSlashCommand(
         return if (playlists.isEmpty())
             event.replyEmbed(PlaylistMessages.NO_PLAYLISTS).queue()
         else {
-            paginatePlaylists(event, 25)
+            paginatePlaylists(event)
             return
         }
     }

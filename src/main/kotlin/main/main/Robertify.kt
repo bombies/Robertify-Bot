@@ -1,56 +1,62 @@
 package main.main
 
+//import main.utils.resume.GuildResumeManager
 import api.RobertifyKtorApi
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
-import dev.minn.jda.ktx.jdabuilder.defaultShard
 import dev.minn.jda.ktx.util.SLF4J
+import dev.schlaubi.lavakord.LavaKord
+import dev.schlaubi.lavakord.MutableLavaKordOptions
+import dev.schlaubi.lavakord.jda.LavaKordShardManager
+import dev.schlaubi.lavakord.jda.applyLavakord
+import dev.schlaubi.lavakord.jda.lavakord
+import dev.schlaubi.lavakord.plugins.lavasrc.LavaSrc
 import io.sentry.Sentry
 import kotlinx.coroutines.*
-import lavalink.client.io.jda.JdaLavalink
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager
 import main.commands.slashcommands.SlashCommandManager.registerCommands
 import main.constants.ENV
-import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.database.mongodb.AbstractMongoDatabase
-import main.utils.database.mongodb.cache.redis.GuildRedisCache
 import main.events.EventManager
 import main.main.Listener.Companion.loadNeededSlashCommands
 import main.main.Listener.Companion.rescheduleUnbans
+import main.utils.GeneralUtils
 import main.utils.api.robertify.RobertifyApi
+import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
+import main.utils.database.mongodb.cache.redis.GuildRedisCache
 import main.utils.json.locale.LocaleConfig
 import main.utils.json.reminders.RemindersConfig
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
-import main.utils.resume.GuildResumeManager
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
+import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.yaml.snakeyaml.reader.ReaderException
-import java.util.Base64
+import java.util.*
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executors
 import java.util.concurrent.ForkJoinPool
 import kotlin.concurrent.thread
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 object Robertify {
     private val logger by SLF4J
     val cronScheduler = StdSchedulerFactory.getDefaultScheduler()
     var topGGAPI: DiscordBotListAPI? = null
-    lateinit var lavalink: JdaLavalink
+    lateinit var lavaKord: LavaKord
         private set
     lateinit var shardManager: ShardManager
         private set
@@ -58,10 +64,9 @@ object Robertify {
         private set
     lateinit var externalApi: RobertifyApi
         private set
+    lateinit var coroutineEventManager: CoroutineEventManager
+        private set
 
-    private val pool = Executors.newScheduledThreadPool(ForkJoinPool.getCommonPoolParallelism().coerceAtLeast(2)) {
-        thread(start = false, name = "Event-Worker-Thread", isDaemon = true, block = it::run)
-    }
 
     fun main() = runBlocking {
         if (Config.hasValue(ENV.SENTRY_DSN))
@@ -80,8 +85,8 @@ object Robertify {
                 RobertifyAudioManager.musicManagers
                     .values
                     .forEach { musicManager ->
-                        if (musicManager.player.playingTrack != null)
-                            GuildResumeManager(musicManager.guild).saveTracks()
+//                        if (musicManager.player.playingTrack != null)
+//                            GuildResumeManager(musicManager.guild).saveTracks()
                         musicManager.destroy()
                     }
             }
@@ -99,17 +104,6 @@ object Robertify {
             }
         })
 
-        // Setup LavaLink
-        lavalink = JdaLavalink(
-            getIdFromToken(Config.BOT_TOKEN),
-            Config.SHARD_COUNT,
-        ) { shardId -> shardManager.getShardById(shardId) }
-
-        Config.LAVA_NODES.forEach { node ->
-            lavalink.addNode(node.name, node.uri, node.password)
-            logger.info("Registered lava node with address: ${node.uri}")
-        }
-
         // Init caches
         AbstractMongoDatabase.initAllCaches()
         logger.info("Initialized all caches.")
@@ -118,19 +112,10 @@ object Robertify {
         logger.info("All guilds have been loaded into cache.")
 
         // Setup custom coroutine event manager
-        val dispatcher = pool.asCoroutineDispatcher()
-        val supervisor = SupervisorJob()
-        val handler = CoroutineExceptionHandler { _, throwable ->
-            if (throwable !is CancellationException)
-                logger.error("Uncaught exception in coroutine event worker", throwable)
-            if (throwable is Error) {
-                supervisor.cancel()
-                throw throwable
-            }
-        }
+        val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
         val context = dispatcher + supervisor + handler
         val scope = CoroutineScope(context)
-        val coroutineEventManager = CoroutineEventManager(scope, 1.minutes)
+        coroutineEventManager = CoroutineEventManager(scope, 30.seconds)
         coroutineEventManager.handleShardReady()
         coroutineEventManager.handleGuildReady()
         coroutineEventManager.listener<ShutdownEvent> {
@@ -139,48 +124,51 @@ object Robertify {
 
         // Build bot connection
         logger.info("Building shard manager...")
-        shardManager = defaultShard(
-            token = Config.BOT_TOKEN,
-            intents = listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
-            enableCoroutines = false
-        ) {
-            setShardsTotal(Config.SHARD_COUNT)
-            setEventManagerProvider { coroutineEventManager }
-            setBulkDeleteSplittingEnabled(false)
-            enableCache(CacheFlag.VOICE_STATE)
-            disableCache(
-                CacheFlag.ACTIVITY,
-                CacheFlag.EMOJI,
-                CacheFlag.CLIENT_STATUS,
-                CacheFlag.ROLE_TAGS,
-                CacheFlag.ONLINE_STATUS,
-                CacheFlag.STICKER,
-                CacheFlag.SCHEDULED_EVENTS
-            )
-            setVoiceDispatchInterceptor(lavalink.voiceInterceptor)
-            setActivity(Activity.listening("Starting up..."))
 
-            val disabledIntents = mutableListOf(
-                GatewayIntent.DIRECT_MESSAGE_TYPING,
-                GatewayIntent.GUILD_MODERATION,
-                GatewayIntent.GUILD_INVITES,
-                GatewayIntent.GUILD_MEMBERS,
-                GatewayIntent.GUILD_MESSAGE_TYPING,
-                GatewayIntent.GUILD_PRESENCES,
-                GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                GatewayIntent.SCHEDULED_EVENTS
-            )
+        val lavakordShardManager = LavaKordShardManager()
+        val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
+            Config.BOT_TOKEN,
+            listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
+        )
+            .apply {
+                setShardsTotal(Config.SHARD_COUNT)
+                setEventManagerProvider { coroutineEventManager }
+                setBulkDeleteSplittingEnabled(false)
+                enableCache(CacheFlag.VOICE_STATE)
+                disableCache(
+                    CacheFlag.ACTIVITY,
+                    CacheFlag.EMOJI,
+                    CacheFlag.CLIENT_STATUS,
+                    CacheFlag.ROLE_TAGS,
+                    CacheFlag.ONLINE_STATUS,
+                    CacheFlag.STICKER,
+                    CacheFlag.SCHEDULED_EVENTS
+                )
+                setActivity(Activity.listening("Starting up..."))
 
-            val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
+                val disabledIntents = mutableListOf(
+                    GatewayIntent.DIRECT_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_MODERATION,
+                    GatewayIntent.GUILD_INVITES,
+                    GatewayIntent.GUILD_MEMBERS,
+                    GatewayIntent.GUILD_MESSAGE_TYPING,
+                    GatewayIntent.GUILD_PRESENCES,
+                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                    GatewayIntent.SCHEDULED_EVENTS
+                )
 
-            if (Config.MESSAGE_CONTENT_ENABLED)
-                enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-            else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+                val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
 
-            enableIntents(enabledIntents)
-            disableIntents(disabledIntents)
-        }
-        logger.info("Successfully built shard manager")
+                if (Config.MESSAGE_CONTENT_ENABLED)
+                    enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+                else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+
+                enableIntents(enabledIntents)
+                disableIntents(disabledIntents)
+            }
+
+        shardManagerBuilder.applyLavakord(lavakordShardManager)
+        shardManager = shardManagerBuilder.build()
 
         val slashCommandManager = SlashCommandManager
         shardManager.registerCommands(
@@ -210,6 +198,30 @@ object Robertify {
 
         if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
             externalApi = RobertifyApi()
+        logger.info("Successfully built shard manager")
+
+        logger.info("Setting up LavaKord...")
+        lavaKord = shardManager.lavakord(
+            lavakordShardManager, context, options = MutableLavaKordOptions(
+                link = MutableLavaKordOptions.LinkConfig(
+                    showTrace = true
+                )
+            )
+        ) {
+            plugins {
+                install(LavaSrc)
+            }
+        }
+
+        Config.LAVA_NODES.forEach { node ->
+            lavaKord.addNode(
+                serverUri = node.uri.toString(),
+                password = node.password,
+                name = node.name
+            )
+            logger.info("Registered lava node with address: ${node.uri}")
+        }
+        logger.info("LavaKord ready")
 
         RobertifyKtorApi.start()
     }
@@ -222,6 +234,8 @@ object Robertify {
     }
 
     private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
+        logger.info("Guild ${event.guild.name} is ready");
+
         val guild = event.guild
         val requestChannelConfig = RequestChannelConfig(guild)
         launch {
@@ -238,7 +252,7 @@ object Robertify {
         RemindersConfig(guild).scheduleReminders()
 
         requestChannelConfig.updateMessage()
-        GuildResumeManager(guild).loadTracks()
+//        GuildResumeManager(guild).loadTracks()
     }
 
     fun initVoteSiteAPIs() {

@@ -24,7 +24,7 @@ class TwentyFourSevenCommand : AbstractSlashCommand(
         event.replyEmbeds(logic(event.guild!!)).queue()
     }
 
-    private fun logic(guild: Guild): MessageEmbed {
+    private suspend fun logic(guild: Guild): MessageEmbed {
         val config = GuildConfig(guild)
         val localeManager = LocaleManager[guild]
         val scheduler = RobertifyAudioManager[guild].scheduler

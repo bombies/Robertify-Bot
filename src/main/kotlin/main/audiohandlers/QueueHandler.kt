@@ -1,14 +1,14 @@
 package main.audiohandlers
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
+import dev.arbjerg.lavalink.protocol.v4.Track
 import java.util.Stack
 import java.util.concurrent.ConcurrentLinkedQueue
 
 class QueueHandler {
-    private val queue = ConcurrentLinkedQueue<AudioTrack>()
-    private val savedQueue = ConcurrentLinkedQueue<AudioTrack>()
-    private val previousTracks = Stack<AudioTrack>()
-    var lastPlayedTrackBuffer: AudioTrack? = null
+    private val queue = ConcurrentLinkedQueue<Track>()
+    private val savedQueue = ConcurrentLinkedQueue<Track>()
+    private val previousTracks = Stack<Track>()
+    var lastPlayedTrackBuffer: Track? = null
     var trackRepeating: Boolean = false
     var queueRepeating: Boolean = false
 
@@ -18,10 +18,10 @@ class QueueHandler {
     val previousTracksSize: Int
         get() = previousTracks.size
 
-    val contents: List<AudioTrack>
+    val contents: List<Track>
         get() = queue.toList()
 
-    val previousTracksContents: List<AudioTrack>
+    val previousTracksContents: List<Track>
         get() = previousTracks.toList().reversed()
 
     val isEmpty: Boolean
@@ -30,11 +30,11 @@ class QueueHandler {
     val isPreviousTracksEmpty: Boolean
         get() = previousTracks.isEmpty()
 
-    fun add(track: AudioTrack): Boolean = queue.offer(track)
+    fun add(track: Track): Boolean = queue.offer(track)
 
-    fun addAll(tracks: Collection<AudioTrack>): Boolean = queue.addAll(tracks)
+    fun addAll(tracks: Collection<Track>): Boolean = queue.addAll(tracks)
 
-    fun setSavedQueue(tracks: Collection<AudioTrack>) {
+    fun setSavedQueue(tracks: Collection<Track>) {
         if (!queueRepeating)
             return
         savedQueue.addAll(tracks)
@@ -45,15 +45,15 @@ class QueueHandler {
         queue.addAll(savedQueue)
     }
 
-    fun pushPastTrack(track: AudioTrack) = previousTracks.push(track)
+    fun pushPastTrack(track: Track): Track = previousTracks.push(track)
 
-    fun remove(track: AudioTrack): Boolean = queue.remove(track)
+    fun remove(track: Track): Boolean = queue.remove(track)
 
-    fun removeAll(tracks: Collection<AudioTrack>): Boolean = queue.removeAll(tracks.toSet())
+    fun removeAll(tracks: Collection<Track>): Boolean = queue.removeAll(tracks.toSet())
 
-    fun poll(): AudioTrack? = queue.poll()
+    fun poll(): Track? = queue.poll()
 
-    fun popPreviousTrack() = previousTracks.pop()
+    fun popPreviousTrack(): Track? = previousTracks.pop()
 
     fun clear() = queue.clear()
 
@@ -61,16 +61,16 @@ class QueueHandler {
 
     fun clearPreviousTracks() = previousTracks.clear()
 
-    fun addToBeginning(track: AudioTrack) {
-        val newQueue = ConcurrentLinkedQueue<AudioTrack>()
+    fun addToBeginning(track: Track) {
+        val newQueue = ConcurrentLinkedQueue<Track>()
         newQueue.offer(track)
         newQueue.addAll(queue)
         queue.clear()
         queue.addAll(newQueue)
     }
 
-    fun addToBeginning(tracks: Collection<AudioTrack>) {
-        val newQueue = ConcurrentLinkedQueue<AudioTrack>()
+    fun addToBeginning(tracks: Collection<Track>) {
+        val newQueue = ConcurrentLinkedQueue<Track>()
         newQueue.addAll(tracks)
         newQueue.addAll(queue)
         queue.clear()

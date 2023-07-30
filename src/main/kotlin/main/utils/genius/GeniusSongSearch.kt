@@ -49,7 +49,7 @@ class GeniusSongSearch(private val gla: GeniusAPI, query: String, page: Int = 1)
 
             val result = try {
                 val response = OkHttpClient().newCall(request).execute()
-                response.body()?.string()
+                response.body?.string()
             } catch (e: Exception) {
                 logger.error("Unexpected error", e)
                 return

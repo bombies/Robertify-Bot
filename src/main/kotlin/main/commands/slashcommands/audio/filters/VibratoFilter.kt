@@ -1,17 +1,19 @@
 package main.commands.slashcommands.audio.filters
 
-import lavalink.client.io.filters.Vibrato
+import dev.schlaubi.lavakord.audio.player.vibrato
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class VibratoFilter : AbstractSlashCommand(SlashCommand(
-    name = "vibrato",
-    description = "Toggle the Vibrato filter.",
-    isPremium = true
-)) {
+class VibratoFilter : AbstractSlashCommand(
+    SlashCommand(
+        name = "vibrato",
+        description = "Toggle the Vibrato filter.",
+        isPremium = true
+    )
+) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
@@ -19,8 +21,8 @@ class VibratoFilter : AbstractSlashCommand(SlashCommand(
                 event = event,
                 filterName = "Vibrato",
                 filterPredicate = { vibrato != null },
-                filterOn = { setVibrato(Vibrato()).commit() },
-                filterOff = { setVibrato(null).commit() }
+                filterOn = { vibrato {} },
+                filterOff = { unsetVibrato() }
             )
         }.queue()
     }

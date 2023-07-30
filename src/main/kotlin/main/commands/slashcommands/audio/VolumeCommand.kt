@@ -57,7 +57,7 @@ class VolumeCommand : AbstractSlashCommand(
                 .build()
 
         val player = RobertifyAudioManager[guild].player
-        player.filters.setVolume(volume / 100.0.toFloat()).commit()
+        player.filters.volume = volume / 100F
 
         RequestChannelConfig(guild).updateMessage()
 

@@ -1,6 +1,7 @@
 package main.main
 
 import dev.minn.jda.ktx.messages.send
+import kotlinx.coroutines.launch
 import main.audiohandlers.RobertifyAudioManager
 import main.events.AbstractEventController
 import main.utils.GeneralUtils
@@ -8,15 +9,22 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.guildconfig.GuildConfig
+import main.utils.json.locale.LocaleConfig
+import main.utils.json.reminders.RemindersConfig
+import main.utils.json.requestchannel.RequestChannelConfig
+import main.utils.locale.LocaleManager
 import main.utils.locale.messages.UnbanMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
+import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.reader.ReaderException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 class Listener : AbstractEventController() {
 
@@ -105,6 +113,10 @@ class Listener : AbstractEventController() {
                 }
             }
         }
+    }
+
+    override fun onGuildReady(event: GuildReadyEvent) {
+        logger.info("Guild ${event.guild.name} is ready")
     }
 
     private val guildJoinListener =

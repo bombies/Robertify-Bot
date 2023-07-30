@@ -1,29 +1,27 @@
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackState
+import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.arbjerg.lavalink.protocol.v4.TrackInfo
 import main.audiohandlers.models.Requester
+import main.audiohandlers.utils.identifier
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 
-internal fun mockAudioTrack(id: String): AudioTrack {
-    val track = mock<AudioTrack> {
-        on { info } doReturn AudioTrackInfo(
-            "test title",
+internal fun mockAudioTrack(id: String): Track {
+    val track = mock<Track> {
+        on { info } doReturn TrackInfo(
+            id,
+            true,
             "test author",
             10000,
-            id,
             false,
-            "http://testuri:80"
+            0,
+            "test title",
+            "http://testuri:80",
+            "mock",
+            null,
+            null
         )
-
-        on { state } doReturn AudioTrackState.PLAYING
-        on { identifier } doReturn id
-        on { isSeekable } doReturn false
-        on { position } doReturn 0
-        on { sourceManager } doReturn null
-        on { makeClone() } doReturn null
     }
 
     verify(track, never()).info
@@ -34,4 +32,4 @@ internal fun mockAudioTracks(count: Int) = (0 until count).map { mockAudioTrack(
 
 internal fun mockAudioTracksWithRequester(count: Int) = mockAudioTracks(count).map { it.withRequester() }
 
-internal fun AudioTrack.withRequester() = Pair(this, Requester("userid", identifier))
+internal fun Track.withRequester() = Pair(this, Requester("userid", identifier))
