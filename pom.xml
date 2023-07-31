@@ -183,7 +183,7 @@
         <dependency>
             <groupId>com.adamratzman</groupId>
             <artifactId>spotify-api-kotlin-jvm</artifactId>
-            <version>4.0.0</version>
+            <version>4.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
