@@ -87,7 +87,8 @@ jobs:
             java-version: 17
         - run: mvn -B package --file pom.xml -DskipTests
         - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
-        - uses: actions/upload-artifact@v3
+        - name: Upload bot artifact
+          uses: actions/upload-artifact@v3
           with:
-            name: Package
+            name: Robertify-Bot.jar
             path: staging
