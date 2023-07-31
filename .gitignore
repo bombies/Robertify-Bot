@@ -43,4 +43,4 @@ sentry.properties
 locale/*.yml
 src/main/resources/application.yml
 built_images
-logs
+docker-compose.yml

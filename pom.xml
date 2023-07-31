@@ -6,25 +6,76 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>5.2.10</version>
+    <version>6.0.0-PRE_ALPHA-1</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <kotlin.code.style>official</kotlin.code.style>
+        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <kotlin.version>1.9.0</kotlin.version>
+        <ktor.version>2.3.1</ktor.version>
+        <koin.version>3.4.0</koin.version>
+        <mockk.version>1.13.5</mockk.version>
+        <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
+        <serialization.version>1.5.1</serialization.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <main.class>main.main.RobertifyKt</main.class>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>mavenCentral</id>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>arbjergDev-snapshots</id>
+            <name>Lavalink Repository</name>
+            <url>https://maven.arbjerg.dev/snapshots</url>
+        </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <name>jcenter</name>
+            <id>bintray-jcenter</id>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+        <repository>
+            <id>jfrog-duncte123</id>
+            <name>jfrog-duncte123</name>
+            <url>https://duncte123.jfrog.io/artifactory/maven</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>dev.schlaubi.lavakord</groupId>
+            <artifactId>jda-jvm</artifactId>
+            <version>5.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.schlaubi.lavakord</groupId>
+            <artifactId>lavasrc-jvm</artifactId>
+            <version>5.1.2</version>
+        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.duncte123</groupId>
-            <artifactId>botCommons</artifactId>
-            <version>2.3.11</version>
         </dependency>
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -34,7 +85,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.8</version>
+            <version>5.0.0-beta.9</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -67,14 +118,9 @@
             <version>3.2.2</version>
         </dependency>
         <dependency>
-            <groupId>com.sedmelluq</groupId>
-            <artifactId>lavaplayer-ext-youtube-rotator</artifactId>
-            <version>0.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.bombies</groupId>
-            <artifactId>Robertify-Lavalink-Client</artifactId>
-            <version>4.0.1</version>
+            <groupId>me.duncte123</groupId>
+            <artifactId>botCommons</artifactId>
+            <version>2.3.11</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -99,16 +145,6 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.18.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry-opentelemetry-core</artifactId>
-            <version>6.18.1</version>
-        </dependency>
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry-opentelemetry-agent</artifactId>
             <version>6.18.1</version>
         </dependency>
         <dependency>
@@ -138,57 +174,158 @@
             <version>2.3.2</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>3.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>6.0.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.11.5</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.11.5</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
-            <version>0.11.5</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-            <version>8.0.0.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.9.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <version>3.0.0</version>
         </dependency>
+
+        <!--        Kotlin-->
+        <dependency>
+            <groupId>com.adamratzman</groupId>
+            <artifactId>spotify-api-kotlin-jvm</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-test-junit5</artifactId>
+            <version>1.8.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.bombies</groupId>
+            <artifactId>jda-ktx</artifactId>
+            <version>master-bf8acdd659-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-json</artifactId>
+            <version>${serialization.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-core-jvm</artifactId>
+            <version>${serialization.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-core-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-core-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-cio-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-netty-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-test-host-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-content-negotiation-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-client-content-negotiation-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-serialization-kotlinx-json-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-auth-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-auth-jwt-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-request-validation-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ktor</groupId>
+            <artifactId>ktor-server-status-pages-jvm</artifactId>
+            <version>${ktor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-core-jvm</artifactId>
+            <version>${koin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.insert-koin</groupId>
+            <artifactId>koin-ktor</artifactId>
+            <version>${koin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.influxdb</groupId>
+            <artifactId>influxdb-client-kotlin</artifactId>
+            <version>6.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.influxdb</groupId>
+            <artifactId>flux-dsl</artifactId>
+            <version>6.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito.kotlin</groupId>
+            <artifactId>mockito-kotlin</artifactId>
+            <version>4.1.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.github.bombies</groupId>
+                <artifactId>jda-ktx</artifactId>
+                <exclusions>
+                    <exclusion>
+                        <groupId>dev.schlaubi.lavakord</groupId>
+                        <artifactId>jda-jvm</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>net.dv8tion</groupId>
+                        <artifactId>JDA</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
             <dependency>
                 <groupId>net.dv8tion</groupId>
                 <artifactId>JDA</artifactId>
@@ -203,84 +340,94 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <dependency>
-                <groupId>com.github.bombies</groupId>
-                <artifactId>Robertify-Lavalink-Client</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.github.walkyst</groupId>
-                        <artifactId>lavaplayer-fork</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
-        <repository>
-            <name>jcenter</name>
-            <id>bintray-jcenter</id>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>dv8tion</id>
-            <name>m2-dv8tion</name>
-            <url>https://m2.dv8tion.net/releases</url>
-        </repository>
-        <repository>
-            <id>jfrog-duncte123</id>
-            <name>jfrog-duncte123</name>
-            <url>https://duncte123.jfrog.io/artifactory/maven</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <name>bintray</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-        </repository>
-    </repositories>
-
-    <properties>
-        <maven.compiler.source>19</maven.compiler.source>
-        <maven.compiler.target>19</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    </properties>
-
     <build>
+        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
         <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <jvmTarget>${maven.compiler.target}</jvmTarget>
+                    <compilerPlugins>
+                        <plugin>kotlinx-serialization</plugin>
+                    </compilerPlugins>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-serialization</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${maven.compiler.target}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+                <executions>
+                    <!-- Replacing default-compile as it is treated specially by Maven -->
+                    <execution>
+                        <id>default-compile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <!-- Replacing default-testCompile as it is treated specially by Maven -->
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>java-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>java-test-compile</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals> <goal>single</goal> </goals>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>${main.class}</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>main.main.Robertify</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

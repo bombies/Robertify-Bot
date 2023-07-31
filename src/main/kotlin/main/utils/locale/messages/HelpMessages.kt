@@ -1,0 +1,19 @@
+package main.utils.locale.messages
+
+import main.utils.locale.LocaleMessage
+
+enum class HelpMessages : LocaleMessage {
+    HELP_MANAGEMENT_OPTION,
+    HELP_MANAGEMENT_OPTION_DESC,
+    HELP_MUSIC_OPTION,
+    HELP_MUSIC_OPTION_DESC,
+    HELP_MISCELLANEOUS_OPTION,
+    HELP_MISCELLANEOUS_OPTION_DESC,
+    HELP_UTILITY_OPTION,
+    HELP_UTILITY_OPTION_DESC,
+    HELP_EMBED_AUTHOR,
+    HELP_EMBED_DESC,
+    HELP_EMBED_FOOTER,
+    HELP_NOTHING_FOUND,
+    HELP_COMMANDS
+}
