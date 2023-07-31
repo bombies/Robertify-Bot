@@ -39,7 +39,7 @@ data class QueueImageBuilder(
     fun addTrack(index: Int, track: Track): QueueImageBuilder =
         addTrack(index, track.title, track.author, track.length)
 
-    override fun build(): InputStream? {
+    override suspend fun build(): InputStream? {
         require(obj.has(QueryFields.TRACKS.toString())) { "The track list must be provided before building the queue image!" }
         obj.put(QueryFields.PAGE.toString(), page)
 

@@ -1,5 +1,6 @@
 package main.utils.pagination
 
+import dev.minn.jda.ktx.messages.editMessage_
 import dev.minn.jda.ktx.util.SLF4J
 import main.constants.MessageButton
 import main.events.AbstractEventController
@@ -129,7 +130,7 @@ class PaginationEvents : AbstractEventController() {
                 return@onEvent
             }
 
-            fun handleButtonPress(
+            suspend fun handleButtonPress(
                 queuePage: QueuePage,
                 frontEnabled: Boolean = true,
                 previousEnabled: Boolean = true,
@@ -149,18 +150,20 @@ class PaginationEvents : AbstractEventController() {
                 }
 
                 try {
-                    val image = queuePage.image ?: run {
+                    val image = queuePage.generateImage() ?: run {
                         sendEmbed()
                         return
                     }
 
-                    event.editMessageAttachments(
-                        AttachedFile.fromData(
-                            image,
-                            AbstractImageBuilder.RANDOM_FILE_NAME
-                        )
-                    )
-                        .setComponents(
+                    event.editMessage_(
+                        attachments = listOf(
+                            AttachedFile.fromData(
+                                image,
+                                AbstractImageBuilder.RANDOM_FILE_NAME
+                            )
+                        ),
+
+                        components = listOf(
                             paginator.getButtons(
                                 user = event.user,
                                 frontEnabled = frontEnabled,
@@ -169,7 +172,8 @@ class PaginationEvents : AbstractEventController() {
                                 endEnabled = endEnabled,
                                 isQueue = true
                             )
-                        ).queue()
+                        )
+                    ).queue()
                 } catch (e: Exception) {
                     when (e) {
                         is SocketTimeoutException,
@@ -233,6 +237,4 @@ class PaginationEvents : AbstractEventController() {
                 }.setEphemeral(true).queue()
             }
         }
-
-
 }

@@ -1,6 +1,8 @@
 package main.commands.slashcommands.dev
 
 import dev.minn.jda.ktx.util.SLF4J
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.main.Robertify
 import main.utils.RobertifyEmbedUtils
@@ -8,7 +10,6 @@ import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
-import me.duncte123.botcommons.web.WebUtils
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import okhttp3.OkHttpClient
 import javax.script.ScriptEngine
@@ -70,7 +71,7 @@ class EvalCommand : AbstractSlashCommand(
             engine.put("guild", event.guild!!)
             engine.put("member", event.member!!)
             engine.put("link", Robertify.lavaKord)
-            engine.put("requester", WebUtils.ins)
+            engine.put("requester", HttpClient(CIO))
             engine.put("http", OkHttpClient())
             // TODO: Add RobertifyAPI
 

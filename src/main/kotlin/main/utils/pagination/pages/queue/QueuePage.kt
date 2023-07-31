@@ -25,19 +25,18 @@ class QueuePage(
     val queueItems
         get() = _queueItems.toList()
 
-    override val image: InputStream?
-        get() {
-            val builder = QueueImageBuilder(guild, pageNumber)
-            queueItems.forEach { item ->
-                builder.addTrack(
-                    item.trackIndex,
-                    item.trackTitle,
-                    item.artist,
-                    item.duration
-                )
-            }
-            return builder.build()
+    override suspend fun generateImage(): InputStream? {
+        val builder = QueueImageBuilder(guild, pageNumber)
+        queueItems.forEach { item ->
+            builder.addTrack(
+                item.trackIndex,
+                item.trackTitle,
+                item.artist,
+                item.duration
+            )
         }
+        return builder.build()
+    }
 
     fun addItem(item: QueueItem) =
         _queueItems.add(item)

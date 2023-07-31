@@ -12,7 +12,7 @@ object EventManager {
     private val logger by SLF4J
 
     /**
-     * Instanciate each event
+     * Instantiate each event
      */
     val registeredEvents by lazy {
         listOf(

@@ -42,7 +42,7 @@ data class NowPlayingImageBuilder(
         addQuery(QueryFields.LIVESTREAM, isLiveStream.toString())
     }
 
-    override fun build(): InputStream? {
+    override suspend fun build(): InputStream? {
         if (artistName.isRightToLeft() ||
             artistName.isRightToLeft() ||
             requesterName.isRightToLeft()

@@ -11,7 +11,7 @@ import java.io.InputStream
 class PlaylistsPage(
     private val guild: Guild,
     private val _playlists: List<PlaylistModel> = mutableListOf(),
-    pageNumber: Int
+    private val pageNumber: Int
 ) : AbstractImagePage() {
     override val embed: MessageEmbed
         get() {
@@ -24,7 +24,7 @@ class PlaylistsPage(
             ).build()
         }
 
-    override val image: InputStream? = PlaylistsImageBuilder(
+    override suspend fun generateImage(): InputStream? = PlaylistsImageBuilder(
         guild = guild,
         page = pageNumber,
         playlists = _playlists

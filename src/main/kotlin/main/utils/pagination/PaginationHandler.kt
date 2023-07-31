@@ -197,7 +197,7 @@ object PaginationHandler {
             }
 
             try {
-                val image = pages[0].image ?: run {
+                val image = pages[0].generateImage() ?: run {
                     return@coroutineScope sendFallbackEmbed()
                 }
 

@@ -16,7 +16,7 @@ class PlaylistPage(
     private val guild: Guild,
     private val tracks: List<PlaylistTrack>,
     private val trackIndexes: Map<PlaylistTrack, Int>,
-    pageNumber: Int
+    private val pageNumber: Int
 ) : AbstractImagePage() {
     override val embed: MessageEmbed
         get() {
@@ -31,7 +31,7 @@ class PlaylistPage(
                 .build()
         }
 
-    override val image: InputStream? = PlaylistImageBuilder(
+    override suspend fun generateImage(): InputStream? = PlaylistImageBuilder(
         guild = guild,
         title = title,
         artworkUrl = artworkUrl,

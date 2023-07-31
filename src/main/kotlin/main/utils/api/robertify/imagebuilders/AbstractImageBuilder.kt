@@ -1,8 +1,11 @@
 package main.utils.api.robertify.imagebuilders
 
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
 import main.main.Config
 import main.utils.api.robertify.imagebuilders.models.ImageQueryField
-import me.duncte123.botcommons.web.WebUtils
 import okhttp3.OkHttpClient
 import org.apache.http.client.utils.URIBuilder
 import org.slf4j.LoggerFactory
@@ -22,12 +25,11 @@ abstract class AbstractImageBuilder protected constructor(imageType: ImageType) 
             get() = "${UUID.randomUUID()}.png"
     }
 
-    private val httpClient = OkHttpClient.Builder()
-        .connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-        .readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-        .writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-        .build();
-    private val webUtils = WebUtils.ins
+    private val httpClient = HttpClient(CIO) {
+        engine {
+            requestTimeout = DEFAULT_TIMEOUT * 1000
+        }
+    }
     private var uri: URIBuilder
 
     init {
@@ -45,14 +47,11 @@ abstract class AbstractImageBuilder protected constructor(imageType: ImageType) 
             .find { it.name.equals(key.toString(), true) }
             ?.value
 
-    open fun build(): InputStream? {
+    open suspend fun build(): InputStream? {
         val url = uri.build().toURL().toString()
 
         return try {
-            httpClient.newCall(webUtils.prepareGet(url).build())
-                .execute()
-                .body
-                ?.byteStream()
+            httpClient.get(url).body<InputStream>()
         } catch (e: SocketTimeoutException) {
             throw ImageBuilderException(cause = e)
         } catch (e: ConnectException) {
