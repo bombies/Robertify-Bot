@@ -210,7 +210,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             } else {
                 logger.error("Unexpected error", ex)
             }
-            return;
+            return
         }
 
         val imgMessage = announcementChannel!!.sendFiles(
@@ -238,13 +238,11 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         )
         val trackToUse = queueHandler.lastPlayedTrackBuffer
 
-        if (queueHandler.trackRepeating) {
+        if (queueHandler.trackRepeating && reason.mayStartNext) {
             if (trackToUse == null) {
                 queueHandler.trackRepeating = false
                 nextTrack(null)
-            } else {
-                player.playTrack(trackToUse.copy())
-            }
+            } else player.playTrack(trackToUse.copy())
         } else if (reason.mayStartNext) {
             if (trackToUse != null)
                 queueHandler.pushPastTrack(trackToUse)
@@ -316,6 +314,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             )?.queue { msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES) }
         } catch (_: InsufficientPermissionException) {
         }
+
         nextTrack(track)
     }
 
