@@ -186,7 +186,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
                 artistName = track.author,
                 title = track.title,
                 albumImage = track.artworkUrl ?: defaultBackgroundImage,
-                requesterName = "${requesterUser.name}#${requesterUser.discriminator}",
+                requesterName = requesterUser.name,
                 requesterAvatar = requesterUser.avatarUrl
             ).build() ?: throw NullPointerException("The generated image was null!")
         } catch (ex: Exception) {
