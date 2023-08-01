@@ -162,7 +162,6 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject)
     }
 
-    @Synchronized
     fun removeChannel() {
         if (!isChannelSet())
             throw IllegalArgumentException(
@@ -197,9 +196,8 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     }
 
     suspend fun updateMessage(): Deferred<Unit>? = coroutineScope {
+        logger.debug("Channel set in ${guild.name} (${guild.idLong}): ${isChannelSet()}")
         if (!isChannelSet()) return@coroutineScope null
-
-        logger.debug("Channel is set in ${guild.name} (${guild.idLong})")
 
         val job = async {
             val msgRequest: RestAction<Message> = messageRequest ?: return@async

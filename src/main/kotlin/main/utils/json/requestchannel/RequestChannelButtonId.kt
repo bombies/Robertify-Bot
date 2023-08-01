@@ -6,7 +6,7 @@ enum class RequestChannelButtonId(private val str: String) {
     REWIND("${IDENTIFIER}rewind"),
     PLAY_AND_PAUSE("${IDENTIFIER}pnp"),
     STOP("${IDENTIFIER}stop"),
-    SKIP("${IDENTIFIER}skip"),
+    SKIP("${IDENTIFIER}end"),
     LOOP("${IDENTIFIER}loop"),
     SHUFFLE("${IDENTIFIER}shuffle"),
     DISCONNECT("${IDENTIFIER}disconnect"),
