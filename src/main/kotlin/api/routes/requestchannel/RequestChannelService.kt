@@ -53,7 +53,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
 
         RequestChannelEditCommand()
             .handleChannelButtonToggle(guild, dto.button.lowercase(), shardManager = shardManager)
-            ?.join()
+            ?.await()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
     }
 
@@ -70,7 +70,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
         dto.buttons.forEach { button ->
             RequestChannelEditCommand()
                 .handleChannelButtonToggle(guild, button.lowercase(), shardManager = shardManager)
-                ?.join()
+                ?.await()
         }
 
         return OkResponse("Successfully toggled the ${dto.buttons.joinToString(", ")} buttons in ${guild.name}")

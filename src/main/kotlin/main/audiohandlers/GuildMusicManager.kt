@@ -13,7 +13,7 @@ class GuildMusicManager(val guild: Guild) {
     val voteSkipManager = GuildVoteSkipManager()
     var isForcePaused = false
 
-    fun clear() {
+    suspend fun clear() {
         val queueHandler = scheduler.queueHandler
 
         queueHandler.clear()
@@ -26,7 +26,7 @@ class GuildMusicManager(val guild: Guild) {
 
         scheduler.clearRequesters()
         SkipCommand().clearVoteSkipInfo(guild)
-        RequestChannelConfig(guild).updateMessage()
+        RequestChannelConfig(guild).updateMessage()?.await()
     }
 
     suspend fun leave() {

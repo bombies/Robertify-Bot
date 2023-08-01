@@ -1,6 +1,11 @@
 package main.utils.json.requestchannel
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
+import dev.minn.jda.ktx.coroutines.await
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.artworkUrl
 import main.audiohandlers.utils.author
@@ -191,11 +196,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         else -> channelId == channel.idLong
     }
 
-    @Synchronized
-    fun updateMessage(): CompletableFuture<Void?>? {
-        if (!isChannelSet()) return null
-        return CompletableFuture.runAsync {
-            val msgRequest: RestAction<Message> = messageRequest ?: return@runAsync
+    suspend fun updateMessage(): Deferred<Unit>? = coroutineScope {
+        if (!isChannelSet()) return@coroutineScope null
+
+        logger.debug("Channel is set in ${guild.name} (${guild.idLong})")
+
+        val job = async {
+            val msgRequest: RestAction<Message> = messageRequest ?: return@async
             val musicManager = RobertifyAudioManager[guild]
             val audioPlayer = musicManager.player
             val playingTrack = audioPlayer.playingTrack
@@ -282,7 +289,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                         ),
                         Pair(
                             "{volume}",
-                            ((audioPlayer.filters.volume?.times(100) ?: 0).toInt()).toString()
+                            ((audioPlayer.filters.volume?.times(100) ?: 100).toInt()).toString()
                         )
                     )
                 )
@@ -329,6 +336,9 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 )
             }
         }
+
+
+        return@coroutineScope job
     }
 
     private fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
@@ -358,11 +368,24 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    fun updateAll() {
+    suspend fun updateAll() {
         try {
-            updateMessage()
-                ?.thenComposeAsync { updateButtons() }
-                ?.thenComposeAsync { updateTopic() }
+            val messageUpdate = updateMessage()
+            val buttonUpdate = updateButtons()
+            val topicUpdate = updateTopic()
+
+            if (messageUpdate == null || buttonUpdate == null || topicUpdate == null) {
+                logger.error(
+                    "Could not update request channel in {} because one or more of the updates resulted in a null job!",
+                    guild.name
+                )
+            } else {
+                awaitAll(
+                    messageUpdate,
+                    buttonUpdate,
+                    topicUpdate
+                )
+            }
         } catch (e: InsufficientPermissionException) {
             logger.error(
                 "I didn't have enough permissions to update the dedicated channel in {}",
@@ -371,15 +394,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    fun updateButtons(): CompletableFuture<Message>? {
-        if (!isChannelSet()) return null
-        val msgRequest: RestAction<Message> = messageRequest ?: return null
-        return msgRequest.submit()
-            .thenCompose { msg: Message ->
-                buttonUpdateRequest(
-                    msg
-                ).submit()
-            }
+    suspend fun updateButtons(): Deferred<Message?>? = coroutineScope {
+        if (!isChannelSet()) return@coroutineScope null
+        val job = async {
+            val msgRequest: RestAction<Message> = messageRequest ?: return@async null
+            msgRequest.await()
+        }
+
+        return@coroutineScope job
     }
 
     fun buttonUpdateRequest(msg: Message): MessageEditAction {
@@ -445,10 +467,12 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         ) else msg.editMessageComponents(firstRow, secondRow)
     }
 
-    fun updateTopic(): CompletableFuture<Void?>? {
-        if (!isChannelSet()) return null
-        val channel: TextChannel? = textChannel
-        return channelTopicUpdateRequest(channel)!!.submit()
+    suspend fun updateTopic(): Deferred<Void>? = coroutineScope {
+        if (!isChannelSet()) return@coroutineScope null
+        return@coroutineScope async {
+            val channel: TextChannel? = textChannel
+            channelTopicUpdateRequest(channel)!!.await()
+        }
     }
 
     @Synchronized

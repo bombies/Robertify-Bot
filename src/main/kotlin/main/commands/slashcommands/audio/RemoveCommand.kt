@@ -73,7 +73,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleRemove(
+    private suspend fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         id: Int
@@ -115,7 +115,7 @@ class RemoveCommand : AbstractSlashCommand(
                 Pair("{author}", removedTrack.author)
             )
             if (id <= 10)
-                RequestChannelConfig(guild).updateMessage()
+                RequestChannelConfig(guild).updateMessage()?.await()
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 RemoveMessages.REMOVED,
@@ -125,7 +125,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleRemove(
+    private suspend fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         name: String
@@ -167,7 +167,7 @@ class RemoveCommand : AbstractSlashCommand(
                 Pair("{author}", removedTrack.author)
             )
             if (id < 10)
-                RequestChannelConfig(guild).updateMessage()
+                RequestChannelConfig(guild).updateMessage()?.await()
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 RemoveMessages.REMOVED,

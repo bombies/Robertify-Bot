@@ -682,13 +682,16 @@ object GeneralUtils {
     fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration, success: Consumer<in T>) =
         queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success)
 
+    fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration, success: Consumer<in T>?, failure: Consumer<in Throwable>) =
+        queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success, failure)
+
     suspend fun <T> RestAction<T>.queueCoroutine(
         context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
         duration: kotlin.time.Duration = kotlin.time.Duration.ZERO,
         onSuccess: (suspend (item: T) -> Unit)? = null
     ) {
         withContext(context) {
-            kotlinx.coroutines.delay(duration)
+            delay(duration)
             val item = await()
             onSuccess?.invoke(item)
         }

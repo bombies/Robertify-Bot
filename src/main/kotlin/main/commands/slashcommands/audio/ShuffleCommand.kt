@@ -29,7 +29,7 @@ class ShuffleCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
+    suspend fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler
 
@@ -42,7 +42,7 @@ class ShuffleCommand : AbstractSlashCommand(
         queueHandler.clear()
         queueHandler.addAll(trackList)
 
-        RequestChannelConfig(guild).updateMessage()
+        RequestChannelConfig(guild).updateMessage()?.await()
 
         LogUtilsKt(guild).sendLog(
             LogType.QUEUE_SHUFFLE,

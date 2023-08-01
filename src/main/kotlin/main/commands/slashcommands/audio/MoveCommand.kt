@@ -69,7 +69,7 @@ class MoveCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private fun handleMove(
+    private suspend fun handleMove(
         guild: Guild,
         mover: User,
         queueHandler: QueueHandler,
@@ -103,7 +103,7 @@ class MoveCommand : AbstractSlashCommand(
             ).build()
         }
 
-        RequestChannelConfig(guild).updateMessage()
+        RequestChannelConfig(guild).updateMessage()?.await()
 
         val movedTrack = trackList[id - 1]
         LogUtilsKt(guild).sendLog(

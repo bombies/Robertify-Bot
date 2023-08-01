@@ -93,7 +93,7 @@ class LanguageCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    fun setLocale(guild: Guild, locale: String, shardManager: ShardManager = Robertify.shardManager): RobertifyLocale {
+    suspend fun setLocale(guild: Guild, locale: String, shardManager: ShardManager = Robertify.shardManager): RobertifyLocale {
         val newLocale = RobertifyLocale.parse(locale)
         LocaleManager[guild].locale = newLocale
         RequestChannelConfig(guild, shardManager).updateAll()

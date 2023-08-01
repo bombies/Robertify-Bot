@@ -47,7 +47,7 @@ class PreviousTrackCommand : AbstractSlashCommand(
         player.stopTrack()
         player.playTrack(queueHandler.popPreviousTrack()!!)
 
-        RequestChannelConfig(guild).updateMessage()
+        RequestChannelConfig(guild).updateMessage()?.await()
 
         LogUtilsKt(guild).sendLog(
             LogType.TRACK_PREVIOUS,

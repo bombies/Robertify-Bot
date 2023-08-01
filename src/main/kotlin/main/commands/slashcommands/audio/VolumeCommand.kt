@@ -62,7 +62,7 @@ class VolumeCommand : AbstractSlashCommand(
             this.volume = volume / 100F
         }
 
-        RequestChannelConfig(guild).updateMessage()
+        RequestChannelConfig(guild).updateMessage()?.await()
 
         LogUtilsKt(guild).sendLog(
             LogType.VOLUME_CHANGE,

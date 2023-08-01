@@ -67,6 +67,8 @@ object Robertify {
     lateinit var coroutineEventManager: CoroutineEventManager
         private set
 
+    private val lavakordShardManager = LavaKordShardManager()
+
 
     fun main() = runBlocking {
         if (Config.hasValue(ENV.SENTRY_DSN))
@@ -124,8 +126,6 @@ object Robertify {
 
         // Build bot connection
         logger.info("Building shard manager...")
-
-        val lavakordShardManager = LavaKordShardManager()
         val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
             Config.BOT_TOKEN,
             listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
@@ -169,6 +169,7 @@ object Robertify {
 
         shardManagerBuilder.applyLavakord(lavakordShardManager)
         shardManager = shardManagerBuilder.build()
+        logger.info("Successfully built shard manager")
 
         val slashCommandManager = SlashCommandManager
         shardManager.registerCommands(
@@ -198,11 +199,20 @@ object Robertify {
 
         if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
             externalApi = RobertifyApi()
-        logger.info("Successfully built shard manager")
+
+        RobertifyKtorApi.start()
+    }
+
+    private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
+        val jda = event.jda
+        logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
+        BotDBCache.instance.lastStartup = System.currentTimeMillis()
+        jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
 
         logger.info("Setting up LavaKord...")
+        val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
         lavaKord = shardManager.lavakord(
-            lavakordShardManager, context, options = MutableLavaKordOptions(
+            lavakordShardManager, dispatcher + supervisor + handler, options = MutableLavaKordOptions(
                 link = MutableLavaKordOptions.LinkConfig(
                     showTrace = true
                 )
@@ -223,21 +233,13 @@ object Robertify {
         }
         logger.info("LavaKord ready")
 
-        RobertifyKtorApi.start()
-    }
-
-    private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
-        val jda = event.jda
-        logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
-        BotDBCache.instance.lastStartup = System.currentTimeMillis()
-        jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
+        shardManager.guildCache.forEach { guild ->
+            RequestChannelConfig(guild).updateMessage()?.await()
+        }
     }
 
     private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
-        logger.info("Guild ${event.guild.name} is ready");
-
         val guild = event.guild
-        val requestChannelConfig = RequestChannelConfig(guild)
         launch {
             val locale = LocaleConfig(guild).locale
             try {
@@ -251,7 +253,6 @@ object Robertify {
         rescheduleUnbans(guild)
         RemindersConfig(guild).scheduleReminders()
 
-        requestChannelConfig.updateMessage()
 //        GuildResumeManager(guild).loadTracks()
     }
 

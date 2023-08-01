@@ -71,7 +71,7 @@ class UpdateCommand : AbstractSlashCommand(
         event.hook.sendEmbed(event.guild, "Updated all caches!").queue()
     }
 
-    private fun handleRequestChannelUpdate(event: SlashCommandInteractionEvent) {
+    private suspend fun handleRequestChannelUpdate(event: SlashCommandInteractionEvent) {
         val (_, _, secondaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (secondaryCommand) {
@@ -83,7 +83,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private fun updateAllRequestChannels(event: SlashCommandInteractionEvent) {
+    private suspend fun updateAllRequestChannels(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channels!",
@@ -93,33 +93,33 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private fun updateRequestChannelButtons(event: SlashCommandInteractionEvent) {
+    private suspend fun updateRequestChannelButtons(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel buttons!",
             errorMsg = "Could not update all request channel buttons!"
         ) {
-            it.updateButtons()?.join()
+            it.updateButtons()?.await()
         }
     }
 
-    private fun updateRequestChannelMessages(event: SlashCommandInteractionEvent) {
+    private suspend fun updateRequestChannelMessages(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel messages!",
             errorMsg = "Could not update all request channel messages!"
         ) {
-            it.updateMessage()?.join()
+            it.updateMessage()?.await()
         }
     }
 
-    private fun updateRequestChannelTopics(event: SlashCommandInteractionEvent) {
+    private suspend fun updateRequestChannelTopics(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel topics!",
             errorMsg = "Could not update all request channel topics!"
         ) {
-            it.updateTopic()?.join()
+            it.updateTopic()?.await()
         }
     }
 

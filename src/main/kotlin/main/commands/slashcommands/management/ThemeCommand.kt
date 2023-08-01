@@ -90,10 +90,10 @@ class ThemeCommand : AbstractSlashCommand(
             .queue()
     }
 
-    fun updateTheme(guild: Guild, theme: RobertifyTheme, shardManager: ShardManager = Robertify.shardManager) {
+    suspend fun updateTheme(guild: Guild, theme: RobertifyTheme, shardManager: ShardManager = Robertify.shardManager) {
         ThemesConfig(guild).theme = theme
         GeneralUtils.setDefaultEmbed(guild)
-        RequestChannelConfig(guild, shardManager).updateMessage()
+        RequestChannelConfig(guild, shardManager).updateMessage()?.await()
     }
 
     private fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
