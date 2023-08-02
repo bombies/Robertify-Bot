@@ -60,7 +60,7 @@ class SearchQueueCommand : AbstractSlashCommand(
             Pair("{position}", (queueHandler.contents.indexOf(result) + 1).toString()),
             Pair(
                 "{requester}",
-                scheduler.findRequester(result.identifier)?.toString()
+                scheduler.findRequester(result.identifier)?.toMention()
                     ?: LocaleManager[guild].getMessage(GeneralMessages.UNKNOWN_REQUESTER)
             )
         )

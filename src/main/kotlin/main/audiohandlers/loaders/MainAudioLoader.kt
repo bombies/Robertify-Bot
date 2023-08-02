@@ -180,7 +180,7 @@ class MainAudioLoader(
 
         LogUtilsKt(guild).sendLog(
             LogType.QUEUE_ADD, AudioLoaderMessages.QUEUE_ADD_LOG,
-            Pair("{user}", sender?.asMention ?: requester.toString()),
+            Pair("{user}", sender?.asMention ?: requester?.toMention() ?: "Unknown"),
             Pair("{title}", trackInfo.title),
             Pair("{author}", trackInfo.author)
         )

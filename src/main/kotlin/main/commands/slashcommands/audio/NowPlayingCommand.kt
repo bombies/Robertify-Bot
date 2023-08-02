@@ -171,7 +171,7 @@ class NowPlayingCommand : AbstractSlashCommand(
                     "\n\n${
                         localeManager.getMessage(
                             NowPlayingMessages.NP_REQUESTER,
-                            Pair("{requester}", requester.toString())
+                            Pair("{requester}", requester.toMention())
                         )
                     }"
                 } else {
