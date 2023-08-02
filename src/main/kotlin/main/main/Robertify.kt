@@ -27,7 +27,7 @@ import main.utils.api.robertify.RobertifyApi
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
-import main.utils.database.mongodb.cache.redis.GuildRedisCache
+import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
 import main.utils.json.locale.LocaleConfig
 import main.utils.json.reminders.RemindersConfig
 import main.utils.json.requestchannel.RequestChannelConfig
@@ -46,10 +46,6 @@ import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.yaml.snakeyaml.reader.ReaderException
 import java.util.*
-import java.util.concurrent.CancellationException
-import java.util.concurrent.Executors
-import java.util.concurrent.ForkJoinPool
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 object Robertify {
@@ -241,9 +237,9 @@ object Robertify {
     private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
         val guild = event.guild
         launch {
-            val locale = LocaleConfig(guild).locale
+            val locale = LocaleConfig(guild).getLocale()
             try {
-                LocaleManager[guild].locale = locale
+                LocaleManager[guild].setLocale(locale)
             } catch (e: ReaderException) {
                 logger.error("I couldn't set the locale for ${guild.name}")
             }

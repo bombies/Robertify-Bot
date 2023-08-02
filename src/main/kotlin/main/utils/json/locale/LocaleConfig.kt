@@ -4,22 +4,19 @@ import main.utils.json.AbstractGuildConfig
 import main.utils.locale.RobertifyLocale
 import net.dv8tion.jda.api.entities.Guild
 
-class LocaleConfig(guild: Guild) : AbstractGuildConfig(guild) {
+class LocaleConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    var locale: RobertifyLocale
-        get() {
-            val guildObject = getGuildObject()
-            if (guildObject.has(Field.LOCALE.toString()))
-                return RobertifyLocale.parse(guildObject.getString(Field.LOCALE.toString()))
-            return RobertifyLocale.ENGLISH
-        }
-        set(value) {
-            val guildObject = getGuildObject()
-            guildObject.put(Field.LOCALE.toString(), value.name.lowercase())
-            cache.updateGuild(guildObject)
-        }
+    suspend fun getLocale(): RobertifyLocale {
+        return RobertifyLocale.parse(getGuildModel().locale)
+    }
 
-    override fun update() {
+    suspend fun setLocale(locale: RobertifyLocale) {
+        cache.updateGuild(guild.id) {
+            this.locale = locale.name.lowercase()
+        }
+    }
+
+    override suspend fun update() {
         TODO("Not yet implemented")
     }
 

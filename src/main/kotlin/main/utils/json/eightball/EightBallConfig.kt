@@ -6,44 +6,39 @@ import net.dv8tion.jda.api.entities.Guild
 
 class EightBallConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    val responses: List<String>
-        get() {
-            val obj = getGuildObject()
-                .getJSONArray(GuildDB.Field.EIGHT_BALL_ARRAY.toString())
-            val responses: MutableList<String> = ArrayList()
-            for (i in 0 until obj.length()) responses.add(obj.getString(i))
-            return responses
+    suspend fun getResponses(): List<String> {
+        return getGuildModel().eight_ball ?: emptyList()
+    }
+
+    suspend fun addResponse(response: String) {
+        cache.updateGuild(guild.id) {
+            eight_ball {
+                add(response)
+            }
+        }
+    }
+
+    suspend fun removeResponse(responseIndex: Int): String {
+        var removed = getResponses()[responseIndex]
+
+        cache.updateGuild(guild.id) {
+            eight_ball {
+                removed = removeAt(responseIndex)
+            }
         }
 
-    operator fun plus(response: String) {
-        val obj = getGuildObject()
-        val array = obj.getJSONArray(GuildDB.Field.EIGHT_BALL_ARRAY.toString())
-            .put(response)
-        cache.setField(guild.idLong, GuildDB.Field.EIGHT_BALL_ARRAY, array)
+        return removed
     }
 
-    fun addResponse(response: String) = plus(response)
-
-    operator fun minus(responseIndex: Int): String {
-        val obj = getGuildObject()
-        val array = obj.getJSONArray(GuildDB.Field.EIGHT_BALL_ARRAY.toString())
-        val value = array.remove(responseIndex).toString()
-        cache.setField(guild.idLong, GuildDB.Field.EIGHT_BALL_ARRAY, array)
-        return value
+    suspend fun clearResponses() {
+        cache.updateGuild(guild.id) {
+            eight_ball {
+                clear()
+            }
+        }
     }
 
-    fun removeResponse(responseIndex: Int) = minus(responseIndex)
-
-    operator fun unaryMinus() {
-        val obj = getGuildObject()
-        val array = obj.getJSONArray(GuildDB.Field.EIGHT_BALL_ARRAY.toString())
-        array.clear()
-        cache.setField(guild.idLong, GuildDB.Field.EIGHT_BALL_ARRAY, array)
-    }
-
-    fun removeAllResponses() = unaryMinus()
-
-    override fun update() {
+    override suspend fun update() {
         // Nothing
     }
 }

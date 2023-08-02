@@ -38,7 +38,7 @@ class QueueCommand : AbstractSlashCommand(
         PaginationHandler.paginateQueue(event)
     }
 
-    fun getContent(guild: Guild, queueHandler: QueueHandler): List<String> {
+    suspend fun getContent(guild: Guild, queueHandler: QueueHandler): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.contents.toMutableList()
         val localeManager = LocaleManager[guild]
@@ -53,7 +53,7 @@ class QueueCommand : AbstractSlashCommand(
         return content
     }
 
-    fun getContent(guild: Guild, queueItems: List<QueueItem>): List<String> {
+    suspend fun getContent(guild: Guild, queueItems: List<QueueItem>): List<String> {
         val content = mutableListOf<String>()
         val localeManager = LocaleManager[guild]
         queueItems.forEach { track ->
@@ -68,7 +68,7 @@ class QueueCommand : AbstractSlashCommand(
         return content
     }
 
-    fun getPastContent(guild: Guild, queueHandler: QueueHandler): List<String> {
+    suspend fun getPastContent(guild: Guild, queueHandler: QueueHandler): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.previousTracksContents.toMutableList().reversed()
         val localeManager = LocaleManager[guild]

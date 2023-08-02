@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Guild
 
 class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    fun addChannel(channelID: Long, type: ChannelType?) {
+    suspend fun addChannel(channelID: Long, type: ChannelType?) {
         val configField: GuildDB.Field = when (type) {
             ChannelType.TEXT_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_TEXT
             ChannelType.VOICE_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_VOICE
@@ -16,14 +16,19 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
 
         check(!isRestrictedChannel(channelID, type)) { "This is already a restricted voice channel!" }
 
-        val obj = getGuildObject()
-        obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
-            .getJSONArray(configField.toString()).put(channelID)
-        cache.updateCache(obj, GuildDB.Field.GUILD_ID, guild.idLong)
+        cache.updateGuild(guild.id) {
+            restricted_channels {
+                when (type) {
+                    ChannelType.TEXT_CHANNEL -> text_channels.add(channelID)
+                    ChannelType.VOICE_CHANNEL -> voice_channels.add(channelID)
+                    else -> throw IllegalArgumentException("Invalid type!")
+                }
+            }
+        }
     }
 
-    fun removeChannel(channelID: Long, type: ChannelType?) {
-        val obj = getGuildObject()
+    suspend fun removeChannel(channelID: Long, type: ChannelType?) {
+        val obj = getGuildModel().toJsonObject()
         val configField: GuildDB.Field = when (type) {
             ChannelType.TEXT_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_TEXT
             ChannelType.VOICE_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_VOICE
@@ -42,27 +47,19 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
         }
     }
 
-    fun getRestrictedChannels(type: ChannelType?): List<Long> {
-        val obj = getGuildObject()
-        val configField: GuildDB.Field = when (type) {
-            ChannelType.TEXT_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_TEXT
-            ChannelType.VOICE_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_VOICE
+    suspend fun getRestrictedChannels(type: ChannelType?): List<Long> {
+        val obj = getGuildModel().restricted_channels
+        return when (type) {
+            ChannelType.TEXT_CHANNEL -> obj?.text_channels ?: emptyList()
+            ChannelType.VOICE_CHANNEL -> obj?.voice_channels ?: emptyList()
             else -> throw IllegalArgumentException("Invalid type!")
         }
-
-        val ret: MutableList<Long> = ArrayList()
-        val arr = obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
-            .getJSONArray(configField.toString())
-
-        for (i in 0 until arr.length())
-            ret.add(arr.getLong(i))
-        return ret
     }
 
-    fun isRestrictedChannel(vcID: Long, type: ChannelType?): Boolean =
+    suspend fun isRestrictedChannel(vcID: Long, type: ChannelType?): Boolean =
         getRestrictedChannels(type).contains(vcID)
 
-    fun restrictedChannelsToString(type: ChannelType?): String =
+    suspend fun restrictedChannelsToString(type: ChannelType?): String =
         getRestrictedChannels(type).joinToString(", ") { channel ->
             "<#$channel>"
         }
@@ -79,5 +76,5 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
     }
 
 
-    override fun update() {}
+    override suspend fun update() {}
 }

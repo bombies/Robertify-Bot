@@ -1,6 +1,8 @@
 package main.utils.database.mongodb.databases
 
 import com.mongodb.client.result.DeleteResult
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import main.constants.ENV
 import main.constants.RobertifyTheme
 import main.constants.Toggle
@@ -8,6 +10,7 @@ import main.constants.database.RobertifyMongoDatabase
 import main.main.Config
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.DocumentBuilder
+import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
 import main.utils.json.GenericJSONField
 import main.utils.json.toggles.TogglesConfig
 import org.bson.Document
@@ -55,11 +58,10 @@ object GuildDB :
 
     fun findGuild(gid: Long): Document? = findSpecificDocument(Field.GUILD_ID, gid)
 
-    fun updateGuild(gid: Long, obj: JSONObject) {
-        require(obj.has(Field.GUILD_ID.toString())) { "The JSON object must have a guild_id field!" }
-        val document = findGuild(gid)
-            ?: throw java.lang.NullPointerException("There was no document found with guild id: $gid")
-        upsertDocument(document, Document.parse(obj.toString()))
+    fun updateGuild(newInfo: GuildDatabaseModel) {
+        val document = findGuild(newInfo.server_id)
+            ?: throw java.lang.NullPointerException("There was no document found with guild id: ${newInfo.server_id}")
+        upsertDocument(document, Document.parse(newInfo.toJsonObject().toString()))
     }
 
     enum class Field(private val str: String) : GenericJSONField {

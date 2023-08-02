@@ -25,12 +25,12 @@ class AutoPlayCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleAutoPlay(guild: Guild): MessageEmbed {
+    private suspend fun handleAutoPlay(guild: Guild): MessageEmbed {
         val localeManager = LocaleManager[guild]
         val autoPlayConfig = AutoPlayConfig(guild)
 
-        return if (autoPlayConfig.status) {
-            autoPlayConfig.status = false
+        return if (autoPlayConfig.getStatus()) {
+            autoPlayConfig.setStatus(false)
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 GeneralMessages.GENERAL_TOGGLE_MESSAGE,
@@ -41,7 +41,7 @@ class AutoPlayCommand : AbstractSlashCommand(
                 )
             ).build()
         } else {
-            autoPlayConfig.status = true
+            autoPlayConfig.setStatus(false)
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 GeneralMessages.GENERAL_TOGGLE_MESSAGE,

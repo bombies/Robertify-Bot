@@ -77,31 +77,27 @@ class LocaleManager private constructor(private val guild: Guild?, _locale: Robe
 
     }
 
-    var locale: RobertifyLocale = _locale
-        set(value) {
-            if (value == field)
-                return
+    suspend fun getLocale(): RobertifyLocale {
+        if (guild == null)
+            return RobertifyLocale.ENGLISH
+        return LocaleConfig(guild).getLocale()
+    }
 
-            locales.putIfAbsent(value, retrieveLocaleFile(value))
-            field = value
+    suspend fun setLocale(locale: RobertifyLocale) {
+        locales.putIfAbsent(locale, retrieveLocaleFile(locale))
 
-            if (guild != null)
-                LocaleConfig(guild).locale = value
-        }
+        if (guild != null)
+            LocaleConfig(guild).setLocale(locale)
+    }
 
-    private val localeFile: Map<String, String>
-        get() = locales.computeIfAbsent(locale) {
+    suspend fun getLocaleFile(): Map<String, String> {
+        return locales.computeIfAbsent(getLocale()) {
             retrieveLocaleFile(it)
         }
+    }
 
-    operator fun get(message: LocaleMessage): String =
-        localeFile[message.name.lowercase()]
-            ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
-
-    fun getMessage(message: LocaleMessage): String = get(message)
-
-    operator fun get(message: LocaleMessage, vararg placeholders: Pair<String, String>): String {
-        var msg = localeFile[message.name.lowercase()]
+    suspend fun getMessage(message: LocaleMessage, vararg placeholders: Pair<String, String>): String {
+        var msg = getLocaleFile()[message.name.lowercase()]
             ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
 
         placeholders.forEach { placeholder ->
@@ -110,7 +106,4 @@ class LocaleManager private constructor(private val guild: Guild?, _locale: Robe
 
         return msg
     }
-
-    fun getMessage(message: LocaleMessage, vararg placeholders: Pair<String, String>): String =
-        get(message, *placeholders)
 }

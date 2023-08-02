@@ -78,7 +78,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleAdd(event: SlashCommandInteractionEvent) {
+    private suspend fun handleAdd(event: SlashCommandInteractionEvent) {
         handleGenericMutation(
             event = event,
             mutateTextChannel = { e, config, channel ->
@@ -104,7 +104,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         )
     }
 
-    private fun handleRemove(event: SlashCommandInteractionEvent) {
+    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
         handleGenericMutation(
             event = event,
             mutateTextChannel = { e, config, channel ->
@@ -122,7 +122,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         )
     }
 
-    private inline fun handleGenericMutation(
+    private suspend inline fun handleGenericMutation(
         event: SlashCommandInteractionEvent,
         mutateAudioChannel: (event: SlashCommandInteractionEvent, config: RestrictedChannelsConfig, channel: AudioChannel) -> Unit,
         mutateTextChannel: (event: SlashCommandInteractionEvent, config: RestrictedChannelsConfig, channel: TextChannel) -> Unit,
@@ -181,7 +181,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleList(event: SlashCommandInteractionEvent) {
+    private suspend fun handleList(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RestrictedChannelsConfig(guild)
         val localeManager = LocaleManager[guild]

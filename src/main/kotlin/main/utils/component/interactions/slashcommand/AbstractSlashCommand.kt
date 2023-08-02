@@ -1,6 +1,7 @@
 package main.utils.component.interactions.slashcommand
 
 import com.influxdb.exceptions.InfluxException
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
 import kotlinx.coroutines.coroutineScope
@@ -31,7 +32,6 @@ import main.utils.managers.RandomMessageManager
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.events.GenericEvent
@@ -41,7 +41,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
-import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -87,7 +86,6 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
                             owner.user.openPrivateChannel().queue { channel ->
                                 channel.sendMessageEmbeds(
                                     RobertifyEmbedUtils.embedMessage(
-                                        guild,
                                         "Hey, I could not create some slash commands in **${guild.name}**" +
                                                 " due to being re-invited too many times. Try inviting me again tomorrow to fix this issue."
                                     ).build()
@@ -126,7 +124,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
                     )
         }
 
-        fun audioChannelChecks(
+        suspend fun audioChannelChecks(
             memberVoiceState: GuildVoiceState,
             selfVoiceState: GuildVoiceState,
             selfChannelNeeded: Boolean = true,
@@ -285,12 +283,12 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         upsertCommand(this)
     }
 
-    protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
+    protected suspend fun sendRandomMessage(event: SlashCommandInteractionEvent) {
         if (SlashCommandManager.isMusicCommand(this) && event.channel.type.isMessage)
             RandomMessageManager().randomlySendMessage(event.channel as GuildMessageChannel)
     }
 
-    protected fun checks(event: SlashCommandInteractionEvent): Boolean {
+    protected suspend fun checks(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!guildCheck(event)) return false
         if (!event.isFromGuild) return true
@@ -306,33 +304,23 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
             val user = event.user
             if (!botDB.userHasViewedAlert(user.idLong) && latestAlert.isNotEmpty() && latestAlert.isNotBlank()
                 && SlashCommandManager.isMusicCommand(this)
-            ) event.channel.asGuildMessageChannel().sendMessageEmbeds(
-                RobertifyEmbedUtils.embedMessage(
-                    event.guild,
-                    GeneralMessages.UNREAD_ALERT_MENTION,
-                    Pair("{user}", user.asMention)
-                ).build()
-            )
-                .queue(
-                    { msg: Message ->
-                        val dedicatedChannelConfig = RequestChannelConfig(msg.guild)
-                        if (dedicatedChannelConfig.isChannelSet()) if (dedicatedChannelConfig.channelId == msg.channel
-                                .idLong
-                        ) msg.delete().queueAfter(
-                            10, TimeUnit.SECONDS, null,
-                            ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                        )
-                    }, ErrorHandler().handle(
-                        ErrorResponse.MISSING_PERMISSIONS
-                    ) { e: ErrorResponseException ->
-                        if (!e.message!!.contains(
-                                "MESSAGE_SEND"
-                            )
-                        ) logger.error(
-                            "Unexpected error when attempting to send an unread alert message",
-                            e.cause
-                        )
-                    })
+            ) {
+                val msg = event.channel.asGuildMessageChannel().sendMessageEmbeds(
+                    RobertifyEmbedUtils.embedMessage(
+                        event.guild,
+                        GeneralMessages.UNREAD_ALERT_MENTION,
+                        Pair("{user}", user.asMention)
+                    ).build()
+                ).await()
+
+                val dedicatedChannelConfig = RequestChannelConfig(msg.guild)
+                if (dedicatedChannelConfig.isChannelSet()) if (dedicatedChannelConfig.getChannelId() == msg.channel
+                        .idLong
+                ) msg.delete().queueAfter(
+                    10, TimeUnit.SECONDS, null,
+                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                )
+            }
         }
 
         if (!adminCheck(event)) return false
@@ -358,7 +346,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         info.name == event.name
 
 
-    protected open fun guildCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun guildCheck(event: SlashCommandInteractionEvent): Boolean {
         if (info.isGuild) return true
         if (!event.isFromGuild && info.guildUseOnly) {
             event.replyEmbeds(
@@ -375,7 +363,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @param event
      * @return True if the user is banned, false if otherwise.
      */
-    protected open fun banCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun banCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         if (!GuildConfig(guild).isBannedUser(event.user.idLong)) return true
         event.replyEmbeds(
@@ -397,7 +385,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @return True - If the command isn't a DJ command or the user is a DJ
      * False - If the command is a DJ command and the user isn't a DJ.
      */
-    protected open fun musicCommandDJCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun musicCommandDJCheck(event: SlashCommandInteractionEvent): Boolean {
         return predicateCheck(event)
     }
 
@@ -409,14 +397,14 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @return True - If the command isn't a premium command or the user is a premium user
      * False - If the command is a premium command and the user isn't a premium user
      */
-    protected open fun premiumCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun premiumCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         if (!info.isPremium) return true
         val user = event.user
         return !(!GeneralUtils.checkPremium(event.guild!!, event) && user.idLong != 276778018440085505L)
     }
 
-    protected open fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!Config.PREMIUM_BOT) return true
         val guild = event.guild ?: return true
         if (!GuildConfig(guild).isPremium()) {
@@ -448,7 +436,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * true will be returned.
      * False will be returned if and only if the command is DJ-only and the user is not a DJ.
      */
-    protected open fun djCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun djCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         val guild = event.guild!!
         val toggles = TogglesConfig(guild)
@@ -478,7 +466,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * true will be returned.
      * False will be returned if and only if the command is admin-only and the user is not an admin.
      */
-    protected open fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         val guild = event.guild!!
         if (info.adminOnly
@@ -498,7 +486,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
         return if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
             if (!event.isFromGuild)
                 true
@@ -518,7 +506,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
             if (GeneralUtils.isDeveloper(event.id)) true else info.checkPermission?.invoke(event) ?: true
     }
 
-    protected open fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {
         if (info.botRequiredPermissions.isEmpty()) return true
         val guild = event.guild ?: return true
         val self = guild.selfMember
@@ -539,7 +527,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open fun botEmbedCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun botEmbedCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         if (!guild.selfMember.hasPermission(event.guildChannel, Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(
@@ -552,7 +540,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open fun restrictedChannelCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun restrictedChannelCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         val togglesConfig = TogglesConfig(guild)
         val config = RestrictedChannelsConfig(guild)
@@ -580,7 +568,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open fun devCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open suspend fun devCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!info.developerOnly) return true
         if (!BotDBCache.instance.isDeveloper(event.user.idLong)) {

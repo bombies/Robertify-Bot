@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.interactions.components.success
 import dev.minn.jda.ktx.util.SLF4J
@@ -142,7 +143,7 @@ class SkipCommand : AbstractSlashCommand(
         return RobertifyEmbedUtils.embedMessage(musicManager.guild, "Skipped to **track #$id**!").build()
     }
 
-    fun handleVoteSkip(
+    suspend fun handleVoteSkip(
         channel: GuildMessageChannel,
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
@@ -161,7 +162,7 @@ class SkipCommand : AbstractSlashCommand(
                 .build()
 
         val neededVotes = getNeededVotes(guild)
-        channel.sendEmbed(guild) {
+        val msg = channel.sendEmbed(guild) {
             embed(
                 SkipMessages.VOTE_SKIP_STARTED_EMBED,
                 Pair("{user}", memberVoiceState.member.asMention),
@@ -176,21 +177,20 @@ class SkipCommand : AbstractSlashCommand(
                 danger(
                     id = "voteskip:cancel:${guild.id}"
                 )
-            )
-            .queue { msg ->
-                val starter = memberVoiceState.member
+            ).await()
 
-                LogUtilsKt(guild).sendLog(
-                    LogType.TRACK_VOTE_SKIP, SkipMessages.VOTE_SKIP_STARTED_LOG,
-                    Pair("{user}", starter.asMention)
-                )
+        val starter = memberVoiceState.member
 
-                val voteSkipManager = musicManager.voteSkipManager
-                voteSkipManager.startedBy = starter.idLong
-                voteSkipManager.voteSkipCount = 1
-                voteSkipManager.addVoter(starter.idLong)
-                voteSkipManager.voteSkipMessage = Pair(channel.idLong, msg.idLong)
-            }
+        LogUtilsKt(guild).sendLog(
+            LogType.TRACK_VOTE_SKIP, SkipMessages.VOTE_SKIP_STARTED_LOG,
+            Pair("{user}", starter.asMention)
+        )
+
+        val voteSkipManager = musicManager.voteSkipManager
+        voteSkipManager.startedBy = starter.idLong
+        voteSkipManager.voteSkipCount = 1
+        voteSkipManager.addVoter(starter.idLong)
+        voteSkipManager.voteSkipMessage = Pair(channel.idLong, msg.idLong)
         return null
     }
 
@@ -215,47 +215,42 @@ class SkipCommand : AbstractSlashCommand(
         clearVoteSkipInfo(guild)
     }
 
-    private fun doVoteSkip(guild: Guild) {
+    private suspend fun doVoteSkip(guild: Guild) {
         val voteSkipManager = RobertifyAudioManager[guild].voteSkipManager
         if (!voteSkipManager.isVoteSkipActive)
             throw IllegalStateException("Can't do a vote skip when there's none active!")
-        guild.getTextChannelById(voteSkipManager.voteSkipMessage!!.first)
+
+        val msg = guild.getTextChannelById(voteSkipManager.voteSkipMessage!!.first)
             ?.retrieveMessageById(voteSkipManager.voteSkipMessage!!.second)
-            ?.submit()
-            ?.whenComplete { msg, err ->
-                if (err != null) {
-                    logger.error("Unexpected error", err)
-                    return@whenComplete
-                }
+            ?.await()
 
-                voteSkipManager.voteSkipMessage = null
-                val track = RobertifyAudioManager[guild]
-                    .player
-                    .playingTrack!!
+        voteSkipManager.voteSkipMessage = null
+        val track = RobertifyAudioManager[guild]
+            .player
+            .playingTrack!!
 
-                runBlocking {
-                    launch { skip(guild) }
-                }
+        runBlocking {
+            launch { skip(guild) }
+        }
 
-                msg.editEmbed {
-                    embed(
-                        SkipMessages.VOTE_SKIPPED,
-                        Pair("{title}", track.title),
-                        Pair("{author}", track.author)
-                    )
-                }
-                    .setComponents()
-                    .queue()
+        msg?.editEmbed {
+            embed(
+                SkipMessages.VOTE_SKIPPED,
+                Pair("{title}", track.title),
+                Pair("{author}", track.author)
+            )
+        }
+            ?.setComponents()
+            ?.queue()
 
-                LogUtilsKt(guild).sendLog(
-                    LogType.TRACK_SKIP, SkipMessages.VOTE_SKIPPED_LOG,
-                    Pair("{title}", track.title),
-                    Pair("{author}", track.author)
-                )
-            }
+        LogUtilsKt(guild).sendLog(
+            LogType.TRACK_SKIP, SkipMessages.VOTE_SKIPPED_LOG,
+            Pair("{title}", track.title),
+            Pair("{author}", track.author)
+        )
     }
 
-    fun clearVoteSkipInfo(guild: Guild) {
+    suspend fun clearVoteSkipInfo(guild: Guild) {
         val voteSkipManagerKt = RobertifyAudioManager[guild].voteSkipManager
         voteSkipManagerKt.clearVoters()
         voteSkipManagerKt.startedBy = null
@@ -264,12 +259,11 @@ class SkipCommand : AbstractSlashCommand(
 
         val message = voteSkipManagerKt.voteSkipMessage
         if (message != null) {
-            guild.getTextChannelById(message.first)
+            val msg = guild.getTextChannelById(message.first)
                 ?.retrieveMessageById(message.second)
-                ?.queue { msg ->
-                    msg.editEmbed { embed(SkipMessages.SKIPPED) }
-                        .queue { voteSkipManagerKt.voteSkipMessage = null }
-                }
+                ?.await()
+            msg?.editEmbed { embed(SkipMessages.SKIPPED) }
+                ?.queue { voteSkipManagerKt.voteSkipMessage = null }
         }
     }
 
@@ -374,66 +368,50 @@ class SkipCommand : AbstractSlashCommand(
                 }
 
                 val message = voteSkipManager.voteSkipMessage!!
-                guild.getTextChannelById(message.first)
+                val msg = guild.getTextChannelById(message.first)
                     ?.retrieveMessageById(message.second)
-                    ?.submit()
-                    ?.whenComplete { msg, err ->
-                        if (err != null) {
-                            logger.error("Unexpected error", err)
-                            return@whenComplete
-                        }
+                    ?.await()
+                val track = RobertifyAudioManager[guild]
+                    .player
+                    .playingTrack!!
 
-                        val track = RobertifyAudioManager[guild]
-                            .player
-                            .playingTrack!!
-
-                        voteSkipManager.voteSkipMessage = null
-                        clearVoteSkipInfo(guild)
-                        msg.editEmbed {
-                            embed(
-                                SkipMessages.VOTE_SKIP_CANCELLED,
-                                Pair("{title}", track.title),
-                                Pair("{author}", track.author)
-                            )
-                        }.queue()
-                    }
+                voteSkipManager.voteSkipMessage = null
+                clearVoteSkipInfo(guild)
+                msg?.editEmbed {
+                    embed(
+                        SkipMessages.VOTE_SKIP_CANCELLED,
+                        Pair("{title}", track.title),
+                        Pair("{author}", track.author)
+                    )
+                }?.queue()
             }
         }
     }
 
-    private fun updateVoteSkipMessage(guild: Guild) {
+    private suspend fun updateVoteSkipMessage(guild: Guild) {
         val voteSkipManager = RobertifyAudioManager[guild].voteSkipManager
         if (!voteSkipManager.isVoteSkipActive)
             return
 
         val message = voteSkipManager.voteSkipMessage!!
-        guild.getTextChannelById(message.first)
+        val msg = guild.getTextChannelById(message.first)
             ?.retrieveMessageById(message.second)
-            ?.submit()
-            ?.thenCompose { msg ->
-                val neededvotes = getNeededVotes(guild)
-                msg.editEmbed {
-                    embed(
-                        SkipMessages.VOTE_SKIP_STARTED_EMBED,
-                        Pair(
-                            "{user}",
-                            GeneralUtils.toMention(
-                                guild,
-                                voteSkipManager.startedBy!!,
-                                GeneralUtils.Mentioner.USER
-                            )
-                        ),
-                        Pair("{neededVotes}", neededvotes.toString())
+            ?.await()
+        val neededvotes = getNeededVotes(guild)
+        msg?.editEmbed {
+            embed(
+                SkipMessages.VOTE_SKIP_STARTED_EMBED,
+                Pair(
+                    "{user}",
+                    GeneralUtils.toMention(
+                        guild,
+                        voteSkipManager.startedBy!!,
+                        GeneralUtils.Mentioner.USER
                     )
-                }
-                    .submit()
-            }
-            ?.whenComplete { _, err ->
-                if (err != null) {
-                    logger.error("Unexepected error", err)
-                    return@whenComplete
-                }
-            }
+                ),
+                Pair("{neededVotes}", neededvotes.toString())
+            )
+        }?.queue()
     }
 
     override val help: String

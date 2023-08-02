@@ -5,11 +5,9 @@ import dev.arbjerg.lavalink.protocol.v4.TrackInfo
 import dev.minn.jda.ktx.coroutines.await
 import dev.schlaubi.lavakord.audio.*
 import dev.schlaubi.lavakord.audio.player.Player
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import main.audiohandlers.models.Requester
 import main.audiohandlers.utils.artworkUrl
 import main.audiohandlers.utils.author
@@ -170,7 +168,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         logger.debug("The requester is not null")
 
         val requesterMention = getRequesterAsMention(track)
-        if (requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == announcementChannel!!.idLong)
+        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelId() == announcementChannel!!.idLong)
             return
 
         logger.debug("The channel is not the request channel")
@@ -178,7 +176,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         val requesterUser = Robertify.shardManager.retrieveUserById(requester.id).await()
         val defaultBackgroundImage = ThemesConfig(
             guild
-        ).theme.nowPlayingBanner
+        ).getTheme().nowPlayingBanner
 
         val img: InputStream
         try {
@@ -193,20 +191,17 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             // Either building the image failed or the bot doesn't have enough
             // permission to send images in a certain channel
             if (ex is PermissionException || ex is ImageBuilderException) {
-                sendNowPlayingEmbed(trackInfo, requesterMention)
-                    ?.whenComplete embedCompletion@{ _, err ->
-                        if (err == null)
-                            return@embedCompletion
-
-                        // Probably doesn't have permission to send embeds
-                        if (err is PermissionException)
-                            sendNowPlayingString(track.info, requesterMention)
-                                ?.whenComplete { _, stringErr ->
-                                    if (stringErr != null)
-                                        logger.warn("I was not able to send a now playing message at all in ${guild.name}")
-                                }
-                        else logger.error("Unexpected error", ex)
+                try {
+                    sendNowPlayingEmbed(trackInfo, requesterMention).await()
+                } catch (ex: PermissionException) {
+                    try {
+                        sendNowPlayingString(track.info, requesterMention).await()
+                    } catch (e: Exception) {
+                        logger.warn("I was not able to send a now playing message at all in ${guild.name}")
                     }
+                } catch (ex: Exception) {
+                    logger.error("Unexpected error", ex)
+                }
             } else {
                 logger.error("Unexpected error", ex)
             }
@@ -253,7 +248,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         }
     }
 
-    private fun onTrackException(event: TrackExceptionEvent) {
+    private suspend fun onTrackException(event: TrackExceptionEvent) {
         val exception = event.exception;
         val track = event.track
 
@@ -319,7 +314,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         nextTrack(track)
     }
 
-    private fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
+    private suspend fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
         val localeManager = LocaleManager[guild]
         return RobertifyEmbedUtils.embedMessage(
             guild, "${
@@ -341,36 +336,37 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         ).build()
     }
 
-    private fun sendNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): CompletableFuture<Message>? {
-        val embed = getNowPlayingEmbed(trackInfo, requesterMention)
-        return announcementChannel?.sendMessageEmbeds(embed)
-            ?.submit()
-            ?.thenApply { message ->
+    private suspend fun sendNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): Deferred<Message?> =
+        coroutineScope {
+            val embed = getNowPlayingEmbed(trackInfo, requesterMention)
+            return@coroutineScope async {
+                val message = announcementChannel?.sendMessageEmbeds(embed)?.await()
                 lastSentMsg?.delete()?.queueAfter(
                     3L, TimeUnit.SECONDS, null,
                     ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
                 )
                 lastSentMsg = message
-                return@thenApply message
+                return@async message
             }
-    }
+        }
 
-    private fun sendNowPlayingString(
+    private suspend fun sendNowPlayingString(
         audioTrackInfo: TrackInfo,
         requesterMention: String
-    ): CompletableFuture<Message>? {
+    ): Deferred<Message?> = coroutineScope {
         val embed = getNowPlayingEmbed(audioTrackInfo, requesterMention)
-        return announcementChannel?.sendMessage(embed.description ?: "")
-            ?.submit()
-            ?.thenApply { message ->
-                lastSentMsg?.delete()?.queueAfter(
-                    3L, TimeUnit.SECONDS, null,
-                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                )
+        return@coroutineScope async {
+            val message = announcementChannel?.sendMessage(embed.description ?: "")
+                ?.await()
 
-                lastSentMsg = message
-                return@thenApply message
-            }
+            lastSentMsg?.delete()?.queueAfter(
+                3L, TimeUnit.SECONDS, null,
+                ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+            )
+
+            lastSentMsg = message
+            return@async message
+        }
     }
 
     suspend fun nextTrack(lastTrack: Track?, skipped: Boolean = false, skippedAt: Long? = null) {
@@ -397,7 +393,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
         } else {
             if (lastTrack != null
-                && AutoPlayConfig(guild).status
+                && AutoPlayConfig(guild).getStatus()
                 && lastTrack.info.sourceName.equals("spotify", true)
             ) {
                 val pastSpotifyTrackList = queueHandler.previousTracksContents
@@ -428,7 +424,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     suspend fun disconnect(announceMsg: Boolean = true) {
         val channel = guild.selfMember.voiceState?.channel ?: return
-        if (GuildConfig(guild).twentyFourSevenMode)
+        if (GuildConfig(guild).getTwentyFourSevenMode())
             return
 
         RobertifyAudioManager
@@ -467,7 +463,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     fun clearRequesters() = requesters.clear()
 
-    fun getRequesterAsMention(track: Track): String {
+    suspend fun getRequesterAsMention(track: Track): String {
         val requester = findRequester(track.info.identifier)
         return if (requester != null)
             "<@${requester.id}>"

@@ -1,5 +1,6 @@
 package main.commands.slashcommands.util.suggestions
 
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.Modal
 import dev.minn.jda.ktx.interactions.components.TextInput
 import dev.minn.jda.ktx.interactions.components.danger
@@ -41,10 +42,10 @@ class SuggestionCommand : AbstractSlashCommand(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val localeManager = LocaleManager[event.guild]
 
-        val textFieldPlaceholder = localeManager[SuggestionMessages.SUGGESTION_MODAL_PLACEHOLDER]
+        val textFieldPlaceholder = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_PLACEHOLDER)
         val suggestion = TextInput(
             id = "suggestion:suggestion_field",
-            label = localeManager[SuggestionMessages.SUGGESTION_MODAL_LABEL],
+            label = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_LABEL),
             placeholder = textFieldPlaceholder.substring(0, textFieldPlaceholder.length.coerceAtMost(100)),
             style = TextInputStyle.PARAGRAPH,
         )
@@ -52,7 +53,7 @@ class SuggestionCommand : AbstractSlashCommand(
         event.replyModal(
             Modal(
                 id = "suggestion:modal",
-                title = localeManager[SuggestionMessages.SUGGESTION_MODAL_TITLE],
+                title = localeManager.getMessage(SuggestionMessages.SUGGESTION_MODAL_TITLE),
                 components = listOf(ActionRow.of(suggestion))
             )
         ).queue()
@@ -63,7 +64,7 @@ class SuggestionCommand : AbstractSlashCommand(
         else if (event.modalId.startsWith("suggestion_reason:")) handleReasonModal(event)
     }
 
-    private fun handleSuggestionModal(event: ModalInteractionEvent) {
+    private suspend fun handleSuggestionModal(event: ModalInteractionEvent) {
         val guild = event.guild
         val suggestion = event.getValue("suggestion:suggestion_field")?.asString
             ?: return event.replyEmbed(SuggestionMessages.INVALID_SUGGESTION).queue()
@@ -109,7 +110,7 @@ class SuggestionCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleReasonModal(event: ModalInteractionEvent) {
+    private suspend fun handleReasonModal(event: ModalInteractionEvent) {
         val config = BotDBCache.instance
         val guild = event.guild!!
         val localeManager = LocaleManager[guild]
@@ -122,95 +123,94 @@ class SuggestionCommand : AbstractSlashCommand(
         val pendingChannel = shardManager.getTextChannelById(config.suggestionsPendingChannelId)!!
         event.deferReply(true).queue()
 
-        pendingChannel.retrieveMessageById(messageId).queue { suggestionMessage ->
-            val suggester = shardManager.getUserById(suggestionMessage.embeds.first().fields.first().value!!.digits())
-            val pendingSuggestion = suggestionMessage.embeds.first().description!!
+        val suggestionMessage = pendingChannel.retrieveMessageById(messageId).await()
+        val suggester = shardManager.getUserById(suggestionMessage.embeds.first().fields.first().value!!.digits())
+        val pendingSuggestion = suggestionMessage.embeds.first().description!!
 
-            when (reasonType) {
-                "accept" -> {
-                    val acceptedChannel = shardManager.getTextChannelById(config.suggestionsAcceptedChannelId)
-                    if (acceptedChannel == null) {
-                        logger.warn("The accepted suggestion channel isn't setup!")
-                        return@queue event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
-                            .setEphemeral(true)
-                            .queue()
-                    }
-
-                    acceptedChannel.sendMessageEmbeds(
-                        getGenericSuggestionEmbed(
-                            title = "Suggestion",
-                            color = Color(77, 255, 69),
-                            suggester = suggester,
-                            suggestion = pendingSuggestion,
-                            reason = reason
-                        )
-                    ).queue()
-
-                    suggestionMessage.delete().queue()
-
-                    suggester?.dm(
-                        EmbedBuilder(
-                            title = "Suggestions",
-                            color = Color(77, 255, 69).rgb,
-                            description = "**Your suggestion has been accepted!**" +
-                                    "\nYou will see it appear in the next changelog\n\n**Your suggestion**\n```${
-                                        pendingSuggestion.substring(
-                                            0,
-                                            pendingSuggestion.length.coerceAtMost(3900)
-                                        )
-                                    }```",
-                            fields = listOf(
-                                MessageEmbed.Field("Comments", reason, false)
-                            )
-                        ).build()
-                    )
-
-                    event.hook.sendEmbed(guild, "Successfully accepted the suggestion!")
+        when (reasonType) {
+            "accept" -> {
+                val acceptedChannel = shardManager.getTextChannelById(config.suggestionsAcceptedChannelId)
+                if (acceptedChannel == null) {
+                    logger.warn("The accepted suggestion channel isn't setup!")
+                    return event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
+                        .setEphemeral(true)
                         .queue()
                 }
 
-                "deny" -> {
-                    val deniedChannel = shardManager.getTextChannelById(config.suggestionsDeniedChannelId)
-                    if (deniedChannel == null) {
-                        logger.warn("The denied suggestion channel isn't setup!")
-                        return@queue event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
-                            .setEphemeral(true)
-                            .queue()
-                    }
-
-                    deniedChannel.sendMessageEmbeds(
-                        getGenericSuggestionEmbed(
-                            title = "Suggestion",
-                            color = Color(187, 0, 0),
-                            suggester = suggester,
-                            suggestion = pendingSuggestion,
-                            reason = reason
-                        )
-                    ).queue()
-
-                    suggestionMessage.delete().queue()
-
-                    suggester?.dm(
-                        EmbedBuilder(
-                            title = "Suggestions",
-                            color = Color(187, 0, 0).rgb,
-                            description = "**Your suggestion has been rejected.**\n\n" +
-                                    "**Your suggestion**\n" +
-                                    "```${
-                                        pendingSuggestion.substring(
-                                            0,
-                                            pendingSuggestion.length.coerceAtMost(3900)
-                                        )
-                                    }```",
-                            fields = listOf(
-                                MessageEmbed.Field("Comments", reason, false)
-                            )
-                        ).build()
+                acceptedChannel.sendMessageEmbeds(
+                    getGenericSuggestionEmbed(
+                        title = "Suggestion",
+                        color = Color(77, 255, 69),
+                        suggester = suggester,
+                        suggestion = pendingSuggestion,
+                        reason = reason
                     )
+                ).queue()
 
-                    event.hook.sendEmbed(guild, "Successfully denied the suggestion!")
+                suggestionMessage.delete().queue()
+
+                suggester?.dm(
+                    EmbedBuilder(
+                        title = "Suggestions",
+                        color = Color(77, 255, 69).rgb,
+                        description = "**Your suggestion has been accepted!**" +
+                                "\nYou will see it appear in the next changelog\n\n**Your suggestion**\n```${
+                                    pendingSuggestion.substring(
+                                        0,
+                                        pendingSuggestion.length.coerceAtMost(3900)
+                                    )
+                                }```",
+                        fields = listOf(
+                            MessageEmbed.Field("Comments", reason, false)
+                        )
+                    ).build()
+                )
+
+                event.hook.sendEmbed(guild, "Successfully accepted the suggestion!")
+                    .queue()
+            }
+
+            "deny" -> {
+                val deniedChannel = shardManager.getTextChannelById(config.suggestionsDeniedChannelId)
+                if (deniedChannel == null) {
+                    logger.warn("The denied suggestion channel isn't setup!")
+                    return event.replyEmbed(GeneralMessages.FEATURE_UNAVAILABLE)
+                        .setEphemeral(true)
                         .queue()
                 }
+
+                deniedChannel.sendMessageEmbeds(
+                    getGenericSuggestionEmbed(
+                        title = "Suggestion",
+                        color = Color(187, 0, 0),
+                        suggester = suggester,
+                        suggestion = pendingSuggestion,
+                        reason = reason
+                    )
+                ).queue()
+
+                suggestionMessage.delete().queue()
+
+                suggester?.dm(
+                    EmbedBuilder(
+                        title = "Suggestions",
+                        color = Color(187, 0, 0).rgb,
+                        description = "**Your suggestion has been rejected.**\n\n" +
+                                "**Your suggestion**\n" +
+                                "```${
+                                    pendingSuggestion.substring(
+                                        0,
+                                        pendingSuggestion.length.coerceAtMost(3900)
+                                    )
+                                }```",
+                        fields = listOf(
+                            MessageEmbed.Field("Comments", reason, false)
+                        )
+                    ).build()
+                )
+
+                event.hook.sendEmbed(guild, "Successfully denied the suggestion!")
+                    .queue()
             }
         }
     }

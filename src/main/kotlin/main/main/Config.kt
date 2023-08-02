@@ -20,20 +20,11 @@ class Config {
         /**
          * Get a string value from its specific key from the .env file
          * @param key .env key to retrieve.
-         * @return The string attached to the key
-         */
-        operator fun get(key: ENV): String {
-            return dotenv[key.toString().uppercase(Locale.getDefault()), ""]
-        }
-
-        /**
-         * Get a string value from its specific key from the .env file
-         * @param key .env key to retrieve.
          * @param defaultValue The value to return if the key specified doesn't have a value.
          * @return The string attached to the key
          */
-        operator fun get(key: ENV, defaultValue: String?): String {
-            return dotenv[key.toString().uppercase(Locale.getDefault()), defaultValue]
+        operator fun get(key: ENV, defaultValue: String? = null): String {
+            return dotenv.get(key.toString().uppercase(Locale.getDefault()), defaultValue ?: "")
         }
 
         /**
@@ -151,7 +142,7 @@ class Config {
 
         val MONGO_CLUSTER_NAME: String
             get() = get(ENV.MONGO_CLUSTER_NAME)
-        
+
         val MONGO_DATABASE_NAME: String
             get() = get(ENV.MONGO_DATABASE_NAME)
 
@@ -166,28 +157,28 @@ class Config {
 
         val INFLUX_ORG_ID: String
             get() = get(ENV.INFLUX_ORG_ID)
-        
+
         val REDIS_HOSTNAME: String
-            get() = get(ENV.REDIS_HOSTNAME)
-        
+            get() = get(ENV.REDIS_HOSTNAME, "localhost")
+
         val REDIS_PORT: String
-            get() = get(ENV.REDIS_PORT)
-        
+            get() = get(ENV.REDIS_PORT, "6379")
+
         val REDIS_PASSWORD: String
             get() = get(ENV.REDIS_PASSWORD)
-        
+
         val TOP_GG_TOKEN: String
             get() = get(ENV.TOP_GG_TOKEN)
-        
+
         val VOTE_REMINDER_CHANCE: Double
             get() = get(ENV.VOTE_REMINDER_CHANCE).toDouble()
-        
+
         val ROBERTIFY_WEB_HOSTNAME: String
             get() = get(ENV.ROBERTIFY_WEB_HOSTNAME)
-        
+
         val ROBERTIFY_API_HOSTNAME: String
             get() = get(ENV.ROBERTIFY_API_HOSTNAME)
-        
+
         val ROBERTIFY_API_PASSWORD: String
             get() = get(ENV.ROBERTIFY_API_PASSWORD)
 

@@ -108,7 +108,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
 
             val textChannelId = AtomicLong()
             val channel = guild.createTextChannel("robertify-requests").await()
-            val theme = ThemesConfig(guild).theme
+            val theme = ThemesConfig(guild).getTheme()
             val localeManager = LocaleManager[guild]
             val manager = channel.manager
 
@@ -128,7 +128,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
 
             config.setChannelAndMessage(textChannelId.get(), message.idLong)
             config.buttonUpdateRequest(message).queue()
-            config.originalAnnouncementToggle = TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES)
+            config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
 
             try {
                 if (RobertifyAudioManager[guild].player.playingTrack != null)
@@ -137,20 +137,20 @@ class RequestChannelEditCommand : AbstractSlashCommand(
             }
 
             RequestChannel(
-                channelId = config.channelId,
-                messageId = config.messageId,
-                config = config.config.config
+                channelId = config.getChannelId(),
+                messageId = config.getMessageId(),
+                config = config.config.getConfigJsonObject()
             )
         }
 
         return@coroutineScope job
     }
 
-    fun deleteRequestChannel(guild: Guild, shardManager: ShardManager = Robertify.shardManager) {
+    suspend fun deleteRequestChannel(guild: Guild, shardManager: ShardManager = Robertify.shardManager) {
         RequestChannelConfig(guild, shardManager).removeChannel()
     }
 
-    private fun handleEdit(event: SlashCommandInteractionEvent) {
+    private suspend fun handleEdit(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RequestChannelConfig(guild)
 

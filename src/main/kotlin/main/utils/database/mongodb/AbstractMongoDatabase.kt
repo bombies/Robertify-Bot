@@ -7,7 +7,7 @@ import dev.minn.jda.ktx.util.SLF4J
 import main.constants.database.RobertifyMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.database.mongodb.cache.FavouriteTracksCache
-import main.utils.database.mongodb.cache.redis.GuildRedisCache
+import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
 import main.utils.json.GenericJSONField
 import org.bson.BsonArray
 import org.bson.BsonObjectId
@@ -16,7 +16,6 @@ import org.bson.conversions.Bson
 import org.bson.json.JsonWriterSettings
 import org.json.JSONArray
 import org.json.JSONObject
-import org.slf4j.LoggerFactory
 
 abstract class AbstractMongoDatabase {
     companion object {

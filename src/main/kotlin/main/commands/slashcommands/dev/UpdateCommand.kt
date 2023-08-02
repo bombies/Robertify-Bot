@@ -65,7 +65,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleCacheUpdate(event: SlashCommandInteractionEvent) {
+    private suspend fun handleCacheUpdate(event: SlashCommandInteractionEvent) {
         event.deferReply(true).queue()
         AbstractMongoDatabase.initAllCaches()
         event.hook.sendEmbed(event.guild, "Updated all caches!").queue()
@@ -123,7 +123,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private fun cleanRequestChannels(event: SlashCommandInteractionEvent) {
+    private suspend fun cleanRequestChannels(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully cleaned all request channels!",
@@ -133,7 +133,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private inline fun handleGenericUpdate(
+    private suspend inline fun handleGenericUpdate(
         event: SlashCommandInteractionEvent,
         successMsg: String,
         errorMsg: String,

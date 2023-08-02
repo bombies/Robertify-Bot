@@ -1,8 +1,13 @@
-package main.utils.database.mongodb.cache.redis
+package main.utils.database.mongodb.cache.redis.guild
 
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import main.constants.RobertifyPermission
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isDiscordId
+import main.utils.database.mongodb.cache.redis.DatabaseRedisCache
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import org.bson.Document
@@ -23,62 +28,27 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         }
     }
 
-    @Synchronized
-    fun getField(gid: Long, field: GuildDB.Field): Any? {
-        if (!guildHasInfo(gid)) loadGuild(gid)
-        return getGuildInfo(gid)!![field.toString()]
+    suspend fun updateGuild(guild: GuildDatabaseModel) {
+        if (!guildHasInfo(guild.server_id)) loadGuild(guild.server_id)
+        setex(guild.server_id, 3600, readyGuildObjForRedis(guild.toJsonObject()))
+        getDB().updateGuild(guild)
     }
 
-    @Synchronized
-    fun setField(gid: Long, field: GuildDB.Field, value: Any) {
-        if (!guildHasInfo(gid)) loadGuild(gid)
-        val guildInfo = getGuildInfo(gid)
-        guildInfo!!.put(field.toString(), value)
-        setex(gid, 3600, guildInfo)
-        updateGuild(guildInfo)
+    suspend fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) = coroutineScope {
+        launch {
+            if (!guildHasInfo(gid)) loadGuild(gid)
+            val guildModel = getGuildModel(gid)!!
+            block(guildModel)
+            setex(gid, 3600, readyGuildObjForRedis(guildModel.toJsonObject()))
+            getDB().updateGuild(guildModel)
+        }
     }
 
-    @Synchronized
-    fun setFields(gid: Long, fields: JSONObject) {
-        if (!guildHasInfo(gid)) loadGuild(gid)
-        val validKeys = GuildDB.Field.values().map { it.toString() }
-        val guildInfo = getGuildInfo(gid)
-
-        fields.keySet()
-            .filter { key -> validKeys.contains(key) }
-            .forEach { guildInfo!!.put(it, fields[it]) }
-
-        setex(gid, 3600, guildInfo!!)
-        updateGuild(guildInfo)
-    }
-
-    @Synchronized
-    fun hasField(gid: Long, field: GuildDB.Field): Boolean {
-        if (!guildHasInfo(gid)) loadGuild(gid)
-        return getGuildInfo(gid)!!.has(field.toString())
-    }
-
-    @Synchronized
-    fun getGuildInfo(gid: Long): JSONObject? {
-        return getGuildInfo(gid.toString())
-    }
-
-    @Synchronized
-    fun getGuildInfo(gid: String): JSONObject? {
+    suspend fun getGuildModel(gid: String): GuildDatabaseModel? {
         if (!guildHasInfo(gid)) loadGuild(gid)
         val guildInfo = get(gid) ?: return null
-        val ret = JSONObject(guildInfo)
-        return correctGuildObj(ret)
-    }
-
-    fun updateGuild(obj: JSONObject, gid: Long) {
-        val db = getDB()
-        updateCacheNoDB(gid.toString(), readyGuildObjForRedis(obj))
-        db.updateGuild(gid, correctGuildObj(obj))
-    }
-
-    fun updateGuild(obj: JSONObject) {
-        updateGuild(obj, GeneralUtils.getID(obj, GuildDB.Field.GUILD_ID))
+        val json = correctGuildObj(JSONObject(guildInfo)).toString()
+        return Json.decodeFromString(json)
     }
 
     private fun readyGuildObjForRedis(obj: JSONObject): JSONObject {
@@ -89,6 +59,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         if (obj.has(GuildDB.Field.LOG_CHANNEL.toString())) if (obj[GuildDB.Field.LOG_CHANNEL.toString()] is Long) obj.put(
             GuildDB.Field.LOG_CHANNEL.toString(), obj.getLong(GuildDB.Field.LOG_CHANNEL.toString()).toString()
         )
+
         if (obj.has(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())) {
             val restrictedChannelObj = obj.getJSONObject(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString())
             var rtc = restrictedChannelObj.getJSONArray(GuildDB.Field.RESTRICTED_CHANNELS_TEXT.toString())
@@ -167,12 +138,13 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
                 )
             }
         }
+
         return obj
     }
 
     fun correctGuildObj(obj: JSONObject?): JSONObject {
         if (!obj!!.has(GuildDB.Field.GUILD_ID.toString())) return obj
-        if (obj.has("_id")) if (obj["_id"] is String) obj.put("_id", ObjectId(obj.getString("_id")))
+        if (obj.has("_id")) obj.remove("_id")
         if (obj[GuildDB.Field.GUILD_ID.toString()] is String) obj.put(
             GuildDB.Field.GUILD_ID.toString(),
             obj.getString(GuildDB.Field.GUILD_ID.toString()).toLong()
@@ -256,23 +228,19 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         return obj
     }
 
-    @Synchronized
-    fun guildHasInfo(gid: Long): Boolean {
+    suspend fun guildHasInfo(gid: Long): Boolean {
         return get(gid) != null
     }
 
-    @Synchronized
-    fun guildHasInfo(gid: String?): Boolean {
+    suspend fun guildHasInfo(gid: String?): Boolean {
         return get(gid!!) != null
     }
 
-    @Synchronized
-    fun loadGuild(gid: Long) {
+    suspend fun loadGuild(gid: Long) {
         loadGuild(gid.toString(), 0)
     }
 
-    @Synchronized
-    fun loadGuild(gid: String) {
+    suspend fun loadGuild(gid: String) {
         loadGuild(gid, 0)
     }
 
@@ -281,8 +249,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
      * @param gid The ID of the guild
      * @param attempt The recursive attempt
      */
-    @Synchronized
-    private fun loadGuild(gid: String, attempt: Int) {
+    private suspend fun loadGuild(gid: String, attempt: Int) {
         var scopedAttempt = attempt
         logger.debug("Attempting to load guild with ID: {}", gid)
         try {
@@ -310,11 +277,11 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         }
     }
 
-    fun unloadGuild(gid: Long) {
+    suspend fun unloadGuild(gid: Long) {
         del(gid)
     }
 
-    fun loadAllGuilds() {
+    suspend fun loadAllGuilds() {
         logger.debug("Attempting to load all guilds")
         collection.find().forEach { document: Document ->
             val jsonObject = readyGuildObjForRedis(JSONObject(document.toJson()))

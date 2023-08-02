@@ -42,7 +42,7 @@ class UnbanCommand : AbstractSlashCommand(
         event.replyEmbed { handleUnban(user) }.queue()
     }
 
-    private fun handleUnban(user: Member): MessageEmbed {
+    private suspend fun handleUnban(user: Member): MessageEmbed {
         val guild = user.guild
         val config = GuildConfig(guild)
         if (!config.isBannedUser(user.idLong))

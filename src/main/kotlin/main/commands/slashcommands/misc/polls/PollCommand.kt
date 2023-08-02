@@ -1,6 +1,8 @@
 package main.commands.slashcommands.misc.polls
 
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.runBlocking
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.constants.RobertifyPermission
 import main.constants.Toggle
@@ -96,7 +98,7 @@ class PollCommand : AbstractSlashCommand(
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
-        if (!TogglesConfig(guild)[Toggle.POLLS])
+        if (!TogglesConfig(guild).get(Toggle.POLLS))
             return event.replyEmbed(GeneralMessages.DISABLED_FEATURE)
                 .setEphemeral(true)
                 .queue()
@@ -131,7 +133,7 @@ class PollCommand : AbstractSlashCommand(
         embedBuilder.setTitle(
             "**$question** ${
                 if (endTime != -1L)
-                    localeManager[
+                    localeManager.getMessage(
                         PollMessages.POLL_ENDS_AT,
                         Pair(
                             "{time}",
@@ -139,17 +141,19 @@ class PollCommand : AbstractSlashCommand(
                                 endTime.toDuration(DurationUnit.MILLISECONDS).inWholeSeconds
                             }:R>)"
                         )
-                    ]
+                    )
                 else ""
             }\n\n"
         )
 
         embedBuilder.appendDescription(
             "${
-                localeManager[PollMessages.POLL_BY, Pair(
-                    "{user}",
-                    event.user.asMention
-                )]
+                localeManager.getMessage(
+                    PollMessages.POLL_BY, Pair(
+                        "{user}",
+                        event.user.asMention
+                    )
+                )
             }\n\n"
         )
 
@@ -159,44 +163,50 @@ class PollCommand : AbstractSlashCommand(
 
         embedBuilder.setTimestamp(Instant.now())
 
-        event.channel.sendEmbed { embedBuilder.build() }
-            .queue { msg ->
-                val map = mutableMapOf<Int, Int>()
-                choices.forEachIndexed { i, _ ->
-                    msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i + 1))).queue()
-                    map[i] = 0
-                }
+        val msg = event.channel.sendEmbed { embedBuilder.build() }.await()
+        val map = mutableMapOf<Int, Int>()
+        choices.forEachIndexed { i, _ ->
+            msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i + 1))).queue()
+            map[i] = 0
+        }
 
-                pollCache[msg.idLong] = map
+        pollCache[msg.idLong] = map
 
-                if (endPoll.get())
-                    doPollEnd(msg, event.user, question, choices, duration.get())
+        if (endPoll.get())
+            doPollEnd(msg, event.user, question, choices, duration.get())
 
-                event.replyEmbed(PollMessages.POLL_SENT)
-                    .setEphemeral(true)
-                    .queue()
-
-            }
+        event.replyEmbed(PollMessages.POLL_SENT)
+            .setEphemeral(true)
+            .queue()
     }
 
     private fun doPollEnd(msg: Message, user: User, question: String, choices: List<String>, timeToEnd: Long) {
         Executors.newSingleThreadScheduledExecutor()
             .schedule({
-                val results = pollCache[msg.idLong]
-                val winner = results!!.entries.maxBy { it.value }.key
-                val guild = msg.guild
-                val localeManager = LocaleManager[guild]
-                val embed = RobertifyEmbedUtils.embedMessage(guild, localeManager[PollMessages.POLL_BY, Pair("{user}", user.asMention)])
-                    .setTitle(localeManager[PollMessages.POLL_ENDED, Pair("{question}", question)])
-                    .appendDescription("\n")
-                    .addField(localeManager[PollMessages.POLL_WINNER_LABEL], "${choices[winner - 1]}\n\n", false)
-                    .setTimestamp(Instant.now())
-                    .build()
+                runBlocking {
+                    val results = pollCache[msg.idLong]
+                    val winner = results!!.entries.maxBy { it.value }.key
+                    val guild = msg.guild
+                    val localeManager = LocaleManager[guild]
+                    val embed = RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        localeManager.getMessage(PollMessages.POLL_BY, Pair("{user}", user.asMention))
+                    )
+                        .setTitle(localeManager.getMessage(PollMessages.POLL_ENDED, Pair("{question}", question)))
+                        .appendDescription("\n")
+                        .addField(
+                            localeManager.getMessage(PollMessages.POLL_WINNER_LABEL),
+                            "${choices[winner - 1]}\n\n",
+                            false
+                        )
+                        .setTimestamp(Instant.now())
+                        .build()
 
-                msg.editMessageEmbeds(embed)
-                    .queue { it.clearReactions().queue() }
+                    msg.editMessageEmbeds(embed)
+                        .queue { it.clearReactions().queue() }
 
-                pollCache.remove(msg.idLong)
+                    pollCache.remove(msg.idLong)
+                }
             }, timeToEnd, TimeUnit.MILLISECONDS)
     }
 

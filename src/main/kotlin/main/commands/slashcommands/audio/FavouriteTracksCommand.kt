@@ -95,7 +95,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleList(event: SlashCommandInteractionEvent) {
+    private suspend fun handleList(event: SlashCommandInteractionEvent) {
         val config = FavouriteTracksCache.instance
         val member = event.member!!
         val guild = member.guild
@@ -127,12 +127,12 @@ class FavouriteTracksCommand : AbstractSlashCommand(
             )
         }
 
-        val theme = ThemesConfig(guild).theme
+        val theme = ThemesConfig(guild).getTheme()
         setDefaultEmbed(member, tracks, theme)
         PaginationHandler.paginateMenu(event, list)
     }
 
-    private fun handleClear(guild: Guild, user: User): MessageEmbed {
+    private suspend fun handleClear(guild: Guild, user: User): MessageEmbed {
         val config = FavouriteTracksCache.instance
         val trackList = config.getTracks(user.idLong)
 
@@ -157,7 +157,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleRemove(guild: Guild, user: User, id: Int): MessageEmbed {
+    private suspend fun handleRemove(guild: Guild, user: User, id: Int): MessageEmbed {
         if (id <= 0)
             return RobertifyEmbedUtils.embedMessage(guild, GeneralMessages.ID_GT_ZERO)
                 .build()
@@ -187,7 +187,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    fun handleAdd(guild: Guild, member: Member): MessageEmbed {
+    suspend fun handleAdd(guild: Guild, member: Member): MessageEmbed {
         val config = FavouriteTracksCache.instance
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player

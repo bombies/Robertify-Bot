@@ -79,7 +79,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         event.replyModal(modal).queue()
     }
 
-    private fun handleRemove(event: SlashCommandInteractionEvent) {
+    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
         val randomMessageManager = RandomMessageManager()
         val id = event.getRequiredOption("id").asInt - 1
 
@@ -95,7 +95,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleList(event: SlashCommandInteractionEvent) {
+    private suspend fun handleList(event: SlashCommandInteractionEvent) {
         val randomMessageManager = RandomMessageManager()
         val messages = randomMessageManager.messages
 
@@ -111,7 +111,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         event.replyEmbed(desc).setEphemeral(true).queue()
     }
 
-    private fun handleClear(event: SlashCommandInteractionEvent) {
+    private suspend fun handleClear(event: SlashCommandInteractionEvent) {
         -RandomMessageManager()
         event.replyEmbed("Successfully cleared all messages!")
             .setEphemeral(true)

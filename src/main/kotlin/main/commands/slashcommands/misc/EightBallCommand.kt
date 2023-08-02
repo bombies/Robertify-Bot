@@ -82,7 +82,7 @@ class EightBallCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleAdd(event: SlashCommandInteractionEvent) {
+    private suspend fun handleAdd(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -93,17 +93,17 @@ class EightBallCommand : AbstractSlashCommand(
         val config = EightBallConfig(guild)
         val response = event.getRequiredOption("response").asString
 
-        if (config.responses.map { it.lowercase() }.contains(response.lowercase()))
+        if (config.getResponses().map { it.lowercase() }.contains(response.lowercase()))
             return event.replyEmbed(EightBallMessages.ALREADY_A_RESPONSE).setEphemeral(true).queue()
 
         // Add the response
-        config + response
+        config.addResponse(response)
 
         event.replyEmbed(EightBallMessages.ADDED_RESPONSE, Pair("{response}", response)).setEphemeral(true)
             .queue()
     }
 
-    private fun handleRemove(event: SlashCommandInteractionEvent) {
+    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -114,19 +114,19 @@ class EightBallCommand : AbstractSlashCommand(
         val config = EightBallConfig(guild)
         val id = event.getRequiredOption("id").asInt - 1
 
-        if (id < 0 || id >= config.responses.size)
+        if (id < 0 || id >= config.getResponses().size)
             return event.replyEmbed(EightBallMessages.NOT_A_RESPONSE).setEphemeral(true).queue()
 
         event.replyEmbed(
             EightBallMessages.REMOVED_RESPONSE,
             // Remove the response
-            Pair("{response}", config - id)
+            Pair("{response}", config.removeResponse(id))
         )
             .setEphemeral(true)
             .queue()
     }
 
-    private fun handleClear(event: SlashCommandInteractionEvent) {
+    private suspend fun handleClear(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -135,14 +135,14 @@ class EightBallCommand : AbstractSlashCommand(
             ).setEphemeral(true).queue()
 
         // Clear responses
-        -EightBallConfig(guild)
+        EightBallConfig(guild).clearResponses()
 
         event.replyEmbed(EightBallMessages.CLEARED_RESPONSES)
             .setEphemeral(true)
             .queue()
     }
 
-    private fun handleList(event: SlashCommandInteractionEvent) {
+    private suspend fun handleList(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -151,7 +151,7 @@ class EightBallCommand : AbstractSlashCommand(
             ).setEphemeral(true).queue()
 
         val config = EightBallConfig(guild)
-        val responses = config.responses
+        val responses = config.getResponses()
 
         if (responses.isEmpty())
             return event.replyEmbed(EightBallMessages.NO_CUSTOM_RESPONSES)
@@ -166,40 +166,40 @@ class EightBallCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleAsk(event: SlashCommandInteractionEvent) {
+    private suspend fun handleAsk(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val localeManager = LocaleManager[guild]
 
         val affirmativeAnswers = listOf(
-            localeManager[EightBallMessages.EB_AF_1],
-            localeManager[EightBallMessages.EB_AF_2],
-            localeManager[EightBallMessages.EB_AF_3],
-            localeManager[EightBallMessages.EB_AF_4],
-            localeManager[EightBallMessages.EB_AF_5],
-            localeManager[EightBallMessages.EB_AF_6],
-            localeManager[EightBallMessages.EB_AF_7],
-            localeManager[EightBallMessages.EB_AF_8],
-            localeManager[EightBallMessages.EB_AF_9],
-            localeManager[EightBallMessages.EB_AF_10],
+            localeManager.getMessage(EightBallMessages.EB_AF_1),
+            localeManager.getMessage(EightBallMessages.EB_AF_2),
+            localeManager.getMessage(EightBallMessages.EB_AF_3),
+            localeManager.getMessage(EightBallMessages.EB_AF_4),
+            localeManager.getMessage(EightBallMessages.EB_AF_5),
+            localeManager.getMessage(EightBallMessages.EB_AF_6),
+            localeManager.getMessage(EightBallMessages.EB_AF_7),
+            localeManager.getMessage(EightBallMessages.EB_AF_8),
+            localeManager.getMessage(EightBallMessages.EB_AF_9),
+            localeManager.getMessage(EightBallMessages.EB_AF_10),
         )
 
         val nonCommittalAnswers = listOf(
-            localeManager[EightBallMessages.EB_NC_1],
-            localeManager[EightBallMessages.EB_NC_2],
-            localeManager[EightBallMessages.EB_NC_3],
-            localeManager[EightBallMessages.EB_NC_4],
-            localeManager[EightBallMessages.EB_NC_5],
+            localeManager.getMessage(EightBallMessages.EB_NC_1),
+            localeManager.getMessage(EightBallMessages.EB_NC_2),
+            localeManager.getMessage(EightBallMessages.EB_NC_3),
+            localeManager.getMessage(EightBallMessages.EB_NC_4),
+            localeManager.getMessage(EightBallMessages.EB_NC_5),
         )
 
         val negativeAnswers = listOf(
-            localeManager[EightBallMessages.EB_N_1],
-            localeManager[EightBallMessages.EB_N_2],
-            localeManager[EightBallMessages.EB_N_3],
-            localeManager[EightBallMessages.EB_N_4],
-            localeManager[EightBallMessages.EB_N_5],
+            localeManager.getMessage(EightBallMessages.EB_N_1),
+            localeManager.getMessage(EightBallMessages.EB_N_2),
+            localeManager.getMessage(EightBallMessages.EB_N_3),
+            localeManager.getMessage(EightBallMessages.EB_N_4),
+            localeManager.getMessage(EightBallMessages.EB_N_5),
         )
 
-        val customAnswers = EightBallConfig(guild).responses
+        val customAnswers = EightBallConfig(guild).getResponses()
         val random = Random.nextDouble()
         val asker = event.user
         val question = event.getRequiredOption("question").asString
@@ -244,7 +244,7 @@ class EightBallCommand : AbstractSlashCommand(
 
         val guild = event.guild!!
         val config = EightBallConfig(guild)
-        val responses = config.responses
+        val responses = config.getResponses()
         val results = responses.filter { it.lowercase().contains(event.focusedOption.value.lowercase()) }
             .mapIndexed { i, response ->
                 Choice(

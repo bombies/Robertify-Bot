@@ -44,7 +44,7 @@ class PlaylistImageBuilder(
         addQuery(QueryFields.TRACKS, tracksArray.toString())
         addQuery(QueryFields.SORT_BY, sortingOrder.ordinal.toString())
         addQuery(QueryFields.PAGE, page.toString())
-        addQuery(QueryFields.THEME, ThemesConfig(guild).theme.name.lowercase())
+        addQuery(QueryFields.THEME, ThemesConfig(guild).getTheme().name.lowercase())
         return super.build()
     }
 

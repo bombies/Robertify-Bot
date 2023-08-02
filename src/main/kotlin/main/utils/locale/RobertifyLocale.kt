@@ -17,10 +17,10 @@ enum class RobertifyLocale(
     companion object {
 
         val availableLanguages: List<RobertifyLocale>
-            get() = values().toList()
+            get() = entries
 
-        fun parse(locale: String): RobertifyLocale {
-            return when (locale.uppercase()) {
+        fun parse(locale: String?): RobertifyLocale {
+            return when (locale?.uppercase()) {
                 "ENGLISH", "EN" -> ENGLISH
                 "SPANISH", "ES" -> SPANISH
                 "PORTUGUESE", "PT" -> PORTUGUESE
@@ -28,6 +28,7 @@ enum class RobertifyLocale(
                 "DUTCH", "NL" -> DUTCH
                 "GERMAN", "DE" -> GERMAN
                 "FRENCH", "FR" -> FRENCH
+                null -> ENGLISH
                 else -> throw IllegalArgumentException("There is no such locale with the name: $locale")
             }
         }

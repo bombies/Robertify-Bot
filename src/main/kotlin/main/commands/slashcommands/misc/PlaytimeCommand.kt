@@ -31,15 +31,15 @@ class PlaytimeCommand : AbstractSlashCommand(
         event.replyEmbed { handlePlaytime(guild) }.queue()
     }
 
-    private fun handlePlaytime(guild: Guild): MessageEmbed {
+    private suspend fun handlePlaytime(guild: Guild): MessageEmbed {
         val player = RobertifyAudioManager[guild].player
 
         val time: Long = (
-                    if (playtime[guild.idLong] == null) 0
-                    else playtime[guild.idLong]!!
+                if (playtime[guild.idLong] == null) 0
+                else playtime[guild.idLong]!!
                 ) + (
-                    if (player.playingTrack == null) 0
-                    else player.playingTrack?.length ?: 0
+                if (player.playingTrack == null) 0
+                else player.playingTrack?.length ?: 0
                 )
 
         return RobertifyEmbedUtils.embedMessage(
@@ -48,7 +48,7 @@ class PlaytimeCommand : AbstractSlashCommand(
             Pair("{time}", GeneralUtils.getDurationString(time))
         )
             .setFooter(
-                LocaleManager[guild][
+                LocaleManager[guild].getMessage(
                     PlaytimeMessages.LAST_BOOTED,
                     Pair(
                         "{time}",
@@ -57,7 +57,7 @@ class PlaytimeCommand : AbstractSlashCommand(
                             TimeFormat.E_DD_MMM_YYYY_HH_MM_SS_Z
                         )
                     )
-                ]
+                )
             )
             .build()
     }

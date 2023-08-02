@@ -14,13 +14,13 @@ class QueuePage(
     val pageNumber: Int,
     private val _queueItems: MutableList<QueueItem> = mutableListOf()
 ) : AbstractImagePage() {
-    override val embed: MessageEmbed
-        get() {
-            val content = QueueCommand().getContent(guild, queueItems)
-            return RobertifyEmbedUtils.embedMessage(guild, "\t" +
-                    content.joinToString { str -> "$str\n" }
-            ).build()
-        }
+
+    override suspend fun getEmbed(): MessageEmbed? {
+        val content = QueueCommand().getContent(guild, queueItems)
+        return RobertifyEmbedUtils.embedMessage(guild, "\t" +
+                content.joinToString { str -> "$str\n" }
+        ).build()
+    }
 
     val queueItems
         get() = _queueItems.toList()

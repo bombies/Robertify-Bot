@@ -52,7 +52,7 @@ class BanCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private fun handleBan(user: Member, mod: Member, duration: String?): MessageEmbed {
+    private suspend fun handleBan(user: Member, mod: Member, duration: String?): MessageEmbed {
         val guild = user.guild
         if (duration != null && !GeneralUtils.isValidDuration(duration))
             return RobertifyEmbedUtils.embedMessage(guild, BanMessages.INVALID_BAN_DURATION)

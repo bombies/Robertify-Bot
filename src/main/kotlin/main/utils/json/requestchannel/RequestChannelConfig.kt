@@ -1,11 +1,11 @@
 package main.utils.json.requestchannel
 
-import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import dev.minn.jda.ktx.coroutines.await
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.serialization.json.Json
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.artworkUrl
 import main.audiohandlers.utils.author
@@ -17,6 +17,7 @@ import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
+import main.utils.database.mongodb.cache.redis.guild.RequestChannelModel
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.themes.ThemesConfig
@@ -41,11 +42,9 @@ import net.dv8tion.jda.api.requests.ErrorResponse
 import net.dv8tion.jda.api.requests.RestAction
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction
 import net.dv8tion.jda.api.sharding.ShardManager
-import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
 class RequestChannelConfig(private val guild: Guild, private val shardManager: ShardManager = Robertify.shardManager) :
@@ -54,145 +53,141 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
-        fun updateAllButtons() {
+        suspend fun updateAllButtons() {
             for (g: Guild in Robertify.shardManager.guilds) {
                 val config = RequestChannelConfig(g)
                 if (!config.isChannelSet()) continue
-                val msgRequest: RestAction<Message> = config.messageRequest ?: continue
-                msgRequest.queue { msg: Message ->
-                    config.buttonUpdateRequest(msg).queue(
-                        null,
-                        ErrorHandler()
-                            .handle(
-                                ErrorResponse.MISSING_PERMISSIONS
-                            ) {
-                                logger.warn(
-                                    "Couldn't update buttons in {}",
-                                    g.name
-                                )
-                            }
-                    )
-                }
+                val msg: Message = config.getMessageRequest()?.await() ?: continue
+                config.buttonUpdateRequest(msg).queue(
+                    null,
+                    ErrorHandler()
+                        .handle(
+                            ErrorResponse.MISSING_PERMISSIONS
+                        ) {
+                            logger.warn(
+                                "Couldn't update buttons in {}",
+                                g.name
+                            )
+                        }
+                )
             }
         }
 
-        fun updateAllTopics() {
+        suspend fun updateAllTopics() {
             for (g: Guild in Robertify.shardManager.guilds) {
                 val config = RequestChannelConfig(g)
                 if (!config.isChannelSet()) continue
-                val channel: TextChannel = config.textChannel ?: continue
+                val channel: TextChannel = config.getTextChannel() ?: continue
                 config.channelTopicUpdateRequest(channel)?.queue()
             }
         }
     }
 
-    var messageId: Long
-        get() {
-            if (!isChannelSet()) throw IllegalArgumentException(
-                shardManager.getGuildById(guild.idLong)
-                    ?.name + "(" + guild.idLong + ") doesn't have a channel set"
-            )
-            return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-                .getLong(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString())
-        }
-        set(value) {
-            val obj: JSONObject = getGuildObject()
-            val dediChannelObj: JSONObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-            dediChannelObj.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), value)
-            cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObj)
-        }
+    suspend fun getMessageId(): Long {
+        if (!isChannelSet()) throw IllegalArgumentException(
+            shardManager.getGuildById(guild.idLong)
+                ?.name + "(" + guild.idLong + ") doesn't have a channel set"
+        )
 
-    var channelId: Long
-        get() {
-            if (!isChannelSet()) throw IllegalArgumentException(
-                shardManager.getGuildById(guild.idLong)
-                    ?.name + "(" + guild.idLong + ") doesn't have a channel set"
-            )
-            return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-                .getLong(GuildDB.Field.REQUEST_CHANNEL_ID.toString())
-        }
-        set(value) {
-            val obj: JSONObject = getGuildObject()
-            val dediChannelObject: JSONObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-            dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), value)
-            cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject)
-        }
+        return getGuildModel().dedicated_channel!!.message_id ?: -1
+    }
 
-    var originalAnnouncementToggle: Boolean
-        get() {
-            return getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-                .getBoolean(RequestChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString())
+    suspend fun setMessageId(id: Long) {
+        cache.updateGuild(guild.id) {
+            dedicated_channel {
+                message_id = id
+            }
         }
-        set(value) {
-            val obj: JSONObject = getGuildObject()
-            val dedicatedChannelObj: JSONObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-            dedicatedChannelObj.put(RequestChannelConfigField.ORIGINAL_ANNOUNCEMENT_TOGGLE.toString(), value)
-            cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dedicatedChannelObj)
-        }
+    }
 
-    val textChannel: TextChannel?
-        get() = shardManager.getTextChannelById(channelId)
+    suspend fun getChannelId(): Long {
+        if (!isChannelSet()) throw IllegalArgumentException(
+            shardManager.getGuildById(guild.idLong)
+                ?.name + "(" + guild.idLong + ") doesn't have a channel set"
+        )
+
+        return getGuildModel().dedicated_channel!!.channel_id ?: -1
+    }
+
+    suspend fun setChannelId(id: Long) {
+        cache.updateGuild(guild.id) {
+            dedicated_channel {
+                channel_id = id
+            }
+        }
+    }
+
+    suspend fun getOriginalAnnouncementToggle(): Boolean {
+        return getGuildModel().dedicated_channel?.og_announcement_toggle ?: true
+    }
+
+    suspend fun setOriginalAnnouncementToggle(value: Boolean) {
+        cache.updateGuild(guild.id) {
+            dedicated_channel {
+                og_announcement_toggle = value
+            }
+        }
+    }
+
+    suspend fun getTextChannel(): TextChannel? =
+        shardManager.getTextChannelById(getChannelId())
+
+    suspend fun getMessageRequest(): RestAction<Message>? = try {
+        getTextChannel()?.retrieveMessageById(getMessageId())
+    } catch (e: InsufficientPermissionException) {
+        val channel: GuildMessageChannel? = RobertifyAudioManager
+            .getMusicManager(guild)
+            .scheduler
+            .announcementChannel
+        channel?.sendMessageEmbeds(
+            RobertifyEmbedUtils.embedMessage(
+                channel.guild,
+                "I don't have access to the requests channel anymore! I cannot update it."
+            ).build()
+        )?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        null
+    }
 
     val config: ChannelConfig
         get() = ChannelConfig(this)
 
-    val messageRequest: RestAction<Message>?
-        get() = try {
-            textChannel!!.retrieveMessageById(messageId)
-        } catch (e: InsufficientPermissionException) {
-            val channel: GuildMessageChannel? = RobertifyAudioManager
-                .getMusicManager(guild)
-                .scheduler
-                .announcementChannel
-            channel?.sendMessageEmbeds(
-                RobertifyEmbedUtils.embedMessage(
-                    channel.guild,
-                    "I don't have access to the requests channel anymore! I cannot update it."
-                ).build()
-            )?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
-            null
+    suspend fun setChannelAndMessage(cid: Long, mid: Long) {
+        cache.updateGuild(guild.id) {
+            this.dedicated_channel = RequestChannelModel(
+                mid,
+                cid,
+                this.dedicated_channel!!.config,
+                this.dedicated_channel!!.og_announcement_toggle,
+            )
         }
-
-    @Synchronized
-    fun setChannelAndMessage(cid: Long, mid: Long) {
-        val obj: JSONObject = getGuildObject()
-        val dediChannelObject: JSONObject = obj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-        dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), cid)
-        dediChannelObject.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), mid)
-        cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, dediChannelObject)
     }
 
-    fun removeChannel() {
+    suspend fun removeChannel() {
         if (!isChannelSet())
             throw IllegalArgumentException(
                 "${shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
             )
 
-        textChannel?.delete()?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        getTextChannel()
+            ?.delete()
+            ?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
 
-        val obj: JSONObject = getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-        obj.put(GuildDB.Field.REQUEST_CHANNEL_ID.toString(), -1)
-        obj.put(GuildDB.Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1)
-        cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, obj)
-    }
-
-    @Synchronized
-    fun isChannelSet(): Boolean {
-        val reqChannelObj: JSONObject =
-            getGuildObject().getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
-        return try {
-            !reqChannelObj.isNull(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) && reqChannelObj
-                .getLong(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) != -1L
-        } catch (e: JSONException) {
-            if (e.message!!.contains("is not a ")) {
-                reqChannelObj.getString(GuildDB.Field.REQUEST_CHANNEL_ID.toString()) != "-1"
-            } else throw e
+        cache.updateGuild(guild.id) {
+            dedicated_channel {
+                channel_id = -1L
+                message_id = -1L
+            }
         }
     }
 
-    fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
+    suspend fun isChannelSet(): Boolean {
+        val obj = getGuildModel().dedicated_channel
+        return obj != null && obj.channel_id != -1L
+    }
+
+    suspend fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
         !isChannelSet() -> false
-        else -> channelId == channel.idLong
+        else -> getChannelId() == channel.idLong
     }
 
     suspend fun updateMessage(): Deferred<Unit>? = coroutineScope {
@@ -200,14 +195,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         if (!isChannelSet()) return@coroutineScope null
 
         val job = async {
-            val msgRequest: RestAction<Message> = messageRequest ?: return@async
+            val msgRequest: RestAction<Message> = getMessageRequest() ?: return@async
             val musicManager = RobertifyAudioManager[guild]
             val audioPlayer = musicManager.player
             val playingTrack = audioPlayer.playingTrack
             val queueHandler = musicManager.scheduler.queueHandler
             val queueAsList = ArrayList(queueHandler.contents)
 
-            val theme = ThemesConfig(guild).theme
+            val theme = ThemesConfig(guild).getTheme()
             val localeManager = LocaleManager[guild]
             val eb = EmbedBuilder()
 
@@ -218,34 +213,27 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 val scheduler = musicManager.scheduler
                 val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
                 try {
-                    msgRequest.queue(
-                        { msg: Message ->
-                            msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                                .setEmbeds(eb.build())
-                                .queue(
-                                    null,
-                                    ErrorHandler()
-                                        .handle(
-                                            ErrorResponse.MISSING_PERMISSIONS
-                                        ) {
-                                            sendEditErrorMessage(
-                                                announcementChannel
-                                            )
-                                        }
-                                )
-                        },
-                        ErrorHandler()
-                            .handle(
-                                ErrorResponse.UNKNOWN_MESSAGE
-                            ) { removeChannel() }
-                            .handle(
-                                ErrorResponse.MISSING_PERMISSIONS
-                            ) {
-                                sendEditErrorMessage(
-                                    announcementChannel
-                                )
-                            }
-                    )
+                    val msg = msgRequest.await()
+                    msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                        .setEmbeds(eb.build())
+                        .await()
+                    // TODO: Handle unknown message error properly
+//                    msgRequest.queue(
+//                        { msg: Message ->
+//
+//                        },
+//                        ErrorHandler()
+//                            .handle(
+//                                ErrorResponse.UNKNOWN_MESSAGE
+//                            ) { removeChannel() }
+//                            .handle(
+//                                ErrorResponse.MISSING_PERMISSIONS
+//                            ) {
+//                                sendEditErrorMessage(
+//                                    announcementChannel
+//                                )
+//                            }
+//                    )
                 } catch (e: InsufficientPermissionException) {
                     if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
                 }
@@ -313,25 +301,28 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                     }
                 }
                 nextTenSongs.append("```")
-                msgRequest.queue(
-                    { msg: Message ->
-                        msg.editMessage(
-                            localeManager.getMessage(
-                                DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
-                                Pair(
-                                    "{songs}",
-                                    nextTenSongs.toString()
-                                )
-                            )
+                val msg = msgRequest.await()
+                msg.editMessage(
+                    localeManager.getMessage(
+                        DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
+                        Pair(
+                            "{songs}",
+                            nextTenSongs.toString()
                         )
-                            .setEmbeds(eb.build())
-                            .queue()
-                    },
-                    ErrorHandler()
-                        .handle(
-                            ErrorResponse.UNKNOWN_MESSAGE
-                        ) { removeChannel() }
+                    )
                 )
+                    .setEmbeds(eb.build())
+                    .queue()
+                // TODO: Handle unknown message error properly
+//                msgRequest.queue(
+//                    { msg: Message ->
+//
+//                    },
+//                    ErrorHandler()
+//                        .handle(
+//                            ErrorResponse.UNKNOWN_MESSAGE
+//                        ) { removeChannel() }
+//                )
             }
         }
 
@@ -339,14 +330,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         return@coroutineScope job
     }
 
-    private fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
+    private suspend fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
         sendErrorMessage(
             messageChannel,
             DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
         )
     }
 
-    private fun sendErrorMessage(
+    private suspend fun sendErrorMessage(
         messageChannel: GuildMessageChannel?,
         message: DedicatedChannelMessages
     ) {
@@ -395,17 +386,17 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     suspend fun updateButtons(): Deferred<Message?>? = coroutineScope {
         if (!isChannelSet()) return@coroutineScope null
         val job = async {
-            val msgRequest: RestAction<Message> = messageRequest ?: return@async null
+            val msgRequest: RestAction<Message> = getMessageRequest() ?: return@async null
             msgRequest.await()
         }
 
         return@coroutineScope job
     }
 
-    fun buttonUpdateRequest(msg: Message): MessageEditAction {
+    suspend fun buttonUpdateRequest(msg: Message): MessageEditAction {
         val localeManager = LocaleManager.getLocaleManager(msg.guild)
         val firstRow = ActionRow.of(
-            RequestChannelButton.firstRow.stream()
+            RequestChannelButton.firstRow
                 .filter { config.getState(it) }
                 .map { field ->
                     Button.of(
@@ -417,7 +408,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 .toList()
         )
         val secondRow: ActionRow = ActionRow.of(
-            RequestChannelButton.secondRow.stream()
+            RequestChannelButton.secondRow
                 .filter { field: RequestChannelButton -> config.getState(field) }
                 .map { field: RequestChannelButton ->
                     Button.of(
@@ -468,13 +459,12 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     suspend fun updateTopic(): Deferred<Void>? = coroutineScope {
         if (!isChannelSet()) return@coroutineScope null
         return@coroutineScope async {
-            val channel: TextChannel? = textChannel
+            val channel: TextChannel? = getTextChannel()
             channelTopicUpdateRequest(channel)!!.await()
         }
     }
 
-    @Synchronized
-    fun channelTopicUpdateRequest(channel: TextChannel?): TextChannelManager? {
+    suspend fun channelTopicUpdateRequest(channel: TextChannel?): TextChannelManager? {
         if (channel == null) return null
         val localeManager = LocaleManager.getLocaleManager(channel.guild)
         return channel.manager.setTopic(
@@ -490,15 +480,17 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         )
     }
 
-    protected fun updateConfig(config: JSONObject) {
-        cache.setField(guild.idLong, GuildDB.Field.REQUEST_CHANNEL_OBJECT, config)
+    protected suspend fun updateConfig(config: JSONObject) {
+        cache.updateGuild(guild.id) {
+            this.dedicated_channel = Json.decodeFromString(config.toString())
+        }
     }
 
-    fun cleanChannel() {
+    suspend fun cleanChannel() {
         if (!isChannelSet()) return
         if (!guild.selfMember.hasPermission(Permission.MESSAGE_HISTORY)) return
-        val channel = textChannel!!
-        MessageHistory.getHistoryAfter((channel), messageId.toString())
+        val channel = getTextChannel()!!
+        MessageHistory.getHistoryAfter((channel), getMessageId().toString())
             .queue { messages: MessageHistory ->
                 val validMessages: List<Message> =
                     messages.retrievedHistory
@@ -519,29 +511,45 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
 
     class ChannelConfig internal constructor(private val mainConfig: RequestChannelConfig) {
-        fun getState(field: RequestChannelButton): Boolean {
+
+        suspend fun getConfigJsonObject(): JSONObject {
+            val guildModel = mainConfig.getGuildModel()
+            return guildModel.dedicated_channel!!.config!!.toJsonObject()
+        }
+
+        suspend fun getState(field: RequestChannelButton): Boolean {
             if (!hasField(field)) initConfig()
-            val config: JSONObject = config
+            val config: JSONObject = mainConfig
+                .getGuildModel()
+                .dedicated_channel!!
+                .config!!
+                .toJsonObject()
             return config.getBoolean(field.name.lowercase(Locale.getDefault()))
         }
 
-        fun setState(field: RequestChannelButton, state: Boolean) {
+        suspend fun setState(field: RequestChannelButton, state: Boolean) {
             if (!hasField(field)) initConfig()
-            val config: JSONObject = config
+
+            val guildModel = mainConfig.getGuildModel()
+            val config = guildModel.dedicated_channel!!.config!!.toJsonObject()
             config.put(field.name.lowercase(Locale.getDefault()), state)
-            val fullConfig: JSONObject = fullConfig.put(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString(), config)
+
+            val fullConfig: JSONObject = guildModel
+                .toJsonObject()
+                .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
+                .put(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString(), config)
             mainConfig.updateConfig(fullConfig)
         }
 
-        private fun initConfig() {
-            val config: JSONObject = mainConfig.getGuildObject()
+        private suspend fun initConfig() {
+            val config: JSONObject = mainConfig.getGuildModel().toJsonObject()
                 .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
             if (!config.has(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())) config.put(
                 GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString(),
                 JSONObject()
             )
             val configObj: JSONObject = config.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())
-            for (field: RequestChannelButton in RequestChannelButton.values()) {
+            for (field: RequestChannelButton in RequestChannelButton.entries) {
                 if (!configObj.has(field.name.lowercase(Locale.getDefault()))) configObj.put(
                     field.name.lowercase(Locale.getDefault()),
                     field != RequestChannelButton.FILTERS
@@ -550,26 +558,15 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             mainConfig.updateConfig(config)
         }
 
-        private fun hasField(field: RequestChannelButton): Boolean {
-            return config.has(field.name.lowercase(Locale.getDefault()))
+        private suspend fun hasField(field: RequestChannelButton): Boolean {
+            val guildModel = mainConfig.getGuildModel()
+            val config = guildModel.dedicated_channel?.config?.toJsonObject()
+            return config?.has(field.name.lowercase(Locale.getDefault())) ?: false
         }
-
-        val config: JSONObject
-            get() {
-                var dedicatedChannelObj: JSONObject = fullConfig
-                if (!dedicatedChannelObj.has(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())) {
-                    initConfig()
-                    dedicatedChannelObj = fullConfig
-                }
-                return dedicatedChannelObj.getJSONObject(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())
-            }
-        private val fullConfig: JSONObject
-            get() = mainConfig.getGuildObject()
-                .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
     }
 
 
-    override fun update() {
+    override suspend fun update() {
         // Nothing
     }
 }

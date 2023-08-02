@@ -1,119 +1,119 @@
 package main.utils.database.mongodb.cache.redis
 
 import com.mongodb.client.MongoCollection
+import kotlinx.coroutines.coroutineScope
 import main.main.Config
 import org.bson.Document
 import org.json.JSONArray
 import org.json.JSONObject
-import redis.clients.jedis.JedisPooled
 import java.util.function.Consumer
 
 abstract class RedisCache protected constructor(cacheID: String) {
-    
-    private val jedis: JedisPooled = RedisDB.jedis
+
+    companion object {
+        private val jedis = RedisDB.jedis
+    }
+
     protected val cacheID = "$cacheID#${Config.MONGO_DATABASE_NAME}#"
 
-    protected fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) {
+    protected suspend fun hsetJSON(identifier: String, hash: HashMap<String, JSONObject>) = coroutineScope {
         val newHash = HashMap<String, String>()
         hash.forEach { (key: String, `val`: JSONObject) ->
             newHash[key] = `val`.toString()
         }
+
         hset(identifier, newHash)
     }
 
-    protected fun hset(identifier: String, hash: HashMap<String, String>) {
+    protected suspend fun hset(identifier: String, hash: HashMap<String, String>) = coroutineScope {
         jedis.hset(cacheID + identifier, hash)
     }
 
-    protected fun hset(hash: HashMap<String, String>) {
-        jedis.hset(cacheID, hash)
+    protected suspend fun hset(hash: HashMap<String, String>) {
+        hset(cacheID, hash)
     }
 
-    protected fun hget(identifier: String, key: String): String? {
-        return jedis.hget(cacheID + identifier, key)
+    protected suspend fun hget(identifier: String, key: String): String? = coroutineScope {
+        return@coroutineScope jedis.hget(cacheID + identifier, key)
     }
 
-    protected fun hgetJSON(identifier: String, key: String): JSONObject {
+    protected suspend fun hgetJSON(identifier: String, key: String): JSONObject {
         return JSONObject(hget(identifier, key))
     }
 
-    protected fun hgetAll(key: String): Map<String, String> {
-        return jedis.hgetAll(key)
+    protected suspend fun hgetAll(key: String): Map<String, String> = coroutineScope {
+        return@coroutineScope jedis.hgetAll(key)
     }
 
-    protected fun setex(identifier: String, seconds: Int, value: String) {
-        jedis.setex(cacheID + identifier, seconds.toLong(), value)
+    protected suspend fun setex(identifier: String, seconds: Long, value: String): String = coroutineScope {
+        jedis.setex(cacheID + identifier, seconds, value)
     }
 
-    protected open operator fun set(identifier: String, value: String) {
-        jedis[cacheID + identifier] = value
+    protected open suspend fun set(identifier: String, value: String) {
+        jedis.set(cacheID + identifier, value)
     }
 
-    protected fun set(value: String): String {
-        return jedis.set(cacheID, value)
+    protected suspend fun set(value: String): String = coroutineScope {
+        jedis.set(cacheID, value)
     }
 
-    protected fun setex(identifier: String, seconds: Int, value: JSONObject) {
+    protected suspend fun setex(identifier: String, seconds: Long, value: JSONObject) {
         setex(identifier, seconds, value.toString())
     }
 
-    protected fun setex(identifier: Long, seconds: Int, value: JSONObject) {
+    protected suspend fun setex(identifier: Long, seconds: Long, value: JSONObject) {
         setex(identifier.toString(), seconds, value.toString())
     }
 
-    protected open operator fun get(identifier: String): String? {
-        return jedis[cacheID + identifier]
+    protected open suspend fun get(identifier: String): String? = coroutineScope {
+        return@coroutineScope jedis.get(cacheID + identifier)
     }
 
-    protected open operator fun get(identifier: Long): String? {
+    protected open suspend fun get(identifier: Long): String? {
         return get(identifier.toString())
     }
 
-    protected fun get(): String? {
-        return jedis[cacheID]
+    protected suspend fun get(): String? = coroutineScope {
+        return@coroutineScope jedis.get(cacheID)
     }
 
-    protected fun del(identifier: String): Long {
-        return jedis.del(cacheID + identifier)
+    protected suspend fun del(identifier: String): Long = coroutineScope {
+        return@coroutineScope jedis.del(cacheID + identifier)
     }
 
-    protected fun del(identifier: Long): Long {
+    protected suspend fun del(identifier: Long): Long {
         return del(identifier.toString())
     }
 
-    protected fun del(): Long {
-        return jedis.del(cacheID)
+    protected suspend fun del(): Long = coroutineScope {
+        return@coroutineScope jedis.del(cacheID)
     }
 
-    protected fun exists(): Boolean {
-        return jedis.exists(cacheID)
+    protected suspend fun exists(): Boolean = coroutineScope {
+        return@coroutineScope jedis.exists(cacheID)
     }
 
-    protected fun exists(identifier: String): Boolean {
-        return jedis.exists(cacheID + identifier)
+    protected suspend fun exists(identifier: String): Boolean = coroutineScope {
+        return@coroutineScope jedis.exists(cacheID + identifier)
     }
 
-    open fun updateCache(identifier: String, document: Document) {
-        jedis.del(identifier)
-        jedis[cacheID + identifier] = document.toJson()
+    open suspend fun updateCache(identifier: String, document: Document) {
+        set(cacheID + identifier, document.toJson())
     }
 
-    fun updateCache(identifier: String, document: Document, expiration: Int) {
-        jedis.del(identifier)
-        jedis.setex(cacheID + identifier, expiration.toLong(), document.toJson())
+    suspend fun updateCache(identifier: String, document: Document, expiration: Long) {
+        setex(cacheID + identifier, expiration, document.toJson())
     }
 
-    open fun updateCache(identifier: String, `object`: JSONObject) {
-        jedis.del(identifier)
-        jedis[cacheID + identifier] = `object`.toString()
+    open suspend fun updateCache(identifier: String, `object`: JSONObject) {
+        set(cacheID + identifier, `object`.toString())
     }
 
-    fun updateCache(identifier: String, `object`: JSONObject, expiration: Int) {
-        jedis.del(identifier)
-        jedis.setex(cacheID + identifier, expiration.toLong(), `object`.toString())
+    suspend fun updateCache(identifier: String, `object`: JSONObject, expiration: Long) {
+        setex(cacheID + identifier, expiration, `object`.toString())
     }
 
-    open fun updateCacheObjects(objects: HashMap<String, JSONObject>) {
+    open suspend fun updateCacheObjects(objects: HashMap<String, JSONObject>) {
         val documents = HashMap<String, Document>()
         objects.forEach { (key: String, `object`: JSONObject) ->
             documents[key] = Document.parse(`object`.toString())
@@ -121,31 +121,29 @@ abstract class RedisCache protected constructor(cacheID: String) {
         updateCache(documents)
     }
 
-    open fun updateCache(documents: HashMap<String, Document>) {
-        for ((key, value) in documents) {
-            jedis.del(key)
+    open suspend fun updateCache(documents: HashMap<String, Document>) {
+        for ((key, value) in documents)
             jedis.setex(cacheID + key, 3600, value.toJson())
-        }
     }
 
-    fun removeFromCache(id: String) {
+    suspend fun removeFromCache(id: String) {
         del(id)
     }
 
-    fun getCacheJSON(identifier: String): JSONObject {
+    suspend fun getCacheJSON(identifier: String): JSONObject {
         return JSONObject(get(identifier))
     }
 
-    open fun getJSON(id: String): JSONObject? {
+    open suspend fun getJSON(id: String): JSONObject? {
         val source = get(id) ?: return null
         return JSONObject(source)
     }
 
-    open fun getJSONByGuild(gid: String): JSONObject? {
+    open suspend fun getJSONByGuild(gid: String): JSONObject? {
         return getJSON(gid)
     }
 
-    fun getJSONByGuild(gid: Long): JSONObject? {
+    suspend fun getJSONByGuild(gid: Long): JSONObject? {
         return getJSON(gid.toString())
     }
 
@@ -161,8 +159,8 @@ abstract class RedisCache protected constructor(cacheID: String) {
         return collectionObj
     }
 
-    open fun getCache(id: String): JSONObject {
+    open suspend fun getCache(id: String): JSONObject {
         return JSONObject(get(cacheID + id))
     }
-    
+
 }

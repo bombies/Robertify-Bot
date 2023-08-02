@@ -8,21 +8,18 @@ import java.util.*
 
 class AutoPlayConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    var status: Boolean
-        get() = try {
-            getGuildObject().getBoolean(Field.AUTOPLAY.name.lowercase(Locale.getDefault()))
-        } catch (e: JSONException) {
-            update()
-            getGuildObject().getBoolean(Field.AUTOPLAY.name.lowercase(Locale.getDefault()))
-        }
-        set(value) {
-            val guildObject = getGuildObject()
-            guildObject.put(Field.AUTOPLAY.name.lowercase(Locale.getDefault()), value)
-            cache.updateGuild(guildObject, guild.idLong)
-        }
+    suspend fun getStatus(): Boolean {
+        return getGuildModel().autoplay ?: false
+    }
 
-    override fun update() {
-        val guildObject = getGuildObject()
+    suspend fun setStatus(status: Boolean) {
+        cache.updateGuild(guild.id) {
+            autoplay = status
+        }
+    }
+
+    override suspend fun update() {
+        val guildObject = getGuildModel().toJsonObject()
         if (!guildObject.has(Field.AUTOPLAY.name.lowercase(Locale.getDefault())))
             guildObject.put(Field.AUTOPLAY.name.lowercase(), false)
         cache.updateCache(guild.idLong.toString(), Document.parse(guildObject.toString()))

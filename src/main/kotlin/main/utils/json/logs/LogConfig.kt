@@ -9,38 +9,37 @@ import org.json.JSONObject
 import java.util.*
 
 class LogConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
-    
-    var channelId: Long
-        get() {
-            if (!channelIsSet) throw NullPointerException("There is no channel for this guild! (ID=${guild.id})")
-            return getGuildObject().getLong(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()))
-        }
-        set(value) {
-            val guildObject: JSONObject = getGuildObject()
-            guildObject.put(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()), value)
-            cache.updateGuild(guildObject, guild.idLong)
-        }
-    
-    val channel: TextChannel?
-        get() = Robertify.shardManager.getTextChannelById(channelId)
-    
-    val channelIsSet: Boolean
-        get() {
-            val guildObject: JSONObject = getGuildObject()
-            if (!guildObject.has(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()))) return false
-            return if (JSONObject.NULL == guildObject[Field.LOG_CHANNEL.name.lowercase(Locale.getDefault())]) false else guildObject.getLong(
-                Field.LOG_CHANNEL.name.lowercase(Locale.getDefault())
-            ) != -1L
-        }
 
-    fun removeChannel() {
-        val guildObject: JSONObject = getGuildObject()
-        guildObject.put(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()), -1L)
-        cache.updateGuild(guildObject, guild.idLong)
+    suspend fun getChannelId(): Long {
+        if (!channelIsSet())
+            throw NullPointerException("There is no channel for this guild! (ID=${guild.id})")
+        return getGuildModel().log_channel!!
     }
 
-    override fun update() {
-        val guildObject: JSONObject = getGuildObject()
+    suspend fun setChannelId(cid: Long) {
+        cache.updateGuild(guild.id) {
+            log_channel = cid
+        }
+    }
+
+    suspend fun getChannel(): TextChannel? {
+        return Robertify.shardManager.getTextChannelById(getChannelId())
+    }
+
+    suspend fun channelIsSet(): Boolean {
+        return getGuildModel().log_channel?.let {
+            it != -1L
+        } ?: false
+    }
+
+    suspend fun removeChannel() {
+        cache.updateGuild(guild.id) {
+            log_channel = -1L
+        }
+    }
+
+    override suspend fun update() {
+        val guildObject: JSONObject = getGuildModel().toJsonObject()
         if (!guildObject.has(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()))) guildObject.put(
             Field.LOG_CHANNEL.name.lowercase(
                 Locale.getDefault()

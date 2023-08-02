@@ -93,7 +93,7 @@ class HelpCommand : AbstractSlashCommand(
         }
     }
 
-    private fun getSelectionMenu(guild: Guild?, userId: Long): SelectMenu {
+    private suspend fun getSelectionMenu(guild: Guild?, userId: Long): SelectMenu {
         val localeManager = LocaleManager[guild]
         return StringSelectionMenuBuilder(
             _name = "menu:help",
@@ -125,7 +125,7 @@ class HelpCommand : AbstractSlashCommand(
         ).build()
     }
 
-    private fun searchCommand(search: String, guild: Guild?): MessageEmbed {
+    private suspend fun searchCommand(search: String, guild: Guild?): MessageEmbed {
         val command = SlashCommandManager.getCommand(search)
             ?: return RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -134,7 +134,7 @@ class HelpCommand : AbstractSlashCommand(
             )
                 .build()
 
-        val theme = if (guild != null) ThemesConfig(guild).theme else RobertifyTheme.GREEN
+        val theme = if (guild != null) ThemesConfig(guild).getTheme() else RobertifyTheme.GREEN
         val localeManager = LocaleManager[guild]
 
         return RobertifyEmbedUtils.embedMessage(guild, command.help)
@@ -145,7 +145,7 @@ class HelpCommand : AbstractSlashCommand(
             ).build()
     }
 
-    private fun getHelpEmbed(guild: Guild?, type: HelpType): MessageEmbed {
+    private suspend fun getHelpEmbed(guild: Guild?, type: HelpType): MessageEmbed {
         val commandManager = SlashCommandManager
         val localeManager = LocaleManager[guild]
         val embedBuilder = RobertifyEmbedUtils.embedMessage(guild, HelpMessages.HELP_COMMANDS, Pair("{prefix}", "/"))

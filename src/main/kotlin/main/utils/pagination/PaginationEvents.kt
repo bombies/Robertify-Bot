@@ -50,7 +50,7 @@ class PaginationEvents : AbstractEventController() {
                         return@onEvent
 
                     currentPage[msg] = 0
-                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].getEmbed())
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -63,7 +63,7 @@ class PaginationEvents : AbstractEventController() {
 
                 "${MessageButton.PREVIOUS}${event.user.id}" -> {
                     currentPage[msg] = currentPage[msg]!!.minus(1)
-                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].getEmbed())
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -76,7 +76,7 @@ class PaginationEvents : AbstractEventController() {
 
                 "${MessageButton.NEXT}${event.user.id}" -> {
                     currentPage[msg] = currentPage[msg]!!.plus(1)
-                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].getEmbed())
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -92,7 +92,7 @@ class PaginationEvents : AbstractEventController() {
                         return@onEvent
 
                     currentPage[msg] = messagePages.size - 1
-                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].embed)
+                    event.editMessageEmbeds(messagePages[currentPage[msg]!!].getEmbed())
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,
@@ -137,8 +137,8 @@ class PaginationEvents : AbstractEventController() {
                 nextEnabled: Boolean = true,
                 endEnabled: Boolean = true
             ) {
-                val sendEmbed: () -> Unit = {
-                    event.editMessageEmbeds(queuePage.embed)
+                val sendEmbed: suspend () -> Unit = {
+                    event.editMessageEmbeds(queuePage.getEmbed())
                         .setComponents(
                             paginator.getButtons(
                                 user = event.user,

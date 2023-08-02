@@ -29,7 +29,7 @@ class BotInfoCommand : AbstractSlashCommand(
 
         event.replyEmbeds(
             RobertifyEmbedUtils.embedMessage(guild, "\t")
-                .setThumbnail(if (guild != null) ThemesConfig(guild).theme.transparent else RobertifyTheme.GREEN.transparent)
+                .setThumbnail(if (guild != null) ThemesConfig(guild).getTheme().transparent else RobertifyTheme.GREEN.transparent)
                 .addField(
                     guild = guild,
                     name = BotInfoMessages.BOT_INFO_DEVELOPERS,

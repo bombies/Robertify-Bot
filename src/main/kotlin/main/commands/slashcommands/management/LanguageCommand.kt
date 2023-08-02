@@ -43,7 +43,7 @@ class LanguageCommand : AbstractSlashCommand(
             event.replyEmbed {
                 embed(
                     LanguageCommandMessages.LANGUAGE_EMBED_DESC,
-                    Pair("{language}", "${localeManager.locale.name} ${localeManager.locale.flag}")
+                    Pair("{language}", "${localeManager.getLocale().name} ${localeManager.getLocale().flag}")
                 )
             }.setActionRow(StringSelectionMenuBuilder(
                 _name = "languagemenu",
@@ -61,7 +61,7 @@ class LanguageCommand : AbstractSlashCommand(
                 .queue()
         } else {
             val newLocale = RobertifyLocale.parse(language)
-            localeManager.locale = newLocale
+            localeManager.setLocale(newLocale)
             RequestChannelConfig(guild).updateAll()
             event.replyEmbed {
                 embed(
@@ -93,9 +93,13 @@ class LanguageCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    suspend fun setLocale(guild: Guild, locale: String, shardManager: ShardManager = Robertify.shardManager): RobertifyLocale {
+    suspend fun setLocale(
+        guild: Guild,
+        locale: String,
+        shardManager: ShardManager = Robertify.shardManager
+    ): RobertifyLocale {
         val newLocale = RobertifyLocale.parse(locale)
-        LocaleManager[guild].locale = newLocale
+        LocaleManager[guild].setLocale(newLocale)
         RequestChannelConfig(guild, shardManager).updateAll()
         return newLocale
     }

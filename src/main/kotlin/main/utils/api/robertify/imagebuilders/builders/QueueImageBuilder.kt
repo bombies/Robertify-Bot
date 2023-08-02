@@ -55,7 +55,7 @@ data class QueueImageBuilder(
         }
 
         addQuery(QueryFields.TRACKS, obj.toString())
-        addQuery(QueryFields.THEME, ThemesConfig(guild).theme.name.lowercase())
+        addQuery(QueryFields.THEME, ThemesConfig(guild).getTheme().name.lowercase())
         return super.build()
     }
 

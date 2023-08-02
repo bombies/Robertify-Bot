@@ -32,7 +32,7 @@ class PlaylistsImageBuilder(
 
         addQuery(QueryFields.PLAYLISTS, arr.toString())
         addQuery(QueryFields.PAGE, page.toString())
-        addQuery(QueryFields.THEME, ThemesConfig(guild).theme.name.lowercase())
+        addQuery(QueryFields.THEME, ThemesConfig(guild).getTheme().name.lowercase())
         return super.build()
     }
 

@@ -77,14 +77,14 @@ class NowPlayingCommand : AbstractSlashCommand(
             event.hook.sendEmbed(guild) { embed }
                 .queue()
         } else {
-            val sendBackupEmbed: () -> Unit = {
+            val sendBackupEmbed: suspend () -> Unit = {
                 event.hook.sendEmbed(guild) {
                     getNowPlayingEmbed(guild, event.channel.asGuildMessageChannel(), selfVoiceState, memberVoiceState)
                 }.queue()
             }
 
             try {
-                val defaultImage = ThemesConfig(guild).theme.nowPlayingBanner
+                val defaultImage = ThemesConfig(guild).getTheme().nowPlayingBanner
                 val builder = NowPlayingImageBuilder(
                     title = track!!.title,
                     artistName = track.author,
@@ -117,7 +117,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         }
     }
 
-    private fun getNowPlayingEmbed(
+    private suspend fun getNowPlayingEmbed(
         guild: Guild,
         channel: GuildMessageChannel,
         selfVoiceState: GuildVoiceState,
@@ -212,7 +212,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         embedBuilder.setAuthor(
             localeManager.getMessage(NowPlayingMessages.NP_AUTHOR),
             if (track.uri.isUrl()) track.uri else null,
-            ThemesConfig(guild).theme.transparent
+            ThemesConfig(guild).getTheme().transparent
         )
         return embedBuilder.build()
     }

@@ -187,6 +187,11 @@
             <version>1.7.3</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core-jvm</artifactId>
+            <version>1.7.3</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.bombies</groupId>
             <artifactId>jda-ktx</artifactId>
             <version>master-bf8acdd659-1</version>

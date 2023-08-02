@@ -61,7 +61,7 @@ class SearchQueueCommand : AbstractSlashCommand(
             Pair(
                 "{requester}",
                 scheduler.findRequester(result.identifier)?.toString()
-                    ?: LocaleManager[guild][GeneralMessages.UNKNOWN_REQUESTER]
+                    ?: LocaleManager[guild].getMessage(GeneralMessages.UNKNOWN_REQUESTER)
             )
         )
 

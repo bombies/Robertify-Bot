@@ -66,7 +66,7 @@ class SearchResultLoader(
                             Pair("{query}", query.replaceFirst(SpotifySourceManager.SEARCH_PREFIX, ""))
                         ),
                         null,
-                        ThemesConfig(guild).theme.transparent
+                        ThemesConfig(guild).getTheme().transparent
                     )
                     .setFooter(localeManager.getMessage(SearchMessages.SEARCH_EMBED_FOOTER))
                     .build()

@@ -1,9 +1,15 @@
 package main.utils.json.toggles
 
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import main.commands.slashcommands.SlashCommandManager
 import main.constants.Toggle
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.cache.GuildDBCache
+import main.utils.database.mongodb.cache.redis.guild.DJTogglesModel
+import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
+import main.utils.database.mongodb.cache.redis.guild.LogTogglesModel
+import main.utils.database.mongodb.cache.redis.guild.TogglesModel
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.getIndexOfObjectInArray
@@ -20,7 +26,7 @@ class TogglesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         fun getDefaultToggleObject(): JSONObject {
             val toggleObj = JSONObject()
             for (toggle in Toggle.values()) try {
-                getTogglesObject(toggleObj, toggle)
+                getToggles(toggleObj, toggle)
             } catch (e: JSONException) {
                 for (errToggles in Toggle.values()) when (errToggles) {
                     Toggle.RESTRICTED_VOICE_CHANNELS, Toggle.RESTRICTED_TEXT_CHANNELS -> toggleObj.put(
@@ -34,7 +40,7 @@ class TogglesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
             return toggleObj
         }
 
-        private fun getTogglesObject(toggleObj: JSONObject, toggle: Toggle) {
+        private fun getToggles(toggleObj: JSONObject, toggle: Toggle) {
             if (!toggleObj.has(toggle.toString())) when (toggle) {
                 Toggle.RESTRICTED_VOICE_CHANNELS, Toggle.RESTRICTED_TEXT_CHANNELS ->
                     toggleObj.put(toggle.toString(), false)
@@ -74,119 +80,126 @@ class TogglesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    operator fun get(toggle: Toggle): Boolean {
+    suspend fun get(toggle: Toggle): Boolean {
         if (!guildHasInfo()) loadGuild()
+
+        val toggles = getTogglesJson();
         return try {
-            getTogglesObject().getBoolean(toggle.toString())
+            toggles.getBoolean(toggle.toString())
         } catch (e: JSONException) {
             if (e.message!!.contains("is not a")) {
-                getTogglesObject().getBoolean(toggle.toString())
+                toggles.getBoolean(toggle.toString())
             } else {
-                val togglesObject = getTogglesObject()
+                val togglesObject = getTogglesJson()
                 togglesObject.put(toggle.toString(), true)
-                cache.setField(guild.idLong, GuildDB.Field.TOGGLES_OBJECT, togglesObject)
+
+                cache.updateGuild(guild.id) {
+                    this.toggles = Json.decodeFromString(togglesObject.toString())
+                }
+
                 true
             }
         }
     }
 
-    fun getToggle(toggle: Toggle): Boolean = get(toggle)
+    suspend fun getToggle(toggle: Toggle): Boolean = get(toggle)
 
-    fun getDJToggles(): HashMap<String, Boolean> {
-        val ret = HashMap<String, Boolean>()
-        val obj = getTogglesObject()
-            .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
-        for (key in obj.keySet())
-            ret[key] = false
-        ret.replaceAll { k, _ -> obj.getBoolean(k) }
-        return ret
+    suspend fun getDJToggles(): DJTogglesModel {
+        return getToggles().dj_toggles
     }
 
-    fun getLogToggles(): HashMap<String, Boolean> {
-        val ret = HashMap<String, Boolean>()
-        val obj = getTogglesObject()
-            .getJSONObject(Toggle.TogglesConfigField.LOG_TOGGLES.toString())
-        for (key in obj.keySet()) ret[key] = true
-        ret.replaceAll { k, _ -> obj.getBoolean(k) }
-        return ret
+    suspend fun getLogToggles(): LogTogglesModel {
+        return getToggles().log_toggles
     }
 
-    fun getDJToggle(cmd: AbstractSlashCommand): Boolean {
+    suspend fun getDJToggle(cmd: AbstractSlashCommand): Boolean {
         if (!SlashCommandManager.isMusicCommand(cmd))
             return false
 
-        val djToggles = getDJToggles()
-        return if (!djToggles.containsKey(cmd.info.name)) {
+        val djToggles = getDJToggles().toJsonObject()
+
+        return if (!djToggles.has(cmd.info.name.lowercase())) {
             setDJToggle(cmd, false)
             return false
-        } else djToggles[cmd.info.name.lowercase(Locale.getDefault())]!!
+        } else djToggles.getBoolean(cmd.info.name.lowercase())
     }
 
-    fun setToggle(toggle: Toggle, value: Boolean) {
-        val obj = getGuildObject()
-        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString()).put(toggle.toString(), value)
-        cache.updateGuild(obj, guild.idLong)
+    suspend fun setToggle(toggle: Toggle, value: Boolean) {
+        val guildModel = getGuildModel().toJsonObject();
+        guildModel.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+            .put(toggle.toString(), value)
+        val newModel = Json.decodeFromString<GuildDatabaseModel>(guildModel.toString())
+        cache.updateGuild(newModel)
     }
 
-    fun setDJToggle(command: AbstractSlashCommand, value: Boolean) {
-        val obj = getGuildObject()
-        obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+    suspend fun setDJToggle(command: AbstractSlashCommand, value: Boolean) {
+        val guildModel = getGuildModel().toJsonObject();
+        guildModel.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
             .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
             .put(command.info.name, value)
-        cache.updateGuild(obj, guild.idLong)
+        val newModel = Json.decodeFromString<GuildDatabaseModel>(guildModel.toString())
+        cache.updateGuild(newModel)
     }
 
-    fun setDJToggle(commands: List<AbstractSlashCommand>, value: Boolean) {
-        val obj = getGuildObject()
-        val djObj = obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+    suspend fun setDJToggle(commands: List<AbstractSlashCommand>, value: Boolean) {
+        val guildModel = getGuildModel().toJsonObject();
+        val djObj = guildModel.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
             .getJSONObject(GuildDB.Field.TOGGLES_DJ.toString())
         commands.forEach { command -> djObj.put(command.info.name, value) }
-        cache.updateGuild(obj, guild.idLong)
+        val newModel = Json.decodeFromString<GuildDatabaseModel>(guildModel.toString())
+        cache.updateGuild(newModel)
     }
 
-    fun setLogToggle(type: LogType, state: Boolean) {
+    suspend fun setLogToggle(type: LogType, state: Boolean) {
         if (!isLogToggleSet(type)) update()
-        val obj = getGuildObject()
+        val obj = getGuildModel().toJsonObject()
         obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
             .getJSONObject(GuildDB.Field.TOGGLES_LOGS.toString())
             .put(type.name.lowercase(Locale.getDefault()), state)
-        cache.updateGuild(obj, guild.idLong)
+        val newModel = Json.decodeFromString<GuildDatabaseModel>(obj.toString())
+        cache.updateGuild(newModel)
     }
 
-    fun getLogToggle(type: LogType): Boolean {
+    suspend fun getLogToggle(type: LogType): Boolean {
         if (!isLogToggleSet(type)) update()
-        val obj = getGuildObject()
+        val obj = getGuildModel().toJsonObject()
         return obj.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
             .getJSONObject(GuildDB.Field.TOGGLES_LOGS.toString())
             .getBoolean(type.name.lowercase(Locale.getDefault()))
     }
 
-    fun isDJToggleSet(cmd: AbstractSlashCommand): Boolean =
-        getDJToggles().containsKey(cmd.info.name.lowercase(Locale.getDefault()))
+    suspend fun isDJToggleSet(cmd: AbstractSlashCommand): Boolean =
+        getDJToggles().toJsonObject().has(cmd.info.name.lowercase())
 
 
-    fun isDJToggleSet(cmd: String): Boolean =
-        getDJToggles().containsKey(cmd.lowercase(Locale.getDefault()))
+    suspend fun isDJToggleSet(cmd: String): Boolean =
+        getDJToggles().toJsonObject().has(cmd.lowercase(Locale.getDefault()))
 
-    fun isLogToggleSet(type: LogType): Boolean = try {
-        getLogToggles().containsKey(type.name.lowercase(Locale.getDefault()))
+    suspend fun isLogToggleSet(type: LogType): Boolean = try {
+        getLogToggles().toJsonObject().has(type.name.lowercase(Locale.getDefault()))
     } catch (e: JSONException) {
         false
     }
 
-    private fun getTogglesObject(): JSONObject =
-        getGuildObject().getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
+    suspend fun getToggles(): TogglesModel {
+        return getGuildModel().toggles ?: run {
+            update()
+            return@run getGuildModel().toggles!!
+        }
+    }
 
-    override fun update() {
+    suspend fun getTogglesJson(): JSONObject = getToggles().toJsonObject()
+
+    override suspend fun update() {
         if (!guildHasInfo()) loadGuild()
         val cacheArr = GuildDBCache.ins.getCache()
         val `object` = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, guild.idLong))
-        for (toggle in Toggle.values()) {
+        for (toggle in Toggle.entries) {
             try {
                 val toggleObj = `object`.getJSONObject(GuildDB.Field.TOGGLES_OBJECT.toString())
-                getTogglesObject(toggleObj, toggle)
+                getToggles(toggleObj, toggle)
             } catch (e: JSONException) {
-                for (errToggles in Toggle.values()) when (errToggles) {
+                for (errToggles in Toggle.entries) when (errToggles) {
                     Toggle.RESTRICTED_VOICE_CHANNELS, Toggle.RESTRICTED_TEXT_CHANNELS -> `object`.getJSONObject(
                         GuildDB.Field.TOGGLES_OBJECT.toString()
                     )

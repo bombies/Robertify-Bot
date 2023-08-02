@@ -1,11 +1,12 @@
 package main.utils.json.guildconfig
 
 import main.constants.RobertifyTheme
+import main.utils.database.mongodb.cache.redis.guild.BannedUserModel
+import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.autoplay.AutoPlayConfig
 import main.utils.json.reminders.RemindersConfig
-import main.utils.json.remove
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONArray
 import org.json.JSONObject
@@ -18,26 +19,29 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
-    var twentyFourSevenMode: Boolean
-        get() {
-            if (!guildHasInfo()) loadGuild()
-            if (!cache.hasField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN)) {
-                cache.setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, false)
-                return false
+    suspend fun getTwentyFourSevenMode(): Boolean {
+        val guildModel = getGuildModel()
+        val value = guildModel.twenty_four_seven_mode
+        return if (value == null) {
+            cache.updateGuild(guild.id) {
+                twenty_four_seven_mode = false
             }
-            return cache.getField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN) as Boolean
-        }
-        set(value) {
-            if (!guildHasInfo()) loadGuild()
-            cache.setField(guild.idLong, GuildDB.Field.TWENTY_FOUR_SEVEN, value)
-        }
+            false
+        } else value
+    }
 
-    fun addGuild() {
-        require(!guildHasInfo()) { "This guild is already added!" }
+    suspend fun setTwentyFourSevenMode(value: Boolean) {
+        cache.updateGuild(guild.id) {
+            twenty_four_seven_mode = value
+        }
+    }
+
+    suspend fun addGuild() {
+        require(guildHasInfo()) { "This guild is already added!" }
         getDatabase().addGuild(guild.idLong)
     }
 
-    fun removeGuild() {
+    suspend fun removeGuild() {
         getDatabase().removeGuild(guild.idLong)
         if (!guildHasInfo()) logger.warn(
             "There is no information for guild with ID {} in the cache.",
@@ -45,82 +49,62 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         ) else unloadGuild()
     }
 
-    fun getPrefix(): String {
-        if (!guildHasInfo()) loadGuild()
-        return cache.getField(guild.idLong, GuildDB.Field.GUILD_PREFIX) as String
+    suspend fun setFields(block: GuildDatabaseModel.() -> Unit) {
+        cache.updateGuild(guild.id, block)
     }
 
-    fun setPrefix(prefix: String) {
-        if (!guildHasInfo()) loadGuild()
-        require(prefix.length <= 4) { "The prefix must be 4 or less characters!" }
-        cache.setField(guild.idLong, GuildDB.Field.GUILD_PREFIX, prefix)
+    private suspend fun getBannedUsers(): List<BannedUser> {
+        return getGuildModel().banned_users
+            ?.map { user ->
+                BannedUser(
+                    user.banned_id,
+                    user.banned_by,
+                    user.banned_at,
+                    user.banned_until
+                )
+            } ?: emptyList()
     }
 
-    fun setManyFields(builder: ConfigBuilder.() -> ConfigBuilder) {
-        cache.setFields(guild.idLong, builder(ConfigBuilder()).build())
-    }
-
-    fun getBannedUsers(): List<BannedUser> {
-        if (!guildHasInfo()) loadGuild()
-        val bannedUsers = cache.getField(guild.idLong, GuildDB.Field.BANNED_USERS_ARRAY) as JSONArray
-        val ret: MutableList<BannedUser> = ArrayList()
-        for (i in 0 until bannedUsers.length()) {
-            val jsonObject = bannedUsers.getJSONObject(i)
-            val bannedUser = BannedUser(
-                jsonObject.getLong(GuildDB.Field.BANNED_USER.toString()),
-                jsonObject.getLong(GuildDB.Field.BANNED_BY.toString()),
-                jsonObject.getLong(GuildDB.Field.BANNED_AT.toString()),
-                jsonObject.getLong(GuildDB.Field.BANNED_UNTIL.toString())
-            )
-            ret.add(bannedUser)
-        }
-        return ret
-    }
-
-    fun getBannedUsersWithUnbanTimes(): HashMap<Long, Long> {
-        if (!guildHasInfo()) loadGuild()
+    suspend fun getBannedUsersWithUnbanTimes(): HashMap<Long, Long> {
         val bannedUsers = getBannedUsers()
         val ret = HashMap<Long, Long>()
         for (bannedUser in bannedUsers) ret[bannedUser.user] = bannedUser.bannedUntil
         return ret
     }
 
-    fun banUser(uid: Long, modId: Long, bannedAt: Long, bannedUntil: Long) {
-        if (!guildHasInfo()) loadGuild()
+    suspend fun banUser(uid: Long, modId: Long, bannedAt: Long, bannedUntil: Long) {
         require(!isBannedUser(uid)) { "This user is already banned!" }
-        val guildObj = cache.getGuildInfo(guild.idLong) ?: return
-        val bannedUsers = guildObj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString())
-        bannedUsers.put(
-            JSONObject()
-                .put(GuildDB.Field.BANNED_USER.toString(), uid)
-                .put(GuildDB.Field.BANNED_BY.toString(), modId)
-                .put(GuildDB.Field.BANNED_AT.toString(), bannedAt)
-                .put(GuildDB.Field.BANNED_UNTIL.toString(), bannedUntil)
-        )
-        cache.updateGuild(guildObj)
+
+        setFields {
+            banned_users?.add(
+                BannedUserModel(
+                    uid,
+                    modId,
+                    bannedAt,
+                    bannedUntil
+                )
+            )
+        }
     }
 
-    fun unbanUser(uid: Long) {
-        if (!guildHasInfo()) loadGuild()
+    suspend fun unbanUser(uid: Long) {
         require(isBannedUser(uid)) { "This user isn't banned!" }
-        val guildObj = cache.getGuildInfo(guild.idLong) ?: return
-        val bannedUsers = guildObj.getJSONArray(GuildDB.Field.BANNED_USERS_ARRAY.toString())
-        bannedUsers.remove(GuildDB.Field.BANNED_USER, uid)
-        cache.updateGuild(guildObj)
+
+        setFields {
+            banned_users?.removeIf { user -> user.banned_id == uid }
+        }
     }
 
-    fun getTimeUntilUnban(uid: Long): Long {
+    suspend fun getTimeUntilUnban(uid: Long): Long {
         require(isBannedUser(uid)) { "This user isn't banned!" }
         val (_, _, bannedAt, bannedUntil) = getBannedUsers()
             .filter { user: BannedUser -> user.user == uid }[0]
         return bannedUntil - bannedAt
     }
 
-    fun isBannedUser(uid: Long): Boolean {
-        if (!guildHasInfo()) loadGuild()
-        for (bannedUser in getBannedUsers())
-            if (bannedUser.user == uid) return true
-        return false
+    suspend fun isBannedUser(uid: Long): Boolean {
+        return getBannedUsers()
+            .any { user: BannedUser -> user.user == uid }
     }
 
     fun isPremium(): Boolean {
@@ -128,7 +112,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 //        return Robertify.getRobertifyAPI().guildIsPremium(guild.idLong);
     }
 
-    override fun update() {
+    override suspend fun update() {
         // Nothing
     }
 

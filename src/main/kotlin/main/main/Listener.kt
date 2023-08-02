@@ -1,7 +1,9 @@
 package main.main
 
+import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.events.AbstractEventController
 import main.utils.GeneralUtils
@@ -16,6 +18,7 @@ import main.utils.locale.LocaleManager
 import main.utils.locale.messages.UnbanMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
@@ -55,7 +58,7 @@ class Listener : AbstractEventController() {
             }
         }
 
-        internal fun rescheduleUnbans(guild: Guild) {
+        internal suspend fun rescheduleUnbans(guild: Guild) {
             val guildConfig = GuildConfig(guild)
             val banMap = guildConfig.getBannedUsersWithUnbanTimes()
 
@@ -70,23 +73,23 @@ class Listener : AbstractEventController() {
                         }
                     } else {
                         val scheduler = Executors.newSingleThreadScheduledExecutor()
-                        val task = Runnable { doUnban(userId, guild, guildConfig) }
+                        val task = Runnable { runBlocking { doUnban(userId, guild, guildConfig) } }
                         scheduler.schedule(task, guildConfig.getTimeUntilUnban(userId), TimeUnit.MILLISECONDS)
                     }
                 }
             }
         }
 
-        fun scheduleUnban(guild: Guild, user: User) {
+        suspend fun scheduleUnban(guild: Guild, user: User) {
             val guildConfig = GuildConfig(guild)
             val scheduler = Executors.newSingleThreadScheduledExecutor()
 
-            val task = Runnable { doUnban(user.idLong, guild, guildConfig) }
+            val task = Runnable { runBlocking { doUnban(user.idLong, guild, guildConfig) } }
             scheduler.schedule(task, guildConfig.getTimeUntilUnban(user.idLong), TimeUnit.MILLISECONDS)
 
         }
 
-        private fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfig = GuildConfig(guild)) {
+        private suspend fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfig = GuildConfig(guild)) {
             if (!guildConfig.isBannedUser(userId))
                 return
 
@@ -94,22 +97,20 @@ class Listener : AbstractEventController() {
             sendUnbanMessage(userId, guild)
         }
 
-        private fun sendUnbanMessage(userId: Long, guild: Guild) {
-            Robertify.shardManager.retrieveUserById(userId).queue { user ->
-                user.openPrivateChannel().queue { channel ->
-                    channel.send(
-                        embeds = listOf(
-                            RobertifyEmbedUtils.embedMessage(
-                                guild,
-                                UnbanMessages.USER_UNBANNED,
-                                Pair("{server}", guild.name)
-                            ).build()
-                        )
-                    ).queue(null) {
-                        ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
-                            logger.warn("Was not able to send an unban message to ${user.asTag} (${user.idLong})")
-                        }
-                    }
+        private suspend fun sendUnbanMessage(userId: Long, guild: Guild) {
+            val user = Robertify.shardManager.retrieveUserById(userId).await()
+            val channel = user.openPrivateChannel().await()
+            channel.send(
+                embeds = listOf(
+                    RobertifyEmbedUtils.embedMessage(
+                        guild,
+                        UnbanMessages.USER_UNBANNED,
+                        Pair("{server}", guild.name)
+                    ).build()
+                )
+            ).queue(null) {
+                ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
+                    logger.warn("Was not able to send an unban message to ${user.asTag} (${user.idLong})")
                 }
             }
         }
@@ -120,7 +121,7 @@ class Listener : AbstractEventController() {
     }
 
     private val guildJoinListener =
-        onEvent<GuildLeaveEvent> { event ->
+        onEvent<GuildJoinEvent> { event ->
             val guild = event.guild
             GuildConfig(guild).addGuild()
             loadSlashCommands(guild)

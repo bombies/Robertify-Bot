@@ -6,6 +6,7 @@ import main.main.Robertify
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.hasPermissions
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -43,8 +44,10 @@ class ThemeCommand : AbstractSlashCommand(
         val choice = event.getOption("theme")
         val guild = event.guild!!
 
+        event.deferReply(true).queue()
+
         if (choice == null) {
-            event.replyEmbed {
+            event.hook.sendEmbed {
                 embed(
                     title = ThemeMessages.THEME_EMBED_TITLE,
                     description = ThemeMessages.THEME_EMBED_DESC
@@ -54,16 +57,20 @@ class ThemeCommand : AbstractSlashCommand(
         } else {
             val theme = RobertifyTheme.parse(choice.asString)
             updateTheme(guild, theme)
-            event.replyEmbed(
-                ThemeMessages.THEME_SET,
-                Pair("{theme}", theme.name.replace("_", " "))
-            ).setEphemeral(true)
-                .queue()
+            event.hook.sendEmbed(guild) {
+                embed(
+                    ThemeMessages.THEME_SET,
+                    Pair("{theme}", theme.name.replace("_", " "))
+                )
+            }.queue()
         }
     }
 
     override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
         if (!event.componentId.startsWith("menu:themes")) return
+
+        event.deferReply(true).queue()
+
         val guild = event.guild!!
 
         if (!event.member!!.hasPermissions(RobertifyPermission.ROBERTIFY_THEME))
@@ -82,21 +89,20 @@ class ThemeCommand : AbstractSlashCommand(
         val theme = RobertifyTheme.parse(optionSelected.value.split(":")[1].lowercase())
         updateTheme(guild, theme)
 
-        event.replyEmbed {
+        event.hook.sendEmbed {
             embedBuilder(ThemeMessages.THEME_SET, Pair("{theme}", theme.name.replace("_", " ")))
                 .setImage(theme.transparent)
                 .build()
-        }.setEphemeral(true)
-            .queue()
+        }.queue()
     }
 
     suspend fun updateTheme(guild: Guild, theme: RobertifyTheme, shardManager: ShardManager = Robertify.shardManager) {
-        ThemesConfig(guild).theme = theme
+        ThemesConfig(guild).setTheme(theme)
         GeneralUtils.setDefaultEmbed(guild)
         RequestChannelConfig(guild, shardManager).updateMessage()?.await()
     }
 
-    private fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
+    private suspend fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
         val localeManager = LocaleManager[guild]
         return StringSelectionMenuBuilder(
             _name = "menu:themes",

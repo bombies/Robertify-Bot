@@ -43,11 +43,11 @@ class SetLogChannelCommand : AbstractSlashCommand(
 
         val config = LogConfig(guild)
 
-        if (config.channelIsSet) {
+        if (config.channelIsSet()) {
             config.removeChannel()
         }
 
-        config.channelId = channel.idLong
+        config.setChannelId(channel.idLong)
         event.replyEmbed {
             embed(
                 LogChannelMessages.LOG_CHANNEL_SET,

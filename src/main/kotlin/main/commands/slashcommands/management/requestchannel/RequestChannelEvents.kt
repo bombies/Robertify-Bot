@@ -48,7 +48,7 @@ class RequestChannelEvents : AbstractEventController() {
             val guild = event.guild
             val config = RequestChannelConfig(guild)
 
-            if (!config.isChannelSet() || config.channelId != event.channel.idLong)
+            if (!config.isChannelSet() || config.getChannelId() != event.channel.idLong)
                 return@onEvent
 
             config.removeChannel()
@@ -63,7 +63,7 @@ class RequestChannelEvents : AbstractEventController() {
 
             if (!config.isChannelSet()) return@onEvent
 
-            if (config.channelId != event.channel.idLong) return@onEvent
+            if (config.getChannelId() != event.channel.idLong) return@onEvent
 
             val selfVoiceState = guild.selfMember.voiceState!!
             val memberVoiceState = event.member!!.voiceState!!
@@ -148,7 +148,7 @@ class RequestChannelEvents : AbstractEventController() {
             val guild = event.guild!!
             val config = RequestChannelConfig(guild)
 
-            if (!config.isChannelSet() && config.channelId != event.channel.idLong)
+            if (!config.isChannelSet() && config.getChannelId() != event.channel.idLong)
                 return@onEvent
 
             val id = event.button.id!!
@@ -211,7 +211,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleSkip(selfVoiceState, memberVoiceState) }
 
-    private fun handleLoop(
+    private suspend fun handleLoop(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -316,7 +316,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handlePrevious(selfVoiceState, memberVoiceState) }
 
-    private fun handleFavouriteTrack(
+    private suspend fun handleFavouriteTrack(
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
         handleGenericCommand(
@@ -325,7 +325,7 @@ class RequestChannelEvents : AbstractEventController() {
         ) { handleAdd(memberVoiceState.guild, memberVoiceState.member) }
 
 
-    private inline fun <T : AbstractSlashCommand> handleGenericCommand(
+    private suspend inline fun <T : AbstractSlashCommand> handleGenericCommand(
         command: T,
         memberVoiceState: GuildVoiceState,
         logic: T.() -> MessageEmbed
@@ -336,7 +336,7 @@ class RequestChannelEvents : AbstractEventController() {
         return logic(command)
     }
 
-    private fun djCheck(
+    private suspend fun djCheck(
         command: AbstractSlashCommand,
         guild: Guild,
         member: Member

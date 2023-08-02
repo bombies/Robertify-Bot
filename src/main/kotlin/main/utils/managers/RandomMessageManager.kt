@@ -26,7 +26,7 @@ class RandomMessageManager {
     val hasMessages: Boolean
         get() = messages.isEmpty()
 
-    fun getMessage(guild: Guild): MessageEmbed {
+    suspend fun getMessage(guild: Guild): MessageEmbed {
         val localeManager = LocaleManager[guild]
         val messages = BotDBCache.instance.getRandomMessages()
 
@@ -52,13 +52,13 @@ class RandomMessageManager {
 
     fun clearMessages() = unaryMinus()
 
-    fun randomlySendMessage(channel: GuildMessageChannel) {
+    suspend fun randomlySendMessage(channel: GuildMessageChannel) {
         val guild = channel.guild
         if (!TogglesConfig(guild).getToggle(Toggle.TIPS))
             return
 
         val requestChannelConfig = RequestChannelConfig(guild)
-        if (requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == channel.idLong)
+        if (requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelId() == channel.idLong)
             return
 
         if (!hasMessages)

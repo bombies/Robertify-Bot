@@ -35,7 +35,7 @@ class RemoveDJCommand : AbstractSlashCommand(SlashCommand(
             .queue()
     }
 
-    private fun handleRemoveDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
+    private suspend fun handleRemoveDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
         val config = PermissionsConfig(guild)
 
         return when {

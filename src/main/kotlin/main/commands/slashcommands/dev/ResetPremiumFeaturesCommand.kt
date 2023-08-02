@@ -47,7 +47,7 @@ class ResetPremiumFeaturesCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleAll(event: SlashCommandInteractionEvent) {
+    private suspend fun handleAll(event: SlashCommandInteractionEvent) {
         event.jda.shardManager!!.guildCache.forEach { guild ->
             RobertifyPremium.resetPremiumFeatures(guild)
             logger.info("Reset all premium features for ${guild.name}")
@@ -56,7 +56,7 @@ class ResetPremiumFeaturesCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleGuild(event: SlashCommandInteractionEvent) {
+    private suspend fun handleGuild(event: SlashCommandInteractionEvent) {
         val guildId = event.getRequiredOption("id").asString
         val eventGuild = event.guild!!
         val guild = event.jda.shardManager!!.getGuildById(guildId)

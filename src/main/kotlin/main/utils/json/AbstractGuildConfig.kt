@@ -1,6 +1,7 @@
 package main.utils.json
 
-import main.utils.database.mongodb.cache.redis.GuildRedisCache
+import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
+import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
 import main.utils.database.mongodb.databases.GuildDB
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONObject
@@ -20,19 +21,19 @@ abstract class AbstractGuildConfig protected constructor(private val guild: Guil
     }
 
 
-    abstract fun update()
+    abstract suspend fun update()
 
-    fun getGuildObject(): JSONObject {
+    protected suspend fun getGuildModel(): GuildDatabaseModel {
         if (!guildHasInfo())
             loadGuild()
-        return cache.getGuildInfo(guild.idLong)!!
+        return cache.getGuildModel(guild.id)!!
     }
 
-    fun guildHasInfo(): Boolean = cache.guildHasInfo(guild.idLong)
+    protected suspend fun guildHasInfo(): Boolean = cache.guildHasInfo(guild.idLong)
 
-    fun loadGuild() = cache.loadGuild(guild.idLong)
+    protected suspend fun loadGuild() = cache.loadGuild(guild.idLong)
 
-    fun unloadGuild() = cache.unloadGuild(guild.idLong)
+    protected suspend fun unloadGuild() = cache.unloadGuild(guild.idLong)
 
-    fun getDatabase(): GuildDB = cache.mongoDB as GuildDB
+    protected fun getDatabase(): GuildDB = cache.mongoDB as GuildDB
 }

@@ -201,7 +201,7 @@ object RobertifyAudioManager {
         hookMessage: InteractionHook? = null
     ): Boolean {
         try {
-            require(!GuildConfig(musicManager.guild).twentyFourSevenMode && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
+            require(!GuildConfig(musicManager.guild).getTwentyFourSevenMode() && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
                     val guild = musicManager.guild
@@ -217,10 +217,10 @@ object RobertifyAudioManager {
                             val embed = RobertifyEmbedUtils.embedMessage(
                                 guild,
                                 """
-                                    ${localeManager[GeneralMessages.CANT_JOIN_CHANNEL]}
+                                    ${localeManager.getMessage(GeneralMessages.CANT_JOIN_CHANNEL)}
                                     
                                     ${
-                                    localeManager[
+                                    localeManager.getMessage(
                                         GeneralMessages.RESTRICTED_TO_JOIN,
                                         Pair(
                                             "{channels}",
@@ -232,9 +232,9 @@ object RobertifyAudioManager {
                                                 restrictedChannelConfig.restrictedChannelsToString(
                                                     RestrictedChannelsConfig.ChannelType.VOICE_CHANNEL
                                                 )
-                                            else localeManager[GeneralMessages.NOTHING_HERE]
+                                            else localeManager.getMessage(GeneralMessages.NOTHING_HERE)
                                         )
-                                    ]
+                                    )
                                 }
                                 """.trimIndent()
                             ).build()
@@ -264,7 +264,7 @@ object RobertifyAudioManager {
             ).build()
             if (message != null)
                 message.editMessageEmbeds(embed).queue()
-            else hookMessage?.editEmbed{ embed }?.queue()
+            else hookMessage?.editEmbed { embed }?.queue()
         }
 
         return false

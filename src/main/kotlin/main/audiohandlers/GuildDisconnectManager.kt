@@ -30,7 +30,7 @@ class GuildDisconnectManager(private val guild: Guild) {
 
         logger.debug("${guild.name} | Starting scheduled disconnect")
 
-        if (GuildConfig(guild).twentyFourSevenMode) {
+        if (GuildConfig(guild).getTwentyFourSevenMode()) {
             logger.debug("${guild.name} | 24/7 mode is enabled, cancelling disconnect scheduling.")
             return
         }

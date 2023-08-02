@@ -4,8 +4,11 @@ import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import net.dv8tion.jda.api.entities.MessageEmbed
 
 class MenuPage : MessagePage {
-    override val embed: MessageEmbed? = null
     private val options = mutableListOf<StringSelectMenuOption>()
+
+    override suspend fun getEmbed(): MessageEmbed? {
+        return null
+    }
 
     fun getOptions(): List<StringSelectMenuOption> =
         options.toList()

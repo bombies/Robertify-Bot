@@ -54,7 +54,7 @@ class LoopCommand : AbstractSlashCommand(
         }
     }
 
-    private fun checks(
+    private suspend fun checks(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         player: Player
@@ -71,7 +71,7 @@ class LoopCommand : AbstractSlashCommand(
         return null
     }
 
-    private fun handleRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
+    private suspend fun handleRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
         val guild = musicManager.guild
         val player = musicManager.player
         val scheduler = musicManager.scheduler

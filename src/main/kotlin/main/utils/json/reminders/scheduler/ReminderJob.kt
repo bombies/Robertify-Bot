@@ -1,5 +1,6 @@
 package main.utils.json.reminders.scheduler
 
+import kotlinx.coroutines.runBlocking
 import main.constants.Toggle
 import main.main.Robertify
 import main.utils.GeneralUtils
@@ -17,67 +18,69 @@ import java.time.Instant
 
 class ReminderJob : Job {
     override fun execute(context: JobExecutionContext) {
-        val dataMap: JobDataMap = context.jobDetail.jobDataMap
-        val guildID = dataMap.getLong("guild")
-        val destination = dataMap.getLong("destination")
-        val user = dataMap.getLong("user")
-        val reminder = dataMap.getString("reminder")
+        runBlocking {
+            val dataMap: JobDataMap = context.jobDetail.jobDataMap
+            val guildID = dataMap.getLong("guild")
+            val destination = dataMap.getLong("destination")
+            val user = dataMap.getLong("user")
+            val reminder = dataMap.getString("reminder")
 
-        val guild = Robertify.shardManager.getGuildById(guildID) ?: return
+            val guild = Robertify.shardManager.getGuildById(guildID) ?: return@runBlocking
 
-        if (destination == -1L) {
-            dmReminder(guild, user, reminder)
-            return
-        }
+            if (destination == -1L) {
+                dmReminder(guild, user, reminder)
+                return@runBlocking
+            }
 
-        val remindersConfig = RemindersConfig(guild)
-        if (remindersConfig.userIsBanned(user)) {
-            dmReminder(guild, user, reminder)
-            return
-        }
+            val remindersConfig = RemindersConfig(guild)
+            if (remindersConfig.userIsBanned(user)) {
+                dmReminder(guild, user, reminder)
+                return@runBlocking
+            }
 
-        val channel = guild.getTextChannelById(destination)
+            val channel = guild.getTextChannelById(destination)
 
-        if (channel == null) {
-            dmReminder(guild, user, reminder)
-            return
-        }
+            if (channel == null) {
+                dmReminder(guild, user, reminder)
+                return@runBlocking
+            }
 
-        if (!guild.selfMember.hasPermission(channel, Permission.MESSAGE_SEND)) {
-            dmReminder(guild, user, reminder)
-            return
-        }
+            if (!guild.selfMember.hasPermission(channel, Permission.MESSAGE_SEND)) {
+                dmReminder(guild, user, reminder)
+                return@runBlocking
+            }
 
-        if (remindersConfig.channelIsBanned(channel.idLong)) {
-            dmReminder(guild, user, reminder)
-            return
-        }
+            if (remindersConfig.channelIsBanned(channel.idLong)) {
+                dmReminder(guild, user, reminder)
+                return@runBlocking
+            }
 
-        if (!TogglesConfig(guild).getToggle(Toggle.REMINDERS)) return
+            if (!TogglesConfig(guild).getToggle(Toggle.REMINDERS)) return@runBlocking
 
-        val localeManager = LocaleManager[guild]
-        channel.sendMessage(
-            localeManager.getMessage(
-                ReminderMessages.REMINDER_SEND,
-                Pair(
-                    "{user}",
-                    GeneralUtils.toMention(guild, user, GeneralUtils.Mentioner.USER)
+            val localeManager = LocaleManager[guild]
+            channel.sendMessage(
+                localeManager.getMessage(
+                    ReminderMessages.REMINDER_SEND,
+                    Pair(
+                        "{user}",
+                        GeneralUtils.toMention(guild, user, GeneralUtils.Mentioner.USER)
+                    )
                 )
             )
-        )
-            .setEmbeds(
-                RobertifyEmbedUtils.embedMessageWithTitle(
-                    guild,
-                    localeManager.getMessage(ReminderMessages.REMINDERS_EMBED_TITLE),
-                    reminder
+                .setEmbeds(
+                    RobertifyEmbedUtils.embedMessageWithTitle(
+                        guild,
+                        localeManager.getMessage(ReminderMessages.REMINDERS_EMBED_TITLE),
+                        reminder
+                    )
+                        .setTimestamp(Instant.now())
+                        .build()
                 )
-                    .setTimestamp(Instant.now())
-                    .build()
-            )
-            .queue()
+                .queue()
+        }
     }
 
-    private fun dmReminder(guild: Guild, user: Long, reminder: String) {
+    private suspend fun dmReminder(guild: Guild, user: Long, reminder: String) {
         val localeManager = LocaleManager[guild]
 
         GeneralUtils.dmUser(

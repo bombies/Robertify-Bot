@@ -15,12 +15,12 @@ data class RobertifyPremium(
 ) {
 
     companion object {
-        fun resetPremiumFeatures(guild: Guild) {
+        suspend fun resetPremiumFeatures(guild: Guild) {
             GuildConfig(guild)
-                .setManyFields {
-                    setAutoPlay(false)
-                        .set247(false)
-                        .setTheme(RobertifyTheme.GREEN)
+                .setFields {
+                    autoplay = false
+                    twenty_four_seven_mode = false
+                    theme = RobertifyTheme.GREEN.name.lowercase()
                 }
         }
     }

@@ -11,26 +11,18 @@ import org.json.JSONException
 import java.util.*
 
 class ThemesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
-
-    var theme: RobertifyTheme
-        get() {
-            if (!guildHasInfo()) loadGuild()
-            val theme: String = try {
-                getGuildObject().getString(ThemesConfigField.THEME.toString())
-            } catch (e: JSONException) {
-                update()
-                getGuildObject().getString(ThemesConfigField.THEME.toString())
-            }
-            return RobertifyTheme.parse(theme.lowercase(Locale.getDefault()))
+    
+    suspend fun getTheme(): RobertifyTheme {
+        return RobertifyTheme.parse(getGuildModel().theme)
+    }
+    
+    suspend fun setTheme(theme: RobertifyTheme) {
+        cache.updateGuild(guild.id) {
+            this.theme = theme.name.lowercase()
         }
-        set(value) {
-            if (!guildHasInfo()) loadGuild()
-            val obj = getGuildObject()
-            obj.put(ThemesConfigField.THEME.toString(), value.name.lowercase(Locale.getDefault()))
-            cache.updateGuild(obj, guild.idLong)
-        }
+    }
 
-    override fun update() {
+    override suspend fun update() {
         if (!guildHasInfo()) loadGuild()
         val cacheArr = GuildDBCache.ins.getCache()
         val obj = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, guild.idLong))

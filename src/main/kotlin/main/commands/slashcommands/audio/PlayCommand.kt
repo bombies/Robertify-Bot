@@ -2,9 +2,7 @@ package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
 import dev.minn.jda.ktx.interactions.components.link
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.constants.InteractionLimits
@@ -17,8 +15,8 @@ import main.utils.GeneralUtils.queueCoroutine
 import main.utils.GeneralUtils.toUrl
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.SubCommand
 import main.utils.locale.messages.FavouriteTracksMessages
 import main.utils.locale.messages.GeneralMessages
@@ -238,7 +236,7 @@ class PlayCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
+    private suspend fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
         val guild = event.guild!!
         val member = event.member!!
 
@@ -246,7 +244,9 @@ class PlayCommand : AbstractSlashCommand(
             "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
                 if (!Files.exists(Path(Config.AUDIO_DIR))) {
                     try {
-                        Files.createDirectory(Paths.get(Config.AUDIO_DIR))
+                        withContext(Dispatchers.IO) {
+                            Files.createDirectory(Paths.get(Config.AUDIO_DIR))
+                        }
                     } catch (e: Exception) {
                         event.hook.sendEmbed(guild) {
                             embed(PlayMessages.LOCAL_DIR_ERR)

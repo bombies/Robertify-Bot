@@ -18,18 +18,18 @@ class PlaylistPage(
     private val trackIndexes: Map<PlaylistTrack, Int>,
     private val pageNumber: Int
 ) : AbstractImagePage() {
-    override val embed: MessageEmbed
-        get() {
-            val content = tracks.map { track ->
-                "**${trackIndexes[track]?.plus(1)}.** ${track.title.coerceAtMost(50)} by ${track.author.coerceAtMost(50)}\n"
-            }
-            return RobertifyEmbedUtils.embedMessage(
-                guild, "# $title\n### $description\n" +
-                        "$content"
-            )
-                .setThumbnail(artworkUrl)
-                .build()
+
+    override suspend fun getEmbed(): MessageEmbed? {
+        val content = tracks.map { track ->
+            "**${trackIndexes[track]?.plus(1)}.** ${track.title.coerceAtMost(50)} by ${track.author.coerceAtMost(50)}\n"
         }
+        return RobertifyEmbedUtils.embedMessage(
+            guild, "# $title\n### $description\n" +
+                    "$content"
+        )
+            .setThumbnail(artworkUrl)
+            .build()
+    }
 
     override suspend fun generateImage(): InputStream? = PlaylistImageBuilder(
         guild = guild,

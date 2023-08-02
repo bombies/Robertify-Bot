@@ -21,7 +21,7 @@ class WebsiteCommand : AbstractSlashCommand(SlashCommand(
                 link(
                     url = "https://robertify.me",
                     label = "Website",
-                    emoji = if (event.guild != null) ThemesConfig(event.guild!!).theme.emoji else RobertifyTheme.GREEN.emoji
+                    emoji = if (event.guild != null) ThemesConfig(event.guild!!).getTheme().emoji else RobertifyTheme.GREEN.emoji
                 )
             )
             .queue()

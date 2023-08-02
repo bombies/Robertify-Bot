@@ -14,45 +14,45 @@ abstract class DatabaseRedisCache protected constructor(cacheID: String, val mon
     
     fun init() = mongoDB.init()
     
-    fun addToCache(identifier: String, obj: JSONObject) {
+    suspend fun addToCache(identifier: String, obj: JSONObject) {
         val objectID = mongoDB.addDocument(obj)
         setex(identifier, 3600, obj.put("_id", objectID.value.toString()).toString())
     }
 
 
-    open fun updateCache(identifier: String, oldDoc: Document, document: Document) {
+    open suspend fun updateCache(identifier: String, oldDoc: Document, document: Document) {
         del(identifier)
         setex(identifier, 3600, mongoDB.documentToJSON(document))
         mongoDB.upsertDocument(oldDoc, document)
     }
 
 
-    override fun updateCache(identifier: String, document: Document) {
+    override suspend fun updateCache(identifier: String, document: Document) {
         del(identifier)
         setex(identifier, 3600, mongoDB.documentToJSON(document))
         mongoDB.upsertDocument(doc = document)
     }
 
 
-    open fun updateCacheNoDB(identifier: String, document: Document) {
+    open suspend fun updateCacheNoDB(identifier: String, document: Document) {
         del(identifier)
         setex(identifier, 3600, mongoDB.documentToJSON(document))
     }
 
 
-    open fun updateCacheNoDB(identifier: String, json: JSONObject) {
+    open suspend fun updateCacheNoDB(identifier: String, json: JSONObject) {
         del(identifier)
         setex(identifier, 3600, json.toString())
     }
 
 
-    override fun updateCache(identifier: String, `object`: JSONObject) {
+    override suspend fun updateCache(identifier: String, `object`: JSONObject) {
         del(identifier)
         setex(identifier, 3600, `object`.toString())
         mongoDB.upsertDocument(`object`)
     }
 
-    override fun updateCacheObjects(objects: HashMap<String, JSONObject>) {
+    override suspend fun updateCacheObjects(objects: HashMap<String, JSONObject>) {
         val documents = HashMap<String, Document>()
         objects.forEach { (key: String, `object`: JSONObject) ->
             documents[key] = Document.parse(`object`.toString())
@@ -60,7 +60,7 @@ abstract class DatabaseRedisCache protected constructor(cacheID: String, val mon
         updateCache(documents)
     }
 
-    override fun updateCache(documents: HashMap<String, Document>) {
+    override suspend fun updateCache(documents: HashMap<String, Document>) {
         for ((key, value) in documents) {
             del(key)
             setex(key, 3600, mongoDB.documentToJSON(value))
@@ -68,22 +68,22 @@ abstract class DatabaseRedisCache protected constructor(cacheID: String, val mon
         mongoDB.upsertManyDocuments(documents.values.stream().toList())
     }
 
-    open fun <T> updateCache(obj: JSONObject, identifier: GenericJSONField, identifierValue: T) {
+    open suspend fun <T> updateCache(obj: JSONObject, identifier: GenericJSONField, identifierValue: T) {
         updateCache(obj, identifier.toString(), identifierValue)
     }
 
-    open fun <T> updateCache(obj: JSONObject, identifier: String, identifierValue: T) {
+    open suspend fun <T> updateCache(obj: JSONObject, identifier: String, identifierValue: T) {
         require(obj.has(identifier)) { "The JSON object must have the identifier passed!" }
         val document = mongoDB.findSpecificDocument(identifier, identifierValue)
             ?: throw NullPointerException("There was no document found with that identifier value!")
         updateCache(identifierValue.toString(), document, Document.parse(obj.toString()))
     }
 
-    override fun getJSON(id: String): JSONObject? {
+    override suspend fun getJSON(id: String): JSONObject? {
         return JSONObject(get(id))
     }
 
-    override fun getJSONByGuild(gid: String): JSONObject? {
+    override suspend fun getJSONByGuild(gid: String): JSONObject? {
         return getJSON(gid)
     }
 
@@ -99,7 +99,7 @@ abstract class DatabaseRedisCache protected constructor(cacheID: String, val mon
         return collectionObj
     }
 
-    override fun getCache(id: String): JSONObject {
+    override suspend fun getCache(id: String): JSONObject {
         return JSONObject(get(id))
     }
 

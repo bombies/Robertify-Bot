@@ -1,5 +1,6 @@
 package main.utils.json.logs
 
+import dev.minn.jda.ktx.coroutines.await
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.LocaleMessage
@@ -13,10 +14,10 @@ import java.time.Instant
 class LogUtilsKt(private val guild: Guild) {
     private val config: LogConfig = LogConfig(guild)
 
-    fun sendLog(type: LogType, message: String) {
-        if (!config.channelIsSet) return
+    suspend fun sendLog(type: LogType, message: String) {
+        if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
-        val channel = config.channel
+        val channel = config.getChannel()
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
@@ -27,11 +28,11 @@ class LogUtilsKt(private val guild: Guild) {
         ).queue()
     }
 
-    fun sendLog(type: LogType, message: LocaleMessage) {
-        if (!config.channelIsSet) return
+    suspend fun sendLog(type: LogType, message: LocaleMessage) {
+        if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
-        val channel = config.channel
+        val channel = config.getChannel()
         channel!!.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
@@ -43,11 +44,11 @@ class LogUtilsKt(private val guild: Guild) {
     }
 
     @SafeVarargs
-    fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
-        if (!config.channelIsSet) return
+    suspend fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
+        if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
-        val channel = config.channel
+        val channel = config.getChannel()
         try {
             channel!!.sendMessageEmbeds(
                 EmbedBuilder()
@@ -57,19 +58,21 @@ class LogUtilsKt(private val guild: Guild) {
                     .setTimestamp(Instant.now())
                     .build()
             ).queue()
-        } catch (_: InsufficientPermissionException) { }
+        } catch (_: InsufficientPermissionException) {
+        }
     }
 
-    fun createChannel() {
-        if (config.channelIsSet) config.removeChannel()
-        guild.createTextChannel("robertify-logs")
+    suspend fun createChannel() {
+        if (config.channelIsSet()) config.removeChannel()
+        val channel = guild.createTextChannel("robertify-logs")
             .addPermissionOverride(guild.publicRole, emptyList(), listOf(Permission.VIEW_CHANNEL))
             .addPermissionOverride(
                 guild.selfMember,
                 listOf(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_SEND),
                 emptyList()
             )
-            .queue { channel: TextChannel -> config.channelId = channel.idLong }
+            .await()
+        config.setChannelId(channel.idLong)
     }
 
 }

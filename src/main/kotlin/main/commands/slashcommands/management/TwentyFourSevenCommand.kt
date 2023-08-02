@@ -29,8 +29,8 @@ class TwentyFourSevenCommand : AbstractSlashCommand(
         val localeManager = LocaleManager[guild]
         val scheduler = RobertifyAudioManager[guild].scheduler
 
-        return if (config.twentyFourSevenMode) {
-            config.twentyFourSevenMode = false
+        return if (config.getTwentyFourSevenMode()) {
+            config.setTwentyFourSevenMode(false)
             scheduler.scheduleDisconnect()
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -38,7 +38,7 @@ class TwentyFourSevenCommand : AbstractSlashCommand(
                 Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS).uppercase())
             ).build()
         } else {
-            config.twentyFourSevenMode = true
+            config.setTwentyFourSevenMode(true)
             scheduler.removeScheduledDisconnect()
             RobertifyEmbedUtils.embedMessage(
                 guild,

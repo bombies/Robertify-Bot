@@ -48,7 +48,7 @@ class MainAudioLoader(
             context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
             time: Long = 10,
             unit: TimeUnit = TimeUnit.SECONDS,
-            deletePredicate: ((message: Message) -> Boolean)? = null,
+            deletePredicate: (suspend (message: Message) -> Boolean)? = null,
             onSuccess: (suspend (message: Message) -> Unit)? = null
         ) {
             val message = this.await();
@@ -74,11 +74,11 @@ class MainAudioLoader(
         if (botMsg != null)
             botMsg.editMessageEmbeds(embed)
                 .queueThenDelete(
-                    deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.channelId == msg.channel.idLong }
+                    deletePredicate = { msg -> requestChannelConfig.isChannelSet() && requestChannelConfig.getChannelId() == msg.channel.idLong }
                 )
         else {
             if (requestChannelConfig.isChannelSet())
-                requestChannelConfig.textChannel
+                requestChannelConfig.getTextChannel()
                     ?.sendMessageEmbeds(embed)
                     ?.queueThenDelete()
             else logger.warn("${guild.name} | ${embed.description}")

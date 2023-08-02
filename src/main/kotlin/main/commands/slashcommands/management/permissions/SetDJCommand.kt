@@ -37,7 +37,7 @@ class SetDJCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private fun handleSetDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
+    private suspend fun handleSetDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
         val config = PermissionsConfig(guild)
 
         return when {

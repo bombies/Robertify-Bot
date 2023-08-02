@@ -1,5 +1,7 @@
 package main.commands.slashcommands.dev
 
+import dev.minn.jda.ktx.coroutines.await
+import kotlinx.coroutines.delay
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -88,10 +90,9 @@ class ManageSuggestionsCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleChannelSet(event: SlashCommandInteractionEvent) {
+    private suspend fun handleChannelSet(event: SlashCommandInteractionEvent) {
         val (_, _, secondaryCommand) = event.fullCommandName.split(" ")
         val config = BotDBCache.instance
-        val guild = event.guild!!
 
         if (!config.suggestionSetup)
             return event.replyEmbed("The suggestions category must be setup before changing these channels!")
@@ -163,7 +164,7 @@ class ManageSuggestionsCommand : AbstractSlashCommand(
         }
     }
 
-    private fun handleChannelsSetup(event: SlashCommandInteractionEvent) {
+    private suspend fun handleChannelsSetup(event: SlashCommandInteractionEvent) {
         val config = BotDBCache.instance
         val guild = event.guild!!
 
@@ -174,7 +175,7 @@ class ManageSuggestionsCommand : AbstractSlashCommand(
                 .setEphemeral(true)
                 .queue()
 
-        guild.createCategory("Suggestions")
+        val category = guild.createCategory("Suggestions")
             .addMemberPermissionOverride(
                 guild.selfMember.idLong,
                 listOf(Permission.VIEW_CHANNEL),
@@ -185,28 +186,31 @@ class ManageSuggestionsCommand : AbstractSlashCommand(
                 listOf(),
                 listOf(Permission.VIEW_CHANNEL)
             )
-            .queue { category ->
-                guild.createTextChannel("pending-suggestions", category)
-                    .queueAfter(2.seconds) { pendingChannel ->
-                        guild.createTextChannel("accepted-suggestions", category)
-                            .queueAfter(1.seconds) { acceptedChannel ->
-                                guild.createTextChannel("denied-suggestions", category)
-                                    .queueAfter(1.seconds) { deniedChannel ->
-                                        config.initSuggestionChannels(
-                                            categoryID = category.idLong,
-                                            pendingChannel = pendingChannel.idLong,
-                                            acceptedChannel = acceptedChannel.idLong,
-                                            deniedChannel = deniedChannel.idLong
-                                        )
-                                        event.hook.sendEmbed(guild, "Successfully setup the suggestion channels")
-                                            .queue()
-                                    }
-                            }
-                    }
-            }
+            .await()
+
+        delay(2.seconds)
+        val pendingChannel = guild.createTextChannel("pending-suggestions", category)
+            .await()
+
+        delay(1.seconds)
+        val acceptedChannel = guild.createTextChannel("accepted-suggestions", category)
+            .await()
+
+        delay(1.seconds)
+        val deniedChannel = guild.createTextChannel("denied-suggestions", category)
+            .await()
+
+        config.initSuggestionChannels(
+            categoryID = category.idLong,
+            pendingChannel = pendingChannel.idLong,
+            acceptedChannel = acceptedChannel.idLong,
+            deniedChannel = deniedChannel.idLong
+        )
+        event.hook.sendEmbed(guild, "Successfully setup the suggestion channels")
+            .queue()
     }
 
-    private fun handleReset(event: SlashCommandInteractionEvent) {
+    private suspend fun handleReset(event: SlashCommandInteractionEvent) {
         val config = BotDBCache.instance
         config.resetSuggestionsConfig()
         event.replyEmbed("Successfully reset the suggestions config")
