@@ -71,5 +71,5 @@ class GuildDisconnectManager(private val guild: Guild) {
      * @return True - There is a disconnect scheduled.
      * False - There are no disconnects scheduled.
      */
-    private fun disconnectScheduled(): Boolean = scheduledDisconnect != null
+    fun disconnectScheduled(): Boolean = scheduledDisconnect != null
 }

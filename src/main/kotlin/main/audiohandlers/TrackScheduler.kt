@@ -57,7 +57,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     private val requesters = ArrayList<Requester>()
     private var lastSentMsg: Message? = null
-    private val disconnectManager = GuildDisconnectManager(guild)
+    val disconnectManager = GuildDisconnectManager(guild)
 
     val unannouncedTracks = emptyList<String>().toMutableList()
     val player: Player

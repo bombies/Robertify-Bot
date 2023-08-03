@@ -20,7 +20,8 @@ object EventManager {
             PaginationEvents(),
             RequestChannelEvents(),
             SuggestionChannelEvents(),
-            PollEvents()
+            PollEvents(),
+            VoiceChannelEvents()
         )
     }
 }
