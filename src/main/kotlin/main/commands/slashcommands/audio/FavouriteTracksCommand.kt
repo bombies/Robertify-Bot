@@ -260,6 +260,14 @@ class FavouriteTracksCommand : AbstractSlashCommand(
             return
         }
 
+        if (source == TrackSource.YOUTUBE) {
+            event.replyEmbed {
+                embed(FavouriteTracksMessages.FT_INVALID_SOURCE)
+            }.setEphemeral(true)
+                .queue()
+            return
+        }
+
         event.replyEmbed {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
@@ -273,9 +281,9 @@ class FavouriteTracksCommand : AbstractSlashCommand(
                 TrackSource.DEEZER -> "https://www.deezer.com/us/track/$id"
                 TrackSource.SPOTIFY -> "https://www.open.spotify.com/track/$id"
                 TrackSource.APPLE_MUSIC -> "https://www.music.apple.com/us/song/$id"
-                TrackSource.YOUTUBE,
                 TrackSource.SOUNDCLOUD,
                 TrackSource.RESUMED -> id
+                else -> throw IllegalArgumentException("Invalid source!")
             }
 
             audioManager.loadAndPlay(
