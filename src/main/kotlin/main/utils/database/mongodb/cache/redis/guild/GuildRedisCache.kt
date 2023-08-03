@@ -145,6 +145,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
     fun correctGuildObj(obj: JSONObject?): JSONObject {
         if (!obj!!.has(GuildDB.Field.GUILD_ID.toString())) return obj
         if (obj.has("_id")) obj.remove("_id")
+        if (obj.has("__v")) obj.remove("__v")
         if (obj[GuildDB.Field.GUILD_ID.toString()] is String) obj.put(
             GuildDB.Field.GUILD_ID.toString(),
             obj.getString(GuildDB.Field.GUILD_ID.toString()).toLong()
