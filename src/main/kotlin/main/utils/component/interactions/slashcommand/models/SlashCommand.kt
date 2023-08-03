@@ -108,3 +108,38 @@ data class SlashCommand(
         return commandData
     }
 }
+
+data class MutableSlashCommand(
+    var name: String = "",
+    var description: String = "",
+    var options: List<CommandOption> = listOf(),
+    var subCommandGroups: List<SubCommandGroup> = listOf(),
+    var subcommands: List<SubCommand> = listOf(),
+    var djOnly: Boolean = false,
+    var adminOnly: Boolean = false,
+    var isPremium: Boolean = false,
+    var developerOnly: Boolean = false,
+    var botRequiredPermissions: List<Permission> = listOf(),
+    var isGuild: Boolean = false,
+    var guildUseOnly: Boolean = true,
+    var checkPermission: ((event: SlashCommandInteractionEvent) -> Boolean)? = null,
+    var requiredPermissions: List<RobertifyPermission> = listOf(),
+) {
+
+    fun toImmutable(): SlashCommand = SlashCommand(
+        name,
+        description,
+        options,
+        subCommandGroups,
+        subcommands,
+        djOnly,
+        adminOnly,
+        isPremium,
+        developerOnly,
+        botRequiredPermissions,
+        isGuild,
+        guildUseOnly,
+        checkPermission,
+        requiredPermissions,
+    )
+}

@@ -19,6 +19,7 @@ import main.utils.GeneralUtils.hasPermissions
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.GenericInteraction
+import main.utils.component.interactions.slashcommand.models.MutableSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.influxdb.databases.commands.CommandInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCache
@@ -48,8 +49,21 @@ import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 abstract class AbstractSlashCommand protected constructor(val info: SlashCommand) : GenericInteraction {
+
+    constructor(block: MutableSlashCommand.() -> Unit) : this(handleConstructorBlock(block))
+
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+
+        private fun handleConstructorBlock(block: MutableSlashCommand.() -> Unit): SlashCommand {
+            val mutableSlashCommand = MutableSlashCommand()
+            block(mutableSlashCommand)
+
+            require(mutableSlashCommand.name.isNotEmpty()) { "The name of the slash command must be provided!" }
+            require(mutableSlashCommand.description.isNotEmpty()) { "The name of the description command must be provided!" }
+
+            return mutableSlashCommand.toImmutable()
+        }
 
         fun loadAllCommands() {
             val slashCommandManager = SlashCommandManager
