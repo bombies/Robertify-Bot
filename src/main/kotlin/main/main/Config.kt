@@ -1,5 +1,6 @@
 package main.main
 
+import dev.minn.jda.ktx.util.SLF4J
 import io.github.cdimascio.dotenv.Dotenv
 import main.constants.ENV
 import main.utils.GeneralUtils
@@ -14,7 +15,7 @@ import java.util.*
 class Config {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(Config::class.java)
+        private val logger by SLF4J
         private var dotenv: Dotenv = Dotenv.load()
 
         /**
@@ -24,7 +25,7 @@ class Config {
          * @return The string attached to the key
          */
         operator fun get(key: ENV, defaultValue: String? = null): String {
-            return dotenv.get(key.toString().uppercase(Locale.getDefault()), defaultValue ?: "")
+            return dotenv[key.toString().uppercase(Locale.getDefault())] ?: defaultValue ?: ""
         }
 
         /**
