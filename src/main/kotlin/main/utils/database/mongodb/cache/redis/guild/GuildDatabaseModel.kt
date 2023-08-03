@@ -4,84 +4,71 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import main.constants.RobertifyTheme
 import main.utils.database.mongodb.databases.GuildDB
+import main.utils.locale.RobertifyLocale
 import org.json.JSONObject
 
 @Serializable
 data class GuildDatabaseModel(
     val server_id: Long,
-    var prefix: String,
-    var announcement_channel: Long,
-    var banned_users: MutableList<BannedUserModel>? = null,
-    var dedicated_channel: RequestChannelModel? = null,
-    var permissions: PermissionsModel? = null,
-    var restricted_channels: RestrictedChannelsModel? = null,
-    var toggles: TogglesModel? = null,
-    var reminders: RemindersModel? = null,
-    var eight_ball: MutableList<String>? = null,
-    var theme: String? = null,
-    var autoplay: Boolean? = null,
-    var twenty_four_seven_mode: Boolean? = null,
-    var log_channel: Long? = null,
-    var locale: String? = null
+    var prefix: String = "+",
+    var announcement_channel: Long = -1,
+    var banned_users: MutableList<BannedUserModel> = emptyList<BannedUserModel>().toMutableList(),
+    var dedicated_channel: RequestChannelModel = RequestChannelModel(),
+    var permissions: PermissionsModel = PermissionsModel(),
+    var restricted_channels: RestrictedChannelsModel = RestrictedChannelsModel(),
+    var toggles: TogglesModel = TogglesModel(),
+    var reminders: RemindersModel = RemindersModel(),
+    var eight_ball: MutableList<String> = mutableListOf(),
+    var theme: String = RobertifyTheme.GREEN.name.lowercase(),
+    var autoplay: Boolean = false,
+    var twenty_four_seven_mode: Boolean = false,
+    var log_channel: Long = -1,
+    var locale: String = RobertifyLocale.ENGLISH.name.lowercase()
 ) : JsonObjectTransferable {
 
     fun dedicated_channel(block: RequestChannelModel.() -> Unit) {
-        if (dedicated_channel == null)
-            dedicated_channel = RequestChannelModel()
-
         val dediChannelStandIn = RequestChannelModel(null, null, null, null)
         block(dediChannelStandIn)
         dedicated_channel = RequestChannelModel(
-            dediChannelStandIn.message_id ?: dedicated_channel!!.message_id,
-            dediChannelStandIn.channel_id ?: dedicated_channel!!.channel_id,
-            dediChannelStandIn.config ?: dedicated_channel!!.config,
-            dediChannelStandIn.og_announcement_toggle ?: dedicated_channel!!.og_announcement_toggle
+            dediChannelStandIn.message_id ?: dedicated_channel.message_id,
+            dediChannelStandIn.channel_id ?: dedicated_channel.channel_id,
+            dediChannelStandIn.config ?: dedicated_channel.config,
+            dediChannelStandIn.og_announcement_toggle ?: dedicated_channel.og_announcement_toggle
         )
     }
 
     fun toggles(block: TogglesModelOptional.() -> Unit) {
-        if (toggles == null)
-            toggles = TogglesModel()
-
         val togglesStandIn = TogglesModelOptional()
         block(togglesStandIn)
         toggles = TogglesModel(
-            togglesStandIn.restricted_text_channels ?: toggles!!.restricted_text_channels,
-            togglesStandIn.restricted_voice_channels ?: toggles!!.restricted_voice_channels,
-            togglesStandIn.announce_changelogs ?: toggles!!.announce_changelogs,
-            togglesStandIn.`8ball` ?: toggles!!.`8ball`,
-            togglesStandIn.show_requester ?: toggles!!.show_requester,
-            togglesStandIn.vote_skips ?: toggles!!.vote_skips,
-            togglesStandIn.announce_messages ?: toggles!!.announce_messages,
-            togglesStandIn.polls ?: toggles!!.polls,
-            togglesStandIn.tips ?: toggles!!.tips,
-            togglesStandIn.global_announcements ?: toggles!!.global_announcements,
-            togglesStandIn.reminders ?: toggles!!.reminders,
-            togglesStandIn.log_toggles ?: toggles!!.log_toggles,
-            togglesStandIn.dj_toggles ?: toggles!!.dj_toggles,
+            togglesStandIn.restricted_text_channels ?: toggles.restricted_text_channels,
+            togglesStandIn.restricted_voice_channels ?: toggles.restricted_voice_channels,
+            togglesStandIn.announce_changelogs ?: toggles.announce_changelogs,
+            togglesStandIn.`8ball` ?: toggles.`8ball`,
+            togglesStandIn.show_requester ?: toggles.show_requester,
+            togglesStandIn.vote_skips ?: toggles.vote_skips,
+            togglesStandIn.announce_messages ?: toggles.announce_messages,
+            togglesStandIn.polls ?: toggles.polls,
+            togglesStandIn.tips ?: toggles.tips,
+            togglesStandIn.global_announcements ?: toggles.global_announcements,
+            togglesStandIn.reminders ?: toggles.reminders,
+            togglesStandIn.log_toggles ?: toggles.log_toggles,
+            togglesStandIn.dj_toggles ?: toggles.dj_toggles,
         )
     }
 
     fun restricted_channels(block: RestrictedChannelsModel.() -> Unit) {
-        if (restricted_channels == null)
-            restricted_channels = RestrictedChannelsModel()
-
-        block(restricted_channels!!)
+        block(restricted_channels)
     }
 
     fun reminders(block: RemindersModel.() -> Unit) {
-        if (reminders == null)
-            reminders = RemindersModel()
-
-        block(reminders!!)
+        block(reminders)
     }
 
     fun eight_ball(block: MutableList<String>.() -> Unit) {
-        if (eight_ball == null)
-            eight_ball = mutableListOf()
-
-        block(eight_ball!!)
+        block(eight_ball)
     }
 
     override fun toJsonObject(): JSONObject {
@@ -89,12 +76,12 @@ data class GuildDatabaseModel(
             .put(GuildDB.Field.GUILD_ID.toString(), server_id)
             .put(GuildDB.Field.GUILD_PREFIX.toString(), prefix)
             .put(GuildDB.Field.ANNOUNCEMENT_CHANNEL.toString(), announcement_channel)
-            .put(GuildDB.Field.BANNED_USERS_ARRAY.toString(), banned_users?.map { it.toJsonObject()})
-            .put(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString(), dedicated_channel?.toJsonObject())
-            .put(GuildDB.Field.PERMISSIONS_OBJECT.toString(), permissions?.toJsonObject())
-            .put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), restricted_channels?.toJsonObject())
-            .put(GuildDB.Field.TOGGLES_OBJECT.toString(), toggles?.toJsonObject())
-            .put("reminders", reminders?.toJsonObject())
+            .put(GuildDB.Field.BANNED_USERS_ARRAY.toString(), banned_users.map { it.toJsonObject()})
+            .put(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString(), dedicated_channel.toJsonObject())
+            .put(GuildDB.Field.PERMISSIONS_OBJECT.toString(), permissions.toJsonObject())
+            .put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), restricted_channels.toJsonObject())
+            .put(GuildDB.Field.TOGGLES_OBJECT.toString(), toggles.toJsonObject())
+            .put("reminders", reminders.toJsonObject())
             .put(GuildDB.Field.EIGHT_BALL_ARRAY.toString(), eight_ball)
             .put(GuildDB.Field.THEME.toString(), theme)
             .put("autoplay", autoplay)

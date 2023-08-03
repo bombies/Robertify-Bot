@@ -23,29 +23,7 @@ object GuildDB :
 
     fun getGuildDocument(gid: Long): Document {
         return DocumentBuilder.create()
-            .addField(Field.GUILD_ID, gid)
-            .addField(Field.GUILD_PREFIX, Config[ENV.PREFIX])
-            .addField(Field.ANNOUNCEMENT_CHANNEL, -1L)
-            .addField(Field.BANNED_USERS_ARRAY, JSONArray())
-            .addField(
-                Field.REQUEST_CHANNEL_OBJECT, JSONObject()
-                    .put(Field.REQUEST_CHANNEL_ID.toString(), -1L)
-                    .put(Field.REQUEST_CHANNEL_MESSAGE_ID.toString(), -1L)
-            )
-            .addField(
-                Field.PERMISSIONS_OBJECT, JSONObject()
-                    .put(Field.PERMISSIONS_DJ.toString(), JSONArray())
-                    .put(Field.PERMISSIONS_ADMIN.toString(), JSONArray())
-                    .put(Field.PERMISSIONS_USERS.toString(), JSONObject())
-            )
-            .addField(
-                Field.RESTRICTED_CHANNELS_OBJECT, JSONObject()
-                    .put(Field.RESTRICTED_CHANNELS_TEXT.toString(), JSONArray())
-                    .put(Field.RESTRICTED_CHANNELS_VOICE.toString(), JSONArray())
-            )
-            .addField(Field.TOGGLES_OBJECT, TogglesConfig.getDefaultToggleObject())
-            .addField(Field.EIGHT_BALL_ARRAY, JSONArray())
-            .addField(Field.THEME, RobertifyTheme.GREEN.name.lowercase(Locale.getDefault()))
+            .setObj(GuildDatabaseModel(server_id = gid).toJsonObject())
             .build()
     }
 

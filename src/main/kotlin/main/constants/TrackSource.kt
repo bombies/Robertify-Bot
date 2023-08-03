@@ -19,6 +19,7 @@ enum class TrackSource {
                 "deezer" -> DEEZER
                 "soundcloud" -> SOUNDCLOUD
                 "applemusic", "apple_music" -> APPLE_MUSIC
+                "resumed" -> RESUMED
                 else -> throw NullPointerException("There is no such source")
             }
         }

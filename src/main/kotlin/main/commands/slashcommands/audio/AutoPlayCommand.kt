@@ -41,7 +41,7 @@ class AutoPlayCommand : AbstractSlashCommand(
                 )
             ).build()
         } else {
-            autoPlayConfig.setStatus(false)
+            autoPlayConfig.setStatus(true)
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 GeneralMessages.GENERAL_TOGGLE_MESSAGE,

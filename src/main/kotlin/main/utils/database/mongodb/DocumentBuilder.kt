@@ -6,7 +6,7 @@ import org.bson.Document
 import org.json.JSONObject
 
 class DocumentBuilder private constructor() {
-    private val obj: JSONObject = JSONObject()
+    private var obj: JSONObject = JSONObject()
 
     companion object {
         fun create(): DocumentBuilder = DocumentBuilder()
@@ -19,6 +19,11 @@ class DocumentBuilder private constructor() {
 
     fun <T> addField(key: GenericJSONField, value: T): DocumentBuilder {
         obj.put(key.toString(), value)
+        return this
+    }
+
+    fun setObj(obj: JSONObject): DocumentBuilder {
+        this.obj = obj
         return this
     }
 
