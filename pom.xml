@@ -113,11 +113,6 @@
             <version>3.2.5</version>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
-        </dependency>
-        <dependency>
             <groupId>org.discordbots</groupId>
             <artifactId>DBL-Java-Library</artifactId>
             <version>19abf19</version>
@@ -141,16 +136,6 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>32.1.2-jre</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
