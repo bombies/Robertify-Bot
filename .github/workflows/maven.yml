@@ -86,10 +86,16 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - name: Cache the Maven packages to speed up build
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - run: mvn -B package --file pom.xml -DskipTests
       - run: mkdir staging && cp target/*jar-with-dependencies.jar staging
       - name: Upload bot artifact
         uses: actions/upload-artifact@v3
         with:
-          name: Robertify-Bot.jar
+          name: Robertify-Bot
           path: staging
