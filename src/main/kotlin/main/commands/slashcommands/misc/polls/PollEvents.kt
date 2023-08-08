@@ -31,8 +31,8 @@ class PollEvents : AbstractEventController() {
 
             val emoji = event.reaction.emoji.name
             val countMap = pollCache[event.messageIdLong]!!
-            var oldVal = countMap[GeneralUtils.parseNumEmoji(emoji) - 1]!!
-            countMap[GeneralUtils.parseNumEmoji(emoji) - 1] = --oldVal
+            var oldVal = countMap[GeneralUtils.parseNumEmoji(emoji)]!!
+            countMap[GeneralUtils.parseNumEmoji(emoji)] = --oldVal
         }
     }
 }

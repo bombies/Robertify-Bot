@@ -110,16 +110,16 @@ class PollCommand : AbstractSlashCommand(
         val durationStr = event.getOption("duration")?.asString
         val localeManager = LocaleManager[guild]
 
-        val endPoll = AtomicBoolean(false)
-        val duration = AtomicLong(-1)
+        var endPoll = false
+        var duration = -1L
         var endTime = -1L
 
         if (durationStr != null && durationStr.matches("^[0-9]+[sSmMhHdD]$".toRegex())) {
-            endPoll.set(true)
+            endPoll = true
 
             try {
                 endTime = GeneralUtils.getFutureTime(durationStr)
-                duration.set(GeneralUtils.getStaticTime(durationStr))
+                duration = GeneralUtils.getStaticTime(durationStr)
             } catch (e: Exception) {
                 return event.replyEmbed(
                     e.message ?: localeManager.getMessage(GeneralMessages.UNEXPECTED_ERROR)
@@ -172,8 +172,8 @@ class PollCommand : AbstractSlashCommand(
 
         pollCache[msg.idLong] = map
 
-        if (endPoll.get())
-            doPollEnd(msg, event.user, question, choices, duration.get())
+        if (endPoll)
+            doPollEnd(msg, event.user, question, choices, duration)
 
         event.replyEmbed(PollMessages.POLL_SENT)
             .setEphemeral(true)
@@ -196,7 +196,7 @@ class PollCommand : AbstractSlashCommand(
                         .appendDescription("\n")
                         .addField(
                             localeManager.getMessage(PollMessages.POLL_WINNER_LABEL),
-                            "${choices[winner - 1]}\n\n",
+                            "${choices[winner]}\n\n",
                             false
                         )
                         .setTimestamp(Instant.now())
