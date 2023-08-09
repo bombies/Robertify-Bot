@@ -42,6 +42,8 @@ import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.yaml.snakeyaml.reader.ReaderException
@@ -66,137 +68,151 @@ object Robertify {
     private val lavakordShardManager = LavaKordShardManager()
 
 
-    fun main() = runBlocking {
-        if (Config.hasValue(ENV.SENTRY_DSN))
-            Sentry.init { options ->
-                options.dsn = Config.SENTRY_DSN
-                options.environment = Config.ENVIRONMENT
-            }
+    fun main() = startKoin {
+        runBlocking {
+            if (Config.hasValue(ENV.SENTRY_DSN))
+                Sentry.init { options ->
+                    options.dsn = Config.SENTRY_DSN
+                    options.environment = Config.ENVIRONMENT
+                }
 
-        // Setup graceful shutdown hooks
-        val mainShutdownHook = ThreadFactoryBuilder()
-            .setNameFormat("RobertifyShutdownHook")
-            .build()
-        Runtime.getRuntime().addShutdownHook(mainShutdownHook.newThread {
-            logger.info("Destroying all players (If any left)")
-            runBlocking {
-                RobertifyAudioManager.musicManagers
-                    .values
-                    .forEach { musicManager ->
+            // Setup graceful shutdown hooks
+            val mainShutdownHook = ThreadFactoryBuilder()
+                .setNameFormat("RobertifyShutdownHook")
+                .build()
+            Runtime.getRuntime().addShutdownHook(mainShutdownHook.newThread {
+                logger.info("Destroying all players (If any left)")
+                runBlocking {
+                    RobertifyAudioManager.musicManagers
+                        .values
+                        .forEach { musicManager ->
 //                        if (musicManager.player.playingTrack != null)
 //                            GuildResumeManager(musicManager.guild).saveTracks()
-                        musicManager.destroy()
-                    }
+                            musicManager.destroy()
+                        }
+                }
+            })
+
+            val cronShutdownHook = ThreadFactoryBuilder()
+                .setNameFormat("RobertifyCronShutdownHook")
+                .build()
+            Runtime.getRuntime().addShutdownHook(cronShutdownHook.newThread {
+                logger.info("Killing cron scheduler")
+                try {
+                    cronScheduler.clear()
+                } catch (e: SchedulerException) {
+                    logger.error("I couldn't clear scheduling data!")
+                }
+            })
+
+            // Init caches
+            AbstractMongoDatabase.initAllCaches()
+            logger.info("Initialized all caches.")
+
+            GuildRedisCache.ins.loadAllGuilds()
+            logger.info("All guilds have been loaded into cache.")
+
+            // Setup custom coroutine event manager
+            val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
+            val context = dispatcher + supervisor + handler
+            val scope = CoroutineScope(context)
+            coroutineEventManager = CoroutineEventManager(scope, 30.seconds)
+            coroutineEventManager.handleShardReady()
+            coroutineEventManager.handleGuildReady()
+            coroutineEventManager.listener<ShutdownEvent> {
+                supervisor.cancel()
             }
-        })
 
-        val cronShutdownHook = ThreadFactoryBuilder()
-            .setNameFormat("RobertifyCronShutdownHook")
-            .build()
-        Runtime.getRuntime().addShutdownHook(cronShutdownHook.newThread {
-            logger.info("Killing cron scheduler")
-            try {
-                cronScheduler.clear()
-            } catch (e: SchedulerException) {
-                logger.error("I couldn't clear scheduling data!")
+            // Build bot connection
+            logger.info("Building shard manager...")
+            val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
+                Config.BOT_TOKEN,
+                listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
+            )
+                .apply {
+                    setShardsTotal(Config.SHARD_COUNT)
+                    setEventManagerProvider { coroutineEventManager }
+                    setBulkDeleteSplittingEnabled(false)
+                    enableCache(CacheFlag.VOICE_STATE)
+                    disableCache(
+                        CacheFlag.ACTIVITY,
+                        CacheFlag.EMOJI,
+                        CacheFlag.CLIENT_STATUS,
+                        CacheFlag.ROLE_TAGS,
+                        CacheFlag.ONLINE_STATUS,
+                        CacheFlag.STICKER,
+                        CacheFlag.SCHEDULED_EVENTS
+                    )
+                    setActivity(Activity.listening("Starting up..."))
+
+                    val disabledIntents = mutableListOf(
+                        GatewayIntent.DIRECT_MESSAGE_TYPING,
+                        GatewayIntent.GUILD_MODERATION,
+                        GatewayIntent.GUILD_INVITES,
+                        GatewayIntent.GUILD_MEMBERS,
+                        GatewayIntent.GUILD_MESSAGE_TYPING,
+                        GatewayIntent.GUILD_PRESENCES,
+                        GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+                        GatewayIntent.SCHEDULED_EVENTS
+                    )
+
+                    val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
+
+                    if (Config.MESSAGE_CONTENT_ENABLED)
+                        enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+                    else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+
+                    enableIntents(enabledIntents)
+                    disableIntents(disabledIntents)
+                }
+
+            shardManagerBuilder.applyLavakord(lavakordShardManager)
+            shardManager = shardManagerBuilder.build()
+            logger.info("Successfully built shard manager")
+
+            val slashCommandManager = SlashCommandManager
+            shardManager.registerCommands(
+                slashCommandManager.guildCommands
+                    .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+            )
+
+            logger.info("Registered all slash commands.")
+
+            EventManager.registeredEvents
+            logger.info("Registered all event controllers.")
+
+            if (Config.LOAD_COMMANDS)
+                AbstractSlashCommand.loadAllCommands()
+
+            if (Config.LOAD_NEEDED_COMMANDS)
+                loadNeededGlobalCommands()
+
+            cronScheduler.start()
+            initVoteSiteAPIs()
+
+            // Setup SpotifyAPI
+            spotifyApi = spotifyAppApi(
+                clientId = Config.SPOTIFY_CLIENT_ID,
+                clientSecret = Config.SPOTIFY_CLIENT_SECRET
+            ).build(true)
+
+            if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
+                externalApi = RobertifyApi()
+
+            RobertifyKtorApi.start()
+
+            val botModules = module {
+                single { shardManager }
+                single { spotifyApi }
+                single { coroutineEventManager }
+                single { cronScheduler }
+                single { lavaKord }
+                single { lavakordShardManager }
+                single { externalApi }
             }
-        })
 
-        // Init caches
-        AbstractMongoDatabase.initAllCaches()
-        logger.info("Initialized all caches.")
-
-        GuildRedisCache.ins.loadAllGuilds()
-        logger.info("All guilds have been loaded into cache.")
-
-        // Setup custom coroutine event manager
-        val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
-        val context = dispatcher + supervisor + handler
-        val scope = CoroutineScope(context)
-        coroutineEventManager = CoroutineEventManager(scope, 30.seconds)
-        coroutineEventManager.handleShardReady()
-        coroutineEventManager.handleGuildReady()
-        coroutineEventManager.listener<ShutdownEvent> {
-            supervisor.cancel()
+            modules(botModules)
         }
-
-        // Build bot connection
-        logger.info("Building shard manager...")
-        val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
-            Config.BOT_TOKEN,
-            listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
-        )
-            .apply {
-                setShardsTotal(Config.SHARD_COUNT)
-                setEventManagerProvider { coroutineEventManager }
-                setBulkDeleteSplittingEnabled(false)
-                enableCache(CacheFlag.VOICE_STATE)
-                disableCache(
-                    CacheFlag.ACTIVITY,
-                    CacheFlag.EMOJI,
-                    CacheFlag.CLIENT_STATUS,
-                    CacheFlag.ROLE_TAGS,
-                    CacheFlag.ONLINE_STATUS,
-                    CacheFlag.STICKER,
-                    CacheFlag.SCHEDULED_EVENTS
-                )
-                setActivity(Activity.listening("Starting up..."))
-
-                val disabledIntents = mutableListOf(
-                    GatewayIntent.DIRECT_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_MODERATION,
-                    GatewayIntent.GUILD_INVITES,
-                    GatewayIntent.GUILD_MEMBERS,
-                    GatewayIntent.GUILD_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                    GatewayIntent.SCHEDULED_EVENTS
-                )
-
-                val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
-
-                if (Config.MESSAGE_CONTENT_ENABLED)
-                    enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-                else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-
-                enableIntents(enabledIntents)
-                disableIntents(disabledIntents)
-            }
-
-        shardManagerBuilder.applyLavakord(lavakordShardManager)
-        shardManager = shardManagerBuilder.build()
-        logger.info("Successfully built shard manager")
-
-        val slashCommandManager = SlashCommandManager
-        shardManager.registerCommands(
-            slashCommandManager.guildCommands
-                .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
-        )
-
-        logger.info("Registered all slash commands.")
-
-        EventManager.registeredEvents
-        logger.info("Registered all event controllers.")
-
-        if (Config.LOAD_COMMANDS)
-            AbstractSlashCommand.loadAllCommands()
-
-        if (Config.LOAD_NEEDED_COMMANDS)
-            loadNeededGlobalCommands()
-
-        cronScheduler.start()
-        initVoteSiteAPIs()
-
-        // Setup SpotifyAPI
-        spotifyApi = spotifyAppApi(
-            clientId = Config.SPOTIFY_CLIENT_ID,
-            clientSecret = Config.SPOTIFY_CLIENT_SECRET
-        ).build(true)
-
-        if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
-            externalApi = RobertifyApi()
-
-        RobertifyKtorApi.start()
     }
 
     private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
