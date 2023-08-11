@@ -6,7 +6,7 @@
 
     <groupId>me.bombies</groupId>
     <artifactId>Robertify</artifactId>
-    <version>6.0.0-PRE_ALPHA-1</version>
+    <version>6.0.0-BETA-1</version>
     <packaging>jar</packaging>
 
     <properties>
