@@ -17,6 +17,7 @@ import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
+import main.utils.database.mongodb.cache.redis.guild.RequestChannelConfigModel
 import main.utils.database.mongodb.cache.redis.guild.RequestChannelModel
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
@@ -156,8 +157,8 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             this.dedicated_channel = RequestChannelModel(
                 mid,
                 cid,
-                this.dedicated_channel!!.config,
-                this.dedicated_channel!!.og_announcement_toggle,
+                this.dedicated_channel.config,
+                this.dedicated_channel.og_announcement_toggle,
             )
         }
     }
@@ -514,14 +515,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
         suspend fun getConfigJsonObject(): JSONObject {
             val guildModel = mainConfig.getGuildModel()
-            return guildModel.dedicated_channel!!.config!!.toJsonObject()
+            return guildModel.dedicated_channel.config?.toJsonObject() ?: RequestChannelConfigModel().toJsonObject()
         }
 
         suspend fun getState(field: RequestChannelButton): Boolean {
             if (!hasField(field)) initConfig()
             val config: JSONObject = mainConfig
                 .getGuildModel()
-                .dedicated_channel!!
+                .dedicated_channel
                 .config!!
                 .toJsonObject()
             return config.getBoolean(field.name.lowercase(Locale.getDefault()))
@@ -531,7 +532,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             if (!hasField(field)) initConfig()
 
             val guildModel = mainConfig.getGuildModel()
-            val config = guildModel.dedicated_channel!!.config!!.toJsonObject()
+            val config = guildModel.dedicated_channel.config!!.toJsonObject()
             config.put(field.name.lowercase(Locale.getDefault()), state)
 
             val fullConfig: JSONObject = guildModel
@@ -560,7 +561,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
         private suspend fun hasField(field: RequestChannelButton): Boolean {
             val guildModel = mainConfig.getGuildModel()
-            val config = guildModel.dedicated_channel?.config?.toJsonObject()
+            val config = guildModel.dedicated_channel.config?.toJsonObject()
             return config?.has(field.name.lowercase(Locale.getDefault())) ?: false
         }
     }

@@ -10,7 +10,9 @@ import api.routes.requestchannel.dto.ToggleRequestChannelButtonsDto
 import api.routes.requestchannel.responses.RequestChannelCreationResponse
 import io.ktor.http.*
 import io.ktor.util.logging.*
+import kotlinx.serialization.json.Json
 import main.commands.slashcommands.management.requestchannel.RequestChannelEditCommand
+import main.utils.database.mongodb.cache.redis.guild.RequestChannelConfigModel
 import main.utils.json.requestchannel.RequestChannelConfig
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.sharding.ShardManager
@@ -30,7 +32,8 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
                 message = "Success",
                 data = RequestChannelCreationResponse(
                     channel_id = channel.channelId.toString(),
-                    message_id = channel.messageId.toString()
+                    message_id = channel.messageId.toString(),
+                    config = RequestChannelConfigModel()
                 ).build()
             )
         } catch (e: InsufficientPermissionException) {
