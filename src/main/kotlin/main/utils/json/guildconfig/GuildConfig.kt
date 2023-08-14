@@ -21,13 +21,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
     suspend fun getTwentyFourSevenMode(): Boolean {
         val guildModel = getGuildModel()
-        val value = guildModel.twenty_four_seven_mode
-        return if (value == null) {
-            cache.updateGuild(guild.id) {
-                twenty_four_seven_mode = false
-            }
-            false
-        } else value
+        return guildModel.twenty_four_seven_mode
     }
 
     suspend fun setTwentyFourSevenMode(value: Boolean) {
@@ -55,14 +49,14 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
     private suspend fun getBannedUsers(): List<BannedUser> {
         return getGuildModel().banned_users
-            ?.map { user ->
+            .map { user ->
                 BannedUser(
                     user.banned_id,
                     user.banned_by,
                     user.banned_at,
                     user.banned_until
                 )
-            } ?: emptyList()
+            }
     }
 
     suspend fun getBannedUsersWithUnbanTimes(): HashMap<Long, Long> {
@@ -76,7 +70,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         require(!isBannedUser(uid)) { "This user is already banned!" }
 
         setFields {
-            banned_users?.add(
+            banned_users.add(
                 BannedUserModel(
                     uid,
                     modId,
@@ -91,7 +85,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         require(isBannedUser(uid)) { "This user isn't banned!" }
 
         setFields {
-            banned_users?.removeIf { user -> user.banned_id == uid }
+            banned_users.removeIf { user -> user.banned_id == uid }
         }
     }
 
