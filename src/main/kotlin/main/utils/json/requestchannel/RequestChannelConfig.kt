@@ -388,7 +388,8 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         if (!isChannelSet()) return@coroutineScope null
         val job = async {
             val msgRequest: RestAction<Message> = getMessageRequest() ?: return@async null
-            msgRequest.await()
+            val msg = msgRequest.await()
+            buttonUpdateRequest(msg).await()
         }
 
         return@coroutineScope job
@@ -396,65 +397,70 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
     suspend fun buttonUpdateRequest(msg: Message): MessageEditAction {
         val localeManager = LocaleManager.getLocaleManager(msg.guild)
-        val firstRow = ActionRow.of(
-            RequestChannelButton.firstRow
-                .filter { config.getState(it) }
-                .map { field ->
-                    Button.of(
-                        ButtonStyle.PRIMARY,
-                        field.id.toString(),
-                        field.emoji
+
+        val validFirstRowItems = RequestChannelButton.firstRow.filter { config.getState(it) }
+        val firstRow: ActionRow? = if (validFirstRowItems.isNotEmpty())
+            ActionRow.of(
+                validFirstRowItems
+                    .map { field ->
+                        Button.of(
+                            ButtonStyle.PRIMARY,
+                            field.id.toString(),
+                            field.emoji
+                        )
+                    }
+                    .toList()
+            ) else null
+
+        val validSecondRowItems = RequestChannelButton.secondRow.filter { config.getState(it) }
+        val secondRow: ActionRow? = if (validSecondRowItems.isNotEmpty())
+            ActionRow.of(
+                validSecondRowItems
+                    .map { field: RequestChannelButton ->
+                        Button.of(
+                            if ((field == RequestChannelButton.DISCONNECT)) ButtonStyle.DANGER else ButtonStyle.SECONDARY,
+                            field.id.toString(),
+                            field.emoji
+                        )
+                    }
+                    .toList()
+            ) else null
+
+        val thirdRow: ActionRow? = if (config.getState(RequestChannelButton.FILTERS))
+            ActionRow.of(
+                StringSelectionMenuBuilder(
+                    _name = RequestChannelButton.FILTERS.id.toString(),
+                    placeholder = LocaleManager.getLocaleManager(msg.guild)
+                        .getMessage(FilterMessages.FILTER_SELECT_PLACEHOLDER),
+                    range = Pair(0, 5),
+                    _options = listOf(
+                        StringSelectMenuOption(
+                            localeManager.getMessage(FilterMessages.EIGHT_D),
+                            "${RequestChannelButton.FILTERS.id}:8d"
+                        ),
+                        StringSelectMenuOption(
+                            localeManager.getMessage(FilterMessages.KARAOKE),
+                            "${RequestChannelButton.FILTERS.id}:karaoke"
+                        ),
+                        StringSelectMenuOption(
+                            localeManager.getMessage(FilterMessages.NIGHTCORE),
+                            "${RequestChannelButton.FILTERS.id}:nightcore"
+                        ),
+                        StringSelectMenuOption(
+                            localeManager.getMessage(FilterMessages.TREMOLO),
+                            "${RequestChannelButton.FILTERS.id}:tremolo"
+                        ),
+                        StringSelectMenuOption(
+                            localeManager.getMessage(FilterMessages.VIBRATO),
+                            "${RequestChannelButton.FILTERS.id}:vibrato"
+                        )
                     )
-                }
-                .toList()
+                ).build()
+            ) else null
+
+        return msg.editMessageComponents(
+            listOfNotNull(firstRow, secondRow, thirdRow)
         )
-        val secondRow: ActionRow = ActionRow.of(
-            RequestChannelButton.secondRow
-                .filter { field: RequestChannelButton -> config.getState(field) }
-                .map { field: RequestChannelButton ->
-                    Button.of(
-                        if ((field == RequestChannelButton.DISCONNECT)) ButtonStyle.DANGER else ButtonStyle.SECONDARY,
-                        field.id.toString(),
-                        field.emoji
-                    )
-                }
-                .toList()
-        )
-        val thirdRow: ActionRow = ActionRow.of(
-            StringSelectionMenuBuilder(
-                _name = RequestChannelButton.FILTERS.id.toString(),
-                placeholder = LocaleManager.getLocaleManager(msg.guild)
-                    .getMessage(FilterMessages.FILTER_SELECT_PLACEHOLDER),
-                range = Pair(0, 5),
-                _options = listOf(
-                    StringSelectMenuOption(
-                        localeManager.getMessage(FilterMessages.EIGHT_D),
-                        "${RequestChannelButton.FILTERS.id}:8d"
-                    ),
-                    StringSelectMenuOption(
-                        localeManager.getMessage(FilterMessages.KARAOKE),
-                        "${RequestChannelButton.FILTERS.id}:karaoke"
-                    ),
-                    StringSelectMenuOption(
-                        localeManager.getMessage(FilterMessages.NIGHTCORE),
-                        "${RequestChannelButton.FILTERS.id}:nightcore"
-                    ),
-                    StringSelectMenuOption(
-                        localeManager.getMessage(FilterMessages.TREMOLO),
-                        "${RequestChannelButton.FILTERS.id}:tremolo"
-                    ),
-                    StringSelectMenuOption(
-                        localeManager.getMessage(FilterMessages.VIBRATO),
-                        "${RequestChannelButton.FILTERS.id}:vibrato"
-                    )
-                )
-            ).build()
-        )
-        return if (config.getState(RequestChannelButton.FILTERS)) msg.editMessageComponents(
-            firstRow,
-            secondRow,
-            thirdRow
-        ) else msg.editMessageComponents(firstRow, secondRow)
     }
 
     suspend fun updateTopic(): Deferred<Void>? = coroutineScope {

@@ -38,8 +38,8 @@ object RobertifyAudioManager {
     val musicManagers: MutableMap<Long, GuildMusicManager> = Collections.synchronizedMap(mutableMapOf())
     val playerManager: AudioPlayerManager
     private val spotifySourceManager: SpotifySourceManager
-    private val deezerAudioSourceManager: DeezerAudioSourceManager
-    private val appleMusicSourceManager: AppleMusicSourceManager
+    private var deezerAudioSourceManager: DeezerAudioSourceManager? = null
+    private var appleMusicSourceManager: AppleMusicSourceManager? = null
 //    private val resumeSourceManager: ResumeSourceManager
 
     init {
@@ -51,15 +51,29 @@ object RobertifyAudioManager {
             "us",
             playerManager
         )
-        deezerAudioSourceManager = DeezerAudioSourceManager(Config.DEEZER_ACCESS_TOKEN)
-        appleMusicSourceManager = AppleMusicSourceManager(Config.providers, null, "us", playerManager)
+
+
 //        resumeSourceManager = ResumeSourceManager(playerManager)
 
         AudioSourceManagers.registerLocalSource(playerManager)
 //        playerManager.registerSourceManager(resumeSourceManager)
         playerManager.registerSourceManager(spotifySourceManager)
-        playerManager.registerSourceManager(deezerAudioSourceManager)
-        playerManager.registerSourceManager(appleMusicSourceManager)
+
+        if (Config.DEEZER_ACCESS_TOKEN.isNotEmpty()) {
+            deezerAudioSourceManager = DeezerAudioSourceManager(Config.DEEZER_ACCESS_TOKEN)
+            playerManager.registerSourceManager(deezerAudioSourceManager)
+        }
+
+        if (Config.APPLE_MUSIC_MEDIA_TOKEN.isNotEmpty()) {
+            appleMusicSourceManager = AppleMusicSourceManager(
+                Config.providers,
+                Config.APPLE_MUSIC_MEDIA_TOKEN,
+                "us",
+                playerManager
+            )
+            playerManager.registerSourceManager(appleMusicSourceManager)
+        }
+
         AudioSourceManagers.registerRemoteSources(playerManager)
     }
 

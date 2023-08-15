@@ -18,7 +18,7 @@ fun RequestValidationConfig.validateToggleRequestChannelButtonsDto() {
         dto.buttons.forEach { s ->
             when (s.lowercase()) {
                 "previous", "rewind", "stop",
-                "pnp", "skip", "favourite", "loop",
+                "pnp", "play_pause", "skip", "favourite", "loop",
                 "shuffle", "disconnect", "filters" -> ValidationResult.Valid
 
                 else -> return@validate ValidationResult.Invalid("$s is an invalid button!")

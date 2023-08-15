@@ -23,6 +23,7 @@ enum class ENV(private val str: String) {
     PREFIX("prefix"),
     SPOTIFY_CLIENT_ID("spotify_client_id"),
     SPOTIFY_CLIENT_SECRET("spotify_client_secret"),
+    APPLE_MUSIC_MEDIA_TOKEN("apple_music_media_token"),
     DEEZER_ACCESS_TOKEN("deezer_access_token"),
     IMGUR_CLIENT("imgur_client"),
     IMGUR_SECRET("imgur_secret"),

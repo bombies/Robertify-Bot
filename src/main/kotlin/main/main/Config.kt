@@ -125,6 +125,8 @@ class Config {
         val SPOTIFY_CLIENT_SECRET: String
             get() = get(ENV.SPOTIFY_CLIENT_SECRET)
 
+        val APPLE_MUSIC_MEDIA_TOKEN: String = get(ENV.APPLE_MUSIC_MEDIA_TOKEN)
+
         val DEEZER_ACCESS_TOKEN: String
             get() = get(ENV.DEEZER_ACCESS_TOKEN)
 

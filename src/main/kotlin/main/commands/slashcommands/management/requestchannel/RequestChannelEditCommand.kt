@@ -275,7 +275,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                     localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND)
             }
 
-            "pnp", "play_and_pause" -> {
+            "pnp", "play_and_pause", "play_pause" -> {
                 field = RequestChannelButton.PLAY_PAUSE
                 button =
                     localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE)
