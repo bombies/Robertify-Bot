@@ -55,7 +55,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
             )
 
         RequestChannelEditCommand()
-            .handleChannelButtonToggle(guild, dto.button.lowercase(), shardManager = shardManager)
+            .handleChannelButtonToggle(guild, listOf(dto.button.lowercase()), shardManager = shardManager)
             ?.await()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
     }
@@ -70,11 +70,12 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
                 status = HttpStatusCode.BadRequest
             )
 
-        dto.buttons.forEach { button ->
-            RequestChannelEditCommand()
-                .handleChannelButtonToggle(guild, button.lowercase(), shardManager = shardManager)
-                ?.await()
-        }
+        RequestChannelEditCommand()
+            .handleChannelButtonToggle(
+                guild,
+                dto.buttons.map { it.lowercase() },
+                shardManager = shardManager
+            )
 
         return OkResponse("Successfully toggled the ${dto.buttons.joinToString(", ")} buttons in ${guild.name}")
     }

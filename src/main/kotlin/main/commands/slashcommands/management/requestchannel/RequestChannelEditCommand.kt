@@ -247,104 +247,100 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         }
 
         event.deferReply().queue()
-        handleChannelButtonToggle(guild, buttonName, event)?.await()
+        handleChannelButtonToggle(guild, listOf(buttonName), event)?.await()
     }
 
     suspend fun handleChannelButtonToggle(
         guild: Guild,
-        buttonName: String,
+        buttonNames: List<String>,
         event: ButtonInteractionEvent? = null,
         shardManager: ShardManager = Robertify.shardManager
     ): Deferred<Message?>? {
         val localeManager = LocaleManager[guild]
         val config = RequestChannelConfig(guild, shardManager)
         val subConfig = config.config
-        val field: RequestChannelButton
-        val button: String
+        val fields: MutableList<RequestChannelButton> = mutableListOf()
+        val buttons: MutableList<String> = mutableListOf()
 
-        when (buttonName) {
-            "previous" -> {
-                field = RequestChannelButton.PREVIOUS
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS)
+        buttonNames.forEach { buttonName ->
+            when (buttonName) {
+                "previous" -> {
+                    fields.add(RequestChannelButton.PREVIOUS)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PREVIOUS))
+                }
+
+                "rewind" -> {
+                    fields.add(RequestChannelButton.REWIND)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND))
+                }
+
+                "pnp", "play_and_pause", "play_pause" -> {
+                    fields.add(RequestChannelButton.PLAY_PAUSE)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE))
+                }
+
+                "stop" -> {
+                    fields.add(RequestChannelButton.STOP)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_STOP))
+                }
+
+                "skip" -> {
+                    fields.add(RequestChannelButton.SKIP)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP))
+                }
+
+                "favourite" -> {
+                    fields.add(RequestChannelButton.FAVOURITE)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE))
+                }
+
+                "loop" -> {
+                    fields.add(RequestChannelButton.LOOP)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP))
+                }
+
+                "shuffle" -> {
+                    fields.add(RequestChannelButton.SHUFFLE)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE))
+                }
+
+                "disconnect" -> {
+                    fields.add(RequestChannelButton.DISCONNECT)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT))
+                }
+
+                "filters" -> {
+                    fields.add(RequestChannelButton.FILTERS)
+                    buttons.add(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS))
+
+                }
+
+                else -> throw IllegalArgumentException("The button ID \"${event?.button?.id!!}\" doesn't map to a case to be handled!")
             }
-
-            "rewind" -> {
-                field = RequestChannelButton.REWIND
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_REWIND)
-            }
-
-            "pnp", "play_and_pause", "play_pause" -> {
-                field = RequestChannelButton.PLAY_PAUSE
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_PLAY_AND_PAUSE)
-            }
-
-            "stop" -> {
-                field = RequestChannelButton.STOP
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_STOP)
-            }
-
-            "skip" -> {
-                field = RequestChannelButton.SKIP
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SKIP)
-            }
-
-            "favourite" -> {
-                field = RequestChannelButton.FAVOURITE
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FAVOURITE)
-            }
-
-            "loop" -> {
-                field = RequestChannelButton.LOOP
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_LOOP)
-            }
-
-            "shuffle" -> {
-                field = RequestChannelButton.SHUFFLE
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_SHUFFLE)
-            }
-
-            "disconnect" -> {
-                field = RequestChannelButton.DISCONNECT
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_DISCONNECT)
-            }
-
-            "filters" -> {
-                field = RequestChannelButton.FILTERS
-                button =
-                    localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_FILTERS)
-            }
-
-            else -> throw IllegalArgumentException("The button ID \"${event?.button?.id!!}\" doesn't map to a case to be handled!")
         }
 
-        if (subConfig.getState(field)) {
-            subConfig.setState(field, false)
-            event?.hook?.sendEmbed(guild) {
-                embed(
-                    DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                    Pair("{button}", button),
-                    Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
-                )
-            }?.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
-        } else {
-            subConfig.setState(field, true)
-            event?.hook?.sendEmbed(guild) {
-                embed(
-                    DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
-                    Pair("{button}", button),
-                    Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
-                )
-            }?.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
-        }
+        subConfig.toggleStates(fields)
+
+        if (event != null)
+            fields.forEachIndexed { i, field ->
+                if (subConfig.getState(field)) {
+                    event.hook.sendEmbed(guild) {
+                        embed(
+                            DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                            Pair("{button}", buttons[i]),
+                            Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
+                        )
+                    }.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
+                } else {
+                    event.hook.sendEmbed(guild) {
+                        embed(
+                            DedicatedChannelMessages.DEDICATED_CHANNEL_BUTTON_TOGGLE,
+                            Pair("{button}", buttons[i]),
+                            Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
+                        )
+                    }.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
+                }
+            }
 
         return config.updateButtons()
     }

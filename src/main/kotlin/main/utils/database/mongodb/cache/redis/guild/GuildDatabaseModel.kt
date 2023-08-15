@@ -76,7 +76,7 @@ data class GuildDatabaseModel(
             .put(GuildDB.Field.GUILD_ID.toString(), server_id)
             .put(GuildDB.Field.GUILD_PREFIX.toString(), prefix)
             .put(GuildDB.Field.ANNOUNCEMENT_CHANNEL.toString(), announcement_channel)
-            .put(GuildDB.Field.BANNED_USERS_ARRAY.toString(), banned_users.map { it.toJsonObject()})
+            .put(GuildDB.Field.BANNED_USERS_ARRAY.toString(), banned_users.map { it.toJsonObject() })
             .put(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString(), dedicated_channel.toJsonObject())
             .put(GuildDB.Field.PERMISSIONS_OBJECT.toString(), permissions.toJsonObject())
             .put(GuildDB.Field.RESTRICTED_CHANNELS_OBJECT.toString(), restricted_channels.toJsonObject())
@@ -123,6 +123,23 @@ data class RequestChannelModel(
             .put(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString(), config?.toJsonObject())
             .put("og_announcement_toggle", og_announcement_toggle)
     }
+
+    fun config(block: RequestChannelConfigModelOptional.() -> Unit) {
+        val configStandIn = RequestChannelConfigModelOptional()
+        block(configStandIn)
+        config = RequestChannelConfigModel(
+            configStandIn.disconnect ?: config?.disconnect ?: true,
+            configStandIn.play_pause ?: config?.play_pause ?: true,
+            configStandIn.previous ?: config?.previous ?: true,
+            configStandIn.rewind ?: config?.rewind ?: true,
+            configStandIn.stop ?: config?.stop ?: true,
+            configStandIn.loop ?: config?.loop ?: true,
+            configStandIn.skip ?: config?.skip ?: true,
+            configStandIn.filters ?: config?.filters ?: false,
+            configStandIn.favourite ?: config?.favourite ?: true,
+            configStandIn.shuffle ?: config?.shuffle ?: true,
+        )
+    }
 }
 
 @Serializable
@@ -137,6 +154,35 @@ data class RequestChannelConfigModel(
     var filters: Boolean = false,
     var favourite: Boolean = true,
     var shuffle: Boolean = true,
+) : JsonObjectTransferable {
+
+    override fun toJsonObject(): JSONObject {
+        return JSONObject()
+            .put("disconnect", disconnect)
+            .put("play_pause", play_pause)
+            .put("previous", previous)
+            .put("rewind", rewind)
+            .put("stop", stop)
+            .put("loop", loop)
+            .put("skip", skip)
+            .put("filters", filters)
+            .put("shuffle", shuffle)
+            .put("favourite", favourite)
+    }
+}
+
+@Serializable
+data class RequestChannelConfigModelOptional(
+    var disconnect: Boolean? = null,
+    var play_pause: Boolean? = null,
+    var previous: Boolean? = null,
+    var rewind: Boolean? = null,
+    var stop: Boolean? = null,
+    var loop: Boolean? = null,
+    var skip: Boolean? = null,
+    var filters: Boolean? = null,
+    var favourite: Boolean? = null,
+    var shuffle: Boolean? = null,
 ) : JsonObjectTransferable {
 
     override fun toJsonObject(): JSONObject {

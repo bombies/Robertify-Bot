@@ -18,6 +18,7 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.selectionmenu.StringSelectMenuOption
 import main.utils.component.interactions.selectionmenu.StringSelectionMenuBuilder
 import main.utils.database.mongodb.cache.redis.guild.RequestChannelConfigModel
+import main.utils.database.mongodb.cache.redis.guild.RequestChannelConfigModelOptional
 import main.utils.database.mongodb.cache.redis.guild.RequestChannelModel
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
@@ -546,6 +547,64 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
                 .put(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString(), config)
             mainConfig.updateConfig(fullConfig)
+        }
+
+        suspend fun toggleStates(buttons: List<RequestChannelButton>) {
+            val guildModel = mainConfig.getGuildModel()
+            val config = guildModel.dedicated_channel.config!!
+            cache.updateGuild(guildModel.server_id.toString()) {
+                dedicated_channel {
+                    config {
+                        if (buttons.contains(RequestChannelButton.FILTERS)) {
+                            filters = !config.filters
+                        }
+
+                        if (buttons.contains(RequestChannelButton.DISCONNECT)) {
+                            disconnect = !config.disconnect
+                        }
+
+                        if (buttons.contains(RequestChannelButton.SKIP)) {
+                            skip = !config.skip
+                        }
+
+                        if (buttons.contains(RequestChannelButton.PREVIOUS)) {
+                            previous = !config.previous
+                        }
+
+                        if (buttons.contains(RequestChannelButton.REWIND)) {
+                            rewind = !config.rewind
+                        }
+
+                        if (buttons.contains(RequestChannelButton.PLAY_PAUSE)) {
+                            play_pause = !config.play_pause
+                        }
+
+                        if (buttons.contains(RequestChannelButton.STOP)) {
+                            stop = !config.stop
+                        }
+
+                        if (buttons.contains(RequestChannelButton.LOOP)) {
+                            loop = !config.loop
+                        }
+
+                        if (buttons.contains(RequestChannelButton.SHUFFLE)) {
+                            shuffle = !config.shuffle
+                        }
+
+                        if (buttons.contains(RequestChannelButton.DISCONNECT)) {
+                            disconnect = !config.disconnect
+                        }
+
+                        if (buttons.contains(RequestChannelButton.FAVOURITE)) {
+                            favourite = !config.favourite
+                        }
+
+                        if (buttons.contains(RequestChannelButton.FILTERS)) {
+                            filters = !config.filters
+                        }
+                    }
+                }
+            }
         }
 
         private suspend fun initConfig() {
