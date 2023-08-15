@@ -360,6 +360,9 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     }
 
     suspend fun updateAll() {
+        if (!isChannelSet())
+            return
+
         try {
             val messageUpdate = updateMessage()
             val buttonUpdate = updateButtons()
