@@ -46,6 +46,7 @@ import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
 import org.yaml.snakeyaml.reader.ReaderException
 import java.util.*
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object Robertify {
@@ -113,7 +114,7 @@ object Robertify {
         val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
         val context = dispatcher + supervisor + handler
         val scope = CoroutineScope(context)
-        coroutineEventManager = CoroutineEventManager(scope, 30.seconds)
+        coroutineEventManager = CoroutineEventManager(scope, 3.minutes)
         coroutineEventManager.handleShardReady()
         coroutineEventManager.handleGuildReady()
         coroutineEventManager.listener<ShutdownEvent> {
