@@ -23,6 +23,7 @@ import main.events.EventManager
 import main.main.Listener.Companion.loadNeededSlashCommands
 import main.main.Listener.Companion.rescheduleUnbans
 import main.utils.GeneralUtils
+import main.utils.GeneralUtils.isNull
 import main.utils.api.robertify.RobertifyApi
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
@@ -206,29 +207,31 @@ object Robertify {
         BotDBCache.instance.lastStartup = System.currentTimeMillis()
         jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
 
-        logger.info("Setting up LavaKord...")
-        val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
-        lavaKord = shardManager.lavakord(
-            lavakordShardManager, dispatcher + supervisor + handler, options = MutableLavaKordOptions(
-                link = MutableLavaKordOptions.LinkConfig(
-                    showTrace = true
+        if (!Robertify::lavaKord.isInitialized) {
+            logger.info("Setting up LavaKord...")
+            val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
+            lavaKord = shardManager.lavakord(
+                lavakordShardManager, dispatcher + supervisor + handler, options = MutableLavaKordOptions(
+                    link = MutableLavaKordOptions.LinkConfig(
+                        showTrace = true
+                    )
                 )
-            )
-        ) {
-            plugins {
-                install(LavaSrc)
+            ) {
+                plugins {
+                    install(LavaSrc)
+                }
             }
-        }
 
-        Config.LAVA_NODES.forEach { node ->
-            lavaKord.addNode(
-                serverUri = node.uri.toString(),
-                password = node.password,
-                name = node.name
-            )
-            logger.info("Registered lava node with address: ${node.uri}")
+            Config.LAVA_NODES.forEach { node ->
+                lavaKord.addNode(
+                    serverUri = node.uri.toString(),
+                    password = node.password,
+                    name = node.name
+                )
+                logger.info("Registered lava node with address: ${node.uri}")
+            }
+            logger.info("LavaKord ready")
         }
-        logger.info("LavaKord ready")
 
         shardManager.guildCache.forEach { guild ->
             RequestChannelConfig(guild).updateMessage()?.await()
