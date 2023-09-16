@@ -67,7 +67,7 @@ abstract class RedisCache protected constructor(cacheID: String) {
 
     protected open suspend fun get(identifier: String): String? = coroutineScope {
         val item = jedis.get(cacheID + identifier)
-        return@coroutineScope item.ifBlank { null }
+        return@coroutineScope if (item == "nil") null else item
     }
 
     protected open suspend fun get(identifier: Long): String? {
