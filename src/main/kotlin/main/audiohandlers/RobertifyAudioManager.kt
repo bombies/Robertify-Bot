@@ -217,7 +217,7 @@ object RobertifyAudioManager {
         hookMessage: InteractionHook? = null
     ): Boolean {
         try {
-            require(!GuildConfig(musicManager.guild).getTwentyFourSevenMode() && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
+            require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
                     val guild = musicManager.guild
