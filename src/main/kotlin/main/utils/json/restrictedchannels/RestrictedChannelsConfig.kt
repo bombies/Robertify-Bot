@@ -1,11 +1,15 @@
 package main.utils.json.restrictedchannels
 
+import dev.minn.jda.ktx.util.SLF4J
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.getIndexOfObjectInArray
 import net.dv8tion.jda.api.entities.Guild
 
 class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
+    companion object {
+        private val logger by SLF4J
+    }
 
     suspend fun addChannel(channelID: Long, type: ChannelType?) {
         val configField: GuildDB.Field = when (type) {
