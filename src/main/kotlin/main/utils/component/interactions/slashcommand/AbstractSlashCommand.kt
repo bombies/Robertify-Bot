@@ -4,6 +4,7 @@ import com.influxdb.exceptions.InfluxException
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
+import dev.minn.jda.ktx.events.onCommand
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import main.audiohandlers.RobertifyAudioManager
@@ -109,7 +110,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
                         }
                     }
                     .handle(ErrorResponse.MISSING_ACCESS) {
-                        logger.warn("I wasn't update to update commands in ${guild.name}!")
+                        logger.warn("I wasn't able update to update commands in ${guild.name}!")
                     }
             )
         }
@@ -184,10 +185,13 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
     }
 
     fun register(shardManager: ShardManager) {
-        onEvent<SlashCommandInteractionEvent>(shardManager) { event ->
+        shardManager.onCommand(this.info.name) { event ->
+            if (event !is SlashCommandInteractionEvent)
+                return@onCommand
+
             val checks = checks(event)
             if (!checks)
-                return@onEvent
+                return@onCommand
 
             handle(event)
 

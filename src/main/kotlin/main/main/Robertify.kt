@@ -6,6 +6,8 @@ import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
+import dev.minn.jda.ktx.events.listener
+import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.minn.jda.ktx.util.SLF4J
 import dev.schlaubi.lavakord.LavaKord
 import dev.schlaubi.lavakord.MutableLavaKordOptions
@@ -62,8 +64,6 @@ object Robertify {
         private set
     lateinit var externalApi: RobertifyApi
         private set
-    lateinit var coroutineEventManager: CoroutineEventManager
-        private set
 
     private val lavakordShardManager = LavaKordShardManager()
 
@@ -111,26 +111,16 @@ object Robertify {
         GuildRedisCache.ins.loadAllGuilds()
         logger.info("All guilds have been loaded into cache.")
 
-        // Setup custom coroutine event manager
-        val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
-        val context = dispatcher + supervisor + handler
-        val scope = CoroutineScope(context)
-        coroutineEventManager = CoroutineEventManager(scope, 3.minutes)
-        coroutineEventManager.handleShardReady()
-        coroutineEventManager.handleGuildReady()
-        coroutineEventManager.listener<ShutdownEvent> {
-            supervisor.cancel()
-        }
-
         // Build bot connection
         logger.info("Building shard manager...")
+
         val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
             Config.BOT_TOKEN,
             listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
         )
             .apply {
                 setShardsTotal(Config.SHARD_COUNT)
-                setEventManagerProvider { coroutineEventManager }
+                injectKTX()
                 setBulkDeleteSplittingEnabled(false)
                 enableCache(CacheFlag.VOICE_STATE)
                 disableCache(
@@ -168,13 +158,14 @@ object Robertify {
         shardManagerBuilder.applyLavakord(lavakordShardManager)
         shardManager = shardManagerBuilder.build()
         logger.info("Successfully built shard manager")
+        shardManager.handleShardReady()
+        shardManager.handleGuildReady()
 
         val slashCommandManager = SlashCommandManager
         shardManager.registerCommands(
             slashCommandManager.guildCommands
                 .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
         )
-
         logger.info("Registered all slash commands.")
 
         EventManager.registeredEvents
@@ -201,7 +192,7 @@ object Robertify {
         RobertifyKtorApi.start()
     }
 
-    private fun CoroutineEventManager.handleShardReady() = listener<ReadyEvent> { event ->
+    private fun ShardManager.handleShardReady() = listener<ReadyEvent> { event ->
         val jda = event.jda
         logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
         BotDBCache.instance.lastStartup = System.currentTimeMillis()
@@ -238,17 +229,14 @@ object Robertify {
         }
     }
 
-    private fun CoroutineEventManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
+    private fun ShardManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
         val guild = event.guild
-        launch {
-            val locale = LocaleConfig(guild).getLocale()
-            try {
-                LocaleManager[guild].setLocale(locale)
-            } catch (e: ReaderException) {
-                logger.error("I couldn't set the locale for ${guild.name}")
-            }
+        val locale = LocaleConfig(guild).getLocale()
+        try {
+            LocaleManager[guild].setLocale(locale)
+        } catch (e: ReaderException) {
+            logger.error("I couldn't set the locale for ${guild.name}")
         }
-
         loadNeededSlashCommands(guild)
         rescheduleUnbans(guild)
         RemindersConfig(guild).scheduleReminders()

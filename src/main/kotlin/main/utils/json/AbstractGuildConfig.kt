@@ -24,8 +24,6 @@ abstract class AbstractGuildConfig protected constructor(private val guild: Guil
     abstract suspend fun update()
 
     protected suspend fun getGuildModel(): GuildDatabaseModel {
-        if (!guildHasInfo())
-            loadGuild()
         return cache.getGuildModel(guild.id)!!
     }
 

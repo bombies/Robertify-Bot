@@ -1,6 +1,7 @@
 package main.utils
 
 import dev.minn.jda.ktx.coroutines.await
+import dev.minn.jda.ktx.events.getDefaultScope
 import kotlinx.coroutines.*
 import main.constants.RobertifyPermission
 import main.constants.RobertifyEmoji
@@ -688,7 +689,7 @@ object GeneralUtils {
         queueAfter(duration.inWholeSeconds, TimeUnit.SECONDS, success, failure)
 
     suspend fun <T> RestAction<T>.queueCoroutine(
-        context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
+        context: CoroutineContext = getDefaultScope().coroutineContext,
         duration: kotlin.time.Duration = kotlin.time.Duration.ZERO,
         onSuccess: (suspend (item: T) -> Unit)? = null
     ) {

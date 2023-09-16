@@ -50,8 +50,8 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
     suspend fun getRestrictedChannels(type: ChannelType?): List<Long> {
         val obj = getGuildModel().restricted_channels
         return when (type) {
-            ChannelType.TEXT_CHANNEL -> obj?.text_channels ?: emptyList()
-            ChannelType.VOICE_CHANNEL -> obj?.voice_channels ?: emptyList()
+            ChannelType.TEXT_CHANNEL -> obj.text_channels
+            ChannelType.VOICE_CHANNEL -> obj.voice_channels
             else -> throw IllegalArgumentException("Invalid type!")
         }
     }

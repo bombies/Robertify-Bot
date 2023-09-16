@@ -8,6 +8,8 @@ import main.constants.RobertifyTheme
 import main.constants.Toggle
 import main.constants.database.RobertifyMongoDatabase
 import main.main.Config
+import main.utils.GeneralUtils
+import main.utils.GeneralUtils.isDiscordId
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.DocumentBuilder
 import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
@@ -34,11 +36,20 @@ object GuildDB :
         else -> removeDocument(doc)
     }
 
-    fun findGuild(gid: Long): Document? = findSpecificDocument(Field.GUILD_ID, gid)
+    fun findGuild(gid: Long): Document? = try {
+        findSpecificDocument(Field.GUILD_ID, gid)
+    } catch (e: NoSuchElementException) {
+        null
+    }
 
     fun updateGuild(newInfo: GuildDatabaseModel) {
         val document = findGuild(newInfo.server_id)
-            ?: throw java.lang.NullPointerException("There was no document found with guild id: ${newInfo.server_id}")
+            ?: run {
+                if (newInfo.server_id.toString().isDiscordId()) {
+                    addGuild(newInfo.server_id)
+                    findGuild(newInfo.server_id)!!
+                } else throw NullPointerException("There is no guild document with ID ${newInfo.server_id} and the ID provided is an invalid Discord ID!")
+            }
         upsertDocument(document, Document.parse(newInfo.toJsonObject().toString()))
     }
 

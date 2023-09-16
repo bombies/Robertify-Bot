@@ -36,7 +36,7 @@ class Listener : AbstractEventController() {
          * @param guild The guild to load the commands in
          */
         internal fun loadNeededSlashCommands(guild: Guild) {
-            loadSlashCommands(guild)
+
         }
 
         internal fun unloadCommands(guild: Guild, vararg commandNames: String) {
