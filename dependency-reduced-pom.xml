@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.bombies</groupId>
   <artifactId>Robertify</artifactId>
-  <version>5.2.9</version>
+  <version>5.2.10</version>
   <build>
     <plugins>
       <plugin>
@@ -84,7 +84,7 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
-      <version>5.9.2</version>
+      <version>5.9.3</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

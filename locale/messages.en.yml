@@ -390,7 +390,7 @@ poll_ended: "**{question}** [ENDED]\n\n"
 
 # REMINDER MESSAGES
 reminders_embed_title: "Reminders"
-cannot_set_banned_reminder_channel: "You cannot ser the reminder channel to {channel} as it is banned!"
+cannot_set_banned_reminder_channel: "You cannot set the reminder channel to {channel} as it is banned!"
 reminder_invalid_time_format: "Invalid time format!\n\n**Correct Format**: `00:00AM/PM` **__OR__** `00:00` *(24-hour format)*"
 reminder_added: "Successfully added your reminder!"
 no_reminders: "You do not have any reminders!"
@@ -511,3 +511,22 @@ history_embed_title: "History"
 
 # DUPLICATE MESSAGES
 removed_duplicates: "You have removed all duplicate tracks from the queue. (If there are any)"
+
+# SUGGESTION MESSAGES
+suggestion_modal_placeholder: "SUGGESTIONS MADE WILL BE FOR THE BOT ITSELF, NOT FOR THE SERVER THE BOT IS IN."
+suggestion_modal_label: "Suggestion"
+suggestion_modal_title: "Make a suggestion"
+suggestion_submitted: "You have successfully submitted your suggestion!"
+invalid_suggestion: "That is an invalid suggestion!"
+suggestion_user_banned: "You are banned from sending suggestions!"
+default_accept_reason: "Your suggestion has been accepted!"
+default_deny_reason: "Your suggestion has been denied!"
+feature_unavailable: "This feature is unavailable right now!"
+
+# OTHER MESSAGES I'M TOO LAZY TO ORGANIZE
+reminder_insufficient_permissions: "I do not have enough permissions to send your reminder in: {channel}"
+reminder_user_insufficient_permissions: "You do not have enough permissions to send your reminder in: {channel}"
+attempting_to_join: "Attempting to join {channel}..."
+couldnt_remove_name: "I could not remove track with name `{name}` from the queue. It doesn't exist!"
+queue_search_nothing_found: "I couldn't find any track for the query: `{title} by {author}`"
+queue_search_item_found: "**Title:** `{title}` \n**Author:** `{author}` \n**Duration:** `{duration}` \n**Position in Queue**: `{position}` \n**Requested By**: {requester}"
