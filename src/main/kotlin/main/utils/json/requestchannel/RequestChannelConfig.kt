@@ -167,10 +167,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             throw IllegalArgumentException(
                 "${shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
             )
-
-        getTextChannel()
-            ?.delete()
-            ?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        try {
+            getTextChannel()
+                ?.delete()
+                ?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        } catch (e: InsufficientPermissionException) {
+            logger.warn("Could not delete Discord request channel in ${guild.name} (${guild.idLong})")
+        }
 
         cache.updateGuild(guild.id) {
             dedicated_channel {

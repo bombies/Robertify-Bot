@@ -8,6 +8,8 @@ import dev.schlaubi.lavakord.audio.player.Player
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import main.audiohandlers.models.Requester
 import main.audiohandlers.utils.artworkUrl
 import main.audiohandlers.utils.author
@@ -114,6 +116,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             .launchIn(player.coroutineScope)
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     private suspend fun onTrackStart(event: TrackStartEvent) {
         val track = event.track
 
@@ -183,7 +186,11 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             img = NowPlayingImageBuilder(
                 artistName = track.author,
                 title = track.title,
-                albumImage = track.artworkUrl ?: defaultBackgroundImage,
+                albumImage = try {
+                    track.artworkUrl ?: defaultBackgroundImage
+                } catch (e: MissingFieldException) {
+                    defaultBackgroundImage
+                },
                 requesterName = requesterUser.name,
                 requesterAvatar = requesterUser.avatarUrl
             ).build() ?: throw NullPointerException("The generated image was null!")
@@ -390,7 +397,6 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         if (nextTrack != null) {
             logger.debug("Retrieved {} and attempting to play", nextTrack.info.title)
             player.playTrack(nextTrack)
-
         } else {
             if (lastTrack != null
                 && AutoPlayConfig(guild).getStatus()

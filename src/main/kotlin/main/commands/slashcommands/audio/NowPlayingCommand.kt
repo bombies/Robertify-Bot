@@ -2,6 +2,8 @@ package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.*
 import main.constants.Toggle
@@ -37,6 +39,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         val logger by SLF4J
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
 
@@ -88,8 +91,11 @@ class NowPlayingCommand : AbstractSlashCommand(
                 val builder = NowPlayingImageBuilder(
                     title = track!!.title,
                     artistName = track.author,
-                    albumImage = track.artworkUrl
-                        ?: defaultImage
+                    albumImage = try {
+                        track.artworkUrl ?: defaultImage
+                    } catch (e: MissingFieldException) {
+                        defaultImage
+                    }
                 )
 
                 val image = if (!track.isStream)

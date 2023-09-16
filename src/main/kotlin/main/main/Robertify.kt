@@ -131,7 +131,9 @@ object Robertify {
                     CacheFlag.ROLE_TAGS,
                     CacheFlag.ONLINE_STATUS,
                     CacheFlag.STICKER,
-                    CacheFlag.SCHEDULED_EVENTS
+                    CacheFlag.SCHEDULED_EVENTS,
+                    CacheFlag.MEMBER_OVERRIDES,
+                    CacheFlag.FORUM_TAGS
                 )
                 setActivity(Activity.listening("Starting up..."))
 
