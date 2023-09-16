@@ -6,6 +6,7 @@ import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.minn.jda.ktx.events.CoroutineEventManager
+import dev.minn.jda.ktx.events.getDefaultScope
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.minn.jda.ktx.util.SLF4J
@@ -158,6 +159,30 @@ object Robertify {
         shardManagerBuilder.applyLavakord(lavakordShardManager)
         shardManager = shardManagerBuilder.build()
         logger.info("Successfully built shard manager")
+
+        logger.info("Setting up LavaKord...")
+        lavaKord = shardManager.lavakord(
+            lavakordShardManager, getDefaultScope().coroutineContext, options = MutableLavaKordOptions(
+                link = MutableLavaKordOptions.LinkConfig(
+                    showTrace = true
+                )
+            )
+        ) {
+            plugins {
+                install(LavaSrc)
+            }
+        }
+
+        Config.LAVA_NODES.forEach { node ->
+            lavaKord.addNode(
+                serverUri = node.uri.toString(),
+                password = node.password,
+                name = node.name
+            )
+            logger.info("Registered lava node with address: ${node.uri}")
+        }
+        logger.info("LavaKord ready")
+
         shardManager.handleShardReady()
         shardManager.handleGuildReady()
 
@@ -198,34 +223,8 @@ object Robertify {
         BotDBCache.instance.lastStartup = System.currentTimeMillis()
         jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
 
-        if (!Robertify::lavaKord.isInitialized) {
-            logger.info("Setting up LavaKord...")
-            val (dispatcher, supervisor, handler) = GeneralUtils.generateHandleCoroutineContextComponents()
-            lavaKord = shardManager.lavakord(
-                lavakordShardManager, dispatcher + supervisor + handler, options = MutableLavaKordOptions(
-                    link = MutableLavaKordOptions.LinkConfig(
-                        showTrace = true
-                    )
-                )
-            ) {
-                plugins {
-                    install(LavaSrc)
-                }
-            }
-
-            Config.LAVA_NODES.forEach { node ->
-                lavaKord.addNode(
-                    serverUri = node.uri.toString(),
-                    password = node.password,
-                    name = node.name
-                )
-                logger.info("Registered lava node with address: ${node.uri}")
-            }
-            logger.info("LavaKord ready")
-        }
-
         shardManager.guildCache.forEach { guild ->
-            RequestChannelConfig(guild).updateMessage()?.await()
+            RequestChannelConfig(guild).updateMessage()?.start()
         }
     }
 

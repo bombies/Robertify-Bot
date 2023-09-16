@@ -4,7 +4,6 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
 import dev.arbjerg.lavalink.protocol.v4.Playlist
 import dev.arbjerg.lavalink.protocol.v4.Track
 import dev.minn.jda.ktx.util.SLF4J
-import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
 import main.audiohandlers.utils.identifier
