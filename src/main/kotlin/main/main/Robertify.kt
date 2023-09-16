@@ -224,7 +224,7 @@ object Robertify {
         jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
 
         shardManager.guildCache.forEach { guild ->
-            RequestChannelConfig(guild).updateMessage()?.start()
+            RequestChannelConfig(guild).updateMessage()
         }
     }
 

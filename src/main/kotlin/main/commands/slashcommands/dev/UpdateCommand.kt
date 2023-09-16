@@ -109,7 +109,7 @@ class UpdateCommand : AbstractSlashCommand(
             successMsg = "Successfully updated all request channel messages!",
             errorMsg = "Could not update all request channel messages!"
         ) {
-            it.updateMessage()?.await()
+            it.updateMessage()
         }
     }
 

@@ -103,7 +103,7 @@ class MoveCommand : AbstractSlashCommand(
             ).build()
         }
 
-        RequestChannelConfig(guild).updateMessage()?.await()
+        RequestChannelConfig(guild).updateMessage()
 
         val movedTrack = trackList[id - 1]
         LogUtilsKt(guild).sendLog(

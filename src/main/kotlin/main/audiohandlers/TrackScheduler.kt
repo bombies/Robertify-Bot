@@ -137,7 +137,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             }
 
         val requestChannelConfig = RequestChannelConfig(guild)
-        requestChannelConfig.updateMessage()?.await()
+        requestChannelConfig.updateMessage()
 
         disconnectManager.cancelDisconnect()
         queueHandler.lastPlayedTrackBuffer = track
@@ -244,7 +244,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             nextTrack(trackToUse)
         } else {
             if (queueHandler.isEmpty)
-                RequestChannelConfig(guild).updateMessage()?.await()
+                RequestChannelConfig(guild).updateMessage()
         }
     }
 

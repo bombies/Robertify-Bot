@@ -26,7 +26,7 @@ class GuildMusicManager(val guild: Guild) {
 
         scheduler.clearRequesters()
         SkipCommand().clearVoteSkipInfo(guild)
-        RequestChannelConfig(guild).updateMessage()?.await()
+        RequestChannelConfig(guild).updateMessage()
     }
 
     suspend fun leave() {

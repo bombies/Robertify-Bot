@@ -185,7 +185,7 @@ class MainAudioLoader(
         if (queueHandler.queueRepeating)
             queueHandler.setSavedQueue(queueHandler.contents)
 
-        requestChannelConfig.updateMessage()?.await()
+        requestChannelConfig.updateMessage()
     }
 
     override suspend fun onNoMatches() {

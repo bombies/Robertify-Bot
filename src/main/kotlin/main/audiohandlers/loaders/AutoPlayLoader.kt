@@ -61,7 +61,7 @@ class AutoPlayLoader(
             queueHandler.clearSavedQueue()
         }
 
-        RequestChannelConfig(guild).updateMessage()?.await()
+        RequestChannelConfig(guild).updateMessage()
     }
 
     override suspend fun onSearchResultLoad(results: List<Track>) {
