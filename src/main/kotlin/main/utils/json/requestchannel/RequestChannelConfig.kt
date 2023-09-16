@@ -32,6 +32,7 @@ import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.ErrorHandler
+import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -181,7 +182,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
     suspend fun isChannelSet(): Boolean {
         val obj = getGuildModel().dedicated_channel
-        return obj != null && obj.channel_id != -1L
+        return obj.channel_id != -1L
     }
 
     suspend fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
@@ -215,25 +216,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
                     .setEmbeds(eb.build())
                     .await()
-                // TODO: Handle unknown message error properly
-//                    msgRequest.queue(
-//                        { msg: Message ->
-//
-//                        },
-//                        ErrorHandler()
-//                            .handle(
-//                                ErrorResponse.UNKNOWN_MESSAGE
-//                            ) { removeChannel() }
-//                            .handle(
-//                                ErrorResponse.MISSING_PERMISSIONS
-//                            ) {
-//                                sendEditErrorMessage(
-//                                    announcementChannel
-//                                )
-//                            }
-//                    )
             } catch (e: InsufficientPermissionException) {
                 if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
+            } catch (e: ErrorResponseException) {
+                when (e.errorResponse) {
+                    ErrorResponse.MISSING_PERMISSIONS -> sendEditErrorMessage(announcementChannel)
+                    ErrorResponse.UNKNOWN_MESSAGE -> removeChannel()
+                    else -> {}
+                }
             }
         } else {
             eb.setColor(theme.color)

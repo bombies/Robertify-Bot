@@ -109,10 +109,6 @@ class Listener : AbstractEventController() {
         }
     }
 
-    override fun onGuildReady(event: GuildReadyEvent) {
-        logger.info("Guild ${event.guild.name} is ready")
-    }
-
     private val guildJoinListener =
         onEvent<GuildJoinEvent> { event ->
             val guild = event.guild

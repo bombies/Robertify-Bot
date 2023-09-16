@@ -239,6 +239,7 @@ object Robertify {
         loadNeededSlashCommands(guild)
         rescheduleUnbans(guild)
         RemindersConfig(guild).scheduleReminders()
+        logger.info("${guild.name} is ready!")
 
 //        GuildResumeManager(guild).loadTracks()
     }
