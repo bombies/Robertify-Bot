@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
@@ -262,7 +263,10 @@ object RobertifyAudioManager {
                         }
                     }
 
-                    musicManager.link.connectAudio(channel.idLong.toULong())
+                    if (channel.type == ChannelType.STAGE) {
+                        guild.jda.directAudioController.connect(channel)
+                    } else musicManager.link.connect(channel.id)
+
                     musicManager.scheduler.scheduleDisconnect()
                     return true
                 }
