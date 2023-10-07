@@ -263,10 +263,7 @@ object RobertifyAudioManager {
                         }
                     }
 
-                    if (channel.type == ChannelType.STAGE) {
-                        guild.jda.directAudioController.connect(channel)
-                    } else musicManager.link.connect(channel.id)
-
+                    guild.jda.directAudioController.connect(channel)
                     musicManager.scheduler.scheduleDisconnect()
                     return true
                 }
