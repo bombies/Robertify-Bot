@@ -50,7 +50,7 @@ class VolumeCommand : AbstractSlashCommand(
         volume: Int
     ): MessageEmbed {
         val guild = selfVoiceState.guild
-        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
+        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks.isNotNull()) return acChecks!!
 
         if (volume < 0 || volume > 200)
