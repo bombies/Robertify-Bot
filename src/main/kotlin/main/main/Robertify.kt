@@ -44,6 +44,8 @@ import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
+import net.dv8tion.jda.api.utils.ChunkingFilter
+import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
@@ -109,32 +111,19 @@ object Robertify {
         AbstractMongoDatabase.initAllCaches()
         logger.info("Initialized all caches.")
 
-        GuildRedisCache.ins.loadAllGuilds()
-        logger.info("All guilds have been loaded into cache.")
-
         // Build bot connection
         logger.info("Building shard manager...")
 
-        val shardManagerBuilder = DefaultShardManagerBuilder.createDefault(
+        val shardManagerBuilder = DefaultShardManagerBuilder.createLight(
             Config.BOT_TOKEN,
             listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
         )
             .apply {
                 setShardsTotal(Config.SHARD_COUNT)
                 injectKTX()
+                setMemberCachePolicy(MemberCachePolicy.DEFAULT)
                 setBulkDeleteSplittingEnabled(false)
                 enableCache(CacheFlag.VOICE_STATE)
-                disableCache(
-                    CacheFlag.ACTIVITY,
-                    CacheFlag.EMOJI,
-                    CacheFlag.CLIENT_STATUS,
-                    CacheFlag.ROLE_TAGS,
-                    CacheFlag.ONLINE_STATUS,
-                    CacheFlag.STICKER,
-                    CacheFlag.SCHEDULED_EVENTS,
-                    CacheFlag.MEMBER_OVERRIDES,
-                    CacheFlag.FORUM_TAGS
-                )
                 setActivity(Activity.listening("Starting up..."))
 
                 val disabledIntents = mutableListOf(

@@ -197,7 +197,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         } catch (ex: Exception) {
             // Either building the image failed or the bot doesn't have enough
             // permission to send images in a certain channel
-            if (ex is PermissionException || ex is ImageBuilderException) {
+            if (ex is PermissionException || ex is ImageBuilderException || ex is NullPointerException) {
                 try {
                     sendNowPlayingEmbed(trackInfo, requesterMention).await()
                 } catch (ex: PermissionException) {
