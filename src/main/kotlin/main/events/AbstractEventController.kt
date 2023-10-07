@@ -6,7 +6,7 @@ import main.main.Robertify
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
-abstract class AbstractEventController : ListenerAdapter() {
+abstract class AbstractEventController {
 
     companion object {
         protected val shardManager = Robertify.shardManager

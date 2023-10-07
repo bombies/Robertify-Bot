@@ -1,10 +1,7 @@
 package main.utils.json.requestchannel
 
 import dev.minn.jda.ktx.coroutines.await
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.artworkUrl
@@ -35,6 +32,7 @@ import net.dv8tion.jda.api.entities.MessageHistory
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.ErrorHandler
+import net.dv8tion.jda.api.exceptions.ErrorResponseException
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
@@ -169,10 +167,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             throw IllegalArgumentException(
                 "${shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
             )
-
-        getTextChannel()
-            ?.delete()
-            ?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        try {
+            getTextChannel()
+                ?.delete()
+                ?.queue(null, ErrorHandler().ignore(ErrorResponse.MISSING_PERMISSIONS))
+        } catch (e: InsufficientPermissionException) {
+            logger.warn("Could not delete Discord request channel in ${guild.name} (${guild.idLong})")
+        }
 
         cache.updateGuild(guild.id) {
             dedicated_channel {
@@ -184,7 +185,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
     suspend fun isChannelSet(): Boolean {
         val obj = getGuildModel().dedicated_channel
-        return obj != null && obj.channel_id != -1L
+        return obj.channel_id != -1L
     }
 
     suspend fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
@@ -192,130 +193,118 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         else -> getChannelId() == channel.idLong
     }
 
-    suspend fun updateMessage(): Deferred<Unit>? = coroutineScope {
+    suspend fun updateMessage(): Unit = coroutineScope {
         logger.debug("Channel set in ${guild.name} (${guild.idLong}): ${isChannelSet()}")
-        if (!isChannelSet()) return@coroutineScope null
+        if (!isChannelSet()) return@coroutineScope
 
-        val job = async {
-            val msgRequest: RestAction<Message> = getMessageRequest() ?: return@async
-            val musicManager = RobertifyAudioManager[guild]
-            val audioPlayer = musicManager.player
-            val playingTrack = audioPlayer.playingTrack
-            val queueHandler = musicManager.scheduler.queueHandler
-            val queueAsList = ArrayList(queueHandler.contents)
+        val msgRequest: RestAction<Message> = getMessageRequest() ?: return@coroutineScope
+        val musicManager = RobertifyAudioManager[guild]
+        val audioPlayer = musicManager.player
+        val playingTrack = audioPlayer.playingTrack
+        val queueHandler = musicManager.scheduler.queueHandler
+        val queueAsList = ArrayList(queueHandler.contents)
 
-            val theme = ThemesConfig(guild).getTheme()
-            val localeManager = LocaleManager[guild]
-            val eb = EmbedBuilder()
+        val theme = ThemesConfig(guild).getTheme()
+        val localeManager = LocaleManager[guild]
+        val eb = EmbedBuilder()
 
-            if (playingTrack == null) {
-                eb.setColor(theme.color)
-                eb.setTitle(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
-                eb.setImage(theme.idleBanner)
-                val scheduler = musicManager.scheduler
-                val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
-                try {
-                    val msg = msgRequest.await()
-                    msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                        .setEmbeds(eb.build())
-                        .await()
-                    // TODO: Handle unknown message error properly
-//                    msgRequest.queue(
-//                        { msg: Message ->
-//
-//                        },
-//                        ErrorHandler()
-//                            .handle(
-//                                ErrorResponse.UNKNOWN_MESSAGE
-//                            ) { removeChannel() }
-//                            .handle(
-//                                ErrorResponse.MISSING_PERMISSIONS
-//                            ) {
-//                                sendEditErrorMessage(
-//                                    announcementChannel
-//                                )
-//                            }
-//                    )
-                } catch (e: InsufficientPermissionException) {
-                    if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
+        if (playingTrack == null) {
+            eb.setColor(theme.color)
+            eb.setTitle(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
+            eb.setImage(theme.idleBanner)
+            val scheduler = musicManager.scheduler
+            val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
+            try {
+                val msg = msgRequest.await()
+                msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                    .setEmbeds(eb.build())
+                    .await()
+            } catch (e: InsufficientPermissionException) {
+                if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
+            } catch (e: ErrorResponseException) {
+                when (e.errorResponse) {
+                    ErrorResponse.MISSING_PERMISSIONS -> sendEditErrorMessage(announcementChannel)
+                    ErrorResponse.UNKNOWN_MESSAGE -> removeChannel()
+                    else -> {}
                 }
+            }
+        } else {
+            eb.setColor(theme.color)
+            eb.setTitle(
+                localeManager.getMessage(
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
+                    Pair(
+                        "{title}",
+                        playingTrack.title
+                    ),
+                    Pair(
+                        "{author}",
+                        playingTrack.author
+                    ),
+
+                    Pair(
+                        "{duration}",
+                        GeneralUtils.formatTime(playingTrack.length)
+                    )
+                )
+            )
+            val requester: String = musicManager.scheduler.getRequesterAsMention(playingTrack)
+            eb.setDescription(
+                localeManager.getMessage(
+                    NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
+                    Pair("{requester}", requester)
+                )
+            )
+
+            eb.setImage(playingTrack.artworkUrl ?: theme.nowPlayingBanner)
+            eb.setFooter(
+                localeManager.getMessage(
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
+                    Pair(
+                        "{numSongs}",
+                        queueAsList.size.toString()
+                    ),
+                    Pair(
+                        "{volume}",
+                        ((audioPlayer.filters.volume?.times(100) ?: 100).toInt()).toString()
+                    )
+                )
+            )
+            val nextTenSongs: StringBuilder = StringBuilder()
+            nextTenSongs.append("```")
+            if (queueAsList.size > 10) {
+                var index = 1
+                for (track in queueAsList.subList(
+                    0,
+                    10
+                )) nextTenSongs.append(index++).append(". → ").append(track.title)
+                    .append(" - ").append(track.author)
+                    .append(" [").append(GeneralUtils.formatTime(track.length))
+                    .append("]\n")
             } else {
-                eb.setColor(theme.color)
-                eb.setTitle(
-                    localeManager.getMessage(
-                        DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_TITLE,
-                        Pair(
-                            "{title}",
-                            playingTrack.title
-                        ),
-                        Pair(
-                            "{author}",
-                            playingTrack.author
-                        ),
-
-                        Pair(
-                            "{duration}",
-                            GeneralUtils.formatTime(playingTrack.length)
-                        )
-                    )
-                )
-                val requester: String = musicManager.scheduler.getRequesterAsMention(playingTrack)
-                eb.setDescription(
-                    localeManager.getMessage(
-                        NowPlayingMessages.NP_ANNOUNCEMENT_REQUESTER,
-                        Pair("{requester}", requester)
-                    )
-                )
-
-                eb.setImage(playingTrack.artworkUrl ?: theme.nowPlayingBanner)
-                eb.setFooter(
-                    localeManager.getMessage(
-                        DedicatedChannelMessages.DEDICATED_CHANNEL_PLAYING_EMBED_FOOTER,
-                        Pair(
-                            "{numSongs}",
-                            queueAsList.size.toString()
-                        ),
-                        Pair(
-                            "{volume}",
-                            ((audioPlayer.filters.volume?.times(100) ?: 100).toInt()).toString()
-                        )
-                    )
-                )
-                val nextTenSongs: StringBuilder = StringBuilder()
-                nextTenSongs.append("```")
-                if (queueAsList.size > 10) {
+                if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
                     var index = 1
-                    for (track in queueAsList.subList(
-                        0,
-                        10
-                    )) nextTenSongs.append(index++).append(". → ").append(track.title)
-                        .append(" - ").append(track.author)
+                    for (track in queueAsList) nextTenSongs.append(
+                        index++
+                    ).append(". → ").append(track.title).append(" - ").append(track.author)
                         .append(" [").append(GeneralUtils.formatTime(track.length))
                         .append("]\n")
-                } else {
-                    if (queueHandler.isEmpty) nextTenSongs.append(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NO_SONGS)) else {
-                        var index = 1
-                        for (track in queueAsList) nextTenSongs.append(
-                            index++
-                        ).append(". → ").append(track.title).append(" - ").append(track.author)
-                            .append(" [").append(GeneralUtils.formatTime(track.length))
-                            .append("]\n")
-                    }
                 }
-                nextTenSongs.append("```")
-                val msg = msgRequest.await()
-                msg.editMessage(
-                    localeManager.getMessage(
-                        DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
-                        Pair(
-                            "{songs}",
-                            nextTenSongs.toString()
-                        )
+            }
+            nextTenSongs.append("```")
+            val msg = msgRequest.await()
+            msg.editMessage(
+                localeManager.getMessage(
+                    DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
+                    Pair(
+                        "{songs}",
+                        nextTenSongs.toString()
                     )
                 )
-                    .setEmbeds(eb.build())
-                    .queue()
-                // TODO: Handle unknown message error properly
+            )
+                .setEmbeds(eb.build())
+                .queue()
+            // TODO: Handle unknown message error properly
 //                msgRequest.queue(
 //                    { msg: Message ->
 //
@@ -325,11 +314,8 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 //                            ErrorResponse.UNKNOWN_MESSAGE
 //                        ) { removeChannel() }
 //                )
-            }
+
         }
-
-
-        return@coroutineScope job
     }
 
     private suspend fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
@@ -364,18 +350,17 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             return
 
         try {
-            val messageUpdate = updateMessage()
+            updateMessage()
             val buttonUpdate = updateButtons()
             val topicUpdate = updateTopic()
 
-            if (messageUpdate == null || buttonUpdate == null || topicUpdate == null) {
+            if (buttonUpdate == null || topicUpdate == null) {
                 logger.error(
                     "Could not update request channel in {} because one or more of the updates resulted in a null job!",
                     guild.name
                 )
             } else {
                 awaitAll(
-                    messageUpdate,
                     buttonUpdate,
                     topicUpdate
                 )

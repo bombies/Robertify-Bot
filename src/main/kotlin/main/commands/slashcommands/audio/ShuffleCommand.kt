@@ -42,7 +42,7 @@ class ShuffleCommand : AbstractSlashCommand(
         queueHandler.clear()
         queueHandler.addAll(trackList)
 
-        RequestChannelConfig(guild).updateMessage()?.await()
+        RequestChannelConfig(guild).updateMessage()
 
         LogUtilsKt(guild).sendLog(
             LogType.QUEUE_SHUFFLE,

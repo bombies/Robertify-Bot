@@ -138,7 +138,7 @@ class SkipCommand : AbstractSlashCommand(
         queueHandler.pushPastTrack(playingTrack)
         scheduler.nextTrack(playingTrack, true, player.position)
 
-        RequestChannelConfig(guild).updateMessage()?.await()
+        RequestChannelConfig(guild).updateMessage()
         SkipCommand().clearVoteSkipInfo(guild)
         return RobertifyEmbedUtils.embedMessage(musicManager.guild, "Skipped to **track #$id**!").build()
     }

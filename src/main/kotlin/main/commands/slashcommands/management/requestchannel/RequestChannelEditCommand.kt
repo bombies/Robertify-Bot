@@ -132,7 +132,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
 
             try {
                 if (RobertifyAudioManager[guild].player.playingTrack != null)
-                    config.updateMessage()?.await()
+                    config.updateMessage()
             } catch (_: UninitializedPropertyAccessException) {
             }
 

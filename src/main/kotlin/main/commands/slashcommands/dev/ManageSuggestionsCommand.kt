@@ -171,7 +171,7 @@ class ManageSuggestionsCommand : AbstractSlashCommand(
         event.deferReply(true).queue()
 
         if (config.suggestionSetup)
-            return event.replyEmbed("The suggestions channels have already been setup!")
+            return event.hook.sendEmbed(guild, "The suggestions channels have already been setup!")
                 .setEphemeral(true)
                 .queue()
 

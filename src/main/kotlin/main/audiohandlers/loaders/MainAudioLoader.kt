@@ -5,13 +5,10 @@ import dev.arbjerg.lavalink.protocol.v4.Exception
 import dev.arbjerg.lavalink.protocol.v4.Playlist
 import dev.arbjerg.lavalink.protocol.v4.Track
 import dev.minn.jda.ktx.coroutines.await
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import dev.minn.jda.ktx.events.getDefaultScope
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.models.Requester
-import main.main.Robertify
 import main.utils.RobertifyEmbedUtils
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
@@ -45,7 +42,7 @@ class MainAudioLoader(
         private val executorService = Executors.newSingleThreadScheduledExecutor()
 
         suspend fun RestAction<Message>.queueThenDelete(
-            context: CoroutineContext = Robertify.coroutineEventManager.coroutineContext,
+            context: CoroutineContext = getDefaultScope().coroutineContext,
             time: Long = 10,
             unit: TimeUnit = TimeUnit.SECONDS,
             deletePredicate: (suspend (message: Message) -> Boolean)? = null,
@@ -188,7 +185,7 @@ class MainAudioLoader(
         if (queueHandler.queueRepeating)
             queueHandler.setSavedQueue(queueHandler.contents)
 
-        requestChannelConfig.updateMessage()?.await()
+        requestChannelConfig.updateMessage()
     }
 
     override suspend fun onNoMatches() {

@@ -23,6 +23,7 @@ import main.utils.json.restrictedchannels.RestrictedChannelsConfig
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.messages.GeneralMessages
+import main.utils.locale.messages.JoinMessages
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Message
@@ -31,6 +32,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
+import java.lang.IllegalArgumentException
 import java.util.*
 
 object RobertifyAudioManager {
@@ -215,7 +217,7 @@ object RobertifyAudioManager {
         hookMessage: InteractionHook? = null
     ): Boolean {
         try {
-            require(!GuildConfig(musicManager.guild).getTwentyFourSevenMode() && channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
+            require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
                 Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
                     val guild = musicManager.guild
@@ -274,6 +276,15 @@ object RobertifyAudioManager {
             val embed = RobertifyEmbedUtils.embedMessage(
                 channel.guild,
                 GeneralMessages.INSUFFICIENT_PERMS_TO_JOIN,
+                Pair("{channel}", channel.asMention)
+            ).build()
+            if (message != null)
+                message.editMessageEmbeds(embed).queue()
+            else hookMessage?.editEmbed { embed }?.queue()
+        } catch (e: IllegalArgumentException) {
+            val embed = RobertifyEmbedUtils.embedMessage(
+                channel.guild,
+                JoinMessages.CANT_JOIN,
                 Pair("{channel}", channel.asMention)
             ).build()
             if (message != null)

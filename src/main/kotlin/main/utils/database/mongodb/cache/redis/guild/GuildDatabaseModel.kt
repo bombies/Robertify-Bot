@@ -24,7 +24,7 @@ data class GuildDatabaseModel(
     var theme: String = RobertifyTheme.GREEN.name.lowercase(),
     var autoplay: Boolean = false,
     var twenty_four_seven_mode: Boolean = false,
-    var log_channel: Long = -1,
+    var log_channel: Long? = -1,
     var locale: String = RobertifyLocale.ENGLISH.name.lowercase()
 ) : JsonObjectTransferable {
 

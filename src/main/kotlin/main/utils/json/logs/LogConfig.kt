@@ -1,6 +1,7 @@
 package main.utils.json.logs
 
 import main.main.Robertify
+import main.utils.GeneralUtils.isNotNull
 import main.utils.json.AbstractGuildConfig
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
@@ -10,10 +11,10 @@ import java.util.*
 
 class LogConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    suspend fun getChannelId(): Long {
+    private suspend fun getChannelId(): Long? {
         if (!channelIsSet())
             throw NullPointerException("There is no channel for this guild! (ID=${guild.id})")
-        return getGuildModel().log_channel!!
+        return getGuildModel().log_channel
     }
 
     suspend fun setChannelId(cid: Long) {
@@ -23,7 +24,8 @@ class LogConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
     }
 
     suspend fun getChannel(): TextChannel? {
-        return Robertify.shardManager.getTextChannelById(getChannelId())
+        val channelId = getChannelId()
+        return channelId?.let { Robertify.shardManager.getTextChannelById(it) }
     }
 
     suspend fun channelIsSet(): Boolean {

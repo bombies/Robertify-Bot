@@ -67,7 +67,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
             val handleRestrictedChannels: (arr: JSONArray) -> JSONArray = { arr ->
                 val newArr = JSONArray()
                 if (!arr.isEmpty && arr[0] is Long) {
-                    rtc.toList().forEach { item: Any ->
+                    arr.toList().forEach { item: Any ->
                         if (item.toString().isDiscordId())
                             newArr.put(item.toString())
                     }
@@ -138,11 +138,10 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
                 )
             }
         }
-
         return obj
     }
 
-    fun correctGuildObj(obj: JSONObject?): JSONObject {
+    private fun correctGuildObj(obj: JSONObject?): JSONObject {
         if (!obj!!.has(GuildDB.Field.GUILD_ID.toString())) return obj
         if (obj.has("_id")) obj.remove("_id")
         if (obj.has("__v")) obj.remove("__v")

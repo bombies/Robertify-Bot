@@ -115,7 +115,7 @@ class RemoveCommand : AbstractSlashCommand(
                 Pair("{author}", removedTrack.author)
             )
             if (id <= 10)
-                RequestChannelConfig(guild).updateMessage()?.await()
+                RequestChannelConfig(guild).updateMessage()
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 RemoveMessages.REMOVED,
@@ -167,7 +167,7 @@ class RemoveCommand : AbstractSlashCommand(
                 Pair("{author}", removedTrack.author)
             )
             if (id < 10)
-                RequestChannelConfig(guild).updateMessage()?.await()
+                RequestChannelConfig(guild).updateMessage()
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 RemoveMessages.REMOVED,
