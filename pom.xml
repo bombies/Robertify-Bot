@@ -17,7 +17,7 @@
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <kotlin.version>1.9.10</kotlin.version>
         <ktor.version>2.3.5</ktor.version>
-        <koin.version>3.4.3</koin.version>
+        <koin.version>3.5.0</koin.version>
         <mockk.version>1.13.5</mockk.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
         <serialization.version>1.6.0</serialization.version>
