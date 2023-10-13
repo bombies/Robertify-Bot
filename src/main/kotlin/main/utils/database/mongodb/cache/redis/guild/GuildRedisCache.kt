@@ -10,6 +10,7 @@ import main.utils.GeneralUtils.isDiscordId
 import main.utils.database.mongodb.cache.redis.DatabaseRedisCache
 import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.AbstractGuildConfig
+import org.bson.BsonMaximumSizeExceededException
 import org.bson.Document
 import org.bson.types.ObjectId
 import org.json.JSONArray
@@ -34,13 +35,18 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         getDB().updateGuild(guild)
     }
 
-    suspend fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) = coroutineScope {
-        launch {
-            if (!guildHasInfo(gid)) loadGuild(gid)
-            val guildModel = getGuildModel(gid)!!
-            block(guildModel)
-            setex(gid, 3600, readyGuildObjForRedis(guildModel.toJsonObject()))
+    suspend fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) {
+        if (!guildHasInfo(gid)) loadGuild(gid)
+        val guildModel = getGuildModel(gid)!!
+        block(guildModel)
+        setex(gid, 3600, readyGuildObjForRedis(guildModel.toJsonObject()))
+        try {
             getDB().updateGuild(guildModel)
+        } catch (e: BsonMaximumSizeExceededException) {
+            del(gid)
+            getDB().removeGuild(gid.toLong());
+            getDB().addGuild(gid.toLong())
+            setex(gid, 3600, readyGuildObjForRedis(GuildDatabaseModel(server_id = gid.toLong()).toJsonObject()))
         }
     }
 
