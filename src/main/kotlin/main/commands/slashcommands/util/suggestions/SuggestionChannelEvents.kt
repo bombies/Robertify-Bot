@@ -9,7 +9,7 @@ class SuggestionChannelEvents : AbstractEventController() {
 
     override fun onChannelDelete(event: ChannelDeleteEvent) {
         if (event.channelType != ChannelType.CATEGORY) {
-            if (event.channelType == ChannelType.TEXT) {
+            return if (event.channelType == ChannelType.TEXT) {
                 val channel = event.channel.asTextChannel()
                 val config = BotDBCache.instance
 
@@ -17,6 +17,7 @@ class SuggestionChannelEvents : AbstractEventController() {
                     config.suggestionsAcceptedChannelId -> config.suggestionsAcceptedChannelId = -1L
                     config.suggestionsDeniedChannelId -> config.suggestionsDeniedChannelId = -1L
                     config.suggestionsPendingChannelId -> config.suggestionsPendingChannelId = -1L
+                    else -> {}
                 }
             } else return;
         }

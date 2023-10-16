@@ -128,22 +128,20 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                         .thenApply { message ->
                             config.setChannelAndMessage(textChannelId.get(), message.idLong)
                             config.buttonUpdateRequest(message).queue()
-                        }
-                }
-                .thenApply {
-                    config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
+                            config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
 
-                    try {
-                        if (RobertifyAudioManager[guild].player.playingTrack != null)
-                            config.updateMessage()
-                    } catch (_: UninitializedPropertyAccessException) {
-                    }
+                            try {
+                                if (RobertifyAudioManager[guild].player.playingTrack != null)
+                                    config.updateMessage()
+                            } catch (_: UninitializedPropertyAccessException) {
+                            }
 
-                    RequestChannel(
-                        channelId = config.getChannelId(),
-                        messageId = config.getMessageId(),
-                        config = config.config.getConfigJsonObject()
-                    )
+                            RequestChannel(
+                                channelId = config.getChannelId(),
+                                messageId = config.getMessageId(),
+                                config = config.config.getConfigJsonObject()
+                            )
+                        }.join()
                 }.join()
             return@run channel
         }

@@ -25,10 +25,12 @@ import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.database.influxdb.databases.commands.CommandInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.guildconfig.GuildConfig
+import main.utils.json.locale.LocaleConfig
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
+import main.utils.locale.RobertifyLocale
 import main.utils.locale.messages.GeneralMessages
 import main.utils.managers.RandomMessageManager
 import net.dv8tion.jda.api.Permission
@@ -230,6 +232,14 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         val checks = runBlocking { checks(event) }
         if (!checks)
             return
+
+        if (event.isFromGuild) {
+            val guild = event.guild!!
+            val localeConfig = LocaleConfig(guild)
+
+            if (!LocaleManager.hasLocale(guild))
+                LocaleManager[guild].setLocale(localeConfig.getLocale())
+        }
 
         handle(event)
         runBlocking {

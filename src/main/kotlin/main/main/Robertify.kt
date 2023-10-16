@@ -23,6 +23,7 @@ import main.events.EventManager
 import main.utils.api.robertify.RobertifyApi
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
+import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
@@ -89,6 +90,9 @@ object Robertify {
         // Init caches
         AbstractMongoDatabase.initAllCaches()
         logger.info("Initialized all caches.")
+
+        GuildRedisCache.ins.loadAllGuilds()
+        logger.info("All guilds loaded into Redis cache.")
 
         // Build bot connection
         logger.info("Building shard manager...")

@@ -108,7 +108,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 ?.name + "(" + guild.idLong + ") doesn't have a channel set"
         )
 
-        return getGuildModel().dedicated_channel!!.channel_id ?: -1
+        return getGuildModel().dedicated_channel.channel_id ?: -1
     }
 
     fun setChannelId(id: Long) {
@@ -195,7 +195,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         else -> getChannelId() == channel.idLong
     }
 
-    fun updateMessage(): Unit {
+    fun updateMessage() {
         logger.debug("Channel set in ${guild.name} (${guild.idLong}): ${isChannelSet()}")
         if (!isChannelSet()) return
 
@@ -218,11 +218,17 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
             try {
                 msgRequest.queue { msg ->
-                    msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                        .setEmbeds(eb.build()).queue()
+                    try {
+                        msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                            .setEmbeds(eb.build())
+                            .queue()
+                    } catch (e: InsufficientPermissionException) {
+                        logger.warn("Couldn't update dedicated channel message due to a lack of permission in ${guild.name} (${guild.idLong})")
+                    }
                 }
             } catch (e: InsufficientPermissionException) {
-                if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
+                if (e.message!!.contains("MESSAGE_SEND"))
+                    sendEditErrorMessage(announcementChannel)
             } catch (e: ErrorResponseException) {
                 when (e.errorResponse) {
                     ErrorResponse.MISSING_PERMISSIONS -> sendEditErrorMessage(announcementChannel)

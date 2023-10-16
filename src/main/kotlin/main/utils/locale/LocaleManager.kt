@@ -25,7 +25,8 @@ class LocaleManager private constructor(private val guild: Guild?, _locale: Robe
             if (guild == null)
                 return globalManager()
             return localeManagers.computeIfAbsent(guild.idLong) {
-                LocaleManager(guild, RobertifyLocale.ENGLISH)
+                val config = LocaleConfig(guild)
+                LocaleManager(guild, config.getLocale())
             }
         }
 
@@ -35,6 +36,10 @@ class LocaleManager private constructor(private val guild: Guild?, _locale: Robe
             return localeManagers.computeIfAbsent(guild.idLong) {
                 LocaleManager(guild, RobertifyLocale.ENGLISH)
             }
+        }
+
+        fun hasLocale(guild: Guild): Boolean {
+            return localeManagers.containsKey(guild.idLong)
         }
 
         private fun retrieveLocaleFile(locale: RobertifyLocale): Map<String, String> {

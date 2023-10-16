@@ -36,17 +36,21 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
     }
 
     fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) {
-        if (!guildHasInfo(gid)) loadGuild(gid)
+        if (!guildHasInfo(gid))
+            loadGuild(gid)
         val guildModel = getGuildModel(gid)!!
         block(guildModel)
-        setex(gid, 3600, readyGuildObjForRedis(guildModel.toJsonObject()))
         try {
             getDB().updateGuild(guildModel)
+            setex(gid, 3600, readyGuildObjForRedis(guildModel.toJsonObject()))
         } catch (e: BsonMaximumSizeExceededException) {
-            del(gid)
-            getDB().removeGuild(gid.toLong());
-            getDB().addGuild(gid.toLong())
-            setex(gid, 3600, readyGuildObjForRedis(GuildDatabaseModel(server_id = gid.toLong()).toJsonObject()))
+            try {
+                getDB().removeGuild(gid.toLong());
+                getDB().addGuild(gid.toLong())
+                setex(gid, 3600, readyGuildObjForRedis(GuildDatabaseModel(server_id = gid.toLong()).toJsonObject()))
+            } catch (e: NoSuchElementException) {
+                logger.warn("Attempted to update guild with ID $gid but it didn't even exist in the database...")
+            }
         }
     }
 
@@ -270,7 +274,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
                 is NullPointerException,
                 is NoSuchElementException -> {
                     if (scopedAttempt == 2) return
-                    logger.debug(
+                    logger.warn(
                         "Guild with ID {} didn't exist in the database. Attempting to add and reload.",
                         gid
                     )

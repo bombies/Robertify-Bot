@@ -60,8 +60,8 @@ class RequestChannelEvents : AbstractEventController() {
         val config = RequestChannelConfig(guild)
 
         if (!config.isChannelSet()) return
-
         if (config.getChannelId() != event.channel.idLong) return
+        if (config.getMessageId() == event.message.idLong) return
 
         val selfVoiceState = guild.selfMember.voiceState!!
         val memberVoiceState = event.member!!.voiceState!!
