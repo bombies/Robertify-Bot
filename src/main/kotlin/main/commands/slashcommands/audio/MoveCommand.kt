@@ -41,7 +41,7 @@ class MoveCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = guild.selfMember.voiceState!!
@@ -69,7 +69,7 @@ class MoveCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private suspend fun handleMove(
+    private fun handleMove(
         guild: Guild,
         mover: User,
         queueHandler: QueueHandler,

@@ -31,7 +31,7 @@ class UnbanCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
             return event.replyEmbed {
                 embed(GeneralMessages.INVALID_ARGS)
@@ -42,7 +42,7 @@ class UnbanCommand : AbstractSlashCommand(
         event.replyEmbed { handleUnban(user) }.queue()
     }
 
-    private suspend fun handleUnban(user: Member): MessageEmbed {
+    private fun handleUnban(user: Member): MessageEmbed {
         val guild = user.guild
         val config = GuildConfig(guild)
         if (!config.isBannedUser(user.idLong))

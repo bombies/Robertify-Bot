@@ -26,12 +26,12 @@ class PlaytimeCommand : AbstractSlashCommand(
         val playtime = mutableMapOf<Long, Long>()
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         event.replyEmbed { handlePlaytime(guild) }.queue()
     }
 
-    private suspend fun handlePlaytime(guild: Guild): MessageEmbed {
+    private fun handlePlaytime(guild: Guild): MessageEmbed {
         val player = RobertifyAudioManager[guild].player
 
         val time: Long = (

@@ -33,14 +33,14 @@ class ThemeCommand : AbstractSlashCommand(
             CommandOption(
                 name = "theme",
                 description = "The theme to set as the bot's current theme.",
-                choices = RobertifyTheme.values().map { it.name.uppercase() },
+                choices = RobertifyTheme.entries.map { it.name.uppercase() },
                 required = false
             )
         )
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val choice = event.getOption("theme")
         val guild = event.guild!!
 
@@ -66,7 +66,7 @@ class ThemeCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+    override fun onStringSelect(event: StringSelectInteractionEvent) {
         if (!event.componentId.startsWith("menu:themes")) return
 
         event.deferReply(true).queue()
@@ -96,13 +96,13 @@ class ThemeCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    suspend fun updateTheme(guild: Guild, theme: RobertifyTheme, shardManager: ShardManager = Robertify.shardManager) {
+    fun updateTheme(guild: Guild, theme: RobertifyTheme, shardManager: ShardManager = Robertify.shardManager) {
         ThemesConfig(guild).setTheme(theme)
         GeneralUtils.setDefaultEmbed(guild)
         RequestChannelConfig(guild, shardManager).updateMessage()
     }
 
-    private suspend fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
+    private fun getSelectMenu(guild: Guild, userId: Long): StringSelectMenu {
         val localeManager = LocaleManager[guild]
         return StringSelectionMenuBuilder(
             _name = "menu:themes",

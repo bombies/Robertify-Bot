@@ -56,7 +56,7 @@ class UpdateCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (primaryCommand) {
@@ -65,13 +65,13 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleCacheUpdate(event: SlashCommandInteractionEvent) {
+    private fun handleCacheUpdate(event: SlashCommandInteractionEvent) {
         event.deferReply(true).queue()
         AbstractMongoDatabase.initAllCaches()
         event.hook.sendEmbed(event.guild, "Updated all caches!").queue()
     }
 
-    private suspend fun handleRequestChannelUpdate(event: SlashCommandInteractionEvent) {
+    private fun handleRequestChannelUpdate(event: SlashCommandInteractionEvent) {
         val (_, _, secondaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (secondaryCommand) {
@@ -83,7 +83,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun updateAllRequestChannels(event: SlashCommandInteractionEvent) {
+    private fun updateAllRequestChannels(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channels!",
@@ -93,17 +93,17 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun updateRequestChannelButtons(event: SlashCommandInteractionEvent) {
+    private fun updateRequestChannelButtons(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel buttons!",
             errorMsg = "Could not update all request channel buttons!"
         ) {
-            it.updateButtons()?.await()
+            it.updateButtons()
         }
     }
 
-    private suspend fun updateRequestChannelMessages(event: SlashCommandInteractionEvent) {
+    private fun updateRequestChannelMessages(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel messages!",
@@ -113,17 +113,17 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun updateRequestChannelTopics(event: SlashCommandInteractionEvent) {
+    private fun updateRequestChannelTopics(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully updated all request channel topics!",
             errorMsg = "Could not update all request channel topics!"
         ) {
-            it.updateTopic()?.await()
+            it.updateTopic()
         }
     }
 
-    private suspend fun cleanRequestChannels(event: SlashCommandInteractionEvent) {
+    private fun cleanRequestChannels(event: SlashCommandInteractionEvent) {
         handleGenericUpdate(
             event = event,
             successMsg = "Successfully cleaned all request channels!",
@@ -133,7 +133,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend inline fun handleGenericUpdate(
+    private inline fun handleGenericUpdate(
         event: SlashCommandInteractionEvent,
         successMsg: String,
         errorMsg: String,

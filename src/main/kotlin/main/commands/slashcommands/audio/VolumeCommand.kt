@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio
 
 import dev.schlaubi.lavakord.audio.player.applyFilters
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils.isNotNull
@@ -34,7 +35,7 @@ class VolumeCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
             handleVolumeChange(
                 memberVoiceState = event.member!!.voiceState!!,
@@ -44,7 +45,7 @@ class VolumeCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private suspend fun handleVolumeChange(
+    private fun handleVolumeChange(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         volume: Int
@@ -58,8 +59,10 @@ class VolumeCommand : AbstractSlashCommand(
                 .build()
 
         val player = RobertifyAudioManager[guild].player
-        player.applyFilters {
-            this.volume = volume / 100F
+        runBlocking {
+            player.applyFilters {
+                this.volume = volume / 100F
+            }
         }
 
         RequestChannelConfig(guild).updateMessage()

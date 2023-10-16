@@ -23,7 +23,7 @@ class QueueCommand : AbstractSlashCommand(
     description = "See all queued songs"
 )
 ) {
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler
@@ -38,7 +38,7 @@ class QueueCommand : AbstractSlashCommand(
         PaginationHandler.paginateQueue(event)
     }
 
-    suspend fun getContent(guild: Guild, queueHandler: QueueHandler): List<String> {
+    fun getContent(guild: Guild, queueHandler: QueueHandler): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.contents.toMutableList()
         val localeManager = LocaleManager[guild]
@@ -53,7 +53,7 @@ class QueueCommand : AbstractSlashCommand(
         return content
     }
 
-    suspend fun getContent(guild: Guild, queueItems: List<QueueItem>): List<String> {
+    fun getContent(guild: Guild, queueItems: List<QueueItem>): List<String> {
         val content = mutableListOf<String>()
         val localeManager = LocaleManager[guild]
         queueItems.forEach { track ->
@@ -68,7 +68,7 @@ class QueueCommand : AbstractSlashCommand(
         return content
     }
 
-    suspend fun getPastContent(guild: Guild, queueHandler: QueueHandler): List<String> {
+    fun getPastContent(guild: Guild, queueHandler: QueueHandler): List<String> {
         val content = mutableListOf<String>()
         val trackList = queueHandler.previousTracksContents.toMutableList().reversed()
         val localeManager = LocaleManager[guild]

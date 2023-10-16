@@ -18,7 +18,7 @@ class AlertCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val botDb = BotDBCache.instance
         val guild = event.guild
         val user = event.user

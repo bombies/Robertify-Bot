@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -19,20 +20,22 @@ class DisconnectCommand : AbstractSlashCommand(
         description = "Disconnect the bot from the voice channel it's currently in",
     )
 ) {
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
             handleDisconnect(event.guild!!.selfMember.voiceState!!, event.member!!.voiceState!!)
         }.queue()
     }
 
-    suspend fun handleDisconnect(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    fun handleDisconnect(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, selfChannelNeeded = true)
         if (acChecks != null) return acChecks
 
-        RobertifyAudioManager
-            .getMusicManager(guild)
-            .leave()
+        runBlocking {
+            RobertifyAudioManager
+                .getMusicManager(guild)
+                .leave()
+        }
 
         LogUtilsKt(guild)
             .sendLog(

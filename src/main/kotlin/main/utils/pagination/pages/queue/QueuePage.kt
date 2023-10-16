@@ -15,7 +15,7 @@ class QueuePage(
     private val _queueItems: MutableList<QueueItem> = mutableListOf()
 ) : AbstractImagePage() {
 
-    override suspend fun getEmbed(): MessageEmbed? {
+    override fun getEmbed(): MessageEmbed? {
         val content = QueueCommand().getContent(guild, queueItems)
         return RobertifyEmbedUtils.embedMessage(guild, "\t" +
                 content.joinToString { str -> "$str\n" }
@@ -25,7 +25,7 @@ class QueuePage(
     val queueItems
         get() = _queueItems.toList()
 
-    override suspend fun generateImage(): InputStream? {
+    override fun generateImage(): InputStream? {
         val builder = QueueImageBuilder(guild, pageNumber)
         queueItems.forEach { item ->
             builder.addTrack(

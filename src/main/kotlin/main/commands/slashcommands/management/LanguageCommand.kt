@@ -34,7 +34,7 @@ class LanguageCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val localeManager = LocaleManager[guild]
         val language = event.getOption("language")?.asString
@@ -73,7 +73,7 @@ class LanguageCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+    override fun onStringSelect(event: StringSelectInteractionEvent) {
         val selectMenu = event.selectMenu
         if (selectMenu.id?.startsWith("languagemenu") != true)
             return
@@ -93,7 +93,7 @@ class LanguageCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    suspend fun setLocale(
+    fun setLocale(
         guild: Guild,
         locale: String,
         shardManager: ShardManager = Robertify.shardManager

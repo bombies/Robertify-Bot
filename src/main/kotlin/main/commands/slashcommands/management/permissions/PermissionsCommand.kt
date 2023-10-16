@@ -137,7 +137,7 @@ class PermissionsCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val (_, subCommandGroup, subCommandName) = event.fullCommandName.split(" ")
 
         when (subCommandGroup) {
@@ -147,7 +147,7 @@ class PermissionsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent, subCommandName: String) {
+    private fun handleList(event: SlashCommandInteractionEvent, subCommandName: String) {
         val guild = event.guild!!
         val config = PermissionsConfig(guild)
         val localeManager = LocaleManager[guild]
@@ -206,7 +206,7 @@ class PermissionsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun displaySpecificMentionable(
+    private fun displaySpecificMentionable(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
         perms: List<RobertifyPermission>
@@ -225,17 +225,17 @@ class PermissionsCommand : AbstractSlashCommand(
             }.queue()
     }
 
-    suspend fun getRolesForPermission(permission: RobertifyPermission, config: PermissionsConfig): List<String> {
+    fun getRolesForPermission(permission: RobertifyPermission, config: PermissionsConfig): List<String> {
         return config.getRolesForPermission(permission)
             .map { id -> id.toMention(GeneralUtils.Mentioner.ROLE) }
     }
 
-    suspend fun getUsersForPermission(permission: RobertifyPermission, config: PermissionsConfig): List<String> {
+    fun getUsersForPermission(permission: RobertifyPermission, config: PermissionsConfig): List<String> {
         return config.getUsersForPermission(permission)
             .map { id -> id.toMention(GeneralUtils.Mentioner.USER) }
     }
 
-    private suspend fun handleAdd(event: SlashCommandInteractionEvent, subCommandName: String) {
+    private fun handleAdd(event: SlashCommandInteractionEvent, subCommandName: String) {
         val config = PermissionsConfig(event.guild!!)
         val permission = RobertifyPermission.valueOf(event.getRequiredOption("permission").asString)
 
@@ -261,7 +261,7 @@ class PermissionsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun displayPermissionAdded(
+    private fun displayPermissionAdded(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
         permission: RobertifyPermission
@@ -276,7 +276,7 @@ class PermissionsCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun displayAlreadyHasPermission(
+    private fun displayAlreadyHasPermission(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
         permission: RobertifyPermission
@@ -291,7 +291,7 @@ class PermissionsCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleRemove(event: SlashCommandInteractionEvent, subCommandName: String) {
+    private fun handleRemove(event: SlashCommandInteractionEvent, subCommandName: String) {
         val config = PermissionsConfig(event.guild!!)
         val permission = RobertifyPermission.valueOf(event.getRequiredOption("permission").asString)
 
@@ -317,7 +317,7 @@ class PermissionsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun displayPermissionRemoved(
+    private fun displayPermissionRemoved(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
         permission: RobertifyPermission
@@ -332,7 +332,7 @@ class PermissionsCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun displayDoesntHavePermission(
+    private fun displayDoesntHavePermission(
         event: SlashCommandInteractionEvent,
         mentionable: IMentionable,
         permission: RobertifyPermission

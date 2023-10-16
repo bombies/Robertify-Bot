@@ -53,27 +53,29 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
 
-        suspend fun updateAllButtons() {
+        fun updateAllButtons() {
             for (g: Guild in Robertify.shardManager.guilds) {
                 val config = RequestChannelConfig(g)
                 if (!config.isChannelSet()) continue
-                val msg: Message = config.getMessageRequest()?.await() ?: continue
-                config.buttonUpdateRequest(msg).queue(
-                    null,
-                    ErrorHandler()
-                        .handle(
-                            ErrorResponse.MISSING_PERMISSIONS
-                        ) {
-                            logger.warn(
-                                "Couldn't update buttons in {}",
-                                g.name
-                            )
-                        }
-                )
+                val msgRequest = config.getMessageRequest() ?: continue
+                msgRequest.queue { msg ->
+                    config.buttonUpdateRequest(msg).queue(
+                        null,
+                        ErrorHandler()
+                            .handle(
+                                ErrorResponse.MISSING_PERMISSIONS
+                            ) {
+                                logger.warn(
+                                    "Couldn't update buttons in {}",
+                                    g.name
+                                )
+                            }
+                    )
+                }
             }
         }
 
-        suspend fun updateAllTopics() {
+        fun updateAllTopics() {
             for (g: Guild in Robertify.shardManager.guilds) {
                 val config = RequestChannelConfig(g)
                 if (!config.isChannelSet()) continue
@@ -83,7 +85,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun getMessageId(): Long {
+    fun getMessageId(): Long {
         if (!isChannelSet()) throw IllegalArgumentException(
             shardManager.getGuildById(guild.idLong)
                 ?.name + "(" + guild.idLong + ") doesn't have a channel set"
@@ -92,7 +94,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         return getGuildModel().dedicated_channel!!.message_id ?: -1
     }
 
-    suspend fun setMessageId(id: Long) {
+    fun setMessageId(id: Long) {
         cache.updateGuild(guild.id) {
             dedicated_channel {
                 message_id = id
@@ -100,7 +102,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun getChannelId(): Long {
+    fun getChannelId(): Long {
         if (!isChannelSet()) throw IllegalArgumentException(
             shardManager.getGuildById(guild.idLong)
                 ?.name + "(" + guild.idLong + ") doesn't have a channel set"
@@ -109,7 +111,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         return getGuildModel().dedicated_channel!!.channel_id ?: -1
     }
 
-    suspend fun setChannelId(id: Long) {
+    fun setChannelId(id: Long) {
         cache.updateGuild(guild.id) {
             dedicated_channel {
                 channel_id = id
@@ -117,11 +119,11 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun getOriginalAnnouncementToggle(): Boolean {
+    fun getOriginalAnnouncementToggle(): Boolean {
         return getGuildModel().dedicated_channel?.og_announcement_toggle ?: true
     }
 
-    suspend fun setOriginalAnnouncementToggle(value: Boolean) {
+    fun setOriginalAnnouncementToggle(value: Boolean) {
         cache.updateGuild(guild.id) {
             dedicated_channel {
                 og_announcement_toggle = value
@@ -129,10 +131,10 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun getTextChannel(): TextChannel? =
+    fun getTextChannel(): TextChannel? =
         shardManager.getTextChannelById(getChannelId())
 
-    suspend fun getMessageRequest(): RestAction<Message>? = try {
+    fun getMessageRequest(): RestAction<Message>? = try {
         getTextChannel()?.retrieveMessageById(getMessageId())
     } catch (e: InsufficientPermissionException) {
         val channel: GuildMessageChannel? = RobertifyAudioManager
@@ -151,7 +153,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     val config: ChannelConfig
         get() = ChannelConfig(this)
 
-    suspend fun setChannelAndMessage(cid: Long, mid: Long) {
+    fun setChannelAndMessage(cid: Long, mid: Long) {
         cache.updateGuild(guild.id) {
             this.dedicated_channel = RequestChannelModel(
                 mid,
@@ -162,7 +164,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun removeChannel() {
+    fun removeChannel() {
         if (!isChannelSet())
             throw IllegalArgumentException(
                 "${shardManager.getGuildById(guild.idLong)?.name} (${guild.idLong}) doesn't have a request channel set."
@@ -183,21 +185,21 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun isChannelSet(): Boolean {
+    fun isChannelSet(): Boolean {
         val obj = getGuildModel().dedicated_channel
         return obj.channel_id != -1L
     }
 
-    suspend fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
+    fun isRequestChannel(channel: GuildMessageChannel): Boolean = when {
         !isChannelSet() -> false
         else -> getChannelId() == channel.idLong
     }
 
-    suspend fun updateMessage(): Unit = coroutineScope {
+    fun updateMessage(): Unit {
         logger.debug("Channel set in ${guild.name} (${guild.idLong}): ${isChannelSet()}")
-        if (!isChannelSet()) return@coroutineScope
+        if (!isChannelSet()) return
 
-        val msgRequest: RestAction<Message> = getMessageRequest() ?: return@coroutineScope
+        val msgRequest: RestAction<Message> = getMessageRequest() ?: return
         val musicManager = RobertifyAudioManager[guild]
         val audioPlayer = musicManager.player
         val playingTrack = audioPlayer.playingTrack
@@ -215,10 +217,10 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             val scheduler = musicManager.scheduler
             val announcementChannel: GuildMessageChannel? = scheduler.announcementChannel
             try {
-                val msg = msgRequest.await()
-                msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                    .setEmbeds(eb.build())
-                    .await()
+                msgRequest.queue { msg ->
+                    msg.editMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                        .setEmbeds(eb.build()).queue()
+                }
             } catch (e: InsufficientPermissionException) {
                 if (e.message!!.contains("MESSAGE_SEND")) sendEditErrorMessage(announcementChannel)
             } catch (e: ErrorResponseException) {
@@ -292,18 +294,20 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
                 }
             }
             nextTenSongs.append("```")
-            val msg = msgRequest.await()
-            msg.editMessage(
-                localeManager.getMessage(
-                    DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
-                    Pair(
-                        "{songs}",
-                        nextTenSongs.toString()
+            msgRequest.queue { msg ->
+                msg.editMessage(
+                    localeManager.getMessage(
+                        DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_PLAYING,
+                        Pair(
+                            "{songs}",
+                            nextTenSongs.toString()
+                        )
                     )
                 )
-            )
-                .setEmbeds(eb.build())
-                .queue()
+                    .setEmbeds(eb.build())
+                    .queue()
+            }
+
             // TODO: Handle unknown message error properly
 //                msgRequest.queue(
 //                    { msg: Message ->
@@ -318,14 +322,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    private suspend fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
+    private fun sendEditErrorMessage(messageChannel: GuildMessageChannel?) {
         sendErrorMessage(
             messageChannel,
             DedicatedChannelMessages.DEDICATED_CHANNEL_SELF_INSUFFICIENT_PERMS_EDIT
         )
     }
 
-    private suspend fun sendErrorMessage(
+    private fun sendErrorMessage(
         messageChannel: GuildMessageChannel?,
         message: DedicatedChannelMessages
     ) {
@@ -345,26 +349,14 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun updateAll() {
+    fun updateAll() {
         if (!isChannelSet())
             return
 
         try {
             updateMessage()
-            val buttonUpdate = updateButtons()
-            val topicUpdate = updateTopic()
-
-            if (buttonUpdate == null || topicUpdate == null) {
-                logger.error(
-                    "Could not update request channel in {} because one or more of the updates resulted in a null job!",
-                    guild.name
-                )
-            } else {
-                awaitAll(
-                    buttonUpdate,
-                    topicUpdate
-                )
-            }
+            updateButtons()
+            updateTopic()
         } catch (e: InsufficientPermissionException) {
             logger.error(
                 "I didn't have enough permissions to update the dedicated channel in {}",
@@ -373,18 +365,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         }
     }
 
-    suspend fun updateButtons(): Deferred<Message?>? = coroutineScope {
-        if (!isChannelSet()) return@coroutineScope null
-        val job = async {
-            val msgRequest: RestAction<Message> = getMessageRequest() ?: return@async null
-            val msg = msgRequest.await()
-            buttonUpdateRequest(msg).await()
-        }
-
-        return@coroutineScope job
+    fun updateButtons() {
+        if (!isChannelSet()) return
+        val msgRequest: RestAction<Message> = getMessageRequest() ?: return
+        msgRequest.queue { msg -> buttonUpdateRequest(msg).queue() }
     }
 
-    suspend fun buttonUpdateRequest(msg: Message): MessageEditAction {
+    fun buttonUpdateRequest(msg: Message): MessageEditAction {
         val localeManager = LocaleManager.getLocaleManager(msg.guild)
 
         val validFirstRowItems = RequestChannelButton.firstRow.filter { config.getState(it) }
@@ -452,15 +439,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         )
     }
 
-    suspend fun updateTopic(): Deferred<Void>? = coroutineScope {
-        if (!isChannelSet()) return@coroutineScope null
-        return@coroutineScope async {
-            val channel: TextChannel? = getTextChannel()
-            channelTopicUpdateRequest(channel)!!.await()
-        }
+    fun updateTopic() {
+        if (!isChannelSet()) return
+        val channel: TextChannel? = getTextChannel()
+        channelTopicUpdateRequest(channel)!!.queue()
     }
 
-    suspend fun channelTopicUpdateRequest(channel: TextChannel?): TextChannelManager? {
+    fun channelTopicUpdateRequest(channel: TextChannel?): TextChannelManager? {
         if (channel == null) return null
         val localeManager = LocaleManager.getLocaleManager(channel.guild)
         return channel.manager.setTopic(
@@ -476,13 +461,13 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         )
     }
 
-    protected suspend fun updateConfig(config: JSONObject) {
+    protected fun updateConfig(config: JSONObject) {
         cache.updateGuild(guild.id) {
             this.dedicated_channel = Json.decodeFromString(config.toString())
         }
     }
 
-    suspend fun cleanChannel() {
+    fun cleanChannel() {
         if (!isChannelSet()) return
         if (!guild.selfMember.hasPermission(Permission.MESSAGE_HISTORY)) return
         val channel = getTextChannel()!!
@@ -508,12 +493,12 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
 
     class ChannelConfig internal constructor(private val mainConfig: RequestChannelConfig) {
 
-        suspend fun getConfigJsonObject(): JSONObject {
+        fun getConfigJsonObject(): JSONObject {
             val guildModel = mainConfig.getGuildModel()
             return guildModel.dedicated_channel.config?.toJsonObject() ?: RequestChannelConfigModel().toJsonObject()
         }
 
-        suspend fun getState(field: RequestChannelButton): Boolean {
+        fun getState(field: RequestChannelButton): Boolean {
             if (!hasField(field)) initConfig()
             val config: JSONObject = mainConfig
                 .getGuildModel()
@@ -523,7 +508,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             return config.getBoolean(field.name.lowercase(Locale.getDefault()))
         }
 
-        suspend fun setState(field: RequestChannelButton, state: Boolean) {
+        fun setState(field: RequestChannelButton, state: Boolean) {
             if (!hasField(field)) initConfig()
 
             val guildModel = mainConfig.getGuildModel()
@@ -537,7 +522,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             mainConfig.updateConfig(fullConfig)
         }
 
-        suspend fun toggleStates(buttons: List<RequestChannelButton>) {
+        fun toggleStates(buttons: List<RequestChannelButton>) {
             val guildModel = mainConfig.getGuildModel()
             val config = guildModel.dedicated_channel.config!!
             cache.updateGuild(guildModel.server_id.toString()) {
@@ -595,7 +580,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             }
         }
 
-        private suspend fun initConfig() {
+        private fun initConfig() {
             val config: JSONObject = mainConfig.getGuildModel().toJsonObject()
                 .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())
             if (!config.has(GuildDB.Field.REQUEST_CHANNEL_CONFIG.toString())) config.put(
@@ -612,7 +597,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             mainConfig.updateConfig(config)
         }
 
-        private suspend fun hasField(field: RequestChannelButton): Boolean {
+        private fun hasField(field: RequestChannelButton): Boolean {
             val guildModel = mainConfig.getGuildModel()
             val config = guildModel.dedicated_channel.config?.toJsonObject()
             return config?.has(field.name.lowercase(Locale.getDefault())) ?: false
@@ -620,7 +605,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
     }
 
 
-    override suspend fun update() {
+    override fun update() {
         // Nothing
     }
 }

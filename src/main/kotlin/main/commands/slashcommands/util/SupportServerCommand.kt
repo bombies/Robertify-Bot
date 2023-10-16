@@ -16,7 +16,7 @@ class SupportServerCommand : AbstractSlashCommand(SlashCommand(
     guildUseOnly = false
 )) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed(SupportServerMessages.JOIN_SUPPORT_SERVER)
             .setEphemeral(true)
             .setActionRow(

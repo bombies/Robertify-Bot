@@ -20,12 +20,12 @@ class AutoPlayCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed { handleAutoPlay(event.guild!!) }
             .queue()
     }
 
-    private suspend fun handleAutoPlay(guild: Guild): MessageEmbed {
+    private fun handleAutoPlay(guild: Guild): MessageEmbed {
         val localeManager = LocaleManager[guild]
         val autoPlayConfig = AutoPlayConfig(guild)
 

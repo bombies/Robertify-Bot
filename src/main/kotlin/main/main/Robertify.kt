@@ -5,10 +5,7 @@ import api.RobertifyKtorApi
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.events.getDefaultScope
-import dev.minn.jda.ktx.events.listener
-import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.minn.jda.ktx.util.SLF4J
 import dev.schlaubi.lavakord.LavaKord
 import dev.schlaubi.lavakord.MutableLavaKordOptions
@@ -17,43 +14,25 @@ import dev.schlaubi.lavakord.jda.applyLavakord
 import dev.schlaubi.lavakord.jda.lavakord
 import dev.schlaubi.lavakord.plugins.lavasrc.LavaSrc
 import io.sentry.Sentry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager
-import main.commands.slashcommands.SlashCommandManager.registerCommands
+import main.commands.slashcommands.util.HelpCommand
 import main.constants.ENV
 import main.events.EventManager
-import main.main.Listener.Companion.loadNeededSlashCommands
-import main.main.Listener.Companion.rescheduleUnbans
-import main.utils.GeneralUtils
-import main.utils.GeneralUtils.isNull
 import main.utils.api.robertify.RobertifyApi
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
-import main.utils.database.mongodb.cache.BotDBCache
-import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
-import main.utils.json.locale.LocaleConfig
-import main.utils.json.reminders.RemindersConfig
-import main.utils.json.requestchannel.RequestChannelConfig
-import main.utils.locale.LocaleManager
-import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
-import net.dv8tion.jda.api.events.guild.GuildReadyEvent
-import net.dv8tion.jda.api.events.session.ReadyEvent
-import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
-import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
-import org.yaml.snakeyaml.reader.ReaderException
 import java.util.*
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 object Robertify {
     private val logger by SLF4J
@@ -113,42 +92,44 @@ object Robertify {
 
         // Build bot connection
         logger.info("Building shard manager...")
-
         val shardManagerBuilder = DefaultShardManagerBuilder.createLight(
             Config.BOT_TOKEN,
             listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
         )
-            .apply {
-                setShardsTotal(Config.SHARD_COUNT)
-                injectKTX()
-                setMemberCachePolicy(MemberCachePolicy.DEFAULT)
-                setBulkDeleteSplittingEnabled(false)
-                enableCache(CacheFlag.VOICE_STATE)
-                setActivity(Activity.listening("Starting up..."))
+            .setShardsTotal(Config.SHARD_COUNT)
+            .setMemberCachePolicy(MemberCachePolicy.VOICE)
+            .setBulkDeleteSplittingEnabled(false)
+            .enableCache(CacheFlag.VOICE_STATE)
+            .setActivity(Activity.listening("Starting up..."))
+            .addEventListeners(
+                *SlashCommandManager.globalCommands.toTypedArray(),
+                *SlashCommandManager.guildCommands.toTypedArray(),
+                *SlashCommandManager.devCommands.toTypedArray(),
+                *EventManager.registeredEvents.toTypedArray()
+            )
 
-                val disabledIntents = mutableListOf(
-                    GatewayIntent.DIRECT_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_MODERATION,
-                    GatewayIntent.GUILD_INVITES,
-                    GatewayIntent.GUILD_MEMBERS,
-                    GatewayIntent.GUILD_MESSAGE_TYPING,
-                    GatewayIntent.GUILD_PRESENCES,
-                    GatewayIntent.DIRECT_MESSAGE_REACTIONS,
-                    GatewayIntent.SCHEDULED_EVENTS
-                )
+        val disabledIntents = mutableListOf(
+            GatewayIntent.DIRECT_MESSAGE_TYPING,
+            GatewayIntent.GUILD_MODERATION,
+            GatewayIntent.GUILD_INVITES,
+            GatewayIntent.GUILD_MEMBERS,
+            GatewayIntent.GUILD_MESSAGE_TYPING,
+            GatewayIntent.GUILD_PRESENCES,
+            GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+            GatewayIntent.SCHEDULED_EVENTS
+        )
 
-                val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
+        val enabledIntents = mutableListOf(GatewayIntent.GUILD_MESSAGES)
 
-                if (Config.MESSAGE_CONTENT_ENABLED)
-                    enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
-                else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+        if (Config.MESSAGE_CONTENT_ENABLED)
+            enabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
+        else disabledIntents.add(GatewayIntent.MESSAGE_CONTENT)
 
-                enableIntents(enabledIntents)
-                disableIntents(disabledIntents)
-            }
-
-        shardManagerBuilder.applyLavakord(lavakordShardManager)
-        shardManager = shardManagerBuilder.build()
+        shardManager = shardManagerBuilder
+            .enableIntents(enabledIntents)
+            .disableIntents(disabledIntents)
+            .applyLavakord(lavakordShardManager)
+            .build()
         logger.info("Successfully built shard manager")
 
         logger.info("Setting up LavaKord...")
@@ -174,18 +155,15 @@ object Robertify {
         }
         logger.info("LavaKord ready")
 
-        shardManager.handleShardReady()
-        shardManager.handleGuildReady()
-
-        val slashCommandManager = SlashCommandManager
-        shardManager.registerCommands(
-            slashCommandManager.guildCommands
-                .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
-        )
-        logger.info("Registered all slash commands.")
-
-        EventManager.registeredEvents
-        logger.info("Registered all event controllers.")
+//        val slashCommandManager = SlashCommandManager
+//        shardManager.registerCommands(
+//            slashCommandManager.guildCommands
+//                .merge(slashCommandManager.globalCommands, slashCommandManager.devCommands)
+//        )
+//        logger.info("Registered all slash commands.")
+//
+//        EventManager.registeredEvents
+//        logger.info("Registered all event controllers.")
 
         if (Config.LOAD_COMMANDS)
             AbstractSlashCommand.loadAllCommands()
@@ -206,31 +184,6 @@ object Robertify {
             externalApi = RobertifyApi()
 
         RobertifyKtorApi.start()
-    }
-
-    private fun ShardManager.handleShardReady() = listener<ReadyEvent> { event ->
-        val jda = event.jda
-        logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
-        BotDBCache.instance.lastStartup = System.currentTimeMillis()
-        jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
-
-        shardManager.guildCache.forEach { guild ->
-            RequestChannelConfig(guild).updateMessage()
-        }
-    }
-
-    private fun ShardManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
-        val guild = event.guild
-        val locale = LocaleConfig(guild).getLocale()
-        try {
-            LocaleManager[guild].setLocale(locale)
-        } catch (e: ReaderException) {
-            logger.error("I couldn't set the locale for ${guild.name}")
-        }
-        loadNeededSlashCommands(guild)
-        rescheduleUnbans(guild)
-        RemindersConfig(guild).scheduleReminders()
-//        GuildResumeManager(guild).loadTracks()
     }
 
     fun initVoteSiteAPIs() {

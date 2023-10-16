@@ -40,151 +40,148 @@ class RequestChannelEvents : AbstractEventController() {
         val logger by SLF4J
     }
 
-    private val handleChannelDelete =
-        onEvent<ChannelDeleteEvent> { event ->
-            if (!event.isFromType(ChannelType.TEXT))
-                return@onEvent
+    override fun onChannelDelete(event: ChannelDeleteEvent) {
+        if (!event.isFromType(ChannelType.TEXT))
+            return
 
-            val guild = event.guild
-            val config = RequestChannelConfig(guild)
+        val guild = event.guild
+        val config = RequestChannelConfig(guild)
 
-            if (!config.isChannelSet() || config.getChannelId() != event.channel.idLong)
-                return@onEvent
+        if (!config.isChannelSet() || config.getChannelId() != event.channel.idLong)
+            return
 
-            config.removeChannel()
-        }
+        config.removeChannel()
+    }
 
-    private val handleMessageSend =
-        onEvent<MessageReceivedEvent> { event ->
-            if (!event.isFromGuild) return@onEvent
+    override fun onMessageReceived(event: MessageReceivedEvent) {
+        if (!event.isFromGuild) return
 
-            val guild = event.guild
-            val config = RequestChannelConfig(guild)
+        val guild = event.guild
+        val config = RequestChannelConfig(guild)
 
-            if (!config.isChannelSet()) return@onEvent
+        if (!config.isChannelSet()) return
 
-            if (config.getChannelId() != event.channel.idLong) return@onEvent
+        if (config.getChannelId() != event.channel.idLong) return
 
-            val selfVoiceState = guild.selfMember.voiceState!!
-            val memberVoiceState = event.member!!.voiceState!!
-            val user = event.author
+        val selfVoiceState = guild.selfMember.voiceState!!
+        val memberVoiceState = event.member!!.voiceState!!
+        val user = event.author
 
-            val msg = event.message
-            val msgContent = msg.contentRaw
+        val msg = event.message
+        val msgContent = msg.contentRaw
 
-            when {
-                !user.isBot && !event.isWebhookMessage -> {
-                    if (!Config.MESSAGE_CONTENT_ENABLED)
-                        return@onEvent run {
-                            msg.reply_(
-                                content = user.asMention,
-                                embeds = listOf(
-                                    RobertifyEmbedUtils.embedMessage(
-                                        guild,
-                                        DedicatedChannelMessages.DEDICATED_CHANNEL_NO_CONTENT_INTENT
-                                    ).build()
-                                )
-                            ).queue()
-                            msg.delete().queueAfter(10.seconds)
-                        }
-
-                    if (!memberVoiceState.inAudioChannel())
-                        return@onEvent run {
-                            msg.reply_(
-                                content = user.asMention,
-                                embeds = listOf(
-                                    RobertifyEmbedUtils.embedMessage(
-                                        guild,
-                                        GeneralMessages.USER_VOICE_CHANNEL_NEEDED
-                                    ).build()
-                                )
-                            ).queue()
-                            msg.delete().queueAfter(10.seconds)
-                        }
-
-
-                    if (selfVoiceState.inAudioChannel()) {
-                        if (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
-                            return@onEvent run {
-                                msg.reply_(
-                                    content = user.asMention,
-                                    embeds = listOf(
-                                        RobertifyEmbedUtils.embedMessage(
-                                            guild,
-                                            GeneralMessages.SAME_VOICE_CHANNEL_LOC,
-                                            "{channel}" to selfVoiceState.channel!!.asMention
-                                        ).build()
-                                    )
-                                ).queue()
-                                msg.delete().queueAfter(10.seconds)
-                            }
-                    } else {
-                        // Cant be bothered to implement this especially since it's not being used anymore.
+        when {
+            !user.isBot && !event.isWebhookMessage -> {
+                if (!Config.MESSAGE_CONTENT_ENABLED)
+                    return run {
+                        msg.reply_(
+                            content = user.asMention,
+                            embeds = listOf(
+                                RobertifyEmbedUtils.embedMessage(
+                                    guild,
+                                    DedicatedChannelMessages.DEDICATED_CHANNEL_NO_CONTENT_INTENT
+                                ).build()
+                            )
+                        ).queue()
+                        msg.delete().queueAfter(10.seconds)
                     }
+
+                if (!memberVoiceState.inAudioChannel())
+                    return run {
+                        msg.reply_(
+                            content = user.asMention,
+                            embeds = listOf(
+                                RobertifyEmbedUtils.embedMessage(
+                                    guild,
+                                    GeneralMessages.USER_VOICE_CHANNEL_NEEDED
+                                ).build()
+                            )
+                        ).queue()
+                        msg.delete().queueAfter(10.seconds)
+                    }
+
+
+                if (selfVoiceState.inAudioChannel()) {
+                    if (memberVoiceState.channel!!.id != selfVoiceState.channel!!.id)
+                        return run {
+                            msg.reply_(
+                                content = user.asMention,
+                                embeds = listOf(
+                                    RobertifyEmbedUtils.embedMessage(
+                                        guild,
+                                        GeneralMessages.SAME_VOICE_CHANNEL_LOC,
+                                        "{channel}" to selfVoiceState.channel!!.asMention
+                                    ).build()
+                                )
+                            ).queue()
+                            msg.delete().queueAfter(10.seconds)
+                        }
+                } else {
+                    // Cant be bothered to implement this especially since it's not being used anymore.
                 }
             }
+        }
 
-            when {
-                user.isBot -> {
-                    if (!msg.isEphemeral)
-                        msg.delete().queueAfter(10.seconds, null) {
-                            ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE) {}
-                        }
-                }
-
-                else -> {
-                    msg.delete().queueAfter(2.seconds, null) {
+        when {
+            user.isBot -> {
+                if (!msg.isEphemeral)
+                    msg.delete().queueAfter(10.seconds, null) {
                         ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE) {}
                     }
+            }
+
+            else -> {
+                msg.delete().queueAfter(2.seconds, null) {
+                    ErrorHandler().handle(ErrorResponse.UNKNOWN_MESSAGE) {}
                 }
             }
         }
+    }
 
-    private val handleButtonClick =
-        onEvent<ButtonInteractionEvent> { event ->
-            if (!event.isFromGuild || event.button.id?.startsWith(RequestChannelButtonId.IDENTIFIER.toString()) != true)
-                return@onEvent
+    override fun onButtonInteraction(event: ButtonInteractionEvent) {
+        if (!event.isFromGuild || event.button.id?.startsWith(RequestChannelButtonId.IDENTIFIER.toString()) != true)
+            return
 
-            val guild = event.guild!!
-            val config = RequestChannelConfig(guild)
+        val guild = event.guild!!
+        val config = RequestChannelConfig(guild)
 
-            if (!config.isChannelSet() && config.getChannelId() != event.channel.idLong)
-                return@onEvent
+        if (!config.isChannelSet() && config.getChannelId() != event.channel.idLong)
+            return
 
-            val id = event.button.id!!
-            val selfVoiceState = guild.selfMember.voiceState!!
-            val memberVoiceState = event.member!!.voiceState!!
+        val id = event.button.id!!
+        val selfVoiceState = guild.selfMember.voiceState!!
+        val memberVoiceState = event.member!!.voiceState!!
 
-            event.reply_(
-                content = event.user.asMention,
-                embeds = listOf(
-                    when (id) {
-                        RequestChannelButtonId.REWIND.toString() -> handleRewind(selfVoiceState, memberVoiceState)
-                        RequestChannelButtonId.PLAY_AND_PAUSE.toString() -> handlePlayAndPause(
-                            selfVoiceState,
-                            memberVoiceState
-                        )
+        event.reply_(
+            content = event.user.asMention,
+            embeds = listOf(
+                when (id) {
+                    RequestChannelButtonId.REWIND.toString() -> handleRewind(selfVoiceState, memberVoiceState)
+                    RequestChannelButtonId.PLAY_AND_PAUSE.toString() -> handlePlayAndPause(
+                        selfVoiceState,
+                        memberVoiceState
+                    )
 
-                        RequestChannelButtonId.SKIP.toString() -> handleSkip(selfVoiceState, memberVoiceState)
-                        RequestChannelButtonId.LOOP.toString() -> handleLoop(selfVoiceState, memberVoiceState)
-                        RequestChannelButtonId.SHUFFLE.toString() -> handleShuffle(memberVoiceState)
-                        RequestChannelButtonId.DISCONNECT.toString() -> handleDisconnect(
-                            selfVoiceState,
-                            memberVoiceState
-                        )
+                    RequestChannelButtonId.SKIP.toString() -> handleSkip(selfVoiceState, memberVoiceState)
+                    RequestChannelButtonId.LOOP.toString() -> handleLoop(selfVoiceState, memberVoiceState)
+                    RequestChannelButtonId.SHUFFLE.toString() -> handleShuffle(memberVoiceState)
+                    RequestChannelButtonId.DISCONNECT.toString() -> handleDisconnect(
+                        selfVoiceState,
+                        memberVoiceState
+                    )
 
-                        RequestChannelButtonId.STOP.toString() -> handleStop(memberVoiceState)
-                        RequestChannelButtonId.PREVIOUS.toString() -> handlePrevious(selfVoiceState, memberVoiceState)
-                        RequestChannelButtonId.FAVOURITE.toString() -> handleFavouriteTrack(memberVoiceState)
-                        else -> throw IllegalArgumentException("Somehow received $id as an argument to parse")
-                    }
-                )
-            ).queue(null) {
-                ErrorHandler().ignore(ErrorResponse.UNKNOWN_INTERACTION)
-            }
+                    RequestChannelButtonId.STOP.toString() -> handleStop(memberVoiceState)
+                    RequestChannelButtonId.PREVIOUS.toString() -> handlePrevious(selfVoiceState, memberVoiceState)
+                    RequestChannelButtonId.FAVOURITE.toString() -> handleFavouriteTrack(memberVoiceState)
+                    else -> throw IllegalArgumentException("Somehow received $id as an argument to parse")
+                }
+            )
+        ).queue(null) {
+            ErrorHandler().ignore(ErrorResponse.UNKNOWN_INTERACTION)
         }
+    }
 
-    private suspend fun handleRewind(
+    private fun handleRewind(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -193,7 +190,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleRewind(memberVoiceState, selfVoiceState) }
 
-    private suspend fun handlePlayAndPause(
+    private fun handlePlayAndPause(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -202,7 +199,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handlePause(memberVoiceState, selfVoiceState) }
 
-    private suspend fun handleSkip(
+    private fun handleSkip(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -211,7 +208,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleSkip(selfVoiceState, memberVoiceState) }
 
-    private suspend fun handleLoop(
+    private fun handleLoop(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -282,7 +279,7 @@ class RequestChannelEvents : AbstractEventController() {
 
         }
 
-    private suspend fun handleShuffle(
+    private fun handleShuffle(
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
         handleGenericCommand(
@@ -290,7 +287,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleShuffle(memberVoiceState.guild, memberVoiceState.member.user) }
 
-    private suspend fun handleDisconnect(
+    private fun handleDisconnect(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -299,7 +296,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleDisconnect(selfVoiceState, memberVoiceState) }
 
-    private suspend fun handleStop(
+    private fun handleStop(
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
         handleGenericCommand(
@@ -307,7 +304,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handleStop(memberVoiceState.member) }
 
-    private suspend fun handlePrevious(
+    private fun handlePrevious(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
@@ -316,7 +313,7 @@ class RequestChannelEvents : AbstractEventController() {
             memberVoiceState
         ) { handlePrevious(selfVoiceState, memberVoiceState) }
 
-    private suspend fun handleFavouriteTrack(
+    private fun handleFavouriteTrack(
         memberVoiceState: GuildVoiceState
     ): MessageEmbed =
         handleGenericCommand(
@@ -325,7 +322,7 @@ class RequestChannelEvents : AbstractEventController() {
         ) { handleAdd(memberVoiceState.guild, memberVoiceState.member) }
 
 
-    private suspend inline fun <T : AbstractSlashCommand> handleGenericCommand(
+    private inline fun <T : AbstractSlashCommand> handleGenericCommand(
         command: T,
         memberVoiceState: GuildVoiceState,
         logic: T.() -> MessageEmbed
@@ -336,7 +333,7 @@ class RequestChannelEvents : AbstractEventController() {
         return logic(command)
     }
 
-    private suspend fun djCheck(
+    private fun djCheck(
         command: AbstractSlashCommand,
         guild: Guild,
         member: Member

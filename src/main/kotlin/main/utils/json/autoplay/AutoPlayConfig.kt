@@ -8,17 +8,17 @@ import java.util.*
 
 class AutoPlayConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    suspend fun getStatus(): Boolean {
+    fun getStatus(): Boolean {
         return getGuildModel().autoplay ?: false
     }
 
-    suspend fun setStatus(status: Boolean) {
+    fun setStatus(status: Boolean) {
         cache.updateGuild(guild.id) {
             autoplay = status
         }
     }
 
-    override suspend fun update() {
+    override fun update() {
         val guildObject = getGuildModel().toJsonObject()
         if (!guildObject.has(Field.AUTOPLAY.name.lowercase(Locale.getDefault())))
             guildObject.put(Field.AUTOPLAY.name.lowercase(), false)

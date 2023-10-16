@@ -3,6 +3,7 @@ package main.commands.slashcommands.dev
 import dev.minn.jda.ktx.util.SLF4J
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
 import main.commands.slashcommands.SlashCommandManager
 import main.main.Robertify
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
@@ -25,7 +26,7 @@ class PostCommandInfoCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val commandManager = SlashCommandManager
         val commands = commandManager.globalCommands
 
@@ -46,13 +47,13 @@ class PostCommandInfoCommand : AbstractSlashCommand(
         event.deferReply(true).queue()
 
         val guild = event.guild
-        val response = Robertify.externalApi.postCommandInfo(body)
+        val response = runBlocking { Robertify.externalApi.postCommandInfo(body) }
         if (response != null && response.status == HttpStatusCode.Created)
             event.hook.sendEmbed(guild, "Posted!")
                 .queue()
         else if (response != null) {
             try {
-                val err = JSONObject(response.bodyAsText()).getString("message")
+                val err = JSONObject(runBlocking { response.bodyAsText() }).getString("message")
                 event.hook.sendEmbed(
                     guild,
                     "There was an issue attempting to post commands! Check console for more information.\n\nError Message:\n```$err```\nError Code:`${response.status.value}`"
@@ -65,7 +66,7 @@ class PostCommandInfoCommand : AbstractSlashCommand(
                     "There was an issue attempting to post commands! Check console for more information.\n\nError Code:`${response.status.value}`"
                 )
                     .queue()
-                logger.error(response.bodyAsText())
+                logger.error(runBlocking { response.bodyAsText() })
 
             }
         } else event.hook.sendEmbed(guild, "Could not get a response! Are you sure there's a connection to the API?")

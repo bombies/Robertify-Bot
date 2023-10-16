@@ -16,7 +16,7 @@ class ListDJCommand : AbstractSlashCommand(SlashCommand(
     adminOnly = true
 )) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = PermissionsConfig(guild)
         val localeManager = LocaleManager[guild]

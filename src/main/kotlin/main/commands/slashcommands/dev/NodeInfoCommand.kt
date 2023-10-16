@@ -16,7 +16,7 @@ class NodeInfoCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val lavalink = Robertify.lavaKord
         val desc = "```txt\n${
             lavalink.nodes.joinToString("\n") { node ->

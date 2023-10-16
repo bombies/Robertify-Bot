@@ -70,7 +70,7 @@ class EightBallCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (primaryCommand) {
@@ -82,7 +82,7 @@ class EightBallCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleAdd(event: SlashCommandInteractionEvent) {
+    private fun handleAdd(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -103,7 +103,7 @@ class EightBallCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
+    private fun handleRemove(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -126,7 +126,7 @@ class EightBallCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleClear(event: SlashCommandInteractionEvent) {
+    private fun handleClear(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -142,7 +142,7 @@ class EightBallCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent) {
+    private fun handleList(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         if (!member.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))
@@ -166,7 +166,7 @@ class EightBallCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleAsk(event: SlashCommandInteractionEvent) {
+    private fun handleAsk(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val localeManager = LocaleManager[guild]
 
@@ -236,7 +236,7 @@ class EightBallCommand : AbstractSlashCommand(
         event.replyEmbed { embed }.queue()
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name != "8ball" && event.focusedOption.name != "id") return
 
         if (!event.member!!.hasPermissions(RobertifyPermission.ROBERTIFY_8BALL))

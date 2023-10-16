@@ -16,18 +16,18 @@ class PingCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
-
-        val ping = event.jda.restPing.await()
-        event.hook.sendEmbed(
-            event.guild, """
+        event.jda.restPing.queue { ping ->
+            event.hook.sendEmbed(
+                event.guild, """
                 🏓 **Pong!**
                 
                 REST Ping: **${ping}ms**
                 Websocket Ping: **${event.jda.shardManager!!.averageGatewayPing.roundToInt()}**
             """.trimIndent()
-        ).queue()
+            ).queue()
+        }
     }
 
     override val help: String

@@ -122,11 +122,11 @@ object SlashCommandManager {
     fun ModalInteractionEvent.getRequiredValue(id: String): ModalMapping =
         this.getValue(id) ?: throw NullPointerException("Invalid value \"$id\". Are you sure that value is required?")
 
-    fun ShardManager.registerCommand(command: AbstractSlashCommand) =
-        command.register(this)
-
-    fun ShardManager.registerCommands(commands: List<AbstractSlashCommand>) =
-        commands.forEach { it.register(this) }
+//    fun ShardManager.registerCommand(command: AbstractSlashCommand) =
+//        command.register(this)
+//
+//    fun ShardManager.registerCommands(commands: List<AbstractSlashCommand>) =
+//        commands.forEach { it.register(this) }
 
     val globalCommands: List<AbstractSlashCommand>
         get() {

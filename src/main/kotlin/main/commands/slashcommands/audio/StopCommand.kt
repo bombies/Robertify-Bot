@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio
 
 import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
@@ -27,12 +28,12 @@ class StopCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
         event.hook.sendEmbed(event.guild) { handleStop(event.member!!) }.queue()
     }
 
-    suspend fun handleStop(stopper: Member): MessageEmbed {
+    fun handleStop(stopper: Member): MessageEmbed {
         val guild = stopper.guild
         val selfVoiceState = guild.selfMember.voiceState!!
         val memberVoiceState = stopper.voiceState!!
@@ -64,8 +65,11 @@ class StopCommand : AbstractSlashCommand(
             ).build()
 
             else -> {
-                musicManager.clear()
-                player.stopTrack()
+                runBlocking {
+                    musicManager.clear()
+                    player.stopTrack()
+                }
+
                 logger.debug("Stopped track. Playing track: ${player.playingTrack?.title ?: "none"}")
 
                 LogUtilsKt(guild).sendLog(

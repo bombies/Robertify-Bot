@@ -18,7 +18,7 @@ class ClearQueueCommand : AbstractSlashCommand(SlashCommand(
     override val help: String
         get() = "Clear all the queued songs"
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler

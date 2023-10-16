@@ -27,7 +27,7 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
         val guild = guildUtils.getGuild(createChannelDto.server_id) ?: return noGuild(createChannelDto.server_id)
 
         return try {
-            val channel = RequestChannelEditCommand().createRequestChannel(guild, shardManager).await()
+            val channel = RequestChannelEditCommand().createRequestChannel(guild, shardManager)
             OkResponse(
                 message = "Success",
                 data = RequestChannelCreationResponse(
@@ -56,7 +56,6 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
 
         RequestChannelEditCommand()
             .handleChannelButtonToggle(guild, listOf(dto.button.lowercase()), shardManager = shardManager)
-            ?.await()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
     }
 

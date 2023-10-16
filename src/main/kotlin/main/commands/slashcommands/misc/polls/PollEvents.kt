@@ -12,8 +12,8 @@ class PollEvents : AbstractEventController() {
         private val logger by SLF4J
     }
 
-    private val handleReactionAdd = onEvent<MessageReactionAddEvent> { event ->
-        if (!pollCache.containsKey(event.messageIdLong)) return@onEvent
+    override fun onMessageReactionAdd(event: MessageReactionAddEvent) {
+        if (!pollCache.containsKey(event.messageIdLong)) return
         event.retrieveUser().queue { user ->
             if (user.isBot) return@queue
 
@@ -24,8 +24,8 @@ class PollEvents : AbstractEventController() {
         }
     }
 
-    private val handleReactionRemove = onEvent<MessageReactionRemoveEvent> { event ->
-        if (!pollCache.containsKey(event.messageIdLong)) return@onEvent
+    override fun onMessageReactionRemove(event: MessageReactionRemoveEvent) {
+        if (!pollCache.containsKey(event.messageIdLong)) return
         event.retrieveUser().queue { user ->
             if (user.isBot) return@queue
 

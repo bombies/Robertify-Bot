@@ -41,21 +41,19 @@ class MainAudioLoader(
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val executorService = Executors.newSingleThreadScheduledExecutor()
 
-        suspend fun RestAction<Message>.queueThenDelete(
-            context: CoroutineContext = getDefaultScope().coroutineContext,
+        fun RestAction<Message>.queueThenDelete(
             time: Long = 10,
             unit: TimeUnit = TimeUnit.SECONDS,
-            deletePredicate: (suspend (message: Message) -> Boolean)? = null,
-            onSuccess: (suspend (message: Message) -> Unit)? = null
+            deletePredicate: ((message: Message) -> Boolean)? = null,
+            onSuccess: ((message: Message) -> Unit)? = null
         ) {
-            val message = this.await();
-            if (deletePredicate == null || deletePredicate(message)) {
-                executorService.schedule({
-                    runBlocking(context) {
-                        message.delete().await()
+            this.queue { message ->
+                if (deletePredicate == null || deletePredicate(message)) {
+                    executorService.schedule({
+                        message.delete().queue()
                         onSuccess?.invoke(message)
-                    }
-                }, time, unit)
+                    }, time, unit)
+                }
             }
         }
     }
@@ -67,7 +65,7 @@ class MainAudioLoader(
         _announcementChannel ?: botMsg?.channel?.asGuildMessageChannel()
     private val requestChannelConfig = RequestChannelConfig(guild)
 
-    private suspend fun handleMessageUpdate(embed: MessageEmbed) {
+    private fun handleMessageUpdate(embed: MessageEmbed) {
         if (botMsg != null)
             botMsg.editMessageEmbeds(embed)
                 .queueThenDelete(

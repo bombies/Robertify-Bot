@@ -40,7 +40,7 @@ class NowPlayingCommand : AbstractSlashCommand(
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
 
         val guild = event.guild!!
@@ -80,7 +80,7 @@ class NowPlayingCommand : AbstractSlashCommand(
             event.hook.sendEmbed(guild) { embed }
                 .queue()
         } else {
-            val sendBackupEmbed: suspend () -> Unit = {
+            val sendBackupEmbed: () -> Unit = {
                 event.hook.sendEmbed(guild) {
                     getNowPlayingEmbed(guild, event.channel.asGuildMessageChannel(), selfVoiceState, memberVoiceState)
                 }.queue()
@@ -123,7 +123,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getNowPlayingEmbed(
+    private fun getNowPlayingEmbed(
         guild: Guild,
         channel: GuildMessageChannel,
         selfVoiceState: GuildVoiceState,

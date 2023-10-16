@@ -38,7 +38,7 @@ class BanCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asMember ?: run {
             return event.replyEmbed {
                 embed(GeneralMessages.INVALID_ARGS)
@@ -52,7 +52,7 @@ class BanCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private suspend fun handleBan(user: Member, mod: Member, duration: String?): MessageEmbed {
+    private fun handleBan(user: Member, mod: Member, duration: String?): MessageEmbed {
         val guild = user.guild
         if (duration != null && !GeneralUtils.isValidDuration(duration))
             return RobertifyEmbedUtils.embedMessage(guild, BanMessages.INVALID_BAN_DURATION)

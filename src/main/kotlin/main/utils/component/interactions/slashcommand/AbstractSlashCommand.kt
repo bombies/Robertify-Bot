@@ -5,13 +5,13 @@ import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.events.onCommand
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager
 import main.constants.BotConstants
 import main.constants.RobertifyPermission
 import main.constants.Toggle
+import main.events.AbstractEventController
 import main.main.Config
 import main.main.Robertify
 import main.utils.GeneralUtils
@@ -49,7 +49,7 @@ import net.dv8tion.jda.api.sharding.ShardManager
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
-abstract class AbstractSlashCommand protected constructor(val info: SlashCommand) : GenericInteraction {
+abstract class AbstractSlashCommand protected constructor(val info: SlashCommand) : GenericInteraction, AbstractEventController() {
 
     constructor(block: MutableSlashCommand.() -> Unit) : this(handleConstructorBlock(block))
 
@@ -139,7 +139,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
                     )
         }
 
-        suspend fun audioChannelChecks(
+        fun audioChannelChecks(
             memberVoiceState: GuildVoiceState,
             selfVoiceState: GuildVoiceState,
             selfChannelNeeded: Boolean = true,
@@ -184,69 +184,86 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         }
     }
 
-    fun register(shardManager: ShardManager) {
-        shardManager.onCommand(this.info.name) { event ->
-            if (event !is SlashCommandInteractionEvent)
-                return@onCommand
+//    fun register(shardManager: ShardManager) {
+//        shardManager.onCommand(this.info.name) { event ->
+//            if (event !is SlashCommandInteractionEvent)
+//                return@onCommand
+//
+//        }
+//
+//        onEvent<ButtonInteractionEvent>(shardManager) {
+//            onButtonClick(it)
+//        }
+//
+//        onEvent<StringSelectInteractionEvent>(shardManager) {
+//            onStringSelect(it)
+//        }
+//
+//        onEvent<CommandAutoCompleteInteractionEvent>(shardManager) { event ->
+//            if (event.name != info.name)
+//                return@onEvent
+//            onCommandAutoComplete(event)
+//        }
+//
+//        onEvent<ModalInteractionEvent>(shardManager) {
+//            onModalSubmit(it)
+//        }
+//    }
 
-            val checks = checks(event)
-            if (!checks)
-                return@onCommand
+//    private inline fun <reified T : GenericEvent> onEvent(
+//        shardManager: ShardManager,
+//        crossinline handler: CoroutineEventListener.(event: T) -> Unit
+//    ) =
+//        shardManager.listener<T> { handler(it) }
 
-            handle(event)
+    abstract fun handle(event: SlashCommandInteractionEvent)
 
-            coroutineScope {
-                launch {
-                    if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand)) {
-                        try {
-                            CommandInfluxDatabase.recordCommand(
-                                guild = event.guild,
-                                command = this@AbstractSlashCommand,
-                                executor = event.user
-                            )
-                        } catch (e: InfluxException) {
-                            logger.warn("Could not record the ${this@AbstractSlashCommand.info.name} command in InfluxDB. Reason: ${e.message ?: "Unknown"}")
-                        }
-                    }
+    open fun onButtonClick(event: ButtonInteractionEvent) {}
+
+    open fun onStringSelect(event: StringSelectInteractionEvent) {}
+
+    open fun onCommandAutoComplete(event: CommandAutoCompleteInteractionEvent) {}
+
+    open fun onModalSubmit(event: ModalInteractionEvent) {}
+
+    override fun onSlashCommandInteraction(event: SlashCommandInteractionEvent) {
+        val checks = runBlocking { checks(event) }
+        if (!checks)
+            return
+
+        handle(event)
+        runBlocking {
+            if (!SlashCommandManager.isDevCommand(this@AbstractSlashCommand)) {
+                try {
+                    CommandInfluxDatabase.recordCommand(
+                        guild = event.guild,
+                        command = this@AbstractSlashCommand,
+                        executor = event.user
+                    )
+                } catch (e: InfluxException) {
+                    logger.warn("Could not record the ${this@AbstractSlashCommand.info.name} command in InfluxDB. Reason: ${e.message ?: "Unknown"}")
                 }
             }
         }
-
-        onEvent<ButtonInteractionEvent>(shardManager) {
-            onButtonInteraction(it)
-        }
-
-        onEvent<StringSelectInteractionEvent>(shardManager) {
-            onStringSelectInteraction(it)
-        }
-
-        onEvent<CommandAutoCompleteInteractionEvent>(shardManager) { event ->
-            if (event.name != info.name)
-                return@onEvent
-            onCommandAutoCompleteInteraction(event)
-        }
-
-        onEvent<ModalInteractionEvent>(shardManager) {
-            onModalInteraction(it)
-        }
-
     }
 
-    private inline fun <reified T : GenericEvent> onEvent(
-        shardManager: ShardManager,
-        crossinline handler: suspend CoroutineEventListener.(event: T) -> Unit
-    ) =
-        shardManager.listener<T> { handler(it) }
+    override fun onButtonInteraction(event: ButtonInteractionEvent) {
+        onButtonClick(event)
+    }
 
-    abstract suspend fun handle(event: SlashCommandInteractionEvent)
+    override fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+        onStringSelect(event)
+    }
 
-    open suspend fun onButtonInteraction(event: ButtonInteractionEvent) {}
+    override fun onModalInteraction(event: ModalInteractionEvent) {
+        onModalSubmit(event)
+    }
 
-    open suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {}
-
-    open suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {}
-
-    open suspend fun onModalInteraction(event: ModalInteractionEvent) {}
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+        if (event.name != this.info.name)
+            return
+        onCommandAutoComplete(event)
+    }
 
     open val help = ""
 
@@ -301,12 +318,12 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         upsertCommand(this)
     }
 
-    protected suspend fun sendRandomMessage(event: SlashCommandInteractionEvent) {
+    protected fun sendRandomMessage(event: SlashCommandInteractionEvent) {
         if (SlashCommandManager.isMusicCommand(this) && event.channel.type.isMessage)
             RandomMessageManager().randomlySendMessage(event.channel as GuildMessageChannel)
     }
 
-    protected suspend fun checks(event: SlashCommandInteractionEvent): Boolean {
+    private suspend fun checks(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!guildCheck(event)) return false
         if (!event.isFromGuild) return true
@@ -364,7 +381,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         info.name == event.name
 
 
-    protected open suspend fun guildCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun guildCheck(event: SlashCommandInteractionEvent): Boolean {
         if (info.isGuild) return true
         if (!event.isFromGuild && info.guildUseOnly) {
             event.replyEmbeds(
@@ -381,7 +398,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @param event
      * @return True if the user is banned, false if otherwise.
      */
-    protected open suspend fun banCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun banCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         if (!GuildConfig(guild).isBannedUser(event.user.idLong)) return true
         event.replyEmbeds(
@@ -403,7 +420,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @return True - If the command isn't a DJ command or the user is a DJ
      * False - If the command is a DJ command and the user isn't a DJ.
      */
-    protected open suspend fun musicCommandDJCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun musicCommandDJCheck(event: SlashCommandInteractionEvent): Boolean {
         return predicateCheck(event)
     }
 
@@ -415,14 +432,14 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * @return True - If the command isn't a premium command or the user is a premium user
      * False - If the command is a premium command and the user isn't a premium user
      */
-    protected open suspend fun premiumCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun premiumCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         if (!info.isPremium) return true
         val user = event.user
         return !(!GeneralUtils.checkPremium(event.guild!!, event) && user.idLong != 276778018440085505L)
     }
 
-    protected open suspend fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun premiumBotCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!Config.PREMIUM_BOT) return true
         val guild = event.guild ?: return true
         if (!GuildConfig(guild).isPremium()) {
@@ -454,7 +471,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * true will be returned.
      * False will be returned if and only if the command is DJ-only and the user is not a DJ.
      */
-    protected open suspend fun djCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun djCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         val guild = event.guild!!
         val toggles = TogglesConfig(guild)
@@ -484,7 +501,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
      * true will be returned.
      * False will be returned if and only if the command is admin-only and the user is not an admin.
      */
-    protected open suspend fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun adminCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!event.isFromGuild) return true
         val guild = event.guild!!
         if (info.adminOnly
@@ -504,7 +521,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open suspend fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun predicateCheck(event: SlashCommandInteractionEvent): Boolean {
         return if (info.checkPermission == null && info.requiredPermissions.isNotEmpty()) {
             if (!event.isFromGuild)
                 true
@@ -524,7 +541,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
             if (GeneralUtils.isDeveloper(event.id)) true else info.checkPermission?.invoke(event) ?: true
     }
 
-    protected open suspend fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun botPermsCheck(event: SlashCommandInteractionEvent): Boolean {
         if (info.botRequiredPermissions.isEmpty()) return true
         val guild = event.guild ?: return true
         val self = guild.selfMember
@@ -545,7 +562,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open suspend fun botEmbedCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun botEmbedCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         if (!guild.selfMember.hasPermission(event.guildChannel, Permission.MESSAGE_EMBED_LINKS)) {
             event.reply(
@@ -558,7 +575,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open suspend fun restrictedChannelCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun restrictedChannelCheck(event: SlashCommandInteractionEvent): Boolean {
         val guild = event.guild ?: return true
         val togglesConfig = TogglesConfig(guild)
         val config = RestrictedChannelsConfig(guild)
@@ -586,7 +603,7 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
         return true
     }
 
-    protected open suspend fun devCheck(event: SlashCommandInteractionEvent): Boolean {
+    protected open fun devCheck(event: SlashCommandInteractionEvent): Boolean {
         if (!nameCheck(event)) return false
         if (!info.developerOnly) return true
         if (!BotDBCache.instance.isDeveloper(event.user.idLong)) {

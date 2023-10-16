@@ -16,7 +16,7 @@ class PlaylistsImageBuilder(
     private val playlists: List<PlaylistModel>
 ) : AbstractImageBuilder(ImageType.PLAYLISTS_LIST) {
 
-    override suspend fun build(): InputStream? {
+    override fun build(): InputStream? {
         require(playlists.isNotEmpty()) { "The list of playlists must not be empty!" }
 
         val arr = JSONArray()

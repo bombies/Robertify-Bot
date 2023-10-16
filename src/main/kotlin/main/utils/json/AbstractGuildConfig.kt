@@ -21,17 +21,17 @@ abstract class AbstractGuildConfig protected constructor(private val guild: Guil
     }
 
 
-    abstract suspend fun update()
+    abstract fun update()
 
-    protected suspend fun getGuildModel(): GuildDatabaseModel {
+    protected fun getGuildModel(): GuildDatabaseModel {
         return cache.getGuildModel(guild.id)!!
     }
 
-    protected suspend fun guildHasInfo(): Boolean = cache.guildHasInfo(guild.idLong)
+    protected fun guildHasInfo(): Boolean = cache.guildHasInfo(guild.idLong)
 
-    protected suspend fun loadGuild() = cache.loadGuild(guild.idLong)
+    protected fun loadGuild() = cache.loadGuild(guild.idLong)
 
-    protected suspend fun unloadGuild() = cache.unloadGuild(guild.idLong)
+    protected fun unloadGuild() = cache.unloadGuild(guild.idLong)
 
     protected fun getDatabase(): GuildDB = cache.mongoDB as GuildDB
 }

@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -21,12 +22,12 @@ class PreviousTrackCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed { handlePrevious(event.guild!!.selfMember.voiceState!!, event.member!!.voiceState!!) }
             .queue()
     }
 
-    suspend fun handlePrevious(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
+    fun handlePrevious(selfVoiceState: GuildVoiceState, memberVoiceState: GuildVoiceState): MessageEmbed {
         val guild = selfVoiceState.guild
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
@@ -44,8 +45,10 @@ class PreviousTrackCommand : AbstractSlashCommand(
 
         val currentTrack = player.playingTrack!!
         queueHandler.addToBeginning(currentTrack)
-        player.stopTrack()
-        player.playTrack(queueHandler.popPreviousTrack()!!)
+        runBlocking {
+            player.stopTrack()
+            player.playTrack(queueHandler.popPreviousTrack()!!)
+        }
 
         RequestChannelConfig(guild).updateMessage()
 

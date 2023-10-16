@@ -22,7 +22,7 @@ class BotInfoCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild
         val localeManager = LocaleManager[guild]
         val botDb = BotDBCache.instance

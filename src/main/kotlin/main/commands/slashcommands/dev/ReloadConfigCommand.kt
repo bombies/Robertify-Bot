@@ -20,7 +20,7 @@ class ReloadConfigCommand : AbstractSlashCommand(SlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         event.deferReply(true).queue()
 

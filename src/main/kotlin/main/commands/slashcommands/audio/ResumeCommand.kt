@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -17,13 +18,13 @@ class ResumeCommand : AbstractSlashCommand(SlashCommand(
     description = "Resume the currently paused track."
 )) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
         event.replyEmbed { handleResume(memberVoiceState, selfVoiceState) }.queue()
     }
 
-    private suspend fun handleResume(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
+    private fun handleResume(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
         val guild = selfVoiceState.guild
@@ -33,7 +34,7 @@ class ResumeCommand : AbstractSlashCommand(SlashCommand(
         if (!player.paused)
             return RobertifyEmbedUtils.embedMessage(guild, PauseMessages.PLAYER_NOT_PAUSED).build()
 
-        player.pause(false)
+        runBlocking { player.pause(false) }
         LogUtilsKt(guild).sendLog(
             LogType.PLAYER_RESUME,
             PauseMessages.RESUMED_LOG,

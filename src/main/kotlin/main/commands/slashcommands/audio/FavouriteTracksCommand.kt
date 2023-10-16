@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio
 
 import dev.minn.jda.ktx.util.SLF4J
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.source
@@ -80,7 +81,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
                 `/favouritetracks` *(View all your favourite tracks)*
                 """
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         when (event.subcommandName) {
             "view" -> handleList(event)
             "add" -> event.replyEmbed { handleAdd(event.guild!!, event.member!!) }.setEphemeral(true).queue()
@@ -95,7 +96,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent) {
+    private fun handleList(event: SlashCommandInteractionEvent) {
         val config = FavouriteTracksCache.instance
         val member = event.member!!
         val guild = member.guild
@@ -132,7 +133,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         PaginationHandler.paginateMenu(event, list)
     }
 
-    private suspend fun handleClear(guild: Guild, user: User): MessageEmbed {
+    private fun handleClear(guild: Guild, user: User): MessageEmbed {
         val config = FavouriteTracksCache.instance
         val trackList = config.getTracks(user.idLong)
 
@@ -157,7 +158,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleRemove(guild: Guild, user: User, id: Int): MessageEmbed {
+    private fun handleRemove(guild: Guild, user: User, id: Int): MessageEmbed {
         if (id <= 0)
             return RobertifyEmbedUtils.embedMessage(guild, GeneralMessages.ID_GT_ZERO)
                 .build()
@@ -187,7 +188,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    suspend fun handleAdd(guild: Guild, member: Member): MessageEmbed {
+    fun handleAdd(guild: Guild, member: Member): MessageEmbed {
         val config = FavouriteTracksCache.instance
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player
@@ -238,7 +239,7 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+    override fun onStringSelect(event: StringSelectInteractionEvent) {
         if (event.selectMenu.id?.startsWith("menupage") == false) return
         if (event.user.id != event.componentId.split(":")[1]) return
 
@@ -276,21 +277,24 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         val messageChannel = event.channel.asGuildMessageChannel()
         messageChannel.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
-        }.queueCoroutine { addingMsg ->
+        }.queue { addingMsg ->
             val url = when (source) {
                 TrackSource.DEEZER -> "https://www.deezer.com/us/track/$id"
                 TrackSource.SPOTIFY -> "https://www.open.spotify.com/track/$id"
                 TrackSource.APPLE_MUSIC -> "https://www.music.apple.com/us/song/$id"
                 TrackSource.SOUNDCLOUD,
                 TrackSource.RESUMED -> id
+
                 else -> throw IllegalArgumentException("Invalid source!")
             }
 
-            audioManager.loadAndPlay(
-                trackUrl = url,
-                memberVoiceState = memberVoiceState,
-                botMessage = addingMsg
-            )
+            runBlocking {
+                audioManager.loadAndPlay(
+                    trackUrl = url,
+                    memberVoiceState = memberVoiceState,
+                    botMessage = addingMsg
+                )
+            }
         }
     }
 

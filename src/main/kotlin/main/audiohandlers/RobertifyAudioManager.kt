@@ -120,7 +120,7 @@ object RobertifyAudioManager {
         }
     }
 
-//    suspend fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
+//    fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
 //        val channelId = data.channel_id
 //        val voiceChannel = Robertify.shardManager.getVoiceChannelById(channelId)
 //
@@ -137,7 +137,7 @@ object RobertifyAudioManager {
 //        else logger.warn("Could not resume tracks in ${musicManager.guild.name} because I couldn't join the voice channel!")
 //    }
 //
-//    private suspend fun resumeTracks(
+//    private fun resumeTracks(
 //        trackList: List<ResumableTrack>,
 //        announcementChannel: GuildMessageChannel?,
 //        musicManager: GuildMusicManager
@@ -211,7 +211,7 @@ object RobertifyAudioManager {
      * @param message The message to edit for any error messages.
      * @return True if the bot successfully joined the channel and vice-versa.
      */
-    suspend fun joinAudioChannel(
+    fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManager,
         message: Message? = null,

@@ -17,7 +17,7 @@ class RemoveDuplicatesCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val queueHandler = RobertifyAudioManager[guild]
             .scheduler

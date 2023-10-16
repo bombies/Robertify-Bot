@@ -5,7 +5,8 @@ import main.commands.slashcommands.management.requestchannel.RequestChannelEvent
 import main.commands.slashcommands.misc.polls.PollEvents
 import main.commands.slashcommands.util.suggestions.SuggestionChannelEvents
 import main.main.Listener
-import main.utils.pagination.PaginationEvents
+import main.utils.pagination.events.PaginationButtonEvent
+import main.utils.pagination.events.PaginationQueueButtonEvent
 
 object EventManager {
 
@@ -14,14 +15,13 @@ object EventManager {
     /**
      * Instantiate each event
      */
-    val registeredEvents by lazy {
-        listOf(
-            Listener(),
-            PaginationEvents(),
-            RequestChannelEvents(),
-            SuggestionChannelEvents(),
-            PollEvents(),
-            VoiceChannelEvents()
-        )
-    }
+    val registeredEvents = listOf(
+        Listener(),
+        PaginationButtonEvent(),
+        PaginationQueueButtonEvent(),
+        RequestChannelEvents(),
+        SuggestionChannelEvents(),
+        PollEvents(),
+        VoiceChannelEvents()
+    )
 }

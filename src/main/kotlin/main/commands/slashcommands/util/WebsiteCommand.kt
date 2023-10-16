@@ -15,7 +15,7 @@ class WebsiteCommand : AbstractSlashCommand(SlashCommand(
     guildUseOnly = false
 )) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed(GeneralMessages.WEBSITE_EMBED_DESC)
             .setActionRow(
                 link(

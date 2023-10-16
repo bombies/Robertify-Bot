@@ -21,7 +21,7 @@ class PlaylistImageBuilder(
     private val sortingOrder: PlaylistSortingOrder = PlaylistSortingOrder.NONE
 ) : AbstractImageBuilder(ImageType.PLAYLISTS_CONTENT) {
 
-    override suspend fun build(): InputStream? {
+    override fun build(): InputStream? {
         val totalDuration = tracks.sumOf { it.duration }
         addQuery(QueryFields.TITLE, title)
         addQuery(QueryFields.DESCRIPTION, description)

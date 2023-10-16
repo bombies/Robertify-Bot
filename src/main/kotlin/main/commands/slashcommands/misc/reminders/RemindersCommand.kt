@@ -197,7 +197,7 @@ class RemindersCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         if (!TogglesConfig(guild).get(Toggle.REMINDERS))
             return event.replyEmbed(GeneralMessages.DISABLED_FEATURE).queue()
@@ -215,7 +215,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleAdd(event: SlashCommandInteractionEvent) {
+    private fun handleAdd(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val time = event.getRequiredOption("time").asString
         val reminder = event.getRequiredOption("reminder").asString
@@ -273,7 +273,7 @@ class RemindersCommand : AbstractSlashCommand(
         event.replyEmbed(ReminderMessages.REMINDER_ADDED).setEphemeral(true).queue()
     }
 
-    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
+    private fun handleRemove(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val member = event.member!!
         val config = RemindersConfig(guild)
@@ -299,7 +299,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleClear(event: SlashCommandInteractionEvent) {
+    private fun handleClear(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RemindersConfig(guild)
 
@@ -313,7 +313,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent) {
+    private fun handleList(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val user = event.user
         val config = RemindersConfig(guild)
@@ -333,7 +333,7 @@ class RemindersCommand : AbstractSlashCommand(
         event.replyEmbed(listString).setEphemeral(true).queue()
     }
 
-    private suspend fun handleEdit(event: SlashCommandInteractionEvent) {
+    private fun handleEdit(event: SlashCommandInteractionEvent) {
         val (_, _, secondaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
         when (secondaryCommand) {
@@ -342,7 +342,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleChannelEdit(event: SlashCommandInteractionEvent) {
+    private fun handleChannelEdit(event: SlashCommandInteractionEvent) {
         val id = event.getRequiredOption("id").asInt - 1
         val channel = event.getOption("channel")?.asChannel?.asGuildMessageChannel()
         val guild = event.guild!!
@@ -403,7 +403,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleTimeEdit(event: SlashCommandInteractionEvent) {
+    private fun handleTimeEdit(event: SlashCommandInteractionEvent) {
         val id = event.getRequiredOption("id").asInt - 1
         val time = event.getRequiredOption("time").asString
         val guild = event.guild!!
@@ -448,7 +448,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleBan(event: SlashCommandInteractionEvent) {
+    private fun handleBan(event: SlashCommandInteractionEvent) {
         handleGenericBanAction(
             event = event,
             handleChannel = { handleChannelBan(it) },
@@ -456,7 +456,7 @@ class RemindersCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend fun handleChannelBan(event: SlashCommandInteractionEvent) {
+    private fun handleChannelBan(event: SlashCommandInteractionEvent) {
         val channel = event.getRequiredOption("channel").asChannel.asGuildMessageChannel()
         val guild = event.guild!!
         val config = RemindersConfig(guild)
@@ -470,7 +470,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleUserBan(event: SlashCommandInteractionEvent) {
+    private fun handleUserBan(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asUser
         val guild = event.guild!!
         val config = RemindersConfig(guild)
@@ -484,7 +484,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleUnban(event: SlashCommandInteractionEvent) {
+    private fun handleUnban(event: SlashCommandInteractionEvent) {
         handleGenericBanAction(
             event = event,
             handleChannel = { handleChannelUnban(it) },
@@ -492,7 +492,7 @@ class RemindersCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend fun handleChannelUnban(event: SlashCommandInteractionEvent) {
+    private fun handleChannelUnban(event: SlashCommandInteractionEvent) {
         val channel = event.getRequiredOption("channel").asChannel.asGuildMessageChannel()
         val guild = event.guild!!
         val config = RemindersConfig(guild)
@@ -506,7 +506,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleUserUnban(event: SlashCommandInteractionEvent) {
+    private fun handleUserUnban(event: SlashCommandInteractionEvent) {
         val user = event.getRequiredOption("user").asUser
         val guild = event.guild!!
         val config = RemindersConfig(guild)
@@ -520,7 +520,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend inline fun handleGenericBanAction(
+    private inline fun handleGenericBanAction(
         event: SlashCommandInteractionEvent,
         handleChannel: (event: SlashCommandInteractionEvent) -> Unit,
         handleUser: (event: SlashCommandInteractionEvent) -> Unit
@@ -539,7 +539,7 @@ class RemindersCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name != "reminders" && event.focusedOption.name != "id") return
 
         val guild = event.guild!!
@@ -558,7 +558,7 @@ class RemindersCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleTimeParsing(event: SlashCommandInteractionEvent, time: String): List<Long>? {
+    private fun handleTimeParsing(event: SlashCommandInteractionEvent, time: String): List<Long>? {
         return try {
             val timeInMillis = timeToMillis(time)
             val hour = extractTime(time, DurationUnit.HOURS)

@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio
 
 import dev.schlaubi.lavakord.audio.player.Player
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
@@ -36,7 +37,7 @@ class LoopCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
         val checksEmbed =
@@ -54,7 +55,7 @@ class LoopCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun checks(
+    private fun checks(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         player: Player
@@ -71,7 +72,7 @@ class LoopCommand : AbstractSlashCommand(
         return null
     }
 
-    private suspend fun handleRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
+    private fun handleRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
         val guild = musicManager.guild
         val player = musicManager.player
         val scheduler = musicManager.scheduler
@@ -110,7 +111,7 @@ class LoopCommand : AbstractSlashCommand(
         return embed
     }
 
-    private suspend fun handleQueueRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
+    private fun handleQueueRepeat(musicManager: GuildMusicManager, looper: User): MessageEmbed {
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
         val guild = musicManager.guild
@@ -130,7 +131,7 @@ class LoopCommand : AbstractSlashCommand(
                         .build()
                 else {
                     queueHandler.queueRepeating = true
-                    scheduler.addToBeginningOfQueue(thisTrack)
+                    runBlocking { scheduler.addToBeginningOfQueue(thisTrack) }
                     queueHandler.setSavedQueue(queueHandler.contents)
                     queueHandler.remove(thisTrack)
                     RobertifyEmbedUtils.embedMessage(guild, LoopMessages.QUEUE_LOOP_START)

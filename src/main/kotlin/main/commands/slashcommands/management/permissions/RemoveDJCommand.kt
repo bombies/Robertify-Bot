@@ -29,13 +29,13 @@ class RemoveDJCommand : AbstractSlashCommand(SlashCommand(
     adminOnly = true
 )) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val mentionable = event.getRequiredOption("target").asMentionable
         event.replyEmbed { handleRemoveDJ(event.guild!!, mentionable) }
             .queue()
     }
 
-    private suspend fun handleRemoveDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
+    private fun handleRemoveDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
         val config = PermissionsConfig(guild)
 
         return when {

@@ -58,7 +58,7 @@ class EvalCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val src = event.getRequiredOption("src").asString
         event.deferReply(true).queue()

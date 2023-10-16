@@ -15,7 +15,7 @@ class ShardInfoCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val embedBuilder = RobertifyEmbedUtils.getEmbedBuilder(guild)
         val currentShard = event.jda.shardInfo.shardId

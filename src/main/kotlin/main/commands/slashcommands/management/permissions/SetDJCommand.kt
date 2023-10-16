@@ -31,13 +31,13 @@ class SetDJCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val mentionable = event.getRequiredOption("target").asMentionable
         event.replyEmbed { handleSetDJ(event.guild!!, mentionable) }
             .queue()
     }
 
-    private suspend fun handleSetDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
+    private fun handleSetDJ(guild: Guild, mentionable: IMentionable): MessageEmbed {
         val config = PermissionsConfig(guild)
 
         return when {

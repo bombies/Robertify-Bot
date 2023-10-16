@@ -10,15 +10,23 @@ import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.guildconfig.GuildConfig
+import main.utils.json.locale.LocaleConfig
+import main.utils.json.reminders.RemindersConfig
+import main.utils.json.requestchannel.RequestChannelConfig
+import main.utils.locale.LocaleManager
 import main.utils.locale.messages.UnbanMessages
+import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
+import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.exceptions.ErrorHandler
 import net.dv8tion.jda.api.requests.ErrorResponse
 import org.slf4j.LoggerFactory
+import org.yaml.snakeyaml.reader.ReaderException
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
@@ -51,7 +59,7 @@ class Listener : AbstractEventController() {
             }
         }
 
-        internal suspend fun rescheduleUnbans(guild: Guild) {
+        internal fun rescheduleUnbans(guild: Guild) {
             val guildConfig = GuildConfig(guild)
             val banMap = guildConfig.getBannedUsersWithUnbanTimes()
 
@@ -73,7 +81,7 @@ class Listener : AbstractEventController() {
             }
         }
 
-        suspend fun scheduleUnban(guild: Guild, user: User) {
+        fun scheduleUnban(guild: Guild, user: User) {
             val guildConfig = GuildConfig(guild)
             val scheduler = Executors.newSingleThreadScheduledExecutor()
 
@@ -82,7 +90,7 @@ class Listener : AbstractEventController() {
 
         }
 
-        private suspend fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfig = GuildConfig(guild)) {
+        private fun doUnban(userId: Long, guild: Guild, guildConfig: GuildConfig = GuildConfig(guild)) {
             if (!guildConfig.isBannedUser(userId))
                 return
 
@@ -90,45 +98,71 @@ class Listener : AbstractEventController() {
             sendUnbanMessage(userId, guild)
         }
 
-        private suspend fun sendUnbanMessage(userId: Long, guild: Guild) {
-            val user = Robertify.shardManager.retrieveUserById(userId).await()
-            val channel = user.openPrivateChannel().await()
-            channel.send(
-                embeds = listOf(
-                    RobertifyEmbedUtils.embedMessage(
-                        guild,
-                        UnbanMessages.USER_UNBANNED,
-                        Pair("{server}", guild.name)
-                    ).build()
-                )
-            ).queue(null) {
-                ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
-                    logger.warn("Was not able to send an unban message to ${user.name} (${user.idLong})")
+        private fun sendUnbanMessage(userId: Long, guild: Guild) {
+            Robertify.shardManager.retrieveUserById(userId).queue { user ->
+                user.openPrivateChannel().queue { channel ->
+                    channel.send(
+                        embeds = listOf(
+                            RobertifyEmbedUtils.embedMessage(
+                                guild,
+                                UnbanMessages.USER_UNBANNED,
+                                Pair("{server}", guild.name)
+                            ).build()
+                        )
+                    ).queue(null) {
+                        ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER) {
+                            logger.warn("Was not able to send an unban message to ${user.name} (${user.idLong})")
+                        }
+                    }
                 }
             }
         }
     }
 
-    private val guildJoinListener =
-        onEvent<GuildJoinEvent> { event ->
-            val guild = event.guild
-            GuildConfig(guild).addGuild()
-            loadSlashCommands(guild)
-            GeneralUtils.setDefaultEmbed(guild)
-            logger.info("Joined ${guild.name}")
+    override fun onReady(event: ReadyEvent) {
+        val jda = event.jda
+        logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
+        BotDBCache.instance.lastStartup = System.currentTimeMillis()
+        jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
 
-            updateServerCount()
+        Robertify.shardManager.guildCache.forEach { guild ->
+            RequestChannelConfig(guild).updateMessage()
         }
+    }
 
-    private val guildLeaveListener =
-        onEvent<GuildLeaveEvent> { event ->
+    override fun onGuildReady(event: GuildReadyEvent) {
+        val guild = event.guild
+        val locale = LocaleConfig(guild).getLocale()
+        try {
+            LocaleManager[guild].setLocale(locale)
+        } catch (e: ReaderException) {
+            logger.error("I couldn't set the locale for ${guild.name}")
+        }
+        loadNeededSlashCommands(guild)
+        rescheduleUnbans(guild)
+        RemindersConfig(guild).scheduleReminders()
+    }
+
+    override fun onGuildJoin(event: GuildJoinEvent) {
+        val guild = event.guild
+        GuildConfig(guild).addGuild()
+        loadSlashCommands(guild)
+        GeneralUtils.setDefaultEmbed(guild)
+        logger.info("Joined ${guild.name}")
+
+        updateServerCount()
+    }
+
+    override fun onGuildLeave(event: GuildLeaveEvent) {
+        runBlocking {
             val guild = event.guild
             GuildConfig(guild).removeGuild()
             RobertifyAudioManager.removeMusicManager(guild)
             logger.info("Left ${guild.name}")
-
-            updateServerCount()
         }
+
+        updateServerCount()
+    }
 
     private fun updateServerCount() {
         val serverCount = Robertify.shardManager.guilds.size

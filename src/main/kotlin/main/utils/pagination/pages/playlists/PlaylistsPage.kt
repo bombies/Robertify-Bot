@@ -14,7 +14,7 @@ class PlaylistsPage(
     private val pageNumber: Int
 ) : AbstractImagePage() {
 
-    override suspend fun getEmbed(): MessageEmbed {
+    override fun getEmbed(): MessageEmbed {
         val content = _playlists.mapIndexed { i, playlist ->
             "**${i + 1}.** ${playlist.title} *(${playlist.tracks.size} tracks)*\n"
         }
@@ -24,7 +24,7 @@ class PlaylistsPage(
         ).build()
     }
 
-    override suspend fun generateImage(): InputStream? = PlaylistsImageBuilder(
+    override fun generateImage(): InputStream? = PlaylistsImageBuilder(
         guild = guild,
         page = pageNumber,
         playlists = _playlists

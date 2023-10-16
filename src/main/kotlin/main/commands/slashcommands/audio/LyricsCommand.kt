@@ -36,7 +36,7 @@ class LyricsCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val member = event.member!!
         val guild = event.guild!!
         val memberVoiceState = member.voiceState!!
@@ -65,70 +65,70 @@ class LyricsCommand : AbstractSlashCommand(
             else -> event.getOption("song")!!.asString
         }
 
-        val lookingMsg = event.replyEmbed {
+        event.replyEmbed {
             embed(LyricsMessages.LYRICS_SEARCHING, Pair("{query}", query))
-        }.await()
+        }.queue { lookingMsg ->
+            val geniusAPI = GeniusAPI()
+            val songSearch = try {
+                geniusAPI.search(query)
+            } catch (e: IOException) {
+                logger.error("Unexpected error", e)
+                return@queue
+            }
 
-        val geniusAPI = GeniusAPI()
-        val songSearch = try {
-            geniusAPI.search(query)
-        } catch (e: IOException) {
-            logger.error("Unexpected error", e)
-            return
-        }
+            if (songSearch.status == 403) {
+                lookingMsg.editEmbed(guild) {
+                    embed(GeneralMessages.SELF_INSUFFICIENT_PERMS)
+                }.queue()
+                return@queue
+            }
 
-        if (songSearch.status == 403) {
-            lookingMsg.editEmbed(guild) {
-                embed(GeneralMessages.SELF_INSUFFICIENT_PERMS)
-            }.queue()
-            return
-        }
+            if (songSearch.status == 404 || songSearch.hits.size == 0) {
+                lookingMsg.editEmbed(guild) {
+                    embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
+                }.queue()
+                return@queue
+            }
 
-        if (songSearch.status == 404 || songSearch.hits.size == 0) {
-            lookingMsg.editEmbed(guild) {
-                embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
-            }.queue()
-            return
-        }
+            val hit = songSearch.hits.first
+            val lyrics = hit.fetchLyrics()
 
-        val hit = songSearch.hits.first
-        val lyrics = hit.fetchLyrics()
+            if (lyrics == null) {
+                lookingMsg.editEmbed(guild) {
+                    embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
+                }.queue()
+                return@queue
+            }
 
-        if (lyrics == null) {
-            lookingMsg.editEmbed(guild) {
-                embed(LyricsMessages.LYRICS_NOTHING_FOUND, Pair("{query}", query))
-            }.queue()
-            return
-        }
-
-        try {
-            lookingMsg.editEmbed(guild) {
-                embed(
-                    title = LyricsMessages.LYRICS_EMBED_TITLE,
-                    description = lyrics,
-                    Pair("{title}", hit.title),
-                    Pair("{author}", hit.artist.name)
-                )
-            }.queue()
-        } catch (e: IllegalArgumentException) {
-            val chars = lyrics.length
-            lookingMsg.editEmbed(guild) {
-                embed(
-                    LyricsMessages.LYRICS_EMBED_TITLE,
-                    lyrics.substring(0, 4096),
-                    Pair("{title}", hit.title),
-                    Pair("{author}", hit.artist.name)
-                )
-            }.queue()
-
-            var i = 4096
-            do {
-                event.channel.sendEmbed(guild) {
-                    embed(lyrics.substring(i, chars.coerceAtMost(i + 4096)))
+            try {
+                lookingMsg.editEmbed(guild) {
+                    embed(
+                        title = LyricsMessages.LYRICS_EMBED_TITLE,
+                        description = lyrics,
+                        Pair("{title}", hit.title),
+                        Pair("{author}", hit.artist.name)
+                    )
+                }.queue()
+            } catch (e: IllegalArgumentException) {
+                val chars = lyrics.length
+                lookingMsg.editEmbed(guild) {
+                    embed(
+                        LyricsMessages.LYRICS_EMBED_TITLE,
+                        lyrics.substring(0, 4096),
+                        Pair("{title}", hit.title),
+                        Pair("{author}", hit.artist.name)
+                    )
                 }.queue()
 
-                i += 4096
-            } while (i < chars)
+                var i = 4096
+                do {
+                    event.channel.sendEmbed(guild) {
+                        embed(lyrics.substring(i, chars.coerceAtMost(i + 4096)))
+                    }.queue()
+
+                    i += 4096
+                } while (i < chars)
+            }
         }
     }
 

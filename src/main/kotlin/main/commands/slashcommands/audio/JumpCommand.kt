@@ -3,6 +3,7 @@ package main.commands.slashcommands.audio
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack
 import dev.arbjerg.lavalink.protocol.v4.Track
 import dev.schlaubi.lavakord.audio.player.Player
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
@@ -39,7 +40,7 @@ class JumpCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
@@ -55,7 +56,7 @@ class JumpCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleJump(
+    private fun handleJump(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         input: String
@@ -82,7 +83,7 @@ class JumpCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend fun doJump(
+    private fun doJump(
         guild: Guild,
         jumper: User,
         input: String,
@@ -112,7 +113,7 @@ class JumpCommand : AbstractSlashCommand(
                 JumpMessages.JUMP_DURATION_GT_TIME_LEFT
             ).build()
 
-        player.seekTo(player.position + time)
+        runBlocking { player.seekTo(player.position + time) }
         LogUtilsKt(guild).sendLog(
             LogType.TRACK_JUMP,
             JumpMessages.JUMPED_LOG,

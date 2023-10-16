@@ -15,7 +15,7 @@ data class RobertifyPremium(
 ) {
 
     companion object {
-        suspend fun resetPremiumFeatures(guild: Guild) {
+        fun resetPremiumFeatures(guild: Guild) {
             GuildConfig(guild)
                 .setFields {
                     autoplay = false

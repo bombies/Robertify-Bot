@@ -55,7 +55,7 @@ class RemoveCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
@@ -73,7 +73,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleRemove(
+    private fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         id: Int
@@ -125,7 +125,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleRemove(
+    private fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         name: String
@@ -177,7 +177,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name != "remove" && event.focusedOption.name != "name") return
 
         val guild = event.guild!!

@@ -11,36 +11,36 @@ import java.util.*
 
 class LogConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    private suspend fun getChannelId(): Long? {
+    private fun getChannelId(): Long? {
         if (!channelIsSet())
             throw NullPointerException("There is no channel for this guild! (ID=${guild.id})")
         return getGuildModel().log_channel
     }
 
-    suspend fun setChannelId(cid: Long) {
+    fun setChannelId(cid: Long) {
         cache.updateGuild(guild.id) {
             log_channel = cid
         }
     }
 
-    suspend fun getChannel(): TextChannel? {
+    fun getChannel(): TextChannel? {
         val channelId = getChannelId()
         return channelId?.let { Robertify.shardManager.getTextChannelById(it) }
     }
 
-    suspend fun channelIsSet(): Boolean {
+    fun channelIsSet(): Boolean {
         return getGuildModel().log_channel?.let {
             it != -1L
         } ?: false
     }
 
-    suspend fun removeChannel() {
+    fun removeChannel() {
         cache.updateGuild(guild.id) {
             log_channel = -1L
         }
     }
 
-    override suspend fun update() {
+    override fun update() {
         val guildObject: JSONObject = getGuildModel().toJsonObject()
         if (!guildObject.has(Field.LOG_CHANNEL.name.lowercase(Locale.getDefault()))) guildObject.put(
             Field.LOG_CHANNEL.name.lowercase(

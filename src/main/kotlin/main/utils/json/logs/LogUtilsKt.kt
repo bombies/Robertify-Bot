@@ -14,7 +14,7 @@ import java.time.Instant
 class LogUtilsKt(private val guild: Guild) {
     private val config: LogConfig = LogConfig(guild)
 
-    suspend fun sendLog(type: LogType, message: String) {
+    fun sendLog(type: LogType, message: String) {
         if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val channel = config.getChannel()
@@ -28,7 +28,7 @@ class LogUtilsKt(private val guild: Guild) {
         ).queue()
     }
 
-    suspend fun sendLog(type: LogType, message: LocaleMessage) {
+    fun sendLog(type: LogType, message: LocaleMessage) {
         if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
@@ -44,7 +44,7 @@ class LogUtilsKt(private val guild: Guild) {
     }
 
     @SafeVarargs
-    suspend fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
+    fun sendLog(type: LogType, message: LocaleMessage, vararg placeholders: Pair<String, String>) {
         if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
@@ -62,17 +62,18 @@ class LogUtilsKt(private val guild: Guild) {
         }
     }
 
-    suspend fun createChannel() {
+    fun createChannel() {
         if (config.channelIsSet()) config.removeChannel()
-        val channel = guild.createTextChannel("robertify-logs")
+        guild.createTextChannel("robertify-logs")
             .addPermissionOverride(guild.publicRole, emptyList(), listOf(Permission.VIEW_CHANNEL))
             .addPermissionOverride(
                 guild.selfMember,
                 listOf(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MESSAGE_SEND),
                 emptyList()
             )
-            .await()
-        config.setChannelId(channel.idLong)
+            .queue { channel ->
+                config.setChannelId(channel.idLong)
+            }
     }
 
 }

@@ -13,7 +13,7 @@ class UptimeCommand : AbstractSlashCommand({
     guildUseOnly = false
 }) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed(
             GeneralUtils.getDurationString(System.currentTimeMillis() - BotDBCache.instance.lastStartup)
         )

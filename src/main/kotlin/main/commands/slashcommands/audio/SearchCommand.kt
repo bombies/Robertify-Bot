@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio
 
 import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils.queueCoroutine
@@ -32,7 +33,7 @@ class SearchCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val requestChannelConfig = RequestChannelConfig(guild)
         if (requestChannelConfig.isRequestChannel(event.channel.asGuildMessageChannel())) {
@@ -49,7 +50,7 @@ class SearchCommand : AbstractSlashCommand(
                 SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
             )
-        }.queueCoroutine { addingMsg ->
+        }.queue { addingMsg ->
             getSearchResult(
                 guild,
                 event.user,
@@ -59,17 +60,17 @@ class SearchCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getSearchResult(
+    private fun getSearchResult(
         guild: Guild,
         requester: User,
         botMSg: InteractionHook,
         query: String
-    ) {
+    ) = runBlocking {
         val musicManager = RobertifyAudioManager[guild]
         RobertifyAudioManager.loadSearchResults(musicManager, requester, botMSg, query)
     }
 
-    override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+    override fun onStringSelect(event: StringSelectInteractionEvent) {
         if (!event.componentId.startsWith("searchresult:")) return
 
         val split = event.componentId.split(":")
@@ -105,15 +106,17 @@ class SearchCommand : AbstractSlashCommand(
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE)
         }.setEphemeral(true)
             .queue()
-
-        RobertifyAudioManager.loadAndPlay(
-            trackUrl = trackQuery,
-            memberVoiceState = memberVoiceState,
-            botMessage = event.message
-        )
+        
+        runBlocking {
+            RobertifyAudioManager.loadAndPlay(
+                trackUrl = trackQuery,
+                memberVoiceState = memberVoiceState,
+                botMessage = event.message
+            )
+        }
     }
 
-    override suspend fun onButtonInteraction(event: ButtonInteractionEvent) {
+    override fun onButtonClick(event: ButtonInteractionEvent) {
         if (event.button.id?.startsWith("searchresult:") == false) return
 
         val split = event.button.id!!.split(":")

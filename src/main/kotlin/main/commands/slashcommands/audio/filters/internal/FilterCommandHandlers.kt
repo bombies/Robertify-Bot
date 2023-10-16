@@ -2,6 +2,7 @@ package main.commands.slashcommands.audio.filters.internal
 
 import dev.schlaubi.lavakord.audio.player.Filters
 import dev.schlaubi.lavakord.audio.player.applyFilters
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isNotNull
@@ -16,7 +17,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-internal suspend inline fun handleGenericFilterToggle(
+internal inline fun handleGenericFilterToggle(
     event: SlashCommandInteractionEvent,
     filterName: String,
     filterPredicate: Filters.() -> Boolean,
@@ -32,7 +33,7 @@ internal suspend inline fun handleGenericFilterToggle(
         filterOff
     )
 
-internal suspend inline fun handleGenericFilterToggle(
+internal inline fun handleGenericFilterToggle(
     memberVoiceState: GuildVoiceState,
     selfVoiceState: GuildVoiceState,
     filterName: String,
@@ -50,7 +51,7 @@ internal suspend inline fun handleGenericFilterToggle(
     val localeManager = LocaleManager[guild]
 
     return if (filterPredicate(filters)) {
-        player.applyFilters(filterOff)
+        runBlocking { player.applyFilters(filterOff) }
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
@@ -69,7 +70,7 @@ internal suspend inline fun handleGenericFilterToggle(
             GeneralUtils.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
         ).build()
     } else {
-        player.applyFilters(filterOn)
+        runBlocking { player.applyFilters(filterOn) }
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${

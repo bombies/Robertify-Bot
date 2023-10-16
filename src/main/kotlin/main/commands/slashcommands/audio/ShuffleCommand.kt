@@ -22,14 +22,14 @@ class ShuffleCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
         event.hook.sendEmbed(event.guild!!) {
             handleShuffle(event.guild!!, event.user)
         }.queue()
     }
 
-    suspend fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
+    fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler
 

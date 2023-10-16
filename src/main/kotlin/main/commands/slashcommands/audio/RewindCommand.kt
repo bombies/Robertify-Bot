@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
 import main.audiohandlers.utils.isStream
@@ -35,7 +36,7 @@ class RewindCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
         event.hook.sendEmbed {
             handleRewind(
@@ -46,7 +47,7 @@ class RewindCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    suspend fun handleRewind(
+    fun handleRewind(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         time: Int? = null
@@ -65,7 +66,7 @@ class RewindCommand : AbstractSlashCommand(
         val logUtils = LogUtilsKt(guild)
 
         return if (time == null) {
-            player.seekTo(0)
+            runBlocking { player.seekTo(0) }
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWIND_TO_BEGINNING_LOG,
@@ -90,7 +91,7 @@ class RewindCommand : AbstractSlashCommand(
                     RewindMessages.DURATION_GT_CURRENT_TIME
                 ).build()
 
-            player.seekTo(player.position - timeInMillis)
+            runBlocking { player.seekTo(player.position - timeInMillis) }
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWOUND_BY_DURATION_LOG,

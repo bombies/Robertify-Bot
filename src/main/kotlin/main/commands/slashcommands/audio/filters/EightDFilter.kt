@@ -17,12 +17,12 @@ class EightDFilter : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed { handle8DToggle(event.member!!.voiceState!!, event.guild!!.selfMember.voiceState!!) }
             .queue()
     }
 
-    private suspend fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
+    private fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
         handleGenericFilterToggle(
             memberVoiceState = memberVoiceState,
             selfVoiceState = selfVoiceState,

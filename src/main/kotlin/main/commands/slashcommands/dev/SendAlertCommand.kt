@@ -25,7 +25,7 @@ class SendAlertCommand : AbstractSlashCommand(
     }
 
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val textField = TextInput(
             id = "send_alert:alert",
             label = "Alert",
@@ -42,7 +42,7 @@ class SendAlertCommand : AbstractSlashCommand(
         event.replyModal(modal).queue()
     }
 
-    override suspend fun onModalInteraction(event: ModalInteractionEvent) {
+    override fun onModalSubmit(event: ModalInteractionEvent) {
         if (event.modalId != "send_alert") return
 
         val guild = event.guild!!
@@ -66,7 +66,7 @@ class SendAlertCommand : AbstractSlashCommand(
             .queue()
     }
 
-    override suspend fun onButtonInteraction(event: ButtonInteractionEvent) {
+    override fun onButtonClick(event: ButtonInteractionEvent) {
         if (!event.componentId.startsWith("sendalert:")) return
 
         val guild = event.guild!!

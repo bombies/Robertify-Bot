@@ -14,7 +14,7 @@ class RequestChannelCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) =
+    override fun handle(event: SlashCommandInteractionEvent) =
         RequestChannelEditCommand().handleSetup(event)
 
     override val help: String

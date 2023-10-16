@@ -15,7 +15,7 @@ class KaraokeFilter : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed {
             handleGenericFilterToggle(
                 memberVoiceState = event.member!!.voiceState!!,

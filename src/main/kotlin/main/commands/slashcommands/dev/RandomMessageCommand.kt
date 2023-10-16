@@ -54,7 +54,7 @@ class RandomMessageCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         when (event.subcommandName) {
             "add" -> handleAdd(event)
             "remove" -> handleRemove(event)
@@ -79,7 +79,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         event.replyModal(modal).queue()
     }
 
-    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
+    private fun handleRemove(event: SlashCommandInteractionEvent) {
         val randomMessageManager = RandomMessageManager()
         val id = event.getRequiredOption("id").asInt - 1
 
@@ -95,7 +95,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent) {
+    private fun handleList(event: SlashCommandInteractionEvent) {
         val randomMessageManager = RandomMessageManager()
         val messages = randomMessageManager.messages
 
@@ -111,14 +111,14 @@ class RandomMessageCommand : AbstractSlashCommand(
         event.replyEmbed(desc).setEphemeral(true).queue()
     }
 
-    private suspend fun handleClear(event: SlashCommandInteractionEvent) {
+    private fun handleClear(event: SlashCommandInteractionEvent) {
         -RandomMessageManager()
         event.replyEmbed("Successfully cleared all messages!")
             .setEphemeral(true)
             .queue()
     }
 
-    override suspend fun onModalInteraction(event: ModalInteractionEvent) {
+    override fun onModalSubmit(event: ModalInteractionEvent) {
         if (!event.modalId.startsWith("random_message:")) return
         val (_, modalType) = event.modalId.split(":")
         val randomMessageManager = RandomMessageManager()
@@ -132,7 +132,7 @@ class RandomMessageCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name != "randommessage" && event.focusedOption.name != "id") return
         val randomMessageManager = RandomMessageManager()
         val choices = randomMessageManager.messages.mapIndexed { i, msg ->

@@ -70,7 +70,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         when (event.subcommandName) {
             "add" -> handleAdd(event)
             "remove" -> handleRemove(event)
@@ -78,7 +78,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleAdd(event: SlashCommandInteractionEvent) {
+    private fun handleAdd(event: SlashCommandInteractionEvent) {
         handleGenericMutation(
             event = event,
             mutateTextChannel = { e, config, channel ->
@@ -104,7 +104,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend fun handleRemove(event: SlashCommandInteractionEvent) {
+    private fun handleRemove(event: SlashCommandInteractionEvent) {
         handleGenericMutation(
             event = event,
             mutateTextChannel = { e, config, channel ->
@@ -122,7 +122,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend inline fun handleGenericMutation(
+    private inline fun handleGenericMutation(
         event: SlashCommandInteractionEvent,
         mutateAudioChannel: (event: SlashCommandInteractionEvent, config: RestrictedChannelsConfig, channel: AudioChannel) -> Unit,
         mutateTextChannel: (event: SlashCommandInteractionEvent, config: RestrictedChannelsConfig, channel: TextChannel) -> Unit,
@@ -181,7 +181,7 @@ class RestrictedChannelsCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleList(event: SlashCommandInteractionEvent) {
+    private fun handleList(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RestrictedChannelsConfig(guild)
         val localeManager = LocaleManager[guild]

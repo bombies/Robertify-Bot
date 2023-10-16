@@ -21,22 +21,20 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu
 
-class HelpCommand : AbstractSlashCommand(
-    SlashCommand(
-        name = "help",
-        description = "See all the commands the bot has to offer to you.",
-        options = listOf(
-            CommandOption(
-                name = "command",
-                description = "View help for a specific command.",
-                required = false
-            )
-        ),
-        guildUseOnly = false
+class HelpCommand : AbstractSlashCommand({
+    name = "help"
+    description = "See all the commands the bot has to offer to you."
+    options = listOf(
+        CommandOption(
+            name = "command",
+            description = "View help for a specific command.",
+            required = false
+        )
     )
-) {
+    guildUseOnly = false
+}) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild
         val localeManager = LocaleManager[guild]
 
@@ -78,7 +76,7 @@ class HelpCommand : AbstractSlashCommand(
 
     }
 
-    override suspend fun onStringSelectInteraction(event: StringSelectInteractionEvent) {
+    override fun onStringSelect(event: StringSelectInteractionEvent) {
         if (!event.componentId.startsWith("menu:help")) return
         val guild = event.guild
 
@@ -93,7 +91,7 @@ class HelpCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getSelectionMenu(guild: Guild?, userId: Long): SelectMenu {
+    private fun getSelectionMenu(guild: Guild?, userId: Long): SelectMenu {
         val localeManager = LocaleManager[guild]
         return StringSelectionMenuBuilder(
             _name = "menu:help",
@@ -125,7 +123,7 @@ class HelpCommand : AbstractSlashCommand(
         ).build()
     }
 
-    private suspend fun searchCommand(search: String, guild: Guild?): MessageEmbed {
+    private fun searchCommand(search: String, guild: Guild?): MessageEmbed {
         val command = SlashCommandManager.getCommand(search)
             ?: return RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -145,7 +143,7 @@ class HelpCommand : AbstractSlashCommand(
             ).build()
     }
 
-    private suspend fun getHelpEmbed(guild: Guild?, type: HelpType): MessageEmbed {
+    private fun getHelpEmbed(guild: Guild?, type: HelpType): MessageEmbed {
         val commandManager = SlashCommandManager
         val localeManager = LocaleManager[guild]
         val embedBuilder = RobertifyEmbedUtils.embedMessage(guild, HelpMessages.HELP_COMMANDS, Pair("{prefix}", "/"))
@@ -156,14 +154,17 @@ class HelpCommand : AbstractSlashCommand(
                 helpTypeFieldName = localeManager.getMessage(HelpMessages.HELP_MANAGEMENT_OPTION)
                 commandManager.managementCommands
             }
+
             HelpType.MUSIC -> {
                 helpTypeFieldName = localeManager.getMessage(HelpMessages.HELP_MUSIC_OPTION)
                 commandManager.musicCommands
             }
+
             HelpType.MISCELLANEOUS -> {
                 helpTypeFieldName = localeManager.getMessage(HelpMessages.HELP_MISCELLANEOUS_OPTION)
                 commandManager.miscCommands
             }
+
             HelpType.UTILITY -> {
                 helpTypeFieldName = localeManager.getMessage(HelpMessages.HELP_UTILITY_OPTION)
                 commandManager.utilityCommands

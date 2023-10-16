@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 class MenuPage : MessagePage {
     private val options = mutableListOf<StringSelectMenuOption>()
 
-    override suspend fun getEmbed(): MessageEmbed? {
+    override fun getEmbed(): MessageEmbed? {
         return null
     }
 

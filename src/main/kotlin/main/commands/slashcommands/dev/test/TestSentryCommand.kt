@@ -13,7 +13,7 @@ class TestSentryCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.replyEmbed("Crashing! Check Sentry to see if the error was pushed.")
             .setEphemeral(true)
             .queue()

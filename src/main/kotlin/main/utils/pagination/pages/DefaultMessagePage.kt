@@ -18,7 +18,7 @@ class DefaultMessagePage(private val embed: MessageEmbed?) : MessagePage {
         }
     )
 
-    override suspend fun getEmbed(): MessageEmbed? {
+    override fun getEmbed(): MessageEmbed? {
         return embed
     }
 }

@@ -255,7 +255,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         }
     }
 
-    private suspend fun onTrackException(event: TrackExceptionEvent) {
+    private fun onTrackException(event: TrackExceptionEvent) {
         val exception = event.exception;
         val track = event.track
 
@@ -321,7 +321,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         nextTrack(track)
     }
 
-    private suspend fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
+    private fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
         val localeManager = LocaleManager[guild]
         return RobertifyEmbedUtils.embedMessage(
             guild, "${
@@ -452,7 +452,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             }
     }
 
-    suspend fun scheduleDisconnect(time: Duration = 5.minutes, announceMsg: Boolean = true) =
+    fun scheduleDisconnect(time: Duration = 5.minutes, announceMsg: Boolean = true) =
         disconnectManager.scheduleDisconnect(time, announceMsg)
 
     fun removeScheduledDisconnect() =
@@ -469,7 +469,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     fun clearRequesters() = requesters.clear()
 
-    suspend fun getRequesterAsMention(track: Track): String {
+    fun getRequesterAsMention(track: Track): String {
         val requester = findRequester(track.info.identifier)
         return if (requester != null)
             "<@${requester.id}>"

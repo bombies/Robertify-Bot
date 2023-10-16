@@ -49,62 +49,59 @@ object PaginationHandler {
     private val logger by SLF4J
     private val messages = Collections.synchronizedMap(mutableMapOf<Long, List<MessagePage>>())
     private val paginator = PaginationButtonGenerator.DEFAULT
-    var embedStyle: suspend () -> EmbedBuilder = { EmbedBuilder() }
+    var embedStyle: () -> EmbedBuilder = { EmbedBuilder() }
 
-    suspend fun paginateMessage(channel: GuildMessageChannel, user: User, messagePages: List<MessagePage>) =
-        coroutineScope {
-            val paginatedMessage = async {
-                channel.sendMessageEmbeds(messagePages[0].getEmbed()!!)
-                    .submit()
-                    .thenApply { message ->
-                        if (messagePages.size > 1) {
-                            message.editMessageComponents(
-                                paginator.getButtons(
-                                    user = user,
-                                    frontEnabled = false,
-                                    previousEnabled = false
-                                )
-                            ).queue()
+    fun paginateMessage(channel: GuildMessageChannel, user: User, messagePages: List<MessagePage>): Message? {
+        val msg = channel.sendMessageEmbeds(messagePages[0].getEmbed()!!)
+            .submit()
+            .thenApply { message ->
+                if (messagePages.size > 1) {
+                    message.editMessageComponents(
+                        paginator.getButtons(
+                            user = user,
+                            frontEnabled = false,
+                            previousEnabled = false
+                        )
+                    ).queue()
 
-                            messages[message.idLong] = messagePages
-                            return@thenApply message
-                        } else return@thenApply null
-                    }.join()
-            }
-            return@coroutineScope paginatedMessage.await()
-        }
+                    messages[message.idLong] = messagePages
+                    return@thenApply message
+                } else return@thenApply null
+            }.join()
 
-    suspend fun paginateMessage(
+        return msg
+    }
+
+    private fun paginateMessage(
         event: SlashCommandInteractionEvent,
         messagePages: List<MessagePage>,
         isQueue: Boolean = false
-    ): Message? =
-        coroutineScope {
-            val paginatedMessage = async {
-                var messageAction = event.hook.sendEmbed(event.guild) { messagePages[0].getEmbed()!! }
+    ): Message? {
+        val paginatedMessage = run {
+            var messageAction = event.hook.sendEmbed(event.guild) { messagePages[0].getEmbed()!! }
 
-                if (messagePages.size > 1)
-                    messageAction = messageAction.addComponents(
-                        paginator.getButtons(
-                            user = event.user,
-                            frontEnabled = false,
-                            previousEnabled = false,
-                            isQueue = isQueue
-                        )
+            if (messagePages.size > 1)
+                messageAction = messageAction.addComponents(
+                    paginator.getButtons(
+                        user = event.user,
+                        frontEnabled = false,
+                        previousEnabled = false,
+                        isQueue = isQueue
                     )
+                )
 
-                return@async messageAction.submit()
-                    .thenApply { msg ->
-                        if (messagePages.size > 1) {
-                            messages[msg.idLong] = messagePages
-                            return@thenApply msg
-                        } else return@thenApply null
-                    }.join()
-            }
-            return@coroutineScope paginatedMessage.await()
+            return@run messageAction.submit()
+                .thenApply { msg ->
+                    if (messagePages.size > 1) {
+                        messages[msg.idLong] = messagePages
+                        return@thenApply msg
+                    } else return@thenApply null
+                }.join()
         }
+        return paginatedMessage
+    }
 
-    suspend fun paginateMessage(
+    fun paginateMessage(
         event: SlashCommandInteractionEvent,
         content: List<String>,
         maxPerPage: Int = 10
@@ -114,7 +111,7 @@ object PaginationHandler {
         return paginateMessage(event, messagePages)
     }
 
-    suspend fun paginatePlaylists(
+    fun paginatePlaylists(
         event: SlashCommandInteractionEvent,
     ): Message? {
         event.deferReply().queue()
@@ -133,10 +130,10 @@ object PaginationHandler {
             )
         }
 
-        return paginateImageMessage(event, pages).await()
+        return paginateImageMessage(event, pages)
     }
 
-    suspend fun paginatePlaylist(
+    fun paginatePlaylist(
         event: SlashCommandInteractionEvent,
         playlist: PlaylistModel,
         maxTracksPerPage: Int
@@ -159,10 +156,10 @@ object PaginationHandler {
             )
         }
 
-        return paginateImageMessage(event, pages).await();
+        return paginateImageMessage(event, pages)
     }
 
-    suspend fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
+    fun paginateQueue(event: SlashCommandInteractionEvent, maxPerPage: Int = 10): Message? {
         val guild = event.guild!!
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler
@@ -171,70 +168,67 @@ object PaginationHandler {
         val queuePages = messageLogic(guild, queueHandler, maxPerPage)
 
         return try {
-            paginateQueueMessage(event, queuePages).await()
+            paginateQueueMessage(event, queuePages)
         } catch (e: ImageBuilderException) {
             val defaultMessagePages = queuePages.map { page -> DefaultMessagePage(page.getEmbed()) }
             paginateMessage(event, defaultMessagePages, true)
         }
     }
 
-    private suspend fun paginateQueueMessage(
+    private fun paginateQueueMessage(
         event: SlashCommandInteractionEvent,
         queuePages: List<QueuePage>
     ) = paginateImageMessage(event, queuePages, true);
 
-    private suspend fun paginateImageMessage(
+    private fun paginateImageMessage(
         event: SlashCommandInteractionEvent,
         pages: List<AbstractImagePage>,
         isQueue: Boolean = false,
-    ): Deferred<Message?> =
-        coroutineScope {
-            val guild = event.guild!!
-            val sendFallbackEmbed: () -> Deferred<Message?> = {
-                async { paginateMessage(event, pages) }
+    ): Message? {
+        val guild = event.guild!!
+        val sendFallbackEmbed: () -> Message? = { paginateMessage(event, pages) }
+
+        try {
+            val image = pages[0].generateImage() ?: run {
+                return sendFallbackEmbed()
             }
 
-            try {
-                val image = pages[0].generateImage() ?: run {
-                    return@coroutineScope sendFallbackEmbed()
-                }
+            var messageAction = event.hook
+                .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.RANDOM_FILE_NAME))
 
-                var messageAction = event.hook
-                    .sendFiles(FileUpload.fromData(image, AbstractImageBuilder.RANDOM_FILE_NAME))
-
-                if (pages.size > 1)
-                    messageAction = messageAction.addComponents(
-                        paginator.getButtons(
-                            user = event.user,
-                            frontEnabled = false,
-                            previousEnabled = false,
-                            isQueue = isQueue
-                        )
+            if (pages.size > 1)
+                messageAction = messageAction.addComponents(
+                    paginator.getButtons(
+                        user = event.user,
+                        frontEnabled = false,
+                        previousEnabled = false,
+                        isQueue = isQueue
                     )
+                )
 
-                val deferredMsg = async {
-                    return@async messageAction.submit()
-                        .thenApply { msg ->
-                            if (pages.size > 1) {
-                                messages[msg.idLong] = pages
-                                return@thenApply msg
-                            } else return@thenApply null
-                        }.join()
-                }
+            val deferredMsg = run {
+                return@run messageAction.submit()
+                    .thenApply { msg ->
+                        if (pages.size > 1) {
+                            messages[msg.idLong] = pages
+                            return@thenApply msg
+                        } else return@thenApply null
+                    }.join()
+            }
 
-                return@coroutineScope deferredMsg
-            } catch (e: Exception) {
-                return@coroutineScope when (e) {
-                    is SocketTimeoutException,
-                    is ConnectException,
-                    is ImageBuilderException -> sendFallbackEmbed()
+            return deferredMsg
+        } catch (e: Exception) {
+            return when (e) {
+                is SocketTimeoutException,
+                is ConnectException,
+                is ImageBuilderException -> sendFallbackEmbed()
 
-                    else -> throw e
-                }
+                else -> throw e
             }
         }
+    }
 
-    suspend fun paginateMenu(
+    fun paginateMenu(
         event: SlashCommandInteractionEvent,
         options: List<StringSelectMenuOption>,
         startingPage: Int = 0,
@@ -297,7 +291,7 @@ object PaginationHandler {
             _options = options.subList(0, options.size.coerceAtMost(InteractionLimits.SELECT_MENU_CHOICES))
         ).build()
 
-    suspend fun getPaginatedEmbed(
+    fun getPaginatedEmbed(
         guild: Guild,
         content: List<*>,
         maxPerPage: Int = 10,
@@ -318,7 +312,11 @@ object PaginationHandler {
         return embedBuilder.build()
     }
 
-    private suspend fun messageLogic(guild: Guild, content: List<String>, maxPerPage: Int = 10): List<DefaultMessagePage> {
+    private fun messageLogic(
+        guild: Guild,
+        content: List<String>,
+        maxPerPage: Int = 10
+    ): List<DefaultMessagePage> {
         if (content.size <= maxPerPage) {
             return listOf(DefaultMessagePage(guild, content))
         } else {
@@ -379,7 +377,7 @@ object PaginationHandler {
         }
     }
 
-    private suspend fun menuLogic(
+    private fun menuLogic(
         event: SlashCommandInteractionEvent,
         options: List<StringSelectMenuOption>,
         startingPage: Int,

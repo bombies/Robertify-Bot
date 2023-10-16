@@ -90,7 +90,7 @@ class PlayCommand : AbstractSlashCommand(
         private val logger = LoggerFactory.getLogger(Companion::class.java)
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
         val guild = event.guild!!
         val member = event.member
@@ -198,7 +198,7 @@ class PlayCommand : AbstractSlashCommand(
     override val help: String
         get() = "Plays a song"
 
-    private suspend fun handlePlayTracks(
+    private fun handlePlayTracks(
         event: SlashCommandInteractionEvent,
         link: String,
         addToBeginning: Boolean = false,
@@ -220,23 +220,21 @@ class PlayCommand : AbstractSlashCommand(
 
         event.hook.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
-        }.queueCoroutine { msg ->
-            coroutineScope {
-                launch {
-                    RobertifyAudioManager
-                        .loadAndPlay(
-                            trackUrl = link,
-                            memberVoiceState = member.voiceState!!,
-                            botMessage = msg,
-                            addToBeginning = addToBeginning,
-                            shuffled = shuffled
-                        )
-                }
+        }.queue { msg ->
+            runBlocking {
+                RobertifyAudioManager
+                    .loadAndPlay(
+                        trackUrl = link,
+                        memberVoiceState = member.voiceState!!,
+                        botMessage = msg,
+                        addToBeginning = addToBeginning,
+                        shuffled = shuffled
+                    )
             }
         }
     }
 
-    private suspend fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
+    private fun handleLocalTrack(event: SlashCommandInteractionEvent, file: Attachment) {
         val guild = event.guild!!
         val member = event.member!!
 
@@ -244,9 +242,7 @@ class PlayCommand : AbstractSlashCommand(
             "mp3", "ogg", "m4a", "wav", "flac", "webm", "mp4", "aac", "mov" -> {
                 if (!Files.exists(Path(Config.AUDIO_DIR))) {
                     try {
-                        withContext(Dispatchers.IO) {
-                            Files.createDirectory(Paths.get(Config.AUDIO_DIR))
-                        }
+                        Files.createDirectory(Paths.get(Config.AUDIO_DIR))
                     } catch (e: Exception) {
                         event.hook.sendEmbed(guild) {
                             embed(PlayMessages.LOCAL_DIR_ERR)
@@ -307,7 +303,7 @@ class PlayCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.focusedOption.name != "tracks" || (event.subcommandName != "tracks" && event.subcommandName != "next"))
             return
         val query = event.focusedOption.value
@@ -320,15 +316,18 @@ class PlayCommand : AbstractSlashCommand(
         if (query.trim().matches("https?://[\\w\\W]*".toRegex()))
             return event.replyChoices().queue()
 
-        event.replyChoices(Robertify.spotifyApi.search.searchTrack(query, limit = 25)
-            .mapNotNull { option ->
-                if (option == null) null else Choice(
-                    "${option.name} by ${option.artists.first().name} ${if (option.explicit) "[EXPLICIT]" else ""}".coerceAtMost(
-                        InteractionLimits.COMMAND_OPTION_CHOICE_LENGTH
-                    ),
-                    "https://open.spotify.com/track/${option.id}"
-                )
-            })
-            .queue()
+        val choices = runBlocking {
+            Robertify.spotifyApi.search.searchTrack(query, limit = 25)
+                .mapNotNull { option ->
+                    if (option == null) null else Choice(
+                        "${option.name} by ${option.artists.first().name} ${if (option.explicit) "[EXPLICIT]" else ""}".coerceAtMost(
+                            InteractionLimits.COMMAND_OPTION_CHOICE_LENGTH
+                        ),
+                        "https://open.spotify.com/track/${option.id}"
+                    )
+                }
+        }
+
+        event.replyChoices(choices).queue()
     }
 }

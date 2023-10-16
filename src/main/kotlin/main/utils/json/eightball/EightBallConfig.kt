@@ -6,11 +6,11 @@ import net.dv8tion.jda.api.entities.Guild
 
 class EightBallConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
-    suspend fun getResponses(): List<String> {
+    fun getResponses(): List<String> {
         return getGuildModel().eight_ball ?: emptyList()
     }
 
-    suspend fun addResponse(response: String) {
+    fun addResponse(response: String) {
         cache.updateGuild(guild.id) {
             eight_ball {
                 add(response)
@@ -18,7 +18,7 @@ class EightBallConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun removeResponse(responseIndex: Int): String {
+    fun removeResponse(responseIndex: Int): String {
         var removed = getResponses()[responseIndex]
 
         cache.updateGuild(guild.id) {
@@ -30,7 +30,7 @@ class EightBallConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         return removed
     }
 
-    suspend fun clearResponses() {
+    fun clearResponses() {
         cache.updateGuild(guild.id) {
             eight_ball {
                 clear()
@@ -38,7 +38,7 @@ class EightBallConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    override suspend fun update() {
+    override fun update() {
         // Nothing
     }
 }

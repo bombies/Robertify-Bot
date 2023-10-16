@@ -19,7 +19,7 @@ class PlaylistPage(
     private val pageNumber: Int
 ) : AbstractImagePage() {
 
-    override suspend fun getEmbed(): MessageEmbed? {
+    override fun getEmbed(): MessageEmbed? {
         val content = tracks.map { track ->
             "**${trackIndexes[track]?.plus(1)}.** ${track.title.coerceAtMost(50)} by ${track.author.coerceAtMost(50)}\n"
         }
@@ -31,7 +31,7 @@ class PlaylistPage(
             .build()
     }
 
-    override suspend fun generateImage(): InputStream? = PlaylistImageBuilder(
+    override fun generateImage(): InputStream? = PlaylistImageBuilder(
         guild = guild,
         title = title,
         artworkUrl = artworkUrl,

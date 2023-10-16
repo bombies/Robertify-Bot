@@ -60,7 +60,7 @@ class PlaylistCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val (_, primaryCommand) = event.fullCommandName.split(" ")
         when (primaryCommand) {
             "list" -> listPlaylists(event)
@@ -70,7 +70,7 @@ class PlaylistCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun listPlaylists(event: SlashCommandInteractionEvent) {
+    private fun listPlaylists(event: SlashCommandInteractionEvent) {
         val playlists = PlaylistDB.findPlaylistForUser(event.user.id)
         return if (playlists.isEmpty())
             event.replyEmbed(PlaylistMessages.NO_PLAYLISTS).queue()
@@ -120,7 +120,7 @@ class PlaylistCommand : AbstractSlashCommand(
         event.replyModal(modal).queue()
     }
 
-    override suspend fun onModalInteraction(event: ModalInteractionEvent) {
+    override fun onModalSubmit(event: ModalInteractionEvent) {
         if (!event.modalId.startsWith("playlists")) return;
 
         val (_, modalType) = event.modalId.split(":");

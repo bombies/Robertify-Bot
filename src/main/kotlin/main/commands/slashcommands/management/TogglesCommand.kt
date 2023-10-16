@@ -108,7 +108,7 @@ class TogglesCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val (_, primaryCommand) = event.fullCommandName.split("\\s".toRegex())
 
@@ -121,7 +121,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleGeneralToggleList(guild: Guild): MessageEmbed {
+    private fun handleGeneralToggleList(guild: Guild): MessageEmbed {
         val config = TogglesConfig(guild)
         val toggleIds = StringBuilder()
         val toggleNames = StringBuilder()
@@ -152,7 +152,7 @@ class TogglesCommand : AbstractSlashCommand(
         ).build()
     }
 
-    private suspend fun handleGeneralSwitch(event: SlashCommandInteractionEvent): MessageEmbed {
+    private fun handleGeneralSwitch(event: SlashCommandInteractionEvent): MessageEmbed {
         val guild = event.guild!!
         val toggle = event.getRequiredOption("toggle").asString
         return when (toggle.lowercase()) {
@@ -221,7 +221,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onButtonInteraction(event: ButtonInteractionEvent) {
+    override fun onButtonClick(event: ButtonInteractionEvent) {
         if (!event.componentId.startsWith("toggledjskip:")) return
 
         val guild = event.guild!!
@@ -259,12 +259,12 @@ class TogglesCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleSwitch(
+    private fun handleSwitch(
         guild: Guild,
         toggle: Toggle,
         toggleString: String,
-        onEnabled: (suspend (guild: Guild, config: TogglesConfig) -> Unit)? = null,
-        onDisabled: (suspend (guild: Guild, config: TogglesConfig) -> Unit)? = null
+        onEnabled: ((guild: Guild, config: TogglesConfig) -> Unit)? = null,
+        onDisabled: ((guild: Guild, config: TogglesConfig) -> Unit)? = null
     ): MessageEmbed {
         val config = TogglesConfig(guild)
         val localeManager = LocaleManager[guild]
@@ -290,7 +290,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleDJ(event: SlashCommandInteractionEvent) {
+    private fun handleDJ(event: SlashCommandInteractionEvent) {
         val (_, _, secondaryCommand) = event.fullCommandName.split("\\s".toRegex())
         val guild = event.guild!!
 
@@ -319,7 +319,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleDJSwitch(guild: Guild, toggle: String): MessageEmbed {
+    private fun handleDJSwitch(guild: Guild, toggle: String): MessageEmbed {
         val command = SlashCommandManager.getCommand(toggle)
             ?: return RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -348,7 +348,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun displayDJToggles(event: SlashCommandInteractionEvent) {
+    private fun displayDJToggles(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val musicCommands = SlashCommandManager.musicCommands
         val config = TogglesConfig(guild)
@@ -382,7 +382,7 @@ class TogglesCommand : AbstractSlashCommand(
         PaginationHandler.paginateMessage(event, description, 25)
     }
 
-    private suspend fun handleLog(event: SlashCommandInteractionEvent): MessageEmbed {
+    private fun handleLog(event: SlashCommandInteractionEvent): MessageEmbed {
         val (_, _, secondaryCommand) = event.fullCommandName.split("\\s".toRegex())
         val guild = event.guild!!
 
@@ -393,7 +393,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getLogTogglesEmbed(guild: Guild): MessageEmbed {
+    private fun getLogTogglesEmbed(guild: Guild): MessageEmbed {
         val config = TogglesConfig(guild)
         val logTypes = LogType.entries.toTypedArray()
         val toggleNames = StringBuilder()
@@ -426,7 +426,7 @@ class TogglesCommand : AbstractSlashCommand(
         return embedBuilder.build()
     }
 
-    private suspend fun handleLogSwitch(guild: Guild, toggle: String): MessageEmbed {
+    private fun handleLogSwitch(guild: Guild, toggle: String): MessageEmbed {
         val config = TogglesConfig(guild)
         val logType = try {
             LogType.valueOf(toggle)
@@ -459,7 +459,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
-    override suspend fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
+    override fun onCommandAutoCompleteInteraction(event: CommandAutoCompleteInteractionEvent) {
         if (event.name != "toggles" && event.subcommandGroup != "dj" && event.focusedOption.name != "toggle")
             return
 

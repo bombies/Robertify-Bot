@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -19,13 +20,13 @@ class PauseCommand : AbstractSlashCommand(
     )
 ) {
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = event.guild!!.selfMember.voiceState!!
         event.replyEmbed { handlePause(memberVoiceState, selfVoiceState) }.queue()
     }
 
-    suspend fun handlePause(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
+    fun handlePause(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
 
@@ -35,7 +36,7 @@ class PauseCommand : AbstractSlashCommand(
         val logUtils = LogUtilsKt(guild)
 
         return if (player.paused) {
-            player.pause(false)
+            runBlocking { player.pause(false) }
             musicManager.isForcePaused = false
             logUtils.sendLog(
                 LogType.PLAYER_RESUME,
@@ -44,7 +45,7 @@ class PauseCommand : AbstractSlashCommand(
             )
             RobertifyEmbedUtils.embedMessage(guild, PauseMessages.RESUMED).build()
         } else {
-            player.pause(true)
+            runBlocking { player.pause(true) }
             musicManager.isForcePaused = true
             logUtils.sendLog(
                 LogType.PLAYER_PAUSE,

@@ -1,6 +1,5 @@
 package main.commands.slashcommands.management.requestchannel
 
-import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.interactions.components.primary
 import dev.minn.jda.ktx.interactions.components.secondary
 import dev.minn.jda.ktx.messages.send
@@ -29,13 +28,11 @@ import main.utils.locale.messages.DedicatedChannelMessages
 import main.utils.locale.messages.GeneralMessages
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.sharding.ShardManager
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicLong
 
@@ -65,12 +62,12 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         private const val EDIT_BUTTON_ID = "togglerqchannel:%s:%s"
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) = when (event.subcommandName) {
+    override fun handle(event: SlashCommandInteractionEvent) = when (event.subcommandName) {
         "setup" -> handleSetup(event)
         else -> handleEdit(event)
     }
 
-    internal suspend fun handleSetup(event: SlashCommandInteractionEvent) {
+    internal fun handleSetup(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
 
         if (RequestChannelConfig(guild).isChannelSet()) {
@@ -81,7 +78,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         }
 
         event.deferReply().queue()
-        val channel = createRequestChannel(guild).await()
+        val channel = createRequestChannel(guild)
 
         try {
             event.hook.sendEmbed(guild) {
@@ -99,58 +96,66 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         }
     }
 
-    suspend fun createRequestChannel(
+    fun createRequestChannel(
         guild: Guild,
         shardManager: ShardManager = Robertify.shardManager
-    ): Deferred<RequestChannel> = coroutineScope {
-        val job = async {
+    ): RequestChannel {
+        val job = run {
             val config = RequestChannelConfig(guild, shardManager)
 
             val textChannelId = AtomicLong()
-            val channel = guild.createTextChannel("robertify-requests").await()
-            val theme = ThemesConfig(guild).getTheme()
             val localeManager = LocaleManager[guild]
-            val manager = channel.manager
-
-            manager.setPosition(0).queue()
-            config.channelTopicUpdateRequest(channel)?.queue()
-
+            val theme = ThemesConfig(guild).getTheme()
             val embedBuilder = EmbedBuilder()
             embedBuilder.setColor(theme.color)
                 .setTitle(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_NOTHING_PLAYING))
                 .setImage(theme.idleBanner)
-            textChannelId.set(channel.idLong)
 
-            val message =
-                channel.sendMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
-                    .setEmbeds(embedBuilder.build())
-                    .await()
+            val channel = guild.createTextChannel("robertify-requests").submit()
+                .thenApply { channel ->
+                    val manager = channel.manager
 
-            config.setChannelAndMessage(textChannelId.get(), message.idLong)
-            config.buttonUpdateRequest(message).queue()
-            config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
+                    manager.setPosition(0).queue()
+                    config.channelTopicUpdateRequest(channel)?.queue()
 
-            try {
-                if (RobertifyAudioManager[guild].player.playingTrack != null)
-                    config.updateMessage()
-            } catch (_: UninitializedPropertyAccessException) {
-            }
+                    textChannelId.set(channel.idLong)
+                    channel
+                }
+                .thenApply { channel ->
+                    channel.sendMessage(localeManager.getMessage(DedicatedChannelMessages.DEDICATED_CHANNEL_QUEUE_NOTHING_PLAYING))
+                        .setEmbeds(embedBuilder.build())
+                        .submit()
+                        .thenApply { message ->
+                            config.setChannelAndMessage(textChannelId.get(), message.idLong)
+                            config.buttonUpdateRequest(message).queue()
+                        }
+                }
+                .thenApply {
+                    config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
 
-            RequestChannel(
-                channelId = config.getChannelId(),
-                messageId = config.getMessageId(),
-                config = config.config.getConfigJsonObject()
-            )
+                    try {
+                        if (RobertifyAudioManager[guild].player.playingTrack != null)
+                            config.updateMessage()
+                    } catch (_: UninitializedPropertyAccessException) {
+                    }
+
+                    RequestChannel(
+                        channelId = config.getChannelId(),
+                        messageId = config.getMessageId(),
+                        config = config.config.getConfigJsonObject()
+                    )
+                }.join()
+            return@run channel
         }
 
-        return@coroutineScope job
+        return job
     }
 
-    suspend fun deleteRequestChannel(guild: Guild, shardManager: ShardManager = Robertify.shardManager) {
+    fun deleteRequestChannel(guild: Guild, shardManager: ShardManager = Robertify.shardManager) {
         RequestChannelConfig(guild, shardManager).removeChannel()
     }
 
-    private suspend fun handleEdit(event: SlashCommandInteractionEvent) {
+    private fun handleEdit(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         val config = RequestChannelConfig(guild)
 
@@ -232,7 +237,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         ).queue()
     }
 
-    override suspend fun onButtonInteraction(event: ButtonInteractionEvent) {
+    override fun onButtonClick(event: ButtonInteractionEvent) {
         if (event.button.id?.startsWith(EDIT_BUTTON_ID.split(":")[0]) != true) return
 
         val guild = event.guild!!
@@ -247,15 +252,15 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         }
 
         event.deferReply().queue()
-        handleChannelButtonToggle(guild, listOf(buttonName), event)?.await()
+        handleChannelButtonToggle(guild, listOf(buttonName), event)
     }
 
-    suspend fun handleChannelButtonToggle(
+    fun handleChannelButtonToggle(
         guild: Guild,
         buttonNames: List<String>,
         event: ButtonInteractionEvent? = null,
         shardManager: ShardManager = Robertify.shardManager
-    ): Deferred<Message?>? {
+    ) {
         val localeManager = LocaleManager[guild]
         val config = RequestChannelConfig(guild, shardManager)
         val subConfig = config.config

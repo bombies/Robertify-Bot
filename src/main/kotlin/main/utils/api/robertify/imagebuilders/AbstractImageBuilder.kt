@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.runBlocking
 import main.main.Config
 import main.utils.api.robertify.imagebuilders.models.ImageQueryField
 import okhttp3.OkHttpClient
@@ -47,10 +48,10 @@ abstract class AbstractImageBuilder protected constructor(imageType: ImageType) 
             .find { it.name.equals(key.toString(), true) }
             ?.value
 
-    open suspend fun build(): InputStream? {
+    open fun build(): InputStream? = runBlocking {
         val url = uri.build().toURL().toString()
 
-        return try {
+        return@runBlocking try {
             httpClient.get(url).body<InputStream>()
         } catch (e: SocketTimeoutException) {
             throw ImageBuilderException(cause = e)

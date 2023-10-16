@@ -96,7 +96,7 @@ class PollCommand : AbstractSlashCommand(
         private val logger by SLF4J
     }
 
-    override suspend fun handle(event: SlashCommandInteractionEvent) {
+    override fun handle(event: SlashCommandInteractionEvent) {
         val guild = event.guild!!
         if (!TogglesConfig(guild).get(Toggle.POLLS))
             return event.replyEmbed(GeneralMessages.DISABLED_FEATURE)
@@ -163,21 +163,22 @@ class PollCommand : AbstractSlashCommand(
 
         embedBuilder.setTimestamp(Instant.now())
 
-        val msg = event.channel.sendEmbed { embedBuilder.build() }.await()
-        val map = mutableMapOf<Int, Int>()
-        choices.forEachIndexed { i, _ ->
-            msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i + 1))).queue()
-            map[i] = 0
+        event.channel.sendEmbed { embedBuilder.build() }.queue { msg ->
+            val map = mutableMapOf<Int, Int>()
+            choices.forEachIndexed { i, _ ->
+                msg.addReaction(Emoji.fromFormatted(GeneralUtils.parseNumEmoji(i + 1))).queue()
+                map[i] = 0
+            }
+
+            pollCache[msg.idLong] = map
+
+            if (endPoll)
+                doPollEnd(msg, event.user, question, choices, duration)
+
+            event.replyEmbed(PollMessages.POLL_SENT)
+                .setEphemeral(true)
+                .queue()
         }
-
-        pollCache[msg.idLong] = map
-
-        if (endPoll)
-            doPollEnd(msg, event.user, question, choices, duration)
-
-        event.replyEmbed(PollMessages.POLL_SENT)
-            .setEphemeral(true)
-            .queue()
     }
 
     private fun doPollEnd(msg: Message, user: User, question: String, choices: List<String>, timeToEnd: Long) {
