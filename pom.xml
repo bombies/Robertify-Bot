@@ -130,7 +130,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.30.0</version>
+            <version>6.33.1</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
