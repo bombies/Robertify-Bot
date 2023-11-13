@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
-        <kotlin.version>1.9.10</kotlin.version>
+        <kotlin.version>1.9.20</kotlin.version>
         <ktor.version>2.3.5</ktor.version>
         <koin.version>3.5.0</koin.version>
         <mockk.version>1.13.5</mockk.version>
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
-            <version>4.10.2</version>
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.walkyst</groupId>
@@ -130,7 +130,7 @@
         <dependency>
             <groupId>io.sentry</groupId>
             <artifactId>sentry-logback</artifactId>
-            <version>6.30.0</version>
+            <version>6.31.0</version>
         </dependency>
         <dependency>
             <groupId>org.yaml</groupId>
