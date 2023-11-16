@@ -20,7 +20,7 @@
         <koin.version>3.5.0</koin.version>
         <mockk.version>1.13.5</mockk.version>
         <kotlin.compiler.incremental>false</kotlin.compiler.incremental>
-        <serialization.version>1.6.0</serialization.version>
+        <serialization.version>1.6.1</serialization.version>
         <maven.compiler.target>17</maven.compiler.target>
         <main.class>main.main.RobertifyKt</main.class>
     </properties>
