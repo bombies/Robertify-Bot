@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio
 
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils.queueCoroutine

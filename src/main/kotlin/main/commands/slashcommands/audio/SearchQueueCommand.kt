@@ -1,6 +1,5 @@
 package main.commands.slashcommands.audio
 
-import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.*
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption

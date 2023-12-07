@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio
 
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager
 import dev.minn.jda.ktx.interactions.components.link
 import kotlinx.coroutines.*
 import main.audiohandlers.RobertifyAudioManager

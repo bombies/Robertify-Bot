@@ -1,6 +1,6 @@
 package main.audiohandlers.loaders
 
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager
 import dev.arbjerg.lavalink.protocol.v4.Exception
 import dev.arbjerg.lavalink.protocol.v4.Playlist
 import dev.arbjerg.lavalink.protocol.v4.Track
