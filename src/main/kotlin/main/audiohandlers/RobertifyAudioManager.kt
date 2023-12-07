@@ -3,9 +3,9 @@ package main.audiohandlers
 //import main.utils.resume.ResumableTrack
 //import main.utils.resume.ResumableTrack.Companion.string
 //import main.utils.resume.ResumeData
-import com.github.topisenpai.lavasrc.applemusic.AppleMusicSourceManager
-import com.github.topisenpai.lavasrc.deezer.DeezerAudioSourceManager
-import com.github.topisenpai.lavasrc.spotify.SpotifySourceManager
+import com.github.topi314.lavasrc.applemusic.AppleMusicSourceManager
+import com.github.topi314.lavasrc.deezer.DeezerAudioSourceManager
+import com.github.topi314.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers

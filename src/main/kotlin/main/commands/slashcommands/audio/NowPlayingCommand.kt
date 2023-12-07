@@ -1,6 +1,5 @@
 package main.commands.slashcommands.audio
 
-import com.github.topisenpai.lavasrc.mirror.MirroringAudioTrack
 import dev.minn.jda.ktx.util.SLF4J
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
