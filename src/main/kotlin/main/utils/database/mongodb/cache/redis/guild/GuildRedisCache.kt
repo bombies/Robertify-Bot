@@ -257,20 +257,20 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
      */
     private fun loadGuild(gid: String, attempt: Int) {
         var scopedAttempt = attempt
-        logger.debug("Attempting to load guild with ID: {}", gid)
+        logger.info("Attempting to load guild with ID: {}", gid)
         try {
             val guildJSON: String? = mongoDB.getDocument(GuildDB.Field.GUILD_ID.toString(), gid.toLong())
             if (guildJSON != null) {
                 val guildObj = readyGuildObjForRedis(JSONObject(guildJSON))
                 setex(gid, 3600, guildObj)
-                logger.debug("Loaded guild with ID: {}", gid)
+                logger.info("Loaded guild with ID: {}", gid)
             }
         } catch (e: Exception) {
             when (e) {
                 is NullPointerException,
                 is NoSuchElementException -> {
                     if (scopedAttempt == 2) return
-                    logger.debug(
+                    logger.info(
                         "Guild with ID {} didn't exist in the database. Attempting to add and reload.",
                         gid
                     )
@@ -278,7 +278,9 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
                     loadGuild(gid, ++scopedAttempt)
                 }
 
-                else -> throw e
+                else -> {
+                    logger.error("There was an error loading guild with ID {}", gid, e)
+                }
             }
         }
     }
