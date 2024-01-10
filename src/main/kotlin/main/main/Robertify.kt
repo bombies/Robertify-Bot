@@ -30,6 +30,7 @@ import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
+import main.utils.database.mongodb.databases.GuildDB
 import main.utils.json.locale.LocaleConfig
 import main.utils.json.reminders.RemindersConfig
 import main.utils.json.requestchannel.RequestChannelConfig

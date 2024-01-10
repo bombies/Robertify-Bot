@@ -31,7 +31,7 @@ class GuildConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
     }
 
     fun addGuild() {
-        require(guildHasInfo()) { "This guild is already added!" }
+        require(!guildHasInfo()) { "This guild is already added!" }
         getDatabase().addGuild(guild.idLong)
     }
 
