@@ -65,7 +65,7 @@ class RewindCommand : AbstractSlashCommand(
         val logUtils = LogUtilsKt(guild)
 
         return if (time == null) {
-            player.setPosition(0)
+            player.setPosition(0).subscribe()
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWIND_TO_BEGINNING_LOG,
@@ -90,7 +90,7 @@ class RewindCommand : AbstractSlashCommand(
                     RewindMessages.DURATION_GT_CURRENT_TIME
                 ).build()
 
-            player.setPosition(player.position - timeInMillis)
+            player.setPosition(player.position - timeInMillis).subscribe()
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWOUND_BY_DURATION_LOG,

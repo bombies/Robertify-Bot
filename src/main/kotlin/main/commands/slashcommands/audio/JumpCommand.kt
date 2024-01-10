@@ -81,7 +81,7 @@ class JumpCommand : AbstractSlashCommand(
         )
     }
 
-    private suspend fun doJump(
+    private fun doJump(
         guild: Guild,
         jumper: User,
         input: String,
@@ -111,7 +111,7 @@ class JumpCommand : AbstractSlashCommand(
                 JumpMessages.JUMP_DURATION_GT_TIME_LEFT
             ).build()
 
-        player.setPosition(player.position + time)
+        player.setPosition(player.position + time).subscribe()
         LogUtilsKt(guild).sendLog(
             LogType.TRACK_JUMP,
             JumpMessages.JUMPED_LOG,

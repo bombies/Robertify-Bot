@@ -31,7 +31,7 @@ class StopCommand : AbstractSlashCommand(
         event.hook.sendEmbed(event.guild) { handleStop(event.member!!) }.queue()
     }
 
-    suspend fun handleStop(stopper: Member): MessageEmbed {
+    fun handleStop(stopper: Member): MessageEmbed {
         val guild = stopper.guild
         val selfVoiceState = guild.selfMember.voiceState!!
         val memberVoiceState = stopper.voiceState!!
@@ -64,7 +64,7 @@ class StopCommand : AbstractSlashCommand(
 
             else -> {
                 musicManager.clear()
-                player.stopTrack()
+                player.stopTrack().subscribe()
                 logger.debug("Stopped track. Playing track: ${player.track?.title ?: "none"}")
 
                 LogUtilsKt(guild).sendLog(

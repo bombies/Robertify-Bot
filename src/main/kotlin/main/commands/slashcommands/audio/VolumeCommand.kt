@@ -6,6 +6,7 @@ import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
+import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
@@ -35,7 +36,8 @@ class VolumeCommand : AbstractSlashCommand(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        event.replyEmbed {
+        event.deferReply().queue()
+        event.hook.sendEmbed {
             handleVolumeChange(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,
@@ -57,8 +59,12 @@ class VolumeCommand : AbstractSlashCommand(
             return RobertifyEmbedUtils.embedMessage(guild, VolumeMessages.INVALID_VOLUME)
                 .build()
 
-        val player = RobertifyAudioManager[guild].player!!
-        player.setVolume(volume)
+        val audioManager = RobertifyAudioManager[guild]
+        val link = audioManager.link
+
+        link.updatePlayer {
+            it.setVolume(volume)
+        }.subscribe()
 
         RequestChannelConfig(guild).updateMessage()
 
@@ -81,5 +87,5 @@ class VolumeCommand : AbstractSlashCommand(
                 Control the volume of the bot
 
                 **__Usages__**
-                `/volume <0-100>`"""
+                `/volume <0-200>`"""
 }

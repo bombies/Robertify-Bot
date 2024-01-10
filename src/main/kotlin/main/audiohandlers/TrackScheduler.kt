@@ -67,9 +67,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
 
     fun playTrack(track: Track) {
         this.link.createOrUpdatePlayer().setTrack(track)
-            .subscribe {
-                logger.debug("Now playing ${it.track?.info?.title}")
-            }
+            .subscribe()
     }
 
 
@@ -95,7 +93,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
         usePlayer { player ->
             when {
                 player.track != null -> queueHandler.addToBeginning(track)
-                else -> link.createOrUpdatePlayer().setTrack(track)
+                else -> playTrack(track)
             }
         }
     }

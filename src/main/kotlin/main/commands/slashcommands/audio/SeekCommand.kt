@@ -58,7 +58,7 @@ class SeekCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private suspend fun handleSeek(
+    private fun handleSeek(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         hours: Int,
@@ -89,7 +89,7 @@ class SeekCommand : AbstractSlashCommand(
             return RobertifyEmbedUtils.embedMessage(guild, SeekMessages.POS_GT_DURATION)
                 .build()
 
-        player.setPosition(seekDuration)
+        player.setPosition(seekDuration).subscribe()
         val time =
             "${if (hours > 9) "$hours" else "0$hours"}:${if (minutes > 9) "$minutes" else "0$minutes"}:${if (seconds > 9) "$seconds" else "0$seconds"}"
 
