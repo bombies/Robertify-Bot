@@ -213,20 +213,10 @@ object Robertify {
         logger.info("Watching ${event.guildAvailableCount} guilds on shard #${jda.shardInfo.shardId} (${event.guildUnavailableCount} unavailable)")
         BotDBCache.instance.lastStartup = System.currentTimeMillis()
         jda.shardManager?.setPresence(OnlineStatus.ONLINE, Activity.listening("/help"))
-
-        shardManager.guildCache.forEach { guild ->
-            RequestChannelConfig(guild).updateMessage()
-        }
     }
 
     private fun ShardManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
         val guild = event.guild
-        val locale = LocaleConfig(guild).getLocale()
-        try {
-            LocaleManager[guild].setLocale(locale)
-        } catch (e: ReaderException) {
-            logger.error("I couldn't set the locale for ${guild.name}")
-        }
         loadNeededSlashCommands(guild)
         rescheduleUnbans(guild)
         RemindersConfig(guild).scheduleReminders()

@@ -139,6 +139,14 @@ abstract class AbstractSlashCommand protected constructor(val info: SlashCommand
                     )
         }
 
+        /**
+         * Executes the necessary checks for audio commands.
+         * @param memberVoiceState The voice state of the user executing the command.
+         * @param selfVoiceState The voice state of the bot.
+         * @param selfChannelNeeded If the bot needs to be in a voice channel for the command to be executed.
+         * @param songMustBePlaying If the bot needs to be playing a song for the command to be executed.
+         * @return An embed of the error message, null if all the checks passed.
+         */
         suspend fun audioChannelChecks(
             memberVoiceState: GuildVoiceState,
             selfVoiceState: GuildVoiceState,

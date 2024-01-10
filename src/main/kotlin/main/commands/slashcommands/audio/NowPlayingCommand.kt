@@ -9,6 +9,7 @@ import main.constants.Toggle
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isUrl
 import main.utils.RobertifyEmbedUtils
+import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
 import main.utils.api.robertify.imagebuilders.ImageBuilderException
@@ -42,83 +43,59 @@ class NowPlayingCommand : AbstractSlashCommand(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
 
+
         val guild = event.guild!!
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = guild.selfMember.voiceState!!
+        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, true, true)
+        if (acChecks != null) {
+            event.replyEmbed { acChecks }.setEphemeral(true).queue()
+            return
+        }
+
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player
         val track = player.playingTrack
 
-        val embed: MessageEmbed? = when {
-            !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtils.embedMessage(
-                guild,
-                GeneralMessages.NOTHING_PLAYING
-            ).build()
-
-            !memberVoiceState.inAudioChannel() -> RobertifyEmbedUtils.embedMessage(
-                guild,
-                GeneralMessages.USER_VOICE_CHANNEL_NEEDED
-            ).build()
-
-            memberVoiceState.channel != selfVoiceState.channel ->
-                RobertifyEmbedUtils.embedMessage(
-                    guild,
-                    GeneralMessages.SAME_VOICE_CHANNEL_LOC,
-                    Pair("{channel}", selfVoiceState.channel!!.asMention)
-                ).build()
-
-            track == null -> RobertifyEmbedUtils.embedMessage(
-                guild,
-                GeneralMessages.NOTHING_PLAYING
-            ).build()
-
-            else -> null
+        val sendBackupEmbed: suspend () -> Unit = {
+            event.hook.sendEmbed(guild) {
+                getNowPlayingEmbed(guild, event.channel.asGuildMessageChannel(), selfVoiceState, memberVoiceState)
+            }.queue()
         }
 
-        if (embed != null) {
-            event.hook.sendEmbed(guild) { embed }
-                .queue()
-        } else {
-            val sendBackupEmbed: suspend () -> Unit = {
-                event.hook.sendEmbed(guild) {
-                    getNowPlayingEmbed(guild, event.channel.asGuildMessageChannel(), selfVoiceState, memberVoiceState)
-                }.queue()
-            }
+        try {
+            val defaultImage = ThemesConfig(guild).getTheme().nowPlayingBanner
+            val builder = NowPlayingImageBuilder(
+                title = track!!.title,
+                artistName = track.author,
+                albumImage = try {
+                    track.artworkUrl ?: defaultImage
+                } catch (e: MissingFieldException) {
+                    defaultImage
+                }
+            )
 
-            try {
-                val defaultImage = ThemesConfig(guild).getTheme().nowPlayingBanner
-                val builder = NowPlayingImageBuilder(
-                    title = track!!.title,
-                    artistName = track.author,
-                    albumImage = try {
-                        track.artworkUrl ?: defaultImage
-                    } catch (e: MissingFieldException) {
-                        defaultImage
-                    }
-                )
-
-                val image = if (!track.isStream)
-                    builder.copy(
-                        duration = track.length,
-                        currentTime = player.position,
-                        isLiveStream = false
-                    ).build()
-                else builder.copy(
+            val image = if (!track.isStream)
+                builder.copy(
+                    duration = track.length,
+                    currentTime = player.position,
                     isLiveStream = false
                 ).build()
+            else builder.copy(
+                isLiveStream = false
+            ).build()
 
-                if (image == null)
-                    sendBackupEmbed()
-                else
-                    event.hook.sendFiles(
-                        FileUpload.fromData(
-                            image,
-                            AbstractImageBuilder.RANDOM_FILE_NAME
-                        )
-                    ).queue()
-            } catch (e: ImageBuilderException) {
+            if (image == null)
                 sendBackupEmbed()
-            }
+            else
+                event.hook.sendFiles(
+                    FileUpload.fromData(
+                        image,
+                        AbstractImageBuilder.RANDOM_FILE_NAME
+                    )
+                ).queue()
+        } catch (e: ImageBuilderException) {
+            sendBackupEmbed()
         }
     }
 
