@@ -19,6 +19,14 @@ import org.json.JSONObject
 
 abstract class AbstractMongoDatabase {
     companion object {
+        /**
+         * This value will be used to determine if a document
+         * is invalid. If the number of mappings exceed this value
+         * more than likely something has gone wrong, and it may lead
+         * to a recursive heap overflow. Don't even ask what lead
+         * to the circumstances for this implementation
+         */
+        private const val KEY_MAPPINGS_THRESHOLD = 200
         private val log by SLF4J
 
         fun initAllCaches() {
@@ -34,10 +42,13 @@ abstract class AbstractMongoDatabase {
     }
 
     private val database: MongoDatabase
-     var collection: MongoCollection<Document>
+    var collection: MongoCollection<Document>
         protected set
 
-    constructor(db: RobertifyMongoDatabase = RobertifyMongoDatabase.ROBERTIFY_DATABASE, collection: RobertifyMongoDatabase) {
+    constructor(
+        db: RobertifyMongoDatabase = RobertifyMongoDatabase.ROBERTIFY_DATABASE,
+        collection: RobertifyMongoDatabase
+    ) {
         database = MongoConnectionManager.connect(db).database()
 
         try {
@@ -61,28 +72,28 @@ abstract class AbstractMongoDatabase {
             ?: throw NullPointerException("The document could not be inserted due to a null problem!")
 
     fun addDocument(obj: JSONObject): BsonObjectId = addDocument(Document.parse(obj.toString()))
-    
+
     fun addManyDocument(docs: Collection<Document>) = collection.insertMany(docs.toMutableList())
-    
+
     fun upsertManyDocuments(docs: Collection<Document>) {
         val bulkWriteModels = ArrayList<WriteModel<out Document>>()
         docs.forEach { doc ->
             val id = doc.getObjectId("_id")
             var oldDoc: Document? = null
-            
-            collection.find().forEach { document -> 
-                if (document.getObjectId("_id").equals(id)) 
+
+            collection.find().forEach { document ->
+                if (document.getObjectId("_id").equals(id))
                     oldDoc = document
             }
-            
+
             if (oldDoc != null)
                 bulkWriteModels.add(DeleteOneModel(oldDoc as Bson))
             bulkWriteModels.add(InsertOneModel(doc))
         }
-        
+
         collection.bulkWrite(bulkWriteModels)
     }
-    
+
     fun upsertDocument(oldDoc: Document? = null, doc: Document) {
         when (oldDoc) {
             null -> {
@@ -96,15 +107,16 @@ abstract class AbstractMongoDatabase {
                     }
                 }
             }
+
             else -> {
                 collection.deleteOne(oldDoc)
                 collection.insertOne(doc)
             }
         }
     }
-    
+
     fun upsertDocument(obj: JSONObject) = upsertDocument(doc = Document.parse(obj.toString()))
-    
+
     protected fun removeDocument(doc: Document) = collection.deleteOne(doc)
 
     protected fun removeDocument(key: String, value: String) = when {
@@ -173,13 +185,23 @@ abstract class AbstractMongoDatabase {
             ?: throw NullPointerException("There is no such document with mapping <$idName:$idValue>")
         updateDocument(document, key, newValue)
     }
-    
+
     protected fun documentExists(key: String, value: String): Boolean =
         findDocument(key, value).hasNext()
-    
+
     protected fun documentExists(key: String, value: Any): Boolean =
         findDocument(key, value).hasNext()
-    
+
+    private fun validateDocument(document: Document?): Document? {
+        if (document == null) return null
+        val keys = document.keys
+        if (keys.size > KEY_MAPPINGS_THRESHOLD) {
+            log.error("A document has exceeded the key mappings threshold!")
+            return null
+        }
+        return document
+    }
+
     protected fun findDocument(key: String, value: String): Iterator<Document> =
         collection.find(Filters.eq(key, value)).iterator()
 
@@ -188,19 +210,19 @@ abstract class AbstractMongoDatabase {
     }
 
     protected fun findSpecificDocument(key: String, value: String): Document? {
-        return collection.find(Filters.eq(key, value)).iterator().next()
+        return validateDocument(collection.find(Filters.eq(key, value)).iterator().next())
     }
 
     protected fun findSpecificDocument(key: String, value: Document): Document? {
-        return collection.find(Filters.eq(key, value)).iterator().next()
+        return validateDocument(collection.find(Filters.eq(key, value)).iterator().next())
     }
 
     protected fun findSpecificDocument(key: String, value: JSONObject): Document? {
-        return collection.find(Filters.eq(key, value)).iterator().next()
+        return validateDocument(collection.find(Filters.eq(key, value)).iterator().next())
     }
 
     fun <T> findSpecificDocument(key: String, value: T): Document? {
-        return collection.find(Filters.eq(key, value)).iterator().next()
+        return validateDocument(collection.find(Filters.eq(key, value)).iterator().next())
     }
 
     protected fun findSpecificDocument(key: GenericJSONField, value: Any): Document? {
@@ -239,7 +261,11 @@ abstract class AbstractMongoDatabase {
             else -> throw IllegalArgumentException("Invalid value type!")
         }
         val sb = StringBuilder()
-        while (doc.hasNext()) sb.append(documentToJSON(doc.next(), indented)).append("\n")
+        while (doc.hasNext()) {
+            val nextDoc = doc.next()
+            if (validateDocument(nextDoc) != null)
+                sb.append(documentToJSON(nextDoc, indented)).append("\n")
+        }
         return sb.toString()
     }
 
