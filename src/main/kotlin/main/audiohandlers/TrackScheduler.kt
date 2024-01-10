@@ -1,23 +1,18 @@
 package main.audiohandlers
 
-import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.arbjerg.lavalink.client.*
+import dev.arbjerg.lavalink.client.protocol.Track
 import dev.arbjerg.lavalink.protocol.v4.TrackInfo
-import dev.minn.jda.ktx.coroutines.await
-import dev.schlaubi.lavakord.audio.*
-import dev.schlaubi.lavakord.audio.player.Player
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import main.audiohandlers.models.Requester
 import main.audiohandlers.utils.artworkUrl
-import main.audiohandlers.utils.author
-import main.audiohandlers.utils.title
 import main.commands.slashcommands.misc.PlaytimeCommand
 import main.constants.Toggle
 import main.main.Robertify
-import main.utils.GeneralUtils
+import main.utils.GeneralUtils.queueAfter
 import main.utils.RobertifyEmbedUtils
 import main.utils.api.robertify.imagebuilders.AbstractImageBuilder
 import main.utils.api.robertify.imagebuilders.ImageBuilderException
@@ -45,79 +40,101 @@ import net.dv8tion.jda.api.utils.FileUpload
 import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionException
 import java.util.concurrent.TimeUnit
 import kotlin.math.log
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
-class TrackScheduler(private val guild: Guild, private val link: Link) {
+class TrackScheduler(private val guild: Guild, val link: Link) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val audioManager = RobertifyAudioManager
+        private var EVENTS_SUBSCRIBED = false
     }
 
     private val requesters = ArrayList<Requester>()
     private var lastSentMsg: Message? = null
     val disconnectManager = GuildDisconnectManager(guild)
-
     val unannouncedTracks = emptyList<String>().toMutableList()
-    val player: Player
-        get() = link.player
     val queueHandler = QueueHandler()
+    val player: LavalinkPlayer? = link.getPlayer().block()
     var announcementChannel: GuildMessageChannel? = null
 
-    suspend fun queue(track: Track) {
-        when {
-            player.playingTrack != null -> queueHandler.add(track)
-            else -> player.playTrack(track)
+    private fun usePlayer(playerCallback: (LavalinkPlayer) -> Unit) {
+        link.getPlayer().subscribe(playerCallback)
+    }
+
+    fun playTrack(track: Track) {
+        this.link.createOrUpdatePlayer().setTrack(track)
+            .subscribe {
+                logger.debug("Now playing ${it.track?.info?.title}")
+            }
+    }
+
+
+    fun queue(track: Track) {
+        usePlayer { player ->
+            when {
+                player.track == null -> playTrack(track)
+                else -> queueHandler.add(track)
+            }
         }
     }
 
-    suspend fun queue(tracks: Collection<Track>) {
+    fun queue(tracks: Collection<Track>) {
         val mutableTracks = tracks.toMutableList()
-        if (player.playingTrack == null)
-            player.playTrack(mutableTracks.removeFirst())
-        queueHandler.addAll(mutableTracks)
-    }
-
-    suspend fun addToBeginningOfQueue(track: Track) = run {
-        when {
-            player.playingTrack != null -> queueHandler.addToBeginning(track)
-            else -> player.playTrack(track)
+        usePlayer { player ->
+            if (player.track == null)
+                playTrack(mutableTracks.removeFirst())
+            queueHandler.addAll(mutableTracks)
         }
     }
 
-    suspend fun addToBeginningOfQueue(tracks: Collection<Track>) {
+    fun addToBeginningOfQueue(track: Track) = run {
+        usePlayer { player ->
+            when {
+                player.track != null -> queueHandler.addToBeginning(track)
+                else -> link.createOrUpdatePlayer().setTrack(track)
+            }
+        }
+    }
+
+    fun addToBeginningOfQueue(tracks: Collection<Track>) {
         val mutableTracks = tracks.toMutableList()
-        if (player.playingTrack == null) {
-            player.playTrack(mutableTracks.removeFirst())
-        }
 
-        queueHandler.addToBeginning(mutableTracks)
+        usePlayer { player ->
+            if (player.track == null)
+                playTrack(mutableTracks.removeFirst())
+            queueHandler.addToBeginning(mutableTracks)
+        }
     }
 
-    suspend fun stop() {
-        queueHandler.clear()
-
-        if (player.playingTrack != null)
-            player.stopTrack()
+    fun stop() {
+        usePlayer { player ->
+            queueHandler.clear()
+            if (player.track != null)
+                player.stopTrack()
+        }
     }
 
     init {
-        player.events.onEach { event ->
-            when (event) {
-                is TrackStartEvent -> onTrackStart(event)
-                is TrackStuckEvent -> onTrackStuck(event)
-                is TrackExceptionEvent -> onTrackException(event)
-                is TrackEndEvent -> onTrackEnd(event)
-            }
-        }
-            .launchIn(player.coroutineScope)
+        logger.debug("Initializing a new TrackScheduler for ${guild.name}...")
+
+        if (!EVENTS_SUBSCRIBED) {
+            logger.debug("Subscribing to scheduler events...")
+            val lavalink = Robertify.lavalink
+            lavalink.on<TrackStartEvent>().subscribe { event -> onTrackStart(event) }
+            lavalink.on<TrackEndEvent>().subscribe { event -> onTrackEnd(event) }
+            lavalink.on<TrackStuckEvent>().subscribe { event -> onTrackStuck(event) }
+            lavalink.on<TrackExceptionEvent>().subscribe { event -> onTrackException(event) }
+            EVENTS_SUBSCRIBED = true
+            logger.debug("Subscribed to scheduler events")
+        } else logger.debug("Already subscribed scheduler to events")
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    private suspend fun onTrackStart(event: TrackStartEvent) {
+    private fun onTrackStart(event: TrackStartEvent) {
         val track = event.track
 
         logger.debug(
@@ -176,62 +193,65 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
         logger.debug("The channel is not the request channel")
 
-        val requesterUser = Robertify.shardManager.retrieveUserById(requester.id).await()
-        val defaultBackgroundImage = ThemesConfig(
-            guild
-        ).getTheme().nowPlayingBanner
+        Robertify.shardManager.retrieveUserById(requester.id).queue { requesterUser ->
+            val defaultBackgroundImage = ThemesConfig(
+                guild
+            ).getTheme().nowPlayingBanner
 
-        val img: InputStream
-        try {
-            img = NowPlayingImageBuilder(
-                artistName = track.author,
-                title = track.title,
-                albumImage = try {
-                    track.artworkUrl ?: defaultBackgroundImage
-                } catch (e: MissingFieldException) {
-                    defaultBackgroundImage
-                },
-                requesterName = requesterUser.name,
-                requesterAvatar = requesterUser.avatarUrl
-            ).build() ?: throw NullPointerException("The generated image was null!")
-        } catch (ex: Exception) {
-            // Either building the image failed or the bot doesn't have enough
-            // permission to send images in a certain channel
-            if (ex is PermissionException || ex is ImageBuilderException || ex is NullPointerException) {
-                try {
-                    sendNowPlayingEmbed(trackInfo, requesterMention).await()
-                } catch (ex: PermissionException) {
+            val img: InputStream
+            try {
+                img = runBlocking {
+                    NowPlayingImageBuilder(
+                        artistName = track.info.author,
+                        title = track.info.title,
+                        albumImage = try {
+                            track.artworkUrl ?: defaultBackgroundImage
+                        } catch (e: MissingFieldException) {
+                            defaultBackgroundImage
+                        },
+                        requesterName = requesterUser.name,
+                        requesterAvatar = requesterUser.avatarUrl
+                    ).build() ?: throw NullPointerException("The generated image was null!")
+                }
+            } catch (ex: Exception) {
+                // Either building the image failed or the bot doesn't have enough
+                // permission to send images in a certain channel
+                if (ex is PermissionException || ex is ImageBuilderException || ex is NullPointerException) {
                     try {
-                        sendNowPlayingString(track.info, requesterMention).await()
-                    } catch (e: Exception) {
-                        logger.warn("I was not able to send a now playing message at all in ${guild.name}")
+                        sendNowPlayingEmbed(trackInfo, requesterMention)
+                    } catch (ex: PermissionException) {
+                        try {
+                            sendNowPlayingString(track.info, requesterMention)
+                        } catch (e: Exception) {
+                            logger.warn("I was not able to send a now playing message at all in ${guild.name}")
+                        }
+                    } catch (ex: Exception) {
+                        logger.error("Unexpected error", ex)
                     }
-                } catch (ex: Exception) {
+                } else {
                     logger.error("Unexpected error", ex)
                 }
-            } else {
-                logger.error("Unexpected error", ex)
+                return@queue
             }
-            return
+
+            announcementChannel!!.sendFiles(
+                FileUpload.fromData(
+                    img,
+                    AbstractImageBuilder.RANDOM_FILE_NAME
+                )
+            ).queue { imgMessage ->
+                lastSentMsg?.delete()?.queueAfter(
+                    3L, TimeUnit.SECONDS, null,
+                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+                )
+
+                lastSentMsg = imgMessage
+            }
         }
-
-        val imgMessage = announcementChannel!!.sendFiles(
-            FileUpload.fromData(
-                img,
-                AbstractImageBuilder.RANDOM_FILE_NAME
-            )
-        ).await()
-
-        lastSentMsg?.delete()?.queueAfter(
-            3L, TimeUnit.SECONDS, null,
-            ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-        )
-
-        lastSentMsg = imgMessage
     }
 
-    private suspend fun onTrackEnd(event: TrackEndEvent) {
-        val reason = event.reason
+    private fun onTrackEnd(event: TrackEndEvent) {
+        val reason = event.endReason
 
         logger.debug(
             "Track ended.\n" +
@@ -244,7 +264,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             if (trackToUse == null) {
                 queueHandler.trackRepeating = false
                 nextTrack(null)
-            } else player.playTrack(trackToUse.copy())
+            } else playTrack(trackToUse.makeClone())
         } else if (reason.mayStartNext) {
             if (trackToUse != null)
                 queueHandler.pushPastTrack(trackToUse)
@@ -255,12 +275,13 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         }
     }
 
-    private suspend fun onTrackException(event: TrackExceptionEvent) {
+    private fun onTrackException(event: TrackExceptionEvent) {
         val exception = event.exception;
         val track = event.track
 
         val handleMessageCleanup: (msg: Message) -> Unit = { msg ->
-            msg.delete().queueAfter(10, TimeUnit.SECONDS)
+            msg.delete().queueAfter(10.seconds)
+            lastSentMsg?.delete()?.queueAfter(10.seconds)
         }
 
         if (exception.message?.contains("matching track") == true) {
@@ -297,10 +318,20 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
                 ).build()
             )
                 ?.queue(handleMessageCleanup)
-        } else logger.error("There was an exception with playing the track {}", exception.cause)
+        } else {
+            logger.error("There was an exception with playing the track {}", exception.cause)
+            announcementChannel?.sendMessageEmbeds(
+                RobertifyEmbedUtils.embedMessage(
+                    guild,
+                    TrackSchedulerMessages.TRACK_COULD_NOT_BE_PLAYED,
+                    Pair("{title}", track.info.title),
+                    Pair("{author}", track.info.author),
+                ).build()
+            )?.queue(handleMessageCleanup)
+        }
     }
 
-    private suspend fun onTrackStuck(event: TrackStuckEvent) {
+    private fun onTrackStuck(event: TrackStuckEvent) {
         if (!TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
             return
 
@@ -321,7 +352,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         nextTrack(track)
     }
 
-    private suspend fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
+    private fun getNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): MessageEmbed {
         val localeManager = LocaleManager[guild]
         return RobertifyEmbedUtils.embedMessage(
             guild, "${
@@ -343,40 +374,39 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
         ).build()
     }
 
-    private suspend fun sendNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): Deferred<Message?> =
-        coroutineScope {
-            val embed = getNowPlayingEmbed(trackInfo, requesterMention)
-            return@coroutineScope async {
-                val message = announcementChannel?.sendMessageEmbeds(embed)?.await()
-                lastSentMsg?.delete()?.queueAfter(
-                    3L, TimeUnit.SECONDS, null,
-                    ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
-                )
-                lastSentMsg = message
-                return@async message
-            }
-        }
-
-    private suspend fun sendNowPlayingString(
-        audioTrackInfo: TrackInfo,
-        requesterMention: String
-    ): Deferred<Message?> = coroutineScope {
-        val embed = getNowPlayingEmbed(audioTrackInfo, requesterMention)
-        return@coroutineScope async {
-            val message = announcementChannel?.sendMessage(embed.description ?: "")
-                ?.await()
-
+    private fun sendNowPlayingEmbed(trackInfo: TrackInfo, requesterMention: String): CompletableFuture<Message>? {
+        val embed = getNowPlayingEmbed(trackInfo, requesterMention)
+        val message = announcementChannel?.sendMessageEmbeds(embed)?.submit()
+        message?.thenAcceptAsync { msg ->
+            lastSentMsg = msg
             lastSentMsg?.delete()?.queueAfter(
                 3L, TimeUnit.SECONDS, null,
                 ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
             )
-
-            lastSentMsg = message
-            return@async message
         }
+
+        return message
     }
 
-    suspend fun nextTrack(lastTrack: Track?, skipped: Boolean = false, skippedAt: Long? = null) {
+    private fun sendNowPlayingString(
+        audioTrackInfo: TrackInfo,
+        requesterMention: String
+    ): CompletableFuture<Message>? {
+        val embed = getNowPlayingEmbed(audioTrackInfo, requesterMention)
+        val message = announcementChannel?.sendMessage(embed.description ?: "")
+            ?.submit()
+        message?.thenAcceptAsync { msg ->
+            lastSentMsg = msg
+            lastSentMsg?.delete()?.queueAfter(
+                3L, TimeUnit.SECONDS, null,
+                ErrorHandler().ignore(ErrorResponse.UNKNOWN_MESSAGE)
+            )
+        }
+
+        return message
+    }
+
+    fun nextTrack(lastTrack: Track?, skipped: Boolean = false, skippedAt: Long? = null) {
         val playtime = PlaytimeCommand.playtime
         if (lastTrack != null) {
             if (!skipped)
@@ -396,7 +426,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
         if (nextTrack != null) {
             logger.debug("Retrieved {} and attempting to play", nextTrack.info.title)
-            player.playTrack(nextTrack)
+            playTrack(nextTrack)
         } else {
             if (lastTrack != null
                 && AutoPlayConfig(guild).getStatus()
@@ -422,13 +452,13 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
                     trackIds = pastSpotifyTracks
                 )
             } else {
-                player.stopTrack()
+                player?.stopTrack()
                 disconnectManager.scheduleDisconnect()
             }
         }
     }
 
-    suspend fun disconnect(announceMsg: Boolean = true) {
+    fun disconnect(announceMsg: Boolean = true) {
         val channel = guild.selfMember.voiceState?.channel ?: return
         if (GuildConfig(guild).getTwentyFourSevenMode())
             return
@@ -452,7 +482,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
             }
     }
 
-    suspend fun scheduleDisconnect(time: Duration = 5.minutes, announceMsg: Boolean = true) =
+    fun scheduleDisconnect(time: Duration = 5.minutes, announceMsg: Boolean = true) =
         disconnectManager.scheduleDisconnect(time, announceMsg)
 
     fun removeScheduledDisconnect() =
@@ -469,7 +499,7 @@ class TrackScheduler(private val guild: Guild, private val link: Link) {
 
     fun clearRequesters() = requesters.clear()
 
-    suspend fun getRequesterAsMention(track: Track): String {
+    fun getRequesterAsMention(track: Track): String {
         val requester = findRequester(track.info.identifier)
         return if (requester != null)
             "<@${requester.id}>"

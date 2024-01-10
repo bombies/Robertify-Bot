@@ -187,16 +187,17 @@ class FavouriteTracksCommand : AbstractSlashCommand(
         }
     }
 
-    suspend fun handleAdd(guild: Guild, member: Member): MessageEmbed {
-        val config = FavouriteTracksCache.instance
-        val musicManager = RobertifyAudioManager[guild]
-        val player = musicManager.player
-        val playingTrack = player.playingTrack
+    fun handleAdd(guild: Guild, member: Member): MessageEmbed {
         val memberVoiceState = member.voiceState!!
         val selfVoiceState = guild.selfMember.voiceState!!
 
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) return acChecks
+
+        val config = FavouriteTracksCache.instance
+        val musicManager = RobertifyAudioManager[guild]
+        val player = musicManager.player!!
+        val playingTrack = player.track
 
         val id = playingTrack!!.info.identifier
 

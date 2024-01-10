@@ -1,6 +1,6 @@
 package main.audiohandlers
 
-import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.arbjerg.lavalink.client.protocol.Track
 import java.util.Stack
 import java.util.concurrent.ConcurrentLinkedQueue
 

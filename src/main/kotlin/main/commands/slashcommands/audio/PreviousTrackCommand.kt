@@ -34,7 +34,7 @@ class PreviousTrackCommand : AbstractSlashCommand(
         val musicManager = RobertifyAudioManager[guild]
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
-        val player = musicManager.player
+        val player = musicManager.player!!
 
         if (queueHandler.isPreviousTracksEmpty)
             return RobertifyEmbedUtils.embedMessage(
@@ -42,10 +42,10 @@ class PreviousTrackCommand : AbstractSlashCommand(
                 PreviousTrackMessages.NO_PREV_TRACKS
             ).build()
 
-        val currentTrack = player.playingTrack!!
+        val currentTrack = player.track!!
         queueHandler.addToBeginning(currentTrack)
         player.stopTrack()
-        player.playTrack(queueHandler.popPreviousTrack()!!)
+        scheduler.playTrack(queueHandler.popPreviousTrack()!!)
 
         RequestChannelConfig(guild).updateMessage()
 

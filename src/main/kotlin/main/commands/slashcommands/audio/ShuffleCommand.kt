@@ -29,7 +29,7 @@ class ShuffleCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    suspend fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
+    fun handleShuffle(guild: Guild, shuffler: User): MessageEmbed {
         val musicManager = RobertifyAudioManager[guild]
         val queueHandler = musicManager.scheduler.queueHandler
 

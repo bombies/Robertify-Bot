@@ -54,19 +54,14 @@
             <name>bintray</name>
             <url>https://jcenter.bintray.com</url>
         </repository>
+        <repository>
+            <id>ll-releases</id>
+            <name>Lavalink Releases</name>
+            <url>https://maven.lavalink.dev/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
-        <dependency>
-            <groupId>dev.schlaubi.lavakord</groupId>
-            <artifactId>jda-jvm</artifactId>
-            <version>5.1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.schlaubi.lavakord</groupId>
-            <artifactId>lavasrc-jvm</artifactId>
-            <version>6.0.0</version>
-        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -81,6 +76,11 @@
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>5.0.0-beta.17</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.arbjerg</groupId>
+            <artifactId>lavalink-client</artifactId>
+            <version>2.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -296,10 +296,6 @@
                 <groupId>com.github.bombies</groupId>
                 <artifactId>jda-ktx</artifactId>
                 <exclusions>
-                    <exclusion>
-                        <groupId>dev.schlaubi.lavakord</groupId>
-                        <artifactId>jda-jvm</artifactId>
-                    </exclusion>
                     <exclusion>
                         <groupId>net.dv8tion</groupId>
                         <artifactId>JDA</artifactId>

@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.interactions.commands.Command.Choice
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -141,7 +142,7 @@ class PlayCommand : AbstractSlashCommand(
                     event.hook.sendEmbed(guild) {
                         embed(ShufflePlayMessages.INVALID_LINK)
                     }
-                } else link = URL(link).getDestination()
+                } else link = URI(link).toURL().getDestination()
 
                 when {
                     link.contains("spotify") && !link.matches("(https?://)?(www\\.)?open\\.spotify\\.com/(user/[a-zA-Z0-9-_]+/)?(?<type>album|playlist|artist)/(?<identifier>[a-zA-Z0-9-_]+)(\\?si=.+)?".toRegex()) -> {
@@ -198,7 +199,7 @@ class PlayCommand : AbstractSlashCommand(
     override val help: String
         get() = "Plays a song"
 
-    private suspend fun handlePlayTracks(
+    private fun handlePlayTracks(
         event: SlashCommandInteractionEvent,
         link: String,
         addToBeginning: Boolean = false,
@@ -220,19 +221,15 @@ class PlayCommand : AbstractSlashCommand(
 
         event.hook.sendEmbed(guild) {
             embed(FavouriteTracksMessages.FT_ADDING_TO_QUEUE_2)
-        }.queueCoroutine { msg ->
-            coroutineScope {
-                launch {
-                    RobertifyAudioManager
-                        .loadAndPlay(
-                            trackUrl = link,
-                            memberVoiceState = member.voiceState!!,
-                            botMessage = msg,
-                            addToBeginning = addToBeginning,
-                            shuffled = shuffled
-                        )
-                }
-            }
+        }.queue { msg ->
+            RobertifyAudioManager
+                .loadAndPlay(
+                    trackUrl = link,
+                    memberVoiceState = member.voiceState!!,
+                    botMessage = msg,
+                    addToBeginning = addToBeginning,
+                    shuffled = shuffled
+                )
         }
     }
 

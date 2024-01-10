@@ -24,7 +24,7 @@
 //
 //        val channel = selfVoiceState.channel!!.id
 //        val allTracks = mutableListOf<ResumableTrack>()
-//        val playingTrack = scheduler.player.playingTrack
+//        val playingTrack = scheduler.player.track
 //
 //        if (playingTrack != null) {
 //            val requester = scheduler.findRequester(playingTrack.identifier)

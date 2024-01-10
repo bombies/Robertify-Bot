@@ -345,8 +345,8 @@ object PaginationHandler {
                 items.add(
                     QueueItem(
                         trackIndex = i + 1,
-                        trackTitle = track.title.coerceAtMost(30),
-                        artist = track.author.coerceAtMost(30),
+                        trackTitle = track.info.title.coerceAtMost(30),
+                        artist = track.info.author.coerceAtMost(30),
                         duration = track.length
                     )
                 )
@@ -366,8 +366,8 @@ object PaginationHandler {
                     page.addItem(
                         QueueItem(
                             trackIndex = lastIndex + 1,
-                            trackTitle = track.title,
-                            artist = track.author,
+                            trackTitle = track.info.title,
+                            artist = track.info.author,
                             duration = track.length
                         )
                     )

@@ -7,7 +7,7 @@ import dev.minn.jda.ktx.messages.send
 import dev.minn.jda.ktx.util.SLF4J
 import kotlinx.coroutines.*
 import main.audiohandlers.RobertifyAudioManager
-import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
+import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDeleteCoroutine
 import main.constants.RobertifyEmoji
 import main.constants.Toggle
 import main.main.Robertify
@@ -131,7 +131,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
             config.setOriginalAnnouncementToggle(TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
 
             try {
-                if (RobertifyAudioManager[guild].player.playingTrack != null)
+                if (RobertifyAudioManager[guild].player?.track!= null)
                     config.updateMessage()
             } catch (_: UninitializedPropertyAccessException) {
             }
@@ -255,7 +255,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
         buttonNames: List<String>,
         event: ButtonInteractionEvent? = null,
         shardManager: ShardManager = Robertify.shardManager
-    ): Deferred<Message?>? {
+    ): CompletableFuture<Message>? {
         val localeManager = LocaleManager[guild]
         val config = RequestChannelConfig(guild, shardManager)
         val subConfig = config.config
@@ -330,7 +330,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                             Pair("{button}", buttons[i]),
                             Pair("{status}", localeManager.getMessage(GeneralMessages.ON_STATUS))
                         )
-                    }.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
+                    }.queueThenDeleteCoroutine(time = 15, unit = TimeUnit.SECONDS)
                 } else {
                     event.hook.sendEmbed(guild) {
                         embed(
@@ -338,7 +338,7 @@ class RequestChannelEditCommand : AbstractSlashCommand(
                             Pair("{button}", buttons[i]),
                             Pair("{status}", localeManager.getMessage(GeneralMessages.OFF_STATUS))
                         )
-                    }.queueThenDelete(time = 15, unit = TimeUnit.SECONDS)
+                    }.queueThenDeleteCoroutine(time = 15, unit = TimeUnit.SECONDS)
                 }
             }
 

@@ -9,8 +9,8 @@ import com.github.topi314.lavasrc.spotify.SpotifySourceManager
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers
+import dev.arbjerg.lavalink.client.LinkState
 import dev.minn.jda.ktx.util.SLF4J
-import dev.schlaubi.lavakord.audio.Link
 import main.audiohandlers.loaders.AutoPlayLoader
 import main.audiohandlers.loaders.MainAudioLoader
 import main.audiohandlers.loaders.SearchResultLoader
@@ -18,7 +18,6 @@ import main.constants.Toggle
 import main.main.Config
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.editEmbed
-import main.utils.json.guildconfig.GuildConfig
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig
 import main.utils.json.toggles.TogglesConfig
 import main.utils.locale.LocaleManager
@@ -28,12 +27,10 @@ import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
-import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
-import java.lang.IllegalArgumentException
 import java.util.*
 
 object RobertifyAudioManager {
@@ -88,12 +85,12 @@ object RobertifyAudioManager {
 
     fun getMusicManager(guild: Guild): GuildMusicManager = get(guild)
 
-    suspend fun removeMusicManager(guild: Guild) {
-        musicManagers[guild.idLong]?.destroy()
+    fun removeMusicManager(guild: Guild) {
         musicManagers.remove(guild.idLong)
+        guild.jda.directAudioController.disconnect(guild)
     }
 
-    suspend fun loadAndPlay(
+    fun loadAndPlay(
         trackUrl: String,
         memberVoiceState: GuildVoiceState,
         botMessage: Message? = null,
@@ -120,7 +117,7 @@ object RobertifyAudioManager {
         }
     }
 
-//    suspend fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
+//    fun loadAndResume(musicManager: GuildMusicManager, data: ResumeData) {
 //        val channelId = data.channel_id
 //        val voiceChannel = Robertify.shardManager.getVoiceChannelById(channelId)
 //
@@ -137,7 +134,7 @@ object RobertifyAudioManager {
 //        else logger.warn("Could not resume tracks in ${musicManager.guild.name} because I couldn't join the voice channel!")
 //    }
 //
-//    private suspend fun resumeTracks(
+//    private fun resumeTracks(
 //        trackList: List<ResumableTrack>,
 //        announcementChannel: GuildMessageChannel?,
 //        musicManager: GuildMusicManager
@@ -156,7 +153,7 @@ object RobertifyAudioManager {
 //        ).loadItem()
 //    }
 
-    private suspend fun loadTrack(
+    private fun loadTrack(
         trackUrl: String,
         musicManager: GuildMusicManager,
         user: User,
@@ -176,7 +173,7 @@ object RobertifyAudioManager {
         ).loadItem()
     }
 
-    suspend fun loadSearchResults(
+    fun loadSearchResults(
         musicManager: GuildMusicManager,
         searcher: User,
         botMessage: InteractionHook,
@@ -190,7 +187,7 @@ object RobertifyAudioManager {
         ).loadItem()
     }
 
-    suspend fun loadRecommendedTracks(
+    fun loadRecommendedTracks(
         musicManager: GuildMusicManager,
         channel: GuildMessageChannel?,
         trackIds: String
@@ -211,7 +208,7 @@ object RobertifyAudioManager {
      * @param message The message to edit for any error messages.
      * @return True if the bot successfully joined the channel and vice-versa.
      */
-    suspend fun joinAudioChannel(
+    fun joinAudioChannel(
         channel: AudioChannel,
         musicManager: GuildMusicManager,
         message: Message? = null,
@@ -220,7 +217,7 @@ object RobertifyAudioManager {
         try {
             require(channel.members.size > 0) { "I can't join a voice channel with no one in it!" }
             when (musicManager.link.state) {
-                Link.State.DESTROYED, Link.State.NOT_CONNECTED -> {
+                LinkState.DISCONNECTED -> {
                     val guild = musicManager.guild
                     if (TogglesConfig(guild).getToggle(Toggle.RESTRICTED_VOICE_CHANNELS)) {
                         val restrictedChannelConfig = RestrictedChannelsConfig(guild)
@@ -268,7 +265,7 @@ object RobertifyAudioManager {
                     return true
                 }
 
-                Link.State.CONNECTED, Link.State.CONNECTING -> return true
+                LinkState.CONNECTED, LinkState.CONNECTING -> return true
                 else -> {
                     return false
                 }

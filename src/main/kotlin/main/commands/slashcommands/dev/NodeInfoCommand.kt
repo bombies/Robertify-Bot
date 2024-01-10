@@ -17,10 +17,10 @@ class NodeInfoCommand : AbstractSlashCommand(
 ) {
 
     override suspend fun handle(event: SlashCommandInteractionEvent) {
-        val lavalink = Robertify.lavaKord
+        val lavalink = Robertify.lavalink
         val desc = "```txt\n${
             lavalink.nodes.joinToString("\n") { node ->
-                val stats = node.lastStatsEvent
+                val stats = node.stats
 
                 if (stats == null)
                     """

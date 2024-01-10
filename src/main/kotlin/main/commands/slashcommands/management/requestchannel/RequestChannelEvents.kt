@@ -223,7 +223,7 @@ class RequestChannelEvents : AbstractEventController() {
             val musicManager = RobertifyAudioManager[guild]
             val scheduler = musicManager.scheduler
             val queueHandler = scheduler.queueHandler
-            val playingTrack = musicManager.player.playingTrack
+            val playingTrack = musicManager.player?.track
             val logUtils = LogUtilsKt(guild)
             val member = memberVoiceState.member
 

@@ -119,7 +119,7 @@ object GeneralUtils {
     fun String.stripDigits(): String =
         this.replace("\\d".toRegex(), "")
 
-    suspend fun Member?.hasPermissions(vararg perms: RobertifyPermission): Boolean {
+    fun Member?.hasPermissions(vararg perms: RobertifyPermission): Boolean {
         if (this == null) return false
 
         if (hasPermission(Permission.ADMINISTRATOR) || isOwner)
@@ -143,7 +143,7 @@ object GeneralUtils {
         return pass >= perms.size
     }
 
-    suspend fun hasPerms(guild: Guild, sender: Member?, vararg perms: RobertifyPermission): Boolean {
+    fun hasPerms(guild: Guild, sender: Member?, vararg perms: RobertifyPermission): Boolean {
         if (sender == null)
             return false
 
@@ -460,14 +460,14 @@ object GeneralUtils {
         }
     }
 
-    suspend fun setDefaultEmbed(guild: Guild) {
+    fun setDefaultEmbed(guild: Guild) {
         val theme = ThemesConfig(guild).getTheme()
         RobertifyEmbedUtils.setEmbedBuilder(guild) {
             EmbedBuilder().setColor(theme.color)
         }
     }
 
-    suspend fun setCustomEmbed(guild: Guild, author: String? = null, footer: String? = null) {
+    fun setCustomEmbed(guild: Guild, author: String? = null, footer: String? = null) {
         val theme = ThemesConfig(guild).getTheme()
         RobertifyEmbedUtils.setEmbedBuilder(guild) {
             EmbedBuilder()
@@ -521,7 +521,7 @@ object GeneralUtils {
         CHANNEL
     }
 
-    suspend fun listOfIDsToMentions(guild: Guild?, mentions: List<Long>, mentioner: Mentioner): String {
+    fun listOfIDsToMentions(guild: Guild?, mentions: List<Long>, mentioner: Mentioner): String {
         val mentionTag: String = when (mentioner) {
             Mentioner.USER -> "@"
             Mentioner.ROLE -> "@&"
@@ -537,16 +537,16 @@ object GeneralUtils {
         }
     }
 
-    suspend fun toMention(guild: Guild? = null, id: Long, mentioner: Mentioner): String =
+    fun toMention(guild: Guild? = null, id: Long, mentioner: Mentioner): String =
         listOfIDsToMentions(guild, listOf(id), mentioner)
 
-    suspend fun toMention(guild: Guild? = null, id: String, mentioner: Mentioner): String =
+    fun toMention(guild: Guild? = null, id: String, mentioner: Mentioner): String =
         listOfIDsToMentions(guild, listOf(id.toLong()), mentioner)
 
-    suspend fun Long.toMention(mentioner: Mentioner, guild: Guild? = null): String =
+    fun Long.toMention(mentioner: Mentioner, guild: Guild? = null): String =
         listOfIDsToMentions(guild, listOf(this), mentioner)
 
-    suspend fun String.toMention(mentioner: Mentioner, guild: Guild? = null): String =
+    fun String.toMention(mentioner: Mentioner, guild: Guild? = null): String =
         listOfIDsToMentions(guild, listOf(this.toLong()), mentioner)
 
     fun getID(obj: JSONObject, field: String): Long = try {
@@ -557,7 +557,7 @@ object GeneralUtils {
 
     fun getID(obj: JSONObject, field: GenericJSONField): Long = getID(obj, field.toString())
 
-    suspend fun checkPremium(guild: Guild, event: GenericComponentInteractionCreateEvent): Boolean {
+    fun checkPremium(guild: Guild, event: GenericComponentInteractionCreateEvent): Boolean {
         // TODO: Guild config premium check
 
         event.replyEmbeds(
@@ -572,7 +572,7 @@ object GeneralUtils {
         return false
     }
 
-    suspend fun checkPremium(guild: Guild, event: GenericCommandInteractionEvent): Boolean {
+    fun checkPremium(guild: Guild, event: GenericCommandInteractionEvent): Boolean {
         // TODO: Guild config premium check
 
         event.replyEmbeds(
@@ -587,7 +587,7 @@ object GeneralUtils {
         return false
     }
 
-    suspend fun checkPremium(guild: Guild, user: User, msg: Message): Boolean {
+    fun checkPremium(guild: Guild, user: User, msg: Message): Boolean {
         // TODO: Guild config premium check
 
         msg.reply(user.asMention)
@@ -610,13 +610,14 @@ object GeneralUtils {
         return false
     }
 
-    suspend fun dmUser(user: User, message: LocaleMessage) {
-        val channel = user.openPrivateChannel().await()
-        channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(message).build())
-            .queue(null) {
-                ErrorHandler()
-                    .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
-            }
+    fun dmUser(user: User, message: LocaleMessage) {
+        user.openPrivateChannel().queue { channel ->
+            channel.sendMessageEmbeds(RobertifyEmbedUtils.embedMessage(message).build())
+                .queue(null) {
+                    ErrorHandler()
+                        .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+                }
+        }
     }
 
     fun dmUser(user: User, message: MessageEmbed) {
@@ -639,13 +640,14 @@ object GeneralUtils {
         }
     }
 
-    suspend fun User.dmEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>) {
-        val channel = openPrivateChannel().await()
-        channel.sendEmbed {
-            embed(message, *placeholders)
-        }.queue(null) {
-            ErrorHandler()
-                .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+    fun User.dmEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>) {
+        openPrivateChannel().queue { channel ->
+            channel.sendEmbed {
+                embed(message, *placeholders)
+            }.queue(null) {
+                ErrorHandler()
+                    .ignore(ErrorResponse.CANNOT_SEND_TO_USER)
+            }
         }
     }
 
@@ -672,7 +674,7 @@ object GeneralUtils {
 
     fun Any?.isNotNull(): Boolean = this != null
 
-    suspend fun <A, B : LocaleMessage> Pair(first: A, second: B, localeManager: LocaleManager): Pair<A, String> =
+    fun <A, B : LocaleMessage> Pair(first: A, second: B, localeManager: LocaleManager): Pair<A, String> =
         Pair(first, localeManager.getMessage(second))
 
     fun <T> RestAction<T>.queueAfter(duration: kotlin.time.Duration) =
@@ -691,7 +693,7 @@ object GeneralUtils {
     suspend fun <T> RestAction<T>.queueCoroutine(
         context: CoroutineContext = getDefaultScope().coroutineContext,
         duration: kotlin.time.Duration = kotlin.time.Duration.ZERO,
-        onSuccess: (suspend (item: T) -> Unit)? = null
+        onSuccess: ((item: T) -> Unit)? = null
     ) {
         withContext(context) {
             delay(duration)

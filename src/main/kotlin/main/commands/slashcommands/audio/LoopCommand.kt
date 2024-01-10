@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio
 
-import dev.schlaubi.lavakord.audio.player.Player
+import dev.arbjerg.lavalink.client.LavalinkPlayer
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.author
@@ -57,14 +57,14 @@ class LoopCommand : AbstractSlashCommand(
     private suspend fun checks(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
-        player: Player
+        player: LavalinkPlayer?
     ): MessageEmbed? {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState)
         if (acChecks != null) return acChecks
 
         val guild = memberVoiceState.guild
 
-        if (player.playingTrack == null)
+        if (player?.track== null)
             return RobertifyEmbedUtils.embedMessage(guild, LoopMessages.LOOP_NOTHING_PLAYING)
                 .build()
 
@@ -76,7 +76,7 @@ class LoopCommand : AbstractSlashCommand(
         val player = musicManager.player
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
-        val track = player.playingTrack
+        val track = player?.track
             ?: return RobertifyEmbedUtils.embedMessage(
                 guild,
                 GeneralMessages.NOTHING_PLAYING
@@ -87,14 +87,14 @@ class LoopCommand : AbstractSlashCommand(
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 LoopMessages.LOOP_STOP,
-                Pair("{title}", track.title)
+                Pair("{title}", track.info.title)
             ).build()
         } else {
             queueHandler.trackRepeating = true
             RobertifyEmbedUtils.embedMessage(
                 guild,
                 LoopMessages.LOOP_START,
-                Pair("{title}", track.title)
+                Pair("{title}", track.info.title)
             ).build()
         }
 
@@ -103,8 +103,8 @@ class LoopCommand : AbstractSlashCommand(
             LoopMessages.LOOP_STOP,
             Pair("{user}", looper.asMention),
             Pair("{status}", if (queueHandler.trackRepeating) "looped" else "unlooped"),
-            Pair("{title}", track.title),
-            Pair("{author}", track.author)
+            Pair("{title}", track.info.title),
+            Pair("{author}", track.info.author)
         )
 
         return embed
@@ -120,11 +120,11 @@ class LoopCommand : AbstractSlashCommand(
             queueHandler.clearSavedQueue()
             RobertifyEmbedUtils.embedMessage(guild, LoopMessages.QUEUE_LOOP_STOP).build()
         } else {
-            if (player.playingTrack == null) {
+            if (player?.track== null) {
                 RobertifyEmbedUtils.embedMessage(guild, GeneralMessages.NOTHING_PLAYING)
                     .build()
             } else {
-                val thisTrack = player.playingTrack!!
+                val thisTrack = player.track!!
                 if (queueHandler.isEmpty)
                     RobertifyEmbedUtils.embedMessage(guild, LoopMessages.QUEUE_LOOP_NOTHING)
                         .build()

@@ -42,7 +42,7 @@ class VoiceChannelEvents : AbstractEventController() {
                 ) {
                     if (guildConfig.getTwentyFourSevenMode() || guildDisconnector.disconnectScheduled() || channelLeft.members.size > 1)
                         return@onEvent
-                    guildMusicManager.player.pause(true)
+                    guildMusicManager.player?.setPaused(true)
                     guildDisconnector.scheduleDisconnect()
                 }
 
@@ -54,7 +54,7 @@ class VoiceChannelEvents : AbstractEventController() {
                  */
                 else if (channelJoined != null && channelJoined.id == selfVoiceState.channel!!.id && guildDisconnector.disconnectScheduled()) {
                     guildDisconnector.cancelDisconnect()
-                    guildMusicManager.player.pause(false)
+                    guildMusicManager.player?.setPaused(false)
 
                 }
             } catch (e: UninitializedPropertyAccessException) {

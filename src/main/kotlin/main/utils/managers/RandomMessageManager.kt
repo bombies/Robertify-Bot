@@ -26,14 +26,14 @@ class RandomMessageManager {
     val hasMessages: Boolean
         get() = messages.isEmpty()
 
-    suspend fun getMessage(guild: Guild): MessageEmbed {
+    fun getMessage(guild: Guild): MessageEmbed {
         val localeManager = LocaleManager[guild]
         val messages = BotDBCache.instance.getRandomMessages()
 
         if (messages.isEmpty())
             throw NullPointerException(localeManager.getMessage(RandomMessages.NO_RANDOM_MESSAGES))
 
-        return RobertifyEmbedUtils.embedMessage(guild, messages.get(Random.nextInt(messages.size)))
+        return RobertifyEmbedUtils.embedMessage(guild, messages[Random.nextInt(messages.size)])
             .setTitle(localeManager.getMessage(RandomMessages.TIP_TITLE))
             .setFooter(localeManager.getMessage(RandomMessages.TIP_FOOTER))
             .setTimestamp(Instant.now())
@@ -52,7 +52,7 @@ class RandomMessageManager {
 
     fun clearMessages() = unaryMinus()
 
-    suspend fun randomlySendMessage(channel: GuildMessageChannel) {
+    fun randomlySendMessage(channel: GuildMessageChannel) {
         val guild = channel.guild
         if (!TogglesConfig(guild).getToggle(Toggle.TIPS))
             return

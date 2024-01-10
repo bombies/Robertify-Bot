@@ -1,7 +1,7 @@
 package main.commands.slashcommands.dev
 
 import dev.minn.jda.ktx.interactions.components.*
-import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
+import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDeleteCoroutine
 import main.commands.slashcommands.SlashCommandManager.getRequiredValue
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
@@ -111,7 +111,7 @@ class SendAlertCommand : AbstractSlashCommand(
                         .map { it.asDisabled() }
                 )
             )
-            .queueThenDelete(time = 1)
+            .queueThenDeleteCoroutine(time = 1)
     }
 
 }

@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio.filters
 
-import dev.schlaubi.lavakord.audio.player.rotation
+import dev.arbjerg.lavalink.protocol.v4.Rotation
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -22,18 +23,16 @@ class EightDFilter : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
+    private fun handle8DToggle(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed =
         handleGenericFilterToggle(
             memberVoiceState = memberVoiceState,
             selfVoiceState = selfVoiceState,
             filterName = "8D",
-            filterPredicate = { rotation != null },
+            filterPredicate = { rotation.isNotNull() },
             filterOn = {
-                rotation {
-                    rotationHz = 0.05
-                }
+                setRotation(Rotation(0.05))
             },
-            filterOff = { unsetRotation() }
+            filterOff = { setRotation(null) }
         )
 
     override val help: String

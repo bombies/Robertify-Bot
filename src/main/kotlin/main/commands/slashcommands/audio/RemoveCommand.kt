@@ -73,7 +73,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleRemove(
+    private fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         id: Int
@@ -125,7 +125,7 @@ class RemoveCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun handleRemove(
+    private fun handleRemove(
         memberVoiceState: GuildVoiceState,
         selfVoiceState: GuildVoiceState,
         name: String

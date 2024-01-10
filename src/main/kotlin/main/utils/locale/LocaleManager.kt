@@ -1,5 +1,6 @@
 package main.utils.locale
 
+import kotlinx.coroutines.runBlocking
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.setContent
 import main.utils.json.locale.LocaleConfig
@@ -77,26 +78,26 @@ class LocaleManager private constructor(private val guild: Guild?, _locale: Robe
 
     }
 
-    suspend fun getLocale(): RobertifyLocale {
+    fun getLocale(): RobertifyLocale {
         if (guild == null)
             return RobertifyLocale.ENGLISH
         return LocaleConfig(guild).getLocale()
     }
 
-    suspend fun setLocale(locale: RobertifyLocale) {
+    fun setLocale(locale: RobertifyLocale) {
         locales.putIfAbsent(locale, retrieveLocaleFile(locale))
 
         if (guild != null)
             LocaleConfig(guild).setLocale(locale)
     }
 
-    suspend fun getLocaleFile(): Map<String, String> {
+    fun getLocaleFile(): Map<String, String> {
         return locales.computeIfAbsent(getLocale()) {
             retrieveLocaleFile(it)
         }
     }
 
-    suspend fun getMessage(message: LocaleMessage, vararg placeholders: Pair<String, String>): String {
+    fun getMessage(message: LocaleMessage, vararg placeholders: Pair<String, String>): String {
         var msg = getLocaleFile()[message.name.lowercase()]
             ?: throw NullPointerException("There was no such message found in the mapping with key: ${message.name}")
 

@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio.filters
 
-import dev.schlaubi.lavakord.audio.player.timescale
+import dev.arbjerg.lavalink.protocol.v4.Timescale
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -20,9 +21,9 @@ class NightcoreFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Nightcore",
-                filterPredicate = { timescale != null },
-                filterOn = { timescale { pitch = 1.5 } },
-                filterOff = { unsetTimescale() }
+                filterPredicate = { timescale.isNotNull() },
+                filterOn = { setTimescale(Timescale(1.5)) },
+                filterOff = { setTimescale(null) }
             )
         }.queue()
     }

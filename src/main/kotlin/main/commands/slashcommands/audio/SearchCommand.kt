@@ -49,7 +49,7 @@ class SearchCommand : AbstractSlashCommand(
                 SearchMessages.LOOKING_FOR,
                 Pair("{query}", query)
             )
-        }.queueCoroutine { addingMsg ->
+        }.queue { addingMsg ->
             getSearchResult(
                 guild,
                 event.user,
@@ -59,7 +59,7 @@ class SearchCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getSearchResult(
+    private fun getSearchResult(
         guild: Guild,
         requester: User,
         botMSg: InteractionHook,

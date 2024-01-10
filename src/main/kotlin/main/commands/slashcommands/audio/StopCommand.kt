@@ -14,7 +14,6 @@ import main.utils.locale.messages.StopMessages
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
-import kotlin.time.Duration.Companion.seconds
 
 class StopCommand : AbstractSlashCommand(
     SlashCommand(
@@ -39,7 +38,7 @@ class StopCommand : AbstractSlashCommand(
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player
         val scheduler = musicManager.scheduler
-        val track = player.playingTrack
+        val track = player?.track
 
         return when {
             !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtils.embedMessage(
@@ -66,7 +65,7 @@ class StopCommand : AbstractSlashCommand(
             else -> {
                 musicManager.clear()
                 player.stopTrack()
-                logger.debug("Stopped track. Playing track: ${player.playingTrack?.title ?: "none"}")
+                logger.debug("Stopped track. Playing track: ${player.track?.title ?: "none"}")
 
                 LogUtilsKt(guild).sendLog(
                     LogType.PLAYER_STOP,

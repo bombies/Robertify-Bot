@@ -23,7 +23,7 @@ class GuildDisconnectManager(private val guild: Guild) {
      * @param announceMsg Whether the bot should announce that it has disconnected due to activity or not.
      * @param duration The time the bot should wait before disconnect. Default to 5 minutes
      */
-    suspend fun scheduleDisconnect(duration: Duration = 5.minutes, announceMsg: Boolean = true) {
+    fun scheduleDisconnect(duration: Duration = 5.minutes, announceMsg: Boolean = true) {
         val botVoiceState = guild.selfMember.voiceState
         if (botVoiceState == null || !botVoiceState.inAudioChannel())
             return

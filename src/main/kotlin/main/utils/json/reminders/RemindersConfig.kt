@@ -1,18 +1,14 @@
 package main.utils.json.reminders
 
 import dev.minn.jda.ktx.util.SLF4J
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import main.utils.database.mongodb.cache.redis.guild.ReminderModel
 import main.utils.database.mongodb.cache.redis.guild.ReminderUserModel
 import main.utils.json.AbstractGuildConfig
 import main.utils.json.GenericJSONField
-import main.utils.json.getIndexOfObjectInArray
 import main.utils.json.reminders.scheduler.ReminderScheduler
 import net.dv8tion.jda.api.entities.Guild
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
@@ -40,7 +36,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         )
     }
 
-    suspend fun addUser(uid: Long) {
+    fun addUser(uid: Long) {
         if (userExists(uid)) return
         cache.updateGuild(guild.id) {
             reminders {
@@ -54,7 +50,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun addReminder(uid: Long, reminder: String, channelID: Long, reminderTime: Long, timeZone: String?) {
+    fun addReminder(uid: Long, reminder: String, channelID: Long, reminderTime: Long, timeZone: String?) {
         if (!userExists(uid)) addUser(uid)
 
         cache.updateGuild(guild.id) {
@@ -72,7 +68,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun removeReminder(uid: Long, id: Int) {
+    fun removeReminder(uid: Long, id: Int) {
         if (!userHasReminders(uid))
             throw NullPointerException("This user doesn't have any reminders in this guild!")
 
@@ -86,7 +82,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun clearReminders(uid: Long) {
+    fun clearReminders(uid: Long) {
         if (!userHasReminders(uid) || getReminders(uid).isNullOrEmpty())
             throw NullPointerException("This user doesn't have any reminders in this guild!")
 
@@ -104,7 +100,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun editReminderChannel(uid: Long, id: Int, channelID: Long) {
+    fun editReminderChannel(uid: Long, id: Int, channelID: Long) {
         if (!userExists(uid))
             throw NullPointerException("This user doesn't have any reminders to edit!")
 
@@ -116,7 +112,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun editReminderTime(uid: Long, id: Int, time: Long) {
+    fun editReminderTime(uid: Long, id: Int, time: Long) {
         if (!userExists(uid))
             throw NullPointerException("This user doesn't have any reminders to edit!")
 
@@ -128,15 +124,15 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun banUser(uid: Long) {
+    fun banUser(uid: Long) {
         setBanState(uid, true)
     }
 
-    suspend fun unbanUser(uid: Long) {
+    fun unbanUser(uid: Long) {
         setBanState(uid, false)
     }
 
-    private suspend fun setBanState(uid: Long, state: Boolean) {
+    private fun setBanState(uid: Long, state: Boolean) {
         if (state)
             check(!userIsBanned(uid)) { "This user is already banned!" }
         else check(userIsBanned(uid)) { "This user is not banned!" }
@@ -149,25 +145,22 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun userIsBanned(uid: Long): Boolean {
+    fun userIsBanned(uid: Long): Boolean {
         if (!userExists(uid))
             addUser(uid)
         return getUser(uid)!!.isBanned
     }
 
-    suspend fun userHasReminders(uid: Long): Boolean {
+    fun userHasReminders(uid: Long): Boolean {
         return if (!userExists(uid)) false else getReminders(uid) != null
     }
 
-    suspend fun getReminders(uid: Long): List<Reminder>? =
+    fun getReminders(uid: Long): List<Reminder>? =
         Collections.unmodifiableList(getUser(uid)!!.reminders)
 
 
-    suspend fun getUser(uid: Long): ReminderUser? {
-        val remindersObj = getGuildModel().reminders ?: run {
-            update()
-            getGuildModel().reminders!!
-        }
+    fun getUser(uid: Long): ReminderUser? {
+        val remindersObj = getGuildModel().reminders
 
         val user = remindersObj.users.find { user -> user.user_id == uid }
         val reminders = user?.user_reminders?.mapIndexed { i, reminder ->
@@ -191,8 +184,8 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         else null
     }
 
-    private suspend fun getAllGuildUsers(): List<ReminderUser> {
-        val users = getGuildModel().reminders?.users ?: return emptyList()
+    private fun getAllGuildUsers(): List<ReminderUser> {
+        val users = getGuildModel().reminders.users
         return users.map { user ->
             val reminders = user.user_reminders.mapIndexed { i, reminder ->
                 Reminder(
@@ -213,10 +206,10 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    private suspend fun guildHasReminders(): Boolean =
+    private fun guildHasReminders(): Boolean =
         getAllGuildUsers().any { user -> user.reminders.isNotEmpty() }
 
-    suspend fun banChannel(cid: Long) {
+    fun banChannel(cid: Long) {
         check(!channelIsBanned(cid)) { "This channel is already banned!" }
         cache.updateGuild(guild.id) {
             reminders {
@@ -225,7 +218,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun unbanChannel(cid: Long) {
+    fun unbanChannel(cid: Long) {
         check(channelIsBanned(cid)) { "This channel is not banned!" }
         cache.updateGuild(guild.id) {
             reminders {
@@ -234,36 +227,31 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         }
     }
 
-    suspend fun channelIsBanned(cid: Long): Boolean {
-        val reminders = getGuildModel().reminders ?: run {
-            update()
-            return false
-        }
-
+    fun channelIsBanned(cid: Long): Boolean {
+        val reminders = getGuildModel().reminders
         return reminders.banned_channels.contains(cid)
     }
 
-    private suspend fun userExists(uid: Long): Boolean =
+    private fun userExists(uid: Long): Boolean =
         getUser(uid) != null
 
-    suspend fun scheduleReminders() = coroutineScope {
-        launch {
-            logger.debug("Attempting to schedule guild reminders for ${guild.name}")
-            val scheduler = ReminderScheduler(guild)
+    fun scheduleReminders() {
+        logger.debug("Attempting to schedule guild reminders for ${guild.name}")
+        val scheduler = ReminderScheduler(guild)
 
-            if (!guildHasReminders()) {
-                logger.debug("${guild.name} didn't have any reminders to schedule.")
-                return@launch
-            }
+        if (!guildHasReminders()) {
+            logger.debug("${guild.name} didn't have any reminders to schedule.")
+            return
+        }
 
-            val allGuildUsers = getAllGuildUsers()
-            allGuildUsers.forEach { user ->
-                val reminders = user.reminders
+        val allGuildUsers = getAllGuildUsers()
+        allGuildUsers.forEach { user ->
+            val reminders = user.reminders
 
-                logger.debug("Attempting to schedule reminder(s) for ${user.id} in ${guild.name}")
-                reminders.forEach { reminder ->
-                    logger.debug(
-                        """
+            logger.debug("Attempting to schedule reminder(s) for ${user.id} in ${guild.name}")
+            reminders.forEach { reminder ->
+                logger.debug(
+                    """
                         Scheduling reminder with information:
                         User Id: ${user.id}
                         Channel Id: ${reminder.channelId}
@@ -272,40 +260,37 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
                         Reminder: ${reminder.reminder}
                         Reminder Id: ${reminder.id}
                     """.trimIndent()
-                    )
-                    scheduler.scheduleReminder(
-                        user = user.id,
-                        destination = reminder.channelId,
-                        hour = reminder.hour,
-                        minute = reminder.minute,
-                        reminder = reminder.reminder,
-                        reminderId = reminder.id,
-                        timeZone = reminder.timezone.id
-                    )
-                }
-                logger.debug("Scheduled all ${reminders.size} reminder(s) for ${user.id} in ${guild.name}")
+                )
+                scheduler.scheduleReminder(
+                    user = user.id,
+                    destination = reminder.channelId,
+                    hour = reminder.hour,
+                    minute = reminder.minute,
+                    reminder = reminder.reminder,
+                    reminderId = reminder.id,
+                    timeZone = reminder.timezone.id
+                )
+            }
+            logger.debug("Scheduled all ${reminders.size} reminder(s) for ${user.id} in ${guild.name}")
+        }
+    }
+
+    fun unscheduleReminders() {
+        val scheduler = ReminderScheduler(guild)
+
+        if (!guildHasReminders())
+            return
+
+        val allUsers = getAllGuildUsers()
+        allUsers.forEach { user ->
+            val reminders = user.reminders
+            reminders.forEach { reminder ->
+                scheduler.removeReminder(user.id, reminder.id)
             }
         }
     }
 
-    suspend fun unscheduleReminders() = coroutineScope {
-        launch {
-            val scheduler = ReminderScheduler(guild)
-
-            if (!guildHasReminders())
-                return@launch
-
-            val allUsers = getAllGuildUsers()
-            allUsers.forEach { user ->
-                val reminders = user.reminders
-                reminders.forEach { reminder ->
-                    scheduler.removeReminder(user.id, reminder.id)
-                }
-            }
-        }
-    }
-
-    override suspend fun update() {
+    override fun update() {
         val guildObject = getGuildModel().toJsonObject()
         if (!guildObject.has(Fields.REMINDERS.toString())) {
             val reminderObj = JSONObject()

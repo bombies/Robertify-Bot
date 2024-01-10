@@ -5,17 +5,15 @@ import api.RobertifyKtorApi
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
+import dev.arbjerg.lavalink.client.LavalinkClient
+import dev.arbjerg.lavalink.client.TrackStartEvent
+import dev.arbjerg.lavalink.client.loadbalancing.RegionGroup
+import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener
 import dev.minn.jda.ktx.events.CoroutineEventManager
 import dev.minn.jda.ktx.events.getDefaultScope
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.minn.jda.ktx.util.SLF4J
-import dev.schlaubi.lavakord.LavaKord
-import dev.schlaubi.lavakord.MutableLavaKordOptions
-import dev.schlaubi.lavakord.jda.LavaKordShardManager
-import dev.schlaubi.lavakord.jda.applyLavakord
-import dev.schlaubi.lavakord.jda.lavakord
-import dev.schlaubi.lavakord.plugins.lavasrc.LavaSrc
 import io.sentry.Sentry
 import kotlinx.coroutines.*
 import main.audiohandlers.RobertifyAudioManager
@@ -38,6 +36,7 @@ import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
 import net.dv8tion.jda.api.events.session.ShutdownEvent
@@ -59,7 +58,7 @@ object Robertify {
     private val logger by SLF4J
     val cronScheduler = StdSchedulerFactory.getDefaultScheduler()
     var topGGAPI: DiscordBotListAPI? = null
-    lateinit var lavaKord: LavaKord
+    lateinit var lavalink: LavalinkClient
         private set
     lateinit var shardManager: ShardManager
         private set
@@ -67,8 +66,6 @@ object Robertify {
         private set
     lateinit var externalApi: RobertifyApi
         private set
-
-    private val lavakordShardManager = LavaKordShardManager()
 
 
     fun main() = runBlocking {
@@ -85,13 +82,9 @@ object Robertify {
         Runtime.getRuntime().addShutdownHook(mainShutdownHook.newThread {
             logger.info("Destroying all players (If any left)")
             runBlocking {
-                RobertifyAudioManager.musicManagers
-                    .values
-                    .forEach { musicManager ->
-//                        if (musicManager.player.playingTrack != null)
-//                            GuildResumeManager(musicManager.guild).saveTracks()
-                        musicManager.destroy()
-                    }
+                shardManager.guilds
+                    .filter { guild -> guild.selfMember.voiceState != null }
+                    .forEach { guild -> guild.jda.directAudioController.disconnect(guild) }
             }
         })
 
@@ -111,9 +104,27 @@ object Robertify {
         AbstractMongoDatabase.initAllCaches()
         logger.info("Initialized all caches.")
 
+
+        // Setup LavaLink
+        logger.info("Setting up LavaLink...")
+        lavalink = LavalinkClient(getIdFromToken(Config.BOT_TOKEN).toLong())
+        lavalink.on<dev.arbjerg.lavalink.client.ReadyEvent>()
+            .subscribe { event ->
+                logger.info("LavaLink ready on node ${event.node.name}. Session ID is ${event.sessionId}")
+            }
+
+        Config.LAVA_NODES.forEach { node ->
+            lavalink.addNode(
+                address = node.uri,
+                password = node.password,
+                name = node.name,
+                regionFilter = RegionGroup.US
+            )
+            logger.info("Registered lava node with address: ${node.uri}")
+        }
+
         // Build bot connection
         logger.info("Building shard manager...")
-
         val shardManagerBuilder = DefaultShardManagerBuilder.createLight(
             Config.BOT_TOKEN,
             listOf(GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.GUILD_MESSAGE_REACTIONS),
@@ -124,6 +135,7 @@ object Robertify {
                 setMemberCachePolicy(MemberCachePolicy.DEFAULT)
                 setBulkDeleteSplittingEnabled(false)
                 enableCache(CacheFlag.VOICE_STATE)
+                setVoiceDispatchInterceptor(JDAVoiceUpdateListener(lavalink))
                 setActivity(Activity.listening("Starting up..."))
 
                 val disabledIntents = mutableListOf(
@@ -147,32 +159,8 @@ object Robertify {
                 disableIntents(disabledIntents)
             }
 
-        shardManagerBuilder.applyLavakord(lavakordShardManager)
         shardManager = shardManagerBuilder.build()
         logger.info("Successfully built shard manager")
-
-        logger.info("Setting up LavaKord...")
-        lavaKord = shardManager.lavakord(
-            lavakordShardManager, getDefaultScope().coroutineContext, options = MutableLavaKordOptions(
-                link = MutableLavaKordOptions.LinkConfig(
-                    showTrace = true
-                )
-            )
-        ) {
-            plugins {
-                install(LavaSrc)
-            }
-        }
-
-        Config.LAVA_NODES.forEach { node ->
-            lavaKord.addNode(
-                serverUri = node.uri.toString(),
-                password = node.password,
-                name = node.name
-            )
-            logger.info("Registered lava node with address: ${node.uri}")
-        }
-        logger.info("LavaKord ready")
 
         shardManager.handleShardReady()
         shardManager.handleGuildReady()

@@ -1,46 +1,46 @@
 package main.audiohandlers.loaders
 
-import dev.arbjerg.lavalink.protocol.v4.Exception
-import dev.arbjerg.lavalink.protocol.v4.LoadResult
-import dev.arbjerg.lavalink.protocol.v4.Playlist
-import dev.arbjerg.lavalink.protocol.v4.Track
-import dev.schlaubi.lavakord.rest.loadItem
+import dev.arbjerg.lavalink.client.protocol.*
+import dev.arbjerg.lavalink.protocol.v4.PlaylistInfo
 import main.audiohandlers.GuildMusicManager
 import main.main.Robertify
 import net.dv8tion.jda.api.entities.Guild
 
 abstract class AudioLoader(guild: Guild) {
-    internal val link = Robertify.lavaKord.getLink(guild.id)
+    internal val link = Robertify.lavalink.getLink(guild.idLong)
     abstract val query: String
     abstract val musicManager: GuildMusicManager
 
-    open suspend fun loadItem() {
-        when (val result = link.loadItem(query)) {
-            is LoadResult.TrackLoaded -> {
-                onTrackLoad(result.data)
-            }
+    open fun loadItem() {
+        link.loadItem(query)
+            .subscribe itemLoad@{ item ->
+                when (item) {
+                    is TrackLoaded -> {
+                        onTrackLoad(item.track)
+                    }
 
-            is LoadResult.PlaylistLoaded -> {
-                onPlaylistLoad(result.data)
-            }
+                    is PlaylistLoaded -> {
+                        onPlaylistLoad(item.tracks, item.info)
+                    }
 
-            is LoadResult.SearchResult -> {
-                onSearchResultLoad(result.data.tracks)
-            }
+                    is SearchResult -> {
+                        onSearchResultLoad(item.tracks)
+                    }
 
-            is LoadResult.NoMatches -> {
-                onNoMatches()
-            }
+                    is NoMatches -> {
+                        onNoMatches()
+                    }
 
-            is LoadResult.LoadFailed -> {
-                onException(result.data)
+                    is LoadFailed -> {
+                        onException(item.exception)
+                    }
+                }
             }
-        }
     }
 
-    abstract suspend fun onPlaylistLoad(playlist: Playlist)
-    abstract suspend fun onSearchResultLoad(results: List<Track>)
-    abstract suspend fun onTrackLoad(result: Track)
-    abstract suspend fun onNoMatches()
-    abstract suspend fun onException(exception: Exception)
+    abstract fun onPlaylistLoad(playlist: List<Track>, playlistInfo: PlaylistInfo)
+    abstract fun onSearchResultLoad(results: List<Track>)
+    abstract fun onTrackLoad(result: Track)
+    abstract fun onNoMatches()
+    abstract fun onException(exception: TrackException)
 }

@@ -1,9 +1,9 @@
 package main.audiohandlers.loaders
 
 import com.github.topi314.lavasrc.spotify.SpotifySourceManager
-import dev.arbjerg.lavalink.protocol.v4.Exception
-import dev.arbjerg.lavalink.protocol.v4.Playlist
-import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.protocol.TrackException
+import dev.arbjerg.lavalink.protocol.v4.PlaylistInfo
 import dev.minn.jda.ktx.interactions.components.danger
 import dev.minn.jda.ktx.messages.send
 import main.audiohandlers.GuildMusicManager
@@ -28,11 +28,11 @@ class SearchResultLoader(
 ) : AudioLoader(musicManager.guild) {
     private val guild = musicManager.guild
 
-    override suspend fun onPlaylistLoad(playlist: Playlist) {
+    override fun onPlaylistLoad(playlist: List<Track>, playlistInfo: PlaylistInfo) {
         throw UnsupportedOperationException("This operation is not supported in the search result loader")
     }
 
-    override suspend fun onSearchResultLoad(results: List<Track>) {
+    override fun onSearchResultLoad(results: List<Track>) {
         val localeManager = LocaleManager[guild]
         val embedDesc = StringBuilder()
 
@@ -83,11 +83,11 @@ class SearchResultLoader(
         ).queue()
     }
 
-    override suspend fun onTrackLoad(result: Track) {
+    override fun onTrackLoad(result: Track) {
         throw UnsupportedOperationException("This operation is not supported in the search result loader")
     }
 
-    override suspend fun onNoMatches() {
+    override fun onNoMatches() {
         botMessage.editOriginalEmbeds(
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -98,7 +98,7 @@ class SearchResultLoader(
             .queue()
     }
 
-    override suspend fun onException(exception: Exception) {
+    override fun onException(exception: TrackException) {
         TODO("Not yet implemented")
     }
 }

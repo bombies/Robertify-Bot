@@ -1,12 +1,11 @@
 package main.audiohandlers.loaders
 
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException
-import dev.arbjerg.lavalink.protocol.v4.Playlist
-import dev.arbjerg.lavalink.protocol.v4.Track
+import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.protocol.TrackException
+import dev.arbjerg.lavalink.protocol.v4.PlaylistInfo
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.loaders.MainAudioLoader.Companion.queueThenDelete
-import main.audiohandlers.utils.identifier
 import main.utils.RobertifyEmbedUtils
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
@@ -29,7 +28,7 @@ class AutoPlayLoader(
     private val queueHandler = scheduler.queueHandler
     private val guild = musicManager.guild
 
-    override suspend fun onPlaylistLoad(playlist: Playlist) {
+    override fun onPlaylistLoad(playlist: List<Track>, playlistInfo: PlaylistInfo) {
         if (channel != null) {
             val localeManager = LocaleManager[guild]
             scheduler.announcementChannel = channel
@@ -45,14 +44,14 @@ class AutoPlayLoader(
         }
 
         val self = guild.selfMember
-        val mutableTracks = playlist.tracks.toMutableList()
+        val mutableTracks = playlist.toMutableList()
 
         mutableTracks.forEach { track ->
-            scheduler.unannouncedTracks.add(track.identifier)
+            scheduler.unannouncedTracks.add(track.info.identifier)
             scheduler.addRequester(self.id, track.info.identifier)
         }
-
-        scheduler.player.playTrack(mutableTracks.removeFirst())
+        
+        scheduler.playTrack(mutableTracks.removeFirst())
         queueHandler.addAll(mutableTracks)
 
         if (queueHandler.queueRepeating) {
@@ -64,15 +63,15 @@ class AutoPlayLoader(
         RequestChannelConfig(guild).updateMessage()
     }
 
-    override suspend fun onSearchResultLoad(results: List<Track>) {
+    override fun onSearchResultLoad(results: List<Track>) {
         throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
     }
 
-    override suspend fun onTrackLoad(result: Track) {
+    override fun onTrackLoad(result: Track) {
         throw UnsupportedOperationException("This operation is not supported in the auto-play loader!")
     }
 
-    override suspend fun onNoMatches() {
+    override fun onNoMatches() {
         channel?.sendMessageEmbeds(
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -84,7 +83,7 @@ class AutoPlayLoader(
             }
     }
 
-    override suspend fun onException(exception: dev.arbjerg.lavalink.protocol.v4.Exception) {
+    override fun onException(exception: TrackException) {
         channel?.sendMessageEmbeds(
             RobertifyEmbedUtils.embedMessage(
                 guild,
@@ -94,10 +93,8 @@ class AutoPlayLoader(
             ?.queueThenDelete(time = 5, unit = TimeUnit.MINUTES) {
                 musicManager.scheduler.scheduleDisconnect(announceMsg = true)
             }
-        throw FriendlyException(
+        throw NullPointerException(
             "There were no similar tracks found!",
-            FriendlyException.Severity.COMMON,
-            NullPointerException()
         )
     }
 }

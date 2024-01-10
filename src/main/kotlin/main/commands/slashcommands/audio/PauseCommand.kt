@@ -31,11 +31,11 @@ class PauseCommand : AbstractSlashCommand(
 
         val guild = selfVoiceState.guild
         val musicManager = RobertifyAudioManager[guild]
-        val player = musicManager.player
+        val player = musicManager.player!!
         val logUtils = LogUtilsKt(guild)
 
         return if (player.paused) {
-            player.pause(false)
+            player.setPaused(false)
             musicManager.isForcePaused = false
             logUtils.sendLog(
                 LogType.PLAYER_RESUME,
@@ -44,7 +44,7 @@ class PauseCommand : AbstractSlashCommand(
             )
             RobertifyEmbedUtils.embedMessage(guild, PauseMessages.RESUMED).build()
         } else {
-            player.pause(true)
+            player.setPaused(true)
             musicManager.isForcePaused = true
             logUtils.sendLog(
                 LogType.PLAYER_PAUSE,

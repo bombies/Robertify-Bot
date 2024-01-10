@@ -38,8 +38,8 @@ class PlaytimeCommand : AbstractSlashCommand(
                 if (playtime[guild.idLong] == null) 0
                 else playtime[guild.idLong]!!
                 ) + (
-                if (player.playingTrack == null) 0
-                else player.playingTrack?.length ?: 0
+                if (player?.track== null) 0
+                else player.track?.length ?: 0
                 )
 
         return RobertifyEmbedUtils.embedMessage(

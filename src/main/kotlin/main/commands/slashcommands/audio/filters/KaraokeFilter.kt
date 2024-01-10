@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio.filters
 
-import dev.schlaubi.lavakord.audio.player.karaoke
+import dev.arbjerg.lavalink.protocol.v4.Karaoke
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -21,9 +22,9 @@ class KaraokeFilter : AbstractSlashCommand(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,
                 filterName = "Karaoke",
-                filterPredicate = { karaoke != null },
-                filterOn = { karaoke {} },
-                filterOff = { unsetKaraoke() }
+                filterPredicate = { karaoke.isNotNull() },
+                filterOn = { setKaraoke(Karaoke()) },
+                filterOff = { setKaraoke(null) }
             )
         }.queue()
     }

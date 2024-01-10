@@ -1,7 +1,6 @@
 package main.audiohandlers.utils
 
-import dev.arbjerg.lavalink.protocol.v4.Track
-import dev.schlaubi.lavakord.plugins.lavasrc.lavaSrcInfo
+import dev.arbjerg.lavalink.client.protocol.Track
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 
@@ -28,7 +27,11 @@ val Track.source: String
 
 @OptIn(ExperimentalSerializationApi::class)
 val Track.artworkUrl: String?
-    get() =  try { info.artworkUrl ?: lavaSrcInfo.artistArtworkUrl } catch (e: MissingFieldException) { null }
+    get() = try {
+        info.artworkUrl
+    } catch (e: MissingFieldException) {
+        null
+    }
 
 val Track.isrc: String?
     get() = info.isrc

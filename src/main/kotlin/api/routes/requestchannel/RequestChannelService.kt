@@ -56,7 +56,6 @@ class RequestChannelService(shardManager: ShardManager) : AbstractGuildService(s
 
         RequestChannelEditCommand()
             .handleChannelButtonToggle(guild, listOf(dto.button.lowercase()), shardManager = shardManager)
-            ?.await()
         return OkResponse("Successfully toggled the ${dto.button} button in ${guild.name}")
     }
 

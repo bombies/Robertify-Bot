@@ -55,8 +55,8 @@ class RewindCommand : AbstractSlashCommand(
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
 
-        val player = RobertifyAudioManager[guild].player
-        val playingTrack = player.playingTrack!!
+        val player = RobertifyAudioManager[guild].player!!
+        val playingTrack = player.track!!
 
         if (playingTrack.isStream)
             return RobertifyEmbedUtils.embedMessage(guild, RewindMessages.CANT_REWIND_STREAM)
@@ -65,7 +65,7 @@ class RewindCommand : AbstractSlashCommand(
         val logUtils = LogUtilsKt(guild)
 
         return if (time == null) {
-            player.seekTo(0)
+            player.setPosition(0)
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWIND_TO_BEGINNING_LOG,
@@ -90,7 +90,7 @@ class RewindCommand : AbstractSlashCommand(
                     RewindMessages.DURATION_GT_CURRENT_TIME
                 ).build()
 
-            player.seekTo(player.position - timeInMillis)
+            player.setPosition(player.position - timeInMillis)
             logUtils.sendLog(
                 LogType.TRACK_REWIND,
                 RewindMessages.REWOUND_BY_DURATION_LOG,

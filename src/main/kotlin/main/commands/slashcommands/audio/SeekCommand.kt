@@ -82,14 +82,14 @@ class SeekCommand : AbstractSlashCommand(
                 DurationUnit.SECONDS
             ).inWholeMilliseconds
 
-        val player = RobertifyAudioManager[guild].player
-        val playingTrack = player.playingTrack!!
+        val player = RobertifyAudioManager[guild].player!!
+        val playingTrack = player.track!!
 
         if (seekDuration > playingTrack.length)
             return RobertifyEmbedUtils.embedMessage(guild, SeekMessages.POS_GT_DURATION)
                 .build()
 
-        player.seekTo(seekDuration)
+        player.setPosition(seekDuration)
         val time =
             "${if (hours > 9) "$hours" else "0$hours"}:${if (minutes > 9) "$minutes" else "0$minutes"}:${if (seconds > 9) "$seconds" else "0$seconds"}"
 

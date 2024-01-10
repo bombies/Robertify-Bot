@@ -12,17 +12,17 @@ import java.util.*
 
 class ThemesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
     
-    suspend fun getTheme(): RobertifyTheme {
+    fun getTheme(): RobertifyTheme {
         return RobertifyTheme.parse(getGuildModel().theme)
     }
     
-    suspend fun setTheme(theme: RobertifyTheme) {
+    fun setTheme(theme: RobertifyTheme) {
         cache.updateGuild(guild.id) {
             this.theme = theme.name.lowercase()
         }
     }
 
-    override suspend fun update() {
+    override fun update() {
         if (!guildHasInfo()) loadGuild()
         val cacheArr = GuildDBCache.ins.getCache()
         val obj = cacheArr.getJSONObject(getIndexOfObjectInArray(cacheArr, GuildDB.Field.GUILD_ID, guild.idLong))

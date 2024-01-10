@@ -29,13 +29,13 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         }
     }
 
-    suspend fun updateGuild(guild: GuildDatabaseModel) {
+    fun updateGuild(guild: GuildDatabaseModel) {
         if (!guildHasInfo(guild.server_id)) loadGuild(guild.server_id)
         setex(guild.server_id, 3600, readyGuildObjForRedis(guild.toJsonObject()))
         getDB().updateGuild(guild)
     }
 
-    suspend fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) {
+    fun updateGuild(gid: String, block: GuildDatabaseModel.() -> Unit) {
         if (!guildHasInfo(gid)) loadGuild(gid)
         val guildModel = getGuildModel(gid)!!
         block(guildModel)
@@ -50,7 +50,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         }
     }
 
-    suspend fun getGuildModel(gid: String): GuildDatabaseModel? {
+    fun getGuildModel(gid: String): GuildDatabaseModel? {
         if (!guildHasInfo(gid)) loadGuild(gid)
         val guildInfo = get(gid) ?: return null
         val json = correctGuildObj(JSONObject(guildInfo)).toString()
@@ -234,19 +234,19 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         return obj
     }
 
-    suspend fun guildHasInfo(gid: Long): Boolean {
+    fun guildHasInfo(gid: Long): Boolean {
         return get(gid) != null
     }
 
-    suspend fun guildHasInfo(gid: String?): Boolean {
+    fun guildHasInfo(gid: String?): Boolean {
         return get(gid!!) != null
     }
 
-    suspend fun loadGuild(gid: Long) {
+    fun loadGuild(gid: Long) {
         loadGuild(gid.toString(), 0)
     }
 
-    suspend fun loadGuild(gid: String) {
+    fun loadGuild(gid: String) {
         loadGuild(gid, 0)
     }
 
@@ -255,7 +255,7 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
      * @param gid The ID of the guild
      * @param attempt The recursive attempt
      */
-    private suspend fun loadGuild(gid: String, attempt: Int) {
+    private fun loadGuild(gid: String, attempt: Int) {
         var scopedAttempt = attempt
         logger.debug("Attempting to load guild with ID: {}", gid)
         try {
@@ -283,11 +283,11 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
         }
     }
 
-    suspend fun unloadGuild(gid: Long) {
+    fun unloadGuild(gid: Long) {
         del(gid)
     }
 
-    suspend fun loadAllGuilds() {
+    fun loadAllGuilds() {
         logger.debug("Attempting to load all guilds")
         collection.find().forEach { document: Document ->
             val jsonObject = readyGuildObjForRedis(JSONObject(document.toJson()))

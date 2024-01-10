@@ -1,5 +1,6 @@
 package main.commands.slashcommands.audio
 
+import dev.arbjerg.lavalink.protocol.v4.ifPresent
 import dev.minn.jda.ktx.util.SLF4J
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
@@ -43,19 +44,23 @@ class NowPlayingCommand : AbstractSlashCommand(
     override suspend fun handle(event: SlashCommandInteractionEvent) {
         event.deferReply().queue()
 
-
         val guild = event.guild!!
         val memberVoiceState = event.member!!.voiceState!!
         val selfVoiceState = guild.selfMember.voiceState!!
-        val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, true, true)
+        val acChecks = audioChannelChecks(
+            memberVoiceState,
+            selfVoiceState,
+            selfChannelNeeded = true,
+            songMustBePlaying = true,
+        )
         if (acChecks != null) {
-            event.replyEmbed { acChecks }.setEphemeral(true).queue()
+            event.hook.sendEmbed { acChecks }.queue()
             return
         }
 
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player
-        val track = player.playingTrack
+        val track = player?.track
 
         val sendBackupEmbed: suspend () -> Unit = {
             event.hook.sendEmbed(guild) {
@@ -67,7 +72,7 @@ class NowPlayingCommand : AbstractSlashCommand(
             val defaultImage = ThemesConfig(guild).getTheme().nowPlayingBanner
             val builder = NowPlayingImageBuilder(
                 title = track!!.title,
-                artistName = track.author,
+                artistName = track.info.author,
                 albumImage = try {
                     track.artworkUrl ?: defaultImage
                 } catch (e: MissingFieldException) {
@@ -99,7 +104,7 @@ class NowPlayingCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend fun getNowPlayingEmbed(
+    private fun getNowPlayingEmbed(
         guild: Guild,
         channel: GuildMessageChannel,
         selfVoiceState: GuildVoiceState,
@@ -107,7 +112,7 @@ class NowPlayingCommand : AbstractSlashCommand(
     ): MessageEmbed {
         val musicManager = RobertifyAudioManager[guild]
         val player = musicManager.player
-        val track = player.playingTrack
+        val track = player?.track
 
         val embed: MessageEmbed? = when {
             !selfVoiceState.inAudioChannel() -> RobertifyEmbedUtils.embedMessage(
@@ -138,15 +143,15 @@ class NowPlayingCommand : AbstractSlashCommand(
         if (embed != null)
             return embed
 
-        val progress = player.position.toDouble() / track!!.length
-        val filters = player.filters
-        val requester = musicManager.scheduler.findRequester(track.identifier)
+        val progress = player?.position?.toDouble()?.div(track!!.length)
+        val filters = player?.filters
+        val requester = musicManager.scheduler.findRequester(track!!.identifier)
         val localeManager = LocaleManager[guild]
         val embedBuilder = RobertifyEmbedUtils.embedMessageWithTitle(
             guild, localeManager.getMessage(
                 NowPlayingMessages.NP_EMBED_TITLE,
-                Pair("{title}", track.title),
-                Pair("{author}", track.author)
+                Pair("{title}", track.info.title),
+                Pair("{author}", track.info.author)
             ),
             "${
                 if (TogglesConfig(guild).getToggle(Toggle.SHOW_REQUESTER) && requester != null) {
@@ -164,7 +169,7 @@ class NowPlayingCommand : AbstractSlashCommand(
                         GeneralUtils.progressBar(
                             guild,
                             channel,
-                            progress,
+                            progress ?: 0.0,
                             GeneralUtils.ProgressBar.DURATION
                         )
                     }" +
@@ -182,7 +187,7 @@ class NowPlayingCommand : AbstractSlashCommand(
                         GeneralUtils.progressBar(
                             guild,
                             channel,
-                            filters.volume?.toDouble() ?: 0.0,
+                            filters?.volume?.ifPresent { it.toDouble() } ?: 0.0,
                             GeneralUtils.ProgressBar.FILL
                         )
                     } 🔊"

@@ -11,7 +11,7 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
         private val logger by SLF4J
     }
 
-    suspend fun addChannel(channelID: Long, type: ChannelType?) {
+    fun addChannel(channelID: Long, type: ChannelType?) {
         val configField: GuildDB.Field = when (type) {
             ChannelType.TEXT_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_TEXT
             ChannelType.VOICE_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_VOICE
@@ -31,7 +31,7 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
         }
     }
 
-    suspend fun removeChannel(channelID: Long, type: ChannelType?) {
+    fun removeChannel(channelID: Long, type: ChannelType?) {
         val obj = getGuildModel().toJsonObject()
         val configField: GuildDB.Field = when (type) {
             ChannelType.TEXT_CHANNEL -> GuildDB.Field.RESTRICTED_CHANNELS_TEXT
@@ -51,7 +51,7 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
         }
     }
 
-    suspend fun getRestrictedChannels(type: ChannelType?): List<Long> {
+    fun getRestrictedChannels(type: ChannelType?): List<Long> {
         val obj = getGuildModel().restricted_channels
         return when (type) {
             ChannelType.TEXT_CHANNEL -> obj.text_channels
@@ -60,10 +60,10 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
         }
     }
 
-    suspend fun isRestrictedChannel(vcID: Long, type: ChannelType?): Boolean =
+    fun isRestrictedChannel(vcID: Long, type: ChannelType?): Boolean =
         getRestrictedChannels(type).contains(vcID)
 
-    suspend fun restrictedChannelsToString(type: ChannelType?): String =
+    fun restrictedChannelsToString(type: ChannelType?): String =
         getRestrictedChannels(type).joinToString(", ") { channel ->
             "<#$channel>"
         }
@@ -80,5 +80,5 @@ class RestrictedChannelsConfig(private val guild: Guild) : AbstractGuildConfig(g
     }
 
 
-    override suspend fun update() {}
+    override fun update() {}
 }

@@ -1,5 +1,6 @@
 package main.utils
 
+import kotlinx.coroutines.runBlocking
 import main.utils.json.requestchannel.RequestChannelConfig
 import main.utils.locale.LocaleManager
 import main.utils.locale.LocaleMessage
@@ -40,7 +41,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             }
         }
 
-        suspend fun getDefaultEmbed(guild: Guild?): EmbedBuilder {
+        fun getDefaultEmbed(guild: Guild?): EmbedBuilder {
             if (guild == null)
                 return getDefaultEmbed()
 
@@ -62,7 +63,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             guildEmbedSuppliers[0L] = supplier
         }
 
-        suspend fun getEmbedBuilder(guild: Guild?): EmbedBuilder {
+        fun getEmbedBuilder(guild: Guild?): EmbedBuilder {
             if (guild == null)
                 return getDefaultEmbed()
 
@@ -76,18 +77,18 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             }
         }
 
-        suspend fun embedMessage(guild: Guild?, message: String): EmbedBuilder {
+        fun embedMessage(guild: Guild?, message: String): EmbedBuilder {
             val builder = if (guild == null) getDefaultEmbed() else getDefaultEmbed(guild)
             return builder.setDescription(message)
         }
 
-        suspend fun embedMessage(guild: Guild?, message: LocaleMessage): EmbedBuilder {
+        fun embedMessage(guild: Guild?, message: LocaleMessage): EmbedBuilder {
             if (guild == null) return embedMessage(message)
             val localeManager = LocaleManager[guild]
             return getDefaultEmbed(guild).setDescription(localeManager.getMessage(message))
         }
 
-        suspend fun embedMessage(message: LocaleMessage): EmbedBuilder {
+        fun embedMessage(message: LocaleMessage): EmbedBuilder {
             val localeManager = LocaleManager.globalManager()
             return getDefaultEmbed().setDescription(localeManager.getMessage(message))
         }
@@ -96,7 +97,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return getDefaultEmbed().setDescription(message)
         }
 
-        suspend fun embedMessage(
+        fun embedMessage(
             guild: Guild?,
             message: LocaleMessage,
             vararg placeholders: Pair<String, String>
@@ -106,30 +107,30 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
                 .setDescription(localeManager.getMessage(message, *placeholders))
         }
 
-        suspend fun embedMessageWithTitle(guild: Guild?, title: String, message: String): EmbedBuilder {
+        fun embedMessageWithTitle(guild: Guild?, title: String, message: String): EmbedBuilder {
             return getDefaultEmbed(guild).setTitle(title).setDescription(message)
         }
 
-        suspend fun embedMessageWithTitle(guild: Guild?, title: LocaleMessage, message: LocaleMessage): EmbedBuilder {
+        fun embedMessageWithTitle(guild: Guild?, title: LocaleMessage, message: LocaleMessage): EmbedBuilder {
             val localeManager = LocaleManager[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title))
                 .setDescription(localeManager.getMessage(message))
         }
 
-        suspend fun embedMessageWithTitle(guild: Guild?, title: String, message: LocaleMessage): EmbedBuilder {
+        fun embedMessageWithTitle(guild: Guild?, title: String, message: LocaleMessage): EmbedBuilder {
             val localeManager = LocaleManager[guild]
             return getDefaultEmbed(guild).setTitle(title)
                 .setDescription(localeManager.getMessage(message))
         }
 
-        suspend fun embedMessageWithTitle(guild: Guild?, title: LocaleMessage, message: String): EmbedBuilder {
+        fun embedMessageWithTitle(guild: Guild?, title: LocaleMessage, message: String): EmbedBuilder {
             val localeManager = LocaleManager[guild]
             return getDefaultEmbed(guild).setTitle(localeManager.getMessage(title))
                 .setDescription(message)
         }
 
         @SafeVarargs
-        suspend fun embedMessageWithTitle(
+        fun embedMessageWithTitle(
             guild: Guild?,
             title: LocaleMessage,
             message: LocaleMessage,
@@ -141,7 +142,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
         }
 
         @SafeVarargs
-        suspend fun embedMessageWithTitle(
+        fun embedMessageWithTitle(
             guild: Guild?,
             title: String,
             message: LocaleMessage,
@@ -153,7 +154,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
         }
 
         @SafeVarargs
-        suspend fun embedMessageWithTitle(
+        fun embedMessageWithTitle(
             guild: Guild?,
             title: LocaleMessage,
             message: String,
@@ -164,7 +165,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
                 .setDescription(message)
         }
 
-        suspend fun getEphemeralState(channel: GuildMessageChannel, default: Boolean = false): Boolean {
+        fun getEphemeralState(channel: GuildMessageChannel, default: Boolean = false): Boolean {
             val dedicatedChannelConfig = RequestChannelConfig(channel.guild)
             return if (!dedicatedChannelConfig.isChannelSet()) default else dedicatedChannelConfig.getChannelId() == channel.idLong
         }
@@ -174,12 +175,12 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        suspend fun InteractionHook.sendEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): WebhookMessageCreateAction<Message> {
+        fun InteractionHook.sendEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): WebhookMessageCreateAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        suspend fun InteractionHook.sendEmbed(guild: Guild? = null, message: String): WebhookMessageCreateAction<Message> {
+        fun InteractionHook.sendEmbed(guild: Guild? = null, message: String): WebhookMessageCreateAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message))
         }
@@ -189,7 +190,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return editOriginalEmbeds(supplier(embedUtils))
         }
 
-        suspend fun InteractionHook.editEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): WebhookMessageEditAction<Message> {
+        fun InteractionHook.editEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): WebhookMessageEditAction<Message> {
             val embedUtils = getGuildUtils(guild)
             return editOriginalEmbeds(embedUtils.embed(message, *placeholders))
         }
@@ -199,7 +200,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return sendMessageEmbeds(supplier(embedUtils))
         }
 
-        suspend fun MessageChannel.sendEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): MessageCreateAction {
+        fun MessageChannel.sendEmbed(guild: Guild? = null, message: LocaleMessage, vararg placeholders: Pair<String, String>): MessageCreateAction {
             val embedUtils = getGuildUtils(guild)
             return sendMessageEmbeds(embedUtils.embed(message, *placeholders))
         }
@@ -208,7 +209,7 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return this.sendEmbed(guild, supplier)
         }
 
-        suspend fun GuildMessageChannel.sendEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>): MessageCreateAction {
+        fun GuildMessageChannel.sendEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>): MessageCreateAction {
             return this.sendEmbed(guild, message, *placeholders)
         }
 
@@ -222,12 +223,12 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return replyEmbeds(supplier(embedUtils))
         }
 
-        suspend fun IReplyCallback.replyEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(message: LocaleMessage, vararg placeholders: Pair<String, String>): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message, *placeholders))
         }
 
-        suspend fun IReplyCallback.replyEmbed(message: String): ReplyCallbackAction {
+        fun IReplyCallback.replyEmbed(message: String): ReplyCallbackAction {
             val embedUtils = getGuildUtils(guild)
             return replyEmbeds(embedUtils.embed(message))
         }
@@ -237,29 +238,29 @@ class RobertifyEmbedUtils private constructor(private val guild: Guild? = null) 
             return editMessageEmbeds(supplier(embedUtils))
         }
 
-        suspend fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessage, value: LocaleMessage, inline: Boolean = false): EmbedBuilder {
+        fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessage, value: LocaleMessage, inline: Boolean = false): EmbedBuilder {
             val localeManager = LocaleManager[guild]
             return addField(localeManager.getMessage(name), localeManager.getMessage(value), inline)
         }
 
-        suspend fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessage, value: String, inline: Boolean = false): EmbedBuilder {
+        fun EmbedBuilder.addField(guild: Guild? = null, name: LocaleMessage, value: String, inline: Boolean = false): EmbedBuilder {
             val localeManager = LocaleManager[guild]
             return addField(localeManager.getMessage(name), value, inline)
         }
     }
 
-    suspend fun embed(description: LocaleMessage, title: LocaleMessage, vararg placeholders: Pair<String, String>): MessageEmbed =
+    fun embed(description: LocaleMessage, title: LocaleMessage, vararg placeholders: Pair<String, String>): MessageEmbed =
         embedMessageWithTitle(guild, title, description, *placeholders).build()
 
-    suspend fun embed(title: LocaleMessage, description: String, vararg placeholders: Pair<String, String>): MessageEmbed =
+    fun embed(title: LocaleMessage, description: String, vararg placeholders: Pair<String, String>): MessageEmbed =
         embedMessageWithTitle(guild, title, description, *placeholders).build()
 
-    suspend fun embed(description: LocaleMessage, vararg placeholders: Pair<String, String>): MessageEmbed =
+    fun embed(description: LocaleMessage, vararg placeholders: Pair<String, String>): MessageEmbed =
         embedMessage(guild, description, *placeholders).build()
 
-    suspend fun embedBuilder(description: LocaleMessage, vararg placeholders: Pair<String, String>): EmbedBuilder =
+    fun embedBuilder(description: LocaleMessage, vararg placeholders: Pair<String, String>): EmbedBuilder =
         embedMessage(guild, description, *placeholders)
 
-    suspend fun embed(description: String): MessageEmbed =
+    fun embed(description: String): MessageEmbed =
         embedMessage(guild, description).build()
 }

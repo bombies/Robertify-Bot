@@ -45,8 +45,8 @@ class QueueCommand : AbstractSlashCommand(
         trackList.forEachIndexed { i, track ->
             content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),
-                Pair("{title}", track.title),
-                Pair("{author}", track.author),
+                Pair("{title}", track.info.title),
+                Pair("{author}", track.info.author),
                 Pair("{duration}", GeneralUtils.formatTime(track.length))
             ))
         }
@@ -75,8 +75,8 @@ class QueueCommand : AbstractSlashCommand(
         trackList.forEachIndexed { i, track ->
             content.add(localeManager.getMessage(QueueMessages.QUEUE_ENTRY,
                 Pair("{id}", (i + 1).toString()),
-                Pair("{title}", track.title),
-                Pair("{author}", track.author),
+                Pair("{title}", track.info.title),
+                Pair("{author}", track.info.author),
                 Pair("{duration}", GeneralUtils.formatTime(track.length))
             ))
         }

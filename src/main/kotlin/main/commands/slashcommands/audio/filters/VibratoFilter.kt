@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio.filters
 
-import dev.schlaubi.lavakord.audio.player.vibrato
+import dev.arbjerg.lavalink.protocol.v4.Vibrato
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -20,9 +21,9 @@ class VibratoFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Vibrato",
-                filterPredicate = { vibrato != null },
-                filterOn = { vibrato {} },
-                filterOff = { unsetVibrato() }
+                filterPredicate = { vibrato.isNotNull() },
+                filterOn = { setVibrato(Vibrato()) },
+                filterOff = { setVibrato(null) }
             )
         }.queue()
     }

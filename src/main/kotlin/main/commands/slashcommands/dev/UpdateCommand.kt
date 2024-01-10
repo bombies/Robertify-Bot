@@ -99,7 +99,7 @@ class UpdateCommand : AbstractSlashCommand(
             successMsg = "Successfully updated all request channel buttons!",
             errorMsg = "Could not update all request channel buttons!"
         ) {
-            it.updateButtons()?.await()
+            it.updateButtons()
         }
     }
 
@@ -119,7 +119,7 @@ class UpdateCommand : AbstractSlashCommand(
             successMsg = "Successfully updated all request channel topics!",
             errorMsg = "Could not update all request channel topics!"
         ) {
-            it.updateTopic()?.await()
+            it.updateTopic()
         }
     }
 

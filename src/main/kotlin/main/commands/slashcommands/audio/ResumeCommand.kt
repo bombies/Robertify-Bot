@@ -23,17 +23,17 @@ class ResumeCommand : AbstractSlashCommand(SlashCommand(
         event.replyEmbed { handleResume(memberVoiceState, selfVoiceState) }.queue()
     }
 
-    private suspend fun handleResume(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
+    private fun handleResume(memberVoiceState: GuildVoiceState, selfVoiceState: GuildVoiceState): MessageEmbed {
         val acChecks = audioChannelChecks(memberVoiceState, selfVoiceState, songMustBePlaying = true)
         if (acChecks != null) return acChecks
         val guild = selfVoiceState.guild
         val player = RobertifyAudioManager[guild]
-            .player
+            .player!!
 
         if (!player.paused)
             return RobertifyEmbedUtils.embedMessage(guild, PauseMessages.PLAYER_NOT_PAUSED).build()
 
-        player.pause(false)
+        player.setPaused(false)
         LogUtilsKt(guild).sendLog(
             LogType.PLAYER_RESUME,
             PauseMessages.RESUMED_LOG,

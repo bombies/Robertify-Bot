@@ -25,7 +25,7 @@ class AutoPlayCommand : AbstractSlashCommand(
             .queue()
     }
 
-    private suspend fun handleAutoPlay(guild: Guild): MessageEmbed {
+    private fun handleAutoPlay(guild: Guild): MessageEmbed {
         val localeManager = LocaleManager[guild]
         val autoPlayConfig = AutoPlayConfig(guild)
 

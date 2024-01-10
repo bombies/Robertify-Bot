@@ -1,7 +1,8 @@
 package main.commands.slashcommands.audio.filters
 
-import dev.schlaubi.lavakord.audio.player.tremolo
+import dev.arbjerg.lavalink.protocol.v4.Tremolo
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
+import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.component.interactions.slashcommand.models.SlashCommand
@@ -20,9 +21,9 @@ class TremoloFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Tremolo",
-                filterPredicate = { tremolo != null },
-                filterOn = { tremolo {} },
-                filterOff = { unsetTremolo() }
+                filterPredicate = { tremolo.isNotNull() },
+                filterOn = { setTremolo(Tremolo()) },
+                filterOff = { setTremolo(null) }
             )
         }.queue()
     }

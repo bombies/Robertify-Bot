@@ -1,8 +1,7 @@
 package main.commands.slashcommands.audio
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack
-import dev.arbjerg.lavalink.protocol.v4.Track
-import dev.schlaubi.lavakord.audio.player.Player
+import dev.arbjerg.lavalink.client.LavalinkPlayer
+import dev.arbjerg.lavalink.client.protocol.Track
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
@@ -10,8 +9,8 @@ import main.utils.GeneralUtils.isInt
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.sendEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
-import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.component.interactions.slashcommand.models.CommandOption
+import main.utils.component.interactions.slashcommand.models.SlashCommand
 import main.utils.json.logs.LogType
 import main.utils.json.logs.LogUtilsKt
 import main.utils.locale.messages.GeneralMessages
@@ -66,8 +65,8 @@ class JumpCommand : AbstractSlashCommand(
 
         val guild = selfVoiceState.guild
         val musicManager = RobertifyAudioManager[guild]
-        val player = musicManager.player
-        val track = player.playingTrack
+        val player = musicManager.player!!
+        val track = player.track
             ?: return RobertifyEmbedUtils.embedMessage(
                 guild,
                 GeneralMessages.NOTHING_PLAYING
@@ -86,7 +85,7 @@ class JumpCommand : AbstractSlashCommand(
         guild: Guild,
         jumper: User,
         input: String,
-        player: Player,
+        player: LavalinkPlayer,
         track: Track
     ): MessageEmbed {
         var time = if (input.isInt())
@@ -112,7 +111,7 @@ class JumpCommand : AbstractSlashCommand(
                 JumpMessages.JUMP_DURATION_GT_TIME_LEFT
             ).build()
 
-        player.seekTo(player.position + time)
+        player.setPosition(player.position + time)
         LogUtilsKt(guild).sendLog(
             LogType.TRACK_JUMP,
             JumpMessages.JUMPED_LOG,

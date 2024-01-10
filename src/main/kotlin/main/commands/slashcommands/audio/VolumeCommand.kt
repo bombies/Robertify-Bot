@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio
 
-import dev.schlaubi.lavakord.audio.player.applyFilters
+import dev.arbjerg.lavalink.protocol.v4.Filters
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption
 import main.utils.GeneralUtils.isNotNull
@@ -44,7 +44,7 @@ class VolumeCommand : AbstractSlashCommand(
         }.queue()
     }
 
-    private suspend fun handleVolumeChange(
+    private fun handleVolumeChange(
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState,
         volume: Int
@@ -57,10 +57,8 @@ class VolumeCommand : AbstractSlashCommand(
             return RobertifyEmbedUtils.embedMessage(guild, VolumeMessages.INVALID_VOLUME)
                 .build()
 
-        val player = RobertifyAudioManager[guild].player
-        player.applyFilters {
-            this.volume = volume / 100F
-        }
+        val player = RobertifyAudioManager[guild].player!!
+        player.setVolume(volume)
 
         RequestChannelConfig(guild).updateMessage()
 
