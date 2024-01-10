@@ -1,6 +1,7 @@
 package main.utils.database.mongodb.databases
 
 import com.mongodb.client.result.DeleteResult
+import dev.minn.jda.ktx.util.SLF4J
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import main.constants.ENV
@@ -8,8 +9,10 @@ import main.constants.RobertifyTheme
 import main.constants.Toggle
 import main.constants.database.RobertifyMongoDatabase
 import main.main.Config
+import main.main.Robertify
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isDiscordId
+import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.DocumentBuilder
 import main.utils.database.mongodb.cache.redis.guild.GuildDatabaseModel
@@ -23,6 +26,8 @@ import java.util.*
 object GuildDB :
     AbstractMongoDatabase(RobertifyMongoDatabase.ROBERTIFY_DATABASE, RobertifyMongoDatabase.ROBERTIFY_GUILDS) {
 
+    val logger by SLF4J
+
     fun getGuildDocument(gid: Long): Document {
         return DocumentBuilder.create()
             .setObj(GuildDatabaseModel(server_id = gid).toJsonObject())
@@ -34,6 +39,14 @@ object GuildDB :
     fun removeGuild(gid: Long): DeleteResult = when (val doc = findSpecificDocument(Field.GUILD_ID, gid)) {
         null -> throw NullPointerException("There is no guild with the ID $gid in the database already!")
         else -> removeDocument(doc)
+    }
+
+    fun cleanup() {
+        if (Robertify.shardManager.shardsRunning != Config.SHARD_COUNT)
+            throw IllegalStateException("Cannot cleanup guilds until all shards are ready!")
+
+        val guilds = Robertify.shardManager.guilds
+        removeManyDocuments(notIn(Field.GUILD_ID.toString(), *guilds.map { it.idLong }.toTypedArray()))
     }
 
     fun findGuild(gid: Long): Document? = try {

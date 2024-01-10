@@ -4,6 +4,8 @@ import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.messages.send
 import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
+import main.commands.slashcommands.SlashCommandManager
+import main.commands.slashcommands.dev.CleanupGuildsCommand
 import main.events.AbstractEventController
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
@@ -36,7 +38,10 @@ class Listener : AbstractEventController() {
          * @param guild The guild to load the commands in
          */
         internal fun loadNeededSlashCommands(guild: Guild) {
-
+            if (guild.ownerIdLong == Config.OWNER_ID)
+                SlashCommandManager.devCommands.forEach { command ->
+                    command.loadCommand(guild)
+                }
         }
 
         internal fun unloadCommands(guild: Guild, vararg commandNames: String) {

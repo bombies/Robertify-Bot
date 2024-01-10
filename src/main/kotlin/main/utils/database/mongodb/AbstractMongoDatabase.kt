@@ -3,6 +3,7 @@ package main.utils.database.mongodb
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.*
+import com.mongodb.client.result.DeleteResult
 import dev.minn.jda.ktx.util.SLF4J
 import main.constants.database.RobertifyMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
@@ -118,6 +119,10 @@ abstract class AbstractMongoDatabase {
     fun upsertDocument(obj: JSONObject) = upsertDocument(doc = Document.parse(obj.toString()))
 
     protected fun removeDocument(doc: Document) = collection.deleteOne(doc)
+
+    protected fun removeManyDocuments(filter: Bson): DeleteResult {
+        return collection.deleteMany(filter)
+    }
 
     protected fun removeDocument(key: String, value: String) = when {
         !documentExists(key, value) -> throw NullPointerException("There is no such document found with key $key")
@@ -288,5 +293,10 @@ abstract class AbstractMongoDatabase {
     @SafeVarargs
     protected fun <TItem> `in`(key: String, vararg values: TItem): Bson {
         return Filters.`in`(key, *values)
+    }
+
+    @SafeVarargs
+    protected fun <TItem> notIn(key: String, vararg values: TItem): Bson {
+        return Filters.nin(key, *values)
     }
 }

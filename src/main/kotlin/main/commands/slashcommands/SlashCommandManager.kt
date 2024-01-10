@@ -113,11 +113,13 @@ object SlashCommandManager {
         SendAlertCommand(),
         UpdateCommand(),
         PostCommandInfoCommand(),
-        TestSentryCommand()
+        TestSentryCommand(),
+        CleanupGuildsCommand(),
     )
 
     fun SlashCommandInteractionEvent.getRequiredOption(name: String): OptionMapping =
-        this.getOption(name) ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required?")
+        this.getOption(name)
+            ?: throw NullPointerException("Invalid option \"$name\". Are you sure that option is required?")
 
     fun ModalInteractionEvent.getRequiredValue(id: String): ModalMapping =
         this.getValue(id) ?: throw NullPointerException("Invalid value \"$id\". Are you sure that value is required?")
