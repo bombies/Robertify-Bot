@@ -5,8 +5,7 @@ import api.RobertifyKtorApi
 import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
-import dev.arbjerg.lavalink.client.LavalinkClient
-import dev.arbjerg.lavalink.client.TrackStartEvent
+import dev.arbjerg.lavalink.client.*
 import dev.arbjerg.lavalink.client.loadbalancing.RegionGroup
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener
 import dev.minn.jda.ktx.events.CoroutineEventManager
@@ -113,6 +112,23 @@ object Robertify {
             .subscribe { event ->
                 logger.info("LavaLink ready on node ${event.node.name}. Session ID is ${event.sessionId}")
             }
+
+        lavalink.on<TrackStartEvent>().subscribe { event ->
+            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+            musicManager.scheduler.onTrackStart(event)
+        }
+        lavalink.on<TrackEndEvent>().subscribe { event ->
+            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+            musicManager.scheduler.onTrackEnd(event)
+        }
+        lavalink.on<TrackStuckEvent>().subscribe { event ->
+            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+            musicManager.scheduler.onTrackStuck(event)
+        }
+        lavalink.on<TrackExceptionEvent>().subscribe { event ->
+            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+            musicManager.scheduler.onTrackException(event)
+        }
 
         Config.LAVA_NODES.forEach { node ->
             lavalink.addNode(

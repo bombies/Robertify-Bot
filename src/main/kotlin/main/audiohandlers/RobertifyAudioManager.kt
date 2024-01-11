@@ -16,6 +16,7 @@ import main.audiohandlers.loaders.MainAudioLoader
 import main.audiohandlers.loaders.SearchResultLoader
 import main.constants.Toggle
 import main.main.Config
+import main.main.Robertify
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.editEmbed
 import main.utils.json.restrictedchannels.RestrictedChannelsConfig
@@ -84,6 +85,12 @@ object RobertifyAudioManager {
         }
 
     fun getMusicManager(guild: Guild): GuildMusicManager = get(guild)
+
+    fun getMusicManager(guildId: Long): GuildMusicManager {
+        val guild = Robertify.shardManager.getGuildById(guildId)
+        return if (guild != null) getMusicManager(guild) else throw IllegalArgumentException("Guild not found!")
+    }
+
 
     fun removeMusicManager(guild: Guild) {
         guild.jda.directAudioController.disconnect(guild)

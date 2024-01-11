@@ -6,8 +6,9 @@ import main.audiohandlers.GuildMusicManager
 import main.main.Robertify
 import net.dv8tion.jda.api.entities.Guild
 
-abstract class AudioLoader(guild: Guild) {
-    internal val link = Robertify.lavalink.getLink(guild.idLong)
+abstract class AudioLoader(private val guild: Guild) {
+    internal val link
+        get() = Robertify.lavalink.getLink(guild.idLong)
     abstract val query: String
     abstract val musicManager: GuildMusicManager
 

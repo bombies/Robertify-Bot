@@ -9,8 +9,9 @@ import main.utils.json.requestchannel.RequestChannelConfig
 import net.dv8tion.jda.api.entities.Guild
 
 class GuildMusicManager(val guild: Guild) {
-    val link: Link = Robertify.lavalink.getLink(guild.idLong)
-    val scheduler = TrackScheduler(guild, link)
+    val link: Link
+        get() = Robertify.lavalink.getLink(guild.idLong)
+    val scheduler = TrackScheduler(guild)
     val voteSkipManager = GuildVoteSkipManager()
     val player: LavalinkPlayer?
         get() = link.getPlayer().block()

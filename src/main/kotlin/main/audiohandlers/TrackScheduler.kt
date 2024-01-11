@@ -46,13 +46,14 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class TrackScheduler(private val guild: Guild, val link: Link) {
+class TrackScheduler(private val guild: Guild) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val audioManager = RobertifyAudioManager
-        private var EVENTS_SUBSCRIBED = AtomicBoolean(false)
     }
 
+    private val link: Link
+        get() = Robertify.lavalink.getLink(guild.idLong)
     private val requesters = ArrayList<Requester>()
     private var lastSentMsg: Message? = null
     val disconnectManager = GuildDisconnectManager(guild)
@@ -118,28 +119,15 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
         }
     }
 
-    init {
-        logger.debug("Initializing a new TrackScheduler for ${guild.name}...")
-
-        if (!EVENTS_SUBSCRIBED.get()) {
-            logger.info("Subscribing to scheduler events...")
-            val lavalink = Robertify.lavalink
-            lavalink.on<TrackStartEvent>().subscribe { event -> onTrackStart(event) }
-            lavalink.on<TrackEndEvent>().subscribe { event -> onTrackEnd(event) }
-            lavalink.on<TrackStuckEvent>().subscribe { event -> onTrackStuck(event) }
-            lavalink.on<TrackExceptionEvent>().subscribe { event -> onTrackException(event) }
-            EVENTS_SUBSCRIBED.set(true)
-            logger.info("Subscribed to scheduler events")
-        } else logger.debug("Already subscribed scheduler to events")
-    }
-
     @OptIn(ExperimentalSerializationApi::class)
-    private fun onTrackStart(event: TrackStartEvent) {
+    fun onTrackStart(event: TrackStartEvent) {
         val track = event.track
 
         logger.debug(
-            "{} | Track started ({}). Announcement channel: {}",
+            "{} ({}) | Track started in {} ({}). Announcement channel: {}",
             link.state.name,
+            link.guildId,
+            guild.id,
             track.info.title,
             announcementChannel?.id ?: "undefined"
         )
@@ -250,7 +238,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
         }
     }
 
-    private fun onTrackEnd(event: TrackEndEvent) {
+    fun onTrackEnd(event: TrackEndEvent) {
         val reason = event.endReason
 
         logger.debug(
@@ -275,7 +263,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
         }
     }
 
-    private fun onTrackException(event: TrackExceptionEvent) {
+    fun onTrackException(event: TrackExceptionEvent) {
         val exception = event.exception;
         val track = event.track
 
@@ -331,7 +319,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
         }
     }
 
-    private fun onTrackStuck(event: TrackStuckEvent) {
+    fun onTrackStuck(event: TrackStuckEvent) {
         if (!TogglesConfig(guild).getToggle(Toggle.ANNOUNCE_MESSAGES))
             return
 
