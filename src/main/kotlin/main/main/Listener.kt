@@ -10,6 +10,8 @@ import main.events.AbstractEventController
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.database.influxdb.databases.guilds.GuildJoinInfluxDatabase
+import main.utils.database.influxdb.databases.guilds.GuildLeaveInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCache
 import main.utils.json.guildconfig.GuildConfig
 import main.utils.locale.messages.UnbanMessages
@@ -123,6 +125,7 @@ class Listener : AbstractEventController() {
             logger.info("Joined ${guild.name}")
 
             updateServerCount()
+            GuildJoinInfluxDatabase.recordJoin(guild)
         }
 
     private val guildLeaveListener =
@@ -133,6 +136,7 @@ class Listener : AbstractEventController() {
             logger.info("Left ${guild.name}")
 
             updateServerCount()
+            GuildLeaveInfluxDatabase.recordLeave(guild)
         }
 
     private fun updateServerCount() {
