@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters
 
 import dev.arbjerg.lavalink.protocol.v4.Vibrato
+import dev.arbjerg.lavalink.protocol.v4.ifPresentAndNotNull
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -21,7 +22,7 @@ class VibratoFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Vibrato",
-                filterPredicate = { vibrato.isNotNull() },
+                filterPredicate = { vibrato.ifPresentAndNotNull { true } ?: false },
                 filterOn = { setVibrato(Vibrato()) },
                 filterOff = { setVibrato(null) }
             )

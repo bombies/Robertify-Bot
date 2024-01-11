@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters
 
 import dev.arbjerg.lavalink.protocol.v4.Tremolo
+import dev.arbjerg.lavalink.protocol.v4.ifPresentAndNotNull
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -21,7 +22,7 @@ class TremoloFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Tremolo",
-                filterPredicate = { tremolo.isNotNull() },
+                filterPredicate = { tremolo.ifPresentAndNotNull { true } ?: false },
                 filterOn = { setTremolo(Tremolo()) },
                 filterOff = { setTremolo(null) }
             )

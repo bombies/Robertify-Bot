@@ -33,7 +33,7 @@ class ResumeCommand : AbstractSlashCommand(SlashCommand(
         if (!player.paused)
             return RobertifyEmbedUtils.embedMessage(guild, PauseMessages.PLAYER_NOT_PAUSED).build()
 
-        player.setPaused(false)
+        player.setPaused(false).build()
         LogUtilsKt(guild).sendLog(
             LogType.PLAYER_RESUME,
             PauseMessages.RESUMED_LOG,

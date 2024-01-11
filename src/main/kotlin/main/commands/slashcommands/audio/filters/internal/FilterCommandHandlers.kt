@@ -50,7 +50,7 @@ internal inline fun handleGenericFilterToggle(
     val localeManager = LocaleManager[guild]
 
     return if (filterPredicate(filters)) {
-        player.setFilters(filterOff(FilterBuilder()).build())
+        player.setFilters(filterOff(FilterBuilder()).build()).subscribe()
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${
@@ -69,7 +69,7 @@ internal inline fun handleGenericFilterToggle(
             GeneralUtils.Pair("{status}", GeneralMessages.OFF_STATUS, localeManager)
         ).build()
     } else {
-        player.setFilters(filterOn(FilterBuilder()).build())
+        player.setFilters(filterOn(FilterBuilder()).build()).subscribe()
         logUtils.sendLog(
             LogType.FILTER_TOGGLE,
             "${memberVoiceState.member.asMention} ${

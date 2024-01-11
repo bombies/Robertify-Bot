@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters
 
 import dev.arbjerg.lavalink.protocol.v4.Timescale
+import dev.arbjerg.lavalink.protocol.v4.ifPresentAndNotNull
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -21,8 +22,8 @@ class NightcoreFilter : AbstractSlashCommand(
             handleGenericFilterToggle(
                 event = event,
                 filterName = "Nightcore",
-                filterPredicate = { timescale.isNotNull() },
-                filterOn = { setTimescale(Timescale(1.5)) },
+                filterPredicate = { timescale.ifPresentAndNotNull { true } ?: false},
+                filterOn = { setTimescale(Timescale(1.25, 1.5)) },
                 filterOff = { setTimescale(null) }
             )
         }.queue()

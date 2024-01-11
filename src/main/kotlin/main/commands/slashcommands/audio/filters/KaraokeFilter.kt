@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters
 
 import dev.arbjerg.lavalink.protocol.v4.Karaoke
+import dev.arbjerg.lavalink.protocol.v4.ifPresentAndNotNull
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -22,7 +23,7 @@ class KaraokeFilter : AbstractSlashCommand(
                 memberVoiceState = event.member!!.voiceState!!,
                 selfVoiceState = event.guild!!.selfMember.voiceState!!,
                 filterName = "Karaoke",
-                filterPredicate = { karaoke.isNotNull() },
+                filterPredicate = { karaoke.ifPresentAndNotNull { true } ?: false },
                 filterOn = { setKaraoke(Karaoke()) },
                 filterOff = { setKaraoke(null) }
             )

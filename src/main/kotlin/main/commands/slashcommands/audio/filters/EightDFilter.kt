@@ -1,6 +1,7 @@
 package main.commands.slashcommands.audio.filters
 
 import dev.arbjerg.lavalink.protocol.v4.Rotation
+import dev.arbjerg.lavalink.protocol.v4.ifPresentAndNotNull
 import main.commands.slashcommands.audio.filters.internal.handleGenericFilterToggle
 import main.utils.GeneralUtils.isNotNull
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
@@ -28,7 +29,7 @@ class EightDFilter : AbstractSlashCommand(
             memberVoiceState = memberVoiceState,
             selfVoiceState = selfVoiceState,
             filterName = "8D",
-            filterPredicate = { rotation.isNotNull() },
+            filterPredicate = { rotation.ifPresentAndNotNull { it.rotationHz != 0.0 } ?: false },
             filterOn = {
                 setRotation(Rotation(0.05))
             },
