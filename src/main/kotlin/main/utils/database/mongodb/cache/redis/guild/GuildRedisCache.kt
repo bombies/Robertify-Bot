@@ -4,6 +4,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import main.constants.RobertifyPermission
 import main.utils.GeneralUtils
 import main.utils.GeneralUtils.isDiscordId
@@ -51,7 +52,8 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
     }
 
     fun getGuildModel(gid: String): GuildDatabaseModel? {
-        if (!guildHasInfo(gid)) loadGuild(gid)
+        if (!guildHasInfo(gid))
+            loadGuild(gid)
         val guildInfo = get(gid) ?: return null
         val json = correctGuildObj(JSONObject(guildInfo)).toString()
         return Json.decodeFromString(json)
@@ -90,6 +92,19 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
                     .put(GuildDB.Field.RESTRICTED_CHANNELS_VOICE.toString(), rvc)
             )
         }
+
+        if (!obj.has(GuildDB.Field.PERMISSIONS_OBJECT.toString())) {
+            obj.put(GuildDB.Field.PERMISSIONS_OBJECT.toString(), PermissionsModel(
+                emptyList<Long>().toMutableList(),
+                emptyList<Long>().toMutableList(),
+                emptyList<Long>().toMutableList(),
+                emptyList<Long>().toMutableList(),
+                emptyList<Long>().toMutableList(),
+                emptyList<Long>().toMutableList(),
+                JsonObject(emptyMap()),
+            ).toJsonObject())
+        }
+
         val permissionsObj = obj.getJSONObject(GuildDB.Field.PERMISSIONS_OBJECT.toString())
 
         for (code in RobertifyPermission.codes) {
@@ -257,20 +272,20 @@ class GuildRedisCache private constructor() : DatabaseRedisCache("ROBERTIFY_GUIL
      */
     private fun loadGuild(gid: String, attempt: Int) {
         var scopedAttempt = attempt
-        logger.info("Attempting to load guild with ID: {}", gid)
+        logger.debug("Attempting to load guild with ID: {}", gid)
         try {
             val guildJSON: String? = mongoDB.getDocument(GuildDB.Field.GUILD_ID.toString(), gid.toLong())
             if (guildJSON != null) {
                 val guildObj = readyGuildObjForRedis(JSONObject(guildJSON))
                 setex(gid, 3600, guildObj)
-                logger.info("Loaded guild with ID: {}", gid)
+                logger.debug("Loaded guild with ID: {}", gid)
             }
         } catch (e: Exception) {
             when (e) {
                 is NullPointerException,
                 is NoSuchElementException -> {
                     if (scopedAttempt == 2) return
-                    logger.info(
+                    logger.debug(
                         "Guild with ID {} didn't exist in the database. Attempting to add and reload.",
                         gid
                     )

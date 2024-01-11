@@ -203,7 +203,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
         val musicManager = RobertifyAudioManager[guild]
 
         musicManager.usePlayer { audioPlayer ->
-            val playingTrack = audioPlayer?.track
+            val playingTrack = audioPlayer.track
             val queueHandler = musicManager.scheduler.queueHandler
             val queueAsList = ArrayList(queueHandler.contents)
 

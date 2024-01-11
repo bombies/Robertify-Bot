@@ -18,7 +18,13 @@ class LogUtilsKt(private val guild: Guild) {
         if (!config.channelIsSet()) return
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val channel = config.getChannel()
-        channel!!.sendMessageEmbeds(
+
+        if (channel == null) {
+            config.removeChannel()
+            return;
+        }
+
+        channel.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
                 .setColor(type.color)
@@ -33,7 +39,13 @@ class LogUtilsKt(private val guild: Guild) {
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
         val channel = config.getChannel()
-        channel!!.sendMessageEmbeds(
+
+        if (channel == null) {
+            config.removeChannel()
+            return;
+        }
+
+        channel.sendMessageEmbeds(
             EmbedBuilder()
                 .setTitle(type.emoji.formatted + " " + type.title)
                 .setColor(type.color)
@@ -49,8 +61,14 @@ class LogUtilsKt(private val guild: Guild) {
         if (!TogglesConfig(guild).getLogToggle(type)) return
         val localeManager = LocaleManager[guild]
         val channel = config.getChannel()
+
+        if (channel == null) {
+            config.removeChannel()
+            return;
+        }
+
         try {
-            channel!!.sendMessageEmbeds(
+            channel.sendMessageEmbeds(
                 EmbedBuilder()
                     .setTitle(type.emoji.formatted + " " + type.title)
                     .setColor(type.color)

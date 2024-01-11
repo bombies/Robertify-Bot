@@ -28,8 +28,10 @@ class GuildMusicManager(val guild: Guild) {
         queueHandler.clearSavedQueue()
         queueHandler.clearPreviousTracks()
 
-        link.createOrUpdatePlayer()
-            .setFilters(Filters())
+        if (link.getPlayer().block() != null)
+            link.updatePlayer {
+                it.setFilters(Filters())
+            }.subscribe()
 
         queueHandler.trackRepeating = false
         queueHandler.queueRepeating = false

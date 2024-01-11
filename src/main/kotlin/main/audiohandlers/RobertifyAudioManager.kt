@@ -172,7 +172,8 @@ object RobertifyAudioManager {
             addToBeginning = addToBeginning,
             announceMsg = announceMessage,
             botMsg = botMessage,
-            loadPlaylistShuffled = shuffled
+            loadPlaylistShuffled = shuffled,
+            _announcementChannel = botMessage?.channel?.asGuildMessageChannel()
         ).loadItem()
     }
 

@@ -1,6 +1,7 @@
 package main.events
 
 import dev.minn.jda.ktx.util.SLF4J
+import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.RobertifyAudioManager
 import main.main.Robertify
 import main.utils.json.guildconfig.GuildConfig
@@ -13,17 +14,21 @@ class VoiceChannelEvents : AbstractEventController() {
 
     private val onGuildVoiceUpdate =
         onEvent<GuildVoiceUpdateEvent> { event ->
+            val guild = event.guild
+            val self = guild.selfMember
+            if (event.member.id != self.id)
+                return@onEvent
+
             try {
-                val guild = event.guild
                 val channelLeft = event.channelLeft
                 val channelJoined = event.channelJoined
-                val self = guild.selfMember
                 val selfVoiceState = self.voiceState!!
                 val guildMusicManager = RobertifyAudioManager[guild]
 
                 // If the bot has left voice channels entirely
-                if (event.member.id == self.id && (channelLeft != null && channelJoined == null))
+                if (channelLeft != null && channelJoined == null) {
                     return@onEvent guildMusicManager.clear()
+                }
 
                 if (!selfVoiceState.inAudioChannel())
                     return@onEvent

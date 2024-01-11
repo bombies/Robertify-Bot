@@ -207,8 +207,18 @@ object Robertify {
     private fun ShardManager.handleGuildReady() = listener<GuildReadyEvent> { event ->
         val guild = event.guild
         loadNeededSlashCommands(guild)
-        rescheduleUnbans(guild)
-        RemindersConfig(guild).scheduleReminders()
+
+        try {
+            rescheduleUnbans(guild)
+        } catch (e: Exception) {
+            logger.error("Failed to reschedule unbans for guild ${guild.id}", e)
+        }
+
+        try {
+            RemindersConfig(guild).scheduleReminders()
+        } catch (e: Exception) {
+            logger.error("Failed to schedule reminders for guild ${guild.id}", e)
+        }
 //        GuildResumeManager(guild).loadTracks()
     }
 

@@ -133,7 +133,7 @@ class UpdateCommand : AbstractSlashCommand(
         }
     }
 
-    private suspend inline fun handleGenericUpdate(
+    private inline fun handleGenericUpdate(
         event: SlashCommandInteractionEvent,
         successMsg: String,
         errorMsg: String,

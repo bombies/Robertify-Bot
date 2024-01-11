@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -50,7 +50,7 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
         private val audioManager = RobertifyAudioManager
-        private var EVENTS_SUBSCRIBED = false
+        private var EVENTS_SUBSCRIBED = AtomicBoolean(false)
     }
 
     private val requesters = ArrayList<Requester>()
@@ -66,7 +66,9 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
     }
 
     fun playTrack(track: Track) {
-        this.link.createOrUpdatePlayer().setTrack(track)
+        this.link
+            .createOrUpdatePlayer()
+            .setTrack(track)
             .subscribe()
     }
 
@@ -119,15 +121,15 @@ class TrackScheduler(private val guild: Guild, val link: Link) {
     init {
         logger.debug("Initializing a new TrackScheduler for ${guild.name}...")
 
-        if (!EVENTS_SUBSCRIBED) {
-            logger.debug("Subscribing to scheduler events...")
+        if (!EVENTS_SUBSCRIBED.get()) {
+            logger.info("Subscribing to scheduler events...")
             val lavalink = Robertify.lavalink
             lavalink.on<TrackStartEvent>().subscribe { event -> onTrackStart(event) }
             lavalink.on<TrackEndEvent>().subscribe { event -> onTrackEnd(event) }
             lavalink.on<TrackStuckEvent>().subscribe { event -> onTrackStuck(event) }
             lavalink.on<TrackExceptionEvent>().subscribe { event -> onTrackException(event) }
-            EVENTS_SUBSCRIBED = true
-            logger.debug("Subscribed to scheduler events")
+            EVENTS_SUBSCRIBED.set(true)
+            logger.info("Subscribed to scheduler events")
         } else logger.debug("Already subscribed scheduler to events")
     }
 

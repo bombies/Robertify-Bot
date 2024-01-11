@@ -236,7 +236,7 @@ class RemindersConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         getUser(uid) != null
 
     fun scheduleReminders() {
-        logger.debug("Attempting to schedule guild reminders for ${guild.name}")
+        logger.debug("Attempting to schedule guild reminders for ${guild.name} (${guild.id})")
         val scheduler = ReminderScheduler(guild)
 
         if (!guildHasReminders()) {
