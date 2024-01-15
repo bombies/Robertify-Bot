@@ -22,11 +22,16 @@ class ShardInfoCommand : AbstractSlashCommand(
         val shardManager = event.jda.shardManager!!
         val shardCache = shardManager.shardCache
         val shards = shardCache.asList().reversed()
+        val restPings = mutableListOf<Long>()
 
         shards.forEach { shard ->
+            val restPing = shard.restPing.complete()
+            restPings.add(restPing)
+
             val description = """
                 **Status:** ${shard.shardStatus}
-                **Ping:** ${shard.gatewayPing}
+                **Gateway Ping:** ${shard.gatewayPing}
+                **REST Ping:** $restPing
                 **Guilds:** ${shard.guildCache.size()}
             """.trimIndent()
 
@@ -43,14 +48,18 @@ class ShardInfoCommand : AbstractSlashCommand(
         }
 
         val connectedShards = shardCache.count { it.status == JDA.Status.CONNECTED }
-        val avgPing = shardManager.averageGatewayPing.roundToInt()
+        val avgGatewayPing = shardManager.averageGatewayPing.roundToInt()
+        val avgRestPing = restPings.average().roundToInt()
         val guilds = shardManager.guildCache.size()
 
-        embedBuilder.addField("Total/Average", """
+        embedBuilder.addField(
+            "Total/Average", """
             **Connected:** $connectedShards
-            **Ping:** $avgPing
+            **Gateway Ping:** $avgGatewayPing
+            **REST Ping:** $avgRestPing
             **Guilds:** $guilds
-        """.trimIndent(), false)
+        """.trimIndent(), false
+        )
 
         event.replyEmbeds(embedBuilder.build())
             .setEphemeral(true)
