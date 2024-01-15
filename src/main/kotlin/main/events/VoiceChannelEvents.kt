@@ -22,7 +22,7 @@ class VoiceChannelEvents : AbstractEventController() {
                 val channelJoined = event.channelJoined
                 val selfVoiceState = self.voiceState!!
                 val member = event.member
-                val guildMusicManager = RobertifyAudioManager[guild]
+                val guildMusicManager = RobertifyAudioManager.getExistingMusicManager(guild) ?: return@onEvent
                 val guildDisconnector = guildMusicManager.scheduler.disconnectManager
 
                 // If the bot has left voice channels entirely
