@@ -29,10 +29,10 @@ class ShardInfoCommand : AbstractSlashCommand(
             restPings.add(restPing)
 
             val description = """
-                **Status:** ${shard.shardStatus}
-                **Gateway Ping:** ${shard.gatewayPing}
-                **REST Ping:** $restPing
-                **Guilds:** ${shard.guildCache.size()}
+                - Status: `${shard.shardStatus}`
+                - Gateway Ping: `${shard.gatewayPing}`
+                - REST Ping: `$restPing`
+                - Guilds: `${shard.guildCache.size()}`
             """.trimIndent()
 
             val shardId = shard.shardInfo.shardId
@@ -54,10 +54,10 @@ class ShardInfoCommand : AbstractSlashCommand(
 
         embedBuilder.addField(
             "Total/Average", """
-            **Connected:** $connectedShards
-            **Gateway Ping:** $avgGatewayPing
-            **REST Ping:** $avgRestPing
-            **Guilds:** $guilds
+            - Connected: `$connectedShards`
+            - Gateway Ping: `$avgGatewayPing`
+            - REST Ping: `$avgRestPing`
+            - Guilds: `$guilds`
         """.trimIndent(), false
         )
 
