@@ -13,9 +13,9 @@ import kotlin.time.Duration.Companion.minutes
 class GuildDisconnectManager(private val guild: Guild) {
     companion object {
         private val logger = LoggerFactory.getLogger(Companion::class.java)
+        private val executorService = Executors.newSingleThreadScheduledExecutor()
     }
 
-    private val executorService = Executors.newSingleThreadScheduledExecutor()
     private var scheduledDisconnect: ScheduledFuture<*>? = null
 
     /**
@@ -24,10 +24,6 @@ class GuildDisconnectManager(private val guild: Guild) {
      * @param duration The time the bot should wait before disconnect. Default to 5 minutes
      */
     fun scheduleDisconnect(duration: Duration = 5.minutes, announceMsg: Boolean = true) {
-        val botVoiceState = guild.selfMember.voiceState
-        if (botVoiceState == null || !botVoiceState.inAudioChannel())
-            return
-
         logger.debug("${guild.name} | Starting scheduled disconnect")
 
         if (GuildConfig(guild).getTwentyFourSevenMode()) {
@@ -39,14 +35,16 @@ class GuildDisconnectManager(private val guild: Guild) {
         logger.debug("${guild.name} | Cleared any previously scheduled disconnects")
 
         val job = executorService.schedule({
-            runBlocking {
-                RobertifyAudioManager
-                    .getMusicManager(guild)
-                    .scheduler
-                    .disconnect(announceMsg)
-                logger.debug("${guild.name} | Bot disconnected.")
-                scheduledDisconnect = null
-            }
+            val botVoiceState = guild.selfMember.voiceState
+            if (botVoiceState == null || !botVoiceState.inAudioChannel())
+                return@schedule
+
+            RobertifyAudioManager
+                .getMusicManager(guild)
+                .scheduler
+                .disconnect(announceMsg)
+            logger.debug("${guild.name} | Bot disconnected.")
+            scheduledDisconnect = null
         }, duration.inWholeMilliseconds, TimeUnit.MILLISECONDS)
 
         scheduledDisconnect = job
