@@ -7,7 +7,8 @@ enum class InfluxDatabase {
     TRACK_STATS,
     PLAYER_STATS,
     GUILD_JOINS,
-    GUILD_LEAVES;
+    GUILD_LEAVES,
+    GUILD_COUNT;
 
     override fun toString(): String = "${name.lowercase()}-${Config.ENVIRONMENT}"
 }

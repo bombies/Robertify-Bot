@@ -10,6 +10,7 @@ import main.events.AbstractEventController
 import main.utils.GeneralUtils
 import main.utils.RobertifyEmbedUtils
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
+import main.utils.database.influxdb.databases.guilds.GuildCountInfluxDatabase
 import main.utils.database.influxdb.databases.guilds.GuildJoinInfluxDatabase
 import main.utils.database.influxdb.databases.guilds.GuildLeaveInfluxDatabase
 import main.utils.database.mongodb.cache.BotDBCache
@@ -139,11 +140,13 @@ class Listener : AbstractEventController() {
             GuildLeaveInfluxDatabase.recordLeave(guild)
         }
 
-    private fun updateServerCount() {
+    private suspend fun updateServerCount() {
         val serverCount = Robertify.shardManager.guilds.size
 
         BotDBCache.instance.setGuildCount(serverCount)
         if (Robertify.topGGAPI != null)
             Robertify.topGGAPI!!.setStats(serverCount)
+
+        GuildCountInfluxDatabase.recordCount(serverCount)
     }
 }
