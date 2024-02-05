@@ -8,13 +8,11 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.arbjerg.lavalink.client.*
 import dev.arbjerg.lavalink.client.loadbalancing.RegionGroup
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener
-import dev.minn.jda.ktx.events.CoroutineEventManager
-import dev.minn.jda.ktx.events.getDefaultScope
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.minn.jda.ktx.util.SLF4J
 import io.sentry.Sentry
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 import main.audiohandlers.RobertifyAudioManager
 import main.commands.slashcommands.SlashCommandManager
 import main.commands.slashcommands.SlashCommandManager.registerCommands
@@ -22,37 +20,24 @@ import main.constants.ENV
 import main.events.EventManager
 import main.main.Listener.Companion.loadNeededSlashCommands
 import main.main.Listener.Companion.rescheduleUnbans
-import main.utils.GeneralUtils
-import main.utils.GeneralUtils.isNull
 import main.utils.api.robertify.RobertifyApi
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand
 import main.utils.database.mongodb.AbstractMongoDatabase
 import main.utils.database.mongodb.cache.BotDBCache
-import main.utils.database.mongodb.cache.redis.guild.GuildRedisCache
-import main.utils.database.mongodb.databases.GuildDB
-import main.utils.json.locale.LocaleConfig
 import main.utils.json.reminders.RemindersConfig
-import main.utils.json.requestchannel.RequestChannelConfig
-import main.utils.locale.LocaleManager
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
-import net.dv8tion.jda.api.entities.GuildVoiceState
 import net.dv8tion.jda.api.events.guild.GuildReadyEvent
 import net.dv8tion.jda.api.events.session.ReadyEvent
-import net.dv8tion.jda.api.events.session.ShutdownEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder
 import net.dv8tion.jda.api.sharding.ShardManager
-import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 import org.discordbots.api.client.DiscordBotListAPI
 import org.quartz.SchedulerException
 import org.quartz.impl.StdSchedulerFactory
-import org.yaml.snakeyaml.reader.ReaderException
 import java.util.*
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 object Robertify {
     private val logger by SLF4J

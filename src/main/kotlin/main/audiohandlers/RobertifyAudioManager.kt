@@ -119,7 +119,7 @@ object RobertifyAudioManager {
     fun removeMusicManager(guild: Guild) {
         if (musicManagers.containsKey(guild.idLong)) {
             guild.jda.directAudioController.disconnect(guild)
-            musicManagers[guild.idLong]!!.link.destroyPlayer().subscribe()
+            musicManagers[guild.idLong]!!.link.destroy().subscribe()
             musicManagers.remove(guild.idLong)
         }
     }
