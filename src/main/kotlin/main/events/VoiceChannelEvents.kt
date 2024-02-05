@@ -16,25 +16,27 @@ class VoiceChannelEvents : AbstractEventController() {
         onEvent<GuildVoiceUpdateEvent> { event ->
             val guild = event.guild
             val self = guild.selfMember
-            if (event.member.id != self.id)
-                return@onEvent
 
             try {
                 val channelLeft = event.channelLeft
                 val channelJoined = event.channelJoined
                 val selfVoiceState = self.voiceState!!
-                val guildMusicManager = RobertifyAudioManager[guild]
+                val member = event.member
+                val guildMusicManager = RobertifyAudioManager.getExistingMusicManager(guild) ?: return@onEvent
+                val guildDisconnector = guildMusicManager.scheduler.disconnectManager
 
                 // If the bot has left voice channels entirely
-                if (channelLeft != null && channelJoined == null) {
-                    return@onEvent guildMusicManager.clear()
+                if (member.id == self.id && channelLeft != null && channelJoined == null) {
+                    return@onEvent run {
+                        guildDisconnector.cancelDisconnect()
+                        guildMusicManager.clear()
+                    }
                 }
 
                 if (!selfVoiceState.inAudioChannel())
                     return@onEvent
 
                 val guildConfig = GuildConfig(guild)
-                val guildDisconnector = guildMusicManager.scheduler.disconnectManager
 
                 /*
                  * If the user left voice channels entirely or
@@ -42,13 +44,15 @@ class VoiceChannelEvents : AbstractEventController() {
                  * disconnect the bot unless 24/7 mode is enabled.
                  */
                 if (
-                    ((channelJoined == null && channelLeft != null) || (channelJoined != null && channelLeft != null))
+                    (member.id != self.id
+                            && ((channelJoined == null && channelLeft != null) || (channelJoined != null && channelLeft != null)))
                     && channelLeft.id == selfVoiceState.channel!!.id
                 ) {
-                    if (guildConfig.getTwentyFourSevenMode() || guildDisconnector.disconnectScheduled() || channelLeft.members.size > 1)
+                    if (guildConfig.getTwentyFourSevenMode() || channelLeft.members.size > 1)
                         return@onEvent
-                    guildMusicManager.player?.setPaused(true)
-                    guildDisconnector.scheduleDisconnect()
+                    guildMusicManager.player?.setPaused(true)?.subscribe()
+                    if (!guildDisconnector.disconnectScheduled())
+                        guildDisconnector.scheduleDisconnect()
                 }
 
                 /*
@@ -57,13 +61,12 @@ class VoiceChannelEvents : AbstractEventController() {
                  * cancel the disconnect and resume playing the song if
                  * the song is paused.
                  */
-                else if (channelJoined != null && channelJoined.id == selfVoiceState.channel!!.id && guildDisconnector.disconnectScheduled()) {
+                else if (member.id != self.id && channelJoined != null && channelJoined.id == selfVoiceState.channel!!.id) {
                     guildDisconnector.cancelDisconnect()
-                    guildMusicManager.player?.setPaused(false)
-
+                    guildMusicManager.player?.setPaused(false)?.subscribe()
                 }
             } catch (e: UninitializedPropertyAccessException) {
-                logger.warn("Tried handling voice channel events before LavaKord was setup!")
+                logger.warn("Tried handling voice channel events before LavaLink was setup!")
             }
         }
 }

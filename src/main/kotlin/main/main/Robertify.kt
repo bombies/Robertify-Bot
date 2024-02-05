@@ -210,6 +210,7 @@ object Robertify {
         if (Config.hasValue(ENV.ROBERTIFY_API_PASSWORD))
             externalApi = RobertifyApi()
 
+        RobertifyAudioManager.scheduleCleanup()
         RobertifyKtorApi.start()
     }
 

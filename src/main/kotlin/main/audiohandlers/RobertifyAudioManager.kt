@@ -33,10 +33,13 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import net.dv8tion.jda.api.interactions.InteractionHook
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 object RobertifyAudioManager {
     private val logger by SLF4J
-    val musicManagers: MutableMap<Long, GuildMusicManager> = Collections.synchronizedMap(mutableMapOf())
+    val musicManagers: MutableMap<Long, GuildMusicManager> = ConcurrentHashMap()
     val playerManager: AudioPlayerManager
     private val spotifySourceManager: SpotifySourceManager
     private var deezerAudioSourceManager: DeezerAudioSourceManager? = null
@@ -78,11 +81,32 @@ object RobertifyAudioManager {
         AudioSourceManagers.registerRemoteSources(playerManager)
     }
 
+    fun scheduleCleanup() {
+        logger.info("Starting music manager cleanup scheduler!")
+        Executors.newSingleThreadScheduledExecutor()
+            .scheduleAtFixedRate({
+                var cleanedUp = 0
+                musicManagers.forEach { (_, musicManager) ->
+                    val guild = musicManager.guild
+                    if (musicManager.link.state == LinkState.DISCONNECTED || guild.selfMember.voiceState?.inAudioChannel() != true) {
+                        logger.debug("Cleaning up music manager for ${guild.name}")
+                        removeMusicManager(guild)
+                        cleanedUp++
+                    }
+                }
+                logger.info("Cleaned up $cleanedUp music manager${if (cleanedUp == 1) "" else "s"}.")
+            }, 5, 5, TimeUnit.MINUTES)
+    }
+
     operator fun get(guild: Guild): GuildMusicManager =
         musicManagers.computeIfAbsent(guild.idLong) {
             logger.debug("Creating new music manager for ${guild.name}")
             GuildMusicManager(guild)
         }
+
+    fun getExistingMusicManager(guild: Guild) = musicManagers[guild.idLong]
+
+    fun getExistingMusicManager(guildId: Long) = musicManagers[guildId]
 
     fun getMusicManager(guild: Guild): GuildMusicManager = get(guild)
 
@@ -93,11 +117,11 @@ object RobertifyAudioManager {
 
 
     fun removeMusicManager(guild: Guild) {
-        guild.jda.directAudioController.disconnect(guild)
-        musicManagers[guild.idLong]?.link?.destroyPlayer()
-            ?.subscribe {
-                musicManagers.remove(guild.idLong)
-            }
+        if (musicManagers.containsKey(guild.idLong)) {
+            guild.jda.directAudioController.disconnect(guild)
+            musicManagers[guild.idLong]!!.link.destroyPlayer().subscribe()
+            musicManagers.remove(guild.idLong)
+        }
     }
 
     fun loadAndPlay(
