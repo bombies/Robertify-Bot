@@ -121,6 +121,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun handleGeneralToggleList(guild: Guild): MessageEmbed {
         val config = TogglesConfig(guild)
         val toggleIds = StringBuilder()
@@ -393,6 +394,7 @@ class TogglesCommand : AbstractSlashCommand(
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun getLogTogglesEmbed(guild: Guild): MessageEmbed {
         val config = TogglesConfig(guild)
         val logTypes = LogType.entries.toTypedArray()
