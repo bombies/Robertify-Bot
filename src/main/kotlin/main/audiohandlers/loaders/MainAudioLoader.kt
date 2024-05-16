@@ -1,8 +1,8 @@
 package main.audiohandlers.loaders
 
 import com.github.topi314.lavasrc.spotify.SpotifySourceManager
-import dev.arbjerg.lavalink.client.protocol.Track
-import dev.arbjerg.lavalink.client.protocol.TrackException
+import dev.arbjerg.lavalink.client.player.Track
+import dev.arbjerg.lavalink.client.player.TrackException
 import dev.arbjerg.lavalink.protocol.v4.PlaylistInfo
 import dev.minn.jda.ktx.coroutines.await
 import dev.minn.jda.ktx.events.getDefaultScope
@@ -218,7 +218,7 @@ class MainAudioLoader(
         handleMessageUpdate(embed)
 
         musicManager.usePlayer { player ->
-            if (queueHandler.isEmpty && player?.track== null)
+            if (queueHandler.isEmpty && player?.track == null)
                 scheduler.scheduleDisconnect(1.seconds, false)
         }
     }

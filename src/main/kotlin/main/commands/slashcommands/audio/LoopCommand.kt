@@ -1,10 +1,8 @@
 package main.commands.slashcommands.audio
 
-import dev.arbjerg.lavalink.client.LavalinkPlayer
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer
 import main.audiohandlers.GuildMusicManager
 import main.audiohandlers.RobertifyAudioManager
-import main.audiohandlers.utils.author
-import main.audiohandlers.utils.title
 import main.utils.RobertifyEmbedUtils
 import main.utils.RobertifyEmbedUtils.Companion.replyEmbed
 import main.utils.component.interactions.slashcommand.AbstractSlashCommand

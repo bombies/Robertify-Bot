@@ -6,6 +6,10 @@ import com.adamratzman.spotify.SpotifyAppApi
 import com.adamratzman.spotify.spotifyAppApi
 import com.google.common.util.concurrent.ThreadFactoryBuilder
 import dev.arbjerg.lavalink.client.*
+import dev.arbjerg.lavalink.client.event.TrackEndEvent
+import dev.arbjerg.lavalink.client.event.TrackExceptionEvent
+import dev.arbjerg.lavalink.client.event.TrackStartEvent
+import dev.arbjerg.lavalink.client.event.TrackStuckEvent
 import dev.arbjerg.lavalink.client.loadbalancing.RegionGroup
 import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener
 import dev.minn.jda.ktx.events.listener
@@ -93,35 +97,39 @@ object Robertify {
         // Setup LavaLink
         logger.info("Setting up LavaLink...")
         lavalink = LavalinkClient(getIdFromToken(Config.BOT_TOKEN).toLong())
-        lavalink.on<dev.arbjerg.lavalink.client.ReadyEvent>()
+        lavalink.on<dev.arbjerg.lavalink.client.event.ReadyEvent>()
             .subscribe { event ->
                 logger.info("LavaLink ready on node ${event.node.name}. Session ID is ${event.sessionId}")
             }
-
-        lavalink.on<TrackStartEvent>().subscribe { event ->
-            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
-            musicManager.scheduler.onTrackStart(event)
-        }
-        lavalink.on<TrackEndEvent>().subscribe { event ->
-            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
-            musicManager.scheduler.onTrackEnd(event)
-        }
-        lavalink.on<TrackStuckEvent>().subscribe { event ->
-            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
-            musicManager.scheduler.onTrackStuck(event)
-        }
-        lavalink.on<TrackExceptionEvent>().subscribe { event ->
-            val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
-            musicManager.scheduler.onTrackException(event)
-        }
+        logger.debug("LavaLink ReadyEvent registered.")
 
         Config.LAVA_NODES.forEach { node ->
-            lavalink.addNode(
-                address = node.uri,
-                password = node.password,
-                name = node.name,
-                regionFilter = RegionGroup.US
+            val lavaNode = lavalink.addNode(
+                NodeOptions.Builder(
+                    serverUri = node.uri,
+                    password = node.password,
+                    name = node.name,
+                    regionFilter = RegionGroup.US
+                ).build()
             )
+
+            lavaNode.on<TrackStartEvent>().subscribe { event ->
+                val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+                musicManager.scheduler.onTrackStart(event)
+            }
+            lavaNode.on<TrackEndEvent>().subscribe { event ->
+                val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+                musicManager.scheduler.onTrackEnd(event)
+            }
+            lavaNode.on<TrackStuckEvent>().subscribe { event ->
+                val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+                musicManager.scheduler.onTrackStuck(event)
+            }
+            lavaNode.on<TrackExceptionEvent>().subscribe { event ->
+                val musicManager = RobertifyAudioManager.getMusicManager(event.guildId)
+                musicManager.scheduler.onTrackException(event)
+            }
+
             logger.info("Registered lava node with address: ${node.uri}")
         }
 

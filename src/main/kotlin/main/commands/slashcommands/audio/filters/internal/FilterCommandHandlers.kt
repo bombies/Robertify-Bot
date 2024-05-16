@@ -1,6 +1,6 @@
 package main.commands.slashcommands.audio.filters.internal
 
-import dev.arbjerg.lavalink.client.protocol.FilterBuilder
+import dev.arbjerg.lavalink.client.player.FilterBuilder
 import dev.arbjerg.lavalink.protocol.v4.Filters
 import main.audiohandlers.RobertifyAudioManager
 import main.utils.GeneralUtils

@@ -1,7 +1,7 @@
 package main.commands.slashcommands.audio
 
-import dev.arbjerg.lavalink.client.LavalinkPlayer
-import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer
+import dev.arbjerg.lavalink.client.player.Track
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.length
 import main.commands.slashcommands.SlashCommandManager.getRequiredOption

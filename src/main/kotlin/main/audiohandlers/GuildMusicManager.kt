@@ -1,8 +1,7 @@
 package main.audiohandlers
 
-import dev.arbjerg.lavalink.client.LavalinkPlayer
 import dev.arbjerg.lavalink.client.Link
-import dev.arbjerg.lavalink.protocol.v4.Filters
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer
 import main.commands.slashcommands.audio.SkipCommand
 import main.main.Robertify
 import main.utils.json.requestchannel.RequestChannelConfig
@@ -10,7 +9,7 @@ import net.dv8tion.jda.api.entities.Guild
 
 class GuildMusicManager(val guild: Guild) {
     val link: Link
-        get() = Robertify.lavalink.getLink(guild.idLong)
+        get() = Robertify.lavalink.getOrCreateLink(guild.idLong)
     val scheduler = TrackScheduler(guild)
     val voteSkipManager = GuildVoteSkipManager()
     val player: LavalinkPlayer?

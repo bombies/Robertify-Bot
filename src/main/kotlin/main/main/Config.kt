@@ -70,7 +70,10 @@ class Config {
                     }
                 ret
             } catch (e: NullPointerException) {
+                logger.warn("No LavaLink nodes were provided!")
                 emptyList()
+            } catch (e: Exception) {
+                throw e
             }
 
         val YOUTUBE_ENABLED: Boolean

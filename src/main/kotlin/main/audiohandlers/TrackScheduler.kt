@@ -1,7 +1,12 @@
 package main.audiohandlers
 
 import dev.arbjerg.lavalink.client.*
-import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.event.TrackEndEvent
+import dev.arbjerg.lavalink.client.event.TrackExceptionEvent
+import dev.arbjerg.lavalink.client.event.TrackStartEvent
+import dev.arbjerg.lavalink.client.event.TrackStuckEvent
+import dev.arbjerg.lavalink.client.player.LavalinkPlayer
+import dev.arbjerg.lavalink.client.player.Track
 import dev.arbjerg.lavalink.protocol.v4.TrackInfo
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,7 +46,6 @@ import org.slf4j.LoggerFactory
 import java.io.InputStream
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -53,7 +57,7 @@ class TrackScheduler(private val guild: Guild) {
     }
 
     private val link: Link
-        get() = Robertify.lavalink.getLink(guild.idLong)
+        get() = Robertify.lavalink.getOrCreateLink(guild.idLong)
     private val requesters = ArrayList<Requester>()
     private var lastSentMsg: Message? = null
     val disconnectManager = GuildDisconnectManager(guild)

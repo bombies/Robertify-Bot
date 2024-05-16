@@ -14,8 +14,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>22</kotlin.compiler.jvmTarget>
-        <maven.compiler.target>22</maven.compiler.target>
+        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <maven.compiler.target>17</maven.compiler.target>
         <kotlin.version>1.9.24</kotlin.version>
         <ktor.version>2.3.11</ktor.version>
         <koin.version>3.5.6</koin.version>
@@ -26,6 +26,11 @@
     </properties>
 
     <repositories>
+        <repository>
+            <id>TopiWTF-releases</id>
+            <name>Topis Maven Repo</name>
+            <url>https://maven.topi.wtf/releases</url>
+        </repository>
         <repository>
             <id>mavenCentral</id>
             <url>https://repo.maven.apache.org/maven2/</url>
@@ -108,8 +113,13 @@
             <version>1.4.3</version>
         </dependency>
         <dependency>
-            <groupId>com.github.TopiSenpai.LavaSrc</groupId>
+            <groupId>com.github.topi314.lavasrc</groupId>
             <artifactId>lavasrc</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.topi314.lavasrc</groupId>
+            <artifactId>protocol-jvm</artifactId>
             <version>4.1.0</version>
         </dependency>
         <dependency>

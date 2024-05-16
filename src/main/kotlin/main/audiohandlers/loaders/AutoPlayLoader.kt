@@ -1,7 +1,7 @@
 package main.audiohandlers.loaders
 
-import dev.arbjerg.lavalink.client.protocol.Track
-import dev.arbjerg.lavalink.client.protocol.TrackException
+import dev.arbjerg.lavalink.client.player.Track
+import dev.arbjerg.lavalink.client.player.TrackException
 import dev.arbjerg.lavalink.protocol.v4.PlaylistInfo
 import dev.minn.jda.ktx.util.SLF4J
 import main.audiohandlers.GuildMusicManager

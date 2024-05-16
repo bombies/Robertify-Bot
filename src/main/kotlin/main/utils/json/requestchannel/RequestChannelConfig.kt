@@ -1,8 +1,6 @@
 package main.utils.json.requestchannel
 
 import dev.arbjerg.lavalink.protocol.v4.ifPresent
-import dev.minn.jda.ktx.coroutines.await
-import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import main.audiohandlers.RobertifyAudioManager
 import main.audiohandlers.utils.artworkUrl

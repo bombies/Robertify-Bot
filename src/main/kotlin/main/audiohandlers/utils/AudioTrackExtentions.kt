@@ -1,6 +1,6 @@
 package main.audiohandlers.utils
 
-import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.player.Track
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 
