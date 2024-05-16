@@ -147,6 +147,7 @@ class PermissionsCommand : AbstractSlashCommand(
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     private suspend fun handleList(event: SlashCommandInteractionEvent, subCommandName: String) {
         val guild = event.guild!!
         val config = PermissionsConfig(guild)
