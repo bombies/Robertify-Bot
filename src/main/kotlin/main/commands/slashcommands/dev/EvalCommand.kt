@@ -34,7 +34,7 @@ class EvalCommand : AbstractSlashCommand(
         val logger by SLF4J
     }
 
-    val engine: ScriptEngine = ScriptEngineManager().getEngineByName("nashorn")
+    private val engine: ScriptEngine = ScriptEngineManager().getEngineByName("nashorn")
 
     init {
         try {

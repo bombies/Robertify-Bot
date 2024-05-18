@@ -596,6 +596,7 @@ class RequestChannelConfig(private val guild: Guild, private val shardManager: S
             }
         }
 
+        @OptIn(ExperimentalStdlibApi::class)
         private fun initConfig() {
             val config: JSONObject = mainConfig.getGuildModel().toJsonObject()
                 .getJSONObject(GuildDB.Field.REQUEST_CHANNEL_OBJECT.toString())

@@ -39,22 +39,20 @@ import java.util.concurrent.TimeUnit
 
 object RobertifyAudioManager {
     private val logger by SLF4J
-    val musicManagers: MutableMap<Long, GuildMusicManager> = ConcurrentHashMap()
-    val playerManager: AudioPlayerManager
-    private val spotifySourceManager: SpotifySourceManager
+    private val musicManagers = ConcurrentHashMap<Long, GuildMusicManager>()
+    private val playerManager: AudioPlayerManager = DefaultAudioPlayerManager()
+    private val spotifySourceManager: SpotifySourceManager = SpotifySourceManager(
+        Config.providers,
+        Config.SPOTIFY_CLIENT_ID,
+        Config.SPOTIFY_CLIENT_SECRET,
+        "us",
+        playerManager
+    )
     private var deezerAudioSourceManager: DeezerAudioSourceManager? = null
     private var appleMusicSourceManager: AppleMusicSourceManager? = null
 //    private val resumeSourceManager: ResumeSourceManager
 
     init {
-        playerManager = DefaultAudioPlayerManager()
-        spotifySourceManager = SpotifySourceManager(
-            Config.providers,
-            Config.SPOTIFY_CLIENT_ID,
-            Config.SPOTIFY_CLIENT_SECRET,
-            "us",
-            playerManager
-        )
 
 
 //        resumeSourceManager = ResumeSourceManager(playerManager)

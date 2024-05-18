@@ -1,4 +1,4 @@
-import dev.arbjerg.lavalink.client.protocol.Track
+import dev.arbjerg.lavalink.client.player.Track
 import dev.arbjerg.lavalink.protocol.v4.TrackInfo
 import main.audiohandlers.models.Requester
 import main.audiohandlers.utils.identifier

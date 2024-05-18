@@ -95,6 +95,7 @@ class PermissionsConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
         return ret
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     fun getRolesForPermission(p: String): List<Long> {
         if (!RobertifyPermission.permissions.contains(p.uppercase(Locale.getDefault())))
             throw NullPointerException("There is no enum with the name \"$p\"")

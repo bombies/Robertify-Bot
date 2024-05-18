@@ -190,6 +190,7 @@ class TogglesConfig(private val guild: Guild) : AbstractGuildConfig(guild) {
 
     fun getTogglesJson(): JSONObject = getToggles().toJsonObject()
 
+    @OptIn(ExperimentalStdlibApi::class)
     override fun update() {
         if (!guildHasInfo()) loadGuild()
         val cacheArr = GuildDBCache.ins.getCache()

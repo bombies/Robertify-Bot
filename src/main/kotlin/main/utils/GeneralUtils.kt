@@ -713,7 +713,7 @@ object GeneralUtils {
         val newString = this.substring(0, this.length.coerceAtMost(if (addEllipse) max - 3 else max))
 
         return if (addEllipse)
-            newString.replaceRange(newString.length - 3..<newString.length, "...")
+            newString.replaceRange(newString.length - 3 until newString.length, "...")
         else newString
     }
 

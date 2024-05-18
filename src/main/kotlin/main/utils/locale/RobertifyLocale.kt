@@ -16,6 +16,7 @@ enum class RobertifyLocale(
 
     companion object {
 
+        @OptIn(ExperimentalStdlibApi::class)
         val availableLanguages: List<RobertifyLocale>
             get() = entries
 

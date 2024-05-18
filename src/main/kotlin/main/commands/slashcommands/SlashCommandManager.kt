@@ -104,7 +104,7 @@ object SlashCommandManager {
 
     val devCommands: List<AbstractSlashCommand> = listOf(
         ManageSuggestionsCommand(),
-        EvalCommand(),
+//        EvalCommand(),
         ShardInfoCommand(),
         NodeInfoCommand(),
         RandomMessageCommand(),

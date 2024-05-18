@@ -86,7 +86,15 @@ class SkipCommand : AbstractSlashCommand(
         } else {
             val musicManager = RobertifyAudioManager[guild]
             val tracksToSkip = event.getRequiredOption("to").asLong.toInt()
-            event.hook.sendMessageEmbeds(handleSkip(event.user, musicManager, tracksToSkip))
+            event.hook.sendMessageEmbeds(
+                handleSkip(
+                    event.user,
+                    selfVoiceState,
+                    memberVoiceState,
+                    musicManager,
+                    tracksToSkip
+                )
+            )
                 .queue()
         }
     }
@@ -114,9 +122,19 @@ class SkipCommand : AbstractSlashCommand(
         return RobertifyEmbedUtils.embedMessage(guild, SkipMessages.SKIPPED).build()
     }
 
-    fun handleSkip(skipper: User, musicManager: GuildMusicManager, id: Int): MessageEmbed {
+    private fun handleSkip(
+        skipper: User,
+        selfVoiceState: GuildVoiceState,
+        memberVoiceState: GuildVoiceState,
+        musicManager: GuildMusicManager,
+        id: Int
+    ): MessageEmbed {
         val scheduler = musicManager.scheduler
         val queueHandler = scheduler.queueHandler
+
+        val checksEmbed = audioChannelChecks(selfVoiceState, memberVoiceState, songMustBePlaying = false)
+        if (checksEmbed != null)
+            return checksEmbed
 
         if (id > queueHandler.size || id <= 0)
             return RobertifyEmbedUtils.embedMessage(
@@ -125,6 +143,7 @@ class SkipCommand : AbstractSlashCommand(
             ).build()
 
         val player = musicManager.player
+
         val playingTrack = player!!.track!!
         val guild = musicManager.guild
         val currentQueue = queueHandler.contents.toMutableList()
@@ -139,7 +158,7 @@ class SkipCommand : AbstractSlashCommand(
         return RobertifyEmbedUtils.embedMessage(musicManager.guild, "Skipped to **track #$id**!").build()
     }
 
-    fun handleVoteSkip(
+    private fun handleVoteSkip(
         channel: GuildMessageChannel,
         selfVoiceState: GuildVoiceState,
         memberVoiceState: GuildVoiceState
